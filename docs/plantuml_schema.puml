@@ -1,0 +1,322 @@
+@startuml wine_marketplace_schema
+
+skinparam linetype ortho
+skinparam roundcorner 6
+hide empty methods
+
+' v1.0.0
+
+' ─────────────────────────────────────────
+'  ENTITIES
+' ─────────────────────────────────────────
+
+entity "Users" {
+  * id              : uuid <<PK>>
+  --
+  * fname                : varchar(30)
+  * lname                : varchar(30)
+  * email                : text <<unique>>
+  * email_verified        : boolean
+  * hashed_password      : varchar(256)
+  * role                 : enum
+  shipping_address_id    : uuid <<FK>>
+  billing_address_id     : uuid <<FK>>
+  * created_at           : timestamp
+  updated_at             : timestamp
+  deleted_at             : timestamp
+}
+
+entity "Addresses" {
+  * id             : uuid <<PK>>
+  --
+  * country        : varchar(50)
+  * city           : varchar(255)
+  * postal_code    : varchar(20)
+  * street         : varchar(255)
+  * house_number   : varchar(20)
+  * created_at     : timestamp
+  updated_at       : timestamp
+  deleted_at       : timestamp
+}
+
+entity "Sessions" {
+  * id          : uuid <<PK>>
+  --
+  * user_id     : uuid <<FK>>
+  * token       : text <<unique>>
+  * role        : enum
+  * created_at  : timestamp
+  * expires_at  : timestamp
+}
+
+entity "Winemakers" {
+  * id           : uuid <<PK>>
+  --
+  * user_id      : uuid <<FK, unique>>
+  * name         : text <<unique>>
+  * description  : text
+  websiteurl     : text
+  * email        : varchar(255)
+  * phone        : varchar(30)
+  * address_id   : uuid <<FK>>
+  * created_at   : timestamp
+  updated_at     : timestamp
+  deleted_at     : timestamp
+}
+
+entity "Wines" {
+  * id               : uuid <<PK>>
+  --
+  * winemaker_id     : uuid <<FK>>
+  * name             : varchar(255)
+  * description      : text
+  * composition      : text
+  * attribution      : text
+  * vintage_year     : smallint
+  * type             : text
+  * color            : varchar(40)
+  * alcohol_content  : decimal(4,2)
+  * volum_ml         : smallint
+  * quantity         : smallint
+  * created_at       : timestamptz
+  * updated_at       : timestamptz
+}
+
+entity "Shops" {
+  * id              : uuid <<PK>>
+  --
+  * owner_user_id   : uuid <<FK>>
+  * name            : varchar(255)
+  * description     : text
+  * address_id      : uuid <<FK>>
+  * created_at      : timestamp
+  updated_at        : timestamp
+  deleted_at        : timestamp
+}
+
+entity "Products" {
+  * id             : uuid <<PK>>
+  --
+  * winemaker_id   : uuid <<FK>>
+  * shop_id        : uuid <<FK>>
+  * name           : varchar(255)
+  description      : text
+  * price          : numeric(10,2)
+  * quantity       : smallint
+  * created_at     : timestamp
+  updated_at       : timestamp
+  deleted_at       : timestamp
+}
+
+entity "Product_wines" {
+  * id          : uuid <<PK>>
+  --
+  * product_id  : uuid <<FK>>
+  * wine_id     : uuid <<FK>>
+  * quantity    : smallint
+}
+
+entity "Carts" {
+  * id          : uuid <<PK>>
+  --
+  * user_id     : uuid <<FK>>
+  * created_at  : timestamptz
+  * updated_at  : timestamptz
+}
+
+entity "Cart_items" {
+  * id          : uuid <<PK>>
+  --
+  * cart_id     : uuid <<FK>>
+  * product_id  : uuid <<FK>>
+  * quantity    : smallint
+  * created_at  : timestamptz
+  * updated_at  : timestamptz
+}
+
+entity "Orders" {
+  * id                      : uuid <<PK>>
+  --
+  * user_id                 : uuid <<FK>>
+  * total_price             : numeric(10,2)
+  * created_at              : timestamp
+  updated_at                : timestamp
+  deleted_at                : timestamp
+  * status                  : varchar(255)
+  * delivery_type           : varchar(255)
+  * shipping_country        : varchar(50)
+  * shipping_city           : varchar(255)
+  * shipping_postal_code    : varchar(20)
+  * shipping_street         : varchar(255)
+  * shipping_house_number   : varchar(20)
+  * billing_country         : varchar(50)
+  * billing_city            : varchar(255)
+  * billing_postal_code     : varchar(20)
+  * billing_street          : varchar(255)
+  * billing_house_number    : varchar(20)
+}
+
+entity "Order_items" {
+  * id                       : uuid <<PK>>
+  --
+  * shop_id                  : uuid <<FK>>
+  * order_id                 : uuid <<FK>>
+  * product_id               : uuid <<FK>>
+  * quantity                 : smallint
+  * unit_price_at_purchase   : numeric(10,2)
+}
+
+entity "Events" {
+  * id            : uuid <<PK>>
+  --
+  * winemaker_id  : uuid <<FK>>
+  * name          : varchar(255)
+  description     : text
+  * address_id    : uuid <<FK>>
+  * start_time    : timestamptz
+  * end_time      : timestamptz
+  * created_at    : timestamp
+  deleted_at      : timestamp
+  * invite_type   : varchar(255)
+  * visibility    : varchar(255)
+}
+
+entity "Event_invites" {
+  * id                   : uuid <<PK>>
+  --
+  * event_id             : uuid <<FK>>
+  * winemaker_id_invited : uuid <<FK>>
+  * token                : uuid <<unique>>
+  * created_at           : timestamp
+  * expires_at           : timestamp
+  * status               : varchar(255)
+}
+
+entity "Comments" {
+  * id          : uuid <<PK>>
+  --
+  * event_id    : uuid <<FK>>
+  * user_id     : uuid <<FK>>
+  * body        : text
+  * created_at  : timestamp
+  deleted_at    : timestamp
+}
+
+entity "Product_reviews" {
+  * id          : uuid <<PK>>
+  --
+  * user_id     : uuid <<FK>>
+  * product_id  : uuid <<FK>>
+  * rating      : smallint
+  body          : text
+  * created_at  : timestamp
+  updated_at    : timestamp
+  deleted_at    : timestamp
+}
+
+entity "Winemaker_reviews" {
+  * id             : uuid <<PK>>
+  --
+  * user_id        : uuid <<FK>>
+  * winemaker_id   : uuid <<FK>>
+  * rating         : smallint
+  body             : text
+  * created_at     : timestamp
+  updated_at       : timestamp
+  deleted_at       : timestamp
+}
+
+entity "Availability_regular" {
+  * id             : uuid <<PK>>
+  --
+  winemaker_id     : uuid <<FK>>
+  shop_id          : uuid <<FK>>
+  * dow            : smallint
+  * start_time     : timestamptz
+  * end_time       : timestamptz
+  * valid_from     : date
+  valid_to         : date
+  * type           : varchar(255)
+}
+
+entity "Availability_exceptions" {
+  * id           : uuid <<PK>>
+  --
+  winemaker_id   : uuid <<FK>>
+  shop_id        : uuid <<FK>>
+  * starts_at    : timestamptz
+  * ends_at      : timestamptz
+  * action       : varchar(255)
+  reason         : text
+}
+
+entity "Images" {
+  * id           : uuid <<PK>>
+  --
+  * url          : text
+  alt_text       : text
+  * entity_type  : varchar(50)
+  * entity_id    : uuid
+  sort_order     : integer
+  * created_at   : timestamp
+  updated_at     : timestamp
+}
+
+' ─────────────────────────────────────────
+'  RELATIONSHIPS
+' ─────────────────────────────────────────
+
+' Users ↔ Addresses (two named FKs)
+Users }o--|| Addresses : "shipping_address"
+Users }o--|| Addresses : "billing_address"
+
+' Users ↔ core entities
+Users ||--o{ Sessions           : ""
+Users ||--|| Winemakers         : ""
+Users ||--o{ Shops              : "owner"
+Users ||--|| Carts              : ""
+Users ||--o{ Orders             : ""
+Users ||--o{ Comments           : ""
+Users ||--o{ Product_reviews    : ""
+Users ||--o{ Winemaker_reviews  : ""
+
+' Winemakers
+Winemakers }o--|| Addresses             : ""
+Winemakers ||--o{ Wines                 : ""
+Winemakers ||--o{ Events                : ""
+Winemakers ||--o{ Winemaker_reviews     : ""
+Winemakers ||--o{ Availability_regular  : ""
+Winemakers ||--o{ Availability_exceptions : ""
+
+' Shops
+Shops }o--|| Addresses               : ""
+Shops ||--o{ Products                 : ""
+Shops ||--o{ Order_items              : ""
+Shops ||--o{ Availability_regular     : ""
+Shops ||--o{ Availability_exceptions  : ""
+
+' Products
+Products }o--|| Winemakers      : ""
+Products ||--o{ Product_wines   : ""
+Products ||--o{ Cart_items      : ""
+Products ||--o{ Order_items     : ""
+Products ||--o{ Product_reviews : ""
+
+' Wines
+Wines ||--o{ Product_wines : ""
+
+' Carts
+Carts ||--o{ Cart_items : ""
+
+' Orders
+Orders ||--o{ Order_items : ""
+
+' Events
+Events }o--|| Addresses      : ""
+Events ||--o{ Event_invites  : ""
+Events ||--o{ Comments       : ""
+
+' Event_invites
+Winemakers ||--o{ Event_invites : "invited"
+
+@enduml
