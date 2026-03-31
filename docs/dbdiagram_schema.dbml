@@ -1,4 +1,3 @@
-//######### v1.0.0 #########
 
 Table Users {
   id uuid [pk]
