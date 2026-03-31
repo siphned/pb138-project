@@ -1,4 +1,46 @@
 
+Enum order_status {
+  pending
+  confirmed
+  shipped
+  delivered
+  cancelled
+}
+
+Enum delivery_type {
+  pickup
+  shipping
+}
+
+Enum event_visibility {
+  public
+  private
+}
+
+Enum event_invite_status {
+  pending
+  accepted
+  declined
+  expired
+}
+
+Enum wine_color {
+  red
+  white
+  rosé
+  orange
+  gray
+  tawny
+  yellow
+}
+
+Enum wine_type {
+  still
+  sparkling
+  fortified
+  dessert
+}
+
 Table Users {
   id uuid [pk]
   fname varchar(30) [not null]
@@ -36,13 +78,14 @@ Table Wines {
   composition text [not null]
   attribution text [not null]
   vintage_year smallint [not null]
-  type text [not null]
-  color varchar(40) [not null]
+  type wine_type [not null]
+  color wine_color [not null]
   alcohol_content decimal(4,2) [not null]
   volume_ml smallint [not null]
   quantity smallint [not null]
   created_at timestamptz [not null]
   updated_at timestamptz [not null]
+  deleted_at timestamptz
 }
 
 Table Sessions {
@@ -116,7 +159,7 @@ Table Events {
   created_at timestamp [not null]
   deleted_at timestamp
   invite_type varchar(255) [not null]
-  visibility varchar(255) [not null]
+  visibility event_visibility [not null]
 }
 
 Table Event_invites {
@@ -126,7 +169,7 @@ Table Event_invites {
   token uuid [not null, unique]
   created_at timestamp [not null]
   expires_at timestamp [not null]
-  status varchar(255) [not null]
+  status event_invite_status [not null]
 }
 
 Table Orders {
@@ -136,20 +179,10 @@ Table Orders {
   created_at timestamp [not null]
   updated_at timestamp
   deleted_at timestamp
-  status varchar(255) [not null]
-  delivery_type varchar(255) [not null]
-  
-  shipping_country varchar(50) [not null]
-  shipping_city varchar(255) [not null]
-  shipping_postal_code varchar(20) [not null]
-  shipping_street varchar(255) [not null]
-  shipping_house_number varchar(20) [not null]
-
-  billing_country varchar(50) [not null]
-  billing_city varchar(255) [not null]
-  billing_postal_code varchar(20) [not null]
-  billing_street varchar(255) [not null]
-  billing_house_number varchar(20) [not null]
+  status order_status [not null]
+  delivery_type delivery_type [not null]
+  shipping_address_id uuid [not null]
+  billing_address_id uuid [not null]
 }
 
 Table Product_wines {
@@ -275,5 +308,7 @@ Ref: Events.address_id > Addresses.id
 Ref: Product_wines.wine_id > Wines.id
 Ref: Product_wines.product_id > Products.id
 Ref: Orders.user_id > Users.id
+Ref: Orders.shipping_address_id > Addresses.id
+Ref: Orders.billing_address_id > Addresses.id
 Ref: Order_items.order_id > Orders.id
 
