@@ -22,15 +22,8 @@ WineMarket je webová platforma určená na prepojenie malých vinárov so záka
 - Vytvoriť funkčnú webovú aplikáciu priblížujúcu sa produkčnej kvalite
 - Prepojiť malých vinárov priamo so zákazníkmi bez nutnosti medzičlánku
 - Ponúknuť transparentné a bohaté informácie o vínach, vinároch, shopoch a eventoch
-- Umožniť pohodlný nákup vína online s flexibilnými možnosťami odberu
 
-
-## 4. Kontext
-
-Malí vinári nemajú efektívnu platformu, kde by mohli priamo osloviť zákazníkov, prezentovať svoje vína a organizovať degustačné podujatia. WineMarket vypĺňa túto medzeru vytvorením centralizovaného miesta, kde sa stretáva ponuka a dopyt v segmente prémiových a remeselných vín.
-
-
-## 5. Predpoklady
+## 4. Predpoklady
 
 **Technické:**
 - Platba je simulovaná — nie je integrovaná reálna platobná brána (napr. Stripe)
@@ -42,15 +35,9 @@ Malí vinári nemajú efektívnu platformu, kde by mohli priamo osloviť zákazn
 - Jeden Shop môže ponúkať produkty od viacerých Winemakeroch
 - Zákazník môže mať pri nákupe rôzne produkty z viacerých shopov v jednom košíku
 
-**Obsah:**
-- Obrázky produktov, vinárov a shopov sú ukladané ako URL referencie (polymorfná `Images` tabuľka — vzor `entity_type` + `entity_id`)
-- Recenzie a komentáre píšu len prihlásení používatelia; Admin ich môže moderovať
-- Adresa objednávky sa vždy zmrazí v čase vytvorenia (nová kópia záznamu) — zmena profilu spätne neovplyvní existujúce objednávky
+## 5. Používateľské role
 
-
-## 6. Používateľské role
-
-### 6.1 Neprihlásený používateľ (Guest)
+### 5.1 Neprihlásený používateľ (Guest)
 - Prehliadanie katalógu vín, vinárov a shopov
 - Filtrovanie podľa regiónu, typu vína, farby, ročníka, cenovej kategórie a otváracích hodín
 - Zobrazenie detailu vína — popis, zloženie, chuťový profil, fotky, priemerné hodnotenie, shopy kde sa predáva
@@ -59,25 +46,26 @@ Malí vinári nemajú efektívnu platformu, kde by mohli priamo osloviť zákazn
 - Prezeranie recenzií
 - Zobrazenie nadchádzajúcich eventov a ich detailu
 - Správa košíka — pridávanie, odoberanie, zmena množstva
-- Pre checkout a registráciu na eventy je potrebné prihlásenie (guest checkout je otvorená otázka)
+- Pre checkout a registráciu na eventy je potrebné prihlásenie
 
-### 6.2 Registrovaný používateľ (Customer)
+### 5.2 Registrovaný používateľ (Customer)
 - Všetky práva neprihláseneho používateľa
 - Dokončenie objednávky (checkout) — výber osobného odberu alebo doručenia na adresu
 - Správa vlastných objednávok — história a aktuálny stav
 - Registrácia na degustačné eventy
-- Písanie recenzií vín, produktov a vinárov (1–5 hviezd + text)
+- Písanie recenzií produktov a vinárov (1–5 hviezd + text)
 - Komentovanie eventov
 - Správa vlastného profilu — meno, uložené adresy, heslo
+- Podanie žiadosti o rolu Winemaker alebo Shop Owner
 
-### 6.3 Winemaker
+### 5.3 Winemaker
 - Všetky práva registrovaného používateľa
 - Správa profilu vinárstva — bio, región, fotky
 - Pridávanie a editácia vín v katalógu (Wine — ročník, odroda, chuťový profil, fotky)
 - Vytváranie a správa degustačných eventov (podliehajú schváleniu adminom)
 - Dashboard vlastnej aktivity (TBD — rozsah otvorený)
 
-### 6.4 Shop Owner
+### 5.4 Shop Owner
 - Všetky práva registrovaného používateľa
 - Správa profilu shopu — názov, adresa, fotky
 - Nastavenie otváracích hodín (regular availability) a výnimiek (availability exceptions)
@@ -86,9 +74,10 @@ Malí vinári nemajú efektívnu platformu, kde by mohli priamo osloviť zákazn
 - Správa a prehľad prichádzajúcich objednávok, zmena stavov objednávok
 - Dashboard shopu (TBD — rozsah otvorený)
 
-### 6.5 Administrátor (Staff)
+### 5.5 Administrátor (Staff)
 - Plný prístup do back-office rozhrania
 - Správa používateľov — zobrazenie, deaktivácia účtov
+- Schvaľovanie a zamietanie žiadostí o rolu Winemaker / Shop Owner
 - Schvaľovanie a zamietanie eventov navrhnutých Winemakermi
 - Moderácia recenzií a komentárov
 - Správa shopov a produktov naprieč platformou
@@ -96,31 +85,35 @@ Malí vinári nemajú efektívnu platformu, kde by mohli priamo osloviť zákazn
 
 ---
 
-## 7. Funkčné požiadavky
+## 6. Funkčné požiadavky
 
-### 7.1 Autentifikácia a autorizácia
+### 6.1 Autentifikácia a autorizácia
 
 | ID | User story |
 |---|---|
-| AU-1 | Ako Guest chcem sa zaregistrovať emailom a heslom, aby som mohol nakupovať a interagovať s platformou |
+| AU-1 | Ako Guest chcem sa zaregistrovať emailom a heslom, prípadne cez inú službu (Google, ...), aby som mohol nakupovať a interagovať s platformou |
 | AU-2 | Ako Guest chcem dostať potvrdzovací email po registrácii |
 | AU-3 | Ako registrovaný používateľ chcem sa prihlásiť a odhlásiť |
 | AU-4 | Ako registrovaný používateľ chcem zmeniť heslo |
 | AU-5 | Ako Admin chcem mať prístup do back-office, do ktorého bežní používatelia nemajú prístup |
+| AU-6 | Ako Customer chcem podať žiadosť o rolu Winemaker vyplnením formulára s detailmi vinárstva |
+| AU-7 | Ako Customer chcem podať žiadosť o rolu Shop Owner vyplnením formulára s detailmi shopu |
+| AU-8 | Ako Customer chcem byť notifikovaný emailom o schválení alebo zamietnutí mojej žiadosti |
 
 **Systémové požiadavky:**
-- Heslá hashované algoritmom bcrypt
-- Autentifikácia pomocou JWT tokenov; session uložená v `Sessions` tabuľke
+- Hashované heslá
+- Autentifikácia; session uložená v `Sessions` tabuľke
 - RBAC — každá rola má presne definované oprávnenia
-- Spôsob získania roly Winemaker / Shop Owner je TBD (viď otvorené otázky)
+- Rola Winemaker / Shop Owner sa získava žiadosťou (AU-6/AU-7); aktivuje sa až po schválení adminom
+- Jeden používateľ môže mať súčasne rolu Winemaker aj Shop Owner
 
 ---
 
-### 7.2 Katalóg a vyhľadávanie
+### 6.2 Katalóg a vyhľadávanie
 
 | ID | User story |
 |---|---|
-| CA-1 | Ako Guest chcem prehľadávať zoznam vín a filtrovať ich podľa: regiónu, typu (červené/biele/ružové/šumivé), farby, ročníka a cenovej kategórie |
+| CA-1 | Ako Guest chcem prehľadávať zoznam vín a filtrovať ich podľa: regiónu, typu (červené/biele/ružové/šumivé/...), farby, ročníka a cenovej kategórie |
 | CA-2 | Ako Guest chcem zobraziť detail vína s popisom, zložením, chuťovým profilom, fotografiami, priemerným hodnotením a zoznamom shopov, kde sa dané víno predáva |
 | CA-3 | Ako Guest chcem prehľadávať winemakeroch a zobraziť profil vinárstva s portfóliom vín |
 | CA-4 | Ako Guest chcem prehľadávať shopy a filtrovať ich podľa otváracích hodín |
@@ -130,11 +123,11 @@ Malí vinári nemajú efektívnu platformu, kde by mohli priamo osloviť zákazn
 
 ---
 
-### 7.3 WineBundle
+### 6.3 WineBundle
 
 | ID | User story |
 |---|---|
-| WB-1 | Ako Shop Owner chcem vytvoriť tematický balíček viacerých vín (WineBundle) so zvýhodnenou cenou |
+| WB-1 | Ako Shop Owner chcem vytvoriť tematický balíček viacerých vín (WineBundle) s vlastnou cenou |
 | WB-2 | Ako Shop Owner chcem editovať a mazať vlastné WineBundles |
 | WB-3 | Ako Guest chcem zobraziť detail WineBundlu s obsahom a cenou |
 
@@ -144,7 +137,7 @@ Malí vinári nemajú efektívnu platformu, kde by mohli priamo osloviť zákazn
 
 ---
 
-### 7.4 Eventy
+### 6.4 Eventy
 
 | ID | User story |
 |---|---|
@@ -152,7 +145,7 @@ Malí vinári nemajú efektívnu platformu, kde by mohli priamo osloviť zákazn
 | EV-2 | Ako Guest chcem zobraziť detail eventu s miestom, časom, kapacitou a komentármi |
 | EV-3 | Ako Customer chcem sa zaregistrovať na event; systém kontroluje kapacitu a zabraňuje duplicitnej registrácii |
 | EV-4 | Ako Customer chcem zanechať komentár pod eventom |
-| EV-5 | Ako Winemaker chcem navrhnúť degustačný event s názvom, popisom, miestom, dátumom a kapacitou |
+| EV-5 | Ako Winemaker chcem navrhnúť event s názvom, popisom, miestom, dátumom a kapacitou |
 | EV-6 | Ako Winemaker chcem spravovať vlastné eventy (editácia, zrušenie) |
 | EV-7 | Ako Admin chcem schváliť alebo zamietnuť navrhnutý event pred jeho zverejnením |
 
@@ -163,7 +156,7 @@ Malí vinári nemajú efektívnu platformu, kde by mohli priamo osloviť zákazn
 
 ---
 
-### 7.5 Košík a objednávky
+### 6.5 Košík a objednávky
 
 | ID | User story |
 |---|---|
@@ -172,7 +165,7 @@ Malí vinári nemajú efektívnu platformu, kde by mohli priamo osloviť zákazn
 | OR-3 | Ako Guest/Customer chcem vidieť aktuálnu cenu košíka v reálnom čase |
 | OR-4 | Ako Customer chcem dokončiť objednávku (checkout) s výberom: osobný odber alebo doručenie na adresu |
 | OR-5 | Ako Customer chcem zvoliť adresu doručenia (nová alebo uložená z profilu) |
-| OR-6 | Ako Customer chcem dostať emailové potvrdenie objednávky |
+| OR-6 | Ako Customer chcem dostať emailové potvrdenie po vytvorení objednávky |
 | OR-7 | Ako Customer chcem sledovať stav svojich objednávok |
 | OR-8 | Ako Shop Owner chcem prezerať a spravovať prichádzajúce objednávky a meniť ich stav |
 
@@ -190,7 +183,7 @@ pending → confirmed → ready_for_pickup → completed
 
 ---
 
-### 7.6 Recenzie a hodnotenia
+### 6.6 Recenzie a hodnotenia
 
 | ID | User story |
 |---|---|
@@ -205,33 +198,34 @@ pending → confirmed → ready_for_pickup → completed
 
 ---
 
-### 7.7 Back-office (Admin)
+### 6.7 Back-office (Admin)
 
 | ID | User story |
 |---|---|
-| BO-1 | Ako Admin chcem zobraziť zoznam všetkých používateľov a deaktivovať účet |
+| BO-1 | Ako Admin chcem zobraziť zoznam všetkých používateľov a vedieť deaktivovať účet |
 | BO-2 | Ako Admin chcem schvaľovať alebo zamietnuť eventy |
 | BO-3 | Ako Admin chcem moderovať recenzie a komentáre (skryť/odstrániť) |
 | BO-4 | Ako Admin chcem spravovať shopy a produkty naprieč platformou |
 | BO-5 | Ako Admin chcem mať prístup k základným štatistikám (počet používateľov, objednávok, eventov) |
+| BO-6 | Ako Admin chcem zobraziť zoznam čakajúcich žiadostí o rolu a schváliť alebo zamietnuť každú z nich |
 
 ---
 
-## 8. Nefunkčné požiadavky
+## 7. Nefunkčné požiadavky
 
 | Požiadavka | Popis |
 |---|---|
-| **Témy** | Aplikácia podporuje svetlý a tmavý motív naprieč celým UI (CSS premenné, Tailwind `dark:` varianty) |
+| **Témy** | Aplikácia podporuje svetlý a tmavý motív naprieč celým UI |
 | **Responzivita** | Mobile-first prístup — všetky stránky sú plne použiteľné na mobilných zariadeniach |
-| **Testovanie** | E2E testy (Playwright) a unit testy pre kritickú business logiku |
-| **Bezpečnosť** | Heslá hashované bcryptom; API chránené JWT autorizáciou; vstupy validované cez Zod na FE aj BE |
-| **Komponentová knižnica** | UI postavené na ShadCN/UI s konzistentným dizajn systémom |
+| **Testovanie** | E2E testy (Playwright) a unit testy pre kritickú logiku |
+| **Bezpečnosť** | Hashované heslá; API chránené autorizáciou; vstupy validované na FE aj BE |
+| **Komponentová knižnica** | UI postavené na ShadCN/UI/... s konzistentným dizajn systémom |
 | **CI/CD** | GitLab pipeline spúšťa ESLint, Prettier a testy pri každom Merge Requeste |
 | **API dokumentácia** | OpenAPI špecifikácia generovaná z Elysia, zobrazená cez Scalar |
 
 ---
 
-## 9. Použité technológie
+## 8. Použité technológie
 
 | Technológia | Oblasť |
 |---|---|
