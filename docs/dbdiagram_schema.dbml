@@ -1,4 +1,20 @@
 
+Enum user_role {
+  user
+  admin
+}
+
+Enum role_request_type {
+  winemaker
+  shop_owner
+}
+
+Enum role_request_status {
+  pending
+  approved
+  rejected
+}
+
 Enum order_status {
   pending
   confirmed
@@ -48,7 +64,7 @@ Table Users {
   email text [not null, unique]
   email_verified boolean [not null]
   hashed_password varchar(256) [not null]
-  role enum [not null, default: 'user']
+  role user_role [not null, default: 'user']
   shipping_address_id uuid
   billing_address_id uuid
   created_at timestamp [not null]
@@ -92,14 +108,13 @@ Table Sessions {
   id uuid [pk]
   user_id uuid [not null]
   token text [not null, unique]
-  role enum [not null, default: 'user']
+  role user_role [not null, default: 'user']
   created_at timestamp [not null]
   expires_at timestamp [not null]
 }
 
 Table Products {
   id uuid [pk]
-  winemaker_id uuid [not null]
   shop_id uuid [not null]
   name varchar(255) [not null]
   description text
@@ -254,6 +269,18 @@ Table Images {
   updated_at timestamp
 }
 
+Table Role_requests {
+  id uuid [pk]
+  user_id uuid [not null]
+  requested_role role_request_type [not null]
+  status role_request_status [not null, default: 'pending']
+  business_name varchar(255) [not null]
+  details text
+  submitted_at timestamp [not null]
+  reviewed_at timestamp
+  reviewed_by_admin_id uuid
+}
+
 Table Addresses {
   id uuid [pk]
   country varchar(50) [not null]
@@ -311,4 +338,7 @@ Ref: Orders.user_id > Users.id
 Ref: Orders.shipping_address_id > Addresses.id
 Ref: Orders.billing_address_id > Addresses.id
 Ref: Order_items.order_id > Orders.id
+
+Ref: Role_requests.user_id > Users.id
+Ref: Role_requests.reviewed_by_admin_id > Users.id
 
