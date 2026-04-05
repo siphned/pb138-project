@@ -1,0 +1,27 @@
+@startuml seq_product_lifecycle.puml
+title Product lifecycle — create, publish, order, inventory
+
+actor ShopOwner
+participant "Shop UI" as UI
+participant "API / Backend" as API
+database "DB" as DB
+participant System
+actor Customer
+participant "Store" as Shop
+
+ShopOwner -> UI: Create product (select Wine, set price, stock)
+UI -> API: POST /shops/:id/products {wine_id, price, quantity}
+API -> DB: INSERT Products (shop_id, name, price, quantity)
+API -> DB: INSERT Product_wines (product_id, wine_id, quantity)
+API -> UI: 201 Created (product id)
+
+Customer -> UI: Add product to cart -> Checkout
+UI -> API: POST /orders/checkout {cart_id, address_id}
+API -> DB: create Orders (status: pending) and Order_items (unit_price_at_purchase)
+API -> DB: UPDATE Products SET quantity = quantity - ordered_qty WHERE id = product_id
+API -> System: notify ShopOwner / mark ready_for_pickup
+API -> UI: 201 Created (order id)
+
+note over DB: Inventory decremented at purchase; price frozen in Order_items
+
+@enduml
