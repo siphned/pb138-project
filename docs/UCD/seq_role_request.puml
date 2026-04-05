@@ -1,0 +1,33 @@
+@startuml seq_role_request.puml
+title Role-request lifecycle — submit, review, approve/reject
+
+actor Customer
+participant "Frontend" as FE
+participant "API / Backend" as API
+database "DB" as DB
+actor Admin
+participant System
+
+Customer -> FE: Submit role request (winemaker / shop_owner)
+FE -> API: POST /role-requests {user_id, details}
+API -> DB: insert Role_requests (status: pending)
+API -> FE: 201 Created
+API -> System: send notification (admins)
+System -> Admin: notify new request
+
+Admin -> API: GET /role-requests
+API -> DB: fetch pending requests
+Admin -> API: POST /role-requests/:id/review {approve|reject}
+API -> DB: update Role_requests.status, reviewed_by_admin_id
+alt approved
+  API -> DB: create Winemakers / Shops record
+  API -> DB: update Users.role (grant role)
+  API -> System: send email (approval)
+else rejected
+  API -> System: send email (rejection)
+end
+API -> FE: 200 OK (review result)
+
+note over DB: Role_requests keeps audit trail; entities created only on approval
+
+@enduml
