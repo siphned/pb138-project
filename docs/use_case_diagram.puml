@@ -7,6 +7,7 @@ actor Customer
 actor Winemaker
 actor "Shop Owner" as ShopOwner
 actor Admin
+actor System
 
 Customer --|> Guest
 Winemaker --|> Customer
@@ -16,48 +17,61 @@ Admin --|> Customer
 
 rectangle "WineMarket Platform" {
 
-Guest --> (Browse wines)
-Guest --> (Browse winemakers)
-Guest --> (Browse shops)
-Guest --> (Browse events)
-Guest --> (View product details)
-Guest --> (Manage guest cart)
-Guest --> (Register)
-Guest --> (Login)
+	Guest --> (Browse wines)
+	Guest --> (View product details)
+	Guest --> (Browse winemakers)
+	Guest --> (Browse shops)
+	Guest --> (Browse events)
+	Guest --> (Manage guest cart)
+	Guest --> (Register)
+	Guest --> (Login)
+	Guest --> (Password reset)
+	(Register) ..> (Verify email) : <<include>>
 
-Customer --> (Checkout order)
-Customer --> (Manage profile)
-Customer --> (Manage addresses)
-Customer --> (View order history)
-Customer --> (Register for event)
-Customer --> (Write product review)
-Customer --> (Write winemaker review)
-Customer --> (Comment event)
-Customer --> (Request Winemaker role)
-Customer --> (Request Shop Owner role)
+	Customer --> (Checkout order)
+	Customer --> (Manage profile)
+	Customer --> (Manage addresses)
+	Customer --> (View order history)
+	Customer --> (Register for event)
+	Customer --> (Write product review)
+	Customer --> (Write winemaker review)
+	Customer --> (Comment event)
+	Customer --> (Request Winemaker role)
+	Customer --> (Request Shop Owner role)
 
-Winemaker --> (Manage winemaker profile)
-Winemaker --> (Add wine)
-Winemaker --> (Edit wine)
-Winemaker --> (Delete wine)
-Winemaker --> (Create event)
-Winemaker --> (Edit event)
-Winemaker --> (Cancel event)
+	(Checkout order) ..> (Manage addresses) : <<include>>
+	(Manage guest cart) ..> (Merge guest cart) : <<extend>>
 
-ShopOwner --> (Manage shop profile)
-ShopOwner --> (Set availability schedule)
-ShopOwner --> (Create product)
-ShopOwner --> (Create WineBundle)
-ShopOwner --> (Manage inventory)
-ShopOwner --> (Process incoming orders)
+	Winemaker --> (Manage winemaker profile)
+	Winemaker --> (Add wine)
+	Winemaker --> (Edit wine)
+	Winemaker --> (Delete wine)
+	Winemaker --> (Create event)
+	Winemaker --> (Edit event)
+	Winemaker --> (Cancel event)
 
-Admin --> (Approve winemaker requests)
-Admin --> (Approve shop owner requests)
-Admin --> (Approve events)
-Admin --> (Moderate reviews)
-Admin --> (Moderate comments)
-Admin --> (Manage users)
-Admin --> (View platform statistics)
+	ShopOwner --> (Manage shop profile)
+	ShopOwner --> (Set availability schedule)
+	ShopOwner --> (Create product)
+	ShopOwner --> (Create WineBundle)
+	ShopOwner --> (Manage inventory)
+	ShopOwner --> (Process incoming orders)
+	ShopOwner --> (View shop orders)
+
+	Admin --> (Approve winemaker requests)
+	Admin --> (Approve shop owner requests)
+	Admin --> (Approve events)
+	Admin --> (Moderate reviews)
+	Admin --> (Moderate comments)
+	Admin --> (Manage users)
+	Admin --> (View platform statistics)
+
+	System --> (Send email notifications)
+	System --> (Enforce event capacity)
+	System --> (Create Winemaker/Shop on approval)
+	System --> (Freeze order prices at purchase)
+	System --> (Validate guest cart merge)
+	System --> (Generate platform reports)
 
 }
 
