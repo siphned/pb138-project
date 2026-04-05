@@ -15,3 +15,12 @@ Traceability (high level):
 Usage:
 - Render PlantUML files with any PlantUML tool or VS Code PlantUML extension.
 - Include exported PNGs/SVGs in Merge Requests for reviewers.
+
+Viewing diagrams (graphic)
+--------------------------
+- Install the VS Code PlantUML extension (e.g. `jebbs.plantuml`).
+- For local rendering, install Graphviz on your machine (optional but recommended).
+- Open any `.puml` file and use the command palette: "PlantUML: Preview Current Diagram" to see a live SVG/PNG preview.
+- To export an image for the MR, run "PlantUML: Export Current Diagram" and choose PNG or SVG.
+- Tip: take the exported PNG/SVG and attach it to the Merge Request for fast review by non-technical stakeholders.
+
