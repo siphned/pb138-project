@@ -57,6 +57,22 @@ Enum wine_type {
   dessert
 }
 
+Enum payment_status {
+  pending
+  authorized
+  captured
+  failed
+  cancelled
+  refunded
+  partially_refunded
+}
+
+Enum payment_method {
+  card
+  bank_transfer
+  cash_on_delivery
+}
+
 Table Users {
   id uuid [pk]
   fname varchar(30) [not null]
@@ -128,10 +144,10 @@ Table Products {
 Table Availability_regular {
   id uuid [pk]
   winemaker_id uuid
-  shop_id uuid
+  shop_id uuid [not null]
   dow smallint [not null]
-  start_time timestamptz [not null]
-  end_time timestamptz [not null]
+  start_time timestamp [not null]
+  end_time timestamp [not null]
   valid_from date [not null]
   valid_to date
   type varchar(255) [not null]
@@ -140,9 +156,9 @@ Table Availability_regular {
 Table Availability_exceptions {
   id uuid [pk]
   winemaker_id uuid
-  shop_id uuid
-  starts_at timestamptz [not null]
-  ends_at timestamptz [not null]
+  shop_id uuid [not null]
+  starts_at timestamp [not null]
+  ends_at timestamp [not null]
   action varchar(255) [not null]
   reason text
 }
@@ -190,6 +206,10 @@ Table Event_invites {
 Table Orders {
   id uuid [pk]
   user_id uuid [not null]
+  shipping_fee numeric(10,2) [not null]
+  discount numeric(10,2) [not null]
+  payment_status payment_status_enum [not null]
+  payment_method payment_method_enum [not null]
   total_price numeric(10,2) [not null]
   created_at timestamp [not null]
   updated_at timestamp
