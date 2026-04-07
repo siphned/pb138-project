@@ -1,0 +1,82 @@
+@startuml role_hierarchy
+!theme plain
+skinparam backgroundColor #FAFAFA
+
+card GUEST #FFE0E0 [
+  <b>GUEST (Unauthenticated)
+  ---
+  OK Browse wines, winemakers, shops
+  OK Browse approved events
+  OK Add to cart
+  OK View reviews
+
+  NO Checkout
+  NO Create content
+  NO Register for events
+]
+
+card CUSTOMER #E0F2F1 [
+  <b>CUSTOMER (Registered)
+  ---
+  OK All GUEST permissions
+  OK Checkout & create orders
+  OK Manage addresses
+  OK Register for events
+  OK Write reviews/comments
+  OK Request Winemaker role
+  OK Request Shop Owner role
+
+  NO Create wine/events
+]
+
+card WINEMAKER #FFF9C4 [
+  <b>WINEMAKER (Role acquired)
+  ---
+  OK All CUSTOMER permissions
+  OK Create/edit/delete wines
+  OK Create/edit/manage events
+  OK View event dashboard
+  OK Can be SHOP_OWNER simultaneously
+
+  NO Approve own events
+  NO Manage shops
+]
+
+card SHOPOWNER #F3E5F5 [
+  <b>SHOP OWNER (Role acquired)
+  ---
+  OK All CUSTOMER permissions
+  OK Create/edit/delete shop
+  OK Manage products & inventory
+  OK Create wine bundles
+  OK Set availability & hours
+  OK View/update incoming orders
+  OK Can be WINEMAKER simultaneously
+]
+
+card ADMIN #FFCCBC [
+  <b>ADMIN (Staff member)
+  ---
+  OK Full access to all features
+  OK Approve/reject role requests
+  OK Approve/reject events
+  OK Manage all users
+  OK Moderate reviews/comments
+  OK View platform statistics
+  OK Back-office access
+]
+
+GUEST --|> CUSTOMER : registers
+CUSTOMER --|> WINEMAKER : approved
+CUSTOMER --|> SHOPOWNER : approved
+CUSTOMER --|> ADMIN : staff assignment
+
+note right of ADMIN
+  <b>Key Rules:
+  - One user can have multiple roles
+  - Roles acquired via approval
+  - ADMIN is separate (staff only)
+  - See roles.md for matrix
+end note
+
+@enduml
