@@ -1,0 +1,16 @@
+@startuml auth_registration
+participant User
+participant Frontend
+participant Backend
+participant Database
+
+User -> Frontend: Enter credentials
+Frontend -> Backend: POST /auth/register
+Backend -> Database: Check email exists
+Database --> Backend: Not found
+Backend -> Database: Hash password + create user
+Database --> Backend: User created
+Backend -> Frontend: 201 Created + JWT tokens
+Frontend -> User: Registration complete
+
+@enduml

@@ -1,0 +1,42 @@
+@startuml architecture_layers
+!theme plain
+skinparam backgroundColor #FAFAFA
+
+package "FRONTEND" #E1F5FE {
+  card "TanStack Router"
+  card "TanStack Query"
+  card "React Components"
+  card "shadcn UI"
+}
+
+package "API CONTRACT" #FFE082 {
+  card "OpenAPI Spec"
+  card "Kubb Generation"
+}
+
+package "BACKEND" #81C784 {
+  card "HTTP Routes"
+  card "Business Services"
+  card "Data Repositories"
+  card "Zod Validation"
+}
+
+package "DATABASE" #FF7043 {
+  card "PostgreSQL"
+  card "Drizzle ORM"
+}
+
+package "EXTERNAL" #E0BEE7 {
+  card "Email Service"
+  card "AWS S3"
+}
+
+FRONTEND --> OpenAPI
+OpenAPI --> "HTTP Routes"
+"HTTP Routes" --> "Business Services"
+"Business Services" --> "Data Repositories"
+"Data Repositories" --> PostgreSQL
+"HTTP Routes" --> "Zod Validation"
+"Business Services" --> "Email Service"
+
+@enduml
