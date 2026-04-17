@@ -22,12 +22,12 @@ jobs:
             exit 1
           fi
 
-      - name: Transition to "In Review" (PR opened)
+      - name: Transition to "Ready for Review" (PR opened)
         if: github.event.action == 'opened'
         uses: atlassian/gajira-transition@master
         with:
           issue: ${{ steps.extract.outputs.issue }}
-          transition: "In Review"
+          transition: "Ready for Review"
         env:
           JIRA_BASE_URL: https://pb138winery.atlassian.net
           JIRA_USER_EMAIL: 536230@mail.muni.cz
