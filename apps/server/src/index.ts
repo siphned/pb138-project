@@ -1,6 +1,5 @@
-import { Elysia } from 'elysia'
-
-const app = new Elysia()
-  .get('/', () => 'Hello from API')
+import { app } from './app'
 
 app.listen(3000)
+
+console.log(`Server running at http://localhost:3000`)
