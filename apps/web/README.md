@@ -2,6 +2,27 @@
 
 This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
 
+## 📁 Project Structure
+
+See [README_STRUCTURE.md](./README_STRUCTURE.md) for detailed folder organization and best practices.
+
+### Quick Start
+
+- **Components**: Add reusable UI components in `src/components/`
+- **Pages**: Add page-level components in `src/pages/`
+- **Utils**: Add helpers and utilities in `src/lib/`
+- **Types**: Define TypeScript types in `src/types/`
+- **Generated**: Auto-generated code (do not edit manually)
+
+### Path Aliases
+
+Use `@/` prefix for cleaner imports:
+```typescript
+import { Button } from '@/components';
+import { formatDate } from '@/lib';
+import type { User } from '@/types';
+```
+
 Currently, two official plugins are available:
 
 - [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
