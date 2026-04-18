@@ -1,0 +1,35 @@
+@startuml seq_event_registration.puml
+title Event registration — signup + capacity check
+
+actor Customer
+participant "Browser / Client" as Client
+participant "API / Backend" as API
+database "DB" as DB
+participant System
+participant Winemaker
+
+Customer -> Client: Click "Register" on event
+Client -> API: POST /events/:id/register
+API -> DB: SELECT event (capacity, status, start_time)
+alt event not approved or past
+  API -> Client: 400/409 (cannot register)
+else
+  API -> DB: SELECT Event_registrations WHERE user_id AND event_id
+  alt already registered
+    API -> Client: 409 Conflict (already registered)
+  else
+    API -> DB: SELECT COUNT(*) registrations WHERE event_id
+    API -> System: Enforce event capacity (compare count < capacity)
+    alt capacity available
+      API -> DB: INSERT Event_registrations (user_id, event_id, created_at)
+      API -> System: send confirmation email
+      API -> Client: 201 Created (registration confirmed)
+    else
+      API -> Client: 409 Conflict (event full)
+    end
+  end
+end
+
+note over DB,System: Registration is idempotent and capacity enforced atomically
+
+@enduml
