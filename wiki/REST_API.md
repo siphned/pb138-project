@@ -6,7 +6,7 @@
 
 - **Stateless** — server remembers nothing, every request is independent
 - **Text-based** (HTTP/1.1) or binary (HTTP/2, HTTP/3)
-- Runs over TCP (port `80` for HTTP, `443` for HTTPS)
+- HTTP/1.1 and HTTP/2 run over TCP (port `80` for HTTP, `443` for HTTPS); HTTP/3 runs over UDP
 
 ```
 Client                          Server
@@ -77,7 +77,7 @@ Content-Length: 42
 |---|---|---|
 | **2xx** | Success | 200 OK, 201 Created, 204 No Content |
 | **3xx** | Redirect | 301 Moved, 304 Not Modified |
-| **4xx** | Client error | 400 Bad Request, 401 Unauthorized, 403 Forbidden, 404 Not Found, 422 Unprocessable |
+| **4xx** | Client error | 400 Bad Request, 401 Unauthorized, 403 Forbidden, 404 Not Found, 422 Unprocessable Entity |
 | **5xx** | Server error | 500 Internal Server Error, 503 Service Unavailable |
 
 ### Common Codes Explained

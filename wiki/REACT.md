@@ -178,7 +178,7 @@ Return a cleanup function to unsubscribe/cancel requests.
 ```tsx
 const sorted = useMemo(() => {
   console.log("Sorting...");
-  return users.sort((a, b) => a.name.localeCompare(b.name));
+  return [...users].sort((a, b) => a.name.localeCompare(b.name));
 }, [users]); // only re-run if users changes
 ```
 

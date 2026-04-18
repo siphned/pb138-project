@@ -132,6 +132,8 @@ npm install @tanstack/react-router @tanstack/router-plugin
 
 ```ts
 // vite.config.ts
+import { defineConfig } from "vite";
+import react from "@vitejs/plugin-react";
 import { tanstackRouter } from "@tanstack/router-plugin/vite";
 
 export default defineConfig({
@@ -149,7 +151,7 @@ Each route file exports a `Route` using `createFileRoute`:
 
 ```tsx
 // src/routes/__root.tsx — Root layout
-import { Outlet, Link } from "@tanstack/react-router";
+import { Outlet, Link, createFileRoute } from "@tanstack/react-router";
 
 export const Route = createFileRoute("/__root")({
   component: RootLayout,

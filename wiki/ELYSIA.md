@@ -60,9 +60,12 @@ app.post('/api/products', ({ body }) => {
 })
 
 // PUT — replace
-app.put('/api/products/:id', ({ params: { id }, body }) => {
+app.put('/api/products/:id', ({ params: { id }, body, set }) => {
   const idx = products.findIndex(p => p.id === id)
-  if (idx === -1) return { error: 'Not found' }
+  if (idx === -1) {
+    set.status = 404
+    return { error: 'Not found' }
+  }
   products[idx] = body
   return products[idx]
 })
