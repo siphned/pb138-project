@@ -68,10 +68,9 @@ AUTH (foundation)
   │   └─ EVENTS (depends on USERS, WINEMAKERS)
   │
   ├─ WINES (depends on USERS→WINEMAKERS)
-  │   ├─ PRODUCTS (depends on WINES, SHOPS)
+  │   ├─ PRODUCTS (depends on WINES, SHOPS) — includes WineBundles (via Product_wines M:N)
   │   │   ├─ CARTS (depends on PRODUCTS)
   │   │   │   └─ ORDERS (depends on CARTS, USERS)
-  │   │   └─ BUNDLES (depends on WINES)
   │
   └─ REVIEWS (depends on PRODUCTS, WINEMAKERS, USERS)
   └─ COMMENTS (depends on EVENTS, USERS)
