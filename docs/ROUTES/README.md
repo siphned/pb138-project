@@ -23,14 +23,15 @@ TanStack Router file-based routing structure for WineMarket frontend.
 - `/wines`, `/wines/:id` (catalog)
 - `/winemakers`, `/shops`, `/events` (browsing)
 
-### Protected Routes
-- `/auth/*` (login, register)
+### Authenticated Routes (Customer)
 - `/cart` (shopping cart)
 - `/checkout` (authenticated checkout)
 - `/dashboard/*` (customer profile)
 - `/winemaker/*` (if winemaker role)
 - `/shop/*` (if shop owner role)
-- `/admin/*` (if admin role)
+
+### Admin Routes
+- `/admin/*` (admin back-office)
 
 ## Component Pattern
 
@@ -56,10 +57,11 @@ Shared components in root:
 - **TanStack Query** for server state
 - **File-based routing** (no route config needed)
 
-## Related Documents
-- `../API/api.md` — API endpoints (routes consume)
-- `../ROLES/roles.md` — Who can access what
-- `../ARCHITECTURE/architecture.md` — Frontend patterns
+## Related Documentation
+See `/docs/` for:
+- **API/** — API endpoint specification
+- **ROLES/** — Role-permission matrix (authorization rules)
+- **ARCHITECTURE/** — System design and layering patterns
 
 ## For Adam (Frontend Developer)
 Build pages matching this structure. Use Kubb hooks for all API calls.

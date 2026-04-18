@@ -96,8 +96,8 @@ Global, imported from anywhere:
 |-------|-------|----------|-----------|------------|-------|
 | / | ✅ | ✅ | ✅ | ✅ | ✅ |
 | /wines | ✅ | ✅ | ✅ | ✅ | ✅ |
-| /checkout | ❌ | ✅ | ✅ | ✅ | ❌ |
-| /dashboard/* | ❌ | ✅ | ✅ | ✅ | ❌ |
+| /checkout | ❌ | ✅ | ✅ | ✅ | ✅ |
+| /dashboard/* | ❌ | ✅ | ✅ | ✅ | ✅ |
 | /winemaker/* | ❌ | ❌ | ✅ | ❌ | ✅ |
 | /shop/* | ❌ | ❌ | ❌ | ✅ | ✅ |
 | /admin/* | ❌ | ❌ | ❌ | ❌ | ✅ |
@@ -142,7 +142,7 @@ export default function WineCatalog() {
 }
 ```
 
-Types auto-generated from OpenAPI spec (see ../API/api.md).
+Types auto-generated from OpenAPI spec (see API specification in docs/).
 
 ---
 
