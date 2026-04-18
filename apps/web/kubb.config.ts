@@ -1,5 +1,5 @@
 import { defineConfig } from '@kubb/core'
-import { pluginFetch } from '@kubb/plugin-fetch'
+import { pluginClient } from '@kubb/plugin-client'
 import { pluginReactQuery } from '@kubb/plugin-react-query'
 
 export default defineConfig({
@@ -10,7 +10,7 @@ export default defineConfig({
     path: 'src/generated',
   },
   plugins: [
-    pluginFetch({
+    pluginClient({
       output: { path: 'clients' },
     }),
     pluginReactQuery({
