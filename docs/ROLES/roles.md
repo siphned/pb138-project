@@ -8,6 +8,7 @@ This matrix defines which user roles can perform which actions in the WineMarket
 - ❌ = No access
 - 🔒 = Own resources only (user's own data)
 - ⚙️ = Conditional/Admin approval required
+- `-` = N/A (feature not applicable to this role)
 
 ---
 
@@ -35,7 +36,7 @@ This matrix defines which user roles can perform which actions in the WineMarket
 | | Confirmation email | AU-2 | ✅ | - | - | - | - |
 | | Login / Logout | AU-3 | ✅ | ✅ | ✅ | ✅ | ✅ |
 | | Change password | AU-4 | ❌ | ✅ | ✅ | ✅ | ✅ |
-| | Request Winemaker role | AU-6 | ❌ | ✅ | - | - | - |
+| | Request Winemaker role | AU-6 | ❌ | ✅ | - | ✅ | - |
 | | Request Shop Owner role | AU-7 | ❌ | ✅ | ✅ | - | - |
 | | Receive role request notification | AU-8 | ❌ | ✅ | ✅ | ✅ | ✅ |
 | | Access back-office | AU-5 | ❌ | ❌ | ❌ | ❌ | ✅ |
@@ -51,10 +52,10 @@ This matrix defines which user roles can perform which actions in the WineMarket
 | | Add product to cart | OR-1 | ✅ | ✅ | ✅ | ✅ | - |
 | | Modify/remove from cart | OR-2 | ✅ | ✅ | ✅ | ✅ | - |
 | | View cart total | OR-3 | ✅ | ✅ | ✅ | ✅ | - |
-| | Checkout (create order) | OR-4 | ❌ | ✅ | ✅ | ✅ | ❌ |
-| | Select delivery address | OR-5 | ❌ | ✅ | ✅ | ✅ | ❌ |
-| | Receive order confirmation email | OR-6 | ❌ | ✅ | ✅ | ✅ | ❌ |
-| | View own order history | OR-7 | ❌ | ✅ | ✅ | ✅ | ❌ |
+| | Checkout (create order) | OR-4 | ❌ | ✅ | ✅ | ✅ | ✅ |
+| | Select delivery address | OR-5 | ❌ | ✅ | ✅ | ✅ | ✅ |
+| | Receive order confirmation email | OR-6 | ❌ | ✅ | ✅ | ✅ | ✅ |
+| | View own order history | OR-7 | ❌ | ✅ | ✅ | ✅ | ✅ |
 | | Manage incoming shop orders | OR-8 | ❌ | ❌ | ❌ | 🔒 | ✅ |
 | | Change order status | OR-8 | ❌ | ❌ | ❌ | 🔒 | ✅ |
 | **WINE BUNDLES** |
@@ -69,14 +70,14 @@ This matrix defines which user roles can perform which actions in the WineMarket
 | **EVENTS** |
 | | Browse events (approved only) | EV-1 | ✅ | ✅ | ✅ | ✅ | ✅ |
 | | View event detail | EV-2 | ✅ | ✅ | ✅ | ✅ | ✅ |
-| | Register for event | EV-3 | ❌ | ✅ | ✅ | ✅ | ❌ |
-| | Comment on event | EV-4 | ❌ | ✅ | ✅ | ✅ | ❌ |
+| | Register for event | EV-3 | ❌ | ✅ | ✅ | ✅ | ✅ |
+| | Comment on event | EV-4 | ❌ | ✅ | ✅ | ✅ | ✅ |
 | | Create event (requires approval) | EV-5 | ❌ | ❌ | ✅ | ❌ | ✅ |
 | | Edit / Cancel own event | EV-6 | ❌ | ❌ | 🔒 | ❌ | ✅ |
 | | Approve / Reject event | EV-7 | ❌ | ❌ | ❌ | ❌ | ✅ |
 | **REVIEWS & RATINGS** |
-| | Write product review | RE-1 | ❌ | ✅ | ✅ | ✅ | ❌ |
-| | Write winemaker review | RE-2 | ❌ | ✅ | ✅ | ✅ | ❌ |
+| | Write product review | RE-1 | ❌ | ✅ | ✅ | ✅ | ✅ |
+| | Write winemaker review | RE-2 | ❌ | ✅ | ✅ | ✅ | ✅ |
 | | View reviews & ratings | RE-3 | ✅ | ✅ | ✅ | ✅ | ✅ |
 | | Moderate reviews | RE-4 | ❌ | ❌ | ❌ | ❌ | ✅ |
 | **ADMIN / BACK-OFFICE** |
@@ -110,10 +111,10 @@ This matrix defines which user roles can perform which actions in the WineMarket
 - **Own bundle** = Created by logged-in Shop Owner
 
 ### Admin Override
-- Admin can perform any action (✅ everywhere)
-- Admin bypasses all ownership checks
+- Admin can perform any action including all customer/user operations
+- Admin bypasses all ownership checks and role restrictions
 - Admin can approve/reject events and role requests
-- Admin can moderate content
+- Admin can moderate and manage all content
 
 ### Special Cases
 - **Checkout**: Only authenticated users (❌ for Guest)
