@@ -1,8 +1,8 @@
 // Application configuration
 export const APP_CONFIG = {
-  APP_NAME: process.env.VITE_APP_NAME || 'My App',
+  APP_NAME: import.meta.env.VITE_APP_NAME || 'My App',
   APP_VERSION: '1.0.0',
-  DEBUG: process.env.VITE_DEBUG === 'true',
+  DEBUG: import.meta.env.VITE_DEBUG === 'true',
 };
 
 export const PAGINATION = {
