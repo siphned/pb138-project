@@ -9,8 +9,10 @@ Frontend -> Backend: POST /auth/register
 Backend -> Database: Check email exists
 Database --> Backend: Not found
 Backend -> Database: Hash password + create user
-Database --> Backend: User created
-Backend -> Frontend: 201 Created + JWT tokens
+Database --> Backend: User created (Customer role)
+Backend -> Database: Create session + tokens
+Database --> Backend: Session token stored
+Backend -> Frontend: 201 Created + JWT (access + refresh)
 Frontend -> User: Registration complete
 
 @enduml

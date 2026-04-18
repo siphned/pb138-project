@@ -17,10 +17,11 @@ System design showing how data flows from database through services to frontend.
 ## Key Principle
 Routes → Services → Repositories (never skip layers)
 
-## Related Documents
-- `../ROLES/roles.md` — Authorization (services check roles)
-- `../API/api.md` — Endpoints (route definitions)
-- `../MODULES/modules.md` — Module structure (implementation plan)
+## Related Documentation
+See `/docs/` for:
+- **ROLES/** — Authorization & role matrix (services check roles)
+- **API/** — REST endpoint specifications (route definitions)
+- **MODULES/** — Backend module structure & implementation plan
 
 ## Revision History
 - **v1.0** (Week 6) — Initial architecture design
