@@ -40,11 +40,14 @@ The API design:
 | Reviews | Johnny |
 | Admin | Both |
 
-## Related Documents
+## Related Documentation
 
-- `../ROLES/roles.md` — Authorization rules (every endpoint references this)
-- `../ARCHITECTURE/architecture.md` — Layered architecture (how routes → services → repos)
-- `../MODULES/modules.md` — Module structure (who implements what)
+See `/docs/` for:
+- **project_requirements_document.md** — Functional requirements & user stories
+- **notes.md** — Implementation notes (address freezing, role flows, etc.)
+- **dbdiagram_schema.dbml** — Database schema definition
+- **MODULES/** — Backend module structure & implementation plan
+- **ARCHITECTURE/** — System design & layering patterns
 
 ## Revision History
 

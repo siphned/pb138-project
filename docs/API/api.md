@@ -9,6 +9,14 @@ This document specifies all REST API endpoints for the WineMarket platform. Each
 
 **Technology**: Elysia + Zod + OpenAPI → Auto-generated documentation via Scalar
 
+**Notes on Authorization:**
+- `❌` = Public, no authentication required
+- `✅` = Authentication required (JWT token)
+- `✅ (Admin)` = Admin role only
+- `✅ (own)` = Own resource or Admin
+- `✅ (WINEMAKER)` = Winemaker role required
+- `✅ (SHOP_OWNER)` = Shop Owner role required
+
 ---
 
 ## Module: AUTH
@@ -37,9 +45,6 @@ This document specifies all REST API endpoints for the WineMarket platform. Each
 | DELETE | `/users/:id/addresses/:addr_id` | Delete address | ✅ (own) |
 | POST | `/users/:id/request-winemaker` | Request Winemaker role | ✅ |
 | POST | `/users/:id/request-shop-owner` | Request Shop Owner role | ✅ |
-| GET | `/role-requests` | Pending requests (Admin) | ✅ (Admin) |
-| POST | `/role-requests/:req_id/approve` | Approve request | ✅ (Admin) |
-| POST | `/role-requests/:req_id/reject` | Reject request | ✅ (Admin) |
 
 ---
 
@@ -102,13 +107,15 @@ This document specifies all REST API endpoints for the WineMarket platform. Each
 ## Module: CARTS & ORDERS
 **Responsibility**: Shopping cart, checkout, orders
 
+**Cart Notes:** Guest carts are session-based; authenticated users have persistent carts tied to their account.
+
 | Method | Path | Description | Auth |
 |--------|------|---|---|
-| GET | `/cart` | Get cart | ❌ |
-| POST | `/cart/items` | Add to cart | ❌ |
-| PATCH | `/cart/items/:item_id` | Update quantity | ❌ |
-| DELETE | `/cart/items/:item_id` | Remove from cart | ❌ |
-| DELETE | `/cart` | Clear cart | ❌ |
+| GET | `/cart` | Get cart | (guest=session, user=JWT) |
+| POST | `/cart/items` | Add to cart | (guest=session, user=JWT) |
+| PATCH | `/cart/items/:item_id` | Update quantity | (guest=session, user=JWT) |
+| DELETE | `/cart/items/:item_id` | Remove from cart | (guest=session, user=JWT) |
+| DELETE | `/cart` | Clear cart | (guest=session, user=JWT) |
 | POST | `/orders` | Create order | ✅ |
 | GET | `/orders/:id` | Order detail | ✅ (own/Admin) |
 | GET | `/orders` | Order history | ✅ |
@@ -170,6 +177,8 @@ This document specifies all REST API endpoints for the WineMarket platform. Each
 | PATCH | `/admin/users/:id/deactivate` | Deactivate user | ✅ (Admin) |
 | GET | `/admin/statistics` | Platform stats | ✅ (Admin) |
 | GET | `/admin/role-requests` | Pending requests | ✅ (Admin) |
+| POST | `/admin/role-requests/:req_id/approve` | Approve request | ✅ (Admin) |
+| POST | `/admin/role-requests/:req_id/reject` | Reject request | ✅ (Admin) |
 
 ---
 
