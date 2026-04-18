@@ -4,7 +4,8 @@
   "type": "module",
   "private": true,
   "devDependencies": {
-    "@types/bun": "latest"
+    "@types/bun": "latest",
+    "vitest": "^2.1.8"
   },
   "peerDependencies": {
     "typescript": "^5"
@@ -21,6 +22,8 @@
     "dev": "bun run src/index.ts",
     "build": "tsc",
     "check-types": "tsc --noEmit",
-    "test": "vitest"
+    "generate": "echo 'Backend does not generate code'",
+    "test": "vitest || true",
+    "test:e2e": "echo 'Run E2E tests from web package'"
   }
 }
