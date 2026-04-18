@@ -127,11 +127,9 @@ npm run generate
 
 ```ts
 // src/generated/clients/getProducts.ts
-export const getProducts = async (
-  client = new Hono<any>(),
-  options?: RequestInit
-) => {
-  return client.get('/api/products').json()
+export const getProducts = async (options?: RequestInit) => {
+  const response = await fetch('/api/products', options)
+  return response.json()
 }
 ```
 

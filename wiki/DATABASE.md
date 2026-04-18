@@ -130,7 +130,8 @@ docker compose up -d  # start from docker-compose.yml
 ```
 
 ```yaml
-# docker-compose.yml
+# docker-compose.yml (in project root)
+# Run from project root: docker compose up -d
 services:
   db:
     image: postgres:18
@@ -312,7 +313,7 @@ Closer to Prisma — declare what you want, Drizzle handles joins:
 
 ```ts
 // Find all courses with optional filtering
-const courses = await db.query.courses.findMany({
+const allCourses = await db.query.courses.findMany({
   where: eq(courses.semester, "spring"),
   orderBy: [asc(courses.name)],
   limit: 10,
