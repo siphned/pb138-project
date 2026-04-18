@@ -28,6 +28,12 @@ Enum delivery_type {
   shipping
 }
 
+Enum event_status {
+  draft
+  approved
+  cancelled
+}
+
 Enum event_visibility {
   public
   private
@@ -93,7 +99,7 @@ Table Winemakers {
   user_id uuid [not null, unique]
   name text [not null, unique]
   description text [not null]
-  websiteurl text
+  website_url text
   email varchar(255) [not null]
   phone varchar(30) [not null]
   address_id uuid [not null]
@@ -187,29 +193,32 @@ Table Events {
   address_id uuid [not null]
   start_time timestamptz [not null]
   end_time timestamptz [not null]
+  capacity smallint [not null]
+  status event_status [not null, default: 'draft']
   created_at timestamp [not null]
+  updated_at timestamp
   deleted_at timestamp
-  invite_type varchar(255) [not null]
   visibility event_visibility [not null]
 }
 
-Table Event_invites {
+Table Event_registrations {
   id uuid [pk]
   event_id uuid [not null]
-  winemaker_id_invited uuid [not null]
-  token uuid [not null, unique]
+  user_id uuid [not null]
   created_at timestamp [not null]
-  expires_at timestamp [not null]
-  status event_invite_status [not null]
+  updated_at timestamp
+  deleted_at timestamp
 }
+
+Note: "Each user can register once per event (unique constraint on event_id, user_id)"
 
 Table Orders {
   id uuid [pk]
   user_id uuid [not null]
   shipping_fee numeric(10,2) [not null]
   discount numeric(10,2) [not null]
-  payment_status payment_status_enum [not null]
-  payment_method payment_method_enum [not null]
+  payment_status payment_status [not null]
+  payment_method payment_method [not null]
   total_price numeric(10,2) [not null]
   created_at timestamp [not null]
   updated_at timestamp
@@ -330,8 +339,8 @@ Ref: Shops.owner_user_id > Users.id
 Ref: Wines.winemaker_id > Winemakers.id
 Ref: Events.winemaker_id > Winemakers.id
 
-Ref: Event_invites.event_id > Events.id
-Ref: Event_invites.winemaker_id_invited > Winemakers.id
+Ref: Event_registrations.event_id > Events.id
+Ref: Event_registrations.user_id > Users.id
 
 Ref: Availability_regular.winemaker_id > Winemakers.id
 Ref: Availability_exceptions.winemaker_id > Winemakers.id
