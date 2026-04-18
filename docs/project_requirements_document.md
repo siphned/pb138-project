@@ -32,7 +32,7 @@ WineMarket je webová platforma určená na prepojenie malých vinárov so záka
 
 **Biznis:**
 - Jeden Winemaker môže predávať cez vlastný shop alebo cez partnerské shopy
-- Jeden Shop môže ponúkať produkty od viacerých Winemakeroch
+- Jeden Shop môže ponúkať produkty od viacerých Winemakerov
 - Zákazník môže mať pri nákupe rôzne produkty z viacerých shopov v jednom košíku
 
 ## 5. Používateľské role
@@ -115,9 +115,9 @@ WineMarket je webová platforma určená na prepojenie malých vinárov so záka
 |---|---|
 | CA-1 | Ako Guest chcem prehľadávať zoznam vín a filtrovať ich podľa: regiónu, typu (červené/biele/ružové/šumivé/...), farby, ročníka a cenovej kategórie |
 | CA-2 | Ako Guest chcem zobraziť detail vína s popisom, zložením, chuťovým profilom, fotografiami, priemerným hodnotením a zoznamom shopov, kde sa dané víno predáva |
-| CA-3 | Ako Guest chcem prehľadávať winemakeroch a zobraziť profil vinárstva s portfóliom vín |
+| CA-3 | Ako Guest chcem prehľadávať winemakerov a zobraziť profil vinárstva s portfóliom vín |
 | CA-4 | Ako Guest chcem prehľadávať shopy a filtrovať ich podľa otváracích hodín |
-| CA-5 | Ako Guest chcem zobraziť detail shopu s dostupnými produktmi a otvárateľnými hodinami |
+| CA-5 | Ako Guest chcem zobraziť detail shopu s dostupnými produktmi a otváracími hodinami |
 | CA-6 | Ako Winemaker chcem pridať nové víno do katalógu s kompletným popisom a fotografiami |
 | CA-7 | Ako Winemaker chcem editovať a mazať vlastné vína |
 
@@ -171,12 +171,13 @@ WineMarket je webová platforma určená na prepojenie malých vinárov so záka
 
 **Stavy objednávky:**
 ```
-pending → confirmed → ready_for_pickup → completed
+pending → confirmed → shipped → delivered
 ```
+(Objednávka môže byť zrušená v ľubovolnom stave.)
 
 **Systémové požiadavky:**
 - Jeden košík môže obsahovať produkty z viacerých shopov
-- Pri checkoutovi sa cena produktov zmrazí (`price_at_purchase` na `Order_items`)
+- Pri checkoutovi sa cena produktov zmrazí (`unit_price_at_purchase` na `Order_items`)
 - Adresa objednávky sa zmrazí vytvorením novej kópie záznamu v `Addresses`
 - Platba je simulovaná — po potvrdení prechádza objednávka do stavu `confirmed` bez reálnej transakcie
 - Každý `Order_item` eviduje referenčný `shop_id` pre logiku osobného odberu
