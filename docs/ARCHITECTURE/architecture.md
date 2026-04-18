@@ -34,9 +34,9 @@ apps/server/src/
     └── errors.ts
 ```
 
-##Key Principles
+## Key Principles
 
--**Single Responsibility**: Each layer has one job
+- **Single Responsibility**: Each layer has one job
   - Routes: HTTP handling only
   - Services: Business logic only
   - Repositories: DB queries only
@@ -47,7 +47,7 @@ apps/server/src/
   - Types + validation + OpenAPI
 
 - **Role-Based Access Control**
-  - Every service method checks roles (from docs/roles.md)
+  - Every service method checks roles (see ROLES/roles.md)
 
 ## Frontend Architecture
 
@@ -79,7 +79,7 @@ React Hooks (@repo/api)
 Frontend Components
 ```
 
-See ../ARCHITECTURE/ folder for detailed diagrams (PlantUML).
+See ARCHITECTURE folder for detailed diagrams (PlantUML).
 
 ## Revision History
 - **v1.0** (Week 6) — Initial system architecture design
