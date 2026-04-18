@@ -1,0 +1,20 @@
+@startuml checkout_flow
+participant Customer
+participant Frontend
+participant Backend
+participant Database
+
+Customer -> Frontend: Add items to cart
+Customer -> Frontend: Proceed to checkout
+Frontend -> Backend: POST /orders
+Backend -> Database: Get cart items
+Database --> Backend: Items returned
+Backend -> Database: Begin transaction
+Backend -> Database: Create order record
+Backend -> Database: Insert order items
+Backend -> Database: Clear cart
+Backend -> Database: Commit transaction
+Backend --> Frontend: 201 Created + Order
+Frontend -> Customer: Order confirmation
+
+@enduml
