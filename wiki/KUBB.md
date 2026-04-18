@@ -78,24 +78,25 @@ mutation.mutate({
 ## Setup
 
 ```bash
-npm install -D @kubb/core @kubb/plugin-fetch @kubb/plugin-react-query
+bun add -D @kubb/cli @kubb/core @kubb/plugin-client @kubb/plugin-react-query
+bun add @tanstack/react-query
 ```
 
 ```ts
-// kubb.config.ts
+// apps/web/kubb.config.ts
 import { defineConfig } from '@kubb/core'
-import { pluginFetch } from '@kubb/plugin-fetch'
+import { pluginClient } from '@kubb/plugin-client'
 import { pluginReactQuery } from '@kubb/plugin-react-query'
 
 export default defineConfig({
   input: {
-    path: 'http://localhost:3000/openapi.json', // from your Elysia server
+    path: 'http://localhost:3000/swagger/json', // from Elysia @elysiajs/openapi
   },
   output: {
     path: 'src/generated',
   },
   plugins: [
-    pluginFetch({
+    pluginClient({
       output: { path: 'clients' },
     }),
     pluginReactQuery({
@@ -105,19 +106,21 @@ export default defineConfig({
 })
 ```
 
-Add to `package.json`:
+Scripts already configured in workspace `package.json`:
 ```json
 {
   "scripts": {
-    "generate": "kubb generate"
+    "generate": "turbo run generate"
   }
 }
 ```
 
-Run whenever the backend changes:
+Run from project root whenever the backend changes:
 ```bash
-npm run generate
+bun run generate
 ```
+
+This will regenerate hooks in `apps/web/src/generated/` based on latest OpenAPI spec.
 
 ---
 
@@ -127,11 +130,9 @@ npm run generate
 
 ```ts
 // src/generated/clients/getProducts.ts
-export const getProducts = async (
-  client = new Hono<any>(),
-  options?: RequestInit
-) => {
-  return client.get('/api/products').json()
+export const getProducts = async (options?: RequestInit) => {
+  const response = await fetch('/api/products', options)
+  return response.json()
 }
 ```
 
