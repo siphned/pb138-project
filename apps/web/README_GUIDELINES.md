@@ -2,7 +2,7 @@
 
 ## Folder Structure Rules
 
-### files Placement
+### File Placement
 
 - **components/** - Reusable UI components only (Button, Card, Modal, etc.)
 - **pages/** - Full page/screen components
