@@ -1,0 +1,57 @@
+@startuml module_dependencies
+!theme plain
+skinparam backgroundColor #FAFAFA
+
+rectangle "PHASE 1" #C8E6C9 {
+  (AUTH)
+  (USERS)
+  USERS --> AUTH
+}
+
+rectangle "PHASE 2" #BBDEFB {
+  (WINES)
+  (WINEMAKERS)
+  (SHOPS)
+  (PRODUCTS)
+  (CARTS)
+
+  WINES --> USERS
+  WINES --> WINEMAKERS
+  WINEMAKERS --> USERS
+  SHOPS --> USERS
+  PRODUCTS --> WINES
+  PRODUCTS --> SHOPS
+  CARTS --> PRODUCTS
+}
+
+rectangle "PHASE 3" #FFE0B2 {
+  (ORDERS)
+  (EVENTS)
+  (COMMENTS)
+  (REVIEWS)
+  (EMAIL)
+  (ADMIN)
+
+  ORDERS --> CARTS
+  ORDERS --> USERS
+  EVENTS --> WINEMAKERS
+  EVENTS --> USERS
+  COMMENTS --> EVENTS
+  COMMENTS --> USERS
+  REVIEWS --> PRODUCTS
+  REVIEWS --> WINEMAKERS
+  REVIEWS --> USERS
+  EMAIL -.-> AUTH
+  EMAIL -.-> USERS
+  EMAIL -.-> ORDERS
+  ADMIN -.-> USERS
+  ADMIN -.-> EVENTS
+  ADMIN -.-> REVIEWS
+}
+
+note right
+  Solid: Direct dependency
+  Dashed: Service dependency
+end note
+
+@enduml
