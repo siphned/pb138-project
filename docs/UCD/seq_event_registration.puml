@@ -10,18 +10,18 @@ participant Winemaker
 
 Customer -> Client: Click "Register" on event
 Client -> API: POST /events/:id/register
-API -> DB: SELECT event (capacity, approved, start_time)
+API -> DB: SELECT event (capacity, status, start_time)
 alt event not approved or past
   API -> Client: 400/409 (cannot register)
 else
-  API -> DB: SELECT Event_invites WHERE user_id AND event_id
+  API -> DB: SELECT Event_registrations WHERE user_id AND event_id
   alt already registered
     API -> Client: 409 Conflict (already registered)
   else
-    API -> DB: SELECT COUNT(*) registrations WHERE event_id AND status=accepted
+    API -> DB: SELECT COUNT(*) registrations WHERE event_id
     API -> System: Enforce event capacity (compare count < capacity)
     alt capacity available
-      API -> DB: INSERT Event_invites (status: accepted, created_at)
+      API -> DB: INSERT Event_registrations (user_id, event_id, created_at)
       API -> System: send confirmation email
       API -> Client: 201 Created (registration confirmed)
     else

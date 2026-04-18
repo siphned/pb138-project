@@ -13,16 +13,13 @@ Guest -> Client: Login / Register
 Client -> API: POST /auth/login
 API -> DB: validate credentials
 API -> Client: 200 OK + session
-Client -> API: POST /carts/merge {guestCart}
-API -> DB: fetch user cart
-API -> DB: merge items (dedupe, check stock)
-API -> System: Validate guest cart merge
-System --> API: merge result / warnings
-API -> Client: 200 OK (merged cart)
+Client -> API: GET /cart (fetch cart items)
+API -> DB: fetch user cart with items
+API -> Client: 200 OK (cart items)
 
-Client -> API: POST /orders/checkout {cart_id, address_id, delivery_type}
-API -> DB: create Order (status: pending, price_at_purchase set)
-API -> DB: create Order_items (unit_price_at_purchase)
+Client -> API: POST /orders {cart_id, address_id, delivery_type, payment_method}
+API -> DB: create Order (status: pending)
+API -> DB: create Order_items (unit_price_at_purchase from products)
 API -> System: Freeze order prices at purchase
 API -> DB: update Order status -> confirmed
 API -> Client: 201 Created (order id, status)
