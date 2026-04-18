@@ -16,7 +16,7 @@ API -> DB: INSERT Product_wines (product_id, wine_id, quantity)
 API -> UI: 201 Created (product id)
 
 Customer -> UI: Add product to cart -> Checkout
-UI -> API: POST /orders/checkout {cart_id, address_id}
+UI -> API: POST /orders {cart_id, address_id, delivery_type, payment_method}
 API -> DB: create Orders (status: pending) and Order_items (unit_price_at_purchase)
 API -> DB: UPDATE Products SET quantity = quantity - ordered_qty WHERE id = product_id
 API -> System: notify ShopOwner / mark ready_for_pickup

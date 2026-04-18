@@ -9,15 +9,15 @@ actor Admin
 participant System
 
 Customer -> FE: Submit role request (winemaker / shop_owner)
-FE -> API: POST /role-requests {user_id, details}
-API -> DB: insert Role_requests (status: pending)
+FE -> API: POST /users/:id/request-winemaker {business_name, details}
+API -> DB: insert Role_requests (status: pending, requested_role)
 API -> FE: 201 Created
 API -> System: send notification (admins)
 System -> Admin: notify new request
 
-Admin -> API: GET /role-requests
+Admin -> API: GET /admin/role-requests
 API -> DB: fetch pending requests
-Admin -> API: POST /role-requests/:id/review {approve|reject}
+Admin -> API: POST /admin/role-requests/:req_id/approve
 API -> DB: update Role_requests.status, reviewed_by_admin_id
 alt approved
   API -> DB: create Winemakers / Shops record
