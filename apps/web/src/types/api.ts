@@ -1,2 +1,2 @@
 // API-related types
-export type {};
+export {};
