@@ -55,12 +55,12 @@
 - **TypeScript** — Type safety throughout
 
 ### Routing
-- **TanStack Router** —File-based routing (similar to Next.js)
+- **TanStack Router** — File-based routing (similar to Next.js)
   - Automatic route code splitting
   - Type-safe route params
 
 ### State Management
-- **TanStack Query (React Query)** —Server state management
+- **TanStack Query (React Query)** — Server state management
   - Automatic caching and synchronization
   - Request deduplication
   - Automatic refetching
@@ -75,7 +75,7 @@
 
 ### UI Components
 - **shadcn/ui** — Unstyled, accessible components
-  - Built on Headless UI
+  - Built on Radix UI primitives
   - Customizable with Tailwind
   - Copy-paste component library
 
@@ -284,7 +284,7 @@ No tech changes without:
 Examples of locked-in decisions:
 - ✅ Using Bun (not Node.js)
 - ✅ Using PostgreSQL (not MongoDB)
-- ✅ Using Zod (not TyPE Validator)
+- ✅ Using Zod (not another type validator)
 - ✅ Using Elysia (not Express/Nest)
 - ✅ Using TanStack Router (not Next.js)
 
