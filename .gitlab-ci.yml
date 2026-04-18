@@ -1,0 +1,98 @@
+image: oven/bun:1.3.11
+
+stages:
+  - install
+  - lint
+  - typecheck
+  - build
+  - test
+
+variables:
+  BUN_INSTALL_CACHE_DIR: "$CI_PROJECT_DIR/.bun-cache"
+
+cache:
+  key:
+    files:
+      - bun.lock
+  paths:
+    - .bun-cache/
+    - node_modules/
+    - apps/server/node_modules/
+    - apps/web/node_modules/
+    - packages/*/node_modules/
+
+# ─── Install ────────────────────────────────────────────────────────────────
+
+install:
+  stage: install
+  script:
+    - bun install --frozen-lockfile
+  artifacts:
+    paths:
+      - node_modules/
+      - apps/server/node_modules/
+      - apps/web/node_modules/
+      - packages/*/node_modules/
+    expire_in: 1 hour
+
+# ─── Lint ───────────────────────────────────────────────────────────────────
+
+biome:check:
+  stage: lint
+  needs: [install]
+  script:
+    - bun biome ci .
+  allow_failure: false
+
+# ─── Type Check ─────────────────────────────────────────────────────────────
+
+typecheck:
+  stage: typecheck
+  needs: [install]
+  script:
+    - bun run check-types
+  allow_failure: false
+
+# ─── Build ──────────────────────────────────────────────────────────────────
+
+build:
+  stage: build
+  needs: [lint, typecheck]
+  script:
+    - bun run build
+  artifacts:
+    paths:
+      - apps/server/dist/
+      - apps/web/dist/
+    expire_in: 1 day
+  only:
+    - dev
+    - main
+    - merge_requests
+
+# ─── Test ───────────────────────────────────────────────────────────────────
+
+test:unit:
+  stage: test
+  needs: [install]
+  script:
+    - bun run --filter server test --run
+    - bun run --filter web test --run
+  coverage: '/Lines\s*:\s*(\d+\.?\d*)%/'
+  artifacts:
+    reports:
+      junit: apps/*/test-results.xml
+    when: always
+    expire_in: 7 days
+
+# ─── Branch rules ───────────────────────────────────────────────────────────
+
+workflow:
+  rules:
+    # Run on MRs (includes source branch pipeline)
+    - if: $CI_PIPELINE_SOURCE == "merge_request_event"
+    # Run on dev and main push
+    - if: $CI_COMMIT_BRANCH == "dev"
+    - if: $CI_COMMIT_BRANCH == "main"
+    # Skip feature branch direct pushes (MR pipeline covers them)
+    - when: never

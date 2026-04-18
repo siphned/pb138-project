@@ -1,0 +1,29 @@
+@startuml seq_checkout.puml
+title Checkout — guest cart merge and order freeze
+
+actor Guest
+actor Customer
+participant "Browser / Client" as Client
+participant "API / Backend" as API
+database "DB" as DB
+participant System
+
+Guest -> Client: Add items to guest cart (localStorage)
+Guest -> Client: Login / Register
+Client -> API: POST /auth/login
+API -> DB: validate credentials
+API -> Client: 200 OK + session
+Client -> API: GET /cart (fetch cart items)
+API -> DB: fetch user cart with items
+API -> Client: 200 OK (cart items)
+
+Client -> API: POST /orders {cart_id, address_id, delivery_type, payment_method}
+API -> DB: create Order (status: pending)
+API -> DB: create Order_items (unit_price_at_purchase from products)
+API -> System: Freeze order prices at purchase
+API -> DB: update Order status -> confirmed
+API -> Client: 201 Created (order id, status)
+
+note over DB, System: Order records keep frozen prices and address copies
+
+@enduml
