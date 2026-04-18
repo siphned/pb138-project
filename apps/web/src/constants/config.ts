@@ -12,5 +12,5 @@ export const PAGINATION = {
 
 export const TIMEOUT = {
   API_CALL: 30000, // 30 seconds
-  DEBOUNCE: 300,   // 300ms
+  DEBOUNCE: 300, // 300ms
 };
