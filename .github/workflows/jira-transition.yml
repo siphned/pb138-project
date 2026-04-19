@@ -17,8 +17,8 @@ jobs:
     runs-on: ubuntu-latest
     permissions: {}
     env:
-      JIRA_BASE_URL: https://api.atlassian.com/ex/jira/c6f2e588-c214-4698-b7bd-5a5be28a9e06/rest/api/3
-      JIRA_EMAIL: 536230@muni.cz
+      JIRA_BASE_URL: ${{ vars.JIRA_BASE_URL }}
+      JIRA_EMAIL: ${{ vars.JIRA_EMAIL }}
       JIRA_TOKEN: ${{ secrets.JIRA_TOKEN }}
     steps:
       - name: Extract Jira issue from PR title
@@ -183,7 +183,7 @@ jobs:
             --config "$JIRA_CURL_CONFIG" \
             -H "Content-Type: application/json" \
             -d "$PAYLOAD" \
-            "$JIRA_BASE_URL/issue/$ISSUE/comments")
+            "$JIRA_BASE_URL/issue/$ISSUE/comment")
 
           HTTP_CODE=$(echo "$RESPONSE" | tail -n1)
           BODY=$(echo "$RESPONSE" | head -n -1)
