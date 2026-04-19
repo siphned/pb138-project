@@ -17,8 +17,8 @@ jobs:
     runs-on: ubuntu-latest
     permissions: {}
     env:
-      JIRA_BASE_URL: ${{ secrets.JIRA_BASE_URL }}
-      JIRA_EMAIL: ${{ secrets.JIRA_EMAIL }}
+      JIRA_BASE_URL: https://api.atlassian.com/ex/jira/c6f2e588-c214-4698-b7bd-5a5be28a9e06/rest/api/3
+      JIRA_EMAIL: 536230@muni.cz
       JIRA_TOKEN: ${{ secrets.JIRA_TOKEN }}
     steps:
       - name: Extract Jira issue from PR title
@@ -40,7 +40,7 @@ jobs:
           if [[ "${{ github.event.action }}" == "closed" && "${{ github.event.pull_request.merged }}" == "true" ]]; then
             echo "name=Done" >> "$GITHUB_OUTPUT"
           elif [[ "${{ github.event.action }}" == "closed" ]]; then
-            echo "name=" >> "$GITHUB_OUTPUT"
+            echo "name=In Progress" >> "$GITHUB_OUTPUT"
           elif [[ "${{ github.event.action }}" == "converted_to_draft" || "${{ github.event.pull_request.draft }}" == "true" ]]; then
             echo "name=In Progress" >> "$GITHUB_OUTPUT"
           else
@@ -130,3 +130,68 @@ jobs:
           fi
 
           echo "✅ Transitioned $ISSUE to '$TRANSITION_NAME' (id: $TRANSITION_ID)"
+
+      - name: Add PR link comment to Jira (opened)
+        if: github.event.action == 'opened' && steps.issue.outputs.issue
+        run: |
+          set -euo pipefail
+          set +x
+
+          ISSUE="${{ steps.issue.outputs.issue }}"
+          PR_TITLE="${{ github.event.pull_request.title }}"
+          PR_URL="${{ github.event.pull_request.html_url }}"
+          PR_BRANCH="${{ github.event.pull_request.head.ref }}"
+
+          if [[ -z "$JIRA_BASE_URL" || -z "$JIRA_EMAIL" || -z "$JIRA_TOKEN" ]]; then
+            echo "Jira secrets are not available. Skipping comment for $ISSUE."
+            exit 0
+          fi
+
+          JIRA_AUTH_HEADER=$(printf '%s:%s' "$JIRA_EMAIL" "$JIRA_TOKEN" | base64 | tr -d '\n')
+          echo "::add-mask::$JIRA_AUTH_HEADER"
+          JIRA_CURL_CONFIG=$(mktemp)
+          trap 'rm -f "$JIRA_CURL_CONFIG"' EXIT
+          printf 'header = "Authorization: Basic %s"\n' "$JIRA_AUTH_HEADER" > "$JIRA_CURL_CONFIG"
+
+          PAYLOAD=$(jq -nc \
+            --arg prTitle "$PR_TITLE" \
+            --arg prUrl "$PR_URL" \
+            --arg prBranch "$PR_BRANCH" \
+            '{
+              body: {
+                version: 1,
+                type: "doc",
+                content: [
+                  {
+                    type: "paragraph",
+                    content: [
+                      {
+                        type: "text",
+                        text: ("🔗 PR linked: " + $prTitle + " | Branch: " + $prBranch),
+                        marks: [{
+                          type: "link",
+                          attrs: { href: $prUrl }
+                        }]
+                      }
+                    ]
+                  }
+                ]
+              }
+            }')
+
+          RESPONSE=$(curl -sS -w "\n%{http_code}" -X POST \
+            --config "$JIRA_CURL_CONFIG" \
+            -H "Content-Type: application/json" \
+            -d "$PAYLOAD" \
+            "$JIRA_BASE_URL/issue/$ISSUE/comments")
+
+          HTTP_CODE=$(echo "$RESPONSE" | tail -n1)
+          BODY=$(echo "$RESPONSE" | head -n -1)
+
+          if [[ "$HTTP_CODE" != "201" ]]; then
+            echo "❌ Failed to add comment to $ISSUE (HTTP $HTTP_CODE)"
+            echo "$BODY"
+            exit 1
+          fi
+
+          echo "✅ Added PR comment to $ISSUE"
