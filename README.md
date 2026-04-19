@@ -18,23 +18,24 @@ WineMarket connects winemakers, shop owners, and customers in a single platform:
 
 ---
 
-## Tech Stack (Planned)
+## Tech Stack
 
-*Currently installed:*
+*Currently installed & configured:*
 
 | Layer | Technology |
 |-------|-----------|
 | Runtime | Bun |
 | Frontend | React + Vite + TypeScript |
-| Backend | Elysia |
-| Database | PostgreSQL + Drizzle ORM |
-| Validation | Zod |
+| Backend | Elysia + Zod (schemas & validation) |
+| Code Generation | Kubb (from OpenAPI spec) |
 | Monorepo | Turborepo |
+
+*Installed but not yet integrated:*
+- PostgreSQL + Drizzle ORM (dependencies present, database wiring coming Phase 2)
 
 *Coming soon (Phase 2):*
 - TanStack Router (frontend routing)
 - Tailwind CSS + shadcn/ui (styling)
-- Kubb (OpenAPI code generation)
 
 ---
 
@@ -71,7 +72,7 @@ bun dev
 Frontend: http://localhost:5173  
 Backend: http://localhost:3000
 
-**Note:** Database setup coming in Phase 2. Currently work with Elysia stub backend.
+**Current Status:** Frontend + Elysia backend running. Database schema exists but not connected to backend yet (Phase 2).
 
 ---
 
@@ -107,9 +108,9 @@ bun test:e2e           # Run E2E tests (Playwright)
 
 ## Environment
 
-See `apps/web/.env.example` for frontend configuration. Copy to `apps/web/.env.local` for local development.
+**Frontend:** See `apps/web/.env.example` for configuration. Copy to `apps/web/.env.local` for local development.
 
-Backend environment configuration coming in Phase 2.
+**Backend:** Environment wiring (database connection strings, etc.) coming in Phase 2 when database is integrated.
 
 ---
 
