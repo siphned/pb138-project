@@ -13,10 +13,12 @@ Code reviews in this project serve three purposes:
 
 | Review | Phase | Timing | Scope |
 |--------|-------|--------|-------|
-| **REVIEW_001** | Design (Week 6) | End of Milestone 1 | Spec docs, architecture, requirements |
-| **REVIEW_002** | Kickoff (Week 9) | End of course setup | Implementation readiness, infrastructure |
+| **REVIEW_001** | Design (Week 6) | Milestone 1 complete | Spec docs, architecture, requirements |
+| **REVIEW_002** | Infrastructure (Week 9) | Course end assessment | Implementation readiness, infrastructure |
 | **REVIEW_003** | Milestone 2 (Week 10) | Implementation checkpoint | Backend modules, database, API |
 | **REVIEW_004** | Milestone 3 (Week 13) | Final assessment | Complete feature set, testing, polish |
+
+*Note: REVIEW_002 conducted at Week 9 (end of course) to assess infrastructure readiness for implementation phase to continue in future semesters.*
 
 ---
 
@@ -32,10 +34,10 @@ Each review document contains:
 
 ```
 code_reviews/REVIEW_NNN_DESCRIPTION.md
-├── REVIEW_001_WEEK6.md              (Milestone 1 complete)
-├── REVIEW_002_WEEK9.md              (Infrastructure ready)
-├── REVIEW_003_WEEK10.md             (Implementation checkpoint)
-├── REVIEW_004_WEEK13.md             (Final complete)
+├── REVIEW_001_WEEK6.md              (Milestone 1 — Design complete)
+├── REVIEW_002_WEEK9.md              (Week 9 — Course assessment, infrastructure ready)
+├── REVIEW_003_WEEK10.md             (Milestone 2 — Implementation checkpoint)
+├── REVIEW_004_WEEK13.md             (Milestone 3 — Final assessment)
 └── GUIDELINES.md                    (This file)
 ```
 
