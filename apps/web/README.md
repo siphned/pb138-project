@@ -2,6 +2,42 @@
 
 This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
 
+## 📁 Project Structure
+
+See [README_STRUCTURE.md](./README_STRUCTURE.md) for detailed folder organization and best practices.
+See [README_GUIDELINES.md](./README_GUIDELINES.md) for development guidelines and conventions.
+
+### Quick Start
+
+- **Components**: Add reusable UI components in `src/components/`
+- **Pages**: Add page-level components in `src/pages/`
+- **Hooks**: Add custom React hooks in `src/hooks/`
+- **Services**: Add API logic in `src/services/`
+- **Utils**: Add utility functions in `src/utils/`
+- **Constants**: Add configuration in `src/constants/`
+- **Context**: Add global state in `src/context/`
+- **Types**: Define TypeScript types in `src/types/`
+- **Generated**: Auto-generated code (do not edit manually)
+
+### Path Aliases
+
+Use `@/` prefix for cleaner imports:
+```typescript
+import { Button } from '@/components';
+import { formatDate } from '@/utils';
+import type { User } from '@/types';
+import { userService } from '@/services';
+```
+
+### Environment Variables
+
+Copy `.env.example` to `.env.local` and update values:
+```bash
+VITE_API_URL=http://localhost:3000/api
+VITE_APP_NAME=My App
+VITE_DEBUG=false
+```
+
 Currently, two official plugins are available:
 
 - [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)

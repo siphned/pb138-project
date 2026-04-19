@@ -27,6 +27,16 @@ out/
 build
 dist
 
+# Generated code (Kubb, code generation)
+apps/web/src/generated/
+
+# Test results
+test-results/
+apps/*/test-results.xml
+
+# Scripts (temporary/local)
+test-all.sh
+
 
 # Debug
 npm-debug.log*
@@ -36,3 +46,6 @@ yarn-error.log*
 # Misc
 .DS_Store
 *.pem
+
+# LLM resources (tracked in git for AI reference)
+# raw/

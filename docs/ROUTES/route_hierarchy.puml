@@ -1,0 +1,45 @@
+@startuml route_structure
+!theme plain
+skinparam backgroundColor #FAFAFA
+
+rectangle "Public" #E0F2F1 {
+  (/) --> (/wines) : browse
+  (/wines) --> (/wines/:id) : detail
+  (/) --> (/winemakers)
+  (/) --> (/shops)
+  (/) --> (/events)
+}
+
+rectangle "Auth" #FFF9C4 {
+  (/auth/login) --> (/dashboard) : success
+  (/auth/register)
+}
+
+rectangle "Customer" #F3E5F5 {
+  (/cart) --> (/checkout) : authenticated
+  (/checkout) --> (/orders/:id) : created
+  (/dashboard) --> (/dashboard/profile)
+  (/dashboard) --> (/dashboard/addresses)
+}
+
+rectangle "Winemaker" #FFCCBC {
+  (/winemaker) --> (/winemaker/wines)
+  (/winemaker/wines) --> (/winemaker/wines/:id)
+  (/winemaker) --> (/winemaker/events)
+}
+
+rectangle "Shop Owner" #FFE0B2 {
+  (/shop) --> (/shop/products)
+  (/shop) --> (/shop/bundles)
+  (/shop) --> (/shop/hours)
+  (/shop) --> (/shop/orders)
+}
+
+rectangle "Admin" #FFCDD2 {
+  (/admin) --> (/admin/users)
+  (/admin) --> (/admin/role-requests)
+  (/admin) --> (/admin/events)
+  (/admin) --> (/admin/reviews)
+}
+
+@enduml
