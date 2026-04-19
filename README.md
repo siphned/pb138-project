@@ -1,159 +1,195 @@
-# Turborepo starter
+# WineMarket — PB138 Web Development Project
 
-This Turborepo starter is maintained by the Turborepo core team.
+A multi-vendor wine marketplace platform with event management, multi-shop ordering, and admin moderation workflows.
 
-## Using this example
+**Course:** PB138 — Úvod do vývoje webu (FI MUNI)  
+**Team:** Adam Mališ, Ján Pullman, Matěj Šinogl, Ondřej Málek
 
-Run the following command:
+---
 
-```sh
-npx create-turbo@latest
+## Overview
+
+WineMarket is a multi-vendor wine marketplace connecting winemakers, shop owners, and customers:
+
+- **Winemakers** create wines, host tasting events, invite collaborators
+- **Shop Owners** manage inventory, create wine bundles, process orders
+- **Customers** browse wines, place multi-vendor orders, attend events, write reviews
+- **Admins** moderate content, approve accounts & events, manage platform
+
+---
+
+## Tech Stack
+
+**Core Technologies** (locked in TECHSTACK.md):
+
+| Layer | Technology | Purpose |
+|-------|-----------|---------|
+| **Runtime** | Bun | Fast JavaScript runtime, native TypeScript, built-in test/lint tools |
+| **Frontend Framework** | React 19 + TypeScript + Vite | UI components, type safety, fast builds |
+| **Routing** | TanStack Router | File-based routing (Phase 2: fully integrated) |
+| **State & Data** | TanStack Query + Kubb | Server state management & auto-generated API hooks |
+| **Backend API** | Elysia + Zod | Type-safe HTTP routes, schema validation |
+| **API Spec** | OpenAPI + Scalar | Auto-generated from Elysia routes, interactive docs |
+| **Code Generation** | Kubb | Generate React hooks from OpenAPI spec → frontend type safety |
+| **Database** | PostgreSQL + Drizzle ORM | Relational DB, type-safe query builder |
+| **Styling** | Tailwind CSS + shadcn/ui | Utility-first CSS, reusable component library (Phase 2) |
+| **Monorepo** | Turborepo + Bun | Multi-package coordination, fast builds |
+| **Validation** | Zod | Schema validation + TypeScript type inference (shared FE/BE) |
+| **Testing** | Vitest + Playwright | Unit tests + E2E tests (Phase 2: expanded coverage) |
+| **CI/CD** | GitLab CI | Lint, type-check, build, test on every MR |
+| **Project Mgmt** | Jira + GitLab | Issue tracking, Git workflow automation |
+
+**Phase 1 (Weeks 6-7):** Design docs ✅  
+**Phase 2 (Weeks 8-10):** Core implementation (database, API, basic frontend)  
+**Phase 3 (Weeks 11-13):** Feature completion, testing, polish
+
+---
+
+## Project Structure
+
+```
+winery/
+├── apps/
+│   ├── web/                    # React frontend (Vite)
+│   └── server/                 # Elysia backend
+├── packages/
+│   ├── typescript-config/      # Shared tsconfig
+│   └── ui/                     # Reusable UI components (stub)
+├── .github/workflows/          # CI/CD pipelines
+├── docs/                       # Design docs, architecture, API specs
+│   ├── ARCHITECTURE/           # System design & layer diagram
+│   ├── API/                    # REST API endpoint specification
+│   ├── ROLES/                  # Role-permission matrix
+│   ├── MODULES/                # Backend module breakdown
+│   ├── ROUTES/                 # Frontend route structure
+│   ├── TECHSTACK/              # Technology decisions & rationale
+│   ├── wiki/                   # Quick-reference guides (comprehensive)
+│   ├── raw/                    # Course materials (seminars, lectures)
+│   ├── code_reviews/           # Code review assessments
+│   └── project_requirements_document.md
+├── CLAUDE.md                   # Development guidelines
+└── TECHSTACK.md                # Technology stack decisions
 ```
 
-## What's inside?
+---
 
-This Turborepo includes the following packages/apps:
+## Quick Start
 
-### Apps and Packages
+**Prerequisites:** [Bun](https://bun.sh)
 
-- `docs`: a [Next.js](https://nextjs.org/) app
-- `web`: another [Next.js](https://nextjs.org/) app
-- `@repo/ui`: a stub React component library shared by both `web` and `docs` applications
-- `@repo/eslint-config`: `eslint` configurations (includes `eslint-config-next` and `eslint-config-prettier`)
-- `@repo/typescript-config`: `tsconfig.json`s used throughout the monorepo
+```bash
+# 1. Install dependencies
+bun install
 
-Each package/app is 100% [TypeScript](https://www.typescriptlang.org/).
-
-### Utilities
-
-This Turborepo has some additional tools already setup for you:
-
-- [TypeScript](https://www.typescriptlang.org/) for static type checking
-- [ESLint](https://eslint.org/) for code linting
-- [Prettier](https://prettier.io) for code formatting
-
-### Build
-
-To build all apps and packages, run the following command:
-
-With [global `turbo`](https://turborepo.dev/docs/getting-started/installation#global-installation) installed (recommended):
-
-```sh
-cd my-turborepo
-turbo build
+# 2. Start dev servers (frontend + backend)
+bun dev
 ```
 
-Without global `turbo`, use your package manager:
+Frontend: http://localhost:5173  
+Backend: http://localhost:3000
 
-```sh
-cd my-turborepo
-npx turbo build
-yarn dlx turbo build
-pnpm exec turbo build
+**Current Status:** Frontend + Elysia backend running. Database schema exists but not connected to backend yet (Phase 2).
+
+---
+
+## Common Commands
+
+**Development:**
+```bash
+bun install            # Install all dependencies
+bun dev                # Start both dev servers (frontend + backend)
+bun run dev:web        # Frontend only (port 5173)
+bun run dev:server     # Backend only (port 3000)
 ```
 
-You can build a specific package by using a [filter](https://turborepo.dev/docs/crafting-your-repository/running-tasks#using-filters):
-
-With [global `turbo`](https://turborepo.dev/docs/getting-started/installation#global-installation) installed:
-
-```sh
-turbo build --filter=docs
+**Code Quality:**
+```bash
+bun run lint           # ESLint check (Biome)
+bun run format         # Auto-format code (Biome)
+bun run type-check     # TypeScript type checking
 ```
 
-Without global `turbo`:
-
-```sh
-npx turbo build --filter=docs
-yarn exec turbo build --filter=docs
-pnpm exec turbo build --filter=docs
+**Database (Phase 2):**
+```bash
+bun run db:generate    # Generate migration from schema changes
+bun run db:migrate     # Apply pending migrations
+bun run db:studio      # Visual database browser (Drizzle Studio)
 ```
 
-### Develop
-
-To develop all apps and packages, run the following command:
-
-With [global `turbo`](https://turborepo.dev/docs/getting-started/installation#global-installation) installed (recommended):
-
-```sh
-cd my-turborepo
-turbo dev
+**Code Generation:**
+```bash
+bun run generate       # Regenerate Kubb types from OpenAPI spec
 ```
 
-Without global `turbo`, use your package manager:
-
-```sh
-cd my-turborepo
-npx turbo dev
-yarn exec turbo dev
-pnpm exec turbo dev
+**Testing:**
+```bash
+bun run test           # Run unit tests (Vitest)
+bun run test:e2e       # Run E2E tests (Playwright)
 ```
 
-You can develop a specific package by using a [filter](https://turborepo.dev/docs/crafting-your-repository/running-tasks#using-filters):
-
-With [global `turbo`](https://turborepo.dev/docs/getting-started/installation#global-installation) installed:
-
-```sh
-turbo dev --filter=web
+**Building:**
+```bash
+bun run build          # Build both packages for production
+bun build:web          # Frontend build → dist/
+bun build:server       # Backend build
 ```
 
-Without global `turbo`:
+---
 
-```sh
-npx turbo dev --filter=web
-yarn exec turbo dev --filter=web
-pnpm exec turbo dev --filter=web
-```
+## Documentation
 
-### Remote Caching
+### Design & Architecture
+| Document | Description |
+|----------|-------------|
+| [docs/ARCHITECTURE/](docs/ARCHITECTURE/) | System design, layer diagram, architecture decisions |
+| [docs/API/](docs/API/) | REST API endpoint specification (50+ endpoints) |
+| [docs/ROLES/](docs/ROLES/) | Role-permission matrix (5 roles × 50+ features) |
+| [docs/MODULES/](docs/MODULES/) | Backend module breakdown & ownership |
+| [docs/ROUTES/](docs/ROUTES/) | Frontend route structure & page hierarchy |
+| [docs/TECHSTACK/](docs/TECHSTACK/) | Technology decisions & rationale |
+| [docs/project_requirements_document.md](docs/project_requirements_document.md) | Complete PRD (functional & non-functional requirements) |
 
-> [!TIP]
-> Vercel Remote Cache is free for all plans. Get started today at [vercel.com](https://vercel.com/signup?utm_source=remote-cache-sdk&utm_campaign=free_remote_cache).
+### Quick Reference (Wiki)
+| Guide | Purpose |
+|-------|---------|
+| [docs/wiki/README.md](docs/wiki/README.md) | Wiki index & how to use |
+| [docs/wiki/REACT.md](docs/wiki/REACT.md) | React patterns, hooks, components, state |
+| [docs/wiki/ROUTING.md](docs/wiki/ROUTING.md) | TanStack Router file-based routing |
+| [docs/wiki/REST_API.md](docs/wiki/REST_API.md) | REST fundamentals & HTTP best practices |
+| [docs/wiki/ELYSIA.md](docs/wiki/ELYSIA.md) | Elysia framework, routes, middleware |
+| [docs/wiki/KUBB.md](docs/wiki/KUBB.md) | Kubb code generation from OpenAPI |
+| [docs/wiki/DATABASE.md](docs/wiki/DATABASE.md) | Drizzle ORM, ERD, migrations, transactions |
+| [docs/wiki/STYLING.md](docs/wiki/STYLING.md) | Tailwind CSS, shadcn/ui, responsive design |
+| [docs/wiki/AI_DEV.md](docs/wiki/AI_DEV.md) | AI-assisted development, context, tokens |
 
-Turborepo can use a technique known as [Remote Caching](https://turborepo.dev/docs/core-concepts/remote-caching) to share cache artifacts across machines, enabling you to share build caches with your team and CI/CD pipelines.
+### Course Materials
+| Resource | Location |
+|----------|----------|
+| Seminar slides & materials | [docs/raw/sem_slides_group_03/](docs/raw/sem_slides_group_03/) |
+| Course lectures | [docs/raw/lec/](docs/raw/lec/) |
+| Code review assessments | [docs/code_reviews/](docs/code_reviews/) |
 
-By default, Turborepo will cache locally. To enable Remote Caching you will need an account with Vercel. If you don't have an account you can [create one](https://vercel.com/signup?utm_source=turborepo-examples), then enter the following commands:
+### Project Guidelines
+| Document | Purpose |
+|----------|---------|
+| [CLAUDE.md](CLAUDE.md) | Development guidelines, architecture patterns, team workflow |
+| [docs/WORKFLOW.md](docs/WORKFLOW.md) | Git workflow, Jira integration, branch naming, PR process |
+| [TECHSTACK.md](TECHSTACK.md) | Technology stack locked decisions |
 
-With [global `turbo`](https://turborepo.dev/docs/getting-started/installation#global-installation) installed (recommended):
+---
 
-```sh
-cd my-turborepo
-turbo login
-```
+## Environment
 
-Without global `turbo`, use your package manager:
+**Frontend:** See `apps/web/.env.example` for configuration. Copy to `apps/web/.env.local` for local development.
 
-```sh
-cd my-turborepo
-npx turbo login
-yarn exec turbo login
-pnpm exec turbo login
-```
+**Backend:** Environment wiring (database connection strings, etc.) coming in Phase 2 when database is integrated.
 
-This will authenticate the Turborepo CLI with your [Vercel account](https://vercel.com/docs/concepts/personal-accounts/overview).
+---
 
-Next, you can link your Turborepo to your Remote Cache by running the following command from the root of your Turborepo:
+## Git Workflow
 
-With [global `turbo`](https://turborepo.dev/docs/getting-started/installation#global-installation) installed:
+- Branch from `dev`: `WINE-XX-short-description`
+- PR targets `dev`, requires one approval + passing CI
+- Squash merge, delete branch after merge
+- `main` = production only, merged from `dev` at milestones
 
-```sh
-turbo link
-```
-
-Without global `turbo`:
-
-```sh
-npx turbo link
-yarn exec turbo link
-pnpm exec turbo link
-```
-
-## Useful Links
-
-Learn more about the power of Turborepo:
-
-- [Tasks](https://turborepo.dev/docs/crafting-your-repository/running-tasks)
-- [Caching](https://turborepo.dev/docs/crafting-your-repository/caching)
-- [Remote Caching](https://turborepo.dev/docs/core-concepts/remote-caching)
-- [Filtering](https://turborepo.dev/docs/crafting-your-repository/running-tasks#using-filters)
-- [Configuration Options](https://turborepo.dev/docs/reference/configuration)
-- [CLI Usage](https://turborepo.dev/docs/reference/command-line-reference)

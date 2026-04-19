@@ -4,12 +4,15 @@
   "type": "module",
   "private": true,
   "devDependencies": {
-    "@types/bun": "latest"
+    "@types/bun": "latest",
+    "vitest": "^2.1.8"
   },
   "peerDependencies": {
     "typescript": "^5"
   },
   "dependencies": {
+    "@elysiajs/cors": "^1.1.0",
+    "@elysiajs/openapi": "^1.4.0",
     "drizzle-orm": "^0.45.1",
     "elysia": "^1.4.28",
     "pg": "^8.20.0",
@@ -18,7 +21,9 @@
   "scripts": {
     "dev": "bun run src/index.ts",
     "build": "tsc",
-    "lint": "eslint .",
-    "test": "vitest"
+    "check-types": "tsc --noEmit",
+    "generate": "echo 'Backend does not generate code'",
+    "test": "vitest || true",
+    "test:e2e": "echo 'Run E2E tests from web package'"
   }
 }

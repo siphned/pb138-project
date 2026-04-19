@@ -1,0 +1,375 @@
+
+Enum user_role {
+  user
+  admin
+}
+
+Enum role_request_type {
+  winemaker
+  shop_owner
+}
+
+Enum role_request_status {
+  pending
+  approved
+  rejected
+}
+
+Enum order_status {
+  pending
+  confirmed
+  shipped
+  delivered
+  cancelled
+}
+
+Enum delivery_type {
+  pickup
+  shipping
+}
+
+Enum event_visibility {
+  public
+  private
+}
+
+Enum event_invite_status {
+  pending
+  accepted
+  declined
+  expired
+}
+
+Enum wine_color {
+  red
+  white
+  rose
+  orange
+  gray
+  tawny
+  yellow
+}
+
+Enum wine_type {
+  still
+  sparkling
+  fortified
+  dessert
+}
+
+Enum payment_status {
+  pending
+  authorized
+  captured
+  failed
+  cancelled
+  refunded
+  partially_refunded
+}
+
+Enum payment_method {
+  card
+  bank_transfer
+  cash_on_delivery
+}
+
+Table Users {
+  id uuid [pk]
+  fname varchar(30) [not null]
+  lname varchar(30) [not null]
+  email text [not null, unique]
+  email_verified boolean [not null]
+  hashed_password varchar(256) [not null]
+  role user_role [not null, default: 'user']
+  shipping_address_id uuid
+  billing_address_id uuid
+  created_at timestamp [not null]
+  updated_at timestamp
+  deleted_at timestamp
+}
+
+Table Winemakers {
+  id uuid [pk]
+  user_id uuid [not null, unique]
+  name text [not null, unique]
+  description text [not null]
+  website_url text
+  email varchar(255) [not null]
+  phone varchar(30) [not null]
+  address_id uuid [not null]
+  created_at timestamp [not null]
+  updated_at timestamp
+  deleted_at timestamp
+}
+
+Table Wines {
+  id uuid [pk]
+  winemaker_id uuid [not null]
+  name varchar(255) [not null]
+  description text [not null]
+  composition text [not null]
+  attribution text [not null]
+  vintage_year smallint [not null]
+  type wine_type [not null]
+  color wine_color [not null]
+  alcohol_content decimal(4,2) [not null]
+  volume_ml smallint [not null]
+  quantity smallint [not null]
+  created_at timestamptz [not null]
+  updated_at timestamptz [not null]
+  deleted_at timestamptz
+}
+
+Table Sessions {
+  id uuid [pk]
+  user_id uuid [not null]
+  token text [not null, unique]
+  role user_role [not null, default: 'user']
+  created_at timestamp [not null]
+  expires_at timestamp [not null]
+}
+
+Table Products {
+  id uuid [pk]
+  shop_id uuid [not null]
+  name varchar(255) [not null]
+  description text
+  price numeric(10,2) [not null]
+  quantity smallint [not null]
+  created_at timestamp [not null]
+  updated_at timestamp
+  deleted_at timestamp
+}
+
+Table Availability_regular {
+  id uuid [pk]
+  winemaker_id uuid
+  shop_id uuid [not null]
+  dow smallint [not null]
+  start_time timestamp [not null]
+  end_time timestamp [not null]
+  valid_from date [not null]
+  valid_to date
+  type varchar(255) [not null]
+}
+
+Table Availability_exceptions {
+  id uuid [pk]
+  winemaker_id uuid
+  shop_id uuid [not null]
+  starts_at timestamp [not null]
+  ends_at timestamp [not null]
+  action varchar(255) [not null]
+  reason text
+}
+
+Table Carts {
+  id uuid [pk]
+  user_id uuid [not null]
+  created_at timestamptz [not null]
+  updated_at timestamptz [not null]
+}
+
+Table Cart_items {
+  id uuid [pk]
+  cart_id uuid [not null]
+  product_id uuid [not null]
+  quantity smallint [not null]
+  created_at timestamptz [not null]
+  updated_at timestamptz [not null]
+}
+
+Table Events {
+  id uuid [pk]
+  winemaker_id uuid [not null]
+  name varchar(255) [not null]
+  description text
+  address_id uuid [not null]
+  capacity smallint [not null]
+  start_time timestamptz [not null]
+  end_time timestamptz [not null]
+  status varchar(50) [not null, default: 'draft']
+  created_at timestamp [not null]
+  updated_at timestamp
+  deleted_at timestamp
+  invite_type varchar(255) [not null]
+  visibility event_visibility [not null]
+}
+
+Table Event_invites {
+  id uuid [pk]
+  event_id uuid [not null]
+  winemaker_id_invited uuid [not null]
+  token uuid [not null, unique]
+  created_at timestamp [not null]
+  expires_at timestamp [not null]
+  status event_invite_status [not null]
+}
+
+Table Event_registrations {
+  id uuid [pk]
+  event_id uuid [not null]
+  user_id uuid [not null]
+  created_at timestamp [not null]
+  deleted_at timestamp
+}
+
+Table Orders {
+  id uuid [pk]
+  user_id uuid [not null]
+  shipping_fee numeric(10,2) [not null]
+  discount numeric(10,2) [not null]
+  payment_status payment_status [not null]
+  payment_method payment_method [not null]
+  total_price numeric(10,2) [not null]
+  created_at timestamp [not null]
+  updated_at timestamp
+  deleted_at timestamp
+  status order_status [not null]
+  delivery_type delivery_type [not null]
+  shipping_address_id uuid [not null]
+  billing_address_id uuid [not null]
+}
+
+Table Product_wines {
+  id uuid [pk]
+  product_id uuid [not null]
+  wine_id uuid [not null]
+  quantity smallint [not null]
+}
+
+Table Order_items {
+  id uuid [pk]
+  shop_id uuid [not null]
+  order_id uuid [not null]
+  product_id uuid [not null]
+  quantity smallint [not null]
+  unit_price_at_purchase numeric(10,2) [not null]
+}
+
+Table Shops {
+  id uuid [pk]
+  owner_user_id uuid [not null] 
+  name varchar(255) [not null]
+  description text [not null]
+  address_id uuid [not null]
+  created_at timestamp [not null]
+  updated_at timestamp
+  deleted_at timestamp
+}
+
+Table Comments {
+  id uuid [pk]
+  event_id uuid [not null]
+  user_id uuid [not null]
+  body text [not null]
+  created_at timestamp [not null]
+  deleted_at timestamp
+}
+
+Table Product_reviews {
+  id uuid [pk]
+  user_id uuid [not null]
+  product_id uuid [not null]
+  rating smallint [not null] 
+  body text
+  created_at timestamp [not null]
+  updated_at timestamp
+  deleted_at timestamp
+}
+
+Table Winemaker_reviews {
+  id uuid [pk]
+  user_id uuid [not null]
+  winemaker_id uuid [not null]
+  rating smallint [not null]
+  body text
+  created_at timestamp [not null]
+  updated_at timestamp
+  deleted_at timestamp
+}
+
+Table Images {
+  id uuid [pk]
+  url text [not null]
+  alt_text text
+  entity_type varchar(50) [not null] 
+  entity_id uuid [not null]
+  sort_order integer [default: 0]
+  created_at timestamp [not null]
+  updated_at timestamp
+}
+
+Table Role_requests {
+  id uuid [pk]
+  user_id uuid [not null]
+  requested_role role_request_type [not null]
+  status role_request_status [not null, default: 'pending']
+  business_name varchar(255) [not null]
+  details text
+  submitted_at timestamp [not null]
+  reviewed_at timestamp
+  reviewed_by_admin_id uuid
+}
+
+Table Addresses {
+  id uuid [pk]
+  country varchar(50) [not null]
+  city varchar(255) [not null]
+  postal_code varchar(20) [not null]
+  street varchar(255) [not null]
+  house_number varchar(20) [not null]
+  created_at timestamp [not null]
+  updated_at timestamp
+  deleted_at timestamp
+}
+
+
+Ref: Winemaker_reviews.user_id > Users.id
+Ref: Winemaker_reviews.winemaker_id > Winemakers.id
+
+Ref: Product_reviews.user_id > Users.id
+Ref: Product_reviews.product_id > Products.id
+
+Ref: Comments.event_id > Events.id
+Ref: Comments.user_id > Users.id
+
+Ref: Sessions.user_id > Users.id
+Ref: Winemakers.user_id - Users.id
+Ref: Shops.owner_user_id > Users.id
+
+Ref: Wines.winemaker_id > Winemakers.id
+Ref: Events.winemaker_id > Winemakers.id
+
+Ref: Event_invites.event_id > Events.id
+Ref: Event_invites.winemaker_id_invited > Winemakers.id
+
+Ref: Availability_regular.winemaker_id > Winemakers.id
+Ref: Availability_exceptions.winemaker_id > Winemakers.id
+Ref: Availability_regular.shop_id > Shops.id
+Ref: Availability_exceptions.shop_id > Shops.id
+
+Ref: Products.shop_id > Shops.id
+Ref: Order_items.shop_id > Shops.id
+
+Ref: Carts.user_id - Users.id
+Ref: Cart_items.cart_id > Carts.id
+Ref: Cart_items.product_id > Products.id
+
+Ref: Users.shipping_address_id > Addresses.id
+Ref: Users.billing_address_id > Addresses.id
+Ref: Winemakers.address_id > Addresses.id
+Ref: Shops.address_id > Addresses.id
+Ref: Events.address_id > Addresses.id
+
+
+Ref: Product_wines.wine_id > Wines.id
+Ref: Product_wines.product_id > Products.id
+Ref: Orders.user_id > Users.id
+Ref: Orders.shipping_address_id > Addresses.id
+Ref: Orders.billing_address_id > Addresses.id
+Ref: Order_items.order_id > Orders.id
+
+Ref: Role_requests.user_id > Users.id
+Ref: Role_requests.reviewed_by_admin_id > Users.id
+
