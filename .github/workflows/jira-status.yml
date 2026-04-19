@@ -5,14 +5,15 @@ on:
     workflows: [CI]
     types: [completed]
 
-env:
-  JIRA_BASE_URL: https://api.atlassian.com/ex/jira/c6f2e588-c214-4698-b7bd-5a5be28a9e06/rest/api/3
-  JIRA_EMAIL: 536230@muni.cz
-
 jobs:
   jira-status:
     runs-on: ubuntu-latest
     steps:
+      - name: Check out code
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.workflow_run.head_commit.id }}
+
       - name: Extract Jira issue from PR title
         id: extract
         run: |
@@ -36,107 +37,30 @@ jobs:
 
       - name: Post CI Status to Jira (Success)
         if: github.event.workflow_run.conclusion == 'success' && steps.extract.outputs.issue
-        run: |
-          set -e
-          ISSUE="${{ steps.extract.outputs.issue }}"
-          AUTH=$(echo -n "$JIRA_EMAIL:${{ secrets.JIRA_TOKEN }}" | base64)
-          WORKFLOW_URL="https://github.com/${{ github.repository }}/actions/runs/${{ github.event.workflow_run.id }}"
+        uses: atlassian/gajira-comment@master
+        with:
+          issue: ${{ steps.extract.outputs.issue }}
+          comment: |
+            ✅ CI Pipeline passed
 
-          PAYLOAD=$(jq -n \
-            --arg workflowUrl "$WORKFLOW_URL" \
-            '{
-              body: {
-                version: 1,
-                type: "doc",
-                content: [
-                  {
-                    type: "paragraph",
-                    content: [{
-                      type: "text",
-                      text: "✅ CI Pipeline passed"
-                    }]
-                  },
-                  {
-                    type: "paragraph",
-                    content: [{
-                      type: "text",
-                      text: "View workflow run",
-                      marks: [{
-                        type: "link",
-                        attrs: { href: $workflowUrl }
-                      }]
-                    }]
-                  }
-                ]
-              }
-            }')
-
-          RESPONSE=$(curl -s -w "\n%{http_code}" -X POST \
-            -H "Authorization: Basic $AUTH" \
-            -H "Content-Type: application/json" \
-            -d "$PAYLOAD" \
-            "$JIRA_BASE_URL/issue/$ISSUE/comments")
-          HTTP_CODE=$(echo "$RESPONSE" | tail -n1)
-          if [ "$HTTP_CODE" != "201" ]; then
-            echo "❌ Failed to post success comment to $ISSUE (HTTP $HTTP_CODE)"
-            echo "$RESPONSE" | head -n-1
-            exit 1
-          fi
-          echo "✅ Posted success comment to $ISSUE"
+            [View workflow run](https://github.com/${{ github.repository }}/actions/runs/${{ github.event.workflow_run.id }})
+        env:
+          JIRA_BASE_URL: https://pb138winery.atlassian.net
+          JIRA_USER_EMAIL: 536230@mail.muni.cz
+          JIRA_API_TOKEN: ${{ secrets.JIRA_TOKEN }}
 
       - name: Post CI Status to Jira (Failure)
         if: github.event.workflow_run.conclusion == 'failure' && steps.extract.outputs.issue
-        run: |
-          set -e
-          ISSUE="${{ steps.extract.outputs.issue }}"
-          AUTH=$(echo -n "$JIRA_EMAIL:${{ secrets.JIRA_TOKEN }}" | base64)
-          WORKFLOW_URL="https://github.com/${{ github.repository }}/actions/runs/${{ github.event.workflow_run.id }}"
+        uses: atlassian/gajira-comment@master
+        with:
+          issue: ${{ steps.extract.outputs.issue }}
+          comment: |
+            ❌ CI Pipeline failed
 
-          PAYLOAD=$(jq -n \
-            --arg workflowUrl "$WORKFLOW_URL" \
-            '{
-              body: {
-                version: 1,
-                type: "doc",
-                content: [
-                  {
-                    type: "paragraph",
-                    content: [{
-                      type: "text",
-                      text: "❌ CI Pipeline failed"
-                    }]
-                  },
-                  {
-                    type: "paragraph",
-                    content: [{
-                      type: "text",
-                      text: "View workflow run",
-                      marks: [{
-                        type: "link",
-                        attrs: { href: $workflowUrl }
-                      }]
-                    }]
-                  },
-                  {
-                    type: "paragraph",
-                    content: [{
-                      type: "text",
-                      text: "Please review the pipeline logs and fix any issues before requesting review."
-                    }]
-                  }
-                ]
-              }
-            }')
+            [View workflow run](https://github.com/${{ github.repository }}/actions/runs/${{ github.event.workflow_run.id }})
 
-          RESPONSE=$(curl -s -w "\n%{http_code}" -X POST \
-            -H "Authorization: Basic $AUTH" \
-            -H "Content-Type: application/json" \
-            -d "$PAYLOAD" \
-            "$JIRA_BASE_URL/issue/$ISSUE/comments")
-          HTTP_CODE=$(echo "$RESPONSE" | tail -n1)
-          if [ "$HTTP_CODE" != "201" ]; then
-            echo "❌ Failed to post failure comment to $ISSUE (HTTP $HTTP_CODE)"
-            echo "$RESPONSE" | head -n-1
-            exit 1
-          fi
-          echo "✅ Posted failure comment to $ISSUE"
+            Please review the pipeline logs and fix any issues before requesting review.
+        env:
+          JIRA_BASE_URL: https://pb138winery.atlassian.net
+          JIRA_USER_EMAIL: 536230@mail.muni.cz
+          JIRA_API_TOKEN: ${{ secrets.JIRA_TOKEN }}
