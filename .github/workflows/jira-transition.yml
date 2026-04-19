@@ -6,7 +6,6 @@ on:
       [
         opened,
         reopened,
-        synchronize,
         ready_for_review,
         converted_to_draft,
         closed,
@@ -41,7 +40,7 @@ jobs:
             echo "name=Done" >> "$GITHUB_OUTPUT"
           elif [[ "${{ github.event.action }}" == "closed" ]]; then
             echo "name=In Progress" >> "$GITHUB_OUTPUT"
-          elif [[ "${{ github.event.action }}" == "converted_to_draft" || "${{ github.event.pull_request.draft }}" == "true" ]]; then
+          elif [[ "${{ github.event.action }}" == "converted_to_draft" ]]; then
             echo "name=In Progress" >> "$GITHUB_OUTPUT"
           else
             echo "name=Ready for Review" >> "$GITHUB_OUTPUT"
@@ -145,6 +144,11 @@ jobs:
           if [[ -z "$JIRA_BASE_URL" || -z "$JIRA_EMAIL" || -z "$JIRA_TOKEN" ]]; then
             echo "Jira secrets are not available. Skipping comment for $ISSUE."
             exit 0
+          fi
+
+          if ! command -v jq >/dev/null 2>&1; then
+            echo "❌ jq is required but is not available on the runner."
+            exit 1
           fi
 
           JIRA_AUTH_HEADER=$(printf '%s:%s' "$JIRA_EMAIL" "$JIRA_TOKEN" | base64 | tr -d '\n')
