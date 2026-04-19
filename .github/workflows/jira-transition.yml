@@ -1,0 +1,106 @@
+name: Jira Transition
+
+on:
+  pull_request:
+    types:
+      [
+        opened,
+        reopened,
+        synchronize,
+        ready_for_review,
+        converted_to_draft,
+        closed,
+      ]
+
+jobs:
+  transition:
+    runs-on: ubuntu-latest
+    env:
+      JIRA_BASE_URL: ${{ secrets.JIRA_BASE_URL }}
+      JIRA_EMAIL: ${{ secrets.JIRA_EMAIL }}
+      JIRA_TOKEN: ${{ secrets.JIRA_TOKEN }}
+    steps:
+      - name: Extract Jira issue from PR title
+        id: issue
+        run: |
+          TITLE="${{ github.event.pull_request.title }}"
+          if [[ $TITLE =~ \[?(WINE-[0-9]+)\]? ]]; then
+            ISSUE="${BASH_REMATCH[1]}"
+            echo "issue=$ISSUE" >> "$GITHUB_OUTPUT"
+            echo "Found Jira issue: $ISSUE"
+          else
+            echo "No Jira issue found in PR title: $TITLE"
+            exit 0
+          fi
+
+      - name: Resolve target transition
+        id: transition
+        run: |
+          if [[ "${{ github.event.action }}" == "closed" && "${{ github.event.pull_request.merged }}" == "true" ]]; then
+            echo "name=Done" >> "$GITHUB_OUTPUT"
+          elif [[ "${{ github.event.action }}" == "closed" ]]; then
+            echo "name=" >> "$GITHUB_OUTPUT"
+          elif [[ "${{ github.event.action }}" == "converted_to_draft" || "${{ github.event.pull_request.draft }}" == "true" ]]; then
+            echo "name=In Progress" >> "$GITHUB_OUTPUT"
+          else
+            echo "name=Ready for Review" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Transition Jira issue
+        run: |
+          set -euo pipefail
+
+          ISSUE="${{ steps.issue.outputs.issue }}"
+          TRANSITION_NAME="${{ steps.transition.outputs.name }}"
+
+          if [[ -z "$ISSUE" || -z "$TRANSITION_NAME" ]]; then
+            echo "No Jira transition required for this pull_request action."
+            exit 0
+          fi
+
+          if [[ -z "$JIRA_BASE_URL" || -z "$JIRA_EMAIL" || -z "$JIRA_TOKEN" ]]; then
+            echo "Jira secrets are not available. Skipping transition for $ISSUE."
+            exit 0
+          fi
+
+          AUTH=$(printf '%s:%s' "$JIRA_EMAIL" "$JIRA_TOKEN" | base64)
+
+          GET_RESPONSE=$(curl -sS -w "\n%{http_code}" -X GET \
+            -H "Authorization: Basic $AUTH" \
+            -H "Accept: application/json" \
+            "$JIRA_BASE_URL/issue/$ISSUE/transitions")
+
+          GET_HTTP_CODE=$(echo "$GET_RESPONSE" | tail -n1)
+          GET_BODY=$(echo "$GET_RESPONSE" | head -n -1)
+
+          if [[ "$GET_HTTP_CODE" != "200" ]]; then
+            echo "❌ Failed to fetch transitions for $ISSUE (HTTP $GET_HTTP_CODE)"
+            echo "$GET_BODY"
+            exit 1
+          fi
+
+          TRANSITION_ID=$(echo "$GET_BODY" | jq -r --arg n "$TRANSITION_NAME" '.transitions[] | select(.name == $n) | .id' | head -n1)
+
+          if [[ -z "$TRANSITION_ID" || "$TRANSITION_ID" == "null" ]]; then
+            echo "❌ Transition '$TRANSITION_NAME' is not available for $ISSUE"
+            echo "Available transitions:"
+            echo "$GET_BODY" | jq -r '.transitions[].name'
+            exit 1
+          fi
+
+          POST_RESPONSE=$(curl -sS -w "\n%{http_code}" -X POST \
+            -H "Authorization: Basic $AUTH" \
+            -H "Content-Type: application/json" \
+            -d "{\"transition\": {\"id\": \"$TRANSITION_ID\"}}" \
+            "$JIRA_BASE_URL/issue/$ISSUE/transitions")
+
+          POST_HTTP_CODE=$(echo "$POST_RESPONSE" | tail -n1)
+          POST_BODY=$(echo "$POST_RESPONSE" | head -n -1)
+
+          if [[ "$POST_HTTP_CODE" != "204" ]]; then
+            echo "❌ Failed to transition $ISSUE to '$TRANSITION_NAME' (HTTP $POST_HTTP_CODE)"
+            echo "$POST_BODY"
+            exit 1
+          fi
+
+          echo "✅ Transitioned $ISSUE to '$TRANSITION_NAME' (id: $TRANSITION_ID)"
