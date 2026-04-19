@@ -25,75 +25,102 @@ jobs:
       - name: Transition to "Ready for Review" (PR opened)
         if: github.event.action == 'opened' && steps.extract.outputs.issue
         run: |
+          set -e
           ISSUE="${{ steps.extract.outputs.issue }}"
-          curl -X POST \
+          RESPONSE=$(curl -s -w "\n%{http_code}" -X POST \
             -H "Authorization: Bearer ${{ secrets.JIRA_TOKEN }}" \
             -H "Content-Type: application/json" \
             -d '{"transition": {"id": "10078"}}' \
-            https://api.atlassian.com/ex/jira/c6f2e588-c214-4698-b7bd-5a5be28a9e06/rest/api/3/issues/$ISSUE/transitions
+            "https://api.atlassian.com/ex/jira/c6f2e588-c214-4698-b7bd-5a5be28a9e06/rest/api/3/issue/$ISSUE/transitions")
+          HTTP_CODE=$(echo "$RESPONSE" | tail -n1)
+          if [ "$HTTP_CODE" != "204" ]; then
+            echo "❌ Failed to transition $ISSUE (HTTP $HTTP_CODE)"
+            echo "$RESPONSE" | head -n-1
+            exit 1
+          fi
           echo "✅ Transitioned $ISSUE to Ready for Review"
 
       - name: Transition to "Done" (PR merged)
         if: github.event.action == 'closed' && github.event.pull_request.merged == true && steps.extract.outputs.issue
         run: |
+          set -e
           ISSUE="${{ steps.extract.outputs.issue }}"
-          curl -X POST \
+          RESPONSE=$(curl -s -w "\n%{http_code}" -X POST \
             -H "Authorization: Bearer ${{ secrets.JIRA_TOKEN }}" \
             -H "Content-Type: application/json" \
             -d '{"transition": {"id": "10042"}}' \
-            https://api.atlassian.com/ex/jira/c6f2e588-c214-4698-b7bd-5a5be28a9e06/rest/api/3/issues/$ISSUE/transitions
+            "https://api.atlassian.com/ex/jira/c6f2e588-c214-4698-b7bd-5a5be28a9e06/rest/api/3/issue/$ISSUE/transitions")
+          HTTP_CODE=$(echo "$RESPONSE" | tail -n1)
+          if [ "$HTTP_CODE" != "204" ]; then
+            echo "❌ Failed to transition $ISSUE (HTTP $HTTP_CODE)"
+            echo "$RESPONSE" | head -n-1
+            exit 1
+          fi
           echo "✅ Transitioned $ISSUE to Done"
 
       - name: Transition back to "In Progress" (PR closed without merge)
         if: github.event.action == 'closed' && github.event.pull_request.merged == false && steps.extract.outputs.issue
         run: |
+          set -e
           ISSUE="${{ steps.extract.outputs.issue }}"
-          curl -X POST \
+          RESPONSE=$(curl -s -w "\n%{http_code}" -X POST \
             -H "Authorization: Bearer ${{ secrets.JIRA_TOKEN }}" \
             -H "Content-Type: application/json" \
             -d '{"transition": {"id": "10041"}}' \
-            https://api.atlassian.com/ex/jira/c6f2e588-c214-4698-b7bd-5a5be28a9e06/rest/api/3/issues/$ISSUE/transitions
+            "https://api.atlassian.com/ex/jira/c6f2e588-c214-4698-b7bd-5a5be28a9e06/rest/api/3/issue/$ISSUE/transitions")
+          HTTP_CODE=$(echo "$RESPONSE" | tail -n1)
+          if [ "$HTTP_CODE" != "204" ]; then
+            echo "❌ Failed to transition $ISSUE (HTTP $HTTP_CODE)"
+            echo "$RESPONSE" | head -n-1
+            exit 1
+          fi
           echo "✅ Transitioned $ISSUE to In Progress"
 
       - name: Add PR link comment to Jira (opened)
         if: github.event.action == 'opened' && steps.extract.outputs.issue
         run: |
+          set -e
           ISSUE="${{ steps.extract.outputs.issue }}"
-          curl -X POST \
-            -H "Authorization: Bearer ${{ secrets.JIRA_TOKEN }}" \
-            -H "Content-Type: application/json" \
-            -d '{
-              "body": {
-                "version": 1,
-                "type": "doc",
-                "content": [
+          PR_TITLE="${{ github.event.pull_request.title }}"
+          PR_URL="${{ github.event.pull_request.html_url }}"
+          PR_BRANCH="${{ github.event.pull_request.head.ref }}"
+
+          # Create ADF payload with properly escaped strings
+          PAYLOAD=$(jq -n \
+            --arg prTitle "$PR_TITLE" \
+            --arg prUrl "$PR_URL" \
+            --arg prBranch "$PR_BRANCH" \
+            '{
+              body: {
+                version: 1,
+                type: "doc",
+                content: [
                   {
-                    "type": "paragraph",
-                    "content": [
+                    type: "paragraph",
+                    content: [
                       {
-                        "type": "text",
-                        "text": "🔗 PR linked: "
-                      },
-                      {
-                        "type": "link",
-                        "attrs": {
-                          "href": "${{ github.event.pull_request.html_url }}"
-                        },
-                        "content": [
-                          {
-                            "type": "text",
-                            "text": "${{ github.event.pull_request.title }}"
-                          }
-                        ]
-                      },
-                      {
-                        "type": "text",
-                        "text": " | Branch: ${{ github.event.pull_request.head.ref }}"
+                        type: "text",
+                        text: ("🔗 PR linked: " + $prTitle + " | Branch: " + $prBranch),
+                        marks: [{
+                          type: "link",
+                          attrs: { href: $prUrl }
+                        }]
                       }
                     ]
                   }
                 ]
               }
-            }' \
-            https://api.atlassian.com/ex/jira/c6f2e588-c214-4698-b7bd-5a5be28a9e06/rest/api/3/issues/$ISSUE/comments
+            }')
+
+          RESPONSE=$(curl -s -w "\n%{http_code}" -X POST \
+            -H "Authorization: Bearer ${{ secrets.JIRA_TOKEN }}" \
+            -H "Content-Type: application/json" \
+            -d "$PAYLOAD" \
+            "https://api.atlassian.com/ex/jira/c6f2e588-c214-4698-b7bd-5a5be28a9e06/rest/api/3/issue/$ISSUE/comments")
+          HTTP_CODE=$(echo "$RESPONSE" | tail -n1)
+          if [ "$HTTP_CODE" != "201" ]; then
+            echo "❌ Failed to add comment to $ISSUE (HTTP $HTTP_CODE)"
+            echo "$RESPONSE" | head -n-1
+            exit 1
+          fi
           echo "✅ Added PR comment to $ISSUE"

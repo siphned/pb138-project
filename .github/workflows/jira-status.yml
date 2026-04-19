@@ -33,96 +33,104 @@ jobs:
       - name: Post CI Status to Jira (Success)
         if: github.event.workflow_run.conclusion == 'success' && steps.extract.outputs.issue
         run: |
+          set -e
           ISSUE="${{ steps.extract.outputs.issue }}"
-          curl -X POST \
-            -H "Authorization: Bearer ${{ secrets.JIRA_TOKEN }}" \
-            -H "Content-Type: application/json" \
-            -d '{
-              "body": {
-                "version": 1,
-                "type": "doc",
-                "content": [
+          WORKFLOW_URL="https://github.com/${{ github.repository }}/actions/runs/${{ github.event.workflow_run.id }}"
+
+          PAYLOAD=$(jq -n \
+            --arg workflowUrl "$WORKFLOW_URL" \
+            '{
+              body: {
+                version: 1,
+                type: "doc",
+                content: [
                   {
-                    "type": "paragraph",
-                    "content": [
-                      {
-                        "type": "text",
-                        "text": "✅ CI Pipeline passed"
-                      }
-                    ]
+                    type: "paragraph",
+                    content: [{
+                      type: "text",
+                      text: "✅ CI Pipeline passed"
+                    }]
                   },
                   {
-                    "type": "paragraph",
-                    "content": [
-                      {
-                        "type": "link",
-                        "attrs": {
-                          "href": "https://github.com/${{ github.repository }}/actions/runs/${{ github.event.workflow_run.id }}"
-                        },
-                        "content": [
-                          {
-                            "type": "text",
-                            "text": "View workflow run"
-                          }
-                        ]
-                      }
-                    ]
+                    type: "paragraph",
+                    content: [{
+                      type: "text",
+                      text: "View workflow run",
+                      marks: [{
+                        type: "link",
+                        attrs: { href: $workflowUrl }
+                      }]
+                    }]
                   }
                 ]
               }
-            }' \
-            https://api.atlassian.com/ex/jira/c6f2e588-c214-4698-b7bd-5a5be28a9e06/rest/api/3/issues/$ISSUE/comments
+            }')
+
+          RESPONSE=$(curl -s -w "\n%{http_code}" -X POST \
+            -H "Authorization: Bearer ${{ secrets.JIRA_TOKEN }}" \
+            -H "Content-Type: application/json" \
+            -d "$PAYLOAD" \
+            "https://api.atlassian.com/ex/jira/c6f2e588-c214-4698-b7bd-5a5be28a9e06/rest/api/3/issue/$ISSUE/comments")
+          HTTP_CODE=$(echo "$RESPONSE" | tail -n1)
+          if [ "$HTTP_CODE" != "201" ]; then
+            echo "❌ Failed to post success comment to $ISSUE (HTTP $HTTP_CODE)"
+            echo "$RESPONSE" | head -n-1
+            exit 1
+          fi
           echo "✅ Posted success comment to $ISSUE"
 
       - name: Post CI Status to Jira (Failure)
         if: github.event.workflow_run.conclusion == 'failure' && steps.extract.outputs.issue
         run: |
+          set -e
           ISSUE="${{ steps.extract.outputs.issue }}"
-          curl -X POST \
-            -H "Authorization: Bearer ${{ secrets.JIRA_TOKEN }}" \
-            -H "Content-Type: application/json" \
-            -d '{
-              "body": {
-                "version": 1,
-                "type": "doc",
-                "content": [
+          WORKFLOW_URL="https://github.com/${{ github.repository }}/actions/runs/${{ github.event.workflow_run.id }}"
+
+          PAYLOAD=$(jq -n \
+            --arg workflowUrl "$WORKFLOW_URL" \
+            '{
+              body: {
+                version: 1,
+                type: "doc",
+                content: [
                   {
-                    "type": "paragraph",
-                    "content": [
-                      {
-                        "type": "text",
-                        "text": "❌ CI Pipeline failed"
-                      }
-                    ]
+                    type: "paragraph",
+                    content: [{
+                      type: "text",
+                      text: "❌ CI Pipeline failed"
+                    }]
                   },
                   {
-                    "type": "paragraph",
-                    "content": [
-                      {
-                        "type": "link",
-                        "attrs": {
-                          "href": "https://github.com/${{ github.repository }}/actions/runs/${{ github.event.workflow_run.id }}"
-                        },
-                        "content": [
-                          {
-                            "type": "text",
-                            "text": "View workflow run"
-                          }
-                        ]
-                      }
-                    ]
+                    type: "paragraph",
+                    content: [{
+                      type: "text",
+                      text: "View workflow run",
+                      marks: [{
+                        type: "link",
+                        attrs: { href: $workflowUrl }
+                      }]
+                    }]
                   },
                   {
-                    "type": "paragraph",
-                    "content": [
-                      {
-                        "type": "text",
-                        "text": "Please review the pipeline logs and fix any issues before requesting review."
-                      }
-                    ]
+                    type: "paragraph",
+                    content: [{
+                      type: "text",
+                      text: "Please review the pipeline logs and fix any issues before requesting review."
+                    }]
                   }
                 ]
               }
-            }' \
-            https://api.atlassian.com/ex/jira/c6f2e588-c214-4698-b7bd-5a5be28a9e06/rest/api/3/issues/$ISSUE/comments
+            }')
+
+          RESPONSE=$(curl -s -w "\n%{http_code}" -X POST \
+            -H "Authorization: Bearer ${{ secrets.JIRA_TOKEN }}" \
+            -H "Content-Type: application/json" \
+            -d "$PAYLOAD" \
+            "https://api.atlassian.com/ex/jira/c6f2e588-c214-4698-b7bd-5a5be28a9e06/rest/api/3/issue/$ISSUE/comments")
+          HTTP_CODE=$(echo "$RESPONSE" | tail -n1)
+          if [ "$HTTP_CODE" != "201" ]; then
+            echo "❌ Failed to post failure comment to $ISSUE (HTTP $HTTP_CODE)"
+            echo "$RESPONSE" | head -n-1
+            exit 1
+          fi
           echo "✅ Posted failure comment to $ISSUE"
