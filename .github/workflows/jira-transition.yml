@@ -2,98 +2,162 @@ name: Jira Transition
 
 on:
   pull_request:
-    types: [opened, closed, reopened]
-
-env:
-  JIRA_BASE_URL: https://api.atlassian.com/ex/jira/c6f2e588-c214-4698-b7bd-5a5be28a9e06/rest/api/3
-  JIRA_EMAIL: 536230@muni.cz
+    types:
+      [
+        opened,
+        reopened,
+        ready_for_review,
+        converted_to_draft,
+        closed,
+      ]
 
 jobs:
   transition:
     runs-on: ubuntu-latest
+    permissions: {}
+    env:
+      JIRA_BASE_URL: ${{ vars.JIRA_BASE_URL }}
+      JIRA_EMAIL: ${{ vars.JIRA_EMAIL }}
+      JIRA_TOKEN: ${{ secrets.JIRA_TOKEN }}
     steps:
       - name: Extract Jira issue from PR title
-        id: extract
+        id: issue
         run: |
           TITLE="${{ github.event.pull_request.title }}"
-          # Extract WINE-XX pattern from PR title
           if [[ $TITLE =~ \[?(WINE-[0-9]+)\]? ]]; then
             ISSUE="${BASH_REMATCH[1]}"
-            echo "issue=$ISSUE" >> $GITHUB_OUTPUT
+            echo "issue=$ISSUE" >> "$GITHUB_OUTPUT"
             echo "Found Jira issue: $ISSUE"
           else
             echo "No Jira issue found in PR title: $TITLE"
             exit 0
           fi
 
-      - name: Transition to "Ready for Review" (PR opened)
-        if: github.event.action == 'opened' && steps.extract.outputs.issue
+      - name: Resolve target transition
+        id: transition
         run: |
-          set -e
-          ISSUE="${{ steps.extract.outputs.issue }}"
-          AUTH=$(echo -n "$JIRA_EMAIL:${{ secrets.JIRA_TOKEN }}" | base64)
-          RESPONSE=$(curl -s -w "\n%{http_code}" -X POST \
-            -H "Authorization: Basic $AUTH" \
-            -H "Content-Type: application/json" \
-            -d '{"transition": {"id": "35"}}' \
-            "$JIRA_BASE_URL/issue/$ISSUE/transitions")
-          HTTP_CODE=$(echo "$RESPONSE" | tail -n1)
-          if [ "$HTTP_CODE" != "204" ]; then
-            echo "❌ Failed to transition $ISSUE (HTTP $HTTP_CODE)"
-            echo "$RESPONSE" | head -n-1
-            exit 1
+          if [[ "${{ github.event.action }}" == "closed" && "${{ github.event.pull_request.merged }}" == "true" ]]; then
+            echo "name=Done" >> "$GITHUB_OUTPUT"
+          elif [[ "${{ github.event.action }}" == "closed" ]]; then
+            echo "name=In Progress" >> "$GITHUB_OUTPUT"
+          elif [[ "${{ github.event.action }}" == "converted_to_draft" ]]; then
+            echo "name=In Progress" >> "$GITHUB_OUTPUT"
+          else
+            echo "name=Ready for Review" >> "$GITHUB_OUTPUT"
           fi
-          echo "✅ Transitioned $ISSUE to Ready for Review"
 
-      - name: Transition to "Done" (PR merged)
-        if: github.event.action == 'closed' && github.event.pull_request.merged == true && steps.extract.outputs.issue
+      - name: Transition Jira issue
         run: |
-          set -e
-          ISSUE="${{ steps.extract.outputs.issue }}"
-          AUTH=$(echo -n "$JIRA_EMAIL:${{ secrets.JIRA_TOKEN }}" | base64)
-          RESPONSE=$(curl -s -w "\n%{http_code}" -X POST \
-            -H "Authorization: Basic $AUTH" \
-            -H "Content-Type: application/json" \
-            -d '{"transition": {"id": "31"}}' \
-            "$JIRA_BASE_URL/issue/$ISSUE/transitions")
-          HTTP_CODE=$(echo "$RESPONSE" | tail -n1)
-          if [ "$HTTP_CODE" != "204" ]; then
-            echo "❌ Failed to transition $ISSUE (HTTP $HTTP_CODE)"
-            echo "$RESPONSE" | head -n-1
-            exit 1
-          fi
-          echo "✅ Transitioned $ISSUE to Done"
+          set -euo pipefail
+          set +x
 
-      - name: Transition back to "In Progress" (PR closed without merge)
-        if: github.event.action == 'closed' && github.event.pull_request.merged == false && steps.extract.outputs.issue
-        run: |
-          set -e
-          ISSUE="${{ steps.extract.outputs.issue }}"
-          AUTH=$(echo -n "$JIRA_EMAIL:${{ secrets.JIRA_TOKEN }}" | base64)
-          RESPONSE=$(curl -s -w "\n%{http_code}" -X POST \
-            -H "Authorization: Basic $AUTH" \
-            -H "Content-Type: application/json" \
-            -d '{"transition": {"id": "21"}}' \
+          ISSUE="${{ steps.issue.outputs.issue }}"
+          TRANSITION_NAME="${{ steps.transition.outputs.name }}"
+
+          if [[ -z "$ISSUE" || -z "$TRANSITION_NAME" ]]; then
+            echo "No Jira transition required for this pull_request action."
+            exit 0
+          fi
+
+          if [[ -z "$JIRA_BASE_URL" || -z "$JIRA_EMAIL" || -z "$JIRA_TOKEN" ]]; then
+            echo "Jira secrets are not available. Skipping transition for $ISSUE."
+            exit 0
+          fi
+
+          JIRA_AUTH_HEADER=$(printf '%s:%s' "$JIRA_EMAIL" "$JIRA_TOKEN" | base64 | tr -d '\n')
+          echo "::add-mask::$JIRA_AUTH_HEADER"
+          JIRA_CURL_CONFIG=$(mktemp)
+          trap 'rm -f "$JIRA_CURL_CONFIG"' EXIT
+          printf 'header = "Authorization: Basic %s"\n' "$JIRA_AUTH_HEADER" > "$JIRA_CURL_CONFIG"
+
+          GET_RESPONSE=$(curl -sS -w "\n%{http_code}" -X GET \
+            --config "$JIRA_CURL_CONFIG" \
+            -H "Accept: application/json" \
             "$JIRA_BASE_URL/issue/$ISSUE/transitions")
-          HTTP_CODE=$(echo "$RESPONSE" | tail -n1)
-          if [ "$HTTP_CODE" != "204" ]; then
-            echo "❌ Failed to transition $ISSUE (HTTP $HTTP_CODE)"
-            echo "$RESPONSE" | head -n-1
+
+          GET_HTTP_CODE=$(echo "$GET_RESPONSE" | tail -n1)
+          GET_BODY=$(echo "$GET_RESPONSE" | head -n -1)
+
+          if [[ "$GET_HTTP_CODE" != "200" ]]; then
+            echo "❌ Failed to fetch transitions for $ISSUE (HTTP $GET_HTTP_CODE)"
+            echo "$GET_BODY"
             exit 1
           fi
-          echo "✅ Transitioned $ISSUE to In Progress"
+
+          if ! command -v jq >/dev/null 2>&1; then
+            echo "❌ jq is required but is not available on the runner."
+            exit 1
+          fi
+
+          if ! echo "$GET_BODY" | jq -e '.transitions and (.transitions | type == "array")' >/dev/null; then
+            echo "❌ Jira transitions response is missing a valid 'transitions' array."
+            echo "$GET_BODY"
+            exit 1
+          fi
+
+          MATCH_COUNT=$(echo "$GET_BODY" | jq -r --arg n "$TRANSITION_NAME" '[.transitions[] | select(.name == $n)] | length')
+          MATCHING_TRANSITION_IDS=$(echo "$GET_BODY" | jq -r --arg n "$TRANSITION_NAME" '.transitions[] | select(.name == $n) | .id')
+
+          if [[ "$MATCH_COUNT" -eq 0 ]]; then
+            echo "❌ Transition '$TRANSITION_NAME' is not available for $ISSUE"
+            echo "Available transitions:"
+            echo "$GET_BODY" | jq -r '.transitions[].name'
+            exit 1
+          fi
+
+          if [[ "$MATCH_COUNT" -gt 1 ]]; then
+            echo "❌ Transition '$TRANSITION_NAME' is ambiguous for $ISSUE (matched IDs: $MATCHING_TRANSITION_IDS)"
+            exit 1
+          fi
+
+          TRANSITION_ID=$(echo "$MATCHING_TRANSITION_IDS" | head -n1)
+          TRANSITION_PAYLOAD=$(jq -nc --arg id "$TRANSITION_ID" '{"transition":{"id":$id}}')
+
+          POST_RESPONSE=$(curl -sS -w "\n%{http_code}" -X POST \
+            --config "$JIRA_CURL_CONFIG" \
+            -H "Content-Type: application/json" \
+            -d "$TRANSITION_PAYLOAD" \
+            "$JIRA_BASE_URL/issue/$ISSUE/transitions")
+
+          POST_HTTP_CODE=$(echo "$POST_RESPONSE" | tail -n1)
+          POST_BODY=$(echo "$POST_RESPONSE" | head -n -1)
+
+          if [[ "$POST_HTTP_CODE" != "204" ]]; then
+            echo "❌ Failed to transition $ISSUE to '$TRANSITION_NAME' (HTTP $POST_HTTP_CODE)"
+            echo "$POST_BODY"
+            exit 1
+          fi
+
+          echo "✅ Transitioned $ISSUE to '$TRANSITION_NAME' (id: $TRANSITION_ID)"
 
       - name: Add PR link comment to Jira (opened)
-        if: github.event.action == 'opened' && steps.extract.outputs.issue
+        if: github.event.action == 'opened' && steps.issue.outputs.issue
         run: |
-          set -e
-          ISSUE="${{ steps.extract.outputs.issue }}"
-          AUTH=$(echo -n "$JIRA_EMAIL:${{ secrets.JIRA_TOKEN }}" | base64)
+          set -euo pipefail
+          set +x
+
+          ISSUE="${{ steps.issue.outputs.issue }}"
           PR_TITLE="${{ github.event.pull_request.title }}"
           PR_URL="${{ github.event.pull_request.html_url }}"
           PR_BRANCH="${{ github.event.pull_request.head.ref }}"
 
-          PAYLOAD=$(jq -n \
+          if [[ -z "$JIRA_BASE_URL" || -z "$JIRA_EMAIL" || -z "$JIRA_TOKEN" ]]; then
+            echo "Jira secrets are not available. Skipping comment for $ISSUE."
+            exit 0
+          fi
+
+          if ! command -v jq >/dev/null 2>&1; then
+            echo "❌ jq is required but is not available on the runner."
+            exit 1
+          fi
+
+          JIRA_AUTH_HEADER=$(printf '%s:%s' "$JIRA_EMAIL" "$JIRA_TOKEN" | base64 | tr -d '\n')
+          echo "::add-mask::$JIRA_AUTH_HEADER"
+          JIRA_CURL_CONFIG=$(mktemp)
+          trap 'rm -f "$JIRA_CURL_CONFIG"' EXIT
+          printf 'header = "Authorization: Basic %s"\n' "$JIRA_AUTH_HEADER" > "$JIRA_CURL_CONFIG"
+
+          PAYLOAD=$(jq -nc \
             --arg prTitle "$PR_TITLE" \
             --arg prUrl "$PR_URL" \
             --arg prBranch "$PR_BRANCH" \
@@ -119,15 +183,19 @@ jobs:
               }
             }')
 
-          RESPONSE=$(curl -s -w "\n%{http_code}" -X POST \
-            -H "Authorization: Basic $AUTH" \
+          RESPONSE=$(curl -sS -w "\n%{http_code}" -X POST \
+            --config "$JIRA_CURL_CONFIG" \
             -H "Content-Type: application/json" \
             -d "$PAYLOAD" \
-            "$JIRA_BASE_URL/issue/$ISSUE/comments")
+            "$JIRA_BASE_URL/issue/$ISSUE/comment")
+
           HTTP_CODE=$(echo "$RESPONSE" | tail -n1)
-          if [ "$HTTP_CODE" != "201" ]; then
+          BODY=$(echo "$RESPONSE" | head -n -1)
+
+          if [[ "$HTTP_CODE" != "201" ]]; then
             echo "❌ Failed to add comment to $ISSUE (HTTP $HTTP_CODE)"
-            echo "$RESPONSE" | head -n-1
+            echo "$BODY"
             exit 1
           fi
+
           echo "✅ Added PR comment to $ISSUE"
