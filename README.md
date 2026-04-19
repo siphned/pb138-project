@@ -3,7 +3,7 @@
 A multi-vendor wine marketplace platform with event management, multi-shop ordering, and admin moderation workflows.
 
 **Course:** PB138 — Úvod do vývoje webu (FI MUNI)  
-**Team:** Matěj Šinogl, Ondřej, Johnny, Adam
+**Team:** Adam Mališ, Ján Pullman, Matěj Šinogl, Ondřej Málek
 
 ---
 
@@ -11,7 +11,7 @@ A multi-vendor wine marketplace platform with event management, multi-shop order
 
 WineMarket connects winemakers, shop owners, and customers in a single platform:
 
-- **Winemakers** manage wines, host events, and invite collaborators
+- **Winemakers** manage wines, host events
 - **Shop Owners** manage inventory and process orders
 - **Customers** browse, order, and review wines
 - **Admins** moderate content and approve accounts
