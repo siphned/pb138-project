@@ -65,11 +65,14 @@ jobs:
             exit 0
           fi
 
-          AUTH=$(printf '%s:%s' "$JIRA_EMAIL" "$JIRA_TOKEN" | base64 | tr -d '\n')
-          echo "::add-mask::$AUTH"
+          JIRA_AUTH_HEADER=$(printf '%s:%s' "$JIRA_EMAIL" "$JIRA_TOKEN" | base64 | tr -d '\n')
+          echo "::add-mask::$JIRA_AUTH_HEADER"
+          JIRA_CURL_CONFIG=$(mktemp)
+          trap 'rm -f "$JIRA_CURL_CONFIG"' EXIT
+          printf 'header = "Authorization: Basic %s"\n' "$JIRA_AUTH_HEADER" > "$JIRA_CURL_CONFIG"
 
           GET_RESPONSE=$(curl -sS -w "\n%{http_code}" -X GET \
-            -H "Authorization: Basic $AUTH" \
+            --config "$JIRA_CURL_CONFIG" \
             -H "Accept: application/json" \
             "$JIRA_BASE_URL/issue/$ISSUE/transitions")
 
@@ -112,7 +115,7 @@ jobs:
           TRANSITION_PAYLOAD=$(jq -nc --arg id "$TRANSITION_ID" '{"transition":{"id":$id}}')
 
           POST_RESPONSE=$(curl -sS -w "\n%{http_code}" -X POST \
-            -H "Authorization: Basic $AUTH" \
+            --config "$JIRA_CURL_CONFIG" \
             -H "Content-Type: application/json" \
             -d "$TRANSITION_PAYLOAD" \
             "$JIRA_BASE_URL/issue/$ISSUE/transitions")
