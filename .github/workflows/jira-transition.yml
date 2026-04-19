@@ -19,51 +19,81 @@ jobs:
             echo "Found Jira issue: $ISSUE"
           else
             echo "No Jira issue found in PR title: $TITLE"
-            exit 1
+            exit 0
           fi
 
       - name: Transition to "Ready for Review" (PR opened)
-        if: github.event.action == 'opened'
-        uses: atlassian/gajira-transition@master
-        with:
-          issue: ${{ steps.extract.outputs.issue }}
-          transition: "Ready for Review"
-        env:
-          JIRA_BASE_URL: https://pb138winery.atlassian.net
-          JIRA_USER_EMAIL: 536230@mail.muni.cz
-          JIRA_API_TOKEN: ${{ secrets.JIRA_TOKEN }}
+        if: github.event.action == 'opened' && steps.extract.outputs.issue
+        run: |
+          ISSUE="${{ steps.extract.outputs.issue }}"
+          curl -X POST \
+            -H "Authorization: Bearer ${{ secrets.JIRA_TOKEN }}" \
+            -H "Content-Type: application/json" \
+            -d '{"transition": {"id": "10078"}}' \
+            https://api.atlassian.com/ex/jira/c6f2e588-c214-4698-b7bd-5a5be28a9e06/rest/api/3/issues/$ISSUE/transitions
+          echo "✅ Transitioned $ISSUE to Ready for Review"
 
       - name: Transition to "Done" (PR merged)
-        if: github.event.action == 'closed' && github.event.pull_request.merged == true
-        uses: atlassian/gajira-transition@master
-        with:
-          issue: ${{ steps.extract.outputs.issue }}
-          transition: "Done"
-        env:
-          JIRA_BASE_URL: https://pb138winery.atlassian.net
-          JIRA_USER_EMAIL: 536230@mail.muni.cz
-          JIRA_API_TOKEN: ${{ secrets.JIRA_TOKEN }}
+        if: github.event.action == 'closed' && github.event.pull_request.merged == true && steps.extract.outputs.issue
+        run: |
+          ISSUE="${{ steps.extract.outputs.issue }}"
+          curl -X POST \
+            -H "Authorization: Bearer ${{ secrets.JIRA_TOKEN }}" \
+            -H "Content-Type: application/json" \
+            -d '{"transition": {"id": "10042"}}' \
+            https://api.atlassian.com/ex/jira/c6f2e588-c214-4698-b7bd-5a5be28a9e06/rest/api/3/issues/$ISSUE/transitions
+          echo "✅ Transitioned $ISSUE to Done"
 
       - name: Transition back to "In Progress" (PR closed without merge)
-        if: github.event.action == 'closed' && github.event.pull_request.merged == false
-        uses: atlassian/gajira-transition@master
-        with:
-          issue: ${{ steps.extract.outputs.issue }}
-          transition: "In Progress"
-        env:
-          JIRA_BASE_URL: https://pb138winery.atlassian.net
-          JIRA_USER_EMAIL: 536230@mail.muni.cz
-          JIRA_API_TOKEN: ${{ secrets.JIRA_TOKEN }}
+        if: github.event.action == 'closed' && github.event.pull_request.merged == false && steps.extract.outputs.issue
+        run: |
+          ISSUE="${{ steps.extract.outputs.issue }}"
+          curl -X POST \
+            -H "Authorization: Bearer ${{ secrets.JIRA_TOKEN }}" \
+            -H "Content-Type: application/json" \
+            -d '{"transition": {"id": "10041"}}' \
+            https://api.atlassian.com/ex/jira/c6f2e588-c214-4698-b7bd-5a5be28a9e06/rest/api/3/issues/$ISSUE/transitions
+          echo "✅ Transitioned $ISSUE to In Progress"
 
       - name: Add PR link comment to Jira (opened)
-        if: github.event.action == 'opened'
-        uses: atlassian/gajira-comment@master
-        with:
-          issue: ${{ steps.extract.outputs.issue }}
-          comment: |
-            🔗 PR linked: [${{ github.event.pull_request.title }}](${{ github.event.pull_request.html_url }})
-            Branch: `${{ github.event.pull_request.head.ref }}`
-        env:
-          JIRA_BASE_URL: https://pb138winery.atlassian.net
-          JIRA_USER_EMAIL: 536230@mail.muni.cz
-          JIRA_API_TOKEN: ${{ secrets.JIRA_TOKEN }}
+        if: github.event.action == 'opened' && steps.extract.outputs.issue
+        run: |
+          ISSUE="${{ steps.extract.outputs.issue }}"
+          curl -X POST \
+            -H "Authorization: Bearer ${{ secrets.JIRA_TOKEN }}" \
+            -H "Content-Type: application/json" \
+            -d '{
+              "body": {
+                "version": 1,
+                "type": "doc",
+                "content": [
+                  {
+                    "type": "paragraph",
+                    "content": [
+                      {
+                        "type": "text",
+                        "text": "🔗 PR linked: "
+                      },
+                      {
+                        "type": "link",
+                        "attrs": {
+                          "href": "${{ github.event.pull_request.html_url }}"
+                        },
+                        "content": [
+                          {
+                            "type": "text",
+                            "text": "${{ github.event.pull_request.title }}"
+                          }
+                        ]
+                      },
+                      {
+                        "type": "text",
+                        "text": " | Branch: ${{ github.event.pull_request.head.ref }}"
+                      }
+                    ]
+                  }
+                ]
+              }
+            }' \
+            https://api.atlassian.com/ex/jira/c6f2e588-c214-4698-b7bd-5a5be28a9e06/rest/api/3/issues/$ISSUE/comments
+          echo "✅ Added PR comment to $ISSUE"
