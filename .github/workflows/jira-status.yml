@@ -5,6 +5,10 @@ on:
     workflows: [CI]
     types: [completed]
 
+env:
+  JIRA_BASE_URL: https://api.atlassian.com/ex/jira/c6f2e588-c214-4698-b7bd-5a5be28a9e06/rest/api/3
+  JIRA_EMAIL: 536230@muni.cz
+
 jobs:
   jira-status:
     runs-on: ubuntu-latest
@@ -35,6 +39,7 @@ jobs:
         run: |
           set -e
           ISSUE="${{ steps.extract.outputs.issue }}"
+          AUTH=$(echo -n "$JIRA_EMAIL:${{ secrets.JIRA_TOKEN }}" | base64)
           WORKFLOW_URL="https://github.com/${{ github.repository }}/actions/runs/${{ github.event.workflow_run.id }}"
 
           PAYLOAD=$(jq -n \
@@ -67,10 +72,10 @@ jobs:
             }')
 
           RESPONSE=$(curl -s -w "\n%{http_code}" -X POST \
-            -H "Authorization: Bearer ${{ secrets.JIRA_TOKEN }}" \
+            -H "Authorization: Basic $AUTH" \
             -H "Content-Type: application/json" \
             -d "$PAYLOAD" \
-            "https://api.atlassian.com/ex/jira/c6f2e588-c214-4698-b7bd-5a5be28a9e06/rest/api/3/issue/$ISSUE/comments")
+            "$JIRA_BASE_URL/issue/$ISSUE/comments")
           HTTP_CODE=$(echo "$RESPONSE" | tail -n1)
           if [ "$HTTP_CODE" != "201" ]; then
             echo "❌ Failed to post success comment to $ISSUE (HTTP $HTTP_CODE)"
@@ -84,6 +89,7 @@ jobs:
         run: |
           set -e
           ISSUE="${{ steps.extract.outputs.issue }}"
+          AUTH=$(echo -n "$JIRA_EMAIL:${{ secrets.JIRA_TOKEN }}" | base64)
           WORKFLOW_URL="https://github.com/${{ github.repository }}/actions/runs/${{ github.event.workflow_run.id }}"
 
           PAYLOAD=$(jq -n \
@@ -123,10 +129,10 @@ jobs:
             }')
 
           RESPONSE=$(curl -s -w "\n%{http_code}" -X POST \
-            -H "Authorization: Bearer ${{ secrets.JIRA_TOKEN }}" \
+            -H "Authorization: Basic $AUTH" \
             -H "Content-Type: application/json" \
             -d "$PAYLOAD" \
-            "https://api.atlassian.com/ex/jira/c6f2e588-c214-4698-b7bd-5a5be28a9e06/rest/api/3/issue/$ISSUE/comments")
+            "$JIRA_BASE_URL/issue/$ISSUE/comments")
           HTTP_CODE=$(echo "$RESPONSE" | tail -n1)
           if [ "$HTTP_CODE" != "201" ]; then
             echo "❌ Failed to post failure comment to $ISSUE (HTTP $HTTP_CODE)"
