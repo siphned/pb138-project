@@ -34,18 +34,16 @@ export const roleRequestsService = {
     const user = await usersRepository.findById(request.userId)
     if (!user) throw new Error('USER_NOT_FOUND')
 
-    await roleRequestsRepository.updateStatus(requestId, 'approved', adminUserId)
-
-    const clerkUser = await clerkClient.users.getUser(user.clerkId)
     const metadataKey =
       request.requestedRole === 'winemaker' ? 'is_winemaker' : 'is_shop_owner'
 
+    // Clerk first — updateUserMetadata does a server-side shallow merge, no spread needed.
+    // If this fails, DB stays pending and the admin can safely retry.
     await clerkClient.users.updateUserMetadata(user.clerkId, {
-      publicMetadata: {
-        ...(clerkUser.publicMetadata as object),
-        [metadataKey]: true,
-      },
+      publicMetadata: { [metadataKey]: true },
     })
+
+    await roleRequestsRepository.updateStatus(requestId, 'approved', adminUserId)
   },
 
   async reject(requestId: string, adminUserId: string) {
