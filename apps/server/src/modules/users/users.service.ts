@@ -17,12 +17,12 @@ export const usersService = {
     const email = clerkUser.emailAddresses[0]?.emailAddress
     if (!email) throw new Error('Clerk user has no email address')
 
-    return usersRepository.create({
+    return usersRepository.upsert({
       clerkId,
       fname: clerkUser.firstName ?? '',
       lname: clerkUser.lastName ?? '',
       email,
-      role: (payload.role as 'user' | 'admin') ?? 'user',
+      role: payload.role === 'admin' ? 'admin' : 'user',
     })
   },
 
