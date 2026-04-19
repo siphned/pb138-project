@@ -18,19 +18,23 @@ WineMarket connects winemakers, shop owners, and customers in a single platform:
 
 ---
 
-## Tech Stack
+## Tech Stack (Planned)
+
+*Currently installed:*
 
 | Layer | Technology |
 |-------|-----------|
 | Runtime | Bun |
 | Frontend | React + Vite + TypeScript |
-| Routing | TanStack Router |
 | Backend | Elysia |
 | Database | PostgreSQL + Drizzle ORM |
 | Validation | Zod |
-| Styling | Tailwind CSS + shadcn/ui |
-| API Client | Kubb (generated from OpenAPI) |
 | Monorepo | Turborepo |
+
+*Coming soon (Phase 2):*
+- TanStack Router (frontend routing)
+- Tailwind CSS + shadcn/ui (styling)
+- Kubb (OpenAPI code generation)
 
 ---
 
@@ -39,61 +43,50 @@ WineMarket connects winemakers, shop owners, and customers in a single platform:
 ```
 winery/
 ├── apps/
-│   ├── web/          # React frontend (port 5173)
-│   └── server/       # Elysia backend (port 3000)
+│   ├── web/                    # React frontend (Vite)
+│   └── server/                 # Elysia backend
 ├── packages/
-│   ├── shared/       # Shared Zod schemas & types
-│   └── ui/           # Reusable UI components
-├── docs/             # Architecture, API spec, diagrams
-├── wiki/             # Quick-reference guides
-└── docker-compose.yml
+│   ├── typescript-config/      # Shared tsconfig
+│   └── ui/                     # Reusable UI components (stub)
+├── .github/workflows/          # CI/CD pipelines
+├── docs/                       # Design docs & diagrams
+├── wiki/                       # Quick-reference guides
+└── CLAUDE.md                   # Development guidelines
 ```
 
 ---
 
 ## Quick Start
 
-**Prerequisites:** [Bun](https://bun.sh), [Docker](https://docker.com)
+**Prerequisites:** [Bun](https://bun.sh)
 
 ```bash
-# 1. Start the database
-docker compose up -d
-
-# 2. Install dependencies
+# 1. Install dependencies
 bun install
 
-# 3. Apply migrations
-bun run db:migrate
-
-# 4. Start dev servers (frontend + backend)
+# 2. Start dev servers (frontend + backend)
 bun dev
 ```
 
 Frontend: http://localhost:5173  
-Backend: http://localhost:3000  
-pgAdmin: http://localhost:5050
+Backend: http://localhost:3000
+
+**Note:** Database setup coming in Phase 2. Currently work with Elysia stub backend.
 
 ---
 
 ## Common Commands
 
 ```bash
-bun dev                # Start all dev servers
-bun run dev:web        # Frontend only
-bun run dev:server     # Backend only
+bun dev                # Start all dev servers (frontend + backend)
+bun build              # Build all packages for production
 
-bun run db:generate    # Generate migration from schema changes
-bun run db:migrate     # Apply pending migrations
-bun run db:studio      # Visual database browser
+bun lint               # Code quality check (Biome)
+bun format             # Auto-format code (Biome)
+bun check-types        # TypeScript type checking
 
-bun run generate       # Regenerate Kubb API client from OpenAPI spec
-
-bun run lint           # ESLint
-bun run format         # Biome format
-bun run type-check     # TypeScript check
-bun run test           # Vitest unit tests
-bun run test:e2e       # Playwright E2E tests
-bun run build          # Build all packages
+bun test               # Run unit tests (Vitest)
+bun test:e2e           # Run E2E tests (Playwright)
 ```
 
 ---
@@ -114,11 +107,9 @@ bun run build          # Build all packages
 
 ## Environment
 
-Create a `.env` file in the root (do not commit):
+See `apps/web/.env.example` for frontend configuration. Copy to `apps/web/.env.local` for local development.
 
-```env
-DATABASE_URL=postgresql://postgres:postgres@localhost:5432/winemarket
-```
+Backend environment configuration coming in Phase 2.
 
 ---
 
