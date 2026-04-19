@@ -2,7 +2,7 @@ import { Elysia, status, t } from 'elysia'
 import { authPlugin } from '../auth'
 import { usersService } from '../users/users.service'
 import { roleRequestsService } from './role-requests.service'
-import { submitRoleRequestBody, roleRequestResponse } from './role-requests.schema'
+import { submitRoleRequestBody } from './role-requests.schema'
 
 export const roleRequestsRoutes = new Elysia()
   .use(authPlugin)
@@ -24,7 +24,16 @@ export const roleRequestsRoutes = new Elysia()
         throw e
       }
     },
-    { requireAuth: true, body: submitRoleRequestBody }
+    {
+      requireAuth: true,
+      body: submitRoleRequestBody,
+      detail: {
+        tags: ['role-requests'],
+        summary: 'Apply for winemaker role',
+        description: 'Submit a pending winemaker role request. One pending request per role per user.',
+        security: [{ bearerAuth: [] }],
+      },
+    }
   )
 
   .post(
@@ -44,13 +53,30 @@ export const roleRequestsRoutes = new Elysia()
         throw e
       }
     },
-    { requireAuth: true, body: submitRoleRequestBody }
+    {
+      requireAuth: true,
+      body: submitRoleRequestBody,
+      detail: {
+        tags: ['role-requests'],
+        summary: 'Apply for shop-owner role',
+        description: 'Submit a pending shop-owner role request. One pending request per role per user.',
+        security: [{ bearerAuth: [] }],
+      },
+    }
   )
 
   .get(
     '/role-requests',
     () => roleRequestsService.listPending(),
-    { requireRole: 'admin' }
+    {
+      requireRole: 'admin',
+      detail: {
+        tags: ['role-requests'],
+        summary: 'List pending role requests',
+        description: 'Admin-only. Returns all role requests with status `pending`.',
+        security: [{ bearerAuth: [] }],
+      },
+    }
   )
 
   .post(
@@ -68,7 +94,17 @@ export const roleRequestsRoutes = new Elysia()
         throw e
       }
     },
-    { requireRole: 'admin', params: t.Object({ id: t.String() }) }
+    {
+      requireRole: 'admin',
+      params: t.Object({ id: t.String() }),
+      detail: {
+        tags: ['role-requests'],
+        summary: 'Approve a role request',
+        description:
+          'Admin-only. Grants the requested capability in Clerk publicMetadata and marks the request as `approved`.',
+        security: [{ bearerAuth: [] }],
+      },
+    }
   )
 
   .post(
@@ -86,5 +122,14 @@ export const roleRequestsRoutes = new Elysia()
         throw e
       }
     },
-    { requireRole: 'admin', params: t.Object({ id: t.String() }) }
+    {
+      requireRole: 'admin',
+      params: t.Object({ id: t.String() }),
+      detail: {
+        tags: ['role-requests'],
+        summary: 'Reject a role request',
+        description: 'Admin-only. Marks the request as `rejected` without changing Clerk metadata.',
+        security: [{ bearerAuth: [] }],
+      },
+    }
   )

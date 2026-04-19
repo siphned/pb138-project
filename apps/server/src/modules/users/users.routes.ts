@@ -14,5 +14,12 @@ export const usersRoutes = new Elysia({ prefix: '/auth' })
     {
       requireAuth: true,
       response: userResponseSchema,
+      detail: {
+        tags: ['users'],
+        summary: 'Get current authenticated user',
+        description:
+          'Returns the caller\'s user record. If no local row exists yet, one is lazily created from Clerk profile data on first call.',
+        security: [{ bearerAuth: [] }],
+      },
     }
   )
