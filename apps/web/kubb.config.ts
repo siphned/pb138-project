@@ -1,8 +1,8 @@
 import { defineConfig } from "@kubb/core";
-import { pluginOas } from "@kubb/plugin-oas";
-import { pluginTs } from "@kubb/plugin-ts";
 import { pluginClient } from "@kubb/plugin-client";
+import { pluginOas } from "@kubb/plugin-oas";
 import { pluginReactQuery } from "@kubb/plugin-react-query";
+import { pluginTs } from "@kubb/plugin-ts";
 
 export default defineConfig({
   input: {
