@@ -1,6 +1,6 @@
-import { Elysia } from "elysia";
 import { cors } from "@elysiajs/cors";
 import { openapi } from "@elysiajs/openapi";
+import { Elysia } from "elysia";
 
 new Elysia()
   .use(cors({ origin: "http://localhost:5173" }))
