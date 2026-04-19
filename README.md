@@ -1,159 +1,130 @@
-# Turborepo starter
+# WineMarket — PB138 Web Development Project
 
-This Turborepo starter is maintained by the Turborepo core team.
+A multi-vendor wine marketplace platform with event management, multi-shop ordering, and admin moderation workflows.
 
-## Using this example
+**Course:** PB138 — Úvod do vývoje webu (FI MUNI)  
+**Team:** Matěj Šinogl, Ondřej, Johnny, Adam
 
-Run the following command:
+---
 
-```sh
-npx create-turbo@latest
+## Overview
+
+WineMarket connects winemakers, shop owners, and customers in a single platform:
+
+- **Winemakers** manage wines, host events, and invite collaborators
+- **Shop Owners** manage inventory and process orders
+- **Customers** browse, order, and review wines
+- **Admins** moderate content and approve accounts
+
+---
+
+## Tech Stack
+
+| Layer | Technology |
+|-------|-----------|
+| Runtime | Bun |
+| Frontend | React + Vite + TypeScript |
+| Routing | TanStack Router |
+| Backend | Elysia |
+| Database | PostgreSQL + Drizzle ORM |
+| Validation | Zod |
+| Styling | Tailwind CSS + shadcn/ui |
+| API Client | Kubb (generated from OpenAPI) |
+| Monorepo | Turborepo |
+
+---
+
+## Project Structure
+
+```
+winery/
+├── apps/
+│   ├── web/          # React frontend (port 5173)
+│   └── server/       # Elysia backend (port 3000)
+├── packages/
+│   ├── shared/       # Shared Zod schemas & types
+│   └── ui/           # Reusable UI components
+├── docs/             # Architecture, API spec, diagrams
+├── wiki/             # Quick-reference guides
+└── docker-compose.yml
 ```
 
-## What's inside?
+---
 
-This Turborepo includes the following packages/apps:
+## Quick Start
 
-### Apps and Packages
+**Prerequisites:** [Bun](https://bun.sh), [Docker](https://docker.com)
 
-- `docs`: a [Next.js](https://nextjs.org/) app
-- `web`: another [Next.js](https://nextjs.org/) app
-- `@repo/ui`: a stub React component library shared by both `web` and `docs` applications
-- `@repo/eslint-config`: `eslint` configurations (includes `eslint-config-next` and `eslint-config-prettier`)
-- `@repo/typescript-config`: `tsconfig.json`s used throughout the monorepo
+```bash
+# 1. Start the database
+docker compose up -d
 
-Each package/app is 100% [TypeScript](https://www.typescriptlang.org/).
+# 2. Install dependencies
+bun install
 
-### Utilities
+# 3. Apply migrations
+bun run db:migrate
 
-This Turborepo has some additional tools already setup for you:
-
-- [TypeScript](https://www.typescriptlang.org/) for static type checking
-- [ESLint](https://eslint.org/) for code linting
-- [Prettier](https://prettier.io) for code formatting
-
-### Build
-
-To build all apps and packages, run the following command:
-
-With [global `turbo`](https://turborepo.dev/docs/getting-started/installation#global-installation) installed (recommended):
-
-```sh
-cd my-turborepo
-turbo build
+# 4. Start dev servers (frontend + backend)
+bun dev
 ```
 
-Without global `turbo`, use your package manager:
+Frontend: http://localhost:5173  
+Backend: http://localhost:3000  
+pgAdmin: http://localhost:5050
 
-```sh
-cd my-turborepo
-npx turbo build
-yarn dlx turbo build
-pnpm exec turbo build
+---
+
+## Common Commands
+
+```bash
+bun dev                # Start all dev servers
+bun run dev:web        # Frontend only
+bun run dev:server     # Backend only
+
+bun run db:generate    # Generate migration from schema changes
+bun run db:migrate     # Apply pending migrations
+bun run db:studio      # Visual database browser
+
+bun run generate       # Regenerate Kubb API client from OpenAPI spec
+
+bun run lint           # ESLint
+bun run format         # Biome format
+bun run type-check     # TypeScript check
+bun run test           # Vitest unit tests
+bun run test:e2e       # Playwright E2E tests
+bun run build          # Build all packages
 ```
 
-You can build a specific package by using a [filter](https://turborepo.dev/docs/crafting-your-repository/running-tasks#using-filters):
+---
 
-With [global `turbo`](https://turborepo.dev/docs/getting-started/installation#global-installation) installed:
+## Documentation
 
-```sh
-turbo build --filter=docs
+| Document | Description |
+|----------|-------------|
+| [docs/ARCHITECTURE/](docs/ARCHITECTURE/) | System design & layer diagram |
+| [docs/API/](docs/API/) | REST API endpoint specification |
+| [docs/ROLES/](docs/ROLES/) | Role-permission matrix |
+| [docs/MODULES/](docs/MODULES/) | Backend module breakdown |
+| [docs/ROUTES/](docs/ROUTES/) | Frontend route structure |
+| [wiki/](wiki/) | Quick-reference guides (React, Elysia, Drizzle, etc.) |
+| [CLAUDE.md](CLAUDE.md) | AI development guide & project conventions |
+
+---
+
+## Environment
+
+Create a `.env` file in the root (do not commit):
+
+```env
+DATABASE_URL=postgresql://postgres:postgres@localhost:5432/winemarket
 ```
 
-Without global `turbo`:
+---
 
-```sh
-npx turbo build --filter=docs
-yarn exec turbo build --filter=docs
-pnpm exec turbo build --filter=docs
-```
+## Git Workflow
 
-### Develop
-
-To develop all apps and packages, run the following command:
-
-With [global `turbo`](https://turborepo.dev/docs/getting-started/installation#global-installation) installed (recommended):
-
-```sh
-cd my-turborepo
-turbo dev
-```
-
-Without global `turbo`, use your package manager:
-
-```sh
-cd my-turborepo
-npx turbo dev
-yarn exec turbo dev
-pnpm exec turbo dev
-```
-
-You can develop a specific package by using a [filter](https://turborepo.dev/docs/crafting-your-repository/running-tasks#using-filters):
-
-With [global `turbo`](https://turborepo.dev/docs/getting-started/installation#global-installation) installed:
-
-```sh
-turbo dev --filter=web
-```
-
-Without global `turbo`:
-
-```sh
-npx turbo dev --filter=web
-yarn exec turbo dev --filter=web
-pnpm exec turbo dev --filter=web
-```
-
-### Remote Caching
-
-> [!TIP]
-> Vercel Remote Cache is free for all plans. Get started today at [vercel.com](https://vercel.com/signup?utm_source=remote-cache-sdk&utm_campaign=free_remote_cache).
-
-Turborepo can use a technique known as [Remote Caching](https://turborepo.dev/docs/core-concepts/remote-caching) to share cache artifacts across machines, enabling you to share build caches with your team and CI/CD pipelines.
-
-By default, Turborepo will cache locally. To enable Remote Caching you will need an account with Vercel. If you don't have an account you can [create one](https://vercel.com/signup?utm_source=turborepo-examples), then enter the following commands:
-
-With [global `turbo`](https://turborepo.dev/docs/getting-started/installation#global-installation) installed (recommended):
-
-```sh
-cd my-turborepo
-turbo login
-```
-
-Without global `turbo`, use your package manager:
-
-```sh
-cd my-turborepo
-npx turbo login
-yarn exec turbo login
-pnpm exec turbo login
-```
-
-This will authenticate the Turborepo CLI with your [Vercel account](https://vercel.com/docs/concepts/personal-accounts/overview).
-
-Next, you can link your Turborepo to your Remote Cache by running the following command from the root of your Turborepo:
-
-With [global `turbo`](https://turborepo.dev/docs/getting-started/installation#global-installation) installed:
-
-```sh
-turbo link
-```
-
-Without global `turbo`:
-
-```sh
-npx turbo link
-yarn exec turbo link
-pnpm exec turbo link
-```
-
-## Useful Links
-
-Learn more about the power of Turborepo:
-
-- [Tasks](https://turborepo.dev/docs/crafting-your-repository/running-tasks)
-- [Caching](https://turborepo.dev/docs/crafting-your-repository/caching)
-- [Remote Caching](https://turborepo.dev/docs/core-concepts/remote-caching)
-- [Filtering](https://turborepo.dev/docs/crafting-your-repository/running-tasks#using-filters)
-- [Configuration Options](https://turborepo.dev/docs/reference/configuration)
-- [CLI Usage](https://turborepo.dev/docs/reference/command-line-reference)
+- Branch from `dev`: `WINE-XX-short-description`
+- PR targets `dev`, requires one approval + passing CI
+- Squash merge, delete branch after merge
+- `main` = production only, merged from `dev` at milestones
