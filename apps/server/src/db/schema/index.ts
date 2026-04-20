@@ -14,13 +14,13 @@ export * from './relations'
 
 // ─── Inferred types ───────────────────────────────────────────────────────────
 
-import { users } from './users'
-import { addresses } from './addresses'
-import { shops, winemakers } from './sellers'
-import { products, wines } from './catalog'
-import { orders } from './orders'
-import { carts } from './carts'
-import { roleRequests } from './role-requests'
+import type { users } from './users'
+import type { addresses } from './addresses'
+import type { shops, winemakers } from './sellers'
+import type { products } from './catalog'
+import type { orders } from './orders'
+import type { carts } from './carts'
+import type { roleRequests } from './role-requests'
 
 export type User = (typeof users)['$inferSelect']
 export type NewUser = (typeof users)['$inferInsert']

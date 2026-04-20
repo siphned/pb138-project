@@ -18,7 +18,8 @@ export const usersRepository = {
 
   async create(data: NewUser): Promise<User> {
     const [user] = await db.insert(users).values(data).returning()
-    return user!
+    if (!user) throw new Error('Insert returned no rows')
+    return user
   },
 
   // Idempotent insert: if clerk_id already exists (concurrent first-login race),
@@ -36,21 +37,27 @@ export const usersRepository = {
     const existing = await db.query.users.findFirst({
       where: eq(users.clerkId, data.clerkId),
     })
-    return existing!
+    if (!existing) throw new Error('User not found after upsert')
+    return existing
   },
 
-  async updateById(id: string, data: Partial<Pick<User, 'fname' | 'lname' | 'shippingAddressId' | 'billingAddressId'>>): Promise<User> {
+  async updateById(
+    id: string,
+    data: Partial<Pick<User, 'fname' | 'lname' | 'shippingAddressId' | 'billingAddressId'>>
+  ): Promise<User> {
     const [updated] = await db
       .update(users)
       .set({ ...data, updatedAt: new Date() })
       .where(eq(users.id, id))
       .returning()
-    return updated!
+    if (!updated) throw new Error('User not found')
+    return updated
   },
 
   async createAddress(data: NewAddress): Promise<Address> {
     const [address] = await db.insert(addresses).values(data).returning()
-    return address!
+    if (!address) throw new Error('Insert returned no rows')
+    return address
   },
 
   async findAddressById(id: string): Promise<Address | undefined> {

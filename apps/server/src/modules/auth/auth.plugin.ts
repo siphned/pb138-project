@@ -9,7 +9,7 @@ export const authPlugin = new Elysia({ name: 'auth' })
   .macro({
     requireAuth: {
       async resolve({ headers, status }) {
-        const payload = await verifyClerkToken(headers['authorization'])
+        const payload = await verifyClerkToken(headers.authorization)
         if (!payload) return status(401)
 
         return {
@@ -21,7 +21,7 @@ export const authPlugin = new Elysia({ name: 'auth' })
 
     requireRole: (role: 'admin') => ({
       async resolve({ headers, status }) {
-        const payload = await verifyClerkToken(headers['authorization'])
+        const payload = await verifyClerkToken(headers.authorization)
         if (!payload) return status(401)
         if (payload.role !== role) return status(403)
 
@@ -34,7 +34,7 @@ export const authPlugin = new Elysia({ name: 'auth' })
 
     requireCapability: (capability: 'winemaker' | 'shop_owner') => ({
       async resolve({ headers, status }) {
-        const payload = await verifyClerkToken(headers['authorization'])
+        const payload = await verifyClerkToken(headers.authorization)
         if (!payload) return status(401)
 
         const hasCapability =
