@@ -1,7 +1,7 @@
 import { eq } from 'drizzle-orm'
 import { db } from '../../db'
-import { users } from '../../db/schema'
-import type { NewUser, User } from '../../db/schema'
+import { users, addresses } from '../../db/schema'
+import type { NewUser, User, Address, NewAddress } from '../../db/schema'
 
 export const usersRepository = {
   findByClerkId(clerkId: string): Promise<User | undefined> {
@@ -37,5 +37,25 @@ export const usersRepository = {
       where: eq(users.clerkId, data.clerkId),
     })
     return existing!
+  },
+
+  async updateById(id: string, data: Partial<Pick<User, 'fname' | 'lname' | 'shippingAddressId' | 'billingAddressId'>>): Promise<User> {
+    const [updated] = await db
+      .update(users)
+      .set({ ...data, updatedAt: new Date() })
+      .where(eq(users.id, id))
+      .returning()
+    return updated!
+  },
+
+  async createAddress(data: NewAddress): Promise<Address> {
+    const [address] = await db.insert(addresses).values(data).returning()
+    return address!
+  },
+
+  async findAddressById(id: string): Promise<Address | undefined> {
+    return db.query.addresses.findFirst({
+      where: eq(addresses.id, id),
+    })
   },
 }
