@@ -14,6 +14,9 @@ vi.mock('./users.repository', () => ({
     findById: vi.fn(),
     create: vi.fn(),
     upsert: vi.fn(),
+    updateById: vi.fn(),
+    createAddress: vi.fn(),
+    findAddressById: vi.fn(),
   },
 }))
 
@@ -22,7 +25,16 @@ import { usersRepository } from './users.repository'
 import type { ClerkPayload } from '../auth'
 
 const clerkId = 'user_clerk_abc'
-const existingUser = { id: 'uuid', clerkId, email: 'a@b.c', fname: 'A', lname: 'B', role: 'user' }
+const existingUser = {
+  id: 'uuid',
+  clerkId,
+  email: 'a@b.c',
+  fname: 'A',
+  lname: 'B',
+  role: 'user',
+  shippingAddressId: null,
+  billingAddressId: null,
+}
 const payload = (role?: string): ClerkPayload => ({ sub: clerkId, role } as never)
 
 beforeEach(() => {
@@ -101,5 +113,91 @@ describe('lazyGetOrCreate', () => {
     expect(usersRepository.upsert).toHaveBeenCalledWith(
       expect.objectContaining({ role: 'user' })
     )
+  })
+})
+
+describe('updateProfile', () => {
+  it('calls updateById with provided fields after resolving the user', async () => {
+    vi.mocked(usersRepository.findByClerkId).mockResolvedValue(existingUser as never)
+    const updated = { ...existingUser, fname: 'NewName' }
+    vi.mocked(usersRepository.updateById).mockResolvedValue(updated as never)
+
+    const result = await usersService.updateProfile(clerkId, payload('user'), { fname: 'NewName' })
+
+    expect(usersRepository.updateById).toHaveBeenCalledWith('uuid', { fname: 'NewName' })
+    expect(result.fname).toBe('NewName')
+  })
+
+  it('can update lname independently', async () => {
+    vi.mocked(usersRepository.findByClerkId).mockResolvedValue(existingUser as never)
+    vi.mocked(usersRepository.updateById).mockResolvedValue({ ...existingUser, lname: 'Smith' } as never)
+
+    await usersService.updateProfile(clerkId, payload('user'), { lname: 'Smith' })
+
+    expect(usersRepository.updateById).toHaveBeenCalledWith('uuid', { lname: 'Smith' })
+  })
+})
+
+describe('getAddresses', () => {
+  it('returns null for both when user has no linked addresses', async () => {
+    vi.mocked(usersRepository.findByClerkId).mockResolvedValue(existingUser as never)
+
+    const result = await usersService.getAddresses(clerkId, payload('user'))
+
+    expect(result).toEqual({ shipping: null, billing: null })
+    expect(usersRepository.findAddressById).not.toHaveBeenCalled()
+  })
+
+  it('fetches shipping address when shippingAddressId is set', async () => {
+    const userWithShipping = { ...existingUser, shippingAddressId: 'addr-uuid' }
+    vi.mocked(usersRepository.findByClerkId).mockResolvedValue(userWithShipping as never)
+    const shippingAddr = { id: 'addr-uuid', country: 'CZ', city: 'Brno', postalCode: '60200', street: 'Main', houseNumber: '1', createdAt: new Date() }
+    vi.mocked(usersRepository.findAddressById).mockResolvedValue(shippingAddr as never)
+
+    const result = await usersService.getAddresses(clerkId, payload('user'))
+
+    expect(usersRepository.findAddressById).toHaveBeenCalledWith('addr-uuid')
+    expect(result.shipping).toEqual(shippingAddr)
+    expect(result.billing).toBeNull()
+  })
+
+  it('fetches both addresses when both IDs are set', async () => {
+    const userWithBoth = { ...existingUser, shippingAddressId: 'ship-id', billingAddressId: 'bill-id' }
+    vi.mocked(usersRepository.findByClerkId).mockResolvedValue(userWithBoth as never)
+    vi.mocked(usersRepository.findAddressById)
+      .mockResolvedValueOnce({ id: 'ship-id' } as never)
+      .mockResolvedValueOnce({ id: 'bill-id' } as never)
+
+    const result = await usersService.getAddresses(clerkId, payload('user'))
+
+    expect(result.shipping).toEqual({ id: 'ship-id' })
+    expect(result.billing).toEqual({ id: 'bill-id' })
+  })
+})
+
+describe('upsertAddress', () => {
+  const addressData = { country: 'CZ', city: 'Brno', postalCode: '60200', street: 'Main', houseNumber: '1' }
+  const createdAddr = { id: 'new-addr-id', ...addressData, createdAt: new Date() }
+
+  it('creates address and links it as shipping', async () => {
+    vi.mocked(usersRepository.findByClerkId).mockResolvedValue(existingUser as never)
+    vi.mocked(usersRepository.createAddress).mockResolvedValue(createdAddr as never)
+    vi.mocked(usersRepository.updateById).mockResolvedValue(existingUser as never)
+
+    const result = await usersService.upsertAddress(clerkId, payload('user'), 'shipping', addressData)
+
+    expect(usersRepository.createAddress).toHaveBeenCalledWith(addressData)
+    expect(usersRepository.updateById).toHaveBeenCalledWith('uuid', { shippingAddressId: 'new-addr-id' })
+    expect(result).toEqual(createdAddr)
+  })
+
+  it('creates address and links it as billing', async () => {
+    vi.mocked(usersRepository.findByClerkId).mockResolvedValue(existingUser as never)
+    vi.mocked(usersRepository.createAddress).mockResolvedValue(createdAddr as never)
+    vi.mocked(usersRepository.updateById).mockResolvedValue(existingUser as never)
+
+    await usersService.upsertAddress(clerkId, payload('user'), 'billing', addressData)
+
+    expect(usersRepository.updateById).toHaveBeenCalledWith('uuid', { billingAddressId: 'new-addr-id' })
   })
 })

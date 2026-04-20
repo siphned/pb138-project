@@ -15,6 +15,7 @@ export * from './relations'
 // ─── Inferred types ───────────────────────────────────────────────────────────
 
 import { users } from './users'
+import { addresses } from './addresses'
 import { shops, winemakers } from './sellers'
 import { products, wines } from './catalog'
 import { orders } from './orders'
@@ -23,6 +24,8 @@ import { roleRequests } from './role-requests'
 
 export type User = (typeof users)['$inferSelect']
 export type NewUser = (typeof users)['$inferInsert']
+export type Address = (typeof addresses)['$inferSelect']
+export type NewAddress = (typeof addresses)['$inferInsert']
 export type Shop = (typeof shops)['$inferSelect']
 export type Winemaker = (typeof winemakers)['$inferSelect']
 export type Product = (typeof products)['$inferSelect']
