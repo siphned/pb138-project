@@ -75,11 +75,10 @@ Enum payment_method {
 
 Table Users {
   id uuid [pk]
+  clerk_id text [not null, unique]
   fname varchar(30) [not null]
   lname varchar(30) [not null]
   email text [not null, unique]
-  email_verified boolean [not null]
-  hashed_password varchar(256) [not null]
   role user_role [not null, default: 'user']
   shipping_address_id uuid
   billing_address_id uuid
@@ -118,15 +117,6 @@ Table Wines {
   created_at timestamptz [not null]
   updated_at timestamptz [not null]
   deleted_at timestamptz
-}
-
-Table Sessions {
-  id uuid [pk]
-  user_id uuid [not null]
-  token text [not null, unique]
-  role user_role [not null, default: 'user']
-  created_at timestamp [not null]
-  expires_at timestamp [not null]
 }
 
 Table Products {
@@ -219,8 +209,8 @@ Table Orders {
   user_id uuid [not null]
   shipping_fee numeric(10,2) [not null]
   discount numeric(10,2) [not null]
-  payment_status payment_status [not null]
-  payment_method payment_method [not null]
+  payment_status payment_status_enum [not null]
+  payment_method payment_method_enum [not null]
   total_price numeric(10,2) [not null]
   created_at timestamp [not null]
   updated_at timestamp
@@ -334,7 +324,6 @@ Ref: Product_reviews.product_id > Products.id
 Ref: Comments.event_id > Events.id
 Ref: Comments.user_id > Users.id
 
-Ref: Sessions.user_id > Users.id
 Ref: Winemakers.user_id - Users.id
 Ref: Shops.owner_user_id > Users.id
 

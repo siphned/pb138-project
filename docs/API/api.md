@@ -45,6 +45,9 @@ This document specifies all REST API endpoints for the WineMarket platform. Each
 | DELETE | `/users/:id/addresses/:addr_id` | Delete address | ✅ (own) |
 | POST | `/users/:id/request-winemaker` | Request Winemaker role | ✅ |
 | POST | `/users/:id/request-shop-owner` | Request Shop Owner role | ✅ |
+| GET | `/role-requests` | Pending requests (Admin) | ✅ (Admin) |
+| POST | `/role-requests/:req_id/approve` | Approve request | ✅ (Admin) |
+| POST | `/role-requests/:req_id/reject` | Reject request | ✅ (Admin) |
 
 ---
 
