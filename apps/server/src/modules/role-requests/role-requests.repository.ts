@@ -1,4 +1,4 @@
-import { and, eq, isNull } from 'drizzle-orm'
+import { eq, } from 'drizzle-orm'
 import { db } from '../../db'
 import { roleRequests } from '../../db/schema'
 import type { RoleRequest } from '../../db/schema'
@@ -32,7 +32,8 @@ export const roleRequestsRepository = {
       .insert(roleRequests)
       .values(data)
       .returning()
-    return request!
+    if (!request) throw new Error('Insert returned no rows')
+    return request
   },
 
   async updateStatus(
@@ -45,6 +46,7 @@ export const roleRequestsRepository = {
       .set({ status, reviewedAt: new Date(), reviewedByAdminId })
       .where(eq(roleRequests.id, id))
       .returning()
-    return updated!
+    if (!updated) throw new Error('Role request not found')
+    return updated
   },
 }
