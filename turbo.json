@@ -5,7 +5,7 @@
     "build": {
       "dependsOn": ["^build"],
       "inputs": ["$TURBO_DEFAULT$", ".env*"],
-      "outputs": ["dist/**"]
+      "outputs": ["dist/**", "build/**"]
     },
     "check-types": {
       "dependsOn": ["^check-types"]
@@ -16,6 +16,14 @@
     },
     "generate": {
       "cache": false
+    },
+    "test": {
+      "cache": false,
+      "outputs": ["coverage/**"]
+    },
+    "test:e2e": {
+      "cache": false,
+      "outputs": ["test-results/**"]
     }
   }
 }
