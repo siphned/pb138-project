@@ -1,8 +1,8 @@
 import { cors } from "@elysiajs/cors";
 import { openapi } from "@elysiajs/openapi";
-import { Elysia } from "elysia";
+import { Elysia, t } from "elysia";
 
-new Elysia()
+export const app = new Elysia()
   .use(cors({ origin: "http://localhost:5173" }))
   .use(
     openapi({
@@ -16,8 +16,11 @@ new Elysia()
       },
     })
   )
-  .get("/", () => "Hello from API")
-  .listen(3000);
+  .get("/", () => "Hello from API", {
+    response: { 200: t.String() },
+  });
+
+app.listen(3000);
 
 console.log("Server running on http://localhost:3000");
 console.log("OpenAPI spec available at http://localhost:3000/swagger/json");
