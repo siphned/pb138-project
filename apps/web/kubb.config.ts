@@ -10,6 +10,7 @@ export default defineConfig({
   },
   output: {
     path: "src/generated",
+    format: false,
   },
   plugins: [
     pluginOas(),
