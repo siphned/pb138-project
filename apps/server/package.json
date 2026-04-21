@@ -20,6 +20,7 @@
   },
   "scripts": {
     "dev": "bun run src/index.ts",
+    "generate:spec": "bun run scripts/export-spec.ts",
     "build": "tsc",
     "check-types": "tsc --noEmit",
     "generate": "echo 'Backend does not generate code'",
