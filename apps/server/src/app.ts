@@ -2,6 +2,7 @@ import { Elysia } from 'elysia'
 import { openapi } from '@elysiajs/openapi'
 import { usersRoutes } from './modules/users'
 import { roleRequestsRoutes } from './modules/role-requests'
+import { shopsRoutes } from './modules/shops'
 
 export const app = new Elysia()
   .use(
@@ -16,10 +17,8 @@ export const app = new Elysia()
         },
         tags: [
           { name: 'users', description: 'Authenticated user profile endpoints' },
-          {
-            name: 'role-requests',
-            description: 'Winemaker/shop-owner role application flow',
-          },
+          { name: 'role-requests', description: 'Winemaker/shop-owner role application flow' },
+          { name: 'shops', description: 'Shop management' },
         ],
         servers: [{ url: 'http://localhost:3000', description: 'Development' }],
         components: {
@@ -37,3 +36,4 @@ export const app = new Elysia()
   )
   .use(usersRoutes)
   .use(roleRequestsRoutes)
+  .use(shopsRoutes)
