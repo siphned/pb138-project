@@ -17,7 +17,7 @@ export async function verifyClerkToken(authHeader: string | undefined): Promise<
   try {
     const payload = await verifyToken(token, {
       jwtKey: process.env.CLERK_JWT_KEY,
-      authorizedParties: [process.env.FRONTEND_URL ?? 'http://localhost:5173'],
+      authorizedParties: [process.env.FRONTEND_URL],
     })
     return payload as ClerkPayload
   } catch {
