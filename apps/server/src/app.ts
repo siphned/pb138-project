@@ -4,6 +4,7 @@ import { usersRoutes } from './modules/users'
 import { roleRequestsRoutes } from './modules/role-requests'
 import { shopsRoutes } from './modules/shops'
 import { productsRoutes } from './modules/products'
+import { availabilityRoutes } from './modules/availability'
 
 export const app = new Elysia()
   .use(
@@ -21,6 +22,7 @@ export const app = new Elysia()
           { name: 'role-requests', description: 'Winemaker/shop-owner role application flow' },
           { name: 'shops', description: 'Shop management' },
           { name: 'products', description: 'Products and bundles' },
+          { name: 'availability', description: 'Shop availability schedule' },
         ],
         servers: [{ url: 'http://localhost:3000', description: 'Development' }],
         components: {
@@ -40,3 +42,4 @@ export const app = new Elysia()
   .use(roleRequestsRoutes)
   .use(shopsRoutes)
   .use(productsRoutes)
+  .use(availabilityRoutes)
