@@ -18,6 +18,7 @@ import type { users } from './users'
 import type { addresses } from './addresses'
 import type { shops, winemakers } from './sellers'
 import type { wines, products, productWines } from './catalog'
+import type { availabilityRegular, availabilityExceptions } from './availability'
 import type { orders } from './orders'
 import type { carts } from './carts'
 import type { roleRequests } from './role-requests'
@@ -36,3 +37,5 @@ export type RoleRequest = (typeof roleRequests)['$inferSelect']
 export type ProductWine = (typeof productWines)['$inferSelect']
 export type NewProduct = (typeof products)['$inferInsert']
 export type NewProductWine = (typeof productWines)['$inferInsert']
+export type AvailabilityRegular = (typeof availabilityRegular)['$inferSelect']
+export type AvailabilityException = (typeof availabilityExceptions)['$inferSelect']
