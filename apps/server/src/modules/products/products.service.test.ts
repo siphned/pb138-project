@@ -124,6 +124,19 @@ describe('createBundle', () => {
       })
     ).rejects.toThrow('INVALID_WINE')
   })
+
+  it('throws BUNDLE_MIN_WINES when fewer than 2 wines are provided', async () => {
+    vi.mocked(shopsRepository.findById).mockResolvedValue(mockShop)
+
+    await expect(
+      productsService.createBundle(shopId, ownerId, {
+        name: 'Solo Pack', price: '10.00', quantity: 1,
+        wines: [{ wineId: wineId1, quantity: 1 }],
+      })
+    ).rejects.toThrow('BUNDLE_MIN_WINES')
+
+    expect(productsRepository.winesExist).not.toHaveBeenCalled()
+  })
 })
 
 // ─── updateBundle ─────────────────────────────────────────────────────────────

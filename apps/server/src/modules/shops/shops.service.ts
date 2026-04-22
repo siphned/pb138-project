@@ -1,6 +1,5 @@
 import { shopsRepository } from './shops.repository'
 import type { ShopWithAddress } from './shops.repository'
-import type { Shop } from '../../db/schema'
 
 type AddressData = {
   country: string
@@ -33,17 +32,18 @@ export const shopsService = {
     return shop
   },
 
-  async createShop(ownerUserId: string, data: CreateShopData): Promise<Shop> {
+  async createShop(ownerUserId: string, data: CreateShopData): Promise<ShopWithAddress> {
     const existing = await shopsRepository.findByOwnerUserId(ownerUserId)
     if (existing) throw new Error('ALREADY_HAS_SHOP')
 
-    return shopsRepository.createShopWithAddress(
+    const shop = await shopsRepository.createShopWithAddress(
       { ownerUserId, name: data.name, description: data.description },
       data.address
     )
+    return shopsRepository.findById(shop.id) as Promise<ShopWithAddress>
   },
 
-  async updateShop(shopId: string, requesterId: string, data: UpdateShopData): Promise<Shop> {
+  async updateShop(shopId: string, requesterId: string, data: UpdateShopData): Promise<ShopWithAddress> {
     const shop = await shopsRepository.findById(shopId)
     if (!shop) throw new Error('NOT_FOUND')
     if (shop.ownerUserId !== requesterId) throw new Error('FORBIDDEN')
@@ -66,6 +66,7 @@ export const shopsService = {
       updates.addressId = newAddress.id
     }
 
-    return shopsRepository.updateById(shopId, updates)
+    await shopsRepository.updateById(shopId, updates)
+    return shopsRepository.findById(shopId) as Promise<ShopWithAddress>
   },
 }

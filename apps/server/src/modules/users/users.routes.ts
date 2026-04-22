@@ -14,10 +14,7 @@ export const usersRoutes = new Elysia({ prefix: '/users' })
 
   .get(
     '/me',
-    async ({ clerkId, clerkPayload }) => {
-      const user = await usersService.lazyGetOrCreate(clerkId, clerkPayload)
-      return user
-    },
+    async ({ dbUser }) => dbUser,
     {
       requireAuth: true,
       response: userResponseSchema,
@@ -33,8 +30,8 @@ export const usersRoutes = new Elysia({ prefix: '/users' })
 
   .put(
     '/me',
-    async ({ clerkId, clerkPayload, body }) => {
-      return usersService.updateProfile(clerkId, clerkPayload, body)
+    async ({ dbUser, body }) => {
+      return usersService.updateProfileById(dbUser.id, body)
     },
     {
       requireAuth: true,
@@ -51,8 +48,8 @@ export const usersRoutes = new Elysia({ prefix: '/users' })
 
   .get(
     '/me/addresses',
-    async ({ clerkId, clerkPayload }) => {
-      return usersService.getAddresses(clerkId, clerkPayload)
+    async ({ dbUser }) => {
+      return usersService.getAddressesForUser(dbUser)
     },
     {
       requireAuth: true,
@@ -68,9 +65,9 @@ export const usersRoutes = new Elysia({ prefix: '/users' })
 
   .post(
     '/me/addresses',
-    async ({ clerkId, clerkPayload, body }) => {
+    async ({ dbUser, body }) => {
       const { type, ...addressData } = body
-      return usersService.upsertAddress(clerkId, clerkPayload, type, addressData)
+      return usersService.upsertAddressForUser(dbUser.id, type, addressData)
     },
     {
       requireAuth: true,
