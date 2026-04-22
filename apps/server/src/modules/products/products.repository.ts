@@ -37,11 +37,12 @@ export const productsRepository = {
   },
 
   async winesExist(wineIds: string[]): Promise<boolean> {
+    const uniqueIds = [...new Set(wineIds)]
     const found = await db.query.wines.findMany({
-      where: and(inArray(wines.id, wineIds), isNull(wines.deletedAt)),
+      where: and(inArray(wines.id, uniqueIds), isNull(wines.deletedAt)),
       columns: { id: true },
     })
-    return found.length === wineIds.length
+    return found.length === uniqueIds.length
   },
 
   async createProductWithWine(
