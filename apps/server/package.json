@@ -28,7 +28,7 @@
     "generate": "echo 'Backend does not generate code'",
     "test": "vitest || true",
     "test:e2e": "echo 'Run E2E tests from web package'",
-    "lint": "eslint .",
+    "lint": "biome lint .",
     "db:generate": "drizzle-kit generate",
     "db:migrate": "drizzle-kit migrate",
     "db:studio": "drizzle-kit studio"
