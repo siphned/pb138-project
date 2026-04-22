@@ -48,6 +48,11 @@ See `/docs/` for:
 - **dbdiagram_schema.dbml** — Database schema definition
 - **MODULES/** — Backend module structure & implementation plan
 - **ARCHITECTURE/** — System design & layering patterns
+## Related Documents
+
+- `../ROLES/roles.md` — Authorization rules (every endpoint references this)
+- `../ARCHITECTURE/architecture.md` — Layered architecture (how routes → services → repos)
+- `../MODULES/modules.md` — Module structure (who implements what)
 
 ## Revision History
 
