@@ -1,6 +1,7 @@
 import { Elysia } from 'elysia'
 import { verifyClerkToken } from './auth.utils'
 import type { ClerkPayload } from './auth.utils'
+import { usersService } from '../users/users.service'
 
 export type { ClerkPayload }
 export type AppRole = 'user' | 'admin' | 'winemaker' | 'shop_owner'
@@ -12,9 +13,12 @@ export const authPlugin = new Elysia({ name: 'auth' })
         const payload = await verifyClerkToken(headers.authorization)
         if (!payload) return status(401)
 
+        const dbUser = await usersService.lazyGetOrCreate(payload.sub, payload)
+
         return {
           clerkId: payload.sub,
           clerkPayload: payload,
+          dbUser,
         }
       },
     },
@@ -25,9 +29,12 @@ export const authPlugin = new Elysia({ name: 'auth' })
         if (!payload) return status(401)
         if (payload.role !== role) return status(403)
 
+        const dbUser = await usersService.lazyGetOrCreate(payload.sub, payload)
+
         return {
           clerkId: payload.sub,
           clerkPayload: payload,
+          dbUser,
         }
       },
     }),
@@ -44,9 +51,12 @@ export const authPlugin = new Elysia({ name: 'auth' })
 
         if (!hasCapability) return status(403)
 
+        const dbUser = await usersService.lazyGetOrCreate(payload.sub, payload)
+
         return {
           clerkId: payload.sub,
           clerkPayload: payload,
+          dbUser,
         }
       },
     }),

@@ -1,6 +1,6 @@
 import { createClerkClient } from '@clerk/backend'
 import { usersRepository } from './users.repository'
-import type { ClerkPayload } from '../auth'
+import type { ClerkPayload } from '../auth/auth.utils'
 import type { User, Address } from '../../db/schema'
 
 const clerkClient = createClerkClient({
