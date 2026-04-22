@@ -40,7 +40,9 @@ export const shopsService = {
       { ownerUserId, name: data.name, description: data.description },
       data.address
     )
-    return shopsRepository.findById(shop.id) as Promise<ShopWithAddress>
+    const created = await shopsRepository.findById(shop.id)
+    if (!created) throw new Error('NOT_FOUND')
+    return created
   },
 
   async updateShop(shopId: string, requesterId: string, data: UpdateShopData): Promise<ShopWithAddress> {
@@ -67,6 +69,8 @@ export const shopsService = {
     }
 
     await shopsRepository.updateById(shopId, updates)
-    return shopsRepository.findById(shopId) as Promise<ShopWithAddress>
+    const updated = await shopsRepository.findById(shopId)
+    if (!updated) throw new Error('NOT_FOUND')
+    return updated
   },
 }

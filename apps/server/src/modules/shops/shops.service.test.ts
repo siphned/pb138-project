@@ -52,6 +52,7 @@ describe('createShop', () => {
   it('creates a shop when user has no existing shop', async () => {
     vi.mocked(shopsRepository.findByOwnerUserId).mockResolvedValue(undefined)
     vi.mocked(shopsRepository.createShopWithAddress).mockResolvedValue(mockShop as never)
+    vi.mocked(shopsRepository.findById).mockResolvedValue(mockShop as never)
 
     await shopsService.createShop(ownerId, {
       name: 'Test Shop',
@@ -82,8 +83,11 @@ describe('createShop', () => {
 
 describe('updateShop', () => {
   it('updates shop fields when caller is the owner', async () => {
-    vi.mocked(shopsRepository.findById).mockResolvedValue(mockShop as never)
-    vi.mocked(shopsRepository.updateById).mockResolvedValue({ ...mockShop, name: 'New Name' } as never)
+    const updatedShop = { ...mockShop, name: 'New Name' }
+    vi.mocked(shopsRepository.findById)
+      .mockResolvedValueOnce(mockShop as never)   // ownership check
+      .mockResolvedValueOnce(updatedShop as never) // re-fetch after update
+    vi.mocked(shopsRepository.updateById).mockResolvedValue(updatedShop as never)
 
     await shopsService.updateShop(shopId, ownerId, { name: 'New Name' })
 
@@ -104,9 +108,12 @@ describe('updateShop', () => {
   })
 
   it('creates a new address row and relinks shop when address is updated', async () => {
-    vi.mocked(shopsRepository.findById).mockResolvedValue(mockShop as never)
+    const updatedShop = { ...mockShop, addressId: newAddressId }
+    vi.mocked(shopsRepository.findById)
+      .mockResolvedValueOnce(mockShop as never)    // ownership check
+      .mockResolvedValueOnce(updatedShop as never)  // re-fetch after update
     vi.mocked(shopsRepository.insertAddress).mockResolvedValue({ ...mockAddress, id: newAddressId } as never)
-    vi.mocked(shopsRepository.updateById).mockResolvedValue({ ...mockShop, addressId: newAddressId } as never)
+    vi.mocked(shopsRepository.updateById).mockResolvedValue(updatedShop as never)
 
     await shopsService.updateShop(shopId, ownerId, {
       address: { city: 'Prague' },

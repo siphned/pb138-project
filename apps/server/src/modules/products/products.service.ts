@@ -51,6 +51,8 @@ export const productsService = {
     if (data.wines.length < 2) throw new Error('BUNDLE_MIN_WINES')
 
     const wineIds = data.wines.map((w) => w.wineId)
+    if (new Set(wineIds).size !== wineIds.length) throw new Error('DUPLICATE_WINE')
+
     const winesExist = await productsRepository.winesExist(wineIds)
     if (!winesExist) throw new Error('INVALID_WINE')
 
@@ -97,6 +99,7 @@ export const productsService = {
     if (data.wines !== undefined) {
       if (data.wines.length < 2) throw new Error('BUNDLE_MIN_WINES')
       const wineIds = data.wines.map((w) => w.wineId)
+      if (new Set(wineIds).size !== wineIds.length) throw new Error('DUPLICATE_WINE')
       const winesExist = await productsRepository.winesExist(wineIds)
       if (!winesExist) throw new Error('INVALID_WINE')
     }
