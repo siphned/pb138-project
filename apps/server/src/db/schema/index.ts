@@ -17,7 +17,7 @@ export * from './relations'
 import type { users } from './users'
 import type { addresses } from './addresses'
 import type { shops, winemakers } from './sellers'
-import type { products, productWines } from './catalog'
+import type { wines, products, productWines } from './catalog'
 import type { orders } from './orders'
 import type { carts } from './carts'
 import type { roleRequests } from './role-requests'
@@ -28,6 +28,7 @@ export type Address = (typeof addresses)['$inferSelect']
 export type NewAddress = (typeof addresses)['$inferInsert']
 export type Shop = (typeof shops)['$inferSelect']
 export type Winemaker = (typeof winemakers)['$inferSelect']
+export type Wine = (typeof wines)['$inferSelect']
 export type Product = (typeof products)['$inferSelect']
 export type Order = (typeof orders)['$inferSelect']
 export type Cart = (typeof carts)['$inferSelect']
