@@ -10,7 +10,12 @@ const clerkClient = createClerkClient({
 export const usersService = {
   async lazyGetOrCreate(clerkId: string, payload: ClerkPayload): Promise<User> {
     const existing = await usersRepository.findByClerkId(clerkId)
-    if (existing) return existing
+    if (existing) {
+      if (payload.role === 'admin' && existing.role !== 'admin') {
+        return usersRepository.updateById(existing.id, { role: 'admin' })
+      }
+      return existing
+    }
 
     const clerkUser = await clerkClient.users.getUser(clerkId)
 

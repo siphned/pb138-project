@@ -43,7 +43,7 @@ export const usersRepository = {
 
   async updateById(
     id: string,
-    data: Partial<Pick<User, 'fname' | 'lname' | 'shippingAddressId' | 'billingAddressId'>>
+    data: Partial<Pick<User, 'fname' | 'lname' | 'shippingAddressId' | 'billingAddressId' | 'role'>>
   ): Promise<User> {
     const [updated] = await db
       .update(users)
