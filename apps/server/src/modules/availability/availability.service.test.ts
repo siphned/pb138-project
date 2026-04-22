@@ -69,6 +69,18 @@ describe('addRegular', () => {
       })
     ).rejects.toThrow('INVALID_TIME_RANGE')
   })
+
+  it('throws INVALID_TIME_RANGE when validTo is not after validFrom', async () => {
+    vi.mocked(availabilityRepository.findShopById).mockResolvedValue(mockShop)
+
+    await expect(
+      availabilityService.addRegular(shopId, ownerId, {
+        dow: 1, startTime: '09:00', endTime: '17:00',
+        validFrom: '2026-06-01', validTo: '2026-05-01',
+        type: 'open',
+      })
+    ).rejects.toThrow('INVALID_TIME_RANGE')
+  })
 })
 
 describe('addException', () => {

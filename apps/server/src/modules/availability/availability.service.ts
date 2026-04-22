@@ -2,9 +2,9 @@ import { availabilityRepository } from './availability.repository'
 import type { AvailabilityException, AvailabilityRegular } from '../../db/schema'
 
 function parseTime(hhmm: string): Date {
-  const [h, m] = hhmm.split(':').map(Number)
+  const [h = 0, m = 0] = hhmm.split(':').map(Number)
   const d = new Date(0)
-  d.setUTCHours(h!, m!, 0, 0)
+  d.setUTCHours(h, m, 0, 0)
   return d
 }
 
