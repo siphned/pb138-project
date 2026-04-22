@@ -126,6 +126,7 @@ Table Products {
   description text
   price numeric(10,2) [not null]
   quantity smallint [not null]
+  is_bundle boolean [not null, default: false]
   created_at timestamp [not null]
   updated_at timestamp
   deleted_at timestamp
