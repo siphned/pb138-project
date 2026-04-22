@@ -17,7 +17,7 @@ export * from './relations'
 import type { users } from './users'
 import type { addresses } from './addresses'
 import type { shops, winemakers } from './sellers'
-import type { products } from './catalog'
+import type { products, productWines } from './catalog'
 import type { orders } from './orders'
 import type { carts } from './carts'
 import type { roleRequests } from './role-requests'
@@ -32,3 +32,6 @@ export type Product = (typeof products)['$inferSelect']
 export type Order = (typeof orders)['$inferSelect']
 export type Cart = (typeof carts)['$inferSelect']
 export type RoleRequest = (typeof roleRequests)['$inferSelect']
+export type ProductWine = (typeof productWines)['$inferSelect']
+export type NewProduct = (typeof products)['$inferInsert']
+export type NewProductWine = (typeof productWines)['$inferInsert']

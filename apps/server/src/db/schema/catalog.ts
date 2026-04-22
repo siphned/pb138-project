@@ -1,4 +1,4 @@
-import { decimal, numeric, pgTable, smallint, text, timestamp, uuid, varchar } from 'drizzle-orm/pg-core'
+import { boolean, decimal, numeric, pgTable, smallint, text, timestamp, uuid, varchar } from 'drizzle-orm/pg-core'
 import { wineColorEnum, wineTypeEnum } from './enums'
 import { timestamptz } from './helpers'
 import { shops, winemakers } from './sellers'
@@ -28,6 +28,7 @@ export const products = pgTable('products', {
   description: text('description'),
   price: numeric('price', { precision: 10, scale: 2 }).notNull(),
   quantity: smallint('quantity').notNull(),
+  isBundle: boolean('is_bundle').notNull().default(false),
   createdAt: timestamp('created_at').notNull().defaultNow(),
   updatedAt: timestamp('updated_at'),
   deletedAt: timestamp('deleted_at'),
