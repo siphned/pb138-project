@@ -1,7 +1,10 @@
 import { verifyToken } from '@clerk/backend'
 
-if (!process.env.CLERK_JWT_KEY) throw new Error('Missing env var: CLERK_JWT_KEY')
-if (!process.env.FRONTEND_URL) throw new Error('Missing env var: FRONTEND_URL')
+const CLERK_JWT_KEY = process.env.CLERK_JWT_KEY as string
+if (!CLERK_JWT_KEY) throw new Error('Missing env var: CLERK_JWT_KEY')
+
+const FRONTEND_URL = process.env.FRONTEND_URL as string
+if (!FRONTEND_URL) throw new Error('Missing env var: FRONTEND_URL')
 
 export type ClerkPayload = Awaited<ReturnType<typeof verifyToken>> & {
   role?: 'user' | 'admin'
@@ -16,8 +19,8 @@ export async function verifyClerkToken(authHeader: string | undefined): Promise<
 
   try {
     const payload = await verifyToken(token, {
-      jwtKey: process.env.CLERK_JWT_KEY,
-      authorizedParties: [process.env.FRONTEND_URL],
+      jwtKey: CLERK_JWT_KEY,
+      authorizedParties: [FRONTEND_URL],
     })
     return payload as ClerkPayload
   } catch {
