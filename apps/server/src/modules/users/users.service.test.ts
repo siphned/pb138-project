@@ -52,6 +52,19 @@ describe('lazyGetOrCreate', () => {
     expect(usersRepository.upsert).not.toHaveBeenCalled()
   })
 
+  it('promotes an existing user to admin when JWT role is admin', async () => {
+    vi.mocked(usersRepository.findByClerkId).mockResolvedValue(existingUser as never)
+    const promotedUser = { ...existingUser, role: 'admin' }
+    vi.mocked(usersRepository.updateById).mockResolvedValue(promotedUser as never)
+
+    const result = await usersService.lazyGetOrCreate(clerkId, payload('admin'))
+
+    expect(usersRepository.updateById).toHaveBeenCalledWith(existingUser.id, { role: 'admin' })
+    expect(mockGetUser).not.toHaveBeenCalled()
+    expect(usersRepository.upsert).not.toHaveBeenCalled()
+    expect(result.role).toBe('admin')
+  })
+
   it('fetches Clerk profile and upserts a new user when not found locally', async () => {
     vi.mocked(usersRepository.findByClerkId).mockResolvedValue(undefined)
     mockGetUser.mockResolvedValue({
