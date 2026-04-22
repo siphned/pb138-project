@@ -214,3 +214,77 @@ describe('upsertAddress', () => {
     expect(usersRepository.updateById).toHaveBeenCalledWith('uuid', { billingAddressId: 'new-addr-id' })
   })
 })
+
+describe('updateProfileById', () => {
+  it('calls updateById directly without a Clerk roundtrip', async () => {
+    const updated = { ...existingUser, fname: 'Direct' }
+    vi.mocked(usersRepository.updateById).mockResolvedValue(updated as never)
+
+    const result = await usersService.updateProfileById('uuid', { fname: 'Direct' })
+
+    expect(usersRepository.updateById).toHaveBeenCalledWith('uuid', { fname: 'Direct' })
+    expect(usersRepository.findByClerkId).not.toHaveBeenCalled()
+    expect(result.fname).toBe('Direct')
+  })
+})
+
+describe('getAddressesForUser', () => {
+  const addressData = { country: 'CZ', city: 'Brno', postalCode: '60200', street: 'Main', houseNumber: '1' }
+
+  it('returns null for both when user has no linked addresses', async () => {
+    const result = await usersService.getAddressesForUser(existingUser as never)
+
+    expect(result).toEqual({ shipping: null, billing: null })
+    expect(usersRepository.findAddressById).not.toHaveBeenCalled()
+  })
+
+  it('fetches shipping address when shippingAddressId is set', async () => {
+    const userWithShipping = { ...existingUser, shippingAddressId: 'addr-uuid' }
+    const shippingAddr = { id: 'addr-uuid', ...addressData, createdAt: new Date() }
+    vi.mocked(usersRepository.findAddressById).mockResolvedValue(shippingAddr as never)
+
+    const result = await usersService.getAddressesForUser(userWithShipping as never)
+
+    expect(usersRepository.findAddressById).toHaveBeenCalledWith('addr-uuid')
+    expect(result.shipping).toEqual(shippingAddr)
+    expect(result.billing).toBeNull()
+  })
+
+  it('fetches both addresses when both IDs are set', async () => {
+    const userWithBoth = { ...existingUser, shippingAddressId: 'ship-id', billingAddressId: 'bill-id' }
+    vi.mocked(usersRepository.findAddressById)
+      .mockResolvedValueOnce({ id: 'ship-id' } as never)
+      .mockResolvedValueOnce({ id: 'bill-id' } as never)
+
+    const result = await usersService.getAddressesForUser(userWithBoth as never)
+
+    expect(result.shipping).toEqual({ id: 'ship-id' })
+    expect(result.billing).toEqual({ id: 'bill-id' })
+  })
+})
+
+describe('upsertAddressForUser', () => {
+  const addressData = { country: 'CZ', city: 'Brno', postalCode: '60200', street: 'Main', houseNumber: '1' }
+  const createdAddr = { id: 'new-addr-id', ...addressData, createdAt: new Date() }
+
+  it('creates address and links it as shipping without a Clerk roundtrip', async () => {
+    vi.mocked(usersRepository.createAddress).mockResolvedValue(createdAddr as never)
+    vi.mocked(usersRepository.updateById).mockResolvedValue(existingUser as never)
+
+    const result = await usersService.upsertAddressForUser('uuid', 'shipping', addressData)
+
+    expect(usersRepository.createAddress).toHaveBeenCalledWith(addressData)
+    expect(usersRepository.updateById).toHaveBeenCalledWith('uuid', { shippingAddressId: 'new-addr-id' })
+    expect(usersRepository.findByClerkId).not.toHaveBeenCalled()
+    expect(result).toEqual(createdAddr)
+  })
+
+  it('creates address and links it as billing', async () => {
+    vi.mocked(usersRepository.createAddress).mockResolvedValue(createdAddr as never)
+    vi.mocked(usersRepository.updateById).mockResolvedValue(existingUser as never)
+
+    await usersService.upsertAddressForUser('uuid', 'billing', addressData)
+
+    expect(usersRepository.updateById).toHaveBeenCalledWith('uuid', { billingAddressId: 'new-addr-id' })
+  })
+})
