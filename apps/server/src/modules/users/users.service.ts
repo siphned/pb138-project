@@ -76,4 +76,32 @@ export const usersService = {
 
     return address
   },
+
+  updateProfileById(
+    userId: string,
+    data: { fname?: string; lname?: string }
+  ): Promise<User> {
+    return usersRepository.updateById(userId, data)
+  },
+
+  async getAddressesForUser(
+    user: User
+  ): Promise<{ shipping: Address | null; billing: Address | null }> {
+    const [shipping, billing] = await Promise.all([
+      user.shippingAddressId ? usersRepository.findAddressById(user.shippingAddressId) : null,
+      user.billingAddressId ? usersRepository.findAddressById(user.billingAddressId) : null,
+    ])
+    return { shipping: shipping ?? null, billing: billing ?? null }
+  },
+
+  async upsertAddressForUser(
+    userId: string,
+    type: 'shipping' | 'billing',
+    addressData: { country: string; city: string; postalCode: string; street: string; houseNumber: string }
+  ): Promise<Address> {
+    const address = await usersRepository.createAddress(addressData)
+    const field = type === 'shipping' ? 'shippingAddressId' : 'billingAddressId'
+    await usersRepository.updateById(userId, { [field]: address.id })
+    return address
+  },
 }

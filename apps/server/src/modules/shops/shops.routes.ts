@@ -1,7 +1,7 @@
 import { Elysia, status, t } from 'elysia'
 import { authPlugin } from '../auth'
 import { shopsService } from './shops.service'
-import { createShopBody, updateShopBody } from './shops.schema'
+import { createShopBody, updateShopBody, shopResponse } from './shops.schema'
 
 export const shopsRoutes = new Elysia()
   .use(authPlugin)
@@ -10,6 +10,7 @@ export const shopsRoutes = new Elysia()
     '/shops',
     () => shopsService.listShops(),
     {
+      response: { 200: t.Array(shopResponse) },
       detail: {
         tags: ['shops'],
         summary: 'List all shops',
@@ -30,6 +31,7 @@ export const shopsRoutes = new Elysia()
     },
     {
       params: t.Object({ id: t.String() }),
+      response: { 200: shopResponse, 404: t.String() },
       detail: {
         tags: ['shops'],
         summary: 'Get shop by ID',
@@ -52,6 +54,7 @@ export const shopsRoutes = new Elysia()
     {
       requireCapability: 'shop_owner',
       body: createShopBody,
+      response: { 201: shopResponse, 409: t.String() },
       detail: {
         tags: ['shops'],
         summary: 'Create a shop',
@@ -78,6 +81,7 @@ export const shopsRoutes = new Elysia()
       requireAuth: true,
       params: t.Object({ id: t.String() }),
       body: updateShopBody,
+      response: { 200: shopResponse, 403: t.String(), 404: t.String() },
       detail: {
         tags: ['shops'],
         summary: 'Update shop',
