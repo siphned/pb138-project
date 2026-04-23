@@ -21,6 +21,7 @@ vi.mock('./events.repository', () => ({
 
 import { eventsService } from './events.service'
 import { eventsRepository } from './events.repository'
+import type { EventWithDetails } from './events.repository'
 
 const userId = '11111111-1111-1111-1111-111111111111'
 const winemakerId = 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa'
@@ -42,9 +43,9 @@ const mockApprovedEvent = {
   capacity: 10,
   startTime: futureStart,
   deletedAt: null,
-} as never
+} as unknown as EventWithDetails
 
-const mockPendingEvent = { ...mockApprovedEvent, status: 'pending' } as never
+const mockPendingEvent = { ...mockApprovedEvent, status: 'pending' } as unknown as EventWithDetails
 
 const validCreateInput = {
   name: 'Wine Tasting',
@@ -233,7 +234,7 @@ describe('registerForEvent', () => {
   })
 
   it('throws EVENT_NOT_AVAILABLE when event start_time is in the past', async () => {
-    const pastEvent = { ...mockApprovedEvent, startTime: new Date(Date.now() - 1000) } as never
+    const pastEvent = { ...mockApprovedEvent, startTime: new Date(Date.now() - 1000) } as unknown as EventWithDetails
     vi.mocked(eventsRepository.findById).mockResolvedValue(pastEvent)
 
     await expect(eventsService.registerForEvent(eventId, userId)).rejects.toThrow('EVENT_NOT_AVAILABLE')
