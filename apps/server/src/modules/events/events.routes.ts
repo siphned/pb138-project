@@ -15,6 +15,7 @@ function handleError(e: unknown) {
     if (e.message === 'NOT_FOUND') return status(404, 'Not found')
     if (e.message === 'FORBIDDEN') return status(403, 'Forbidden')
     if (e.message === 'CONFLICT') return status(409, 'Event cannot be edited in its current status')
+    if (e.message === 'CAPACITY_TOO_LOW') return status(409, 'Capacity cannot be lower than current registration count')
     if (e.message === 'ALREADY_REGISTERED') return status(409, 'Already registered for this event')
     if (e.message === 'CAPACITY_FULL') return status(409, 'Event is at full capacity')
     if (e.message === 'EVENT_NOT_AVAILABLE') return status(409, 'Event is not available for this action')
@@ -29,8 +30,12 @@ export const eventsRoutes = new Elysia()
   .get(
     '/events',
     async ({ query }) => {
-      const { page, limit, ...filters } = query
-      return eventsService.listEvents(filters, { page, limit })
+      try {
+        const { page, limit, ...filters } = query
+        return await eventsService.listEvents(filters, { page, limit })
+      } catch (e) {
+        return handleError(e)
+      }
     },
     {
       query: listEventsQuery,
@@ -83,7 +88,7 @@ export const eventsRoutes = new Elysia()
       }
     },
     {
-      requireAuth: true,
+      requireCapability: 'winemaker',
       params: eventParams,
       body: updateEventBody,
       detail: {
@@ -105,7 +110,7 @@ export const eventsRoutes = new Elysia()
       }
     },
     {
-      requireAuth: true,
+      requireCapability: 'winemaker',
       params: eventParams,
       detail: {
         tags: ['events'],
