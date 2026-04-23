@@ -1,4 +1,5 @@
 import { Elysia } from 'elysia'
+import { cors } from '@elysiajs/cors'
 import { openapi } from '@elysiajs/openapi'
 import { usersRoutes } from './modules/users'
 import { roleRequestsRoutes } from './modules/role-requests'
@@ -7,6 +8,7 @@ import { productsRoutes } from './modules/products'
 import { availabilityRoutes } from './modules/availability'
 
 export const app = new Elysia()
+  .use(cors({ origin: 'http://localhost:5173' }))
   .use(
     openapi({
       provider: 'scalar',
