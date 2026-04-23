@@ -12,6 +12,7 @@ export const app = new Elysia()
   .use(
     openapi({
       provider: 'scalar',
+      specPath: '/swagger/json',
       documentation: {
         info: {
           title: 'WineMarket API',
