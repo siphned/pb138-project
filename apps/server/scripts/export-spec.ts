@@ -6,17 +6,18 @@
  * reflects the actual server routes — no duplication.
  */
 import { writeFile } from "node:fs/promises";
-import { app } from "../src/index";
+import { app } from "../src/app";
 
 const OUTPUT_PATH = "./openapi.json";
+const SPEC_PORT = 3001;
 
 // Override the port so it doesn't clash with a running dev server
-app.listen(3001);
+app.listen(SPEC_PORT);
 
 // Give Elysia time to compile routes then fetch the spec
 await new Promise((resolve) => setTimeout(resolve, 500));
 
-const res = await fetch("http://localhost:3001/swagger/json");
+const res = await fetch(`http://localhost:${SPEC_PORT}/openapi/json`);
 const spec = await res.json();
 
 await writeFile(OUTPUT_PATH, JSON.stringify(spec, null, 2));

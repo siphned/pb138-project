@@ -1,26 +1,6 @@
-import { cors } from "@elysiajs/cors";
-import { openapi } from "@elysiajs/openapi";
-import { Elysia, t } from "elysia";
+import { app } from './app'
 
-export const app = new Elysia()
-  .use(cors({ origin: "http://localhost:5173" }))
-  .use(
-    openapi({
-      path: "/swagger",
-      documentation: {
-        info: {
-          title: "WineMarket API",
-          version: "1.0.0",
-          description: "Multi-vendor wine marketplace API",
-        },
-      },
-    })
-  )
-  .get("/", () => "Hello from API", {
-    response: { 200: t.String() },
-  });
+app.listen(3000)
 
-app.listen(3000);
-
-console.log("Server running on http://localhost:3000");
-console.log("OpenAPI spec available at http://localhost:3000/swagger/json");
+console.log('Server running on http://localhost:3000')
+console.log('OpenAPI spec available at http://localhost:3000/openapi/json')
