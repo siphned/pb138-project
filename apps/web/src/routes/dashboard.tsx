@@ -1,6 +1,6 @@
-import { createFileRoute } from "@tanstack/react-router";
 import { Calendar, DollarSign, ShoppingBag, TrendingUp, Wine } from "lucide-react";
 import { useState } from "react";
+import { createFileRoute } from "@tanstack/react-router";
 import { DashboardTabs } from "@/components/dashboard/DashboardTabs";
 import { ProfileEditForm } from "@/components/dashboard/ProfileEditForm";
 import { UserInfoCard } from "@/components/dashboard/UserInfoCard";
