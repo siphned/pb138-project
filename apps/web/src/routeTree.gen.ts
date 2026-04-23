@@ -9,38 +9,221 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as SettingsRouteImport } from './routes/settings'
+import { Route as SearchRouteImport } from './routes/search'
+import { Route as OrdersRouteImport } from './routes/orders'
+import { Route as LogoutRouteImport } from './routes/logout'
+import { Route as InventoryRouteImport } from './routes/inventory'
+import { Route as ExploreRouteImport } from './routes/explore'
+import { Route as EventsRouteImport } from './routes/events'
 import { Route as DashboardRouteImport } from './routes/dashboard'
+import { Route as CartRouteImport } from './routes/cart'
+import { Route as BundlesRouteImport } from './routes/bundles'
+import { Route as IndexRouteImport } from './routes/index'
 
+const SettingsRoute = SettingsRouteImport.update({
+  id: '/settings',
+  path: '/settings',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const SearchRoute = SearchRouteImport.update({
+  id: '/search',
+  path: '/search',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const OrdersRoute = OrdersRouteImport.update({
+  id: '/orders',
+  path: '/orders',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const LogoutRoute = LogoutRouteImport.update({
+  id: '/logout',
+  path: '/logout',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const InventoryRoute = InventoryRouteImport.update({
+  id: '/inventory',
+  path: '/inventory',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ExploreRoute = ExploreRouteImport.update({
+  id: '/explore',
+  path: '/explore',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const EventsRoute = EventsRouteImport.update({
+  id: '/events',
+  path: '/events',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const DashboardRoute = DashboardRouteImport.update({
   id: '/dashboard',
   path: '/dashboard',
   getParentRoute: () => rootRouteImport,
 } as any)
+const CartRoute = CartRouteImport.update({
+  id: '/cart',
+  path: '/cart',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const BundlesRoute = BundlesRouteImport.update({
+  id: '/bundles',
+  path: '/bundles',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const IndexRoute = IndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
+  '/': typeof IndexRoute
+  '/bundles': typeof BundlesRoute
+  '/cart': typeof CartRoute
   '/dashboard': typeof DashboardRoute
+  '/events': typeof EventsRoute
+  '/explore': typeof ExploreRoute
+  '/inventory': typeof InventoryRoute
+  '/logout': typeof LogoutRoute
+  '/orders': typeof OrdersRoute
+  '/search': typeof SearchRoute
+  '/settings': typeof SettingsRoute
 }
 export interface FileRoutesByTo {
+  '/': typeof IndexRoute
+  '/bundles': typeof BundlesRoute
+  '/cart': typeof CartRoute
   '/dashboard': typeof DashboardRoute
+  '/events': typeof EventsRoute
+  '/explore': typeof ExploreRoute
+  '/inventory': typeof InventoryRoute
+  '/logout': typeof LogoutRoute
+  '/orders': typeof OrdersRoute
+  '/search': typeof SearchRoute
+  '/settings': typeof SettingsRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
+  '/': typeof IndexRoute
+  '/bundles': typeof BundlesRoute
+  '/cart': typeof CartRoute
   '/dashboard': typeof DashboardRoute
+  '/events': typeof EventsRoute
+  '/explore': typeof ExploreRoute
+  '/inventory': typeof InventoryRoute
+  '/logout': typeof LogoutRoute
+  '/orders': typeof OrdersRoute
+  '/search': typeof SearchRoute
+  '/settings': typeof SettingsRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/dashboard'
+  fullPaths:
+    | '/'
+    | '/bundles'
+    | '/cart'
+    | '/dashboard'
+    | '/events'
+    | '/explore'
+    | '/inventory'
+    | '/logout'
+    | '/orders'
+    | '/search'
+    | '/settings'
   fileRoutesByTo: FileRoutesByTo
-  to: '/dashboard'
-  id: '__root__' | '/dashboard'
+  to:
+    | '/'
+    | '/bundles'
+    | '/cart'
+    | '/dashboard'
+    | '/events'
+    | '/explore'
+    | '/inventory'
+    | '/logout'
+    | '/orders'
+    | '/search'
+    | '/settings'
+  id:
+    | '__root__'
+    | '/'
+    | '/bundles'
+    | '/cart'
+    | '/dashboard'
+    | '/events'
+    | '/explore'
+    | '/inventory'
+    | '/logout'
+    | '/orders'
+    | '/search'
+    | '/settings'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
+  IndexRoute: typeof IndexRoute
+  BundlesRoute: typeof BundlesRoute
+  CartRoute: typeof CartRoute
   DashboardRoute: typeof DashboardRoute
+  EventsRoute: typeof EventsRoute
+  ExploreRoute: typeof ExploreRoute
+  InventoryRoute: typeof InventoryRoute
+  LogoutRoute: typeof LogoutRoute
+  OrdersRoute: typeof OrdersRoute
+  SearchRoute: typeof SearchRoute
+  SettingsRoute: typeof SettingsRoute
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/settings': {
+      id: '/settings'
+      path: '/settings'
+      fullPath: '/settings'
+      preLoaderRoute: typeof SettingsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/search': {
+      id: '/search'
+      path: '/search'
+      fullPath: '/search'
+      preLoaderRoute: typeof SearchRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/orders': {
+      id: '/orders'
+      path: '/orders'
+      fullPath: '/orders'
+      preLoaderRoute: typeof OrdersRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/logout': {
+      id: '/logout'
+      path: '/logout'
+      fullPath: '/logout'
+      preLoaderRoute: typeof LogoutRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/inventory': {
+      id: '/inventory'
+      path: '/inventory'
+      fullPath: '/inventory'
+      preLoaderRoute: typeof InventoryRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/explore': {
+      id: '/explore'
+      path: '/explore'
+      fullPath: '/explore'
+      preLoaderRoute: typeof ExploreRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/events': {
+      id: '/events'
+      path: '/events'
+      fullPath: '/events'
+      preLoaderRoute: typeof EventsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/dashboard': {
       id: '/dashboard'
       path: '/dashboard'
@@ -48,11 +231,42 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof DashboardRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/cart': {
+      id: '/cart'
+      path: '/cart'
+      fullPath: '/cart'
+      preLoaderRoute: typeof CartRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/bundles': {
+      id: '/bundles'
+      path: '/bundles'
+      fullPath: '/bundles'
+      preLoaderRoute: typeof BundlesRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/': {
+      id: '/'
+      path: '/'
+      fullPath: '/'
+      preLoaderRoute: typeof IndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
 const rootRouteChildren: RootRouteChildren = {
+  IndexRoute: IndexRoute,
+  BundlesRoute: BundlesRoute,
+  CartRoute: CartRoute,
   DashboardRoute: DashboardRoute,
+  EventsRoute: EventsRoute,
+  ExploreRoute: ExploreRoute,
+  InventoryRoute: InventoryRoute,
+  LogoutRoute: LogoutRoute,
+  OrdersRoute: OrdersRoute,
+  SearchRoute: SearchRoute,
+  SettingsRoute: SettingsRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
