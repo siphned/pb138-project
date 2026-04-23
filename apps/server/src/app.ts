@@ -6,6 +6,8 @@ import { roleRequestsRoutes } from './modules/role-requests'
 import { shopsRoutes } from './modules/shops'
 import { productsRoutes } from './modules/products'
 import { availabilityRoutes } from './modules/availability'
+import { winesRoutes } from './modules/wines'
+import { winemakersRoutes } from './modules/winemakers'
 
 export const app = new Elysia()
   .use(cors({ origin: 'http://localhost:5173' }))
@@ -26,6 +28,8 @@ export const app = new Elysia()
           { name: 'shops', description: 'Shop management' },
           { name: 'products', description: 'Products and bundles' },
           { name: 'availability', description: 'Shop availability schedule' },
+          { name: 'wines', description: 'Wine catalog CRUD and filtering' },
+          { name: 'winemakers', description: 'Winemaker profiles and portfolios' },
         ],
         servers: [{ url: 'http://localhost:3000', description: 'Development' }],
         components: {
@@ -46,3 +50,5 @@ export const app = new Elysia()
   .use(shopsRoutes)
   .use(productsRoutes)
   .use(availabilityRoutes)
+  .use(winesRoutes)
+  .use(winemakersRoutes)
