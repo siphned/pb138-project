@@ -22,6 +22,20 @@
       "when": 1776889065328,
       "tag": "0002_living_onslaught",
       "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "7",
+      "when": 1776895803744,
+      "tag": "0003_rich_black_tom",
+      "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "7",
+      "when": 1776937975742,
+      "tag": "0004_quick_vargas",
+      "breakpoints": true
     }
   ]
 }
