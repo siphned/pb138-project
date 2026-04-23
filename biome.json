@@ -15,7 +15,8 @@
       "!**/.turbo/**",
       "!**/bun.lock",
       "!**/tsconfig*.json",
-      "!**/src/generated/**"
+      "!**/src/generated/**",
+      "!**/routeTree.gen.ts"
     ]
   },
   "formatter": {
