@@ -1,7 +1,7 @@
-import { createContext, type ReactNode, useContext, useEffect, useState } from "react";
-import { useGetProfile } from "@/generated/hooks/useGetProfile";
-import { usePutProfile } from "@/generated/hooks/usePutProfile";
 import { useQueryClient } from "@tanstack/react-query";
+import { createContext, type ReactNode, useContext, useEffect, useState } from "react";
+import { getProfileQueryKey, useGetProfile } from "@/generated/hooks/useGetProfile";
+import { usePutProfile } from "@/generated/hooks/usePutProfile";
 
 export interface UserProfile {
   name: string;
@@ -33,8 +33,10 @@ export function UserProvider({ children }: { children: ReactNode }) {
   const { data: profile, isLoading } = useGetProfile();
   const queryClient = useQueryClient();
   const updateMutation = usePutProfile({
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["profile"] });
+    mutation: {
+      onSuccess: () => {
+        queryClient.invalidateQueries({ queryKey: getProfileQueryKey() });
+      },
     },
   });
 
