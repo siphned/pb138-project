@@ -22,6 +22,7 @@ import type { availabilityRegular, availabilityExceptions } from './availability
 import type { orders } from './orders'
 import type { carts } from './carts'
 import type { roleRequests } from './role-requests'
+import type { events, eventRegistrations, comments } from './events'
 
 export type User = (typeof users)['$inferSelect']
 export type NewUser = (typeof users)['$inferInsert']
@@ -39,8 +40,6 @@ export type NewProduct = (typeof products)['$inferInsert']
 export type NewProductWine = (typeof productWines)['$inferInsert']
 export type AvailabilityRegular = (typeof availabilityRegular)['$inferSelect']
 export type AvailabilityException = (typeof availabilityExceptions)['$inferSelect']
-
-import type { events, eventRegistrations, comments } from './events'
 export type Event = (typeof events)['$inferSelect']
 export type NewEvent = (typeof events)['$inferInsert']
 export type EventRegistration = (typeof eventRegistrations)['$inferSelect']
