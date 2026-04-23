@@ -59,7 +59,7 @@ export const eventsService = {
     }
   ): Promise<Event> {
     const winemaker = await eventsRepository.findWinemakerByUserId(userId)
-    if (!winemaker) throw new Error('NOT_FOUND')
+    if (!winemaker) throw new Error('FORBIDDEN')
 
     const startTime = new Date(data.startTime)
     const endTime = new Date(data.endTime)
@@ -113,7 +113,11 @@ export const eventsService = {
     } = {}
     if (data.name !== undefined) updates.name = data.name
     if (data.description !== undefined) updates.description = data.description
-    if (data.capacity !== undefined) updates.capacity = data.capacity
+    if (data.capacity !== undefined) {
+      const registrationCount = await eventsRepository.countActiveRegistrations(id)
+      if (data.capacity < registrationCount) throw new Error('CAPACITY_TOO_LOW')
+      updates.capacity = data.capacity
+    }
     if (data.startTime !== undefined) updates.startTime = startTime
     if (data.endTime !== undefined) updates.endTime = endTime
 
@@ -155,7 +159,7 @@ export const eventsService = {
     paginationQuery: { page?: number; limit?: number }
   ): Promise<PaginatedResult<CommentWithUser>> {
     const event = await eventsRepository.findById(eventId)
-    if (!event) throw new Error('NOT_FOUND')
+    if (!event || event.status !== 'approved') throw new Error('NOT_FOUND')
 
     const { limit, offset } = parsePagination(paginationQuery)
     const page = Math.max(1, paginationQuery.page ?? 1)

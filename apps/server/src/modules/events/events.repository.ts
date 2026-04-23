@@ -171,6 +171,14 @@ export const eventsRepository = {
     await db.update(events).set({ deletedAt: new Date() }).where(eq(events.id, id))
   },
 
+  async countActiveRegistrations(eventId: string): Promise<number> {
+    const [result] = await db
+      .select({ value: count() })
+      .from(eventRegistrations)
+      .where(and(eq(eventRegistrations.eventId, eventId), isNull(eventRegistrations.deletedAt)))
+    return Number(result?.value ?? 0)
+  },
+
   findActiveRegistration(eventId: string, userId: string): Promise<EventRegistration | undefined> {
     return db.query.eventRegistrations.findFirst({
       where: and(

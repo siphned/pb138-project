@@ -10,6 +10,7 @@ vi.mock('./events.repository', () => ({
     createEventWithAddress: vi.fn(),
     update: vi.fn(),
     softDelete: vi.fn(),
+    countActiveRegistrations: vi.fn(),
     findActiveRegistration: vi.fn(),
     createRegistration: vi.fn(),
     softDeleteRegistration: vi.fn(),
@@ -75,10 +76,10 @@ describe('createEvent', () => {
     )
   })
 
-  it('throws NOT_FOUND when user has no winemaker profile', async () => {
+  it('throws FORBIDDEN when user has no winemaker profile', async () => {
     vi.mocked(eventsRepository.findWinemakerByUserId).mockResolvedValue(undefined)
 
-    await expect(eventsService.createEvent(userId, validCreateInput)).rejects.toThrow('NOT_FOUND')
+    await expect(eventsService.createEvent(userId, validCreateInput)).rejects.toThrow('FORBIDDEN')
     expect(eventsRepository.createEventWithAddress).not.toHaveBeenCalled()
   })
 
@@ -141,6 +142,15 @@ describe('updateEvent', () => {
     vi.mocked(eventsRepository.findWinemakerByUserId).mockResolvedValue(mockWinemaker)
 
     await expect(eventsService.updateEvent(eventId, userId, { name: 'X' })).rejects.toThrow('CONFLICT')
+  })
+
+  it('throws CAPACITY_TOO_LOW when new capacity is below active registration count', async () => {
+    vi.mocked(eventsRepository.findById).mockResolvedValue(mockPendingEvent)
+    vi.mocked(eventsRepository.findWinemakerByUserId).mockResolvedValue(mockWinemaker)
+    vi.mocked(eventsRepository.countActiveRegistrations).mockResolvedValue(8)
+
+    await expect(eventsService.updateEvent(eventId, userId, { capacity: 5 })).rejects.toThrow('CAPACITY_TOO_LOW')
+    expect(eventsRepository.update).not.toHaveBeenCalled()
   })
 })
 
@@ -311,6 +321,12 @@ describe('listComments', () => {
 
   it('throws NOT_FOUND when event does not exist', async () => {
     vi.mocked(eventsRepository.findById).mockResolvedValue(undefined)
+
+    await expect(eventsService.listComments(eventId, {})).rejects.toThrow('NOT_FOUND')
+  })
+
+  it('throws NOT_FOUND for pending event', async () => {
+    vi.mocked(eventsRepository.findById).mockResolvedValue(mockPendingEvent)
 
     await expect(eventsService.listComments(eventId, {})).rejects.toThrow('NOT_FOUND')
   })
