@@ -1,4 +1,4 @@
-import { t } from 'elysia'
+import { t } from "elysia";
 
 const addressBody = t.Object({
   country: t.String({ minLength: 1, maxLength: 50 }),
@@ -6,19 +6,19 @@ const addressBody = t.Object({
   postalCode: t.String({ minLength: 1, maxLength: 20 }),
   street: t.String({ minLength: 1, maxLength: 255 }),
   houseNumber: t.String({ minLength: 1, maxLength: 20 }),
-})
+});
 
 export const createShopBody = t.Object({
   name: t.String({ minLength: 1, maxLength: 255 }),
   description: t.String({ minLength: 1 }),
   address: addressBody,
-})
+});
 
 export const updateShopBody = t.Object({
   name: t.Optional(t.String({ minLength: 1, maxLength: 255 })),
   description: t.Optional(t.String({ minLength: 1 })),
   address: t.Optional(t.Partial(addressBody)),
-})
+});
 
 const addressResponse = t.Object({
   id: t.String(),
@@ -27,7 +27,7 @@ const addressResponse = t.Object({
   postalCode: t.String(),
   street: t.String(),
   houseNumber: t.String(),
-})
+});
 
 export const shopResponse = t.Object({
   id: t.String(),
@@ -37,4 +37,4 @@ export const shopResponse = t.Object({
   address: addressResponse,
   createdAt: t.Date(),
   updatedAt: t.Nullable(t.Date()),
-})
+});
