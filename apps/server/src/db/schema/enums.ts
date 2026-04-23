@@ -11,3 +11,4 @@ export const wineColorEnum = pgEnum('wine_color', ['red', 'white', 'rosé', 'ora
 export const wineTypeEnum = pgEnum('wine_type', ['still', 'sparkling', 'fortified', 'dessert'])
 export const paymentStatusEnum = pgEnum('payment_status', ['pending', 'authorized', 'captured', 'failed', 'cancelled', 'refunded', 'partially_refunded'])
 export const paymentMethodEnum = pgEnum('payment_method', ['card', 'bank_transfer', 'cash_on_delivery'])
+export const eventStatusEnum = pgEnum('event_status', ['pending', 'approved', 'rejected'])

@@ -39,3 +39,9 @@ export type NewProduct = (typeof products)['$inferInsert']
 export type NewProductWine = (typeof productWines)['$inferInsert']
 export type AvailabilityRegular = (typeof availabilityRegular)['$inferSelect']
 export type AvailabilityException = (typeof availabilityExceptions)['$inferSelect']
+
+import type { events, eventRegistrations, comments } from './events'
+export type Event = (typeof events)['$inferSelect']
+export type NewEvent = (typeof events)['$inferInsert']
+export type EventRegistration = (typeof eventRegistrations)['$inferSelect']
+export type Comment = (typeof comments)['$inferSelect']
