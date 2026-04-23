@@ -17,7 +17,7 @@ app.listen(SPEC_PORT);
 // Give Elysia time to compile routes then fetch the spec
 await new Promise((resolve) => setTimeout(resolve, 500));
 
-const res = await fetch(`http://localhost:${SPEC_PORT}/openapi/json`);
+const res = await fetch(`http://localhost:${SPEC_PORT}/swagger/json`);
 const spec = await res.json();
 
 await writeFile(OUTPUT_PATH, JSON.stringify(spec, null, 2));
