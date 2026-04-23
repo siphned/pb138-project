@@ -1,31 +1,29 @@
-import { useClerk } from "@clerk/react";
-import { Pencil } from "lucide-react";
+import { Globe, MapPin, Pencil } from "lucide-react";
 import { useState } from "react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 // 1. Import the Dialog components
 import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/dialog";
+import { useUser } from "@/context/UserContext";
 
 // 2. Import your brand new form!
 import { ProfileEditForm } from "./ProfileEditForm";
 
 export function UserInfoCard({ onEdit }: { onEdit?: () => void }) {
-  const { user: clerkUser } = useClerk();
-
+  const { user } = useUser();
   // 3. Add state to control when the dialog is open or closed
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
 
-  const fullName = `${clerkUser?.firstName || ""} ${clerkUser?.lastName || ""}`.trim() || "User";
-  const initials = fullName.substring(0, 2).toUpperCase();
+  const initials = (user?.name || "??").substring(0, 2).toUpperCase();
 
   return (
     <Card className="bg-secondary/40 border-none shadow-none rounded-3xl">
       <CardContent className="p-6 md:p-8">
         <div className="flex flex-col md:flex-row gap-6 md:gap-8 items-start">
           <Avatar className="h-24 w-24 md:h-28 md:w-28 flex-none">
-            <AvatarImage src={clerkUser?.imageUrl} alt={clerkUser?.fullName || "User"} />
-            <AvatarFallback className="bg-primary text-primary-foreground font-heading text-3xl font-medium">
+            <AvatarImage src={user.avatarUrl} alt={user.name} />
+            <AvatarFallback className="bg-primary text-primary-foreground font-heading text-2xl font-medium">
               {initials}
             </AvatarFallback>
           </Avatar>
@@ -33,9 +31,24 @@ export function UserInfoCard({ onEdit }: { onEdit?: () => void }) {
           <div className="flex-1 flex flex-col gap-4 w-full">
             <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-4">
               <div className="space-y-1.5">
-                <h1 className="font-heading text-2xl md:text-3xl font-semibold">{fullName}</h1>
+                <h1 className="font-heading text-2xl md:text-3xl font-semibold">{user.name}</h1>
                 <div className="flex flex-wrap items-center gap-3 text-sm text-muted-foreground">
-                  <span>{clerkUser?.emailAddresses[0]?.emailAddress}</span>
+                  <span className="flex items-center gap-1.5">
+                    <MapPin className="h-4 w-4" /> {user.location}
+                  </span>
+                  {user.website && (
+                    <>
+                      <span className="hidden sm:inline text-border">|</span>
+                      <a
+                        href={user.website}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="flex items-center gap-1.5 hover:text-primary transition-colors"
+                      >
+                        <Globe className="h-4 w-4" /> Website
+                      </a>
+                    </>
+                  )}
                 </div>
               </div>
 
@@ -69,9 +82,8 @@ export function UserInfoCard({ onEdit }: { onEdit?: () => void }) {
                 </DialogContent>
               </Dialog>
             </div>
-            <div className="text-sm text-muted-foreground">
-              {"This user prefers to keep an air of mystery about them."}
-            </div>
+
+            <p className="text-sm text-muted-foreground leading-relaxed max-w-4xl">{user.bio}</p>
           </div>
         </div>
       </CardContent>

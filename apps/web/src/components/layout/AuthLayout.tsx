@@ -16,7 +16,11 @@ export function AuthLayout({ children, activeRole, onRoleChange }: AuthLayoutPro
 
       {/* Right Side: Header + Page Content */}
       <div className="flex flex-col flex-1">
-        <Header activeRole={activeRole} onRoleChange={onRoleChange} />
+        <Header
+          user={{ name: "Chateau Montrose", email: "contact@chateaumontrose.com" }}
+          activeRole={activeRole}
+          onRoleChange={onRoleChange}
+        />
 
         {/* The actual page content is injected here */}
         <main className="flex-1 p-6 lg:p-8 overflow-auto">{children}</main>
