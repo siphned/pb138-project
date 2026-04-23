@@ -12,6 +12,7 @@ import {
   Wine,
 } from "lucide-react";
 import { useState } from "react";
+import { Link } from "@tanstack/react-router";
 import {
   Accordion,
   AccordionContent,
@@ -113,64 +114,64 @@ export function Sidebar({ userRoles = [Role.CUSTOMER], activeRole, onRoleChange 
             )}
 
             {/* ROLE-AWARE LINKS */}
-            {currentActiveRole === "Customer" ? (
+            {currentActiveRole === Role.CUSTOMER ? (
               <>
-                <a
-                  href="/orders"
+                <Link
+                  to="/orders"
                   className="flex-none flex items-center gap-3 px-3 py-3 rounded-md bg-secondary hover:bg-secondary/80 transition-colors text-sm font-medium text-primary"
                 >
                   <ShoppingBag className="h-4 w-4" /> Order History
-                </a>
-                <a
-                  href="/explore"
+                </Link>
+                <Link
+                  to="/explore"
                   className="flex-none flex items-center gap-3 px-3 py-3 rounded-md bg-secondary hover:bg-secondary/80 transition-colors text-sm font-medium text-primary sm:hidden"
                 >
                   <Search className="h-4 w-4" /> Explore Wines
-                </a>
+                </Link>
               </>
             ) : (
               <>
-                <a
-                  href="/inventory"
+                <Link
+                  to="/inventory"
                   className="flex-none flex items-center gap-3 px-3 py-3 rounded-md bg-secondary hover:bg-secondary/80 transition-colors text-sm font-medium text-primary"
                 >
                   <Wine className="h-4 w-4" /> My Wines
-                </a>
-                <a
-                  href="/bundles"
+                </Link>
+                <Link
+                  to="/bundles"
                   className="flex-none flex items-center gap-3 px-3 py-3 rounded-md bg-secondary hover:bg-secondary/80 transition-colors text-sm font-medium text-primary"
                 >
                   <Package className="h-4 w-4" /> Bundles
-                </a>
+                </Link>
               </>
             )}
 
-            <a
-              href="/events"
+            <Link
+              to="/events"
               className="flex-none flex items-center gap-3 px-3 py-3 rounded-md bg-secondary hover:bg-secondary/80 transition-colors text-sm font-medium text-primary"
             >
               <Calendar className="h-4 w-4" /> Events
-            </a>
+            </Link>
 
-            <a
-              href="/search"
+            <Link
+              to="/search"
               className="flex-none flex items-center gap-3 px-3 py-3 rounded-md bg-secondary hover:bg-secondary/80 transition-colors text-sm font-medium text-primary sm:hidden"
             >
               <Search className="h-4 w-4" /> Search
-            </a>
-            <a
-              href="/cart"
+            </Link>
+            <Link
+              to="/cart"
               className="flex-none flex items-center gap-3 px-3 py-3 rounded-md bg-secondary hover:bg-secondary/80 transition-colors text-sm font-medium text-primary sm:hidden"
             >
               <ShoppingCart className="h-4 w-4" /> Shopping cart
-            </a>
+            </Link>
 
-            <a
-              href="/settings"
+            <Link
+              to="/settings"
               className="flex-none flex items-center gap-3 px-3 py-3 rounded-md hover:bg-secondary/50 transition-colors text-sm font-medium text-muted-foreground mt-2"
             >
               <Settings className="h-4 w-4" /> Settings
-            </a>
+            </Link>
           </nav>
         </div>
 
@@ -182,12 +183,12 @@ export function Sidebar({ userRoles = [Role.CUSTOMER], activeRole, onRoleChange 
             <Moon className="h-4 w-4" />
           </button>
 
-          <a
-            href="/logout"
+          <Link
+            to="/logout"
             className="flex items-center gap-3 px-3 py-2 rounded-md hover:bg-destructive/10 transition-colors text-sm font-medium text-muted-foreground hover:text-destructive mt-2"
           >
             <LogOut className="h-4 w-4" /> Log out
-          </a>
+          </Link>
         </div>
       </SheetContent>
     </Sheet>
