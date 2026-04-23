@@ -1,4 +1,5 @@
-import { pgTable, smallint, text, timestamp, uuid, varchar } from 'drizzle-orm/pg-core'
+import { pgTable, smallint, text, timestamp, uniqueIndex, uuid, varchar } from 'drizzle-orm/pg-core'
+import { sql } from 'drizzle-orm'
 import { eventInviteStatusEnum, eventStatusEnum, eventVisibilityEnum } from './enums'
 import { timestamptz } from './helpers'
 import { addresses } from './addresses'
@@ -47,4 +48,8 @@ export const eventRegistrations = pgTable('event_registrations', {
   userId: uuid('user_id').notNull().references(() => users.id),
   createdAt: timestamp('created_at').notNull().defaultNow(),
   deletedAt: timestamp('deleted_at'),
-})
+}, (t) => [
+  uniqueIndex('uq_event_reg_event_user_active')
+    .on(t.eventId, t.userId)
+    .where(sql`${t.deletedAt} IS NULL`),
+])
