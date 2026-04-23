@@ -6,6 +6,7 @@ import { roleRequestsRoutes } from './modules/role-requests'
 import { shopsRoutes } from './modules/shops'
 import { productsRoutes } from './modules/products'
 import { availabilityRoutes } from './modules/availability'
+import { eventsRoutes } from './modules/events'
 
 export const app = new Elysia()
   .use(cors({ origin: 'http://localhost:5173' }))
@@ -26,6 +27,7 @@ export const app = new Elysia()
           { name: 'shops', description: 'Shop management' },
           { name: 'products', description: 'Products and bundles' },
           { name: 'availability', description: 'Shop availability schedule' },
+          { name: 'events', description: 'Event management and registration' },
         ],
         servers: [{ url: 'http://localhost:3000', description: 'Development' }],
         components: {
@@ -46,3 +48,4 @@ export const app = new Elysia()
   .use(shopsRoutes)
   .use(productsRoutes)
   .use(availabilityRoutes)
+  .use(eventsRoutes)
