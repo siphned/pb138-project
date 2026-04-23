@@ -1,4 +1,5 @@
-import { pgTable, smallint, text, timestamp, uuid, varchar } from "drizzle-orm/pg-core";
+import { sql } from "drizzle-orm";
+import { pgTable, smallint, text, timestamp, uniqueIndex, uuid, varchar } from "drizzle-orm/pg-core";
 import { addresses } from "./addresses";
 import { eventInviteStatusEnum, eventStatusEnum, eventVisibilityEnum } from "./enums";
 import { timestamptz } from "./helpers";
@@ -53,14 +54,22 @@ export const comments = pgTable("comments", {
   deletedAt: timestamp("deleted_at"),
 });
 
-export const eventRegistrations = pgTable("event_registrations", {
-  id: uuid("id").primaryKey().defaultRandom(),
-  eventId: uuid("event_id")
-    .notNull()
-    .references(() => events.id),
-  userId: uuid("user_id")
-    .notNull()
-    .references(() => users.id),
-  createdAt: timestamp("created_at").notNull().defaultNow(),
-  deletedAt: timestamp("deleted_at"),
-});
+export const eventRegistrations = pgTable(
+  "event_registrations",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    eventId: uuid("event_id")
+      .notNull()
+      .references(() => events.id),
+    userId: uuid("user_id")
+      .notNull()
+      .references(() => users.id),
+    createdAt: timestamp("created_at").notNull().defaultNow(),
+    deletedAt: timestamp("deleted_at"),
+  },
+  (t) => [
+    uniqueIndex("uq_event_reg_event_user_active")
+      .on(t.eventId, t.userId)
+      .where(sql`${t.deletedAt} IS NULL`),
+  ]
+);
