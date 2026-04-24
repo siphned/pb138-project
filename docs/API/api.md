@@ -140,9 +140,6 @@ This document specifies all REST API endpoints for the WineMarket platform. Each
 | POST | `/events/:id/register` | Register for event | ✅ |
 | DELETE | `/events/:id/register` | Cancel registration | ✅ (own) |
 | GET | `/events/:id/registrations` | Get attendees | ✅ (own WINEMAKER) |
-| GET | `/events/pending` | Pending events | ✅ (Admin) |
-| POST | `/events/:id/approve` | Approve event | ✅ (Admin) |
-| POST | `/events/:id/reject` | Reject event | ✅ (Admin) |
 
 ---
 
@@ -166,8 +163,7 @@ This document specifies all REST API endpoints for the WineMarket platform. Each
 | POST | `/products/:id/reviews` | Write review | ✅ |
 | GET | `/winemakers/:id/reviews` | Winemaker reviews | ❌ |
 | POST | `/winemakers/:id/reviews` | Write review | ✅ |
-| DELETE | `/reviews/:id` | Delete review | ✅ (own/Admin) |
-| PATCH | `/reviews/:id/hide` | Hide review | ✅ (Admin) |
+| DELETE | `/reviews/:id` | Delete own review | ✅ (own) |
 
 ---
 
@@ -176,12 +172,12 @@ This document specifies all REST API endpoints for the WineMarket platform. Each
 
 | Method | Path | Description | Auth |
 |--------|------|---|---|
-| GET | `/admin/users` | List users | ✅ (Admin) |
-| PATCH | `/admin/users/:id/deactivate` | Deactivate user | ✅ (Admin) |
-| GET | `/admin/statistics` | Platform stats | ✅ (Admin) |
-| GET | `/admin/role-requests` | Pending requests | ✅ (Admin) |
-| POST | `/admin/role-requests/:req_id/approve` | Approve request | ✅ (Admin) |
-| POST | `/admin/role-requests/:req_id/reject` | Reject request | ✅ (Admin) |
+| GET | `/admin/users` | List users (filterable by status/role) | ✅ (Admin) |
+| PATCH | `/admin/users/:id/status` | Set user status (active/suspended/banned) | ✅ (Admin) |
+| GET | `/admin/events` | List events by status (default: pending) | ✅ (Admin) |
+| PATCH | `/admin/events/:id/status` | Approve or reject a pending event | ✅ (Admin) |
+| GET | `/admin/reviews` | List all reviews (product + winemaker) | ✅ (Admin) |
+| DELETE | `/admin/reviews/:id` | Soft-delete a review (?type=product\|winemaker) | ✅ (Admin) |
 
 ---
 
@@ -202,3 +198,4 @@ This document specifies all REST API endpoints for the WineMarket platform. Each
 
 ## Revision History
 - **v1.0** (Week 6) — Initial API design from PRD requirements
+- **v1.1** (Week 9, WINE-79) — Admin module: event moderation moved from /events to /admin/events; user deactivate replaced with full status lifecycle (active/suspended/banned); review admin endpoints added under /admin/reviews; role-request admin routes removed (live at /role-requests without prefix); GET /admin/statistics deferred
