@@ -30,12 +30,12 @@
     "rules": {
       "recommended": true,
       "correctness": {
-        "noUnusedImports": "warn",
-        "noUnusedVariables": "warn"
+        "noUnusedImports": "error",
+        "noUnusedVariables": "error"
       },
       "style": {
-        "noNonNullAssertion": "warn",
-        "useImportType": "warn",
+        "noNonNullAssertion": "error",
+        "useImportType": "error",
         "noParameterAssign": "error",
         "useAsConstAssertion": "error",
         "useDefaultParameterLast": "error",
@@ -48,10 +48,10 @@
         "noUselessElse": "error"
       },
       "suspicious": {
-        "noExplicitAny": "warn"
+        "noExplicitAny": "error"
       },
       "a11y": {
-        "useButtonType": "warn"
+        "useButtonType": "error"
       }
     }
   },

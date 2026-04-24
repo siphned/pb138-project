@@ -15,3 +15,31 @@ export const addExceptionBody = t.Object({
   action: t.Union([t.Literal("closed"), t.Literal("modified_hours"), t.Literal("special_event")]),
   reason: t.Optional(t.String()),
 });
+
+// Response schemas
+export const regularResponse = t.Object({
+  id: t.String(),
+  shopId: t.String(),
+  winemakerId: t.Union([t.String(), t.Null()]),
+  dow: t.Integer(),
+  startTime: t.Date(),
+  endTime: t.Date(),
+  validFrom: t.String(),
+  validTo: t.Union([t.String(), t.Null()]),
+  type: t.String(),
+});
+
+export const exceptionResponse = t.Object({
+  id: t.String(),
+  shopId: t.String(),
+  winemakerId: t.Union([t.String(), t.Null()]),
+  startsAt: t.Date(),
+  endsAt: t.Date(),
+  action: t.String(),
+  reason: t.Union([t.String(), t.Null()]),
+});
+
+export const getAvailabilityResponse = t.Object({
+  regular: t.Array(regularResponse),
+  exceptions: t.Array(exceptionResponse),
+});
