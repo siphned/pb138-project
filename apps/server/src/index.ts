@@ -1,24 +1,4 @@
-import { cors } from "@elysiajs/cors";
-import { openapi } from "@elysiajs/openapi";
-import { Elysia, t } from "elysia";
-
-export const app = new Elysia()
-  .use(cors({ origin: "http://localhost:5173" }))
-  .use(
-    openapi({
-      path: "/swagger",
-      documentation: {
-        info: {
-          title: "WineMarket API",
-          version: "1.0.0",
-          description: "Multi-vendor wine marketplace API",
-        },
-      },
-    })
-  )
-  .get("/", () => "Hello from API", {
-    response: { 200: t.String() },
-  });
+import { app } from "./app";
 
 app.listen(3000);
 

@@ -108,6 +108,7 @@ Table Wines {
   description text [not null]
   composition text [not null]
   attribution text [not null]
+  region varchar(255) [not null]
   vintage_year smallint [not null]
   type wine_type [not null]
   color wine_color [not null]
@@ -126,9 +127,10 @@ Table Products {
   description text
   price numeric(10,2) [not null]
   quantity smallint [not null]
-  created_at timestamp [not null]
-  updated_at timestamp
-  deleted_at timestamp
+  is_bundle boolean [not null, default: false]
+  created_at timestamptz [not null]
+  updated_at timestamptz
+  deleted_at timestamptz
 }
 
 Table Availability_regular {
