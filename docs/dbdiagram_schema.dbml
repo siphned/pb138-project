@@ -108,6 +108,7 @@ Table Wines {
   description text [not null]
   composition text [not null]
   attribution text [not null]
+  region varchar(255) [not null]
   vintage_year smallint [not null]
   type wine_type [not null]
   color wine_color [not null]
