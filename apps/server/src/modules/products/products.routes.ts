@@ -1,16 +1,40 @@
 import { Elysia, status, t } from "elysia";
 import { authPlugin } from "../auth";
-import { productsService } from "./products.service";
 import {
   createBundleBody,
   createProductBody,
   updateBundleBody,
   updateProductBody,
 } from "./products.schema";
+import { productsService } from "./products.service";
 
 const shopParams = t.Object({ id: t.String() });
 const shopProductParams = t.Object({ id: t.String(), productId: t.String() });
 const shopBundleParams = t.Object({ id: t.String(), bundleId: t.String() });
+
+const bundleResponse = t.Object({
+  id: t.String(),
+  shopId: t.String(),
+  name: t.String(),
+  description: t.Nullable(t.String()),
+  price: t.String(),
+  quantity: t.Integer(),
+  isBundle: t.Boolean(),
+  createdAt: t.Date(),
+  updatedAt: t.Nullable(t.Date()),
+});
+
+const productResponse = t.Object({
+  id: t.String(),
+  shopId: t.String(),
+  name: t.String(),
+  description: t.Nullable(t.String()),
+  price: t.String(),
+  quantity: t.Integer(),
+  isBundle: t.Boolean(),
+  createdAt: t.Date(),
+  updatedAt: t.Nullable(t.Date()),
+});
 
 function handleError(e: unknown) {
   if (e instanceof Error) {
@@ -167,6 +191,7 @@ export const productsRoutes = new Elysia()
       requireAuth: true,
       params: shopBundleParams,
       body: updateBundleBody,
+      response: { 200: bundleResponse, 403: t.String(), 404: t.String(), 422: t.String() },
       detail: {
         tags: ["products"],
         summary: "Update a bundle",
