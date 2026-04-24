@@ -1,25 +1,19 @@
 import { Search, ShoppingCart } from "lucide-react";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { useUser } from "@/context/UserContext";
 import { Role } from "@/types/roles";
 import { Sidebar } from "./Sidebar"; // Import your new component here!
 
 interface HeaderProps {
-  user?: {
-    name: string;
-    email: string;
-    avatarUrl?: string;
-  };
   activeRole?: Role;
   onRoleChange?: (role: Role) => void;
 }
 
-export function Header({ user: propUser, activeRole, onRoleChange }: HeaderProps) {
+export function Header({ activeRole, onRoleChange }: HeaderProps) {
   const { user: contextUser } = useUser();
-  const currentUser = propUser || contextUser;
-
-  const initials = currentUser.name.substring(0, 2).toUpperCase();
+  const fullName = `${contextUser.fname} ${contextUser.lname}`.trim();
+  const initials = fullName.substring(0, 2).toUpperCase() || "U";
 
   return (
     <header className="h-16 border-b bg-background flex items-center justify-between px-6 lg:px-12">
@@ -45,7 +39,6 @@ export function Header({ user: propUser, activeRole, onRoleChange }: HeaderProps
           className="rounded-full focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2"
         >
           <Avatar className="h-9 w-9 hover:opacity-80 transition-opacity">
-            <AvatarImage src={currentUser.avatarUrl} alt={currentUser.name} />
             <AvatarFallback className="bg-secondary text-secondary-foreground">
               {initials}
             </AvatarFallback>

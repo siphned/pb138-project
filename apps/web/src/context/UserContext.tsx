@@ -1,15 +1,14 @@
 import { useQueryClient } from "@tanstack/react-query";
 import { createContext, type ReactNode, useContext, useEffect, useState } from "react";
-import { getProfileQueryKey, useGetProfile } from "@/generated/hooks/useGetProfile";
-import { usePutProfile } from "@/generated/hooks/usePutProfile";
+import { getUsersMeQueryKey, useGetUsersMe } from "@/generated/hooks/useGetUsersMe";
+import { usePutUsersMe } from "@/generated/hooks/usePutUsersMe";
 
 export interface UserProfile {
-  name: string;
-  location: string;
-  website: string;
-  bio: string;
-  avatarUrl?: string;
+  id: string;
+  fname: string;
+  lname: string;
   email: string;
+  role: "user" | "admin";
 }
 
 interface UserContextType {
@@ -19,23 +18,22 @@ interface UserContextType {
 }
 
 const defaultUser: UserProfile = {
-  name: "Loading...",
-  location: "",
-  website: "",
-  bio: "",
+  id: "",
+  fname: "",
+  lname: "",
   email: "",
-  avatarUrl: "",
+  role: "user",
 };
 
 const UserContext = createContext<UserContextType | undefined>(undefined);
 
 export function UserProvider({ children }: { children: ReactNode }) {
-  const { data: profile, isLoading } = useGetProfile();
+  const { data: profile, isLoading } = useGetUsersMe();
   const queryClient = useQueryClient();
-  const updateMutation = usePutProfile({
+  const updateMutation = usePutUsersMe({
     mutation: {
-      onSuccess: () => {
-        queryClient.invalidateQueries({ queryKey: getProfileQueryKey() });
+      onSuccess: (): void => {
+        void queryClient.invalidateQueries({ queryKey: getUsersMeQueryKey() });
       },
     },
   });
@@ -44,19 +42,17 @@ export function UserProvider({ children }: { children: ReactNode }) {
   useEffect(() => {
     if (profile) {
       setUser({
-        name: profile.name || "",
-        location: profile.location || "",
-        website: profile.website || "",
-        bio: profile.bio || "",
-        email: profile.email || "",
-        avatarUrl: profile.avatarUrl || "",
+        id: profile.id,
+        fname: profile.fname,
+        lname: profile.lname,
+        email: profile.email,
+        role: profile.role,
       });
     }
   }, [profile]);
 
-  const updateUser = async (newData: Partial<UserProfile>) => {
-    const updatedProfile = { ...user, ...newData };
-    return updateMutation.mutateAsync({ data: updatedProfile });
+  const updateUser = async (newData: Partial<UserProfile>): Promise<void> => {
+    await updateMutation.mutateAsync({ data: newData as any });
   };
 
   return (
