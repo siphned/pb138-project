@@ -36,6 +36,25 @@ jobs:
   generate:
     needs: install
     runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: winemarket
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+        ports:
+          - 5432:5432
+    env:
+      DATABASE_URL: postgresql://postgres:postgres@localhost:5432/winemarket
+      FRONTEND_URL: http://localhost:5173
+      # Clerk key only needed when verifyClerkToken is actually called (not during spec gen)
+      CLERK_JWT_KEY: ${{ secrets.CLERK_JWT_KEY }}
     steps:
       - uses: actions/checkout@v4
       - name: Setup Bun
@@ -118,7 +137,7 @@ jobs:
 
   build:
     if: github.event_name == 'push' || github.event_name == 'pull_request'
-    needs: [lint, typecheck]
+    needs: [lint, typecheck, generate]
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
