@@ -40,5 +40,9 @@ export const orderItems = pgTable("order_items", {
     .notNull()
     .references(() => products.id),
   quantity: smallint("quantity").notNull(),
-  unitPriceAtPurchase: numeric("unit_price_at_purchase", { precision: 10, scale: 2 }).notNull(),
+  unitPriceAtPurchase: numeric("unit_price_at_purchase", {
+    precision: 10,
+    scale: 2,
+  }).notNull(),
+  status: orderStatusEnum("status").notNull().default("pending"),
 });
