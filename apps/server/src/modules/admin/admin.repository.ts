@@ -72,7 +72,7 @@ export const adminRepository = {
   },
 
   findUserById(id: string) {
-    return db.query.users.findFirst({ where: eq(users.id, id) })
+    return db.query.users.findFirst({ where: and(eq(users.id, id), isNull(users.deletedAt)) })
   },
 
   async setUserStatus(id: string, newStatus: 'active' | 'suspended' | 'banned'): Promise<AdminUserRow> {
