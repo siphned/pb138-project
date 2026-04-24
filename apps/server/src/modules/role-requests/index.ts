@@ -1,1 +1,1 @@
-export { roleRequestsRoutes } from './role-requests.routes'
+export { roleRequestsRoutes } from "./role-requests.routes";

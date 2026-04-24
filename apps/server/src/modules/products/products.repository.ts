@@ -1,13 +1,16 @@
-import { and, eq, inArray, isNull } from 'drizzle-orm'
-import { db } from '../../db'
-import { productWines, products, wines } from '../../db/schema'
-import type { NewProduct, NewProductWine, Product, ProductWine, Wine } from '../../db/schema'
+import { and, eq, inArray, isNull } from "drizzle-orm";
+import { db } from "../../db";
+import { productWines, products, wines } from "../../db/schema";
+import type { NewProduct, NewProductWine, Product, ProductWine, Wine } from "../../db/schema";
 
-export type WineInfo = Pick<Wine, 'id' | 'name' | 'type' | 'color' | 'vintageYear' | 'alcoholContent' | 'volumeMl'>
+export type WineInfo = Pick<
+  Wine,
+  "id" | "name" | "type" | "color" | "vintageYear" | "alcoholContent" | "volumeMl"
+>;
 
-export type ProductWineWithInfo = ProductWine & { wine: WineInfo }
+export type ProductWineWithInfo = ProductWine & { wine: WineInfo };
 
-export type ProductWithWines = Product & { productWines: ProductWineWithInfo[] }
+export type ProductWithWines = Product & { productWines: ProductWineWithInfo[] };
 
 export const productsRepository = {
   findById(id: string): Promise<ProductWithWines | undefined> {
@@ -15,10 +18,22 @@ export const productsRepository = {
       where: and(eq(products.id, id), isNull(products.deletedAt)),
       with: {
         productWines: {
-          with: { wine: { columns: { id: true, name: true, type: true, color: true, vintageYear: true, alcoholContent: true, volumeMl: true } } },
+          with: {
+            wine: {
+              columns: {
+                id: true,
+                name: true,
+                type: true,
+                color: true,
+                vintageYear: true,
+                alcoholContent: true,
+                volumeMl: true,
+              },
+            },
+          },
         },
       },
-    }) as Promise<ProductWithWines | undefined>
+    }) as Promise<ProductWithWines | undefined>;
   },
 
   findByShopId(shopId: string, isBundle?: boolean): Promise<ProductWithWines[]> {
@@ -30,19 +45,31 @@ export const productsRepository = {
       ),
       with: {
         productWines: {
-          with: { wine: { columns: { id: true, name: true, type: true, color: true, vintageYear: true, alcoholContent: true, volumeMl: true } } },
+          with: {
+            wine: {
+              columns: {
+                id: true,
+                name: true,
+                type: true,
+                color: true,
+                vintageYear: true,
+                alcoholContent: true,
+                volumeMl: true,
+              },
+            },
+          },
         },
       },
-    }) as Promise<ProductWithWines[]>
+    }) as Promise<ProductWithWines[]>;
   },
 
   async winesExist(wineIds: string[]): Promise<boolean> {
-    const uniqueIds = [...new Set(wineIds)]
+    const uniqueIds = [...new Set(wineIds)];
     const found = await db.query.wines.findMany({
       where: and(inArray(wines.id, uniqueIds), isNull(wines.deletedAt)),
       columns: { id: true },
-    })
-    return found.length === uniqueIds.length
+    });
+    return found.length === uniqueIds.length;
   },
 
   async createProductWithWine(
@@ -58,15 +85,15 @@ export const productsRepository = {
         price: productData.price,
         quantity: productData.quantity,
         isBundle: false,
-      }
-      const [product] = await tx.insert(products).values(values).returning()
-      if (!product) throw new Error('Product insert returned no rows')
+      };
+      const [product] = await tx.insert(products).values(values).returning();
+      if (!product) throw new Error("Product insert returned no rows");
 
-      const pw: NewProductWine = { productId: product.id, wineId, quantity: 1 }
-      await tx.insert(productWines).values(pw)
+      const pw: NewProductWine = { productId: product.id, wineId, quantity: 1 };
+      await tx.insert(productWines).values(pw);
 
-      return product
-    })
+      return product;
+    });
   },
 
   async createBundleWithWines(
@@ -82,19 +109,19 @@ export const productsRepository = {
         price: productData.price,
         quantity: productData.quantity,
         isBundle: true,
-      }
-      const [product] = await tx.insert(products).values(values).returning()
-      if (!product) throw new Error('Product insert returned no rows')
+      };
+      const [product] = await tx.insert(products).values(values).returning();
+      if (!product) throw new Error("Product insert returned no rows");
 
       const pwRows: NewProductWine[] = wineList.map((w) => ({
         productId: product.id,
         wineId: w.wineId,
         quantity: w.quantity,
-      }))
-      await tx.insert(productWines).values(pwRows)
+      }));
+      await tx.insert(productWines).values(pwRows);
 
-      return product
-    })
+      return product;
+    });
   },
 
   async updateProduct(
@@ -107,16 +134,16 @@ export const productsRepository = {
         .update(products)
         .set({ ...fields, updatedAt: new Date() })
         .where(eq(products.id, id))
-        .returning()
-      if (!updated) throw new Error('Product not found')
+        .returning();
+      if (!updated) throw new Error("Product not found");
 
       if (newWineId !== undefined) {
-        await tx.delete(productWines).where(eq(productWines.productId, id))
-        await tx.insert(productWines).values({ productId: id, wineId: newWineId, quantity: 1 })
+        await tx.delete(productWines).where(eq(productWines.productId, id));
+        await tx.insert(productWines).values({ productId: id, wineId: newWineId, quantity: 1 });
       }
 
-      return updated
-    })
+      return updated;
+    });
   },
 
   async updateBundle(
@@ -129,24 +156,24 @@ export const productsRepository = {
         .update(products)
         .set({ ...fields, updatedAt: new Date() })
         .where(eq(products.id, id))
-        .returning()
-      if (!updated) throw new Error('Product not found')
+        .returning();
+      if (!updated) throw new Error("Product not found");
 
       if (newWines !== undefined) {
-        await tx.delete(productWines).where(eq(productWines.productId, id))
+        await tx.delete(productWines).where(eq(productWines.productId, id));
         const pwRows: NewProductWine[] = newWines.map((w) => ({
           productId: id,
           wineId: w.wineId,
           quantity: w.quantity,
-        }))
-        await tx.insert(productWines).values(pwRows)
+        }));
+        await tx.insert(productWines).values(pwRows);
       }
 
-      return updated
-    })
+      return updated;
+    });
   },
 
   async softDelete(id: string): Promise<void> {
-    await db.update(products).set({ deletedAt: new Date() }).where(eq(products.id, id))
+    await db.update(products).set({ deletedAt: new Date() }).where(eq(products.id, id));
   },
-}
+};
