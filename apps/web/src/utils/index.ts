@@ -4,4 +4,4 @@
 // Examples:
 // export { formatDate } from './dateFormatter';
 // export { validateEmail } from './validators';
-// export { truncateString } from './stringUtils';
+export { getStockStatus } from "./stock";

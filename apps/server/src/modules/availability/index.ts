@@ -1,1 +1,1 @@
-export { availabilityRoutes } from './availability.routes'
+export { availabilityRoutes } from "./availability.routes";

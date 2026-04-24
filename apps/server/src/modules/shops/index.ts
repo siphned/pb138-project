@@ -1,1 +1,1 @@
-export { shopsRoutes } from './shops.routes'
+export { shopsRoutes } from "./shops.routes";
