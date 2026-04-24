@@ -16,7 +16,7 @@
     "@types/react-dom": "19.2.2",
     "typescript": "5.9.2"
   },
-  "dependencies": {
+  "peerDependencies": {
     "react": "^19.2.0",
     "react-dom": "^19.2.0"
   }

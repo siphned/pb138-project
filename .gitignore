@@ -51,9 +51,3 @@ yarn-error.log*
 # LLM resources (tracked in git for AI reference)
 # raw/
 .claude/settings*
-
-# AI-generated plans (local only)
-docs/superpowers/
-
-# Git worktrees
-.worktrees/

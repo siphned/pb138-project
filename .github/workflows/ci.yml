@@ -137,7 +137,7 @@ jobs:
 
   build:
     if: github.event_name == 'push' || github.event_name == 'pull_request'
-    needs: [lint, typecheck]
+    needs: [lint, typecheck, generate]
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4

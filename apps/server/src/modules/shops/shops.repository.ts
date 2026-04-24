@@ -1,37 +1,37 @@
-import { and, eq, isNull } from 'drizzle-orm'
-import { db } from '../../db'
-import { addresses, shops } from '../../db/schema'
-import type { Address, Shop } from '../../db/schema'
+import { and, eq, isNull } from "drizzle-orm";
+import { db } from "../../db";
+import type { Address, Shop } from "../../db/schema";
+import { addresses, shops } from "../../db/schema";
 
-export type ShopWithAddress = Shop & { address: Address }
+export type ShopWithAddress = Shop & { address: Address };
 
 type AddressData = {
-  country: string
-  city: string
-  postalCode: string
-  street: string
-  houseNumber: string
-}
+  country: string;
+  city: string;
+  postalCode: string;
+  street: string;
+  houseNumber: string;
+};
 
 export const shopsRepository = {
   findAll(): Promise<ShopWithAddress[]> {
     return db.query.shops.findMany({
       where: isNull(shops.deletedAt),
       with: { address: true },
-    }) as Promise<ShopWithAddress[]>
+    }) as Promise<ShopWithAddress[]>;
   },
 
   findById(id: string): Promise<ShopWithAddress | undefined> {
     return db.query.shops.findFirst({
       where: and(eq(shops.id, id), isNull(shops.deletedAt)),
       with: { address: true },
-    }) as Promise<ShopWithAddress | undefined>
+    }) as Promise<ShopWithAddress | undefined>;
   },
 
   findByOwnerUserId(ownerUserId: string): Promise<Shop | undefined> {
     return db.query.shops.findFirst({
       where: and(eq(shops.ownerUserId, ownerUserId), isNull(shops.deletedAt)),
-    })
+    });
   },
 
   async createShopWithAddress(
@@ -39,23 +39,23 @@ export const shopsRepository = {
     addressData: AddressData
   ): Promise<Shop> {
     return db.transaction(async (tx) => {
-      const [address] = await tx.insert(addresses).values(addressData).returning()
-      if (!address) throw new Error('Address insert returned no rows')
+      const [address] = await tx.insert(addresses).values(addressData).returning();
+      if (!address) throw new Error("Address insert returned no rows");
 
       const [shop] = await tx
         .insert(shops)
         .values({ ...shopData, addressId: address.id })
-        .returning()
-      if (!shop) throw new Error('Shop insert returned no rows')
+        .returning();
+      if (!shop) throw new Error("Shop insert returned no rows");
 
-      return shop
-    })
+      return shop;
+    });
   },
 
   async insertAddress(data: AddressData): Promise<Address> {
-    const [address] = await db.insert(addresses).values(data).returning()
-    if (!address) throw new Error('Address insert returned no rows')
-    return address
+    const [address] = await db.insert(addresses).values(data).returning();
+    if (!address) throw new Error("Address insert returned no rows");
+    return address;
   },
 
   async updateById(
@@ -66,8 +66,8 @@ export const shopsRepository = {
       .update(shops)
       .set({ ...data, updatedAt: new Date() })
       .where(eq(shops.id, id))
-      .returning()
-    if (!updated) throw new Error('Shop not found')
-    return updated
+      .returning();
+    if (!updated) throw new Error("Shop not found");
+    return updated;
   },
-}
+};

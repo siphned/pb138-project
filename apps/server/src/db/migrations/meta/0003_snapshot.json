@@ -154,12 +154,8 @@
           "name": "users_shipping_address_id_addresses_id_fk",
           "tableFrom": "users",
           "tableTo": "addresses",
-          "columnsFrom": [
-            "shipping_address_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["shipping_address_id"],
+          "columnsTo": ["id"],
           "onDelete": "no action",
           "onUpdate": "no action"
         },
@@ -167,12 +163,8 @@
           "name": "users_billing_address_id_addresses_id_fk",
           "tableFrom": "users",
           "tableTo": "addresses",
-          "columnsFrom": [
-            "billing_address_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["billing_address_id"],
+          "columnsTo": ["id"],
           "onDelete": "no action",
           "onUpdate": "no action"
         }
@@ -182,16 +174,12 @@
         "users_clerk_id_unique": {
           "name": "users_clerk_id_unique",
           "nullsNotDistinct": false,
-          "columns": [
-            "clerk_id"
-          ]
+          "columns": ["clerk_id"]
         },
         "users_email_unique": {
           "name": "users_email_unique",
           "nullsNotDistinct": false,
-          "columns": [
-            "email"
-          ]
+          "columns": ["email"]
         }
       },
       "policies": {},
@@ -259,12 +247,8 @@
           "name": "shops_owner_user_id_users_id_fk",
           "tableFrom": "shops",
           "tableTo": "users",
-          "columnsFrom": [
-            "owner_user_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["owner_user_id"],
+          "columnsTo": ["id"],
           "onDelete": "no action",
           "onUpdate": "no action"
         },
@@ -272,12 +256,8 @@
           "name": "shops_address_id_addresses_id_fk",
           "tableFrom": "shops",
           "tableTo": "addresses",
-          "columnsFrom": [
-            "address_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["address_id"],
+          "columnsTo": ["id"],
           "onDelete": "no action",
           "onUpdate": "no action"
         }
@@ -287,9 +267,7 @@
         "shops_owner_user_id_unique": {
           "name": "shops_owner_user_id_unique",
           "nullsNotDistinct": false,
-          "columns": [
-            "owner_user_id"
-          ]
+          "columns": ["owner_user_id"]
         }
       },
       "policies": {},
@@ -375,12 +353,8 @@
           "name": "winemakers_user_id_users_id_fk",
           "tableFrom": "winemakers",
           "tableTo": "users",
-          "columnsFrom": [
-            "user_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["user_id"],
+          "columnsTo": ["id"],
           "onDelete": "no action",
           "onUpdate": "no action"
         },
@@ -388,12 +362,8 @@
           "name": "winemakers_address_id_addresses_id_fk",
           "tableFrom": "winemakers",
           "tableTo": "addresses",
-          "columnsFrom": [
-            "address_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["address_id"],
+          "columnsTo": ["id"],
           "onDelete": "no action",
           "onUpdate": "no action"
         }
@@ -403,16 +373,12 @@
         "winemakers_user_id_unique": {
           "name": "winemakers_user_id_unique",
           "nullsNotDistinct": false,
-          "columns": [
-            "user_id"
-          ]
+          "columns": ["user_id"]
         },
         "winemakers_name_unique": {
           "name": "winemakers_name_unique",
           "nullsNotDistinct": false,
-          "columns": [
-            "name"
-          ]
+          "columns": ["name"]
         }
       },
       "policies": {},
@@ -455,12 +421,8 @@
           "name": "product_wines_product_id_products_id_fk",
           "tableFrom": "product_wines",
           "tableTo": "products",
-          "columnsFrom": [
-            "product_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["product_id"],
+          "columnsTo": ["id"],
           "onDelete": "no action",
           "onUpdate": "no action"
         },
@@ -468,12 +430,8 @@
           "name": "product_wines_wine_id_wines_id_fk",
           "tableFrom": "product_wines",
           "tableTo": "wines",
-          "columnsFrom": [
-            "wine_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["wine_id"],
+          "columnsTo": ["id"],
           "onDelete": "no action",
           "onUpdate": "no action"
         }
@@ -558,12 +516,8 @@
           "name": "products_shop_id_shops_id_fk",
           "tableFrom": "products",
           "tableTo": "shops",
-          "columnsFrom": [
-            "shop_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["shop_id"],
+          "columnsTo": ["id"],
           "onDelete": "no action",
           "onUpdate": "no action"
         }
@@ -686,12 +640,8 @@
           "name": "wines_winemaker_id_winemakers_id_fk",
           "tableFrom": "wines",
           "tableTo": "winemakers",
-          "columnsFrom": [
-            "winemaker_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["winemaker_id"],
+          "columnsTo": ["id"],
           "onDelete": "no action",
           "onUpdate": "no action"
         }
@@ -756,12 +706,8 @@
           "name": "availability_exceptions_winemaker_id_winemakers_id_fk",
           "tableFrom": "availability_exceptions",
           "tableTo": "winemakers",
-          "columnsFrom": [
-            "winemaker_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["winemaker_id"],
+          "columnsTo": ["id"],
           "onDelete": "no action",
           "onUpdate": "no action"
         },
@@ -769,12 +715,8 @@
           "name": "availability_exceptions_shop_id_shops_id_fk",
           "tableFrom": "availability_exceptions",
           "tableTo": "shops",
-          "columnsFrom": [
-            "shop_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["shop_id"],
+          "columnsTo": ["id"],
           "onDelete": "no action",
           "onUpdate": "no action"
         }
@@ -851,12 +793,8 @@
           "name": "availability_regular_winemaker_id_winemakers_id_fk",
           "tableFrom": "availability_regular",
           "tableTo": "winemakers",
-          "columnsFrom": [
-            "winemaker_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["winemaker_id"],
+          "columnsTo": ["id"],
           "onDelete": "no action",
           "onUpdate": "no action"
         },
@@ -864,12 +802,8 @@
           "name": "availability_regular_shop_id_shops_id_fk",
           "tableFrom": "availability_regular",
           "tableTo": "shops",
-          "columnsFrom": [
-            "shop_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["shop_id"],
+          "columnsTo": ["id"],
           "onDelete": "no action",
           "onUpdate": "no action"
         }
@@ -930,12 +864,8 @@
           "name": "cart_items_cart_id_carts_id_fk",
           "tableFrom": "cart_items",
           "tableTo": "carts",
-          "columnsFrom": [
-            "cart_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["cart_id"],
+          "columnsTo": ["id"],
           "onDelete": "no action",
           "onUpdate": "no action"
         },
@@ -943,12 +873,8 @@
           "name": "cart_items_product_id_products_id_fk",
           "tableFrom": "cart_items",
           "tableTo": "products",
-          "columnsFrom": [
-            "product_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["product_id"],
+          "columnsTo": ["id"],
           "onDelete": "no action",
           "onUpdate": "no action"
         }
@@ -997,12 +923,8 @@
           "name": "carts_user_id_users_id_fk",
           "tableFrom": "carts",
           "tableTo": "users",
-          "columnsFrom": [
-            "user_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["user_id"],
+          "columnsTo": ["id"],
           "onDelete": "no action",
           "onUpdate": "no action"
         }
@@ -1012,9 +934,7 @@
         "carts_user_id_unique": {
           "name": "carts_user_id_unique",
           "nullsNotDistinct": false,
-          "columns": [
-            "user_id"
-          ]
+          "columns": ["user_id"]
         }
       },
       "policies": {},
@@ -1070,12 +990,8 @@
           "name": "comments_event_id_events_id_fk",
           "tableFrom": "comments",
           "tableTo": "events",
-          "columnsFrom": [
-            "event_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["event_id"],
+          "columnsTo": ["id"],
           "onDelete": "no action",
           "onUpdate": "no action"
         },
@@ -1083,12 +999,8 @@
           "name": "comments_user_id_users_id_fk",
           "tableFrom": "comments",
           "tableTo": "users",
-          "columnsFrom": [
-            "user_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["user_id"],
+          "columnsTo": ["id"],
           "onDelete": "no action",
           "onUpdate": "no action"
         }
@@ -1155,12 +1067,8 @@
           "name": "event_invites_event_id_events_id_fk",
           "tableFrom": "event_invites",
           "tableTo": "events",
-          "columnsFrom": [
-            "event_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["event_id"],
+          "columnsTo": ["id"],
           "onDelete": "no action",
           "onUpdate": "no action"
         },
@@ -1168,12 +1076,8 @@
           "name": "event_invites_winemaker_id_invited_winemakers_id_fk",
           "tableFrom": "event_invites",
           "tableTo": "winemakers",
-          "columnsFrom": [
-            "winemaker_id_invited"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["winemaker_id_invited"],
+          "columnsTo": ["id"],
           "onDelete": "no action",
           "onUpdate": "no action"
         }
@@ -1183,9 +1087,7 @@
         "event_invites_token_unique": {
           "name": "event_invites_token_unique",
           "nullsNotDistinct": false,
-          "columns": [
-            "token"
-          ]
+          "columns": ["token"]
         }
       },
       "policies": {},
@@ -1272,12 +1174,8 @@
           "name": "events_winemaker_id_winemakers_id_fk",
           "tableFrom": "events",
           "tableTo": "winemakers",
-          "columnsFrom": [
-            "winemaker_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["winemaker_id"],
+          "columnsTo": ["id"],
           "onDelete": "no action",
           "onUpdate": "no action"
         },
@@ -1285,12 +1183,8 @@
           "name": "events_address_id_addresses_id_fk",
           "tableFrom": "events",
           "tableTo": "addresses",
-          "columnsFrom": [
-            "address_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["address_id"],
+          "columnsTo": ["id"],
           "onDelete": "no action",
           "onUpdate": "no action"
         }
@@ -1349,12 +1243,8 @@
           "name": "order_items_shop_id_shops_id_fk",
           "tableFrom": "order_items",
           "tableTo": "shops",
-          "columnsFrom": [
-            "shop_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["shop_id"],
+          "columnsTo": ["id"],
           "onDelete": "no action",
           "onUpdate": "no action"
         },
@@ -1362,12 +1252,8 @@
           "name": "order_items_order_id_orders_id_fk",
           "tableFrom": "order_items",
           "tableTo": "orders",
-          "columnsFrom": [
-            "order_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["order_id"],
+          "columnsTo": ["id"],
           "onDelete": "no action",
           "onUpdate": "no action"
         },
@@ -1375,12 +1261,8 @@
           "name": "order_items_product_id_products_id_fk",
           "tableFrom": "order_items",
           "tableTo": "products",
-          "columnsFrom": [
-            "product_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["product_id"],
+          "columnsTo": ["id"],
           "onDelete": "no action",
           "onUpdate": "no action"
         }
@@ -1492,12 +1374,8 @@
           "name": "orders_user_id_users_id_fk",
           "tableFrom": "orders",
           "tableTo": "users",
-          "columnsFrom": [
-            "user_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["user_id"],
+          "columnsTo": ["id"],
           "onDelete": "no action",
           "onUpdate": "no action"
         },
@@ -1505,12 +1383,8 @@
           "name": "orders_shipping_address_id_addresses_id_fk",
           "tableFrom": "orders",
           "tableTo": "addresses",
-          "columnsFrom": [
-            "shipping_address_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["shipping_address_id"],
+          "columnsTo": ["id"],
           "onDelete": "no action",
           "onUpdate": "no action"
         },
@@ -1518,12 +1392,8 @@
           "name": "orders_billing_address_id_addresses_id_fk",
           "tableFrom": "orders",
           "tableTo": "addresses",
-          "columnsFrom": [
-            "billing_address_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["billing_address_id"],
+          "columnsTo": ["id"],
           "onDelete": "no action",
           "onUpdate": "no action"
         }
@@ -1595,12 +1465,8 @@
           "name": "product_reviews_user_id_users_id_fk",
           "tableFrom": "product_reviews",
           "tableTo": "users",
-          "columnsFrom": [
-            "user_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["user_id"],
+          "columnsTo": ["id"],
           "onDelete": "no action",
           "onUpdate": "no action"
         },
@@ -1608,12 +1474,8 @@
           "name": "product_reviews_product_id_products_id_fk",
           "tableFrom": "product_reviews",
           "tableTo": "products",
-          "columnsFrom": [
-            "product_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["product_id"],
+          "columnsTo": ["id"],
           "onDelete": "no action",
           "onUpdate": "no action"
         }
@@ -1685,12 +1547,8 @@
           "name": "winemaker_reviews_user_id_users_id_fk",
           "tableFrom": "winemaker_reviews",
           "tableTo": "users",
-          "columnsFrom": [
-            "user_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["user_id"],
+          "columnsTo": ["id"],
           "onDelete": "no action",
           "onUpdate": "no action"
         },
@@ -1698,12 +1556,8 @@
           "name": "winemaker_reviews_winemaker_id_winemakers_id_fk",
           "tableFrom": "winemaker_reviews",
           "tableTo": "winemakers",
-          "columnsFrom": [
-            "winemaker_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["winemaker_id"],
+          "columnsTo": ["id"],
           "onDelete": "no action",
           "onUpdate": "no action"
         }
@@ -1848,12 +1702,8 @@
           "name": "role_requests_user_id_users_id_fk",
           "tableFrom": "role_requests",
           "tableTo": "users",
-          "columnsFrom": [
-            "user_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["user_id"],
+          "columnsTo": ["id"],
           "onDelete": "no action",
           "onUpdate": "no action"
         },
@@ -1861,12 +1711,8 @@
           "name": "role_requests_reviewed_by_admin_id_users_id_fk",
           "tableFrom": "role_requests",
           "tableTo": "users",
-          "columnsFrom": [
-            "reviewed_by_admin_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["reviewed_by_admin_id"],
+          "columnsTo": ["id"],
           "onDelete": "no action",
           "onUpdate": "no action"
         }
@@ -1882,48 +1728,27 @@
     "public.delivery_type": {
       "name": "delivery_type",
       "schema": "public",
-      "values": [
-        "pickup",
-        "shipping"
-      ]
+      "values": ["pickup", "shipping"]
     },
     "public.event_invite_status": {
       "name": "event_invite_status",
       "schema": "public",
-      "values": [
-        "pending",
-        "accepted",
-        "declined",
-        "expired"
-      ]
+      "values": ["pending", "accepted", "declined", "expired"]
     },
     "public.event_visibility": {
       "name": "event_visibility",
       "schema": "public",
-      "values": [
-        "public",
-        "private"
-      ]
+      "values": ["public", "private"]
     },
     "public.order_status": {
       "name": "order_status",
       "schema": "public",
-      "values": [
-        "pending",
-        "confirmed",
-        "shipped",
-        "delivered",
-        "cancelled"
-      ]
+      "values": ["pending", "confirmed", "shipped", "delivered", "cancelled"]
     },
     "public.payment_method": {
       "name": "payment_method",
       "schema": "public",
-      "values": [
-        "card",
-        "bank_transfer",
-        "cash_on_delivery"
-      ]
+      "values": ["card", "bank_transfer", "cash_on_delivery"]
     },
     "public.payment_status": {
       "name": "payment_status",
@@ -1941,50 +1766,27 @@
     "public.role_request_status": {
       "name": "role_request_status",
       "schema": "public",
-      "values": [
-        "pending",
-        "approved",
-        "rejected"
-      ]
+      "values": ["pending", "approved", "rejected"]
     },
     "public.role_request_type": {
       "name": "role_request_type",
       "schema": "public",
-      "values": [
-        "winemaker",
-        "shop_owner"
-      ]
+      "values": ["winemaker", "shop_owner"]
     },
     "public.user_role": {
       "name": "user_role",
       "schema": "public",
-      "values": [
-        "user",
-        "admin"
-      ]
+      "values": ["user", "admin"]
     },
     "public.wine_color": {
       "name": "wine_color",
       "schema": "public",
-      "values": [
-        "red",
-        "white",
-        "rosé",
-        "orange",
-        "gray",
-        "tawny",
-        "yellow"
-      ]
+      "values": ["red", "white", "rosé", "orange", "gray", "tawny", "yellow"]
     },
     "public.wine_type": {
       "name": "wine_type",
       "schema": "public",
-      "values": [
-        "still",
-        "sparkling",
-        "fortified",
-        "dessert"
-      ]
+      "values": ["still", "sparkling", "fortified", "dessert"]
     }
   },
   "schemas": {},

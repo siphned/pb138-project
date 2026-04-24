@@ -11,17 +11,16 @@ import { winemakersRoutes } from './modules/winemakers'
 import { reviewsRoutes } from './modules/reviews'
 
 export const app = new Elysia()
-  .use(cors({ origin: 'http://localhost:5173' }))
+  .use(cors({ origin: "http://localhost:5173" }))
   .use(
     openapi({
-      provider: 'scalar',
-      specPath: '/swagger/json',
+      provider: "scalar",
+      specPath: "/swagger/json",
       documentation: {
         info: {
-          title: 'WineMarket API',
-          version: '0.1.0',
-          description:
-            'Backend API for the WineMarket platform.',
+          title: "WineMarket API",
+          version: "0.1.0",
+          description: "Backend API for the WineMarket platform.",
         },
         tags: [
           { name: 'users', description: 'Authenticated user profile endpoints' },
@@ -33,14 +32,14 @@ export const app = new Elysia()
           { name: 'winemakers', description: 'Winemaker profiles and portfolios' },
           { name: 'reviews', description: 'Product and winemaker reviews & ratings' },
         ],
-        servers: [{ url: 'http://localhost:3000', description: 'Development' }],
+        servers: [{ url: "http://localhost:3000", description: "Development" }],
         components: {
           securitySchemes: {
             bearerAuth: {
-              type: 'http',
-              scheme: 'bearer',
-              bearerFormat: 'JWT',
-              description: 'Clerk-issued JWT sent as `Authorization: Bearer <token>`',
+              type: "http",
+              scheme: "bearer",
+              bearerFormat: "JWT",
+              description: "Clerk-issued JWT sent as `Authorization: Bearer <token>`",
             },
           },
         },

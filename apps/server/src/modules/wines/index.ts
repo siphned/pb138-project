@@ -1,1 +1,1 @@
-export { winesRoutes } from './wines.routes'
+export { winesRoutes } from "./wines.routes";

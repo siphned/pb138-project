@@ -1,12 +1,12 @@
-import { t } from 'elysia'
+import { t } from "elysia";
 
 export const updateWinemakerBody = t.Object({
   name: t.Optional(t.String({ minLength: 1 })),
   description: t.Optional(t.String({ minLength: 1 })),
   websiteUrl: t.Optional(t.Nullable(t.String())),
-  email: t.Optional(t.String({ format: 'email', maxLength: 255 })),
+  email: t.Optional(t.String({ format: "email", maxLength: 255 })),
   phone: t.Optional(t.String({ minLength: 1, maxLength: 30 })),
-})
+});
 
 const addressResponse = t.Object({
   id: t.String(),
@@ -15,7 +15,7 @@ const addressResponse = t.Object({
   postalCode: t.String(),
   street: t.String(),
   houseNumber: t.String(),
-})
+});
 
 export const winemakerListItemResponse = t.Object({
   id: t.String(),
@@ -27,7 +27,7 @@ export const winemakerListItemResponse = t.Object({
   address: addressResponse,
   createdAt: t.Date(),
   updatedAt: t.Nullable(t.Date()),
-})
+});
 
 const wineInProfile = t.Object({
   id: t.String(),
@@ -42,7 +42,7 @@ const wineInProfile = t.Object({
   quantity: t.Integer(),
   createdAt: t.Date(),
   updatedAt: t.Date(),
-})
+});
 
 const eventInProfile = t.Object({
   id: t.String(),
@@ -53,7 +53,7 @@ const eventInProfile = t.Object({
   visibility: t.String(),
   inviteType: t.String(),
   createdAt: t.Date(),
-})
+});
 
 export const winemakerProfileResponse = t.Object({
   id: t.String(),
@@ -67,4 +67,4 @@ export const winemakerProfileResponse = t.Object({
   events: t.Array(eventInProfile),
   createdAt: t.Date(),
   updatedAt: t.Nullable(t.Date()),
-})
+});
