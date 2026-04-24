@@ -118,6 +118,20 @@ export const reviewsRepository = {
     return review
   },
 
+  findProductReviewWithUser(reviewId: string): Promise<ProductReviewWithUser | undefined> {
+    return db.query.productReviews.findFirst({
+      where: and(eq(productReviews.id, reviewId), isNull(productReviews.deletedAt)),
+      with: { user: { columns: { id: true, fname: true, lname: true } } },
+    }) as Promise<ProductReviewWithUser | undefined>
+  },
+
+  findWinemakerReviewWithUser(reviewId: string): Promise<WinemakerReviewWithUser | undefined> {
+    return db.query.winemakerReviews.findFirst({
+      where: and(eq(winemakerReviews.id, reviewId), isNull(winemakerReviews.deletedAt)),
+      with: { user: { columns: { id: true, fname: true, lname: true } } },
+    }) as Promise<WinemakerReviewWithUser | undefined>
+  },
+
   async softDeleteProductReview(reviewId: string): Promise<void> {
     await db.update(productReviews).set({ deletedAt: new Date() }).where(eq(productReviews.id, reviewId))
   },

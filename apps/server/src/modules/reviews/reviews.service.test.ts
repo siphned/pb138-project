@@ -10,6 +10,8 @@ vi.mock('./reviews.repository', () => ({
     findWinemakerReview: vi.fn(),
     findProductReviewById: vi.fn(),
     findWinemakerReviewById: vi.fn(),
+    findProductReviewWithUser: vi.fn(),
+    findWinemakerReviewWithUser: vi.fn(),
     hasPurchasedProduct: vi.fn(),
     insertProductReview: vi.fn(),
     insertWinemakerReview: vi.fn(),
@@ -96,6 +98,7 @@ describe('createProductReview', () => {
     vi.mocked(reviewsRepository.hasPurchasedProduct).mockResolvedValue(true)
     vi.mocked(reviewsRepository.findProductReview).mockResolvedValue(undefined)
     vi.mocked(reviewsRepository.insertProductReview).mockResolvedValue(mockProductReview as never)
+    vi.mocked(reviewsRepository.findProductReviewWithUser).mockResolvedValue(mockProductReview as never)
 
     const result = await reviewsService.createProductReview(userId, productId, { rating: 4, body: 'Great wine' })
 
@@ -129,6 +132,7 @@ describe('createWinemakerReview', () => {
   it('creates review when no prior review exists', async () => {
     vi.mocked(reviewsRepository.findWinemakerReview).mockResolvedValue(undefined)
     vi.mocked(reviewsRepository.insertWinemakerReview).mockResolvedValue(mockWinemakerReview as never)
+    vi.mocked(reviewsRepository.findWinemakerReviewWithUser).mockResolvedValue(mockWinemakerReview as never)
 
     const result = await reviewsService.createWinemakerReview(userId, winemakerId, { rating: 5 })
 

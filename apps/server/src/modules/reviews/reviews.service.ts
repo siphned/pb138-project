@@ -32,7 +32,10 @@ export const reviewsService = {
     const existing = await reviewsRepository.findProductReview(userId, productId)
     if (existing) throw new Error('DUPLICATE_REVIEW')
 
-    return reviewsRepository.insertProductReview(userId, productId, data) as Promise<ProductReviewWithUser>
+    const inserted = await reviewsRepository.insertProductReview(userId, productId, data)
+    const review = await reviewsRepository.findProductReviewWithUser(inserted.id)
+    if (!review) throw new Error('NOT_FOUND')
+    return review
   },
 
   async createWinemakerReview(
@@ -43,7 +46,10 @@ export const reviewsService = {
     const existing = await reviewsRepository.findWinemakerReview(userId, winemakerId)
     if (existing) throw new Error('DUPLICATE_REVIEW')
 
-    return reviewsRepository.insertWinemakerReview(userId, winemakerId, data) as Promise<WinemakerReviewWithUser>
+    const inserted = await reviewsRepository.insertWinemakerReview(userId, winemakerId, data)
+    const review = await reviewsRepository.findWinemakerReviewWithUser(inserted.id)
+    if (!review) throw new Error('NOT_FOUND')
+    return review
   },
 
   async deleteProductReview(
