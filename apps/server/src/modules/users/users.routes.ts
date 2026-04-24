@@ -1,13 +1,13 @@
 import { Elysia } from "elysia";
 import { authPlugin } from "../auth";
-import { usersService } from "./users.service";
 import {
-  userResponseSchema,
-  updateProfileBody,
   addressBody,
   addressesResponseSchema,
   addressResponseSchema,
+  updateProfileBody,
+  userResponseSchema,
 } from "./users.schema";
+import { usersService } from "./users.service";
 
 export const usersRoutes = new Elysia({ prefix: "/users" })
   .use(authPlugin)

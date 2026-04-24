@@ -1,7 +1,7 @@
 import { and, eq, isNull } from "drizzle-orm";
 import { db } from "../../db";
-import { addresses, shops } from "../../db/schema";
 import type { Address, Shop } from "../../db/schema";
+import { addresses, shops } from "../../db/schema";
 
 export type ShopWithAddress = Shop & { address: Address };
 

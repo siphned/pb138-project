@@ -1,9 +1,9 @@
 import { pgTable, text, timestamp, uuid, varchar } from "drizzle-orm/pg-core";
+import { addresses } from "./addresses";
 import { eventInviteStatusEnum, eventVisibilityEnum } from "./enums";
 import { timestamptz } from "./helpers";
-import { addresses } from "./addresses";
-import { users } from "./users";
 import { winemakers } from "./sellers";
+import { users } from "./users";
 
 export const events = pgTable("events", {
   id: uuid("id").primaryKey().defaultRandom(),

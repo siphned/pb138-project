@@ -1,6 +1,6 @@
 import { pgTable, smallint, uuid } from "drizzle-orm/pg-core";
-import { timestamptz } from "./helpers";
 import { products } from "./catalog";
+import { timestamptz } from "./helpers";
 import { users } from "./users";
 
 export const carts = pgTable("carts", {

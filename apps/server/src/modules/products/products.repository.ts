@@ -1,7 +1,7 @@
 import { and, eq, inArray, isNull } from "drizzle-orm";
 import { db } from "../../db";
-import { productWines, products, wines } from "../../db/schema";
 import type { NewProduct, NewProductWine, Product, ProductWine, Wine } from "../../db/schema";
+import { products, productWines, wines } from "../../db/schema";
 
 export type WineInfo = Pick<
   Wine,

@@ -1,4 +1,4 @@
-import { describe, it, expect, beforeEach, vi } from "vitest";
+import { beforeEach, describe, expect, it, vi } from "vitest";
 
 const mockUpdateUserMetadata = vi.hoisted(() => vi.fn());
 
@@ -24,9 +24,9 @@ vi.mock("../users/users.repository", () => ({
   },
 }));
 
-import { roleRequestsService } from "./role-requests.service";
-import { roleRequestsRepository } from "./role-requests.repository";
 import { usersRepository } from "../users/users.repository";
+import { roleRequestsRepository } from "./role-requests.repository";
+import { roleRequestsService } from "./role-requests.service";
 
 const userId = "11111111-1111-1111-1111-111111111111";
 const adminId = "22222222-2222-2222-2222-222222222222";

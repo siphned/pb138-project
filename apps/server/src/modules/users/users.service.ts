@@ -1,7 +1,7 @@
 import { createClerkClient } from "@clerk/backend";
-import { usersRepository } from "./users.repository";
+import type { Address, User } from "../../db/schema";
 import type { ClerkPayload } from "../auth/auth.utils";
-import type { User, Address } from "../../db/schema";
+import { usersRepository } from "./users.repository";
 
 const clerkClient = createClerkClient({
   secretKey: process.env.CLERK_SECRET_KEY,

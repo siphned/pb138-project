@@ -1,7 +1,7 @@
 import { eq } from "drizzle-orm";
 import { db } from "../../db";
-import { roleRequests } from "../../db/schema";
 import type { RoleRequest } from "../../db/schema";
+import { roleRequests } from "../../db/schema";
 
 export const roleRequestsRepository = {
   findById(id: string): Promise<RoleRequest | undefined> {
