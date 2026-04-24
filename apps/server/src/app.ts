@@ -1,6 +1,7 @@
 import { cors } from "@elysiajs/cors";
 import { openapi } from "@elysiajs/openapi";
 import { Elysia } from "elysia";
+import { adminRoutes } from "./modules/admin";
 import { availabilityRoutes } from "./modules/availability";
 import { eventsRoutes } from "./modules/events";
 import { productsRoutes } from "./modules/products";
@@ -29,6 +30,7 @@ export const app = new Elysia()
           { name: "products", description: "Products and bundles" },
           { name: "availability", description: "Shop availability schedule" },
           { name: "events", description: "Event management and registration" },
+          { name: "admin", description: "Back-office administration" },
           { name: "wines", description: "Wine catalog CRUD and filtering" },
           { name: "winemakers", description: "Winemaker profiles and portfolios" },
         ],
@@ -52,5 +54,6 @@ export const app = new Elysia()
   .use(productsRoutes)
   .use(availabilityRoutes)
   .use(eventsRoutes)
+  .use(adminRoutes)
   .use(winesRoutes)
   .use(winemakersRoutes);
