@@ -1,6 +1,7 @@
 import { useQueryClient } from "@tanstack/react-query";
 import { createContext, type ReactNode, useContext, useEffect, useState } from "react";
 import { getUsersMeQueryKey, useGetUsersMe } from "@/generated/hooks/useGetUsersMe";
+import type { PutUsersMeMutationRequest } from "@/generated/types";
 import { usePutUsersMe } from "@/generated/hooks/usePutUsersMe";
 
 export interface UserProfile {
@@ -52,7 +53,14 @@ export function UserProvider({ children }: { children: ReactNode }) {
   }, [profile]);
 
   const updateUser = async (newData: Partial<UserProfile>): Promise<void> => {
-    await updateMutation.mutateAsync({ data: newData as any });
+    const mutationData: PutUsersMeMutationRequest = {};
+    if (newData.fname !== undefined) {
+      mutationData.fname = newData.fname;
+    }
+    if (newData.lname !== undefined) {
+      mutationData.lname = newData.lname;
+    }
+    await updateMutation.mutateAsync({ data: mutationData });
   };
 
   return (
