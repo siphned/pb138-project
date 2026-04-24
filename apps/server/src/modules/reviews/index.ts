@@ -1,1 +1,1 @@
-export { reviewsRoutes } from './reviews.routes'
+export { reviewsRoutes } from "./reviews.routes";
