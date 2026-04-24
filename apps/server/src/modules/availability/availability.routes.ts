@@ -1,6 +1,6 @@
 import { Elysia, status, t } from "elysia";
 import { authPlugin } from "../auth";
-import { addExceptionBody, addRegularBody, getAvailabilityResponse, regularResponse, exceptionResponse } from "./availability.schema";
+import { addExceptionBody, addRegularBody, getAvailabilityResponse } from "./availability.schema";
 import { availabilityService } from "./availability.service";
 
 const shopParams = t.Object({ id: t.String() });
@@ -8,7 +8,7 @@ const shopEntryParams = t.Object({ id: t.String(), entryId: t.String() });
 
 export const availabilityRoutes = new Elysia()
   .use(authPlugin)
-  .onError(({ error, code }) => {
+  .onError(({ error }) => {
     if (error instanceof Error) {
       if (error.message === "NOT_FOUND") return new Response("Shop not found", { status: 404 });
       if (error.message === "FORBIDDEN") return new Response("Forbidden", { status: 403 });

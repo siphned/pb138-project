@@ -24,18 +24,6 @@ const bundleResponse = t.Object({
   updatedAt: t.Union([t.Date(), t.Null()]),
 });
 
-const productResponse = t.Object({
-  id: t.String(),
-  shopId: t.String(),
-  name: t.String(),
-  description: t.Union([t.String(), t.Null()]),
-  price: t.String(),
-  quantity: t.Integer(),
-  isBundle: t.Boolean(),
-  createdAt: t.Date(),
-  updatedAt: t.Union([t.Date(), t.Null()]),
-});
-
 function handleError(e: unknown) {
   if (e instanceof Error) {
     if (e.message === "NOT_FOUND") return status(404, "Not found");
