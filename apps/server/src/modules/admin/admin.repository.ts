@@ -80,18 +80,18 @@ export const adminRepository = {
       .update(users)
       .set({ status: newStatus, updatedAt: new Date() })
       .where(eq(users.id, id))
-      .returning()
+      .returning({
+        id: users.id,
+        fname: users.fname,
+        lname: users.lname,
+        email: users.email,
+        role: users.role,
+        status: users.status,
+        createdAt: users.createdAt,
+        deletedAt: users.deletedAt,
+      })
     if (!updated) throw new Error('User not found')
-    return {
-      id: updated.id,
-      fname: updated.fname,
-      lname: updated.lname,
-      email: updated.email,
-      role: updated.role,
-      status: updated.status,
-      createdAt: updated.createdAt,
-      deletedAt: updated.deletedAt,
-    }
+    return updated
   },
 
   async listEvents(

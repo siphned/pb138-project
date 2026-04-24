@@ -11,6 +11,14 @@ import {
   adminEventSchema,
 } from './admin.schema'
 
+function handleError(e: unknown) {
+  if (e instanceof Error) {
+    if (e.message === 'NOT_FOUND') return status(404, 'Not found')
+    if (e.message === 'CONFLICT') return status(409, 'Conflict')
+  }
+  throw e
+}
+
 export const adminRoutes = new Elysia({ prefix: '/admin' })
   .use(authPlugin)
 
@@ -41,22 +49,20 @@ export const adminRoutes = new Elysia({ prefix: '/admin' })
     }
   )
 
-  .put(
+  .patch(
     '/users/:id/status',
     async ({ params, body }) => {
       try {
         return await adminService.changeUserStatus(params.id, body.status)
       } catch (e: unknown) {
-        if (e instanceof Error && e.message === 'NOT_FOUND')
-          return status(404, 'User not found')
-        throw e
+        return handleError(e)
       }
     },
     {
       requireRole: 'admin',
       params: t.Object({ id: t.String() }),
       body: updateUserStatusBody,
-      response: { 200: adminUserSchema, 404: t.String() },
+      response: { 200: adminUserSchema, 404: t.String(), 409: t.String() },
       detail: {
         tags: ['admin'],
         summary: 'Update user status',
@@ -92,17 +98,13 @@ export const adminRoutes = new Elysia({ prefix: '/admin' })
     }
   )
 
-  .put(
+  .patch(
     '/events/:id/status',
     async ({ params, body }) => {
       try {
         return await adminService.setEventStatus(params.id, body.status)
       } catch (e: unknown) {
-        if (e instanceof Error) {
-          if (e.message === 'NOT_FOUND') return status(404, 'Event not found')
-          if (e.message === 'CONFLICT') return status(409, 'Event is not in pending status')
-        }
-        throw e
+        return handleError(e)
       }
     },
     {
@@ -145,14 +147,12 @@ export const adminRoutes = new Elysia({ prefix: '/admin' })
 
   .delete(
     '/reviews/:id',
-    async ({ params, query, set }) => {
+    async ({ params, query }) => {
       try {
         await adminService.deleteReview(params.id, query.type)
-        set.status = 204
+        return status(204, null)
       } catch (e: unknown) {
-        if (e instanceof Error && e.message === 'NOT_FOUND')
-          return status(404, 'Review not found')
-        throw e
+        return handleError(e)
       }
     },
     {
@@ -161,6 +161,7 @@ export const adminRoutes = new Elysia({ prefix: '/admin' })
       query: t.Object({
         type: t.Union([t.Literal('product'), t.Literal('winemaker')]),
       }),
+      response: { 204: t.Null(), 404: t.String(), 409: t.String() },
       detail: {
         tags: ['admin'],
         summary: 'Delete a review',
