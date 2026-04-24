@@ -1,13 +1,13 @@
-import { Elysia } from "elysia";
 import { cors } from "@elysiajs/cors";
 import { openapi } from "@elysiajs/openapi";
-import { usersRoutes } from "./modules/users";
+import { Elysia } from "elysia";
+import { availabilityRoutes } from "./modules/availability";
+import { productsRoutes } from "./modules/products";
 import { roleRequestsRoutes } from "./modules/role-requests";
 import { shopsRoutes } from "./modules/shops";
-import { productsRoutes } from "./modules/products";
-import { availabilityRoutes } from "./modules/availability";
-import { winesRoutes } from "./modules/wines";
+import { usersRoutes } from "./modules/users";
 import { winemakersRoutes } from "./modules/winemakers";
+import { winesRoutes } from "./modules/wines";
 
 export const app = new Elysia()
   .use(cors({ origin: "http://localhost:5173" }))

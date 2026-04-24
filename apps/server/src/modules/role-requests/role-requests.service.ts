@@ -1,6 +1,6 @@
 import { createClerkClient } from "@clerk/backend";
-import { roleRequestsRepository } from "./role-requests.repository";
 import { usersRepository } from "../users/users.repository";
+import { roleRequestsRepository } from "./role-requests.repository";
 
 const clerkClient = createClerkClient({
   secretKey: process.env.CLERK_SECRET_KEY,

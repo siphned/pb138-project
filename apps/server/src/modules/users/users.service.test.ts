@@ -1,4 +1,4 @@
-import { describe, it, expect, beforeEach, vi } from "vitest";
+import { beforeEach, describe, expect, it, vi } from "vitest";
 
 const mockGetUser = vi.hoisted(() => vi.fn());
 
@@ -20,9 +20,9 @@ vi.mock("./users.repository", () => ({
   },
 }));
 
-import { usersService } from "./users.service";
-import { usersRepository } from "./users.repository";
 import type { ClerkPayload } from "../auth";
+import { usersRepository } from "./users.repository";
+import { usersService } from "./users.service";
 
 const clerkId = "user_clerk_abc";
 const existingUser = {

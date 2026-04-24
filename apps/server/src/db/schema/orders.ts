@@ -1,7 +1,7 @@
 import { numeric, pgTable, smallint, timestamp, uuid } from "drizzle-orm/pg-core";
-import { deliveryTypeEnum, orderStatusEnum, paymentMethodEnum, paymentStatusEnum } from "./enums";
 import { addresses } from "./addresses";
 import { products } from "./catalog";
+import { deliveryTypeEnum, orderStatusEnum, paymentMethodEnum, paymentStatusEnum } from "./enums";
 import { shops } from "./sellers";
 import { users } from "./users";
 

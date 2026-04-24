@@ -1,8 +1,8 @@
 import { Elysia, status, t } from "elysia";
 import { authPlugin } from "../auth";
 import { usersService } from "../users/users.service";
-import { roleRequestsService } from "./role-requests.service";
 import { submitRoleRequestBody } from "./role-requests.schema";
+import { roleRequestsService } from "./role-requests.service";
 
 export const roleRequestsRoutes = new Elysia()
   .use(authPlugin)

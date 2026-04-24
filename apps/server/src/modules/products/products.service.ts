@@ -1,7 +1,7 @@
-import { shopsRepository } from "../shops/shops.repository";
-import { productsRepository } from "./products.repository";
-import type { ProductWithWines } from "./products.repository";
 import type { Product } from "../../db/schema";
+import { shopsRepository } from "../shops/shops.repository";
+import type { ProductWithWines } from "./products.repository";
+import { productsRepository } from "./products.repository";
 
 async function assertShopOwnership(shopId: string, requesterId: string): Promise<void> {
   const shop = await shopsRepository.findById(shopId);

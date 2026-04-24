@@ -1,7 +1,7 @@
 import { eq } from "drizzle-orm";
 import { db } from "../../db";
-import { users, addresses } from "../../db/schema";
-import type { NewUser, User, Address, NewAddress } from "../../db/schema";
+import type { Address, NewAddress, NewUser, User } from "../../db/schema";
+import { addresses, users } from "../../db/schema";
 
 export const usersRepository = {
   findByClerkId(clerkId: string): Promise<User | undefined> {

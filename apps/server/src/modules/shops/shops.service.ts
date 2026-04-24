@@ -1,5 +1,5 @@
-import { shopsRepository } from "./shops.repository";
 import type { ShopWithAddress } from "./shops.repository";
+import { shopsRepository } from "./shops.repository";
 
 type AddressData = {
   country: string;

@@ -1,4 +1,4 @@
-import { describe, it, expect, beforeEach, vi } from "vitest";
+import { beforeEach, describe, expect, it, vi } from "vitest";
 
 vi.mock("./shops.repository", () => ({
   shopsRepository: {
@@ -11,8 +11,8 @@ vi.mock("./shops.repository", () => ({
   },
 }));
 
-import { shopsService } from "./shops.service";
 import { shopsRepository } from "./shops.repository";
+import { shopsService } from "./shops.service";
 
 const ownerId = "11111111-1111-1111-1111-111111111111";
 const otherId = "22222222-2222-2222-2222-222222222222";

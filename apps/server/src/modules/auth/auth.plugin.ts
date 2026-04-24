@@ -1,7 +1,7 @@
 import { Elysia } from "elysia";
-import { verifyClerkToken } from "./auth.utils";
-import type { ClerkPayload } from "./auth.utils";
 import { usersService } from "../users/users.service";
+import type { ClerkPayload } from "./auth.utils";
+import { verifyClerkToken } from "./auth.utils";
 
 export type { ClerkPayload };
 export type AppRole = "user" | "admin" | "winemaker" | "shop_owner";

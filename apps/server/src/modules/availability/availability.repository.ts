@@ -1,7 +1,7 @@
 import { and, eq, isNull } from "drizzle-orm";
 import { db } from "../../db";
-import { availabilityExceptions, availabilityRegular, shops } from "../../db/schema";
 import type { AvailabilityException, AvailabilityRegular } from "../../db/schema";
+import { availabilityExceptions, availabilityRegular, shops } from "../../db/schema";
 
 export const availabilityRepository = {
   findRegularByShopId(shopId: string): Promise<AvailabilityRegular[]> {

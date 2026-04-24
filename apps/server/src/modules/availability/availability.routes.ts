@@ -12,7 +12,8 @@ export const availabilityRoutes = new Elysia()
     if (error instanceof Error) {
       if (error.message === "NOT_FOUND") return new Response("Shop not found", { status: 404 });
       if (error.message === "FORBIDDEN") return new Response("Forbidden", { status: 403 });
-      if (error.message === "INVALID_TIME_RANGE") return new Response("Invalid time range", { status: 422 });
+      if (error.message === "INVALID_TIME_RANGE")
+        return new Response("Invalid time range", { status: 422 });
     }
   })
 

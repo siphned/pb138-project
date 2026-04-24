@@ -1,5 +1,5 @@
-import { availabilityRepository } from "./availability.repository";
 import type { AvailabilityException, AvailabilityRegular } from "../../db/schema";
+import { availabilityRepository } from "./availability.repository";
 
 function parseTime(hhmm: string): Date {
   const [h = 0, m = 0] = hhmm.split(":").map(Number);

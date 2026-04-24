@@ -1,7 +1,7 @@
 import { Elysia, status, t } from "elysia";
 import { authPlugin } from "../auth";
+import { createShopBody, shopResponse, updateShopBody } from "./shops.schema";
 import { shopsService } from "./shops.service";
-import { createShopBody, updateShopBody, shopResponse } from "./shops.schema";
 
 export const shopsRoutes = new Elysia()
   .use(authPlugin)
