@@ -36,5 +36,5 @@ export const shopResponse = t.Object({
   description: t.String(),
   address: addressResponse,
   createdAt: t.Date(),
-  updatedAt: t.Nullable(t.Date()),
+  updatedAt: t.Union([t.Date(), t.Null()]),
 });
