@@ -15,13 +15,6 @@ function handleError(e: unknown) {
   throw e;
 }
 
-const availabilityResponse = t.Object({
-  regular: t.Array(t.Object({ id: t.String(), shopId: t.String(), dayOfWeek: t.Integer(), openTime: t.String(), closeTime: t.String() })),
-  exceptions: t.Array(t.Object({ id: t.String(), shopId: t.String(), startsAt: t.Date(), endsAt: t.Date(), isOpen: t.Boolean() })),
-});
-
-const exceptionResponse = t.Object({ id: t.String(), shopId: t.String(), startsAt: t.Date(), endsAt: t.Date(), isOpen: t.Boolean() });
-
 export const availabilityRoutes = new Elysia()
   .use(authPlugin)
 
@@ -36,7 +29,6 @@ export const availabilityRoutes = new Elysia()
     },
     {
       params: shopParams,
-      response: { 200: availabilityResponse, 403: t.String(), 404: t.String(), 422: t.String() },
       detail: {
         tags: ["availability"],
         summary: "Get shop availability",
@@ -58,7 +50,6 @@ export const availabilityRoutes = new Elysia()
       requireAuth: true,
       params: shopParams,
       body: addRegularBody,
-      response: { 201: t.Object({}), 403: t.String(), 404: t.String(), 422: t.String() },
       detail: {
         tags: ["availability"],
         summary: "Add regular schedule entry",
@@ -80,7 +71,6 @@ export const availabilityRoutes = new Elysia()
     {
       requireAuth: true,
       params: shopEntryParams,
-      response: { 204: t.Null(), 403: t.String(), 404: t.String() },
       detail: {
         tags: ["availability"],
         summary: "Remove regular schedule entry",
@@ -102,7 +92,6 @@ export const availabilityRoutes = new Elysia()
       requireAuth: true,
       params: shopParams,
       body: addExceptionBody,
-      response: { 201: exceptionResponse, 403: t.String(), 404: t.String(), 422: t.String() },
       detail: {
         tags: ["availability"],
         summary: "Add availability exception",
@@ -124,7 +113,6 @@ export const availabilityRoutes = new Elysia()
     {
       requireAuth: true,
       params: shopEntryParams,
-      response: { 204: t.Null(), 403: t.String(), 404: t.String() },
       detail: {
         tags: ["availability"],
         summary: "Remove availability exception",
