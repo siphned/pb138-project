@@ -1,0 +1,1 @@
+ALTER TABLE "wines" ADD COLUMN "region" varchar(255) NOT NULL;

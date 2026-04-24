@@ -1,6 +1,6 @@
 {
-  "id": "77b23081-cabd-40ad-9488-892f4c77660a",
-  "prevId": "ef5ae552-0f37-4caf-9c03-236c2b3ec71e",
+  "id": "813974c7-94ec-4620-bac3-d66a71893729",
+  "prevId": "77b23081-cabd-40ad-9488-892f4c77660a",
   "version": "7",
   "dialect": "postgresql",
   "tables": {
@@ -612,6 +612,12 @@
         "attribution": {
           "name": "attribution",
           "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "region": {
+          "name": "region",
+          "type": "varchar(255)",
           "primaryKey": false,
           "notNull": true
         },

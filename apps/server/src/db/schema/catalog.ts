@@ -10,6 +10,7 @@ export const wines = pgTable('wines', {
   description: text('description').notNull(),
   composition: text('composition').notNull(),
   attribution: text('attribution').notNull(),
+  region: varchar('region', { length: 255 }).notNull(),
   vintageYear: smallint('vintage_year').notNull(),
   type: wineTypeEnum('type').notNull(),
   color: wineColorEnum('color').notNull(),
