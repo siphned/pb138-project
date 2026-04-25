@@ -1,4 +1,4 @@
-import { eq } from "drizzle-orm";
+import { and, eq, isNull } from "drizzle-orm";
 import { db } from "../../db";
 import type { Order, OrderItem, Product } from "../../db/schema";
 import { addresses, cartItems as cartItemsTable, orderItems, orders } from "../../db/schema";
@@ -83,7 +83,7 @@ export const ordersRepository = {
 
   findOrdersByUserId(userId: string): Promise<OrderWithItems[]> {
     return db.query.orders.findMany({
-      where: eq(orders.userId, userId),
+      where: and(eq(orders.userId, userId), isNull(orders.deletedAt)),
       with: {
         items: {
           with: {
@@ -96,7 +96,7 @@ export const ordersRepository = {
 
   findOrderById(orderId: string): Promise<OrderWithItems | undefined> {
     return db.query.orders.findFirst({
-      where: eq(orders.id, orderId),
+      where: and(eq(orders.id, orderId), isNull(orders.deletedAt)),
       with: {
         items: {
           with: {
@@ -119,7 +119,7 @@ export const ordersRepository = {
   ): Promise<OrderItem> {
     const [updated] = await db
       .update(orderItems)
-      .set({ status: newStatus })
+      .set({ status: newStatus, updatedAt: new Date() })
       .where(eq(orderItems.id, itemId))
       .returning();
     if (!updated) throw new Error("OrderItem not found");
