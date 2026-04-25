@@ -10,20 +10,24 @@ import {
 } from "./events.schema";
 import { eventsService } from "./events.service";
 
+const errorMessages: Record<string, [number, string]> = {
+  NOT_FOUND: [404, "Not found"],
+  FORBIDDEN: [403, "Forbidden"],
+  CONFLICT: [409, "Event cannot be edited in its current status"],
+  CAPACITY_TOO_LOW: [409, "Capacity cannot be lower than current registration count"],
+  ALREADY_REGISTERED: [409, "Already registered for this event"],
+  CAPACITY_FULL: [409, "Event is at full capacity"],
+  EVENT_NOT_AVAILABLE: [409, "Event is not available for this action"],
+  INVALID_DATES: [422, "Invalid dates: start must be in future, end must be after start"],
+};
+
 function handleError(e: unknown) {
   if (e instanceof Error) {
-    if (e.message === "NOT_FOUND") return status(404, "Not found");
-    if (e.message === "FORBIDDEN") return status(403, "Forbidden");
-    if (e.message === "CONFLICT")
-      return status(409, "Event cannot be edited in its current status");
-    if (e.message === "CAPACITY_TOO_LOW")
-      return status(409, "Capacity cannot be lower than current registration count");
-    if (e.message === "ALREADY_REGISTERED") return status(409, "Already registered for this event");
-    if (e.message === "CAPACITY_FULL") return status(409, "Event is at full capacity");
-    if (e.message === "EVENT_NOT_AVAILABLE")
-      return status(409, "Event is not available for this action");
-    if (e.message === "INVALID_DATES")
-      return status(422, "Invalid dates: start must be in future, end must be after start");
+    const errorData = errorMessages[e.message];
+    if (errorData) {
+      const [code, message] = errorData;
+      return status(code, message);
+    }
   }
   throw e;
 }
