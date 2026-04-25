@@ -1,1 +1,1 @@
-export { adminRoutes } from './admin.routes'
+export { adminRoutes } from "./admin.routes";

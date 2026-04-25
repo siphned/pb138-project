@@ -1,7 +1,8 @@
-import { numeric, pgTable, smallint, timestamp, uuid } from "drizzle-orm/pg-core";
+import { numeric, pgTable, smallint, uuid } from "drizzle-orm/pg-core";
 import { addresses } from "./addresses";
 import { products } from "./catalog";
 import { deliveryTypeEnum, orderStatusEnum, paymentMethodEnum, paymentStatusEnum } from "./enums";
+import { timestamptz } from "./helpers";
 import { shops } from "./sellers";
 import { users } from "./users";
 
@@ -15,9 +16,9 @@ export const orders = pgTable("orders", {
   paymentStatus: paymentStatusEnum("payment_status").notNull(),
   paymentMethod: paymentMethodEnum("payment_method").notNull(),
   totalPrice: numeric("total_price", { precision: 10, scale: 2 }).notNull(),
-  createdAt: timestamp("created_at").notNull().defaultNow(),
-  updatedAt: timestamp("updated_at"),
-  deletedAt: timestamp("deleted_at"),
+  createdAt: timestamptz("created_at").notNull().defaultNow(),
+  updatedAt: timestamptz("updated_at"),
+  deletedAt: timestamptz("deleted_at"),
   status: orderStatusEnum("status").notNull(),
   deliveryType: deliveryTypeEnum("delivery_type").notNull(),
   shippingAddressId: uuid("shipping_address_id")
@@ -40,5 +41,11 @@ export const orderItems = pgTable("order_items", {
     .notNull()
     .references(() => products.id),
   quantity: smallint("quantity").notNull(),
-  unitPriceAtPurchase: numeric("unit_price_at_purchase", { precision: 10, scale: 2 }).notNull(),
+  unitPriceAtPurchase: numeric("unit_price_at_purchase", {
+    precision: 10,
+    scale: 2,
+  }).notNull(),
+  status: orderStatusEnum("status").notNull().default("pending"),
+  createdAt: timestamptz("created_at").notNull().defaultNow(),
+  updatedAt: timestamptz("updated_at"),
 });

@@ -3,6 +3,8 @@ import { openapi } from "@elysiajs/openapi";
 import { Elysia } from "elysia";
 import { adminRoutes } from "./modules/admin";
 import { availabilityRoutes } from "./modules/availability";
+import { cartsRoutes } from "./modules/carts";
+import { ordersRoutes } from "./modules/orders";
 import { eventsRoutes } from "./modules/events";
 import { productsRoutes } from "./modules/products";
 import { roleRequestsRoutes } from "./modules/role-requests";
@@ -33,6 +35,8 @@ export const app = new Elysia()
           { name: "admin", description: "Back-office administration" },
           { name: "wines", description: "Wine catalog CRUD and filtering" },
           { name: "winemakers", description: "Winemaker profiles and portfolios" },
+          { name: "carts", description: "Shopping cart management" },
+          { name: "orders", description: "Order checkout and lifecycle" },
         ],
         servers: [{ url: "http://localhost:3000", description: "Development" }],
         components: {
@@ -56,4 +60,6 @@ export const app = new Elysia()
   .use(eventsRoutes)
   .use(adminRoutes)
   .use(winesRoutes)
-  .use(winemakersRoutes);
+  .use(winemakersRoutes)
+  .use(cartsRoutes)
+  .use(ordersRoutes);
