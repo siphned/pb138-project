@@ -1,7 +1,7 @@
-import { parsePagination } from "../../utils/pagination";
 import type { PaginatedResult } from "../../utils/pagination";
+import { parsePagination } from "../../utils/pagination";
+import type { AdminEventRow, AdminReviewRow, AdminUserRow } from "./admin.repository";
 import { adminRepository } from "./admin.repository";
-import type { AdminUserRow, AdminEventRow, AdminReviewRow } from "./admin.repository";
 
 export const adminService = {
   async listUsers(

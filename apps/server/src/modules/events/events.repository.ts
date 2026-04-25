@@ -1,7 +1,7 @@
 import { and, count, eq, gte, ilike, inArray, isNull, lte } from "drizzle-orm";
 import { db } from "../../db";
-import { addresses, comments, eventRegistrations, events, winemakers } from "../../db/schema";
 import type { Comment, Event, EventRegistration } from "../../db/schema";
+import { addresses, comments, eventRegistrations, events, winemakers } from "../../db/schema";
 
 export type EventWithDetails = Event & {
   winemaker: { id: string; name: string } | null;

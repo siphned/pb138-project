@@ -1,7 +1,7 @@
 import { Elysia, status, t } from "elysia";
 import { authPlugin } from "../auth";
-import { reviewsService } from "./reviews.service";
 import { createReviewBody, reviewListResponse, reviewResponse } from "./reviews.schema";
+import { reviewsService } from "./reviews.service";
 
 export const reviewsRoutes = new Elysia()
   .use(authPlugin)

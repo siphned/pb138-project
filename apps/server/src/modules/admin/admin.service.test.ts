@@ -1,4 +1,4 @@
-import { describe, it, expect, beforeEach, vi } from "vitest";
+import { beforeEach, describe, expect, it, vi } from "vitest";
 
 vi.mock("./admin.repository", () => ({
   adminRepository: {
@@ -17,9 +17,9 @@ vi.mock("./admin.repository", () => ({
   },
 }));
 
-import { adminService } from "./admin.service";
+import type { AdminEventRow, AdminUserRow } from "./admin.repository";
 import { adminRepository } from "./admin.repository";
-import type { AdminUserRow, AdminEventRow } from "./admin.repository";
+import { adminService } from "./admin.service";
 
 const userId = "11111111-1111-1111-1111-111111111111";
 const eventId = "aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa";

@@ -1,4 +1,4 @@
-import { describe, it, expect, beforeEach, vi } from "vitest";
+import { beforeEach, describe, expect, it, vi } from "vitest";
 
 vi.mock("./reviews.repository", () => ({
   reviewsRepository: {
@@ -20,8 +20,8 @@ vi.mock("./reviews.repository", () => ({
   },
 }));
 
-import { reviewsService } from "./reviews.service";
 import { reviewsRepository } from "./reviews.repository";
+import { reviewsService } from "./reviews.service";
 
 const userId = "11111111-1111-1111-1111-111111111111";
 const otherUser = "22222222-2222-2222-2222-222222222222";

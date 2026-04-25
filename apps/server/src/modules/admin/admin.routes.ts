@@ -1,15 +1,15 @@
 import { Elysia, status, t } from "elysia";
 import { authPlugin } from "../auth";
-import { adminService } from "./admin.service";
 import {
-  updateUserStatusBody,
-  updateEventStatusBody,
-  paginatedUsersSchema,
+  adminEventSchema,
+  adminUserSchema,
   paginatedEventsSchema,
   paginatedReviewsSchema,
-  adminUserSchema,
-  adminEventSchema,
+  paginatedUsersSchema,
+  updateEventStatusBody,
+  updateUserStatusBody,
 } from "./admin.schema";
+import { adminService } from "./admin.service";
 
 function handleError(e: unknown) {
   if (e instanceof Error) {

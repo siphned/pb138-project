@@ -1,7 +1,7 @@
 import { and, avg, eq, isNull } from "drizzle-orm";
 import { db } from "../../db";
-import { orderItems, orders, productReviews, winemakerReviews } from "../../db/schema";
 import type { ProductReview, WinemakerReview } from "../../db/schema";
+import { orderItems, orders, productReviews, winemakerReviews } from "../../db/schema";
 
 export type ProductReviewWithUser = ProductReview & {
   user: { id: string; fname: string; lname: string };
