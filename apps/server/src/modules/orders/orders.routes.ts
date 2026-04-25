@@ -1,89 +1,115 @@
 import { Elysia, status, t } from "elysia";
-import { handleError } from "../../utils/errors";
 import { authPlugin } from "../auth";
-import { checkoutBody, orderResponse, updateItemStatusBody } from "./orders.schema";
+import { verifyClerkToken } from "../auth/auth.utils";
+import { cartsService } from "../carts/carts.service";
+import { usersService } from "../users/users.service";
+import type { CheckoutData } from "./orders.service";
 import { ordersService } from "./orders.service";
 
-const errorResponses = { 400: t.String(), 403: t.String(), 404: t.String(), 409: t.String() };
+const addressSchema = t.Object({
+  country: t.String(),
+  city: t.String(),
+  postalCode: t.String(),
+  street: t.String(),
+  houseNumber: t.String(),
+});
 
-export const ordersRoutes = new Elysia()
+const orderResponse = t.Object({
+  id: t.String(),
+  userId: t.Union([t.String(), t.Null()]),
+  guestSessionId: t.Union([t.String(), t.Null()]),
+  guestEmail: t.Union([t.String(), t.Null()]),
+  guestName: t.Union([t.String(), t.Null()]),
+  shippingFee: t.String(),
+  discount: t.String(),
+  paymentStatus: t.String(),
+  paymentMethod: t.String(),
+  totalPrice: t.String(),
+  status: t.String(),
+  deliveryType: t.String(),
+  shippingAddressId: t.String(),
+  billingAddressId: t.String(),
+  createdAt: t.Date(),
+  updatedAt: t.Union([t.Date(), t.Null()]),
+  deletedAt: t.Union([t.Date(), t.Null()]),
+});
+
+const checkoutBody = t.Object({
+  guestEmail: t.Optional(t.String()),
+  guestName: t.Optional(t.String()),
+  paymentMethod: t.Union([
+    t.Literal("card"),
+    t.Literal("bank_transfer"),
+    t.Literal("cash_on_delivery"),
+  ]),
+  deliveryType: t.Union([t.Literal("pickup"), t.Literal("shipping")]),
+  shippingAddress: addressSchema,
+  billingAddress: t.Optional(addressSchema),
+});
+
+export const ordersRoutes = new Elysia({ prefix: "/orders", tags: ["orders"] })
   .use(authPlugin)
-
-  .post(
-    "/orders",
-    async ({ dbUser, body }) => {
-      try {
-        return status(201, await ordersService.checkout(dbUser.id, body));
-      } catch (e) {
-        return handleError(e);
+  .derive(async ({ headers, cookie: { guest_session_id } }) => {
+    const payload = await verifyClerkToken(headers.authorization);
+    if (payload) {
+      const dbUser = await usersService.lazyGetOrCreate(payload.sub, payload);
+      const guestSessionId = guest_session_id?.value;
+      if (typeof guestSessionId === "string") {
+        await cartsService.mergeOnLogin(dbUser.id, guestSessionId);
+        guest_session_id?.remove();
       }
-    },
-    {
-      requireAuth: true,
-      body: checkoutBody,
-      response: { 201: orderResponse, ...errorResponses },
-      detail: {
-        tags: ["orders"],
-        summary: "Checkout — convert cart to order",
-        security: [{ bearerAuth: [] }],
-      },
+      return { user: dbUser, sessionId: undefined as string | undefined };
     }
-  )
-
-  .get("/orders", async ({ dbUser }) => ordersService.getMyOrders(dbUser.id), {
-    requireAuth: true,
-    response: { 200: t.Array(orderResponse) },
-    detail: {
-      tags: ["orders"],
-      summary: "List current user's orders",
-      security: [{ bearerAuth: [] }],
-    },
+    return { user: undefined, sessionId: guest_session_id?.value as string | undefined };
   })
 
-  .get(
-    "/orders/:id",
-    async ({ dbUser, params }) => {
+  .post(
+    "/checkout",
+    async ({ user, sessionId, body }) => {
+      if (!(user || sessionId)) return status(400, "No user or guest session");
+      if (!(user || body.guestEmail)) return status(400, "Email required for guest checkout");
+
       try {
-        return await ordersService.getOrderById(dbUser.id, params.id);
-      } catch (e) {
-        return handleError(e);
+        const checkoutData = body as CheckoutData;
+        return await ordersService.createOrder({ userId: user?.id, sessionId }, checkoutData);
+      } catch (e: unknown) {
+        if (e instanceof Error && e.message.startsWith("INSUFFICIENT_STOCK")) {
+          return status(422, e.message);
+        }
+        throw e;
       }
     },
     {
-      requireAuth: true,
-      params: t.Object({ id: t.String() }),
-      response: { 200: orderResponse, ...errorResponses },
+      body: checkoutBody,
+      response: { 200: orderResponse, 400: t.String(), 422: t.String() },
       detail: {
-        tags: ["orders"],
-        summary: "Get order by ID (own orders only)",
-        security: [{ bearerAuth: [] }],
+        summary: "Checkout",
+        description:
+          "Create an order from the current cart. Works for both authenticated users and guests.",
       },
     }
   )
 
-  .put(
-    "/orders/:id/items/:itemId/status",
-    async ({ dbUser, params, body }) => {
+  .get(
+    "/:id",
+    async ({ user, params }) => {
+      if (!user) return status(401, "Auth required");
       try {
-        return await ordersService.updateOrderItemStatus(
-          dbUser.id,
-          params.id,
-          params.itemId,
-          body.status
-        );
-      } catch (e) {
-        return handleError(e);
+        return await ordersService.getOrder(params.id, user.id);
+      } catch (e: unknown) {
+        if (e instanceof Error) {
+          if (e.message === "NOT_FOUND") return status(404, "Not found");
+          if (e.message === "FORBIDDEN") return status(403, "Forbidden");
+        }
+        throw e;
       }
     },
     {
-      requireCapability: "shop_owner",
-      params: t.Object({ id: t.String(), itemId: t.String() }),
-      body: updateItemStatusBody,
-      response: { 200: orderResponse, ...errorResponses },
+      params: t.Object({ id: t.String() }),
+      response: { 200: orderResponse, 401: t.String(), 403: t.String(), 404: t.String() },
       detail: {
-        tags: ["orders"],
-        summary: "Update order item status (shop owner only)",
-        security: [{ bearerAuth: [] }],
+        summary: "Get order by ID",
+        description: "Returns an order by ID. Only the owning user can access it.",
       },
     }
   );

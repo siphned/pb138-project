@@ -1,132 +1,113 @@
 import { Elysia, status, t } from "elysia";
 import { authPlugin } from "../auth";
-import { usersService } from "../users/users.service";
-import { submitRoleRequestBody } from "./role-requests.schema";
 import { roleRequestsService } from "./role-requests.service";
 
-export const roleRequestsRoutes = new Elysia()
+const roleRequestBody = t.Object({
+  type: t.Union([t.Literal("winemaker"), t.Literal("shop_owner")]),
+  businessName: t.String(),
+  details: t.Optional(t.String()),
+});
+
+const roleRequestResponse = t.Object({
+  id: t.String(),
+  userId: t.String(),
+  type: t.Union([t.Literal("winemaker"), t.Literal("shop_owner")]),
+  status: t.Union([t.Literal("pending"), t.Literal("approved"), t.Literal("rejected")]),
+  businessName: t.String(),
+  details: t.Union([t.String(), t.Null()]),
+  submittedAt: t.Date(),
+});
+
+export const roleRequestsRoutes = new Elysia({
+  prefix: "/role-requests",
+  tags: ["role-requests"],
+})
   .use(authPlugin)
 
   .post(
-    "/users/me/request-winemaker",
-    async ({ clerkId, clerkPayload, body }) => {
-      const user = await usersService.lazyGetOrCreate(clerkId, clerkPayload);
+    "/",
+    async ({ dbUser, body }) => {
       try {
-        return await roleRequestsService.submitRequest(
-          user.id,
-          "winemaker",
-          body.business_name,
-          body.details
+        return status(
+          201,
+          await roleRequestsService.submitRequest(
+            dbUser.id,
+            body.type,
+            body.businessName,
+            body.details
+          )
         );
       } catch (e: unknown) {
-        if (e instanceof Error && e.message === "DUPLICATE_REQUEST")
-          return status(409, "Pending request already exists");
+        if (e instanceof Error && e.message === "ALREADY_HAS_PENDING_REQUEST") {
+          return status(409, "You already have a pending request for this role");
+        }
         throw e;
       }
     },
     {
       requireAuth: true,
-      body: submitRoleRequestBody,
+      body: roleRequestBody,
+      response: { 201: roleRequestResponse, 409: t.String() },
       detail: {
-        tags: ["role-requests"],
-        summary: "Apply for winemaker role",
-        description:
-          "Submit a pending winemaker role request. One pending request per role per user.",
+        summary: "Submit a role request",
+        description: "Submit a request to become a winemaker or shop owner.",
         security: [{ bearerAuth: [] }],
       },
     }
   )
 
-  .post(
-    "/users/me/request-shop-owner",
-    async ({ clerkId, clerkPayload, body }) => {
-      const user = await usersService.lazyGetOrCreate(clerkId, clerkPayload);
-      try {
-        return await roleRequestsService.submitRequest(
-          user.id,
-          "shop_owner",
-          body.business_name,
-          body.details
-        );
-      } catch (e: unknown) {
-        if (e instanceof Error && e.message === "DUPLICATE_REQUEST")
-          return status(409, "Pending request already exists");
-        throw e;
-      }
-    },
-    {
-      requireAuth: true,
-      body: submitRoleRequestBody,
-      detail: {
-        tags: ["role-requests"],
-        summary: "Apply for shop-owner role",
-        description:
-          "Submit a pending shop-owner role request. One pending request per role per user.",
-        security: [{ bearerAuth: [] }],
-      },
-    }
-  )
-
-  .get("/role-requests", () => roleRequestsService.listPending(), {
-    requireRole: "admin",
+  .get("/", () => roleRequestsService.listPending(), {
+    requireRoles: ["admin"],
+    response: { 200: t.Array(roleRequestResponse) },
     detail: {
-      tags: ["role-requests"],
       summary: "List pending role requests",
-      description: "Admin-only. Returns all role requests with status `pending`.",
       security: [{ bearerAuth: [] }],
     },
   })
 
-  .post(
-    "/role-requests/:id/approve",
-    async ({ params, clerkId, clerkPayload }) => {
-      const admin = await usersService.lazyGetOrCreate(clerkId, clerkPayload);
+  .patch(
+    "/:id/approve",
+    async ({ dbUser, params }) => {
       try {
-        await roleRequestsService.approve(params.id, admin.id);
-        return { success: true };
+        return await roleRequestsService.approve(params.id, dbUser.id);
       } catch (e: unknown) {
         if (e instanceof Error) {
-          if (e.message === "NOT_FOUND") return status(404, "Role request not found");
-          if (e.message === "NOT_PENDING") return status(409, "Request is not pending");
+          if (e.message === "NOT_FOUND") return status(404, "Request not found");
+          if (e.message === "ALREADY_RESPONDED") return status(400, "Request already processed");
         }
         throw e;
       }
     },
     {
-      requireRole: "admin",
+      requireRoles: ["admin"],
       params: t.Object({ id: t.String() }),
+      response: { 200: roleRequestResponse, 400: t.String(), 404: t.String() },
       detail: {
-        tags: ["role-requests"],
         summary: "Approve a role request",
-        description:
-          "Admin-only. Grants the requested capability in Clerk publicMetadata and marks the request as `approved`.",
         security: [{ bearerAuth: [] }],
       },
     }
   )
 
-  .post(
-    "/role-requests/:id/reject",
-    async ({ params, clerkId, clerkPayload }) => {
-      const admin = await usersService.lazyGetOrCreate(clerkId, clerkPayload);
+  .patch(
+    "/:id/reject",
+    async ({ dbUser, params }) => {
       try {
-        await roleRequestsService.reject(params.id, admin.id);
-        return { success: true };
+        return await roleRequestsService.reject(params.id, dbUser.id);
       } catch (e: unknown) {
         if (e instanceof Error) {
-          if (e.message === "NOT_FOUND") return status(404, "Role request not found");
-          if (e.message === "NOT_PENDING") return status(409, "Request is not pending");
+          if (e.message === "NOT_FOUND") return status(404, "Request not found");
+          if (e.message === "ALREADY_RESPONDED") return status(400, "Request already processed");
         }
         throw e;
       }
     },
     {
-      requireRole: "admin",
+      requireRoles: ["admin"],
       params: t.Object({ id: t.String() }),
+      response: { 200: roleRequestResponse, 400: t.String(), 404: t.String() },
       detail: {
-        tags: ["role-requests"],
         summary: "Reject a role request",
-        description: "Admin-only. Marks the request as `rejected` without changing Clerk metadata.",
         security: [{ bearerAuth: [] }],
       },
     }

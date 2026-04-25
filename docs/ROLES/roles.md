@@ -52,8 +52,8 @@ This matrix defines which user roles can perform which actions in the WineMarket
 | | Add product to cart | OR-1 | ✅ | ✅ | ✅ | ✅ | - |
 | | Modify/remove from cart | OR-2 | ✅ | ✅ | ✅ | ✅ | - |
 | | View cart total | OR-3 | ✅ | ✅ | ✅ | ✅ | - |
-| | Checkout (create order) | OR-4 | ❌ | ✅ | ✅ | ✅ | ✅ |
-| | Select delivery address | OR-5 | ❌ | ✅ | ✅ | ✅ | ✅ |
+| | Checkout (create order) | OR-4 | ✅ | ✅ | ✅ | ✅ | ✅ |
+| | Select delivery address | OR-5 | ✅ | ✅ | ✅ | ✅ | ✅ |
 | | Receive order confirmation email | OR-6 | ❌ | ✅ | ✅ | ✅ | ✅ |
 | | View own order history | OR-7 | ❌ | ✅ | ✅ | ✅ | ✅ |
 | | Manage incoming shop orders | OR-8 | ❌ | ❌ | ❌ | 🔒 | ✅ |

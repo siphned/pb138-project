@@ -5,10 +5,16 @@ import { Header } from "./Header";
 interface AuthLayoutProps {
   children: React.ReactNode;
   activeRole?: Role;
+  availableRoles?: Role[];
   onRoleChange?: (role: Role) => void;
 }
 
-export function AuthLayout({ children, activeRole, onRoleChange }: AuthLayoutProps) {
+export function AuthLayout({
+  children,
+  activeRole,
+  availableRoles,
+  onRoleChange,
+}: AuthLayoutProps) {
   return (
     <div className="flex min-h-screen w-full bg-background">
       {/* Left Side: Sidebar */}
@@ -17,8 +23,8 @@ export function AuthLayout({ children, activeRole, onRoleChange }: AuthLayoutPro
       {/* Right Side: Header + Page Content */}
       <div className="flex flex-col flex-1">
         <Header
-          user={{ name: "Chateau Montrose", email: "contact@chateaumontrose.com" }}
           activeRole={activeRole}
+          availableRoles={availableRoles}
           onRoleChange={onRoleChange}
         />
 

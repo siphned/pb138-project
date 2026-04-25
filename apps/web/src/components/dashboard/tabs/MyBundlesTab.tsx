@@ -6,12 +6,12 @@ interface MyBundlesTabProps {
   role?: Role;
 }
 
-export function MyBundlesTab({ role = Role.WINEMAKER }: MyBundlesTabProps) {
+export function MyBundlesTab({ role = Role.winemaker }: MyBundlesTabProps) {
   // Defensive check: If a customer somehow gets here, render nothing.
-  if (role === Role.CUSTOMER) return null;
+  if (role === Role.customer) return null;
 
   // Route to the correct component
-  if (role === Role.SHOP_OWNER) {
+  if (role === Role.shopOwner) {
     return <ShopOwnerBundles />;
   }
 
