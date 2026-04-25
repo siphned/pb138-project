@@ -9,13 +9,12 @@ import {
   availabilityRegular,
   cartItems,
   carts,
-  comments,
   events,
   orderItems,
   orders,
+  productReviews,
   products,
   productWines,
-  reviews,
   roleRequests,
   shops,
   users,
@@ -49,8 +48,7 @@ function pick<T>(arr: T[]): T {
 
 async function teardown() {
   console.log("Clearing existing seed data...");
-  await db.delete(comments);
-  await db.delete(reviews);
+  await db.delete(productReviews);
   await db.delete(orderItems);
   await db.delete(orders);
   await db.delete(cartItems);
@@ -204,22 +202,12 @@ async function main() {
   const firstProd = prodRows[0];
   if (firstProd) {
     for (const customer of customers) {
-      const [review] = await db
-        .insert(reviews)
-        .values({
-          userId: customer.id,
-          productId: firstProd.id,
-          rating: 5,
-          comment: "Nice",
-        })
-        .returning();
-      if (review) {
-        await db.insert(comments).values({
-          userId: victor.id,
-          reviewId: review.id,
-          text: "Thanks!",
-        });
-      }
+      await db.insert(productReviews).values({
+        userId: customer.id,
+        productId: firstProd.id,
+        rating: 5,
+        body: "Nice wine!",
+      });
     }
   }
 }

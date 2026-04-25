@@ -6,7 +6,7 @@ import { products, productWines, wines } from "./catalog";
 import { eventComments, eventInvitations, eventRegistrations, events } from "./events";
 import { images } from "./images";
 import { orderItems, orders } from "./orders";
-import { comments, reviews } from "./reviews";
+import { productReviews, winemakerReviews } from "./reviews";
 import { roleRequests } from "./role-requests";
 import { shops, winemakers } from "./sellers";
 import { users } from "./users";
@@ -36,8 +36,8 @@ export const usersRelations = relations(users, ({ one, many }) => ({
   shops: many(shops),
   cart: one(carts),
   orders: many(orders),
-  reviews: many(reviews),
-  comments: many(comments),
+  productReviews: many(productReviews),
+  winemakerReviews: many(winemakerReviews),
   roleRequests: many(roleRequests, { relationName: "roleRequestUser" }),
   reviewedRoleRequests: many(roleRequests, { relationName: "roleRequestReviewer" }),
   eventRegistrations: many(eventRegistrations),
@@ -50,6 +50,7 @@ export const winemakersRelations = relations(winemakers, ({ one, many }) => ({
   events: many(events),
   availabilityRegular: many(availabilityRegular),
   availabilityExceptions: many(availabilityExceptions),
+  reviews: many(winemakerReviews),
 }));
 
 export const winesRelations = relations(wines, ({ one, many }) => ({
@@ -71,7 +72,7 @@ export const productsRelations = relations(products, ({ one, many }) => ({
   productWines: many(productWines),
   cartItems: many(cartItems),
   orderItems: many(orderItems),
-  reviews: many(reviews),
+  reviews: many(productReviews),
 }));
 
 export const productWinesRelations = relations(productWines, ({ one }) => ({
@@ -148,15 +149,17 @@ export const orderItemsRelations = relations(orderItems, ({ one }) => ({
   product: one(products, { fields: [orderItems.productId], references: [products.id] }),
 }));
 
-export const reviewsRelations = relations(reviews, ({ one, many }) => ({
-  user: one(users, { fields: [reviews.userId], references: [users.id] }),
-  product: one(products, { fields: [reviews.productId], references: [products.id] }),
-  comments: many(comments),
+export const productReviewsRelations = relations(productReviews, ({ one }) => ({
+  user: one(users, { fields: [productReviews.userId], references: [users.id] }),
+  product: one(products, { fields: [productReviews.productId], references: [products.id] }),
 }));
 
-export const commentsRelations = relations(comments, ({ one }) => ({
-  review: one(reviews, { fields: [comments.reviewId], references: [reviews.id] }),
-  user: one(users, { fields: [comments.userId], references: [users.id] }),
+export const winemakerReviewsRelations = relations(winemakerReviews, ({ one }) => ({
+  user: one(users, { fields: [winemakerReviews.userId], references: [users.id] }),
+  winemaker: one(winemakers, {
+    fields: [winemakerReviews.winemakerId],
+    references: [winemakers.id],
+  }),
 }));
 
 export const imagesRelations = relations(images, () => ({}));
