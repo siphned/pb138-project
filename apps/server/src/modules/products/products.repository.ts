@@ -1,4 +1,4 @@
-import { and, eq, inArray, isNull } from "drizzle-orm";
+import { and, eq, inArray, isNull, sql } from "drizzle-orm";
 import { db } from "../../db";
 import type { NewProduct, NewProductWine, Product, ProductWine, Wine } from "../../db/schema";
 import { products, productWines, wines } from "../../db/schema";
@@ -11,6 +11,8 @@ export type WineInfo = Pick<
 export type ProductWineWithInfo = ProductWine & { wine: WineInfo };
 
 export type ProductWithWines = Product & { productWines: ProductWineWithInfo[] };
+
+type Transaction = Parameters<Parameters<typeof db.transaction>[0]>[0];
 
 export const productsRepository = {
   findById(id: string): Promise<ProductWithWines | undefined> {
@@ -82,12 +84,26 @@ export const productsRepository = {
     return found.length === uniqueIds.length;
   },
 
-  async createProductWithWine(
+  createProductWithWine(
     shopId: string,
     productData: { name: string; description?: string; price: string; quantity: number },
     wineId: string
   ): Promise<Product> {
     return db.transaction(async (tx) => {
+      const [wine] = await tx
+        .select({ quantity: wines.quantity })
+        .from(wines)
+        .where(and(eq(wines.id, wineId), isNull(wines.deletedAt)))
+        .for("update");
+
+      if (!wine) throw new Error("INVALID_WINE");
+      if (wine.quantity < productData.quantity) throw new Error("NOT_ENOUGH_STOCK");
+
+      await tx
+        .update(wines)
+        .set({ quantity: sql`${wines.quantity} - ${productData.quantity}` })
+        .where(eq(wines.id, wineId));
+
       const values: NewProduct = {
         shopId,
         name: productData.name,
@@ -106,12 +122,29 @@ export const productsRepository = {
     });
   },
 
-  async createBundleWithWines(
+  createBundleWithWines(
     shopId: string,
     productData: { name: string; description?: string; price: string; quantity: number },
     wineList: { wineId: string; quantity: number }[]
   ): Promise<Product> {
     return db.transaction(async (tx) => {
+      for (const item of wineList) {
+        const totalNeeded = item.quantity * productData.quantity;
+        const [wine] = await tx
+          .select({ quantity: wines.quantity })
+          .from(wines)
+          .where(and(eq(wines.id, item.wineId), isNull(wines.deletedAt)))
+          .for("update");
+
+        if (!wine) throw new Error("INVALID_WINE");
+        if (wine.quantity < totalNeeded) throw new Error("NOT_ENOUGH_STOCK");
+
+        await tx
+          .update(wines)
+          .set({ quantity: sql`${wines.quantity} - ${totalNeeded}` })
+          .where(eq(wines.id, item.wineId));
+      }
+
       const values: NewProduct = {
         shopId,
         name: productData.name,
@@ -140,6 +173,36 @@ export const productsRepository = {
     newWineId?: string
   ): Promise<Product> {
     return db.transaction(async (tx) => {
+      const current = await tx.query.products.findFirst({
+        where: eq(products.id, id),
+        with: { productWines: true },
+      });
+      if (!current) throw new Error("Product not found");
+
+      const currentQty = current.quantity;
+      const newQty = fields.quantity ?? currentQty;
+      const currentWineId = current.productWines[0]?.wineId;
+      const targetWineId = newWineId ?? currentWineId;
+
+      if (!(currentWineId && targetWineId)) throw new Error("INCONSISTENT_DATA");
+
+      if (targetWineId === currentWineId) {
+        await this.handleSameWineQuantityChange(
+          tx as Transaction,
+          currentWineId,
+          currentQty,
+          newQty
+        );
+      } else {
+        await this.handleWineIdChange(
+          tx as Transaction,
+          currentWineId,
+          currentQty,
+          targetWineId,
+          newQty
+        );
+      }
+
       const [updated] = await tx
         .update(products)
         .set({ ...fields, updatedAt: new Date() })
@@ -156,18 +219,78 @@ export const productsRepository = {
     });
   },
 
+  async handleSameWineQuantityChange(
+    tx: Transaction,
+    wineId: string,
+    oldQty: number,
+    newQty: number
+  ) {
+    const diff = newQty - oldQty;
+    if (diff === 0) return;
+
+    const [wine] = await tx
+      .select({ quantity: wines.quantity })
+      .from(wines)
+      .where(eq(wines.id, wineId))
+      .for("update");
+    if (!wine) throw new Error("INVALID_WINE");
+    if (wine.quantity < diff) throw new Error("NOT_ENOUGH_STOCK");
+
+    await tx
+      .update(wines)
+      .set({ quantity: sql`${wines.quantity} - ${diff}` })
+      .where(eq(wines.id, wineId));
+  },
+
+  async handleWineIdChange(
+    tx: Transaction,
+    oldId: string,
+    oldQty: number,
+    newId: string,
+    newQty: number
+  ) {
+    await tx
+      .update(wines)
+      .set({ quantity: sql`${wines.quantity} + ${oldQty}` })
+      .where(eq(wines.id, oldId));
+
+    const [wine] = await tx
+      .select({ quantity: wines.quantity })
+      .from(wines)
+      .where(eq(wines.id, newId))
+      .for("update");
+    if (!wine) throw new Error("INVALID_WINE");
+    if (wine.quantity < newQty) throw new Error("NOT_ENOUGH_STOCK");
+
+    await tx
+      .update(wines)
+      .set({ quantity: sql`${wines.quantity} - ${newQty}` })
+      .where(eq(wines.id, newId));
+  },
+
   async updateBundle(
     id: string,
     fields: { name?: string; description?: string | null; price?: string; quantity?: number },
     newWines?: { wineId: string; quantity: number }[]
   ): Promise<Product> {
     return db.transaction(async (tx) => {
+      const current = await tx.query.products.findFirst({
+        where: eq(products.id, id),
+        with: { productWines: true },
+      });
+      if (!current) throw new Error("Product not found");
+
+      await this.revertBundleAllocations(tx as Transaction, current);
+
+      const targetWines = newWines ?? current.productWines;
+      const newQty = fields.quantity ?? current.quantity;
+      await this.applyBundleAllocations(tx as Transaction, targetWines, newQty);
+
       const [updated] = await tx
         .update(products)
         .set({ ...fields, updatedAt: new Date() })
         .where(eq(products.id, id))
         .returning();
-      if (!updated) throw new Error("Product not found");
 
       if (newWines !== undefined) {
         await tx.delete(productWines).where(eq(productWines.productId, id));
@@ -179,11 +302,54 @@ export const productsRepository = {
         await tx.insert(productWines).values(pwRows);
       }
 
+      if (!updated) throw new Error("Product not found");
       return updated;
     });
   },
 
+  async revertBundleAllocations(
+    tx: Transaction,
+    product: Product & { productWines: ProductWine[] }
+  ) {
+    for (const pw of product.productWines) {
+      await tx
+        .update(wines)
+        .set({ quantity: sql`${wines.quantity} + ${pw.quantity * product.quantity}` })
+        .where(eq(wines.id, pw.wineId));
+    }
+  },
+
+  async applyBundleAllocations(
+    tx: Transaction,
+    targetWines: { wineId: string; quantity: number }[],
+    newQty: number
+  ) {
+    for (const tw of targetWines) {
+      const total = tw.quantity * newQty;
+      const [wine] = await tx
+        .select({ quantity: wines.quantity })
+        .from(wines)
+        .where(eq(wines.id, tw.wineId))
+        .for("update");
+      if (!wine || wine.quantity < total) throw new Error("NOT_ENOUGH_STOCK");
+
+      await tx
+        .update(wines)
+        .set({ quantity: sql`${wines.quantity} - ${total}` })
+        .where(eq(wines.id, tw.wineId));
+    }
+  },
+
   async softDelete(id: string): Promise<void> {
-    await db.update(products).set({ deletedAt: new Date() }).where(eq(products.id, id));
+    await db.transaction(async (tx) => {
+      const product = await tx.query.products.findFirst({
+        where: eq(products.id, id),
+        with: { productWines: true },
+      });
+      if (product) {
+        await this.revertBundleAllocations(tx as Transaction, product);
+      }
+      await tx.update(products).set({ deletedAt: new Date() }).where(eq(products.id, id));
+    });
   },
 };

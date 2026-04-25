@@ -30,6 +30,8 @@ function handleError(e: unknown) {
     if (e.message === "FORBIDDEN") return status(403, "Forbidden");
     if (e.message === "INVALID_WINE") return status(422, "One or more wine IDs are invalid");
     if (e.message === "BUNDLE_MIN_WINES") return status(422, "Bundle requires at least 2 wines");
+    if (e.message === "NOT_ENOUGH_STOCK")
+      return status(422, "Not enough winemaker stock available");
   }
   throw e;
 }
@@ -90,9 +92,10 @@ export const productsRoutes = new Elysia()
       }
     },
     {
-      requireCapability: "shop_owner",
+      requireRoles: ["shop_owner"],
       params: shopParams,
       body: createProductBody,
+      response: { 201: bundleResponse, 403: t.String(), 404: t.String(), 422: t.String() },
       detail: {
         tags: ["products"],
         summary: "Create a product",
@@ -114,6 +117,7 @@ export const productsRoutes = new Elysia()
       requireAuth: true,
       params: shopProductParams,
       body: updateProductBody,
+      response: { 200: bundleResponse, 403: t.String(), 404: t.String(), 422: t.String() },
       detail: {
         tags: ["products"],
         summary: "Update a product",
@@ -135,6 +139,7 @@ export const productsRoutes = new Elysia()
     {
       requireAuth: true,
       params: shopProductParams,
+      response: { 204: t.Null(), 403: t.String(), 404: t.String() },
       detail: {
         tags: ["products"],
         summary: "Delete a product",
@@ -155,9 +160,10 @@ export const productsRoutes = new Elysia()
       }
     },
     {
-      requireCapability: "shop_owner",
+      requireRoles: ["shop_owner"],
       params: shopParams,
       body: createBundleBody,
+      response: { 201: bundleResponse, 403: t.String(), 404: t.String(), 422: t.String() },
       detail: {
         tags: ["products"],
         summary: "Create a bundle",
@@ -201,6 +207,7 @@ export const productsRoutes = new Elysia()
     {
       requireAuth: true,
       params: shopBundleParams,
+      response: { 204: t.Null(), 403: t.String(), 404: t.String() },
       detail: {
         tags: ["products"],
         summary: "Delete a bundle",

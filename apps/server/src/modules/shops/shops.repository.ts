@@ -34,11 +34,17 @@ export const shopsRepository = {
     });
   },
 
+  findAllByOwnerUserId(ownerUserId: string): Promise<Shop[]> {
+    return db.query.shops.findMany({
+      where: and(eq(shops.ownerUserId, ownerUserId), isNull(shops.deletedAt)),
+    });
+  },
+
   async createShopWithAddress(
     shopData: { ownerUserId: string; name: string; description: string },
     addressData: AddressData
   ): Promise<Shop> {
-    return db.transaction(async (tx) => {
+    return await db.transaction(async (tx) => {
       const [address] = await tx.insert(addresses).values(addressData).returning();
       if (!address) throw new Error("Address insert returned no rows");
 

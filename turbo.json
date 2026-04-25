@@ -15,6 +15,8 @@
       "persistent": true
     },
     "generate": {
+      "dependsOn": ["^generate"],
+      "outputs": ["openapi.json", "src/generated/**"],
       "cache": false
     },
     "test": {
@@ -24,6 +26,9 @@
     "test:e2e": {
       "cache": false,
       "outputs": ["test-results/**"]
+    },
+    "db:seed": {
+      "cache": false
     }
   }
 }

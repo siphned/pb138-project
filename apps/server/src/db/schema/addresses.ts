@@ -1,4 +1,5 @@
-import { pgTable, timestamp, uuid, varchar } from "drizzle-orm/pg-core";
+import { pgTable, uuid, varchar } from "drizzle-orm/pg-core";
+import { timestamptz } from "./helpers";
 
 export const addresses = pgTable("addresses", {
   id: uuid("id").primaryKey().defaultRandom(),
@@ -7,7 +8,7 @@ export const addresses = pgTable("addresses", {
   postalCode: varchar("postal_code", { length: 20 }).notNull(),
   street: varchar("street", { length: 255 }).notNull(),
   houseNumber: varchar("house_number", { length: 20 }).notNull(),
-  createdAt: timestamp("created_at").notNull().defaultNow(),
-  updatedAt: timestamp("updated_at"),
-  deletedAt: timestamp("deleted_at"),
+  createdAt: timestamptz("created_at").notNull().defaultNow(),
+  updatedAt: timestamptz("updated_at"),
+  deletedAt: timestamptz("deleted_at"),
 });

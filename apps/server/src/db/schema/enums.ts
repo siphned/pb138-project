@@ -1,6 +1,7 @@
 import { pgEnum } from "drizzle-orm/pg-core";
 
 export const userRoleEnum = pgEnum("user_role", ["user", "admin"]);
+export const userStatusEnum = pgEnum("user_status", ["active", "suspended", "banned"]);
 export const roleRequestTypeEnum = pgEnum("role_request_type", ["winemaker", "shop_owner"]);
 export const roleRequestStatusEnum = pgEnum("role_request_status", [
   "pending",
@@ -47,4 +48,9 @@ export const paymentMethodEnum = pgEnum("payment_method", [
   "cash_on_delivery",
 ]);
 export const eventStatusEnum = pgEnum("event_status", ["pending", "approved", "rejected"]);
-export const userStatusEnum = pgEnum("user_status", ["active", "suspended", "banned"]);
+
+export const supplyAgreementStatusEnum = pgEnum("supply_agreement_status", [
+  "pending",
+  "approved",
+  "rejected",
+]);

@@ -6,7 +6,6 @@ export const userResponseSchema = t.Object({
   fname: t.String(),
   lname: t.String(),
   email: t.String(),
-  role: t.Union([t.Literal("user"), t.Literal("admin")]),
   shippingAddressId: t.Union([t.String(), t.Null()]),
   billingAddressId: t.Union([t.String(), t.Null()]),
   createdAt: t.Date(),

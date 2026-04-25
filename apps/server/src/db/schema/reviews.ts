@@ -1,5 +1,6 @@
-import { pgTable, smallint, text, timestamp, uuid } from "drizzle-orm/pg-core";
+import { pgTable, smallint, text, uuid } from "drizzle-orm/pg-core";
 import { products } from "./catalog";
+import { timestamptz } from "./helpers";
 import { winemakers } from "./sellers";
 import { users } from "./users";
 
@@ -13,9 +14,9 @@ export const productReviews = pgTable("product_reviews", {
     .references(() => products.id),
   rating: smallint("rating").notNull(),
   body: text("body"),
-  createdAt: timestamp("created_at").notNull().defaultNow(),
-  updatedAt: timestamp("updated_at"),
-  deletedAt: timestamp("deleted_at"),
+  createdAt: timestamptz("created_at").notNull().defaultNow(),
+  updatedAt: timestamptz("updated_at"),
+  deletedAt: timestamptz("deleted_at"),
 });
 
 export const winemakerReviews = pgTable("winemaker_reviews", {
@@ -28,7 +29,7 @@ export const winemakerReviews = pgTable("winemaker_reviews", {
     .references(() => winemakers.id),
   rating: smallint("rating").notNull(),
   body: text("body"),
-  createdAt: timestamp("created_at").notNull().defaultNow(),
-  updatedAt: timestamp("updated_at"),
-  deletedAt: timestamp("deleted_at"),
+  createdAt: timestamptz("created_at").notNull().defaultNow(),
+  updatedAt: timestamptz("updated_at"),
+  deletedAt: timestamptz("deleted_at"),
 });
