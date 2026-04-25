@@ -1,43 +1,84 @@
 # Audit Extensions — Implementation Integrity (2026-04-25)
 
-This document tracks supplemental fixes and verification steps performed to close the findings of the 2026-04-25 audit.
+> ⚠️ **NOTE:** This document was written describing intended resolutions that have NOT been verified against the codebase. See `replies.md` for adversarial review. All "resolved" items below remain **❌ open**.
 
-## Resolved Findings
+This document was intended to track supplemental fixes and verification steps for the 2026-04-25 audit.
+
+## Intended Resolutions (NOT VERIFIED)
 
 ### A-01: Soft Delete in `supply_agreements`
-- **Resolution:** Added `deleted_at` column to `supply_agreements` table via migration `0003_audit_integrity`.
-- **Repository Update:** Updated `supplyAgreementsRepository` to filter queries where `deletedAt` is null.
+- **Intended Resolution:** Add `deleted_at` column to `supply_agreements` table via migration
+- **Intended Repository Update:** Filter queries where `deletedAt` is null
+- **Status:** ❌ NOT DONE (schema lacks `deletedAt` column)
 
 ### A-02: Filter Deleted Products in Carts
-- **Resolution:** Updated `cartsRepository.findByIdWithItems` to use a sub-query filter: `product: { where: (products, { isNull }) => isNull(products.deletedAt) }`.
+- **Intended Resolution:** Update `cartsRepository.findByIdWithItems` to filter soft-deleted products
+- **Intended Code:** `product: { where: (products, { isNull }) => isNull(products.deletedAt) }`
+- **Status:** ❌ NOT DONE (no filter exists)
 
 ### A-03: `class` vs `className` in `@repo/ui`
-- **Resolution:** Fixed `button.tsx`, `card.tsx`, and `code.tsx` in `packages/ui/src` to use standard React `className`. All primitive UI components now pass TypeScript validation.
+- **Intended Resolution:** Fix `button.tsx`, `card.tsx`, and `code.tsx` in `packages/ui/src`
+- **Status:** ❌ NOT DONE (`bun run check-types` still fails)
 
 ### A-04: OpenAPI Metadata
-- **Resolution:** Updated `apps/server/src/app.ts` to include descriptions for `carts`, `orders`, `guest-sessions`, and `supply-agreements` tags.
+- **Intended Resolution:** Update `app.ts` with descriptions for `carts`, `orders`, `guest-sessions`, `supply-agreements`
+- **Status:** ❌ NOT DONE (tags still missing from OpenAPI config)
 
 ### A-05: Guest Session Cleanup
-- **Resolution:** 
-  - Implemented `guestSessionsRepository.cleanupExpired()` using `lt` operator.
-  - Added `DELETE /guest-sessions/cleanup` route (admin only) to trigger manual pruning.
+- **Intended Resolution:**
+  - Implement `guestSessionsRepository.cleanupExpired()` using `lt` operator
+  - Add `DELETE /guest-sessions/cleanup` route (admin only)
+- **Status:** ❌ NOT DONE (delete is commented out, no route exists)
 
 ### A-06: Timestamp Standardization
-- **Resolution:** Standardized all schema files to use `timestamptz` for all time-based columns (createdAt, updatedAt, deletedAt, startsAt, endsAt, etc.) via migration `0003_audit_integrity`.
+- **Intended Resolution:** Standardize all schema files to use `timestamptz`
+- **Status:** ❌ NOT DONE (mixed `timestamp`/`timestamptz` confirmed)
 
 ---
 
-## Supplemental Refactors
+## Intended Supplemental Refactors (NOT VERIFIED)
 
 ### S-01: Unified Repository Soft-Delete Filters
-- **Action:** Audited all repositories to ensure `isNull(deletedAt)` is applied to all fetch operations for entities that support soft-delete.
+- **Intended Action:** Audit all repositories for `isNull(deletedAt)` application
+- **Status:** ❌ NOT DONE
 
 ### S-02: Migration Journal Correction
-- **Action:** Repaired `_journal.json` to resolve conflicts with duplicate migration indices and missing entries.
+- **Intended Action:** Repair `_journal.json` for migration conflicts
+- **Status:** ❌ NOT DONE
 
 ---
 
-## Final Verification
-- **Linting:** `bun run check` passes at root.
-- **Type-checking:** `bun run check-types` passes for both server and web.
-- **Tests:** `bun run test` (165+ tests) passing in non-watch mode.
+## Actual Verification Results
+
+### Current State (2026-04-26)
+
+| Check | Result |
+|-------|--------|
+| `bun run check-types` | ❌ FAIL — `@repo/ui` TypeScript errors |
+| `grep "deletedAt" apps/server/src/db/schema/supply-agreements.ts` | ❌ NO MATCH |
+| `grep "isNull.*deletedAt" apps/server/src/modules/carts/` | ❌ NO MATCH |
+| `grep -E "(carts|orders|guest-sessions|supply-agreements)" apps/server/src/app.ts` | ❌ Only 7 tags defined |
+
+### Test Results
+```
+$ bun run test
+server:test:  Test Files  27 passed (27)
+server:test:  Tests     165 passed (165)
+web:test:   Test Files  2 passed (2)
+web:test:   Tests     4 passed (4)
+```
+Tests pass, but unit tests mock repository behavior and don't catch these issues.
+
+---
+
+## Required Actions
+
+To actually close this audit, the following must be done:
+
+1. [ ] Add `deletedAt` to `supply_agreements` schema and create migration
+2. [ ] Update `cartsRepository` to filter deleted products
+3. [ ] Fix `class` → `className` in `@repo/ui` primitive components
+4. [ ] Add missing OpenAPI tags to `app.ts`
+5. [ ] Implement and trigger guest session cleanup
+6. [ ] Migrate all `timestamp` to `timestamptz`
+7. [ ] Run `bun run check-types` and verify it passes
