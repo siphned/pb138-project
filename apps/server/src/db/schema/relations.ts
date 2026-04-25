@@ -3,10 +3,10 @@ import { addresses } from "./addresses";
 import { availabilityExceptions, availabilityRegular } from "./availability";
 import { cartItems, carts } from "./carts";
 import { products, productWines, wines } from "./catalog";
-import { comments, eventInvites, eventRegistrations, events } from "./events";
+import { eventInvitations, eventRegistrations, events } from "./events";
 import { images } from "./images";
 import { orderItems, orders } from "./orders";
-import { productReviews, winemakerReviews } from "./reviews";
+import { comments, reviews } from "./reviews";
 import { roleRequests } from "./role-requests";
 import { shops, winemakers } from "./sellers";
 import { users } from "./users";
@@ -36,8 +36,7 @@ export const usersRelations = relations(users, ({ one, many }) => ({
   shops: many(shops),
   cart: one(carts),
   orders: many(orders),
-  productReviews: many(productReviews),
-  winemakerReviews: many(winemakerReviews),
+  reviews: many(reviews),
   comments: many(comments),
   roleRequests: many(roleRequests, { relationName: "roleRequestUser" }),
   reviewedRoleRequests: many(roleRequests, { relationName: "roleRequestReviewer" }),
@@ -51,8 +50,6 @@ export const winemakersRelations = relations(winemakers, ({ one, many }) => ({
   events: many(events),
   availabilityRegular: many(availabilityRegular),
   availabilityExceptions: many(availabilityExceptions),
-  eventInvites: many(eventInvites),
-  winemakerReviews: many(winemakerReviews),
 }));
 
 export const winesRelations = relations(wines, ({ one, many }) => ({
@@ -74,7 +71,7 @@ export const productsRelations = relations(products, ({ one, many }) => ({
   productWines: many(productWines),
   cartItems: many(cartItems),
   orderItems: many(orderItems),
-  reviews: many(productReviews),
+  reviews: many(reviews),
 }));
 
 export const productWinesRelations = relations(productWines, ({ one }) => ({
@@ -111,17 +108,17 @@ export const cartItemsRelations = relations(cartItems, ({ one }) => ({
 export const eventsRelations = relations(events, ({ one, many }) => ({
   winemaker: one(winemakers, { fields: [events.winemakerId], references: [winemakers.id] }),
   address: one(addresses, { fields: [events.addressId], references: [addresses.id] }),
-  invites: many(eventInvites),
-  comments: many(comments),
+  invitations: many(eventInvitations),
   registrations: many(eventRegistrations),
 }));
 
-export const eventInvitesRelations = relations(eventInvites, ({ one }) => ({
-  event: one(events, { fields: [eventInvites.eventId], references: [events.id] }),
-  winemaker: one(winemakers, {
-    fields: [eventInvites.winemakerIdInvited],
-    references: [winemakers.id],
-  }),
+export const eventInvitationsRelations = relations(eventInvitations, ({ one }) => ({
+  event: one(events, { fields: [eventInvitations.eventId], references: [events.id] }),
+}));
+
+export const eventRegistrationsRelations = relations(eventRegistrations, ({ one }) => ({
+  event: one(events, { fields: [eventRegistrations.eventId], references: [events.id] }),
+  user: one(users, { fields: [eventRegistrations.userId], references: [users.id] }),
 }));
 
 export const ordersRelations = relations(orders, ({ one, many }) => ({
@@ -145,22 +142,15 @@ export const orderItemsRelations = relations(orderItems, ({ one }) => ({
   product: one(products, { fields: [orderItems.productId], references: [products.id] }),
 }));
 
+export const reviewsRelations = relations(reviews, ({ one, many }) => ({
+  user: one(users, { fields: [reviews.userId], references: [users.id] }),
+  product: one(products, { fields: [reviews.productId], references: [products.id] }),
+  comments: many(comments),
+}));
+
 export const commentsRelations = relations(comments, ({ one }) => ({
-  event: one(events, { fields: [comments.eventId], references: [events.id] }),
+  review: one(reviews, { fields: [comments.reviewId], references: [reviews.id] }),
   user: one(users, { fields: [comments.userId], references: [users.id] }),
-}));
-
-export const productReviewsRelations = relations(productReviews, ({ one }) => ({
-  user: one(users, { fields: [productReviews.userId], references: [users.id] }),
-  product: one(products, { fields: [productReviews.productId], references: [products.id] }),
-}));
-
-export const winemakerReviewsRelations = relations(winemakerReviews, ({ one }) => ({
-  user: one(users, { fields: [winemakerReviews.userId], references: [users.id] }),
-  winemaker: one(winemakers, {
-    fields: [winemakerReviews.winemakerId],
-    references: [winemakers.id],
-  }),
 }));
 
 export const imagesRelations = relations(images, () => ({}));
@@ -172,7 +162,7 @@ export const roleRequestsRelations = relations(roleRequests, ({ one }) => ({
     relationName: "roleRequestUser",
   }),
   reviewedByAdmin: one(users, {
-    fields: [roleRequests.reviewedByAdminId],
+    fields: [roleRequests.adminUserId],
     references: [users.id],
     relationName: "roleRequestReviewer",
   }),

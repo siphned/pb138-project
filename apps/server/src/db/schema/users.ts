@@ -1,5 +1,6 @@
-import { pgTable, text, timestamp, uuid, varchar } from "drizzle-orm/pg-core";
+import { pgTable, text, uuid, varchar } from "drizzle-orm/pg-core";
 import { addresses } from "./addresses";
+import { timestamptz } from "./helpers";
 
 export const users = pgTable("users", {
   id: uuid("id").primaryKey().defaultRandom(),
@@ -9,7 +10,7 @@ export const users = pgTable("users", {
   email: text("email").notNull().unique(),
   shippingAddressId: uuid("shipping_address_id").references(() => addresses.id),
   billingAddressId: uuid("billing_address_id").references(() => addresses.id),
-  createdAt: timestamp("created_at").notNull().defaultNow(),
-  updatedAt: timestamp("updated_at"),
-  deletedAt: timestamp("deleted_at"),
+  createdAt: timestamptz("created_at").notNull().defaultNow(),
+  updatedAt: timestamptz("updated_at"),
+  deletedAt: timestamptz("deleted_at"),
 });

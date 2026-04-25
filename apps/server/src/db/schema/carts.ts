@@ -14,6 +14,7 @@ export const carts = pgTable("carts", {
     .references(() => guestSessions.id),
   createdAt: timestamptz("created_at").notNull().defaultNow(),
   updatedAt: timestamptz("updated_at").notNull().defaultNow(),
+  deletedAt: timestamptz("deleted_at"),
 });
 
 export const cartItems = pgTable(
@@ -29,6 +30,7 @@ export const cartItems = pgTable(
     quantity: smallint("quantity").notNull(),
     createdAt: timestamptz("created_at").notNull().defaultNow(),
     updatedAt: timestamptz("updated_at").notNull().defaultNow(),
+    deletedAt: timestamptz("deleted_at"),
   },
   (t) => ({
     unq: uniqueIndex("cart_items_cart_id_product_id_key").on(t.cartId, t.productId),

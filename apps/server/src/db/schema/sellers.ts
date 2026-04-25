@@ -1,5 +1,6 @@
-import { pgTable, text, timestamp, uuid, varchar } from "drizzle-orm/pg-core";
+import { pgTable, text, uuid, varchar } from "drizzle-orm/pg-core";
 import { addresses } from "./addresses";
+import { timestamptz } from "./helpers";
 import { users } from "./users";
 
 export const winemakers = pgTable("winemakers", {
@@ -8,17 +9,17 @@ export const winemakers = pgTable("winemakers", {
     .notNull()
     .unique()
     .references(() => users.id),
-  name: text("name").notNull().unique(),
+  name: varchar("name", { length: 255 }).notNull(),
   description: text("description").notNull(),
-  websiteUrl: text("websiteurl"),
-  email: varchar("email", { length: 255 }).notNull(),
-  phone: varchar("phone", { length: 30 }).notNull(),
+  websiteUrl: text("website_url"),
+  phone: varchar("phone", { length: 20 }),
+  email: text("email"),
   addressId: uuid("address_id")
     .notNull()
     .references(() => addresses.id),
-  createdAt: timestamp("created_at").notNull().defaultNow(),
-  updatedAt: timestamp("updated_at"),
-  deletedAt: timestamp("deleted_at"),
+  createdAt: timestamptz("created_at").notNull().defaultNow(),
+  updatedAt: timestamptz("updated_at"),
+  deletedAt: timestamptz("deleted_at"),
 });
 
 export const shops = pgTable("shops", {
@@ -31,7 +32,7 @@ export const shops = pgTable("shops", {
   addressId: uuid("address_id")
     .notNull()
     .references(() => addresses.id),
-  createdAt: timestamp("created_at").notNull().defaultNow(),
-  updatedAt: timestamp("updated_at"),
-  deletedAt: timestamp("deleted_at"),
+  createdAt: timestamptz("created_at").notNull().defaultNow(),
+  updatedAt: timestamptz("updated_at"),
+  deletedAt: timestamptz("deleted_at"),
 });

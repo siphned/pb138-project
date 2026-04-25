@@ -1,9 +1,9 @@
-import { pgTable, smallint, text, timestamp, uuid } from "drizzle-orm/pg-core";
+import { pgTable, smallint, text, uuid } from "drizzle-orm/pg-core";
 import { products } from "./catalog";
-import { winemakers } from "./sellers";
+import { timestamptz } from "./helpers";
 import { users } from "./users";
 
-export const productReviews = pgTable("product_reviews", {
+export const reviews = pgTable("reviews", {
   id: uuid("id").primaryKey().defaultRandom(),
   userId: uuid("user_id")
     .notNull()
@@ -12,23 +12,22 @@ export const productReviews = pgTable("product_reviews", {
     .notNull()
     .references(() => products.id),
   rating: smallint("rating").notNull(),
-  body: text("body"),
-  createdAt: timestamp("created_at").notNull().defaultNow(),
-  updatedAt: timestamp("updated_at"),
-  deletedAt: timestamp("deleted_at"),
+  comment: text("comment"),
+  createdAt: timestamptz("created_at").notNull().defaultNow(),
+  updatedAt: timestamptz("updated_at"),
+  deletedAt: timestamptz("deleted_at"),
 });
 
-export const winemakerReviews = pgTable("winemaker_reviews", {
+export const comments = pgTable("comments", {
   id: uuid("id").primaryKey().defaultRandom(),
   userId: uuid("user_id")
     .notNull()
     .references(() => users.id),
-  winemakerId: uuid("winemaker_id")
+  reviewId: uuid("review_id")
     .notNull()
-    .references(() => winemakers.id),
-  rating: smallint("rating").notNull(),
-  body: text("body"),
-  createdAt: timestamp("created_at").notNull().defaultNow(),
-  updatedAt: timestamp("updated_at"),
-  deletedAt: timestamp("deleted_at"),
+    .references(() => reviews.id),
+  text: text("text").notNull(),
+  createdAt: timestamptz("created_at").notNull().defaultNow(),
+  updatedAt: timestamptz("updated_at"),
+  deletedAt: timestamptz("deleted_at"),
 });

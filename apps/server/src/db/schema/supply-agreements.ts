@@ -1,5 +1,6 @@
-import { pgTable, timestamp, uuid } from "drizzle-orm/pg-core";
+import { pgTable, uuid } from "drizzle-orm/pg-core";
 import { supplyAgreementStatusEnum } from "./enums";
+import { timestamptz } from "./helpers";
 import { shops, winemakers } from "./sellers";
 
 export const supplyAgreements = pgTable("supply_agreements", {
@@ -11,6 +12,7 @@ export const supplyAgreements = pgTable("supply_agreements", {
     .notNull()
     .references(() => winemakers.id),
   status: supplyAgreementStatusEnum("status").notNull().default("pending"),
-  createdAt: timestamp("created_at").notNull().defaultNow(),
-  respondedAt: timestamp("responded_at"),
+  createdAt: timestamptz("created_at").notNull().defaultNow(),
+  respondedAt: timestamptz("responded_at"),
+  deletedAt: timestamptz("deleted_at"),
 });
