@@ -11,6 +11,9 @@ export default defineConfig({
     react(),
     tailwindcss(),
   ],
+  test: {
+    environment: "jsdom",
+  },
   server: {
     proxy: {
       "/profile": "http://localhost:3000",

@@ -1,7 +1,7 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
-import { db } from "../../db";
-import { cartItems, carts } from "../../db/schema";
 import { cartsRepository } from "./carts.repository";
+import { db } from "../../db";
+import { carts, cartItems } from "../../db/schema";
 
 interface MockChained {
   from: () => MockChained;
@@ -22,6 +22,11 @@ interface MockDatabase {
   onConflictDoUpdate: () => MockChained;
   set: () => MockChained;
   where: () => MockChained;
+  query: {
+    carts: {
+      findFirst: vi.Mock;
+    };
+  };
 }
 
 const mockDb = db as unknown as MockDatabase;
@@ -57,8 +62,19 @@ describe("cartsRepository", () => {
     it("delegates to db.query", async () => {
       const mockCart = { id: "c1", userId: "u1" };
       vi.mocked(db.query.carts.findFirst).mockResolvedValue(mockCart as never);
-
+      
       const result = await cartsRepository.findByUserId("u1");
+
+      expect(result).toBe(mockCart);
+    });
+  });
+
+  describe("findBySessionId", () => {
+    it("delegates to db.query", async () => {
+      const mockCart = { id: "c1", sessionId: "s1" };
+      vi.mocked(db.query.carts.findFirst).mockResolvedValue(mockCart as never);
+      
+      const result = await cartsRepository.findBySessionId("s1");
 
       expect(result).toBe(mockCart);
     });
@@ -70,6 +86,33 @@ describe("cartsRepository", () => {
 
       expect(db.insert).toHaveBeenCalledWith(cartItems);
       expect(mockDb.onConflictDoUpdate).toHaveBeenCalled();
+    });
+  });
+
+  describe("updateItemQuantity", () => {
+    it("updates quantity if > 0", async () => {
+      await cartsRepository.updateItemQuantity("c1", "p1", 5);
+      expect(db.update).toHaveBeenCalledWith(cartItems);
+      expect(db.set).toHaveBeenCalled();
+    });
+
+    it("deletes item if quantity <= 0", async () => {
+      await cartsRepository.updateItemQuantity("c1", "p1", 0);
+      expect(db.delete).toHaveBeenCalledWith(cartItems);
+    });
+  });
+
+  describe("removeItem", () => {
+    it("deletes item from cart_items", async () => {
+      await cartsRepository.removeItem("c1", "p1");
+      expect(db.delete).toHaveBeenCalledWith(cartItems);
+    });
+  });
+
+  describe("clear", () => {
+    it("deletes all items for a cart", async () => {
+      await cartsRepository.clear("c1");
+      expect(db.delete).toHaveBeenCalledWith(cartItems);
     });
   });
 
