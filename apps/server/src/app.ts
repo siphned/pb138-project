@@ -8,6 +8,7 @@ import { ordersRoutes } from "./modules/orders";
 import { eventsRoutes } from "./modules/events";
 import { productsRoutes } from "./modules/products";
 import { roleRequestsRoutes } from "./modules/role-requests";
+import { reviewsRoutes } from "./modules/reviews";
 import { shopsRoutes } from "./modules/shops";
 import { usersRoutes } from "./modules/users";
 import { winemakersRoutes } from "./modules/winemakers";
@@ -35,6 +36,7 @@ export const app = new Elysia()
           { name: "admin", description: "Back-office administration" },
           { name: "wines", description: "Wine catalog CRUD and filtering" },
           { name: "winemakers", description: "Winemaker profiles and portfolios" },
+          { name: "reviews", description: "Product and winemaker reviews & ratings" },
           { name: "carts", description: "Shopping cart management" },
           { name: "orders", description: "Order checkout and lifecycle" },
         ],
@@ -61,5 +63,6 @@ export const app = new Elysia()
   .use(adminRoutes)
   .use(winesRoutes)
   .use(winemakersRoutes)
+  .use(reviewsRoutes)
   .use(cartsRoutes)
   .use(ordersRoutes);
