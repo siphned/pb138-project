@@ -17,7 +17,7 @@ export interface UserProfile {
 
 interface UserContextType {
   user: UserProfile | null;
-  updateUser: (newData: Partial<Pick<UserProfile, "fname" | "lname">>) => Promise<any>;
+  updateUser: (newData: Partial<Pick<UserProfile, "fname" | "lname">>) => Promise<UserProfile>;
   isLoading: boolean;
 }
 
