@@ -1,7 +1,7 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
-import { supplyAgreementsRepository } from "./supply-agreements.repository";
 import { db } from "../../db";
 import { supplyAgreements } from "../../db/schema";
+import { supplyAgreementsRepository } from "./supply-agreements.repository";
 
 interface MockChained {
   from: () => MockChained;

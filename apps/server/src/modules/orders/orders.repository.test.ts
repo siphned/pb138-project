@@ -1,7 +1,7 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
-import { ordersRepository } from "./orders.repository";
 import { db } from "../../db";
-import { orders, orderItems, addresses } from "../../db/schema";
+import { addresses, orderItems, orders } from "../../db/schema";
+import { ordersRepository } from "./orders.repository";
 
 interface MockChained {
   from: () => MockChained;
@@ -62,8 +62,20 @@ describe("ordersRepository", () => {
           totalPrice: "100",
           status: "pending",
           deliveryType: "shipping",
-          shippingAddress: { country: "CZ", city: "B", postalCode: "1", street: "S", houseNumber: "1" },
-          billingAddress: { country: "CZ", city: "B", postalCode: "1", street: "S", houseNumber: "1" },
+          shippingAddress: {
+            country: "CZ",
+            city: "B",
+            postalCode: "1",
+            street: "S",
+            houseNumber: "1",
+          },
+          billingAddress: {
+            country: "CZ",
+            city: "B",
+            postalCode: "1",
+            street: "S",
+            houseNumber: "1",
+          },
         } as never,
         [{ shopId: "s1", productId: "p1", quantity: 1, unitPrice: "90" }]
       );

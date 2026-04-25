@@ -1,7 +1,7 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
-import { cartsRepository } from "./carts.repository";
 import { db } from "../../db";
-import { carts, cartItems } from "../../db/schema";
+import { cartItems, carts } from "../../db/schema";
+import { cartsRepository } from "./carts.repository";
 
 interface MockChained {
   from: () => MockChained;
@@ -57,7 +57,7 @@ describe("cartsRepository", () => {
     it("delegates to db.query", async () => {
       const mockCart = { id: "c1", userId: "u1" };
       vi.mocked(db.query.carts.findFirst).mockResolvedValue(mockCart as never);
-      
+
       const result = await cartsRepository.findByUserId("u1");
 
       expect(result).toBe(mockCart);

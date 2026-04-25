@@ -28,9 +28,9 @@ vi.mock("@clerk/backend", () => ({
   }),
 }));
 
+import { usersRepository } from "../users/users.repository";
 import { roleRequestsRepository } from "./role-requests.repository";
 import { roleRequestsService } from "./role-requests.service";
-import { usersRepository } from "../users/users.repository";
 
 describe("roleRequestsService", () => {
   beforeEach(() => {
@@ -63,9 +63,9 @@ describe("roleRequestsService", () => {
         { requestedRole: "winemaker", status: "pending" },
       ] as never);
 
-      await expect(
-        roleRequestsService.submitRequest(userId, "winemaker", "Other")
-      ).rejects.toThrow("DUPLICATE_REQUEST");
+      await expect(roleRequestsService.submitRequest(userId, "winemaker", "Other")).rejects.toThrow(
+        "DUPLICATE_REQUEST"
+      );
     });
   });
 
@@ -78,7 +78,7 @@ describe("roleRequestsService", () => {
         status: "pending",
       } as never);
       vi.mocked(usersRepository.findById).mockResolvedValue({ clerkId } as never);
-      
+
       await roleRequestsService.approve(requestId, adminId);
 
       expect(mockUpdateUserMetadata).toHaveBeenCalledWith(clerkId, {
