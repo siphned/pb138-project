@@ -51,3 +51,6 @@ yarn-error.log*
 # LLM resources (tracked in git for AI reference)
 # raw/
 .claude/settings*
+
+# local gemini
+GEMINI.md
