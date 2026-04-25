@@ -1,4 +1,5 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
+import type { ClerkPayload } from "../auth/auth.utils";
 
 const { mockGetUser, mockUpdateUser, mockUpdateUserMetadata } = vi.hoisted(() => ({
   mockGetUser: vi.fn(),
@@ -37,10 +38,11 @@ describe("usersService", () => {
   });
 
   const clerkId = "user_123";
-  const payload = (roles: string[]) => ({
-    sub: clerkId,
-    roles,
-  });
+  const payload = (roles: string[]) =>
+    ({
+      sub: clerkId,
+      roles,
+    }) as unknown as ClerkPayload;
 
   describe("lazyGetOrCreate", () => {
     it("returns the existing user and never calls Clerk when the user is already in the DB", async () => {
