@@ -29,10 +29,12 @@ export function ProfileEditForm({ onSuccess, onCancel }: ProfileEditFormProps) {
   const [isSaving, setIsSaving] = useState(false);
 
   useEffect(() => {
-    setFormData({
-      fname: user.fname || "",
-      lname: user.lname || "",
-    });
+    if (user) {
+      setFormData({
+        fname: user.fname || "",
+        lname: user.lname || "",
+      });
+    }
   }, [user]);
 
   const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
