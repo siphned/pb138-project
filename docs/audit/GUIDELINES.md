@@ -15,9 +15,16 @@ An architecture audit is a structured review of the codebase against its design 
 
 ## Audit Document Format
 
-Each audit lives in `docs/audit/` as a single `.md` file named `YYYY-MM-DD-<topic>.md` (e.g. `2026-04-24-architecture-audit.md`).
+Each audit lives in its own folder in `docs/audit/` named `YYYY-MM-DD-<topic>/` (e.g. `docs/audit/2026-04-24-architecture-audit/`).
 
-### Required Sections
+### Folder Contents
+
+- `audit.md`: The primary audit document (follows the format below).
+- `replies.md` (optional): Threaded responses from other team members.
+- `extensions.md` (optional): Supplemental findings or deeper dives added after the initial audit.
+- Any relevant artifacts (diagrams, small logs, etc.).
+
+### `audit.md` Format
 
 ```
 # Audit — <Topic> (<Date>)
