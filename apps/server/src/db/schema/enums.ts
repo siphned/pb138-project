@@ -47,3 +47,4 @@ export const paymentMethodEnum = pgEnum("payment_method", [
   "cash_on_delivery",
 ]);
 export const eventStatusEnum = pgEnum("event_status", ["pending", "approved", "rejected"]);
+export const userStatusEnum = pgEnum("user_status", ["active", "suspended", "banned"]);

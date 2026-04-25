@@ -43,6 +43,13 @@
       "when": 1776942458851,
       "tag": "0005_rare_caretaker",
       "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "7",
+      "when": 1776951585399,
+      "tag": "0006_huge_black_queen",
+      "breakpoints": true
     }
   ]
 }
