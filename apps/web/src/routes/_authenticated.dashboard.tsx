@@ -7,16 +7,34 @@ import { UserInfoCard } from "@/components/dashboard/UserInfoCard";
 import { AuthLayout } from "@/components/layout/AuthLayout";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useUser } from "@/context/UserContext";
+import { useRoles } from "@/hooks/useRoles";
 import { Role } from "@/types/roles";
 
 export const Route = createFileRoute("/_authenticated/dashboard")({
   component: DashboardPage,
 });
 
+function appRoleToDisplayRole(appRoles: ReturnType<typeof useRoles>): Role {
+  if (appRoles.includes("winemaker")) return Role.winemaker;
+  if (appRoles.includes("shop_owner")) return Role.shopOwner;
+  return Role.customer;
+}
+
+function availableRoles(appRoles: ReturnType<typeof useRoles>): Role[] {
+  const roles: Role[] = [];
+  if (appRoles.includes("winemaker") || appRoles.includes("admin")) roles.push(Role.winemaker);
+  if (appRoles.includes("shop_owner") || appRoles.includes("admin")) roles.push(Role.shopOwner);
+  roles.push(Role.customer);
+  return roles;
+}
+
 function DashboardPage() {
   const { isLoading } = useUser();
-  const [currentRole, setCurrentRole] = useState<Role>(Role.winemaker);
+  const appRoles = useRoles();
+  const [currentRole, setCurrentRole] = useState<Role>(() => appRoleToDisplayRole(appRoles));
   const [isEditing, setIsEditing] = useState(false);
+
+  const allowedRoles = availableRoles(appRoles);
 
   const getStatsForRole = (role: Role) => {
     switch (role) {
@@ -53,10 +71,12 @@ function DashboardPage() {
 
   if (isLoading) {
     return (
-      <div class="flex h-screen w-full items-center justify-center bg-background">
-        <div class="flex flex-col items-center gap-4">
-          <div class="h-12 w-12 animate-spin rounded-full border-4 border-primary border-t-transparent" />
-          <p class="text-muted-foreground animate-pulse font-heading">Loading your dashboard...</p>
+      <div className="flex h-screen w-full items-center justify-center bg-background">
+        <div className="flex flex-col items-center gap-4">
+          <div className="h-12 w-12 animate-spin rounded-full border-4 border-primary border-t-transparent" />
+          <p className="text-muted-foreground animate-pulse font-heading">
+            Loading your dashboard...
+          </p>
         </div>
       </div>
     );
@@ -65,9 +85,12 @@ function DashboardPage() {
   return (
     <AuthLayout
       activeRole={currentRole}
-      onRoleChange={(newRole) => setCurrentRole(newRole as Role)}
+      availableRoles={allowedRoles}
+      onRoleChange={(newRole) => {
+        if (allowedRoles.includes(newRole)) setCurrentRole(newRole);
+      }}
     >
-      <div class="space-y-8 pb-12">
+      <div className="space-y-8 pb-12">
         {isEditing ? (
           <ProfileEditForm
             onSuccess={() => setIsEditing(false)}
@@ -77,18 +100,21 @@ function DashboardPage() {
           <>
             <UserInfoCard onEdit={() => setIsEditing(true)} />
 
-            <div class="grid gap-4 grid-cols-1 lg:grid-flow-col lg:auto-cols-fr">
+            <div className="grid gap-4 grid-cols-1 lg:grid-flow-col lg:auto-cols-fr">
               {stats.map((stat) => (
-                <Card key={stat.title} class="border-none shadow-sm bg-secondary/20 rounded-2xl">
-                  <CardHeader class="flex flex-row items-center justify-between pb-2 space-y-0">
-                    <CardTitle class="text-sm font-medium text-muted-foreground">
+                <Card
+                  key={stat.title}
+                  className="border-none shadow-sm bg-secondary/20 rounded-2xl"
+                >
+                  <CardHeader className="flex flex-row items-center justify-between pb-2 space-y-0">
+                    <CardTitle className="text-sm font-medium text-muted-foreground">
                       {stat.title}
                     </CardTitle>
-                    <stat.icon class="w-4 h-4 text-primary" />
+                    <stat.icon className="w-4 h-4 text-primary" />
                   </CardHeader>
                   <CardContent>
-                    <div class="text-2xl font-bold">{stat.value}</div>
-                    <p class="text-xs text-muted-foreground mt-1">{stat.trend}</p>
+                    <div className="text-2xl font-bold">{stat.value}</div>
+                    <p className="text-xs text-muted-foreground mt-1">{stat.trend}</p>
                   </CardContent>
                 </Card>
               ))}

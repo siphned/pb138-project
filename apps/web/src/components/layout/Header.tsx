@@ -7,39 +7,40 @@ import { Sidebar } from "./Sidebar"; // Import your new component here!
 
 interface HeaderProps {
   activeRole?: Role;
+  availableRoles?: Role[];
   onRoleChange?: (role: Role) => void;
 }
 
-export function Header({ activeRole, onRoleChange }: HeaderProps) {
+export function Header({ activeRole, availableRoles, onRoleChange }: HeaderProps) {
   const { user: contextUser } = useUser();
   const fullName = `${contextUser.fname} ${contextUser.lname}`.trim();
   const initials = fullName.substring(0, 2).toUpperCase() || "U";
 
   return (
-    <header class="h-16 border-b bg-background flex items-center justify-between px-6 lg:px-12">
+    <header className="h-16 border-b bg-background flex items-center justify-between px-6 lg:px-12">
       {/* Left: Logo Area */}
-      <div class="flex items-center gap-2 font-heading font-bold text-xl">
-        <div class="h-8 w-8 bg-primary rounded-full flex items-center justify-center text-primary-foreground text-xs">
+      <div className="flex items-center gap-2 font-heading font-bold text-xl">
+        <div className="h-8 w-8 bg-primary rounded-full flex items-center justify-center text-primary-foreground text-xs">
           WE
         </div>
         Wine Enjoyers
       </div>
 
       {/* Right: Icons & Menus */}
-      <div class="flex items-center gap-4">
-        <Button variant="ghost" size="icon" class="hidden sm:flex">
-          <Search class="h-5 w-5" />
+      <div className="flex items-center gap-4">
+        <Button variant="ghost" size="icon" className="hidden sm:flex">
+          <Search className="h-5 w-5" />
         </Button>
-        <Button variant="ghost" size="icon" class="hidden sm:flex">
-          <ShoppingCart class="h-5 w-5" />
+        <Button variant="ghost" size="icon" className="hidden sm:flex">
+          <ShoppingCart className="h-5 w-5" />
         </Button>
 
         <a
           href="/profile"
-          class="rounded-full focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2"
+          className="rounded-full focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2"
         >
-          <Avatar class="h-9 w-9 hover:opacity-80 transition-opacity">
-            <AvatarFallback class="bg-secondary text-secondary-foreground">
+          <Avatar className="h-9 w-9 hover:opacity-80 transition-opacity">
+            <AvatarFallback className="bg-secondary text-secondary-foreground">
               {initials}
             </AvatarFallback>
           </Avatar>
@@ -47,7 +48,7 @@ export function Header({ activeRole, onRoleChange }: HeaderProps) {
 
         {/* Drop the Sidebar right here! */}
         <Sidebar
-          userRoles={[Role.winemaker, Role.shopOwner, Role.customer]}
+          userRoles={availableRoles ?? [Role.customer]}
           activeRole={activeRole}
           onRoleChange={onRoleChange}
         />

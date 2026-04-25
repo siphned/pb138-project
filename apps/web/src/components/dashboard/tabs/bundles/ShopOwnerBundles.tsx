@@ -43,13 +43,13 @@ export function ShopOwnerBundles() {
   return (
     <>
       {/* Header Controls */}
-      <div class="flex flex-col md:flex-row items-start md:items-center justify-between mb-8 gap-4">
-        <div class="flex items-center gap-2 font-heading text-xl font-semibold text-primary">
-          <Package class="h-5 w-5" /> Shop Bundles
+      <div className="flex flex-col md:flex-row items-start md:items-center justify-between mb-8 gap-4">
+        <div className="flex items-center gap-2 font-heading text-xl font-semibold text-primary">
+          <Package className="h-5 w-5" /> Shop Bundles
         </div>
-        <div class="flex items-center w-full md:w-auto">
+        <div className="flex items-center w-full md:w-auto">
           <Select defaultValue="all">
-            <SelectTrigger class="w-full sm:w-[180px] bg-background border-none rounded-lg h-10">
+            <SelectTrigger className="w-full sm:w-[180px] bg-background border-none rounded-lg h-10">
               <SelectValue placeholder="Filter by Winemaker" />
             </SelectTrigger>
             <SelectContent>
@@ -62,35 +62,41 @@ export function ShopOwnerBundles() {
       </div>
 
       {/* --- DESKTOP VIEW --- */}
-      <div class="hidden md:block overflow-x-auto">
+      <div className="hidden md:block overflow-x-auto">
         <Table>
           <TableHeader>
-            <TableRow class="border-border/50 hover:bg-transparent">
-              <TableHead class="text-muted-foreground font-medium">Bundle Name</TableHead>
-              <TableHead class="text-muted-foreground font-medium">Winemaker / Brand</TableHead>
-              <TableHead class="text-muted-foreground font-medium text-center">
+            <TableRow className="border-border/50 hover:bg-transparent">
+              <TableHead className="text-muted-foreground font-medium">Bundle Name</TableHead>
+              <TableHead className="text-muted-foreground font-medium">Winemaker / Brand</TableHead>
+              <TableHead className="text-muted-foreground font-medium text-center">
                 Available Qty
               </TableHead>
-              <TableHead class="text-muted-foreground font-medium text-center">
+              <TableHead className="text-muted-foreground font-medium text-center">
                 Retail Price
               </TableHead>
-              <TableHead class="text-muted-foreground font-medium text-center">Status</TableHead>
-              <TableHead class="text-muted-foreground font-medium text-right">Actions</TableHead>
+              <TableHead className="text-muted-foreground font-medium text-center">
+                Status
+              </TableHead>
+              <TableHead className="text-muted-foreground font-medium text-right">
+                Actions
+              </TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
             {shopBundlesData.map((bundle) => (
-              <TableRow key={bundle.id} class="border-border/50 border-b">
-                <TableCell class="font-medium text-sm">{bundle.name}</TableCell>
-                <TableCell class="text-muted-foreground text-sm">{bundle.winemaker}</TableCell>
-                <TableCell class="text-center font-medium text-sm">{bundle.creatableQty}</TableCell>
-                <TableCell class="text-center font-medium text-sm">{bundle.price}</TableCell>
-                <TableCell class="text-center">
-                  <Badge class={`${bundle.badgeClasses} border-none`}>{bundle.status}</Badge>
+              <TableRow key={bundle.id} className="border-border/50 border-b">
+                <TableCell className="font-medium text-sm">{bundle.name}</TableCell>
+                <TableCell className="text-muted-foreground text-sm">{bundle.winemaker}</TableCell>
+                <TableCell className="text-center font-medium text-sm">
+                  {bundle.creatableQty}
                 </TableCell>
-                <TableCell class="text-right">
-                  <Button variant="ghost" size="icon" class="h-8 w-8 text-muted-foreground">
-                    <MoreHorizontal class="h-4 w-4" />
+                <TableCell className="text-center font-medium text-sm">{bundle.price}</TableCell>
+                <TableCell className="text-center">
+                  <Badge className={`${bundle.badgeClasses} border-none`}>{bundle.status}</Badge>
+                </TableCell>
+                <TableCell className="text-right">
+                  <Button variant="ghost" size="icon" className="h-8 w-8 text-muted-foreground">
+                    <MoreHorizontal className="h-4 w-4" />
                   </Button>
                 </TableCell>
               </TableRow>
@@ -100,33 +106,33 @@ export function ShopOwnerBundles() {
       </div>
 
       {/* --- MOBILE VIEW --- */}
-      <div class="md:hidden flex flex-col">
+      <div className="md:hidden flex flex-col">
         {shopBundlesData.map((bundle) => (
           <div
             key={bundle.id}
-            class="flex justify-between py-5 border-b border-border/50 last:border-0"
+            className="flex justify-between py-5 border-b border-border/50 last:border-0"
           >
-            <div class="flex flex-col gap-1.5 w-full pr-4">
-              <span class="font-heading font-semibold text-[15px] truncate">{bundle.name}</span>
-              <span class="text-xs text-muted-foreground font-medium truncate">
+            <div className="flex flex-col gap-1.5 w-full pr-4">
+              <span className="font-heading font-semibold text-[15px] truncate">{bundle.name}</span>
+              <span className="text-xs text-muted-foreground font-medium truncate">
                 {bundle.winemaker}
               </span>
-              <div class="flex items-center gap-3 pt-1.5">
-                <Badge class={`${bundle.badgeClasses} border-none px-2 py-0.5 text-[10px]`}>
+              <div className="flex items-center gap-3 pt-1.5">
+                <Badge className={`${bundle.badgeClasses} border-none px-2 py-0.5 text-[10px]`}>
                   {bundle.status}
                 </Badge>
-                <span class="text-xs font-medium text-muted-foreground">
+                <span className="text-xs font-medium text-muted-foreground">
                   Qty: {bundle.creatableQty}
                 </span>
-                <span class="text-sm font-semibold ml-auto">{bundle.price}</span>
+                <span className="text-sm font-semibold ml-auto">{bundle.price}</span>
               </div>
             </div>
             <Button
               variant="ghost"
               size="icon"
-              class="h-8 w-8 shrink-0 -mr-2 text-muted-foreground"
+              className="h-8 w-8 shrink-0 -mr-2 text-muted-foreground"
             >
-              <MoreHorizontal class="h-5 w-5" />
+              <MoreHorizontal className="h-5 w-5" />
             </Button>
           </div>
         ))}

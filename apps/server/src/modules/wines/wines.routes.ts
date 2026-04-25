@@ -76,7 +76,7 @@ export const winesRoutes = new Elysia()
       }
     },
     {
-      requireAuth: true,
+      requireRoles: ["winemaker", "admin"],
       params: t.Object({ id: t.String() }),
       body: updateWineBody,
       response: { 200: wineResponse, 403: t.String(), 404: t.String() },
@@ -104,7 +104,7 @@ export const winesRoutes = new Elysia()
       }
     },
     {
-      requireAuth: true,
+      requireRoles: ["winemaker", "admin"],
       params: t.Object({ id: t.String() }),
       response: { 204: t.Null(), 403: t.String(), 404: t.String() },
       detail: {

@@ -15,5 +15,5 @@ export function EventsTab({ role }: { role: Role }) {
     }
   };
 
-  return <div class="">{renderEventsContent()}</div>;
+  return <div className="">{renderEventsContent()}</div>;
 }

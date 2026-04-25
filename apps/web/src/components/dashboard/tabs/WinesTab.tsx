@@ -14,5 +14,5 @@ export function WinesTab({ role }: { role: Role }) {
         return <WinemakerInventory />;
     }
   };
-  return <div class="">{renderTableContent()}</div>;
+  return <div className="">{renderTableContent()}</div>;
 }

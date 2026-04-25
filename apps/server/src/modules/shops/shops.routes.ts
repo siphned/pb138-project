@@ -79,7 +79,7 @@ export const shopsRoutes = new Elysia()
       }
     },
     {
-      requireAuth: true,
+      requireRoles: ["shop_owner", "admin"],
       params: t.Object({ id: t.String() }),
       body: updateShopBody,
       response: { 200: shopResponse, 403: t.String(), 404: t.String() },

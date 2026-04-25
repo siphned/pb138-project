@@ -9,22 +9,71 @@ const cartItemSchema = t.Object({
   quantity: t.Integer(),
 });
 
+const productInCart = t.Object({
+  id: t.String(),
+  shopId: t.String(),
+  name: t.String(),
+  description: t.Union([t.String(), t.Null()]),
+  price: t.String(),
+  quantity: t.Integer(),
+  isBundle: t.Boolean(),
+  createdAt: t.Date(),
+  updatedAt: t.Union([t.Date(), t.Null()]),
+  deletedAt: t.Union([t.Date(), t.Null()]),
+});
+
+const cartItemResponse = t.Object({
+  id: t.String(),
+  cartId: t.String(),
+  productId: t.String(),
+  quantity: t.Integer(),
+  createdAt: t.Date(),
+  updatedAt: t.Date(),
+  deletedAt: t.Union([t.Date(), t.Null()]),
+  product: productInCart,
+});
+
+const cartResponse = t.Object({
+  id: t.String(),
+  userId: t.Union([t.String(), t.Null()]),
+  sessionId: t.Union([t.String(), t.Null()]),
+  createdAt: t.Date(),
+  updatedAt: t.Date(),
+  deletedAt: t.Union([t.Date(), t.Null()]),
+  items: t.Array(cartItemResponse),
+});
+
 export const cartsRoutes = new Elysia({ prefix: "/carts", tags: ["carts"] })
   .use(authPlugin)
   .derive(async ({ headers, cookie: { guest_session_id } }) => {
     const payload = await verifyClerkToken(headers.authorization);
     if (payload) {
       const dbUser = await usersService.lazyGetOrCreate(payload.sub, payload);
+      const guestSessionId = guest_session_id?.value;
+      if (typeof guestSessionId === "string") {
+        await cartsService.mergeOnLogin(dbUser.id, guestSessionId);
+        guest_session_id?.remove();
+      }
       return { user: dbUser, sessionId: undefined as string | undefined };
     }
     return { user: undefined, sessionId: guest_session_id?.value as string | undefined };
   })
 
-  .get("/", async ({ user, sessionId }) => {
-    if (user) return await cartsService.getCartForUser(user.id);
-    if (sessionId) return await cartsService.getCartForSession(sessionId);
-    return status(400, "No user or session found");
-  })
+  .get(
+    "/",
+    async ({ user, sessionId }) => {
+      if (user) return (await cartsService.getCartForUser(user.id)) ?? null;
+      if (sessionId) return (await cartsService.getCartForSession(sessionId)) ?? null;
+      return status(400, "No user or session found");
+    },
+    {
+      response: { 200: t.Union([cartResponse, t.Null()]), 400: t.String() },
+      detail: {
+        summary: "Get current cart",
+        description: "Returns the cart for the authenticated user or guest session.",
+      },
+    }
+  )
 
   .post(
     "/items",
@@ -34,6 +83,10 @@ export const cartsRoutes = new Elysia({ prefix: "/carts", tags: ["carts"] })
     },
     {
       body: cartItemSchema,
+      response: { 201: t.String() },
+      detail: {
+        summary: "Add item to cart",
+      },
     }
   )
 
@@ -50,10 +103,24 @@ export const cartsRoutes = new Elysia({ prefix: "/carts", tags: ["carts"] })
     {
       params: t.Object({ productId: t.String() }),
       body: t.Object({ quantity: t.Integer() }),
+      response: { 200: t.String() },
+      detail: {
+        summary: "Update item quantity",
+      },
     }
   )
 
-  .delete("/items/:productId", async ({ user, sessionId, params }) => {
-    await cartsService.removeItem({ userId: user?.id, sessionId }, params.productId);
-    return status(204, null);
-  });
+  .delete(
+    "/items/:productId",
+    async ({ user, sessionId, params }) => {
+      await cartsService.removeItem({ userId: user?.id, sessionId }, params.productId);
+      return status(204, null);
+    },
+    {
+      params: t.Object({ productId: t.String() }),
+      response: { 204: t.Null() },
+      detail: {
+        summary: "Remove item from cart",
+      },
+    }
+  );

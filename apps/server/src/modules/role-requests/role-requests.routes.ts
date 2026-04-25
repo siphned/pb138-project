@@ -28,11 +28,14 @@ export const roleRequestsRoutes = new Elysia({
     "/",
     async ({ dbUser, body }) => {
       try {
-        return await roleRequestsService.submitRequest(
-          dbUser.id,
-          body.type,
-          body.businessName,
-          body.details
+        return status(
+          201,
+          await roleRequestsService.submitRequest(
+            dbUser.id,
+            body.type,
+            body.businessName,
+            body.details
+          )
         );
       } catch (e: unknown) {
         if (e instanceof Error && e.message === "ALREADY_HAS_PENDING_REQUEST") {
@@ -44,7 +47,7 @@ export const roleRequestsRoutes = new Elysia({
     {
       requireAuth: true,
       body: roleRequestBody,
-      response: { 200: roleRequestResponse, 409: t.String() },
+      response: { 201: roleRequestResponse, 409: t.String() },
       detail: {
         summary: "Submit a role request",
         description: "Submit a request to become a winemaker or shop owner.",

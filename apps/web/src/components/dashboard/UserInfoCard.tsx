@@ -19,20 +19,20 @@ export function UserInfoCard({ onEdit }: { onEdit?: () => void }) {
   const initials = fullName.substring(0, 2).toUpperCase();
 
   return (
-    <Card class="bg-secondary/40 border-none shadow-none rounded-3xl">
-      <CardContent class="p-6 md:p-8">
-        <div class="flex flex-col md:flex-row gap-6 md:gap-8 items-start">
-          <Avatar class="h-24 w-24 md:h-28 md:w-28 flex-none">
-            <AvatarFallback class="bg-primary text-primary-foreground font-heading text-2xl font-medium">
+    <Card className="bg-secondary/40 border-none shadow-none rounded-3xl">
+      <CardContent className="p-6 md:p-8">
+        <div className="flex flex-col md:flex-row gap-6 md:gap-8 items-start">
+          <Avatar className="h-24 w-24 md:h-28 md:w-28 flex-none">
+            <AvatarFallback className="bg-primary text-primary-foreground font-heading text-2xl font-medium">
               {initials}
             </AvatarFallback>
           </Avatar>
 
-          <div class="flex-1 flex flex-col gap-4 w-full">
-            <div class="flex flex-col sm:flex-row sm:items-start justify-between gap-4">
-              <div class="space-y-1.5">
-                <h1 class="font-heading text-2xl md:text-3xl font-semibold">{fullName}</h1>
-                <div class="flex flex-wrap items-center gap-3 text-sm text-muted-foreground">
+          <div className="flex-1 flex flex-col gap-4 w-full">
+            <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-4">
+              <div className="space-y-1.5">
+                <h1 className="font-heading text-2xl md:text-3xl font-semibold">{fullName}</h1>
+                <div className="flex flex-wrap items-center gap-3 text-sm text-muted-foreground">
                   <span>{user.email}</span>
                 </div>
               </div>
@@ -43,7 +43,7 @@ export function UserInfoCard({ onEdit }: { onEdit?: () => void }) {
                   render={
                     <Button
                       variant="outline"
-                      class="bg-background shrink-0 rounded-full px-5"
+                      className="bg-background shrink-0 rounded-full px-5"
                       onClick={(e) => {
                         if (onEdit) {
                           e.preventDefault();
@@ -51,14 +51,14 @@ export function UserInfoCard({ onEdit }: { onEdit?: () => void }) {
                         }
                       }}
                     >
-                      <Pencil class="h-4 w-4 mr-2" />
+                      <Pencil className="h-4 w-4 mr-2" />
                       Edit Profile
                     </Button>
                   }
                 />
 
                 {/* 5. RENDER THE FORM INSIDE THE DIALOG CONTENT */}
-                <DialogContent class="sm:max-w-2xl bg-background border-border p-0 overflow-hidden rounded-3xl">
+                <DialogContent className="sm:max-w-2xl bg-background border-border p-0 overflow-hidden rounded-3xl">
                   {/* Notice how it is properly rendered with < /> */}
                   <ProfileEditForm
                     onCancel={() => setIsEditDialogOpen(false)}

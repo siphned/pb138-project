@@ -74,13 +74,13 @@ export function CustomerOrderHistory() {
 
   return (
     <>
-      <div class="flex flex-col md:flex-row items-start md:items-center justify-between mb-8 gap-4">
-        <div class="flex items-center gap-2 font-heading text-xl font-semibold text-primary">
-          <ShoppingBag class="h-5 w-5" /> Past Orders
+      <div className="flex flex-col md:flex-row items-start md:items-center justify-between mb-8 gap-4">
+        <div className="flex items-center gap-2 font-heading text-xl font-semibold text-primary">
+          <ShoppingBag className="h-5 w-5" /> Past Orders
         </div>
-        <div class="flex w-full md:w-auto">
+        <div className="flex w-full md:w-auto">
           <Select value={timeframe} onValueChange={(val) => setTimeframe(val || "6months")}>
-            <SelectTrigger class="w-full sm:w-40 bg-background border-none rounded-lg h-10 focus:ring-1 focus:ring-primary/20">
+            <SelectTrigger className="w-full sm:w-40 bg-background border-none rounded-lg h-10 focus:ring-1 focus:ring-primary/20">
               <SelectValue placeholder="Timeframe" />
             </SelectTrigger>
             <SelectContent>
@@ -95,31 +95,35 @@ export function CustomerOrderHistory() {
       {filteredOrders.length > 0 ? (
         <>
           {/* --- DESKTOP VIEW --- */}
-          <div class="hidden md:block overflow-x-auto">
+          <div className="hidden md:block overflow-x-auto">
             <Table>
               <TableHeader>
-                <TableRow class="border-border/50 hover:bg-transparent">
-                  <TableHead class="text-muted-foreground font-medium">Order ID</TableHead>
-                  <TableHead class="text-muted-foreground font-medium">Date</TableHead>
-                  <TableHead class="text-muted-foreground font-medium text-center">Items</TableHead>
-                  <TableHead class="text-muted-foreground font-medium text-center">
+                <TableRow className="border-border/50 hover:bg-transparent">
+                  <TableHead className="text-muted-foreground font-medium">Order ID</TableHead>
+                  <TableHead className="text-muted-foreground font-medium">Date</TableHead>
+                  <TableHead className="text-muted-foreground font-medium text-center">
+                    Items
+                  </TableHead>
+                  <TableHead className="text-muted-foreground font-medium text-center">
                     Status
                   </TableHead>
-                  <TableHead class="text-muted-foreground font-medium text-right">Total</TableHead>
+                  <TableHead className="text-muted-foreground font-medium text-right">
+                    Total
+                  </TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
                 {filteredOrders.map((order) => (
-                  <TableRow key={order.id} class="border-border/50 border-b">
-                    <TableCell class="font-medium text-primary flex items-center gap-1 hover:underline cursor-pointer text-sm">
-                      {order.orderId} <ArrowUpRight class="h-3 w-3" />
+                  <TableRow key={order.id} className="border-border/50 border-b">
+                    <TableCell className="font-medium text-primary flex items-center gap-1 hover:underline cursor-pointer text-sm">
+                      {order.orderId} <ArrowUpRight className="h-3 w-3" />
                     </TableCell>
-                    <TableCell class="text-muted-foreground text-sm">{order.date}</TableCell>
-                    <TableCell class="text-center font-medium text-sm">{order.items}</TableCell>
-                    <TableCell class="text-center">
-                      <Badge class={`${order.badgeClasses} border-none`}>{order.status}</Badge>
+                    <TableCell className="text-muted-foreground text-sm">{order.date}</TableCell>
+                    <TableCell className="text-center font-medium text-sm">{order.items}</TableCell>
+                    <TableCell className="text-center">
+                      <Badge className={`${order.badgeClasses} border-none`}>{order.status}</Badge>
                     </TableCell>
-                    <TableCell class="text-right font-medium text-sm">{order.total}</TableCell>
+                    <TableCell className="text-right font-medium text-sm">{order.total}</TableCell>
                   </TableRow>
                 ))}
               </TableBody>
@@ -127,32 +131,32 @@ export function CustomerOrderHistory() {
           </div>
 
           {/* --- MOBILE VIEW --- */}
-          <div class="md:hidden flex flex-col">
+          <div className="md:hidden flex flex-col">
             {filteredOrders.map((order) => (
               <div
                 key={order.id}
-                class="flex justify-between items-center py-5 border-b border-border/50 last:border-0"
+                className="flex justify-between items-center py-5 border-b border-border/50 last:border-0"
               >
-                <div class="flex flex-col gap-1.5">
-                  <span class="font-heading font-semibold text-[15px] text-primary flex items-center gap-1">
-                    {order.orderId} <ArrowUpRight class="h-3 w-3" />
+                <div className="flex flex-col gap-1.5">
+                  <span className="font-heading font-semibold text-[15px] text-primary flex items-center gap-1">
+                    {order.orderId} <ArrowUpRight className="h-3 w-3" />
                   </span>
-                  <span class="text-xs text-muted-foreground font-medium">
-                    {order.date} <span class="mx-1">|</span> {order.items}
+                  <span className="text-xs text-muted-foreground font-medium">
+                    {order.date} <span className="mx-1">|</span> {order.items}
                   </span>
-                  <div class="pt-1.5">
-                    <Badge class={`${order.badgeClasses} border-none px-2 py-0.5 text-[10px]`}>
+                  <div className="pt-1.5">
+                    <Badge className={`${order.badgeClasses} border-none px-2 py-0.5 text-[10px]`}>
                       {order.status}
                     </Badge>
                   </div>
                 </div>
-                <div class="font-medium text-[15px]">{order.total}</div>
+                <div className="font-medium text-[15px]">{order.total}</div>
               </div>
             ))}
           </div>
         </>
       ) : (
-        <div class="py-12 text-center text-muted-foreground">
+        <div className="py-12 text-center text-muted-foreground">
           No orders found for this timeframe.
         </div>
       )}
