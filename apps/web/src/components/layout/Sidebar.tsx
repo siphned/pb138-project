@@ -31,7 +31,7 @@ interface SidebarProps {
   onRoleChange?: (role: Role) => void;
 }
 
-export function Sidebar({ userRoles = [Role.CUSTOMER], activeRole, onRoleChange }: SidebarProps) {
+export function Sidebar({ userRoles = [Role.customer], activeRole, onRoleChange }: SidebarProps) {
   // TODO: Re-enable user context once UserProvider is enabled
   const user: any = null;
   const currentActiveRole = activeRole || userRoles[0];
@@ -128,7 +128,7 @@ export function Sidebar({ userRoles = [Role.CUSTOMER], activeRole, onRoleChange 
             )}
 
             {/* ROLE-AWARE LINKS */}
-            {currentActiveRole === Role.CUSTOMER ? (
+            {currentActiveRole === Role.customer ? (
               <>
                 <Link
                   to="/orders"

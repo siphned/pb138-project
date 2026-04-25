@@ -85,7 +85,6 @@ function DashboardPage() {
   return (
     <AuthLayout
       activeRole={currentRole}
-      availableRoles={allowedRoles}
       onRoleChange={(newRole) => {
         if (allowedRoles.includes(newRole)) setCurrentRole(newRole);
       }}
