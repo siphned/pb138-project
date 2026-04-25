@@ -1,27 +1,36 @@
-import { pgTable, smallint, uuid } from "drizzle-orm/pg-core";
+import { pgTable, smallint, uniqueIndex, uuid } from "drizzle-orm/pg-core";
 import { products } from "./catalog";
+import { guestSessions } from "./guest-sessions";
 import { timestamptz } from "./helpers";
 import { users } from "./users";
 
 export const carts = pgTable("carts", {
   id: uuid("id").primaryKey().defaultRandom(),
   userId: uuid("user_id")
-    .notNull()
     .unique()
     .references(() => users.id),
+  sessionId: uuid("session_id")
+    .unique()
+    .references(() => guestSessions.id),
   createdAt: timestamptz("created_at").notNull().defaultNow(),
   updatedAt: timestamptz("updated_at").notNull().defaultNow(),
 });
 
-export const cartItems = pgTable("cart_items", {
-  id: uuid("id").primaryKey().defaultRandom(),
-  cartId: uuid("cart_id")
-    .notNull()
-    .references(() => carts.id),
-  productId: uuid("product_id")
-    .notNull()
-    .references(() => products.id),
-  quantity: smallint("quantity").notNull(),
-  createdAt: timestamptz("created_at").notNull().defaultNow(),
-  updatedAt: timestamptz("updated_at").notNull().defaultNow(),
-});
+export const cartItems = pgTable(
+  "cart_items",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    cartId: uuid("cart_id")
+      .notNull()
+      .references(() => carts.id),
+    productId: uuid("product_id")
+      .notNull()
+      .references(() => products.id),
+    quantity: smallint("quantity").notNull(),
+    createdAt: timestamptz("created_at").notNull().defaultNow(),
+    updatedAt: timestamptz("updated_at").notNull().defaultNow(),
+  },
+  (t) => ({
+    unq: uniqueIndex("cart_items_cart_id_product_id_key").on(t.cartId, t.productId),
+  })
+);

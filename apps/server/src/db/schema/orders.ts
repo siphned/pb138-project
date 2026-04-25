@@ -1,24 +1,25 @@
-import { numeric, pgTable, smallint, uuid } from "drizzle-orm/pg-core";
+import { numeric, pgTable, smallint, text, timestamp, uuid } from "drizzle-orm/pg-core";
 import { addresses } from "./addresses";
 import { products } from "./catalog";
 import { deliveryTypeEnum, orderStatusEnum, paymentMethodEnum, paymentStatusEnum } from "./enums";
-import { timestamptz } from "./helpers";
+import { guestSessions } from "./guest-sessions";
 import { shops } from "./sellers";
 import { users } from "./users";
 
 export const orders = pgTable("orders", {
   id: uuid("id").primaryKey().defaultRandom(),
-  userId: uuid("user_id")
-    .notNull()
-    .references(() => users.id),
+  userId: uuid("user_id").references(() => users.id),
+  guestSessionId: uuid("guest_session_id").references(() => guestSessions.id),
+  guestEmail: text("guest_email"),
+  guestName: text("guest_name"),
   shippingFee: numeric("shipping_fee", { precision: 10, scale: 2 }).notNull(),
   discount: numeric("discount", { precision: 10, scale: 2 }).notNull(),
   paymentStatus: paymentStatusEnum("payment_status").notNull(),
   paymentMethod: paymentMethodEnum("payment_method").notNull(),
   totalPrice: numeric("total_price", { precision: 10, scale: 2 }).notNull(),
-  createdAt: timestamptz("created_at").notNull().defaultNow(),
-  updatedAt: timestamptz("updated_at"),
-  deletedAt: timestamptz("deleted_at"),
+  createdAt: timestamp("created_at").notNull().defaultNow(),
+  updatedAt: timestamp("updated_at"),
+  deletedAt: timestamp("deleted_at"),
   status: orderStatusEnum("status").notNull(),
   deliveryType: deliveryTypeEnum("delivery_type").notNull(),
   shippingAddressId: uuid("shipping_address_id")
@@ -41,11 +42,5 @@ export const orderItems = pgTable("order_items", {
     .notNull()
     .references(() => products.id),
   quantity: smallint("quantity").notNull(),
-  unitPriceAtPurchase: numeric("unit_price_at_purchase", {
-    precision: 10,
-    scale: 2,
-  }).notNull(),
-  status: orderStatusEnum("status").notNull().default("pending"),
-  createdAt: timestamptz("created_at").notNull().defaultNow(),
-  updatedAt: timestamptz("updated_at"),
+  unitPriceAtPurchase: numeric("unit_price_at_purchase", { precision: 10, scale: 2 }).notNull(),
 });

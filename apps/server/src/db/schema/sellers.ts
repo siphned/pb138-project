@@ -25,7 +25,6 @@ export const shops = pgTable("shops", {
   id: uuid("id").primaryKey().defaultRandom(),
   ownerUserId: uuid("owner_user_id")
     .notNull()
-    .unique()
     .references(() => users.id),
   name: varchar("name", { length: 255 }).notNull(),
   description: text("description").notNull(),
