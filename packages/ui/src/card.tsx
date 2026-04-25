@@ -13,7 +13,7 @@ export function Card({
 }): JSX.Element {
   return (
     <a
-      class={className}
+      className={className}
       href={`${href}?utm_source=create-turbo&utm_medium=basic&utm_campaign=create-turbo"`}
       rel="noopener noreferrer"
       target="_blank"
