@@ -1,106 +1,59 @@
 import { Elysia, status, t } from "elysia";
-import { handleError } from "../../utils/errors";
 import { authPlugin } from "../auth";
-import { addItemBody, cartResponse, mergeBody, updateItemBody } from "./carts.schema";
+import { verifyClerkToken } from "../auth/auth.utils";
+import { usersService } from "../users/users.service";
 import { cartsService } from "./carts.service";
 
-const errorResponses = { 400: t.String(), 403: t.String(), 404: t.String(), 409: t.String() };
+const cartItemSchema = t.Object({
+  productId: t.String(),
+  quantity: t.Integer(),
+});
 
-export const cartsRoutes = new Elysia()
+export const cartsRoutes = new Elysia({ prefix: "/carts", tags: ["carts"] })
   .use(authPlugin)
+  .derive(async ({ headers, cookie: { guest_session_id } }) => {
+    const payload = await verifyClerkToken(headers.authorization);
+    if (payload) {
+      const dbUser = await usersService.lazyGetOrCreate(payload.sub, payload);
+      return { user: dbUser, sessionId: undefined as string | undefined };
+    }
+    return { user: undefined, sessionId: guest_session_id?.value as string | undefined };
+  })
 
-  .get("/carts/me", async ({ dbUser }) => cartsService.getMyCart(dbUser.id), {
-    requireAuth: true,
-    response: { 200: cartResponse },
-    detail: {
-      tags: ["carts"],
-      summary: "Get current user's cart",
-      security: [{ bearerAuth: [] }],
-    },
+  .get("/", async ({ user, sessionId }) => {
+    if (user) return await cartsService.getCartForUser(user.id);
+    if (sessionId) return await cartsService.getCartForSession(sessionId);
+    return status(400, "No user or session found");
   })
 
   .post(
-    "/carts/items",
-    async ({ dbUser, body }) => {
-      try {
-        return status(201, await cartsService.addItem(dbUser.id, body.productId, body.quantity));
-      } catch (e) {
-        return handleError(e);
-      }
+    "/items",
+    async ({ user, sessionId, body }) => {
+      await cartsService.addItem({ userId: user?.id, sessionId }, body.productId, body.quantity);
+      return status(201, "Item added");
     },
     {
-      requireAuth: true,
-      body: addItemBody,
-      response: { 201: cartResponse, ...errorResponses },
-      detail: {
-        tags: ["carts"],
-        summary: "Add item to cart",
-        security: [{ bearerAuth: [] }],
-      },
+      body: cartItemSchema,
     }
   )
 
   .put(
-    "/carts/items/:id",
-    async ({ dbUser, params, body }) => {
-      try {
-        return await cartsService.updateItem(dbUser.id, params.id, body.quantity);
-      } catch (e) {
-        return handleError(e);
-      }
+    "/items/:productId",
+    async ({ user, sessionId, params, body }) => {
+      await cartsService.updateItemQuantity(
+        { userId: user?.id, sessionId },
+        params.productId,
+        body.quantity
+      );
+      return "Quantity updated";
     },
     {
-      requireAuth: true,
-      params: t.Object({ id: t.String() }),
-      body: updateItemBody,
-      response: { 200: cartResponse, ...errorResponses },
-      detail: {
-        tags: ["carts"],
-        summary: "Update cart item quantity",
-        security: [{ bearerAuth: [] }],
-      },
+      params: t.Object({ productId: t.String() }),
+      body: t.Object({ quantity: t.Integer() }),
     }
   )
 
-  .delete(
-    "/carts/items/:id",
-    async ({ dbUser, params }) => {
-      try {
-        await cartsService.removeItem(dbUser.id, params.id);
-        return status(204, null);
-      } catch (e) {
-        return handleError(e);
-      }
-    },
-    {
-      requireAuth: true,
-      params: t.Object({ id: t.String() }),
-      response: { 204: t.Null(), ...errorResponses },
-      detail: {
-        tags: ["carts"],
-        summary: "Remove item from cart",
-        security: [{ bearerAuth: [] }],
-      },
-    }
-  )
-
-  .post(
-    "/carts/merge",
-    async ({ dbUser, body }) => {
-      try {
-        return await cartsService.mergeGuestItems(dbUser.id, body.items);
-      } catch (e) {
-        return handleError(e);
-      }
-    },
-    {
-      requireAuth: true,
-      body: mergeBody,
-      response: { 200: cartResponse, ...errorResponses },
-      detail: {
-        tags: ["carts"],
-        summary: "Merge guest cart items into user cart (DB wins on conflict)",
-        security: [{ bearerAuth: [] }],
-      },
-    }
-  );
+  .delete("/items/:productId", async ({ user, sessionId, params }) => {
+    await cartsService.removeItem({ userId: user?.id, sessionId }, params.productId);
+    return status(204, null);
+  });
