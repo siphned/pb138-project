@@ -70,6 +70,34 @@ jobs:
           trap 'rm -f "$JIRA_CURL_CONFIG"' EXIT
           printf 'header = "Authorization: Basic %s"\n' "$JIRA_AUTH_HEADER" > "$JIRA_CURL_CONFIG"
 
+          # Get issue status first
+          GET_ISSUE_RESPONSE=$(curl -sS -w "\n%{http_code}" -X GET \
+            --config "$JIRA_CURL_CONFIG" \
+            -H "Accept: application/json" \
+            "$JIRA_BASE_URL/issue/$ISSUE?fields=status")
+
+          ISSUE_HTTP_CODE=$(echo "$GET_ISSUE_RESPONSE" | tail -n1)
+          ISSUE_BODY=$(echo "$GET_ISSUE_RESPONSE" | head -n -1)
+
+          if [[ "$ISSUE_HTTP_CODE" != "200" ]]; then
+            echo "❌ Failed to fetch issue status for $ISSUE (HTTP $ISSUE_HTTP_CODE)"
+            echo "$ISSUE_BODY"
+            exit 1
+          fi
+
+          if ! command -v jq >/dev/null 2>&1; then
+            echo "❌ jq is required but is not available on the runner."
+            exit 1
+          fi
+
+          CURRENT_STATUS=$(echo "$ISSUE_BODY" | jq -r '.fields.status.name')
+
+          # Skip transition if already in target state
+          if [[ "$CURRENT_STATUS" == "$TRANSITION_NAME" ]]; then
+            echo "ℹ️  $ISSUE is already in status '$TRANSITION_NAME'. No transition needed."
+            exit 0
+          fi
+
           GET_RESPONSE=$(curl -sS -w "\n%{http_code}" -X GET \
             --config "$JIRA_CURL_CONFIG" \
             -H "Accept: application/json" \
@@ -84,11 +112,6 @@ jobs:
             exit 1
           fi
 
-          if ! command -v jq >/dev/null 2>&1; then
-            echo "❌ jq is required but is not available on the runner."
-            exit 1
-          fi
-
           if ! echo "$GET_BODY" | jq -e '.transitions and (.transitions | type == "array")' >/dev/null; then
             echo "❌ Jira transitions response is missing a valid 'transitions' array."
             echo "$GET_BODY"
@@ -99,7 +122,7 @@ jobs:
           MATCHING_TRANSITION_IDS=$(echo "$GET_BODY" | jq -r --arg n "$TRANSITION_NAME" '.transitions[] | select(.name == $n) | .id')
 
           if [[ "$MATCH_COUNT" -eq 0 ]]; then
-            echo "❌ Transition '$TRANSITION_NAME' is not available for $ISSUE"
+            echo "❌ Transition '$TRANSITION_NAME' is not available for $ISSUE (current: $CURRENT_STATUS)"
             echo "Available transitions:"
             echo "$GET_BODY" | jq -r '.transitions[].name'
             exit 1
@@ -128,7 +151,7 @@ jobs:
             exit 1
           fi
 
-          echo "✅ Transitioned $ISSUE to '$TRANSITION_NAME' (id: $TRANSITION_ID)"
+          echo "✅ Transitioned $ISSUE from '$CURRENT_STATUS' to '$TRANSITION_NAME' (id: $TRANSITION_ID)"
 
       - name: Add PR link comment to Jira (opened)
         if: github.event.action == 'opened' && steps.issue.outputs.issue

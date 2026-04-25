@@ -14,16 +14,16 @@ export * from "./users";
 
 // ─── Inferred types ───────────────────────────────────────────────────────────
 
-import type { users } from "./users";
 import type { addresses } from "./addresses";
-import type { shops, winemakers } from "./sellers";
-import type { wines, products, productWines } from "./catalog";
-import type { availabilityRegular, availabilityExceptions } from "./availability";
-import type { orders, orderItems } from "./orders";
-import type { carts, cartItems } from "./carts";
-import type { roleRequests } from "./role-requests";
-import type { events, eventRegistrations, comments } from "./events";
+import type { availabilityExceptions, availabilityRegular } from "./availability";
+import type { cartItems, carts } from "./carts";
+import type { products, productWines, wines } from "./catalog";
+import type { comments, eventRegistrations, events } from "./events";
+import type { orderItems, orders } from "./orders";
 import type { productReviews, winemakerReviews } from "./reviews";
+import type { roleRequests } from "./role-requests";
+import type { shops, winemakers } from "./sellers";
+import type { users } from "./users";
 
 export type User = (typeof users)["$inferSelect"];
 export type NewUser = (typeof users)["$inferInsert"];

@@ -1,7 +1,7 @@
 import { and, count, eq, isNull } from "drizzle-orm";
 import { db } from "../../db";
-import { events, productReviews, users, winemakerReviews } from "../../db/schema";
 import type { Event } from "../../db/schema";
+import { events, productReviews, users, winemakerReviews } from "../../db/schema";
 
 export type AdminUserRow = {
   id: string;

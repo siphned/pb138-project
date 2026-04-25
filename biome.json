@@ -14,6 +14,7 @@
       "!**/build/**",
       "!**/.turbo/**",
       "!**/bun.lock",
+      "!**/raw/**",
       "!**/tsconfig*.json",
       "!**/src/generated/**",
       "!**/routeTree.gen.ts"
@@ -52,6 +53,9 @@
       },
       "a11y": {
         "useButtonType": "error"
+      },
+      "complexity": {
+        "noExcessiveCognitiveComplexity": "error"
       }
     }
   },
@@ -62,5 +66,30 @@
       "semicolons": "always"
     }
   },
-  "assist": { "actions": { "source": { "organizeImports": "on" } } }
+  "assist": { "actions": { "source": { "organizeImports": "on" } } },
+  "overrides": [
+    {
+      "includes": ["**/db/seed.ts", "**/scripts/**/*.ts"],
+      "linter": {
+        "rules": {
+          "suspicious": {
+            "noConsole": "off"
+          },
+          "complexity": {
+            "noExcessiveCognitiveComplexity": "off"
+          }
+        }
+      }
+    },
+    {
+      "includes": ["**/routes/**/*.tsx", "**/routes/**/*.ts"],
+      "linter": {
+        "rules": {
+          "style": {
+            "useFilenamingConvention": "off"
+          }
+        }
+      }
+    }
+  ]
 }

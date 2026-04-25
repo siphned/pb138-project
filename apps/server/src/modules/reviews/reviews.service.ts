@@ -1,5 +1,5 @@
-import { reviewsRepository } from "./reviews.repository";
 import type { ProductReviewWithUser, WinemakerReviewWithUser } from "./reviews.repository";
+import { reviewsRepository } from "./reviews.repository";
 
 type ReviewListResult<T> = { reviews: T[]; averageRating: number | null };
 type ReviewData = { rating: number; body?: string };

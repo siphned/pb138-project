@@ -20,9 +20,9 @@ vi.mock("../products/products.repository", () => ({
   },
 }));
 
+import { productsRepository } from "../products/products.repository";
 import { cartsRepository } from "./carts.repository";
 import { cartsService } from "./carts.service";
-import { productsRepository } from "../products/products.repository";
 
 const mockCartBase = {
   id: "cart-1",
