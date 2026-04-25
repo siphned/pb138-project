@@ -1,3 +1,4 @@
+import { User } from "lucide-react";
 import { type ChangeEvent, type FormEvent, useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import {
@@ -12,14 +13,14 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useUser } from "@/context/UserContext";
 
-interface FormData {
-  fname: string;
-  lname: string;
-}
-
 interface ProfileEditFormProps {
   onSuccess?: () => void;
   onCancel?: () => void;
+}
+
+interface FormData {
+  fname: string;
+  lname: string;
 }
 
 export function ProfileEditForm({ onSuccess, onCancel }: ProfileEditFormProps) {
@@ -30,20 +31,17 @@ export function ProfileEditForm({ onSuccess, onCancel }: ProfileEditFormProps) {
 
   useEffect(() => {
     if (user) {
-      setFormData({
-        fname: user.fname || "",
-        lname: user.lname || "",
-      });
+      setFormData({ fname: user.fname, lname: user.lname });
     }
   }, [user]);
 
   const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
-    setFormData((prev) => ({ ...prev, [name]: value }));
+    setFormData((prev) => ({ ...prev, [name as keyof FormData]: value }));
 
     // Clear error when user starts typing
     if (errors[name as keyof FormData]) {
-      setErrors((prev) => ({ ...prev, [name]: undefined }));
+      setErrors((prev) => ({ ...prev, [name as keyof FormData]: undefined }));
     }
   };
 
@@ -52,14 +50,9 @@ export function ProfileEditForm({ onSuccess, onCancel }: ProfileEditFormProps) {
     setIsSaving(true);
     setErrors({});
 
-    // Validate required fields
     const newErrors: Partial<Record<keyof FormData, string>> = {};
-    if (!formData.fname.trim()) {
-      newErrors.fname = "First name is required";
-    }
-    if (!formData.lname.trim()) {
-      newErrors.lname = "Last name is required";
-    }
+    if (!formData.fname.trim()) newErrors.fname = "First name is required";
+    if (!formData.lname.trim()) newErrors.lname = "Last name is required";
 
     if (Object.keys(newErrors).length > 0) {
       setErrors(newErrors);
@@ -70,8 +63,8 @@ export function ProfileEditForm({ onSuccess, onCancel }: ProfileEditFormProps) {
     try {
       await updateUser(formData);
       if (onSuccess) onSuccess();
-    } catch (_error) {
-      setErrors({ fname: "Failed to save changes" });
+    } catch (error) {
+      console.error("Failed to update profile", error);
     } finally {
       setIsSaving(false);
     }
@@ -81,13 +74,15 @@ export function ProfileEditForm({ onSuccess, onCancel }: ProfileEditFormProps) {
     <Card className="max-w-2xl mx-auto border-none shadow-none bg-background rounded-3xl">
       <CardHeader className="px-6 pt-8 pb-4">
         <CardTitle className="font-heading text-2xl">Edit Profile</CardTitle>
-        <CardDescription>Update your name.</CardDescription>
+        <CardDescription>Update your name information.</CardDescription>
       </CardHeader>
       <form onSubmit={handleSubmit}>
         <CardContent className="px-6 space-y-6">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div className="space-y-2">
-              <Label htmlFor="fname">First Name</Label>
+              <Label htmlFor="fname" className="flex items-center gap-2">
+                <User className="h-4 w-4" /> First Name
+              </Label>
               <Input
                 id="fname"
                 name="fname"
@@ -98,8 +93,11 @@ export function ProfileEditForm({ onSuccess, onCancel }: ProfileEditFormProps) {
               />
               {errors.fname && <p className="text-xs text-destructive mt-1">{errors.fname}</p>}
             </div>
+
             <div className="space-y-2">
-              <Label htmlFor="lname">Last Name</Label>
+              <Label htmlFor="lname" className="flex items-center gap-2">
+                <User className="h-4 w-4" /> Last Name
+              </Label>
               <Input
                 id="lname"
                 name="lname"
