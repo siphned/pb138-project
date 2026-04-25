@@ -1,8 +1,8 @@
+import { useAuth } from "@clerk/react";
 import { useQueryClient } from "@tanstack/react-query";
 import { createContext, type ReactNode, useContext } from "react";
 import { getUsersMeQueryKey, useGetUsersMe } from "@/generated/hooks/useGetUsersMe";
 import { usePutUsersMe } from "@/generated/hooks/usePutUsersMe";
-import { useAuth } from "@clerk/react";
 
 export interface UserProfile {
   id: string;

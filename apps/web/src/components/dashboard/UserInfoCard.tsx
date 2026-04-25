@@ -1,3 +1,4 @@
+import { useClerk } from "@clerk/react";
 import { Pencil } from "lucide-react";
 import { useState } from "react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
@@ -5,7 +6,6 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 // 1. Import the Dialog components
 import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/dialog";
-import { useClerk } from "@clerk/react";
 
 // 2. Import your brand new form!
 import { ProfileEditForm } from "./ProfileEditForm";

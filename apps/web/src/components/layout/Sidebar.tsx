@@ -1,3 +1,4 @@
+import { Show, useAuth, useClerk, useUser as useClerkUser } from "@clerk/react";
 import { Link, useNavigate } from "@tanstack/react-router";
 import {
   Calendar,
@@ -22,7 +23,6 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
 import { useUser } from "@/context/UserContext";
-import { Show, useAuth, useClerk, useUser as useClerkUser } from "@clerk/react";
 
 import { Role } from "@/types/roles";
 
@@ -38,13 +38,13 @@ export function Sidebar({ userRoles = [Role.CUSTOMER], activeRole, onRoleChange 
   const { isSignedIn } = useAuth();
   const { signOut, openUserProfile } = useClerk();
   const navigate = useNavigate();
-  
+
   const currentActiveRole = activeRole || userRoles[0];
   const [accordionState, setAccordionState] = useState<string[]>([]);
 
   const displayUserName = isSignedIn ? clerkUser?.fullName || "User" : "Guest";
   const fullName = user ? `${user.fname || ""} ${user.lname || ""}`.trim() : "Guest";
-  const initials = fullName === "Guest" ? "G" : (fullName.substring(0, 2).toUpperCase() || "U");
+  const initials = fullName === "Guest" ? "G" : fullName.substring(0, 2).toUpperCase() || "U";
   const hasMultipleRoles = userRoles.length > 1;
 
   const handleLogout = async () => {
@@ -74,9 +74,8 @@ export function Sidebar({ userRoles = [Role.CUSTOMER], activeRole, onRoleChange 
                   </AvatarFallback>
                 </Avatar>
                 <div className="flex flex-col">
-                   <span className="text-sm font-semibold">{fullName}</span>
-                    {displayUserName}
-                   
+                  <span className="text-sm font-semibold">{fullName}</span>
+                  {displayUserName}
                 </div>
               </SheetTitle>
             </SheetHeader>
@@ -84,12 +83,14 @@ export function Sidebar({ userRoles = [Role.CUSTOMER], activeRole, onRoleChange 
         </Show>
 
         <Show when="signed-out">
-           <div className="flex-none border-b bg-background z-10 px-6 py-8">
-              <p className="text-sm text-muted-foreground">Sign in to manage your wines and orders.</p>
-              <Link to="/auth/login" className="mt-4 block">
-                <Button className="w-full">Sign In</Button>
-              </Link>
-           </div>
+          <div className="flex-none border-b bg-background z-10 px-6 py-8">
+            <p className="text-sm text-muted-foreground">
+              Sign in to manage your wines and orders.
+            </p>
+            <Link to="/auth/login" className="mt-4 block">
+              <Button className="w-full">Sign In</Button>
+            </Link>
+          </div>
         </Show>
 
         <div className="flex-1 overflow-y-auto">
@@ -146,7 +147,7 @@ export function Sidebar({ userRoles = [Role.CUSTOMER], activeRole, onRoleChange 
             >
               <Search className="h-4 w-4" /> Search
             </Link>
-            
+
             <Link
               to="/cart"
               className="flex-none flex items-center gap-3 px-3 py-3 rounded-md bg-secondary hover:bg-secondary/80 transition-colors text-sm font-medium text-primary sm:hidden"
@@ -175,7 +176,6 @@ export function Sidebar({ userRoles = [Role.CUSTOMER], activeRole, onRoleChange 
               <Calendar className="h-4 w-4" /> Events
             </Link>
 
-
             <Show when="signed-in">
               <button
                 type="button"
@@ -189,7 +189,10 @@ export function Sidebar({ userRoles = [Role.CUSTOMER], activeRole, onRoleChange 
         </div>
 
         <div className="flex-none border-t pt-4 pb-6 px-6 flex flex-col gap-1 bg-background z-10">
-          <button type="button" className="flex items-center justify-between px-3 py-2 rounded-md hover:bg-secondary/50 transition-colors text-sm font-medium text-muted-foreground w-full text-left">
+          <button
+            type="button"
+            className="flex items-center justify-between px-3 py-2 rounded-md hover:bg-secondary/50 transition-colors text-sm font-medium text-muted-foreground w-full text-left"
+          >
             Theme
             <Moon className="h-4 w-4" />
           </button>

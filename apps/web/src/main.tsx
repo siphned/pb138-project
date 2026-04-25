@@ -3,10 +3,10 @@ import { createRouter, RouterProvider } from "@tanstack/react-router";
 import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
 import "./index.css";
-import { UserProvider } from "./context/UserContext.tsx";
-import { routeTree } from "./routeTree.gen.ts";
 import { ClerkProvider } from "@clerk/react";
 import { AxiosInterceptor } from "./components/AxiosInterceptor.tsx";
+import { UserProvider } from "./context/UserContext.tsx";
+import { routeTree } from "./routeTree.gen.ts";
 
 const queryClient = new QueryClient();
 const router = createRouter({ routeTree });

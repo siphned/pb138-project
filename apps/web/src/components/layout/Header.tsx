@@ -1,11 +1,10 @@
+import { Show, useClerk } from "@clerk/react";
+import { Link } from "@tanstack/react-router";
 import { Search, ShoppingCart, User } from "lucide-react";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { Role } from "@/types/roles";
 import { Sidebar } from "./Sidebar";
-import { Link } from "@tanstack/react-router";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Show, useClerk } from "@clerk/react";
-
 
 interface HeaderProps {
   activeRole?: Role;
@@ -13,7 +12,7 @@ interface HeaderProps {
 }
 
 export function Header({ activeRole, onRoleChange }: HeaderProps) {
-  const {user: clerkUser} = useClerk();
+  const { user: clerkUser } = useClerk();
   const initials = clerkUser ? (clerkUser.fullName || "User").substring(0, 2).toUpperCase() : "GU";
   return (
     <header className="h-16 border-b bg-background flex items-center justify-between px-6 lg:px-12">
@@ -44,12 +43,12 @@ export function Header({ activeRole, onRoleChange }: HeaderProps) {
 
         <Show when="signed-in">
           <Link to="/dashboard">
-          <Avatar className="h-8 w-8">
+            <Avatar className="h-8 w-8">
               <AvatarImage src={clerkUser?.imageUrl} alt={clerkUser?.fullName || "User"} />
               <AvatarFallback className="bg-primary text-primary-foreground font-heading text-xs">
                 {initials}
               </AvatarFallback>
-          </Avatar>
+            </Avatar>
           </Link>
         </Show>
 
