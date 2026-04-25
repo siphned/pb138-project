@@ -1,0 +1,25 @@
+{
+  "name": "seminar-05",
+  "version": "1.0.0",
+  "main": "index.js",
+  "scripts": {
+    "db:generate": "drizzle-kit generate --config=drizzle.config.ts",
+    "db:migrate": "ts-node src/db/migration.ts",
+    "db:seed": "ts-node src/db/seed.ts",
+    "start": "ts-node src/index.ts"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "description": "",
+  "dependencies": {
+    "@faker-js/faker": "^9.6.0",
+    "@types/pg": "^8.11.11",
+    "dotenv": "^16.4.7",
+    "drizzle-kit": "^0.31.10",
+    "drizzle-orm": "^0.45.1",
+    "pg": "^8.14.1",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.8.2"
+  }
+}

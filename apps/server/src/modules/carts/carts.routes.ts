@@ -1,106 +1,126 @@
 import { Elysia, status, t } from "elysia";
-import { handleError } from "../../utils/errors";
 import { authPlugin } from "../auth";
-import { addItemBody, cartResponse, mergeBody, updateItemBody } from "./carts.schema";
+import { verifyClerkToken } from "../auth/auth.utils";
+import { usersService } from "../users/users.service";
 import { cartsService } from "./carts.service";
 
-const errorResponses = { 400: t.String(), 403: t.String(), 404: t.String(), 409: t.String() };
+const cartItemSchema = t.Object({
+  productId: t.String(),
+  quantity: t.Integer(),
+});
 
-export const cartsRoutes = new Elysia()
+const productInCart = t.Object({
+  id: t.String(),
+  shopId: t.String(),
+  name: t.String(),
+  description: t.Union([t.String(), t.Null()]),
+  price: t.String(),
+  quantity: t.Integer(),
+  isBundle: t.Boolean(),
+  createdAt: t.Date(),
+  updatedAt: t.Union([t.Date(), t.Null()]),
+  deletedAt: t.Union([t.Date(), t.Null()]),
+});
+
+const cartItemResponse = t.Object({
+  id: t.String(),
+  cartId: t.String(),
+  productId: t.String(),
+  quantity: t.Integer(),
+  createdAt: t.Date(),
+  updatedAt: t.Date(),
+  deletedAt: t.Union([t.Date(), t.Null()]),
+  product: productInCart,
+});
+
+const cartResponse = t.Object({
+  id: t.String(),
+  userId: t.Union([t.String(), t.Null()]),
+  sessionId: t.Union([t.String(), t.Null()]),
+  createdAt: t.Date(),
+  updatedAt: t.Date(),
+  deletedAt: t.Union([t.Date(), t.Null()]),
+  items: t.Array(cartItemResponse),
+});
+
+export const cartsRoutes = new Elysia({ prefix: "/carts", tags: ["carts"] })
   .use(authPlugin)
-
-  .get("/carts/me", async ({ dbUser }) => cartsService.getMyCart(dbUser.id), {
-    requireAuth: true,
-    response: { 200: cartResponse },
-    detail: {
-      tags: ["carts"],
-      summary: "Get current user's cart",
-      security: [{ bearerAuth: [] }],
-    },
+  .derive(async ({ headers, cookie: { guest_session_id } }) => {
+    const payload = await verifyClerkToken(headers.authorization);
+    if (payload) {
+      const dbUser = await usersService.lazyGetOrCreate(payload.sub, payload);
+      const guestSessionId = guest_session_id?.value;
+      if (typeof guestSessionId === "string") {
+        await cartsService.mergeOnLogin(dbUser.id, guestSessionId);
+        guest_session_id?.remove();
+      }
+      return { user: dbUser, sessionId: undefined as string | undefined };
+    }
+    return { user: undefined, sessionId: guest_session_id?.value as string | undefined };
   })
 
-  .post(
-    "/carts/items",
-    async ({ dbUser, body }) => {
-      try {
-        return status(201, await cartsService.addItem(dbUser.id, body.productId, body.quantity));
-      } catch (e) {
-        return handleError(e);
-      }
+  .get(
+    "/",
+    async ({ user, sessionId }) => {
+      if (user) return (await cartsService.getCartForUser(user.id)) ?? null;
+      if (sessionId) return (await cartsService.getCartForSession(sessionId)) ?? null;
+      return status(400, "No user or session found");
     },
     {
-      requireAuth: true,
-      body: addItemBody,
-      response: { 201: cartResponse, ...errorResponses },
+      response: { 200: t.Union([cartResponse, t.Null()]), 400: t.String() },
       detail: {
-        tags: ["carts"],
+        summary: "Get current cart",
+        description: "Returns the cart for the authenticated user or guest session.",
+      },
+    }
+  )
+
+  .post(
+    "/items",
+    async ({ user, sessionId, body }) => {
+      await cartsService.addItem({ userId: user?.id, sessionId }, body.productId, body.quantity);
+      return status(201, "Item added");
+    },
+    {
+      body: cartItemSchema,
+      response: { 201: t.String() },
+      detail: {
         summary: "Add item to cart",
-        security: [{ bearerAuth: [] }],
       },
     }
   )
 
   .put(
-    "/carts/items/:id",
-    async ({ dbUser, params, body }) => {
-      try {
-        return await cartsService.updateItem(dbUser.id, params.id, body.quantity);
-      } catch (e) {
-        return handleError(e);
-      }
+    "/items/:productId",
+    async ({ user, sessionId, params, body }) => {
+      await cartsService.updateItemQuantity(
+        { userId: user?.id, sessionId },
+        params.productId,
+        body.quantity
+      );
+      return "Quantity updated";
     },
     {
-      requireAuth: true,
-      params: t.Object({ id: t.String() }),
-      body: updateItemBody,
-      response: { 200: cartResponse, ...errorResponses },
+      params: t.Object({ productId: t.String() }),
+      body: t.Object({ quantity: t.Integer() }),
+      response: { 200: t.String() },
       detail: {
-        tags: ["carts"],
-        summary: "Update cart item quantity",
-        security: [{ bearerAuth: [] }],
+        summary: "Update item quantity",
       },
     }
   )
 
   .delete(
-    "/carts/items/:id",
-    async ({ dbUser, params }) => {
-      try {
-        await cartsService.removeItem(dbUser.id, params.id);
-        return status(204, null);
-      } catch (e) {
-        return handleError(e);
-      }
+    "/items/:productId",
+    async ({ user, sessionId, params }) => {
+      await cartsService.removeItem({ userId: user?.id, sessionId }, params.productId);
+      return status(204, null);
     },
     {
-      requireAuth: true,
-      params: t.Object({ id: t.String() }),
-      response: { 204: t.Null(), ...errorResponses },
+      params: t.Object({ productId: t.String() }),
+      response: { 204: t.Null() },
       detail: {
-        tags: ["carts"],
         summary: "Remove item from cart",
-        security: [{ bearerAuth: [] }],
-      },
-    }
-  )
-
-  .post(
-    "/carts/merge",
-    async ({ dbUser, body }) => {
-      try {
-        return await cartsService.mergeGuestItems(dbUser.id, body.items);
-      } catch (e) {
-        return handleError(e);
-      }
-    },
-    {
-      requireAuth: true,
-      body: mergeBody,
-      response: { 200: cartResponse, ...errorResponses },
-      detail: {
-        tags: ["carts"],
-        summary: "Merge guest cart items into user cart (DB wins on conflict)",
-        security: [{ bearerAuth: [] }],
       },
     }
   );

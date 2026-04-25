@@ -1,4 +1,5 @@
 import { createClerkClient } from "@clerk/backend";
+import type { RoleRequest } from "../../db/schema";
 import { usersRepository } from "../users/users.repository";
 import { roleRequestsRepository } from "./role-requests.repository";
 
@@ -7,48 +8,50 @@ const clerkClient = createClerkClient({
 });
 
 export const roleRequestsService = {
-  listPending() {
+  async submitRequest(
+    userId: string,
+    type: "winemaker" | "shop_owner",
+    businessName: string,
+    details?: string
+  ): Promise<RoleRequest> {
+    const existing = await roleRequestsRepository.findByUserId(userId);
+    const pending = existing.find((r) => r.type === type && r.status === "pending");
+
+    if (pending) throw new Error("ALREADY_HAS_PENDING_REQUEST");
+
+    return roleRequestsRepository.create({
+      userId,
+      type,
+      businessName,
+      details,
+    });
+  },
+
+  async listPending(): Promise<RoleRequest[]> {
     return roleRequestsRepository.findPending();
   },
 
-  async submitRequest(
-    userId: string,
-    requestedRole: "winemaker" | "shop_owner",
-    businessName: string,
-    details?: string
-  ) {
-    const existing = await roleRequestsRepository.findByUserId(userId);
-    const duplicate = existing.find(
-      (r) => r.requestedRole === requestedRole && r.status === "pending"
-    );
-    if (duplicate) throw new Error("DUPLICATE_REQUEST");
-
-    return roleRequestsRepository.create({ userId, requestedRole, businessName, details });
-  },
-
-  async approve(requestId: string, adminUserId: string) {
+  async approve(requestId: string, adminUserId: string): Promise<RoleRequest> {
     const request = await roleRequestsRepository.findById(requestId);
     if (!request) throw new Error("NOT_FOUND");
-    if (request.status !== "pending") throw new Error("NOT_PENDING");
+    if (request.status !== "pending") throw new Error("ALREADY_RESPONDED");
 
     const user = await usersRepository.findById(request.userId);
     if (!user) throw new Error("USER_NOT_FOUND");
 
-    const metadataKey = request.requestedRole === "winemaker" ? "is_winemaker" : "is_shop_owner";
+    const metadataKey = request.type === "winemaker" ? "is_winemaker" : "is_shop_owner";
 
-    // Clerk first — updateUserMetadata does a server-side shallow merge, no spread needed.
-    // If this fails, DB stays pending and the admin can safely retry.
     await clerkClient.users.updateUserMetadata(user.clerkId, {
       publicMetadata: { [metadataKey]: true },
     });
 
-    await roleRequestsRepository.updateStatus(requestId, "approved", adminUserId);
+    return roleRequestsRepository.updateStatus(requestId, "approved", adminUserId);
   },
 
-  async reject(requestId: string, adminUserId: string) {
+  async reject(requestId: string, adminUserId: string): Promise<RoleRequest> {
     const request = await roleRequestsRepository.findById(requestId);
     if (!request) throw new Error("NOT_FOUND");
-    if (request.status !== "pending") throw new Error("NOT_PENDING");
+    if (request.status !== "pending") throw new Error("ALREADY_RESPONDED");
 
     return roleRequestsRepository.updateStatus(requestId, "rejected", adminUserId);
   },

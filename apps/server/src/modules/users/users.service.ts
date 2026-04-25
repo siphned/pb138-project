@@ -8,26 +8,27 @@ const clerkClient = createClerkClient({
 });
 
 export const usersService = {
-  async lazyGetOrCreate(clerkId: string, payload: ClerkPayload): Promise<User> {
+  async lazyGetOrCreate(clerkId: string, _payload: ClerkPayload): Promise<User> {
     const existing = await usersRepository.findByClerkId(clerkId);
-    if (existing) {
-      if (payload.role === "admin" && existing.role !== "admin") {
-        return usersRepository.updateById(existing.id, { role: "admin" });
-      }
-      return existing;
-    }
+    if (existing) return existing;
 
     const clerkUser = await clerkClient.users.getUser(clerkId);
 
     const email = clerkUser.emailAddresses[0]?.emailAddress;
     if (!email) throw new Error("Clerk user has no email address");
 
+    // First login: seed the customer role in Clerk public metadata if not already set
+    if (!clerkUser.publicMetadata?.roles) {
+      await clerkClient.users.updateUser(clerkId, {
+        publicMetadata: { ...clerkUser.publicMetadata, roles: ["customer"] },
+      });
+    }
+
     return usersRepository.upsert({
       clerkId,
       fname: clerkUser.firstName ?? "",
       lname: clerkUser.lastName ?? "",
       email,
-      role: payload.role === "admin" ? "admin" : "user",
     });
   },
 

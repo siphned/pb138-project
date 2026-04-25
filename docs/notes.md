@@ -14,13 +14,15 @@ Only on admin approval are the corresponding records created and the user's role
 
 **Why:** Prevents partial/orphaned records for rejected applicants, and keeps the data model clean — a `Shops` or `Winemakers` record always means an active, approved entity.
 
-## Guest Cart — localStorage
+## Guest Cart — Server-side Anonymous Sessions
 
-Unauthenticated users can add items to their cart (OR-1). The `Carts` table has a `user_id` FK, so a guest cart cannot be persisted in the database.
+Unauthenticated users can add items to their cart (OR-1). The cart is stored in the database and associated with a `guest_session_id`.
 
-**Solution:** Store the guest cart in `localStorage` on the frontend. On login/registration, merge the localStorage cart into the user's database cart before redirecting to checkout.
+**Solution:** On the first cart action by a guest, the backend creates a `guest_session` record and returns a session cookie. Cart items in the DB reference this session ID.
 
-**Things to handle:** duplicate products (add quantities), stock availability check after merge, clearing localStorage after merge.
+**Login/Registration:** On login/registration, the guest session cart is merged into the user's database cart (server-side merge).
+
+**Why:** Ensures the cart survives across refreshes and different browsers (if the cookie is managed), and allows for a more consistent data model between guest and authenticated users.
 
 ## Images — Polymorphic Association
 

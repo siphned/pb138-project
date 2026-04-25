@@ -1,100 +1,104 @@
-import { cartsRepository } from "../carts/carts.repository";
-import { shopsRepository } from "../shops/shops.repository";
-import type { OrderWithItems } from "./orders.repository";
+import type { Order, orders } from "../../db/schema";
+import { cartsService } from "../carts/carts.service";
+import type { CreateOrderData, CreateOrderItem, OrderWithItems } from "./orders.repository";
 import { ordersRepository } from "./orders.repository";
 
-type CheckoutBody = {
+export interface CheckoutData {
+  guestEmail?: string;
+  guestName?: string;
   paymentMethod: "card" | "bank_transfer" | "cash_on_delivery";
   deliveryType: "pickup" | "shipping";
-  shippingAddressId?: string;
-  newShippingAddress?: {
+  shippingAddress: {
     country: string;
     city: string;
-    street: string;
     postalCode: string;
+    street: string;
     houseNumber: string;
   };
-  billingAddressId?: string;
-  newBillingAddress?: {
+  billingAddress?: {
     country: string;
     city: string;
-    street: string;
     postalCode: string;
+    street: string;
     houseNumber: string;
   };
-};
+}
 
 export const ordersService = {
-  async checkout(userId: string, body: CheckoutBody): Promise<OrderWithItems> {
-    const cart = await cartsRepository.findByUserId(userId);
+  async createOrder(
+    { userId, sessionId }: { userId?: string; sessionId?: string },
+    data: CheckoutData
+  ): Promise<Order> {
+    const cart = userId
+      ? await cartsService.getCartForUser(userId)
+      : sessionId
+        ? await cartsService.getCartForSession(sessionId)
+        : null;
+
     if (!cart || cart.items.length === 0) throw new Error("CART_EMPTY");
 
-    const shippingAddress = body.newShippingAddress ?? body.shippingAddressId;
-    if (!shippingAddress) throw new Error("MISSING_SHIPPING_ADDRESS");
-    const billingAddress = body.newBillingAddress ?? body.billingAddressId;
-    if (!billingAddress) throw new Error("MISSING_BILLING_ADDRESS");
+    const items: CreateOrderItem[] = [];
+    let subtotal = 0;
 
-    const insufficientItem = cart.items.find((item) => item.product.quantity < item.quantity);
-    if (insufficientItem) throw new Error("INSUFFICIENT_STOCK");
+    for (const cartItem of cart.items) {
+      if (cartItem.product.quantity < cartItem.quantity) {
+        throw new Error(`INSUFFICIENT_STOCK:${cartItem.product.name}`);
+      }
 
-    const totalPrice = cart.items
-      .reduce((sum, item) => sum + Number.parseFloat(item.product.price) * item.quantity, 0)
-      .toFixed(2);
+      items.push({
+        shopId: cartItem.product.shopId,
+        productId: cartItem.productId,
+        quantity: cartItem.quantity,
+        unitPrice: cartItem.product.price,
+      });
 
-    const itemsData = cart.items.map((item) => ({
-      shopId: item.product.shopId,
-      productId: item.productId,
-      quantity: item.quantity,
-      unitPriceAtPurchase: item.product.price,
-    }));
+      subtotal += Number.parseFloat(cartItem.product.price) * cartItem.quantity;
+    }
 
-    const order = await ordersRepository.createOrderWithItems(
-      {
-        userId,
-        shippingAddress,
-        billingAddress,
-        paymentMethod: body.paymentMethod,
-        deliveryType: body.deliveryType,
-        totalPrice,
-      },
-      itemsData,
-      cart.id
-    );
+    const shippingFee = "10.00";
+    const discount = "0.00";
+    const totalPrice = (
+      subtotal +
+      Number.parseFloat(shippingFee) -
+      Number.parseFloat(discount)
+    ).toFixed(2);
 
-    const full = await ordersRepository.findOrderById(order.id);
-    if (!full) throw new Error("Unexpected: order not found after creation");
-    return full;
+    const orderData: CreateOrderData = {
+      userId,
+      guestSessionId: sessionId,
+      guestEmail: data.guestEmail,
+      guestName: data.guestName,
+      shippingFee,
+      discount,
+      paymentStatus: "pending",
+      paymentMethod: data.paymentMethod,
+      totalPrice,
+      status: "pending",
+      deliveryType: data.deliveryType,
+      shippingAddress: data.shippingAddress,
+      billingAddress: data.billingAddress || data.shippingAddress,
+    };
+
+    return await ordersRepository.create(orderData, items);
   },
 
-  async getMyOrders(userId: string): Promise<OrderWithItems[]> {
-    return ordersRepository.findOrdersByUserId(userId);
-  },
+  async getOrder(id: string, userId: string): Promise<OrderWithItems> {
+    const order = await ordersRepository.findById(id);
+    if (!order) throw new Error("NOT_FOUND");
 
-  async getOrderById(userId: string, orderId: string): Promise<OrderWithItems> {
-    const order = await ordersRepository.findOrderById(orderId);
-    if (!order || order.userId !== userId) throw new Error("NOT_FOUND");
+    if (order.userId !== userId) throw new Error("FORBIDDEN");
+
     return order;
   },
 
-  async updateOrderItemStatus(
-    shopOwnerUserId: string,
+  async updateStatus(
     orderId: string,
-    itemId: string,
-    newStatus: "confirmed" | "shipped" | "delivered" | "cancelled"
-  ): Promise<OrderWithItems> {
-    const shop = await shopsRepository.findByOwnerUserId(shopOwnerUserId);
-    if (!shop) throw new Error("FORBIDDEN");
+    _userId: string,
+    status: typeof orders.$inferSelect.status
+  ): Promise<Order> {
+    const order = await ordersRepository.findById(orderId);
+    if (!order) throw new Error("NOT_FOUND");
 
-    const item = await ordersRepository.findOrderItem(itemId);
-    if (!item || item.orderId !== orderId) throw new Error("NOT_FOUND");
-    if (item.shopId !== shop.id) throw new Error("FORBIDDEN");
-    if (item.status === "delivered" || item.status === "cancelled")
-      throw new Error("INVALID_TRANSITION");
-
-    await ordersRepository.updateOrderItemStatus(itemId, newStatus);
-
-    const order = await ordersRepository.findOrderById(orderId);
-    if (!order) throw new Error("Unexpected: order not found after status update");
-    return order;
+    return ordersRepository.updateStatus(orderId, status);
   },
 };

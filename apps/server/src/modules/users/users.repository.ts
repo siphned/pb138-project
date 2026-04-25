@@ -43,7 +43,7 @@ export const usersRepository = {
 
   async updateById(
     id: string,
-    data: Partial<Pick<User, "fname" | "lname" | "shippingAddressId" | "billingAddressId" | "role">>
+    data: Partial<Pick<User, "fname" | "lname" | "shippingAddressId" | "billingAddressId">>
   ): Promise<User> {
     const [updated] = await db
       .update(users)
@@ -61,7 +61,7 @@ export const usersRepository = {
   },
 
   async findAddressById(id: string): Promise<Address | undefined> {
-    return db.query.addresses.findFirst({
+    return await db.query.addresses.findFirst({
       where: eq(addresses.id, id),
     });
   },
