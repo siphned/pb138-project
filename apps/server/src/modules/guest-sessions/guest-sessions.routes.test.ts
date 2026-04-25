@@ -27,7 +27,7 @@ describe("guest-sessions routes", () => {
     expect(response.status).toBe(200);
     const data = await response.json();
     expect(data.id).toBe("test-session-id");
-    
+
     const cookie = response.headers.get("Set-Cookie");
     expect(cookie).toContain("guest_session_id=test-session-id");
   });

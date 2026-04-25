@@ -26,8 +26,12 @@ describe("orders routes", () => {
           paymentMethod: "card",
           deliveryType: "shipping",
           shippingAddress: {
-            country: "CZ", city: "B", postalCode: "1", street: "S", houseNumber: "1"
-          }
+            country: "CZ",
+            city: "B",
+            postalCode: "1",
+            street: "S",
+            houseNumber: "1",
+          },
         }),
       })
     );
@@ -49,8 +53,12 @@ describe("orders routes", () => {
           paymentMethod: "card",
           deliveryType: "shipping",
           shippingAddress: {
-            country: "CZ", city: "B", postalCode: "1", street: "S", houseNumber: "1"
-          }
+            country: "CZ",
+            city: "B",
+            postalCode: "1",
+            street: "S",
+            houseNumber: "1",
+          },
         }),
       })
     );

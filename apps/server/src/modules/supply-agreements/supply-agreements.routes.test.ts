@@ -1,7 +1,7 @@
 import { describe, expect, it, vi } from "vitest";
 import { app } from "../../app";
 
-const mockAgreement = {
+const _mockAgreement = {
   id: "a1",
   shopId: "s1",
   winemakerId: "wm1",
@@ -28,22 +28,26 @@ vi.mock("./supply-agreements.service", () => ({
       createdAt: new Date(),
       respondedAt: new Date(),
     }),
-    listForShop: vi.fn().mockResolvedValue([{
-      id: "a1",
-      shopId: "s1",
-      winemakerId: "wm1",
-      status: "pending",
-      createdAt: new Date(),
-      respondedAt: null,
-    }]),
-    listForWinemaker: vi.fn().mockResolvedValue([{
-      id: "a1",
-      shopId: "s1",
-      winemakerId: "wm1",
-      status: "pending",
-      createdAt: new Date(),
-      respondedAt: null,
-    }]),
+    listForShop: vi.fn().mockResolvedValue([
+      {
+        id: "a1",
+        shopId: "s1",
+        winemakerId: "wm1",
+        status: "pending",
+        createdAt: new Date(),
+        respondedAt: null,
+      },
+    ]),
+    listForWinemaker: vi.fn().mockResolvedValue([
+      {
+        id: "a1",
+        shopId: "s1",
+        winemakerId: "wm1",
+        status: "pending",
+        createdAt: new Date(),
+        respondedAt: null,
+      },
+    ]),
   },
 }));
 

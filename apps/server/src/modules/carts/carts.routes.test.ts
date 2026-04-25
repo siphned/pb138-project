@@ -13,8 +13,6 @@ vi.mock("../auth/auth.utils", () => ({
   verifyClerkToken: vi.fn().mockResolvedValue(null),
 }));
 
-import { verifyClerkToken } from "../auth/auth.utils";
-
 describe("carts routes", () => {
   it("GET /carts returns guest cart if no auth but session cookie", async () => {
     const response = await app.handle(
