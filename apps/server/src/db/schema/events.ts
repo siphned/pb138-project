@@ -11,6 +11,8 @@ export const events = pgTable("events", {
   winemakerId: uuid("winemaker_id")
     .notNull()
     .references(() => winemakers.id),
+  name: varchar("name", { length: 255 }).notNull(),
+  description: text("description"),
   addressId: uuid("address_id")
     .notNull()
     .references(() => addresses.id),
@@ -48,5 +50,15 @@ export const eventRegistrations = pgTable("event_registrations", {
   deletedAt: timestamptz("deleted_at"),
 });
 
-// Extend eventRegistrations with unique constraint for active registrations
-// This is handled through relations.ts since we already defined eventRegistrations above
+export const eventComments = pgTable("event_comments", {
+  id: uuid("id").primaryKey().defaultRandom(),
+  eventId: uuid("event_id")
+    .notNull()
+    .references(() => events.id),
+  userId: uuid("user_id")
+    .notNull()
+    .references(() => users.id),
+  body: text("body").notNull(),
+  createdAt: timestamptz("created_at").notNull().defaultNow(),
+  deletedAt: timestamptz("deleted_at"),
+});

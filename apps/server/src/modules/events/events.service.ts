@@ -1,37 +1,8 @@
-import type { Comment, Event, EventRegistration } from "../../db/schema";
+import type { Event, EventComment, EventRegistration } from "../../db/schema";
 import type { PaginatedResult } from "../../utils/pagination";
 import { parsePagination } from "../../utils/pagination";
 import type { CommentWithUser, EventWithDetails } from "./events.repository";
 import { eventsRepository } from "./events.repository";
-
-function validateEventDates(
-  data: { startTime?: string; endTime?: string },
-  startTime: Date,
-  endTime: Date
-) {
-  if (data.startTime && startTime <= new Date()) throw new Error("INVALID_DATES");
-  if ((data.startTime || data.endTime) && endTime <= startTime) throw new Error("INVALID_DATES");
-}
-
-function buildEventUpdates(
-  data: {
-    name?: string;
-    description?: string | null;
-    capacity?: number;
-    startTime?: string;
-    endTime?: string;
-  },
-  startTime: Date,
-  endTime: Date
-): Record<string, unknown> {
-  const updates: Record<string, unknown> = {};
-  if (data.name !== undefined) updates.name = data.name;
-  if (data.description !== undefined) updates.description = data.description;
-  if (data.capacity !== undefined) updates.capacity = data.capacity;
-  if (data.startTime !== undefined) updates.startTime = startTime;
-  if (data.endTime !== undefined) updates.endTime = endTime;
-  return updates;
-}
 
 export const eventsService = {
   async listEvents(
@@ -130,16 +101,27 @@ export const eventsService = {
 
     const startTime = data.startTime ? new Date(data.startTime) : event.startTime;
     const endTime = data.endTime ? new Date(data.endTime) : event.endTime;
+    if (data.startTime && startTime <= new Date()) throw new Error("INVALID_DATES");
+    if ((data.startTime || data.endTime) && endTime <= startTime) throw new Error("INVALID_DATES");
 
-    validateEventDates(data, startTime, endTime);
-
+    const updates: {
+      name?: string;
+      description?: string | null;
+      capacity?: number;
+      startTime?: Date;
+      endTime?: Date;
+    } = {};
+    if (data.name !== undefined) updates.name = data.name;
+    if (data.description !== undefined) updates.description = data.description;
     if (data.capacity !== undefined) {
       const registrationCount = await eventsRepository.countActiveRegistrations(id);
       if (data.capacity < registrationCount) throw new Error("CAPACITY_TOO_LOW");
+      updates.capacity = data.capacity;
     }
+    if (data.startTime !== undefined) updates.startTime = startTime;
+    if (data.endTime !== undefined) updates.endTime = endTime;
 
-    const updates = buildEventUpdates(data, startTime, endTime);
-    return eventsRepository.update(id, updates as Parameters<typeof eventsRepository.update>[1]);
+    return eventsRepository.update(id, updates);
   },
 
   async deleteEvent(id: string, userId: string): Promise<void> {
@@ -166,7 +148,7 @@ export const eventsService = {
     await eventsRepository.softDeleteRegistration(reg.id);
   },
 
-  async addComment(eventId: string, userId: string, body: string): Promise<Comment> {
+  async addComment(eventId: string, userId: string, body: string): Promise<EventComment> {
     const event = await eventsRepository.findById(eventId);
     if (!event || event.status !== "approved") throw new Error("EVENT_NOT_AVAILABLE");
     return eventsRepository.createComment(eventId, userId, body);

@@ -3,7 +3,7 @@ import { addresses } from "./addresses";
 import { availabilityExceptions, availabilityRegular } from "./availability";
 import { cartItems, carts } from "./carts";
 import { products, productWines, wines } from "./catalog";
-import { eventInvitations, eventRegistrations, events } from "./events";
+import { eventComments, eventInvitations, eventRegistrations, events } from "./events";
 import { images } from "./images";
 import { orderItems, orders } from "./orders";
 import { comments, reviews } from "./reviews";
@@ -110,6 +110,7 @@ export const eventsRelations = relations(events, ({ one, many }) => ({
   address: one(addresses, { fields: [events.addressId], references: [addresses.id] }),
   invitations: many(eventInvitations),
   registrations: many(eventRegistrations),
+  comments: many(eventComments),
 }));
 
 export const eventInvitationsRelations = relations(eventInvitations, ({ one }) => ({
@@ -119,6 +120,11 @@ export const eventInvitationsRelations = relations(eventInvitations, ({ one }) =
 export const eventRegistrationsRelations = relations(eventRegistrations, ({ one }) => ({
   event: one(events, { fields: [eventRegistrations.eventId], references: [events.id] }),
   user: one(users, { fields: [eventRegistrations.userId], references: [users.id] }),
+}));
+
+export const eventCommentsRelations = relations(eventComments, ({ one }) => ({
+  event: one(events, { fields: [eventComments.eventId], references: [events.id] }),
+  user: one(users, { fields: [eventComments.userId], references: [users.id] }),
 }));
 
 export const ordersRelations = relations(orders, ({ one, many }) => ({
@@ -166,9 +172,4 @@ export const roleRequestsRelations = relations(roleRequests, ({ one }) => ({
     references: [users.id],
     relationName: "roleRequestReviewer",
   }),
-}));
-
-export const eventRegistrationsRelations = relations(eventRegistrations, ({ one }) => ({
-  event: one(events, { fields: [eventRegistrations.eventId], references: [events.id] }),
-  user: one(users, { fields: [eventRegistrations.userId], references: [users.id] }),
 }));

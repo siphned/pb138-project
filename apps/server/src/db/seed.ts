@@ -176,6 +176,7 @@ async function insertEvents(winemakerId: string, count: number) {
       .values({
         winemakerId,
         name: `Tasting ${i}`,
+        capacity: 50,
         startTime: new Date(),
         endTime: new Date(),
         visibility: pick(["public", "private"] as const),

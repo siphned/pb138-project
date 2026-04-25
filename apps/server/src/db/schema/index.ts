@@ -20,20 +20,14 @@ import type { addresses } from "./addresses";
 import type { availabilityExceptions, availabilityRegular } from "./availability";
 import type { carts } from "./carts";
 import type { products, productWines, wines } from "./catalog";
+import type { eventComments, eventRegistrations, events } from "./events";
 import type { guestSessions } from "./guest-sessions";
 import type { orders } from "./orders";
+import type { comments } from "./reviews";
 import type { roleRequests } from "./role-requests";
 import type { shops, winemakers } from "./sellers";
 import type { supplyAgreements } from "./supply-agreements";
 import type { users } from "./users";
-import type { addresses } from "./addresses";
-import type { shops, winemakers } from "./sellers";
-import type { wines, products, productWines } from "./catalog";
-import type { availabilityRegular, availabilityExceptions } from "./availability";
-import type { orders } from "./orders";
-import type { carts } from "./carts";
-import type { roleRequests } from "./role-requests";
-import type { events, eventRegistrations, comments } from "./events";
 
 export type User = (typeof users)["$inferSelect"];
 export type NewUser = (typeof users)["$inferInsert"];
@@ -56,4 +50,5 @@ export type AvailabilityException = (typeof availabilityExceptions)["$inferSelec
 export type Event = (typeof events)["$inferSelect"];
 export type NewEvent = (typeof events)["$inferInsert"];
 export type EventRegistration = (typeof eventRegistrations)["$inferSelect"];
+export type EventComment = (typeof eventComments)["$inferSelect"];
 export type Comment = (typeof comments)["$inferSelect"];

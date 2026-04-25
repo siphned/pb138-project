@@ -1,7 +1,7 @@
 import { and, count, eq, gte, ilike, inArray, isNull, lte } from "drizzle-orm";
 import { db } from "../../db";
-import type { Comment, Event, EventRegistration } from "../../db/schema";
-import { addresses, comments, eventRegistrations, events, winemakers } from "../../db/schema";
+import type { Event, EventComment, EventRegistration } from "../../db/schema";
+import { addresses, eventComments, eventRegistrations, events, winemakers } from "../../db/schema";
 
 export type EventWithDetails = Event & {
   winemaker: { id: string; name: string } | null;
@@ -14,7 +14,7 @@ export type EventWithDetails = Event & {
   } | null;
 };
 
-export type CommentWithUser = Comment & {
+export type CommentWithUser = EventComment & {
   user: { id: string; fname: string; lname: string };
 };
 
@@ -230,8 +230,8 @@ export const eventsRepository = {
     eventId: string,
     pagination: { limit: number; offset: number }
   ): Promise<CommentWithUser[]> {
-    return db.query.comments.findMany({
-      where: and(eq(comments.eventId, eventId), isNull(comments.deletedAt)),
+    return db.query.eventComments.findMany({
+      where: and(eq(eventComments.eventId, eventId), isNull(eventComments.deletedAt)),
       with: { user: { columns: { id: true, fname: true, lname: true } } },
       limit: pagination.limit,
       offset: pagination.offset,
@@ -242,13 +242,13 @@ export const eventsRepository = {
   async countComments(eventId: string): Promise<number> {
     const [result] = await db
       .select({ value: count() })
-      .from(comments)
-      .where(and(eq(comments.eventId, eventId), isNull(comments.deletedAt)));
+      .from(eventComments)
+      .where(and(eq(eventComments.eventId, eventId), isNull(eventComments.deletedAt)));
     return Number(result?.value ?? 0);
   },
 
-  async createComment(eventId: string, userId: string, body: string): Promise<Comment> {
-    const [comment] = await db.insert(comments).values({ eventId, userId, body }).returning();
+  async createComment(eventId: string, userId: string, body: string): Promise<EventComment> {
+    const [comment] = await db.insert(eventComments).values({ eventId, userId, body }).returning();
     if (!comment) throw new Error("Comment insert returned no rows");
     return comment;
   },
