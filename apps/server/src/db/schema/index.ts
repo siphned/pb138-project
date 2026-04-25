@@ -23,6 +23,7 @@ import type { orders, orderItems } from "./orders";
 import type { carts, cartItems } from "./carts";
 import type { roleRequests } from "./role-requests";
 import type { events, eventRegistrations, comments } from "./events";
+import type { productReviews, winemakerReviews } from "./reviews";
 
 export type User = (typeof users)["$inferSelect"];
 export type NewUser = (typeof users)["$inferInsert"];
@@ -49,3 +50,5 @@ export type Event = (typeof events)["$inferSelect"];
 export type NewEvent = (typeof events)["$inferInsert"];
 export type EventRegistration = (typeof eventRegistrations)["$inferSelect"];
 export type Comment = (typeof comments)["$inferSelect"];
+export type ProductReview = (typeof productReviews)["$inferSelect"];
+export type WinemakerReview = (typeof winemakerReviews)["$inferSelect"];

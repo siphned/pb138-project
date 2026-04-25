@@ -166,7 +166,10 @@ This document specifies all REST API endpoints for the WineMarket platform. Each
 | POST | `/products/:id/reviews` | Write review | ✅ |
 | GET | `/winemakers/:id/reviews` | Winemaker reviews | ❌ |
 | POST | `/winemakers/:id/reviews` | Write review | ✅ |
+| DELETE | `/products/:productId/reviews/:reviewId` | Delete product review | ✅ (own/Admin) |
+| DELETE | `/winemakers/:winemakerId/reviews/:reviewId` | Delete winemaker review | ✅ (own/Admin) |
 | DELETE | `/reviews/:id` | Delete own review | ✅ (own) |
+| PATCH | `/reviews/:id/hide` | Hide review | ✅ (Admin) |
 
 ---
 
