@@ -70,8 +70,7 @@ export function ProfileEditForm({ onSuccess, onCancel }: ProfileEditFormProps) {
     try {
       await updateUser(formData);
       if (onSuccess) onSuccess();
-    } catch (error) {
-      console.error("Failed to update profile", error);
+    } catch (_error) {
       setErrors({ fname: "Failed to save changes" });
     } finally {
       setIsSaving(false);

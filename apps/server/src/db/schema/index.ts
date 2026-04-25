@@ -4,25 +4,29 @@ export * from "./carts";
 export * from "./catalog";
 export * from "./enums";
 export * from "./events";
+export * from "./guest-sessions";
 export * from "./images";
 export * from "./orders";
 export * from "./relations";
 export * from "./reviews";
 export * from "./role-requests";
 export * from "./sellers";
+export * from "./supply-agreements";
 export * from "./users";
 
 // ─── Inferred types ───────────────────────────────────────────────────────────
 
 import type { addresses } from "./addresses";
 import type { availabilityExceptions, availabilityRegular } from "./availability";
-import type { cartItems, carts } from "./carts";
+import type { carts } from "./carts";
 import type { products, productWines, wines } from "./catalog";
-import type { comments, eventRegistrations, events } from "./events";
-import type { orderItems, orders } from "./orders";
+import type { eventComments, eventRegistrations, events } from "./events";
+import type { guestSessions } from "./guest-sessions";
+import type { orders } from "./orders";
 import type { productReviews, winemakerReviews } from "./reviews";
 import type { roleRequests } from "./role-requests";
 import type { shops, winemakers } from "./sellers";
+import type { supplyAgreements } from "./supply-agreements";
 import type { users } from "./users";
 
 export type User = (typeof users)["$inferSelect"];
@@ -35,12 +39,9 @@ export type Wine = (typeof wines)["$inferSelect"];
 export type Product = (typeof products)["$inferSelect"];
 export type Order = (typeof orders)["$inferSelect"];
 export type Cart = (typeof carts)["$inferSelect"];
-export type CartItem = (typeof cartItems)["$inferSelect"];
-export type NewCartItem = (typeof cartItems)["$inferInsert"];
-export type OrderItem = (typeof orderItems)["$inferSelect"];
-export type NewOrderItem = (typeof orderItems)["$inferInsert"];
-export type NewOrder = (typeof orders)["$inferInsert"];
+export type GuestSession = (typeof guestSessions)["$inferSelect"];
 export type RoleRequest = (typeof roleRequests)["$inferSelect"];
+export type SupplyAgreement = (typeof supplyAgreements)["$inferSelect"];
 export type ProductWine = (typeof productWines)["$inferSelect"];
 export type NewProduct = (typeof products)["$inferInsert"];
 export type NewProductWine = (typeof productWines)["$inferInsert"];
@@ -49,6 +50,6 @@ export type AvailabilityException = (typeof availabilityExceptions)["$inferSelec
 export type Event = (typeof events)["$inferSelect"];
 export type NewEvent = (typeof events)["$inferInsert"];
 export type EventRegistration = (typeof eventRegistrations)["$inferSelect"];
-export type Comment = (typeof comments)["$inferSelect"];
+export type EventComment = (typeof eventComments)["$inferSelect"];
 export type ProductReview = (typeof productReviews)["$inferSelect"];
 export type WinemakerReview = (typeof winemakerReviews)["$inferSelect"];

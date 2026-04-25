@@ -1,63 +1,85 @@
-import { productsRepository } from "../products/products.repository";
+import type { Cart } from "../../db/schema";
 import type { CartWithItems } from "./carts.repository";
 import { cartsRepository } from "./carts.repository";
 
 export const cartsService = {
-  async getMyCart(userId: string): Promise<CartWithItems> {
-    await cartsRepository.upsertCart(userId);
-    const cart = await cartsRepository.findByUserId(userId);
-    if (!cart) throw new Error("Unexpected: cart not found after upsert");
-    return cart;
+  async getCartForUser(userId: string): Promise<CartWithItems | undefined> {
+    let cart = await cartsRepository.findByUserId(userId);
+    if (!cart) {
+      cart = await cartsRepository.create({ userId });
+    }
+    return cartsRepository.findByIdWithItems(cart.id);
   },
 
-  async addItem(userId: string, productId: string, quantity: number): Promise<CartWithItems> {
-    const product = await productsRepository.findById(productId);
-    if (!product) throw new Error("NOT_FOUND");
+  async getCartForSession(sessionId: string): Promise<CartWithItems | undefined> {
+    let cart = await cartsRepository.findBySessionId(sessionId);
+    if (!cart) {
+      cart = await cartsRepository.create({ sessionId });
+    }
+    return cartsRepository.findByIdWithItems(cart.id);
+  },
 
-    const cart = await cartsRepository.upsertCart(userId);
+  async addItem(
+    { userId, sessionId }: { userId?: string; sessionId?: string },
+    productId: string,
+    quantity: number
+  ): Promise<void> {
+    let cart: Cart | undefined;
+    if (userId) {
+      cart = await cartsRepository.findByUserId(userId);
+      if (!cart) cart = await cartsRepository.create({ userId });
+    } else if (sessionId) {
+      cart = await cartsRepository.findBySessionId(sessionId);
+      if (!cart) cart = await cartsRepository.create({ sessionId });
+    }
+
+    if (!cart) throw new Error("Could not find or create cart");
+
     await cartsRepository.addItem(cart.id, productId, quantity);
-
-    const full = await cartsRepository.findByUserId(userId);
-    if (!full) throw new Error("Unexpected: cart not found after add");
-    return full;
   },
 
-  async updateItem(userId: string, cartItemId: string, quantity: number): Promise<CartWithItems> {
-    const [cart, item] = await Promise.all([
-      cartsRepository.findByUserId(userId),
-      cartsRepository.findItem(cartItemId),
-    ]);
-    if (!cart || !item || item.cartId !== cart.id) throw new Error("NOT_FOUND");
+  async updateItemQuantity(
+    { userId, sessionId }: { userId?: string; sessionId?: string },
+    productId: string,
+    quantity: number
+  ): Promise<void> {
+    let cart: Cart | undefined;
+    if (userId) {
+      cart = await cartsRepository.findByUserId(userId);
+    } else if (sessionId) {
+      cart = await cartsRepository.findBySessionId(sessionId);
+    }
 
-    await cartsRepository.updateItem(cartItemId, quantity);
+    if (!cart) throw new Error("Cart not found");
 
-    const full = await cartsRepository.findByUserId(userId);
-    if (!full) throw new Error("Unexpected: cart not found after update");
-    return full;
+    await cartsRepository.updateItemQuantity(cart.id, productId, quantity);
   },
 
-  async removeItem(userId: string, cartItemId: string): Promise<void> {
-    const [cart, item] = await Promise.all([
-      cartsRepository.findByUserId(userId),
-      cartsRepository.findItem(cartItemId),
-    ]);
-    if (!cart || !item || item.cartId !== cart.id) throw new Error("NOT_FOUND");
+  async removeItem(
+    { userId, sessionId }: { userId?: string; sessionId?: string },
+    productId: string
+  ): Promise<void> {
+    let cart: Cart | undefined;
+    if (userId) {
+      cart = await cartsRepository.findByUserId(userId);
+    } else if (sessionId) {
+      cart = await cartsRepository.findBySessionId(sessionId);
+    }
 
-    await cartsRepository.removeItem(cartItemId);
+    if (!cart) throw new Error("Cart not found");
+
+    await cartsRepository.removeItem(cart.id, productId);
   },
 
-  async mergeGuestItems(
-    userId: string,
-    items: { productId: string; quantity: number }[]
-  ): Promise<CartWithItems> {
-    const allExist = await productsRepository.productIdsExist(items.map((i) => i.productId));
-    if (!allExist) throw new Error("NOT_FOUND");
+  async mergeOnLogin(userId: string, sessionId: string): Promise<void> {
+    const guestCart = await cartsRepository.findBySessionId(sessionId);
+    if (!guestCart) return;
 
-    const cart = await cartsRepository.upsertCart(userId);
-    await cartsRepository.mergeGuestItems(cart.id, items);
+    let userCart = await cartsRepository.findByUserId(userId);
+    if (!userCart) {
+      userCart = await cartsRepository.create({ userId });
+    }
 
-    const full = await cartsRepository.findByUserId(userId);
-    if (!full) throw new Error("Unexpected: cart not found after merge");
-    return full;
+    await cartsRepository.mergeCarts(guestCart.id, userCart.id);
   },
 };

@@ -6,9 +6,9 @@ import { WinemakerEvents } from "./events/WinemakerEvents";
 export function EventsTab({ role }: { role: Role }) {
   const renderEventsContent = () => {
     switch (role) {
-      case Role.CUSTOMER:
+      case Role.customer:
         return <CustomerEvents />;
-      case Role.SHOP_OWNER:
+      case Role.shopOwner:
         return <ShopOwnerEvents />;
       default:
         return <WinemakerEvents />;

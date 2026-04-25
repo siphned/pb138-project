@@ -32,10 +32,11 @@ export const shopsService = {
     return shop;
   },
 
-  async createShop(ownerUserId: string, data: CreateShopData): Promise<ShopWithAddress> {
-    const existing = await shopsRepository.findByOwnerUserId(ownerUserId);
-    if (existing) throw new Error("ALREADY_HAS_SHOP");
+  listMyShops(ownerUserId: string): Promise<ShopWithAddress[]> {
+    return shopsRepository.findAllByOwnerUserId(ownerUserId) as Promise<ShopWithAddress[]>;
+  },
 
+  async createShop(ownerUserId: string, data: CreateShopData): Promise<ShopWithAddress> {
     const shop = await shopsRepository.createShopWithAddress(
       { ownerUserId, name: data.name, description: data.description },
       data.address
