@@ -58,7 +58,7 @@ export function Header({ user: propUser, activeRole, onRoleChange }: HeaderProps
 
         {/* Drop the Sidebar right here! */}
         <Sidebar
-          userRoles={[Role.WINEMAKER, Role.SHOP_OWNER, Role.CUSTOMER]}
+          userRoles={[Role.winemaker, Role.shopOwner, Role.customer]}
           activeRole={activeRole}
           onRoleChange={onRoleChange}
         />
