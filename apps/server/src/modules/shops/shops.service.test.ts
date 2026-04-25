@@ -39,7 +39,7 @@ const mockShop = {
   name: "Test Shop",
   description: "A description",
   addressId,
-  address: mockAddress,
+  address: { country: "CZ", city: "B", postalCode: "1", street: "S", houseNumber: "1" },
   createdAt: new Date(),
   updatedAt: null,
   deletedAt: null,
@@ -145,8 +145,8 @@ describe("updateShop", () => {
     expect(shopsRepository.insertAddress).toHaveBeenCalledWith({
       country: "CZ",
       city: "Prague",
-      postalCode: "60200",
-      street: "Masarykova",
+      postalCode: "1",
+      street: "S",
       houseNumber: "1",
     });
     expect(shopsRepository.updateById).toHaveBeenCalledWith(shopId, { addressId: newAddressId });

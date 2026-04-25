@@ -1,4 +1,4 @@
-import { eq } from "drizzle-orm";
+import { eq, lt } from "drizzle-orm";
 import { db } from "../../db";
 import type { GuestSession } from "../../db/schema";
 import { guestSessions } from "../../db/schema";
@@ -20,8 +20,6 @@ export const guestSessionsRepository = {
   },
 
   async cleanupExpired(): Promise<void> {
-    // This would be called by a cron job or similar
-    // For now just providing the capability
-    // await db.delete(guestSessions).where(lt(guestSessions.expiresAt, new Date()));
+    await db.delete(guestSessions).where(lt(guestSessions.expiresAt, new Date()));
   },
 };

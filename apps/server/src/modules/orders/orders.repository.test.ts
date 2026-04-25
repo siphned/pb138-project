@@ -19,8 +19,8 @@ interface MockDatabase {
   selectDistinct: () => MockChained;
   query: {
     orders: {
-      findFirst: vi.Mock;
-      findMany: vi.Mock;
+      findFirst: unknown;
+      findMany: unknown;
     };
   };
 }

@@ -15,11 +15,11 @@ interface MockDatabase {
   returning: () => Promise<unknown[]>;
   query: {
     wines: {
-      findFirst: vi.Mock;
-      findMany: vi.Mock;
+      findFirst: unknown;
+      findMany: unknown;
     };
     winemakers: {
-      findFirst: vi.Mock;
+      findFirst: unknown;
     };
   };
 }

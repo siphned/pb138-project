@@ -15,10 +15,10 @@ interface MockDatabase {
   returning: () => Promise<unknown[]>;
   query: {
     availabilityRegular: {
-      findMany: vi.Mock;
+      findMany: unknown;
     };
     availabilityExceptions: {
-      findMany: vi.Mock;
+      findMany: unknown;
     };
   };
 }

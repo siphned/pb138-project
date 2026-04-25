@@ -25,7 +25,7 @@ describe("carts routes", () => {
     );
 
     expect(response.status).toBe(200);
-    const data = await response.json();
+    const data = (await response.json()) as unknown as { id: string };
     expect(data.id).toBe("gc1");
   });
 

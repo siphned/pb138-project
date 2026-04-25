@@ -1,10 +1,13 @@
 import { Elysia, status, t } from "elysia";
+import { authPlugin } from "../auth";
+import { guestSessionsRepository } from "./guest-sessions.repository";
 import { guestSessionsService } from "./guest-sessions.service";
 
 export const guestSessionsRoutes = new Elysia({
   prefix: "/guest-sessions",
   tags: ["guest-sessions"],
 })
+  .use(authPlugin)
   .post(
     "/",
     async ({ cookie: { guest_session_id } }) => {
@@ -61,6 +64,22 @@ export const guestSessionsRoutes = new Elysia({
           expiresAt: t.Date(),
         }),
         404: t.String(),
+      },
+    }
+  )
+  .delete(
+    "/cleanup",
+    async () => {
+      await guestSessionsRepository.cleanupExpired();
+      return status(204, null);
+    },
+    {
+      requireRoles: ["admin"],
+      detail: {
+        summary: "Cleanup expired guest sessions",
+        description:
+          "Removes all guest sessions that have passed their expiresAt date. Admin only.",
+        security: [{ bearerAuth: [] }],
       },
     }
   );

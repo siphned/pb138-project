@@ -1,40 +1,58 @@
-import { and, eq, sql } from "drizzle-orm";
+import { and, eq, isNull, sql } from "drizzle-orm";
 import { db } from "../../db";
 import type { Cart, Product } from "../../db/schema";
 import { cartItems, carts } from "../../db/schema";
 
-export type CartItemWithProduct = typeof cartItems.$inferSelect & {
+export interface CartItemWithProduct {
+  id: string;
+  cartId: string;
+  productId: string;
+  quantity: number;
+  createdAt: Date;
+  updatedAt: Date;
+  deletedAt: Date | null;
   product: Product;
-};
+}
 
-export type CartWithItems = Cart & {
+export interface CartWithItems extends Cart {
   items: CartItemWithProduct[];
-};
+}
 
 export const cartsRepository = {
-  findByUserId(userId: string): Promise<Cart | undefined> {
+  async findByUserId(userId: string): Promise<Cart | undefined> {
     return db.query.carts.findFirst({
-      where: eq(carts.userId, userId),
+      where: and(eq(carts.userId, userId), isNull(carts.deletedAt)),
     });
   },
 
-  findBySessionId(sessionId: string): Promise<Cart | undefined> {
+  async findBySessionId(sessionId: string): Promise<Cart | undefined> {
     return db.query.carts.findFirst({
-      where: eq(carts.sessionId, sessionId),
+      where: and(eq(carts.sessionId, sessionId), isNull(carts.deletedAt)),
     });
   },
 
-  findByIdWithItems(id: string): Promise<CartWithItems | undefined> {
-    return db.query.carts.findFirst({
-      where: eq(carts.id, id),
+  async findByIdWithItems(id: string): Promise<CartWithItems | undefined> {
+    const cart = await db.query.carts.findFirst({
+      where: and(eq(carts.id, id), isNull(carts.deletedAt)),
       with: {
         items: {
+          where: (items, { isNull }) => isNull(items.deletedAt),
           with: {
             product: true,
           },
         },
       },
-    }) as Promise<CartWithItems | undefined>;
+    });
+
+    if (cart) {
+      const typedCart = cart as unknown as CartWithItems;
+      if (typedCart.items) {
+        typedCart.items = typedCart.items.filter((item) => item.product && !item.product.deletedAt);
+      }
+      return typedCart;
+    }
+
+    return undefined;
   },
 
   async create(data: { userId?: string; sessionId?: string }): Promise<Cart> {
@@ -91,7 +109,7 @@ export const cartsRepository = {
       }
 
       await tx.delete(cartItems).where(eq(cartItems.cartId, fromCartId));
-      await tx.delete(carts).where(eq(carts.id, fromCartId));
+      await tx.update(carts).set({ deletedAt: new Date() }).where(eq(carts.id, fromCartId));
     });
   },
 };

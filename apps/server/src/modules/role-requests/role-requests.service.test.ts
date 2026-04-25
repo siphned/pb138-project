@@ -52,19 +52,19 @@ describe("roleRequestsService", () => {
       expect(result.id).toBe(requestId);
       expect(roleRequestsRepository.create).toHaveBeenCalledWith({
         userId,
-        requestedRole: "winemaker",
+        type: "winemaker",
         businessName: "My Business",
         details: undefined,
       });
     });
 
-    it("throws DUPLICATE_REQUEST if a pending request for the same role exists", async () => {
+    it("throws ALREADY_HAS_PENDING_REQUEST if a pending request for the same role exists", async () => {
       vi.mocked(roleRequestsRepository.findByUserId).mockResolvedValue([
-        { requestedRole: "winemaker", status: "pending" },
+        { type: "winemaker", status: "pending" },
       ] as never);
 
       await expect(roleRequestsService.submitRequest(userId, "winemaker", "Other")).rejects.toThrow(
-        "DUPLICATE_REQUEST"
+        "ALREADY_HAS_PENDING_REQUEST"
       );
     });
   });
@@ -74,7 +74,7 @@ describe("roleRequestsService", () => {
       vi.mocked(roleRequestsRepository.findById).mockResolvedValue({
         id: requestId,
         userId,
-        requestedRole: "winemaker",
+        type: "winemaker",
         status: "pending",
       } as never);
       vi.mocked(usersRepository.findById).mockResolvedValue({ clerkId } as never);
@@ -97,13 +97,15 @@ describe("roleRequestsService", () => {
       await expect(roleRequestsService.approve(requestId, adminId)).rejects.toThrow("NOT_FOUND");
     });
 
-    it("throws NOT_PENDING if request is not pending", async () => {
+    it("throws ALREADY_RESPONDED if request is not pending", async () => {
       vi.mocked(roleRequestsRepository.findById).mockResolvedValue({
         id: requestId,
         status: "rejected",
       } as never);
 
-      await expect(roleRequestsService.approve(requestId, adminId)).rejects.toThrow("NOT_PENDING");
+      await expect(roleRequestsService.approve(requestId, adminId)).rejects.toThrow(
+        "ALREADY_RESPONDED"
+      );
     });
   });
 

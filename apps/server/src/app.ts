@@ -35,6 +35,10 @@ export const app = new Elysia()
           { name: "events", description: "Event management and registration" },
           { name: "wines", description: "Wine catalog CRUD and filtering" },
           { name: "winemakers", description: "Winemaker profiles and portfolios" },
+          { name: "carts", description: "Shopping cart management for guests and users" },
+          { name: "orders", description: "Order placement and history" },
+          { name: "guest-sessions", description: "Anonymous session management" },
+          { name: "supply-agreements", description: "B2B supply relationship management" },
         ],
         servers: [{ url: "http://localhost:3000", description: "Development" }],
         components: {

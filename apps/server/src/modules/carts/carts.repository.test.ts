@@ -24,7 +24,7 @@ interface MockDatabase {
   where: () => MockChained;
   query: {
     carts: {
-      findFirst: vi.Mock;
+      findFirst: unknown;
     };
   };
 }
@@ -93,7 +93,7 @@ describe("cartsRepository", () => {
     it("updates quantity if > 0", async () => {
       await cartsRepository.updateItemQuantity("c1", "p1", 5);
       expect(db.update).toHaveBeenCalledWith(cartItems);
-      expect(db.set).toHaveBeenCalled();
+      expect(mockDb.set).toHaveBeenCalled();
     });
 
     it("deletes item if quantity <= 0", async () => {
@@ -128,7 +128,7 @@ describe("cartsRepository", () => {
       expect(db.transaction).toHaveBeenCalled();
       expect(db.insert).toHaveBeenCalledWith(cartItems);
       expect(db.delete).toHaveBeenCalledWith(cartItems);
-      expect(db.delete).toHaveBeenCalledWith(carts);
+      expect(mockDb.update).toHaveBeenCalledWith(carts);
     });
   });
 });

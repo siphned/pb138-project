@@ -15,7 +15,7 @@ interface MockDatabase {
   returning: () => Promise<unknown[]>;
   query: {
     roleRequests: {
-      findFirst: vi.Mock;
+      findFirst: unknown;
     };
   };
 }

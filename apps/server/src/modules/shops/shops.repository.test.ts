@@ -15,8 +15,8 @@ interface MockDatabase {
   returning: () => Promise<unknown[]>;
   query: {
     shops: {
-      findFirst: vi.Mock;
-      findMany: vi.Mock;
+      findFirst: unknown;
+      findMany: unknown;
     };
   };
 }
