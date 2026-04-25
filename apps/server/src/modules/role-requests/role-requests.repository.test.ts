@@ -1,7 +1,7 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
-import { roleRequestsRepository } from "./role-requests.repository";
 import { db } from "../../db";
 import { roleRequests } from "../../db/schema";
+import { roleRequestsRepository } from "./role-requests.repository";
 
 interface MockChained {
   from: () => MockChained;

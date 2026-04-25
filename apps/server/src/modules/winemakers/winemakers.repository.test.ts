@@ -1,7 +1,7 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
-import { winemakersRepository } from "./winemakers.repository";
 import { db } from "../../db";
 import { winemakers } from "../../db/schema";
+import { winemakersRepository } from "./winemakers.repository";
 
 interface MockChained {
   returning: () => Promise<unknown[]>;

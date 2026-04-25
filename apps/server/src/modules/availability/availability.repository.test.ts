@@ -1,7 +1,7 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
-import { availabilityRepository } from "./availability.repository";
 import { db } from "../../db";
 import { availabilityExceptions, availabilityRegular } from "../../db/schema";
+import { availabilityRepository } from "./availability.repository";
 
 interface MockChained {
   from: () => MockChained;

@@ -1,5 +1,5 @@
-import { describe, expect, it, vi } from "vitest";
 import { renderHook } from "@testing-library/react";
+import { describe, expect, it, vi } from "vitest";
 import { useRoles } from "../hooks/useRoles";
 
 vi.mock("@clerk/react", () => ({
@@ -14,7 +14,7 @@ describe("useRoles", () => {
       sessionClaims: {
         roles: ["admin", "customer"],
       },
-    } as any);
+    } as never);
 
     const { result } = renderHook(() => useRoles());
 
@@ -24,7 +24,7 @@ describe("useRoles", () => {
   it("returns empty array if no sessionClaims", () => {
     vi.mocked(useAuth).mockReturnValue({
       sessionClaims: null,
-    } as any);
+    } as never);
 
     const { result } = renderHook(() => useRoles());
 
@@ -34,7 +34,7 @@ describe("useRoles", () => {
   it("returns empty array if roles missing in sessionClaims", () => {
     vi.mocked(useAuth).mockReturnValue({
       sessionClaims: {},
-    } as any);
+    } as never);
 
     const { result } = renderHook(() => useRoles());
 

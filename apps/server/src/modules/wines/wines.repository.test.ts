@@ -1,7 +1,7 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
-import { winesRepository } from "./wines.repository";
 import { db } from "../../db";
 import { wines } from "../../db/schema";
+import { winesRepository } from "./wines.repository";
 
 interface MockChained {
   returning: () => Promise<unknown[]>;
@@ -55,9 +55,9 @@ describe("winesRepository", () => {
   describe("findAll", () => {
     it("applies filters correctly", async () => {
       vi.mocked(db.query.wines.findMany).mockResolvedValue([]);
-      
+
       await winesRepository.findAll({ region: "Bordeaux", type: "still" });
-      
+
       expect(db.query.wines.findMany).toHaveBeenCalled();
     });
   });
@@ -98,9 +98,9 @@ describe("winesRepository", () => {
   describe("updateById", () => {
     it("updates wine record", async () => {
       vi.mocked(mockDb.returning).mockResolvedValueOnce([{ id: "w1" }]);
-      
-      await winesRepository.updateById("w1", { name: "Updated" } as any);
-      
+
+      await winesRepository.updateById("w1", { name: "Updated" } as never);
+
       expect(db.update).toHaveBeenCalledWith(wines);
     });
   });
