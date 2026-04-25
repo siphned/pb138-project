@@ -1,6 +1,6 @@
 import { useAuth } from "@clerk/react";
-import { useEffect } from "react";
 import axios from "axios";
+import { useEffect } from "react";
 
 // Configure global axios defaults
 axios.defaults.baseURL = import.meta.env.VITE_API_URL || "http://localhost:3000";
