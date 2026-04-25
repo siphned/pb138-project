@@ -3,7 +3,8 @@ import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
 import "./index.css";
 import App from "./App.tsx";
-import { UserProvider } from "./context/UserContext.tsx";
+
+// import { UserProvider } from "./context/UserContext.tsx";
 
 const queryClient = new QueryClient();
 
@@ -11,9 +12,11 @@ const queryClient = new QueryClient();
 createRoot(document.getElementById("root")!).render(
   <StrictMode>
     <QueryClientProvider client={queryClient}>
-      <UserProvider>
+      {/* TODO: Re-enable UserProvider once user schema is properly designed */}
+      <App />
+      {/* <UserProvider>
         <App />
-      </UserProvider>
+      </UserProvider> */}
     </QueryClientProvider>
   </StrictMode>
 );

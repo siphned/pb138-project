@@ -1,4 +1,4 @@
-import { Globe, MapPin, Pencil } from "lucide-react";
+import { Pencil } from "lucide-react";
 import { useState } from "react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
@@ -15,14 +15,17 @@ export function UserInfoCard({ onEdit }: { onEdit?: () => void }) {
   // 3. Add state to control when the dialog is open or closed
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
 
-  const initials = (user?.name || "??").substring(0, 2).toUpperCase();
+  if (!user) return null;
+
+  const initials = `${user.fname[0]}${user.lname[0]}`.toUpperCase();
+  const fullName = `${user.fname} ${user.lname}`;
 
   return (
     <Card className="bg-secondary/40 border-none shadow-none rounded-3xl">
       <CardContent className="p-6 md:p-8">
         <div className="flex flex-col md:flex-row gap-6 md:gap-8 items-start">
           <Avatar className="h-24 w-24 md:h-28 md:w-28 flex-none">
-            <AvatarImage src={user.avatarUrl} alt={user.name} />
+            <AvatarImage src="" alt={fullName} />
             <AvatarFallback className="bg-primary text-primary-foreground font-heading text-2xl font-medium">
               {initials}
             </AvatarFallback>
@@ -31,24 +34,9 @@ export function UserInfoCard({ onEdit }: { onEdit?: () => void }) {
           <div className="flex-1 flex flex-col gap-4 w-full">
             <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-4">
               <div className="space-y-1.5">
-                <h1 className="font-heading text-2xl md:text-3xl font-semibold">{user.name}</h1>
+                <h1 className="font-heading text-2xl md:text-3xl font-semibold">{fullName}</h1>
                 <div className="flex flex-wrap items-center gap-3 text-sm text-muted-foreground">
-                  <span className="flex items-center gap-1.5">
-                    <MapPin className="h-4 w-4" /> {user.location}
-                  </span>
-                  {user.website && (
-                    <>
-                      <span className="hidden sm:inline text-border">|</span>
-                      <a
-                        href={user.website}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="flex items-center gap-1.5 hover:text-primary transition-colors"
-                      >
-                        <Globe className="h-4 w-4" /> Website
-                      </a>
-                    </>
-                  )}
+                  <span>{user.email}</span>
                 </div>
               </div>
 
@@ -82,8 +70,6 @@ export function UserInfoCard({ onEdit }: { onEdit?: () => void }) {
                 </DialogContent>
               </Dialog>
             </div>
-
-            <p className="text-sm text-muted-foreground leading-relaxed max-w-4xl">{user.bio}</p>
           </div>
         </div>
       </CardContent>
