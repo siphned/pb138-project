@@ -44,54 +44,54 @@ export function MyWines({ role = "Winemaker" }: MyWinesProps) {
   };
 
   return (
-    <div className="flex flex-col gap-6 space-y-6 mt-6">
-      <Tabs defaultValue="main" className="w-full">
-        <TabsList className="w-full justify-start h-14 bg-secondary/40 rounded-2xl p-1 gap-2">
+    <div class="flex flex-col gap-6 space-y-6 mt-6">
+      <Tabs defaultValue="main" class="w-full">
+        <TabsList class="w-full justify-start h-14 bg-secondary/40 rounded-2xl p-1 gap-2">
           <TabsTrigger
             value="main"
-            className="flex-1 rounded-xl data-[state=active]:bg-background data-[state=active]:shadow-sm"
+            class="flex-1 rounded-xl data-[state=active]:bg-background data-[state=active]:shadow-sm"
           >
             {role === "Customer" ? (
-              <ShoppingBag className="h-4 w-4 mr-2" />
+              <ShoppingBag class="h-4 w-4 mr-2" />
             ) : (
-              <Wine className="h-4 w-4 mr-2" />
+              <Wine class="h-4 w-4 mr-2" />
             )}
             {role === "Customer" ? "Order History" : "My Wines"}
           </TabsTrigger>
           {role !== "Customer" && (
             <TabsTrigger
               value="bundles"
-              className="flex-1 rounded-xl data-[state=active]:bg-background data-[state=active]:shadow-sm"
+              class="flex-1 rounded-xl data-[state=active]:bg-background data-[state=active]:shadow-sm"
             >
               Bundles
             </TabsTrigger>
           )}
           <TabsTrigger
             value="events"
-            className="flex-1 rounded-xl data-[state=active]:bg-background data-[state=active]:shadow-sm"
+            class="flex-1 rounded-xl data-[state=active]:bg-background data-[state=active]:shadow-sm"
           >
             Events
           </TabsTrigger>
         </TabsList>
 
-        <TabsContent value="main" className="mt-6">
-          <Card className="bg-secondary/40 border-none shadow-none rounded-3xl">
-            <CardContent className="p-6 md:p-8">{renderTableContent()}</CardContent>
+        <TabsContent value="main" class="mt-6">
+          <Card class="bg-secondary/40 border-none shadow-none rounded-3xl">
+            <CardContent class="p-6 md:p-8">{renderTableContent()}</CardContent>
           </Card>
         </TabsContent>
 
-        <TabsContent value="bundles" className="mt-6">
-          <Card className="bg-secondary/40 border-none shadow-none rounded-3xl">
-            <CardContent className="p-6 md:p-8">
+        <TabsContent value="bundles" class="mt-6">
+          <Card class="bg-secondary/40 border-none shadow-none rounded-3xl">
+            <CardContent class="p-6 md:p-8">
               {/* Plug in the Bundles component here! */}
               <BundlesList />
             </CardContent>
           </Card>
         </TabsContent>
 
-        <TabsContent value="events" className="mt-6">
-          <Card className="bg-secondary/40 border-none shadow-none rounded-3xl">
-            <CardContent className="p-6 md:p-8">
+        <TabsContent value="events" class="mt-6">
+          <Card class="bg-secondary/40 border-none shadow-none rounded-3xl">
+            <CardContent class="p-6 md:p-8">
               {/* Plug in the Events component here! */}
               <EventsList />
             </CardContent>
@@ -143,13 +143,13 @@ function WinemakerInventory() {
 
   return (
     <>
-      <div className="flex flex-col md:flex-row items-start md:items-center justify-between mb-8 gap-4">
-        <div className="flex items-center gap-2 font-heading text-xl font-semibold text-primary">
-          <Wine className="h-5 w-5" /> My Wines
+      <div class="flex flex-col md:flex-row items-start md:items-center justify-between mb-8 gap-4">
+        <div class="flex items-center gap-2 font-heading text-xl font-semibold text-primary">
+          <Wine class="h-5 w-5" /> My Wines
         </div>
-        <div className="flex items-center gap-3 w-full md:w-auto">
+        <div class="flex items-center gap-3 w-full md:w-auto">
           <Select defaultValue="all">
-            <SelectTrigger className="w-full sm:w-[120px] bg-background border-none rounded-lg h-10">
+            <SelectTrigger class="w-full sm:w-[120px] bg-background border-none rounded-lg h-10">
               <SelectValue placeholder="Select" />
             </SelectTrigger>
             <SelectContent>
@@ -158,46 +158,38 @@ function WinemakerInventory() {
               <SelectItem value="white">White</SelectItem>
             </SelectContent>
           </Select>
-          <Button className="w-auto bg-primary hover:bg-primary/90 text-primary-foreground rounded-lg h-10 px-5">
-            <Plus className="h-4 w-4 mr-2" /> Add
+          <Button class="w-auto bg-primary hover:bg-primary/90 text-primary-foreground rounded-lg h-10 px-5">
+            <Plus class="h-4 w-4 mr-2" /> Add
           </Button>
         </div>
       </div>
 
       {/* --- DESKTOP VIEW (Hidden on Mobile) --- */}
-      <div className="hidden md:block overflow-x-auto">
+      <div class="hidden md:block overflow-x-auto">
         <Table>
           <TableHeader>
-            <TableRow className="border-border/50 hover:bg-transparent">
-              <TableHead className="text-muted-foreground font-medium">Wine Name</TableHead>
-              <TableHead className="text-muted-foreground font-medium text-center">
-                Vintage
-              </TableHead>
-              <TableHead className="text-muted-foreground font-medium text-center">
-                Quantity
-              </TableHead>
-              <TableHead className="text-muted-foreground font-medium text-center">
-                Status
-              </TableHead>
-              <TableHead className="text-muted-foreground font-medium text-right">
-                Actions
-              </TableHead>
+            <TableRow class="border-border/50 hover:bg-transparent">
+              <TableHead class="text-muted-foreground font-medium">Wine Name</TableHead>
+              <TableHead class="text-muted-foreground font-medium text-center">Vintage</TableHead>
+              <TableHead class="text-muted-foreground font-medium text-center">Quantity</TableHead>
+              <TableHead class="text-muted-foreground font-medium text-center">Status</TableHead>
+              <TableHead class="text-muted-foreground font-medium text-right">Actions</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
             {inventoryData.map((wine) => (
-              <TableRow key={wine.id} className="border-border/50 border-b">
-                <TableCell className="font-medium text-sm">{wine.name}</TableCell>
-                <TableCell className="text-center text-muted-foreground text-sm">
+              <TableRow key={wine.id} class="border-border/50 border-b">
+                <TableCell class="font-medium text-sm">{wine.name}</TableCell>
+                <TableCell class="text-center text-muted-foreground text-sm">
                   {wine.vintage}
                 </TableCell>
-                <TableCell className="text-center font-medium text-sm">{wine.qty}</TableCell>
-                <TableCell className="text-center">
-                  <Badge className={`${wine.badgeClasses} border-none`}>{wine.status}</Badge>
+                <TableCell class="text-center font-medium text-sm">{wine.qty}</TableCell>
+                <TableCell class="text-center">
+                  <Badge class={`${wine.badgeClasses} border-none`}>{wine.status}</Badge>
                 </TableCell>
-                <TableCell className="text-right">
-                  <Button variant="ghost" size="icon" className="h-8 w-8 text-muted-foreground">
-                    <MoreHorizontal className="h-4 w-4" />
+                <TableCell class="text-right">
+                  <Button variant="ghost" size="icon" class="h-8 w-8 text-muted-foreground">
+                    <MoreHorizontal class="h-4 w-4" />
                   </Button>
                 </TableCell>
               </TableRow>
@@ -207,25 +199,25 @@ function WinemakerInventory() {
       </div>
 
       {/* --- MOBILE VIEW (Hidden on Desktop) --- */}
-      <div className="block md:hidden flex flex-col">
+      <div class="block md:hidden flex flex-col">
         {inventoryData.map((wine) => (
           <div
             key={wine.id}
-            className="flex justify-between py-5 border-b border-border/50 last:border-0"
+            class="flex justify-between py-5 border-b border-border/50 last:border-0"
           >
-            <div className="flex flex-col gap-1.5">
-              <span className="font-heading font-semibold text-[15px]">{wine.name}</span>
-              <span className="text-xs text-muted-foreground font-medium">
-                {wine.vintage} <span className="mx-1">|</span> Qty: {wine.qty}
+            <div class="flex flex-col gap-1.5">
+              <span class="font-heading font-semibold text-[15px]">{wine.name}</span>
+              <span class="text-xs text-muted-foreground font-medium">
+                {wine.vintage} <span class="mx-1">|</span> Qty: {wine.qty}
               </span>
-              <div className="pt-1.5">
-                <Badge className={`${wine.badgeClasses} border-none px-2 py-0.5 text-[10px]`}>
+              <div class="pt-1.5">
+                <Badge class={`${wine.badgeClasses} border-none px-2 py-0.5 text-[10px]`}>
                   {wine.status}
                 </Badge>
               </div>
             </div>
-            <Button variant="ghost" size="icon" className="h-8 w-8 -mr-2 text-muted-foreground">
-              <MoreHorizontal className="h-5 w-5" />
+            <Button variant="ghost" size="icon" class="h-8 w-8 -mr-2 text-muted-foreground">
+              <MoreHorizontal class="h-5 w-5" />
             </Button>
           </div>
         ))}
@@ -255,13 +247,13 @@ function ShopOwnerInventory() {
 
   return (
     <>
-      <div className="flex flex-col md:flex-row items-start md:items-center justify-between mb-8 gap-4">
-        <div className="flex items-center gap-2 font-heading text-xl font-semibold text-primary">
-          <Wine className="h-5 w-5" /> Shop Inventory
+      <div class="flex flex-col md:flex-row items-start md:items-center justify-between mb-8 gap-4">
+        <div class="flex items-center gap-2 font-heading text-xl font-semibold text-primary">
+          <Wine class="h-5 w-5" /> Shop Inventory
         </div>
-        <div className="flex flex-col sm:flex-row items-center gap-3 w-full md:w-auto">
+        <div class="flex flex-col sm:flex-row items-center gap-3 w-full md:w-auto">
           <Select defaultValue="all">
-            <SelectTrigger className="w-full sm:w-[180px] bg-background border-none rounded-lg h-10">
+            <SelectTrigger class="w-full sm:w-[180px] bg-background border-none rounded-lg h-10">
               <SelectValue placeholder="Select Winemaker" />
             </SelectTrigger>
             <SelectContent>
@@ -270,36 +262,32 @@ function ShopOwnerInventory() {
               <SelectItem value="margaux">Chateau Margaux</SelectItem>
             </SelectContent>
           </Select>
-          <Button className="w-full sm:w-auto bg-primary hover:bg-primary/90 text-primary-foreground rounded-lg h-10 px-5">
-            <Plus className="h-4 w-4 mr-2" /> Add Wine
+          <Button class="w-full sm:w-auto bg-primary hover:bg-primary/90 text-primary-foreground rounded-lg h-10 px-5">
+            <Plus class="h-4 w-4 mr-2" /> Add Wine
           </Button>
         </div>
       </div>
 
       {/* --- DESKTOP VIEW --- */}
-      <div className="hidden md:block overflow-x-auto">
+      <div class="hidden md:block overflow-x-auto">
         <Table>
           <TableHeader>
-            <TableRow className="border-border/50 hover:bg-transparent">
-              <TableHead className="text-muted-foreground font-medium">Wine Name</TableHead>
-              <TableHead className="text-muted-foreground font-medium">Winemaker</TableHead>
-              <TableHead className="text-muted-foreground font-medium text-center">
-                In Shop
-              </TableHead>
-              <TableHead className="text-muted-foreground font-medium text-right">
-                Actions
-              </TableHead>
+            <TableRow class="border-border/50 hover:bg-transparent">
+              <TableHead class="text-muted-foreground font-medium">Wine Name</TableHead>
+              <TableHead class="text-muted-foreground font-medium">Winemaker</TableHead>
+              <TableHead class="text-muted-foreground font-medium text-center">In Shop</TableHead>
+              <TableHead class="text-muted-foreground font-medium text-right">Actions</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
             {shopData.map((wine) => (
-              <TableRow key={wine.id} className="border-border/50 border-b">
-                <TableCell className="font-medium text-sm">{wine.name}</TableCell>
-                <TableCell className="text-muted-foreground text-sm">{wine.winemaker}</TableCell>
-                <TableCell className="text-center font-medium text-sm">{wine.qty}</TableCell>
-                <TableCell className="text-right">
-                  <Button variant="ghost" size="icon" className="h-8 w-8 text-muted-foreground">
-                    <MoreHorizontal className="h-4 w-4" />
+              <TableRow key={wine.id} class="border-border/50 border-b">
+                <TableCell class="font-medium text-sm">{wine.name}</TableCell>
+                <TableCell class="text-muted-foreground text-sm">{wine.winemaker}</TableCell>
+                <TableCell class="text-center font-medium text-sm">{wine.qty}</TableCell>
+                <TableCell class="text-right">
+                  <Button variant="ghost" size="icon" class="h-8 w-8 text-muted-foreground">
+                    <MoreHorizontal class="h-4 w-4" />
                   </Button>
                 </TableCell>
               </TableRow>
@@ -309,20 +297,20 @@ function ShopOwnerInventory() {
       </div>
 
       {/* --- MOBILE VIEW --- */}
-      <div className="block md:hidden flex flex-col">
+      <div class="block md:hidden flex flex-col">
         {shopData.map((wine) => (
           <div
             key={wine.id}
-            className="flex justify-between py-5 border-b border-border/50 last:border-0"
+            class="flex justify-between py-5 border-b border-border/50 last:border-0"
           >
-            <div className="flex flex-col gap-1.5">
-              <span className="font-heading font-semibold text-[15px]">{wine.name}</span>
-              <span className="text-xs text-muted-foreground font-medium">
-                {wine.winemaker} <span className="mx-1">|</span> Qty: {wine.qty}
+            <div class="flex flex-col gap-1.5">
+              <span class="font-heading font-semibold text-[15px]">{wine.name}</span>
+              <span class="text-xs text-muted-foreground font-medium">
+                {wine.winemaker} <span class="mx-1">|</span> Qty: {wine.qty}
               </span>
             </div>
-            <Button variant="ghost" size="icon" className="h-8 w-8 -mr-2 text-muted-foreground">
-              <MoreHorizontal className="h-5 w-5" />
+            <Button variant="ghost" size="icon" class="h-8 w-8 -mr-2 text-muted-foreground">
+              <MoreHorizontal class="h-5 w-5" />
             </Button>
           </div>
         ))}
@@ -358,13 +346,13 @@ function CustomerOrderHistory() {
 
   return (
     <>
-      <div className="flex flex-col md:flex-row items-start md:items-center justify-between mb-8 gap-4">
-        <div className="flex items-center gap-2 font-heading text-xl font-semibold text-primary">
-          <ShoppingBag className="h-5 w-5" /> Past Orders
+      <div class="flex flex-col md:flex-row items-start md:items-center justify-between mb-8 gap-4">
+        <div class="flex items-center gap-2 font-heading text-xl font-semibold text-primary">
+          <ShoppingBag class="h-5 w-5" /> Past Orders
         </div>
-        <div className="flex w-full md:w-auto">
+        <div class="flex w-full md:w-auto">
           <Select defaultValue="6months">
-            <SelectTrigger className="w-full sm:w-[160px] bg-background border-none rounded-lg h-10">
+            <SelectTrigger class="w-full sm:w-[160px] bg-background border-none rounded-lg h-10">
               <SelectValue placeholder="Timeframe" />
             </SelectTrigger>
             <SelectContent>
@@ -377,31 +365,29 @@ function CustomerOrderHistory() {
       </div>
 
       {/* --- DESKTOP VIEW --- */}
-      <div className="hidden md:block overflow-x-auto">
+      <div class="hidden md:block overflow-x-auto">
         <Table>
           <TableHeader>
-            <TableRow className="border-border/50 hover:bg-transparent">
-              <TableHead className="text-muted-foreground font-medium">Order ID</TableHead>
-              <TableHead className="text-muted-foreground font-medium">Date</TableHead>
-              <TableHead className="text-muted-foreground font-medium text-center">Items</TableHead>
-              <TableHead className="text-muted-foreground font-medium text-center">
-                Status
-              </TableHead>
-              <TableHead className="text-muted-foreground font-medium text-right">Total</TableHead>
+            <TableRow class="border-border/50 hover:bg-transparent">
+              <TableHead class="text-muted-foreground font-medium">Order ID</TableHead>
+              <TableHead class="text-muted-foreground font-medium">Date</TableHead>
+              <TableHead class="text-muted-foreground font-medium text-center">Items</TableHead>
+              <TableHead class="text-muted-foreground font-medium text-center">Status</TableHead>
+              <TableHead class="text-muted-foreground font-medium text-right">Total</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
             {orderData.map((order) => (
-              <TableRow key={order.id} className="border-border/50 border-b">
-                <TableCell className="font-medium text-primary flex items-center gap-1 hover:underline cursor-pointer text-sm">
-                  {order.orderId} <ArrowUpRight className="h-3 w-3" />
+              <TableRow key={order.id} class="border-border/50 border-b">
+                <TableCell class="font-medium text-primary flex items-center gap-1 hover:underline cursor-pointer text-sm">
+                  {order.orderId} <ArrowUpRight class="h-3 w-3" />
                 </TableCell>
-                <TableCell className="text-muted-foreground text-sm">{order.date}</TableCell>
-                <TableCell className="text-center font-medium text-sm">{order.items}</TableCell>
-                <TableCell className="text-center">
-                  <Badge className={`${order.badgeClasses} border-none`}>{order.status}</Badge>
+                <TableCell class="text-muted-foreground text-sm">{order.date}</TableCell>
+                <TableCell class="text-center font-medium text-sm">{order.items}</TableCell>
+                <TableCell class="text-center">
+                  <Badge class={`${order.badgeClasses} border-none`}>{order.status}</Badge>
                 </TableCell>
-                <TableCell className="text-right font-medium text-sm">{order.total}</TableCell>
+                <TableCell class="text-right font-medium text-sm">{order.total}</TableCell>
               </TableRow>
             ))}
           </TableBody>
@@ -409,26 +395,26 @@ function CustomerOrderHistory() {
       </div>
 
       {/* --- MOBILE VIEW --- */}
-      <div className="block md:hidden flex flex-col">
+      <div class="block md:hidden flex flex-col">
         {orderData.map((order) => (
           <div
             key={order.id}
-            className="flex justify-between items-center py-5 border-b border-border/50 last:border-0"
+            class="flex justify-between items-center py-5 border-b border-border/50 last:border-0"
           >
-            <div className="flex flex-col gap-1.5">
-              <span className="font-heading font-semibold text-[15px] text-primary flex items-center gap-1">
-                {order.orderId} <ArrowUpRight className="h-3 w-3" />
+            <div class="flex flex-col gap-1.5">
+              <span class="font-heading font-semibold text-[15px] text-primary flex items-center gap-1">
+                {order.orderId} <ArrowUpRight class="h-3 w-3" />
               </span>
-              <span className="text-xs text-muted-foreground font-medium">
-                {order.date} <span className="mx-1">|</span> {order.items}
+              <span class="text-xs text-muted-foreground font-medium">
+                {order.date} <span class="mx-1">|</span> {order.items}
               </span>
-              <div className="pt-1.5">
-                <Badge className={`${order.badgeClasses} border-none px-2 py-0.5 text-[10px]`}>
+              <div class="pt-1.5">
+                <Badge class={`${order.badgeClasses} border-none px-2 py-0.5 text-[10px]`}>
                   {order.status}
                 </Badge>
               </div>
             </div>
-            <div className="font-medium text-[15px]">{order.total}</div>
+            <div class="font-medium text-[15px]">{order.total}</div>
           </div>
         ))}
       </div>
@@ -461,47 +447,41 @@ function BundlesList() {
 
   return (
     <>
-      <div className="flex flex-col md:flex-row items-start md:items-center justify-between mb-8 gap-4">
-        <div className="flex items-center gap-2 font-heading text-xl font-semibold text-primary">
-          <Package className="h-5 w-5" /> Active Bundles
+      <div class="flex flex-col md:flex-row items-start md:items-center justify-between mb-8 gap-4">
+        <div class="flex items-center gap-2 font-heading text-xl font-semibold text-primary">
+          <Package class="h-5 w-5" /> Active Bundles
         </div>
-        <Button className="w-full sm:w-auto bg-primary hover:bg-primary/90 text-primary-foreground rounded-lg h-10 px-5">
-          <Plus className="h-4 w-4 mr-2" /> Create Bundle
+        <Button class="w-full sm:w-auto bg-primary hover:bg-primary/90 text-primary-foreground rounded-lg h-10 px-5">
+          <Plus class="h-4 w-4 mr-2" /> Create Bundle
         </Button>
       </div>
 
       {/* --- DESKTOP VIEW --- */}
-      <div className="hidden md:block overflow-x-auto">
+      <div class="hidden md:block overflow-x-auto">
         <Table>
           <TableHeader>
-            <TableRow className="border-border/50 hover:bg-transparent">
-              <TableHead className="text-muted-foreground font-medium">Bundle Name</TableHead>
-              <TableHead className="text-muted-foreground font-medium text-center">
-                Contents
-              </TableHead>
-              <TableHead className="text-muted-foreground font-medium text-center">Price</TableHead>
-              <TableHead className="text-muted-foreground font-medium text-center">
-                Status
-              </TableHead>
-              <TableHead className="text-muted-foreground font-medium text-right">
-                Actions
-              </TableHead>
+            <TableRow class="border-border/50 hover:bg-transparent">
+              <TableHead class="text-muted-foreground font-medium">Bundle Name</TableHead>
+              <TableHead class="text-muted-foreground font-medium text-center">Contents</TableHead>
+              <TableHead class="text-muted-foreground font-medium text-center">Price</TableHead>
+              <TableHead class="text-muted-foreground font-medium text-center">Status</TableHead>
+              <TableHead class="text-muted-foreground font-medium text-right">Actions</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
             {bundlesData.map((bundle) => (
-              <TableRow key={bundle.id} className="border-border/50 border-b">
-                <TableCell className="font-medium text-sm">{bundle.name}</TableCell>
-                <TableCell className="text-center text-muted-foreground text-sm">
+              <TableRow key={bundle.id} class="border-border/50 border-b">
+                <TableCell class="font-medium text-sm">{bundle.name}</TableCell>
+                <TableCell class="text-center text-muted-foreground text-sm">
                   {bundle.items}
                 </TableCell>
-                <TableCell className="text-center font-medium text-sm">{bundle.price}</TableCell>
-                <TableCell className="text-center">
-                  <Badge className={`${bundle.badgeClasses} border-none`}>{bundle.status}</Badge>
+                <TableCell class="text-center font-medium text-sm">{bundle.price}</TableCell>
+                <TableCell class="text-center">
+                  <Badge class={`${bundle.badgeClasses} border-none`}>{bundle.status}</Badge>
                 </TableCell>
-                <TableCell className="text-right">
-                  <Button variant="ghost" size="icon" className="h-8 w-8 text-muted-foreground">
-                    <MoreHorizontal className="h-4 w-4" />
+                <TableCell class="text-right">
+                  <Button variant="ghost" size="icon" class="h-8 w-8 text-muted-foreground">
+                    <MoreHorizontal class="h-4 w-4" />
                   </Button>
                 </TableCell>
               </TableRow>
@@ -511,25 +491,25 @@ function BundlesList() {
       </div>
 
       {/* --- MOBILE VIEW --- */}
-      <div className="block md:hidden flex flex-col">
+      <div class="block md:hidden flex flex-col">
         {bundlesData.map((bundle) => (
           <div
             key={bundle.id}
-            className="flex justify-between items-center py-5 border-b border-border/50 last:border-0"
+            class="flex justify-between items-center py-5 border-b border-border/50 last:border-0"
           >
-            <div className="flex flex-col gap-1.5">
-              <span className="font-heading font-semibold text-[15px]">{bundle.name}</span>
-              <span className="text-xs text-muted-foreground font-medium">
-                {bundle.items} <span className="mx-1">|</span> {bundle.price}
+            <div class="flex flex-col gap-1.5">
+              <span class="font-heading font-semibold text-[15px]">{bundle.name}</span>
+              <span class="text-xs text-muted-foreground font-medium">
+                {bundle.items} <span class="mx-1">|</span> {bundle.price}
               </span>
-              <div className="pt-1.5">
-                <Badge className={`${bundle.badgeClasses} border-none px-2 py-0.5 text-[10px]`}>
+              <div class="pt-1.5">
+                <Badge class={`${bundle.badgeClasses} border-none px-2 py-0.5 text-[10px]`}>
                   {bundle.status}
                 </Badge>
               </div>
             </div>
-            <Button variant="ghost" size="icon" className="h-8 w-8 -mr-2 text-muted-foreground">
-              <MoreHorizontal className="h-5 w-5" />
+            <Button variant="ghost" size="icon" class="h-8 w-8 -mr-2 text-muted-foreground">
+              <MoreHorizontal class="h-5 w-5" />
             </Button>
           </div>
         ))}
@@ -565,49 +545,43 @@ function EventsList() {
 
   return (
     <>
-      <div className="flex flex-col md:flex-row items-start md:items-center justify-between mb-8 gap-4">
-        <div className="flex items-center gap-2 font-heading text-xl font-semibold text-primary">
-          <Calendar className="h-5 w-5" /> Hosted Events
+      <div class="flex flex-col md:flex-row items-start md:items-center justify-between mb-8 gap-4">
+        <div class="flex items-center gap-2 font-heading text-xl font-semibold text-primary">
+          <Calendar class="h-5 w-5" /> Hosted Events
         </div>
-        <Button className="w-full sm:w-auto bg-primary hover:bg-primary/90 text-primary-foreground rounded-lg h-10 px-5">
-          <Plus className="h-4 w-4 mr-2" /> Schedule Event
+        <Button class="w-full sm:w-auto bg-primary hover:bg-primary/90 text-primary-foreground rounded-lg h-10 px-5">
+          <Plus class="h-4 w-4 mr-2" /> Schedule Event
         </Button>
       </div>
 
       {/* --- DESKTOP VIEW --- */}
-      <div className="hidden md:block overflow-x-auto">
+      <div class="hidden md:block overflow-x-auto">
         <Table>
           <TableHeader>
-            <TableRow className="border-border/50 hover:bg-transparent">
-              <TableHead className="text-muted-foreground font-medium">Event Name</TableHead>
-              <TableHead className="text-muted-foreground font-medium text-center">
+            <TableRow class="border-border/50 hover:bg-transparent">
+              <TableHead class="text-muted-foreground font-medium">Event Name</TableHead>
+              <TableHead class="text-muted-foreground font-medium text-center">
                 Date & Location
               </TableHead>
-              <TableHead className="text-muted-foreground font-medium text-center">
-                Attendees
-              </TableHead>
-              <TableHead className="text-muted-foreground font-medium text-center">
-                Status
-              </TableHead>
-              <TableHead className="text-muted-foreground font-medium text-right">
-                Actions
-              </TableHead>
+              <TableHead class="text-muted-foreground font-medium text-center">Attendees</TableHead>
+              <TableHead class="text-muted-foreground font-medium text-center">Status</TableHead>
+              <TableHead class="text-muted-foreground font-medium text-right">Actions</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
             {eventsData.map((event) => (
-              <TableRow key={event.id} className="border-border/50 border-b">
-                <TableCell className="font-medium text-sm">{event.name}</TableCell>
-                <TableCell className="text-center text-muted-foreground text-sm">
+              <TableRow key={event.id} class="border-border/50 border-b">
+                <TableCell class="font-medium text-sm">{event.name}</TableCell>
+                <TableCell class="text-center text-muted-foreground text-sm">
                   {event.date} • {event.location}
                 </TableCell>
-                <TableCell className="text-center font-medium text-sm">{event.attendees}</TableCell>
-                <TableCell className="text-center">
-                  <Badge className={`${event.badgeClasses} border-none`}>{event.status}</Badge>
+                <TableCell class="text-center font-medium text-sm">{event.attendees}</TableCell>
+                <TableCell class="text-center">
+                  <Badge class={`${event.badgeClasses} border-none`}>{event.status}</Badge>
                 </TableCell>
-                <TableCell className="text-right">
-                  <Button variant="ghost" size="icon" className="h-8 w-8 text-muted-foreground">
-                    <MoreHorizontal className="h-4 w-4" />
+                <TableCell class="text-right">
+                  <Button variant="ghost" size="icon" class="h-8 w-8 text-muted-foreground">
+                    <MoreHorizontal class="h-4 w-4" />
                   </Button>
                 </TableCell>
               </TableRow>
@@ -617,28 +591,28 @@ function EventsList() {
       </div>
 
       {/* --- MOBILE VIEW --- */}
-      <div className="block md:hidden flex flex-col">
+      <div class="block md:hidden flex flex-col">
         {eventsData.map((event) => (
           <div
             key={event.id}
-            className="flex justify-between items-center py-5 border-b border-border/50 last:border-0"
+            class="flex justify-between items-center py-5 border-b border-border/50 last:border-0"
           >
-            <div className="flex flex-col gap-1.5">
-              <span className="font-heading font-semibold text-[15px]">{event.name}</span>
-              <span className="text-xs text-muted-foreground font-medium">
-                {event.date} <span className="mx-1">|</span> {event.location}
+            <div class="flex flex-col gap-1.5">
+              <span class="font-heading font-semibold text-[15px]">{event.name}</span>
+              <span class="text-xs text-muted-foreground font-medium">
+                {event.date} <span class="mx-1">|</span> {event.location}
               </span>
-              <div className="pt-1.5 flex items-center gap-2">
-                <Badge className={`${event.badgeClasses} border-none px-2 py-0.5 text-[10px]`}>
+              <div class="pt-1.5 flex items-center gap-2">
+                <Badge class={`${event.badgeClasses} border-none px-2 py-0.5 text-[10px]`}>
                   {event.status}
                 </Badge>
-                <span className="text-xs text-muted-foreground font-medium pl-2 border-l border-border/50">
+                <span class="text-xs text-muted-foreground font-medium pl-2 border-l border-border/50">
                   {event.attendees}
                 </span>
               </div>
             </div>
-            <Button variant="ghost" size="icon" className="h-8 w-8 -mr-2 text-muted-foreground">
-              <MoreHorizontal className="h-5 w-5" />
+            <Button variant="ghost" size="icon" class="h-8 w-8 -mr-2 text-muted-foreground">
+              <MoreHorizontal class="h-5 w-5" />
             </Button>
           </div>
         ))}

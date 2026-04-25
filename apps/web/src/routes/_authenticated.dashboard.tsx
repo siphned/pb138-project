@@ -9,23 +9,23 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useUser } from "@/context/UserContext";
 import { Role } from "@/types/roles";
 
-export const Route = createFileRoute("/dashboard")({
+export const Route = createFileRoute("/_authenticated/dashboard")({
   component: DashboardPage,
 });
 
 function DashboardPage() {
   const { isLoading } = useUser();
-  const [currentRole, setCurrentRole] = useState<Role>(Role.WINEMAKER);
+  const [currentRole, setCurrentRole] = useState<Role>(Role.winemaker);
   const [isEditing, setIsEditing] = useState(false);
 
   const getStatsForRole = (role: Role) => {
     switch (role) {
-      case Role.CUSTOMER:
+      case Role.customer:
         return [
           { title: "Total Orders", value: "15", icon: ShoppingBag, trend: "5 new this month" },
           { title: "Events Attended", value: "4", icon: Calendar, trend: "Next: May 12" },
         ];
-      case Role.SHOP_OWNER:
+      case Role.shopOwner:
         return [
           {
             title: "Total Revenue",
@@ -53,12 +53,10 @@ function DashboardPage() {
 
   if (isLoading) {
     return (
-      <div className="flex h-screen w-full items-center justify-center bg-background">
-        <div className="flex flex-col items-center gap-4">
-          <div className="h-12 w-12 animate-spin rounded-full border-4 border-primary border-t-transparent" />
-          <p className="text-muted-foreground animate-pulse font-heading">
-            Loading your dashboard...
-          </p>
+      <div class="flex h-screen w-full items-center justify-center bg-background">
+        <div class="flex flex-col items-center gap-4">
+          <div class="h-12 w-12 animate-spin rounded-full border-4 border-primary border-t-transparent" />
+          <p class="text-muted-foreground animate-pulse font-heading">Loading your dashboard...</p>
         </div>
       </div>
     );
@@ -69,7 +67,7 @@ function DashboardPage() {
       activeRole={currentRole}
       onRoleChange={(newRole) => setCurrentRole(newRole as Role)}
     >
-      <div className="space-y-8 pb-12">
+      <div class="space-y-8 pb-12">
         {isEditing ? (
           <ProfileEditForm
             onSuccess={() => setIsEditing(false)}
@@ -79,21 +77,18 @@ function DashboardPage() {
           <>
             <UserInfoCard onEdit={() => setIsEditing(true)} />
 
-            <div className="grid gap-4 grid-cols-1 lg:grid-flow-col lg:auto-cols-fr">
+            <div class="grid gap-4 grid-cols-1 lg:grid-flow-col lg:auto-cols-fr">
               {stats.map((stat) => (
-                <Card
-                  key={stat.title}
-                  className="border-none shadow-sm bg-secondary/20 rounded-2xl"
-                >
-                  <CardHeader className="flex flex-row items-center justify-between pb-2 space-y-0">
-                    <CardTitle className="text-sm font-medium text-muted-foreground">
+                <Card key={stat.title} class="border-none shadow-sm bg-secondary/20 rounded-2xl">
+                  <CardHeader class="flex flex-row items-center justify-between pb-2 space-y-0">
+                    <CardTitle class="text-sm font-medium text-muted-foreground">
                       {stat.title}
                     </CardTitle>
-                    <stat.icon className="w-4 h-4 text-primary" />
+                    <stat.icon class="w-4 h-4 text-primary" />
                   </CardHeader>
                   <CardContent>
-                    <div className="text-2xl font-bold">{stat.value}</div>
-                    <p className="text-xs text-muted-foreground mt-1">{stat.trend}</p>
+                    <div class="text-2xl font-bold">{stat.value}</div>
+                    <p class="text-xs text-muted-foreground mt-1">{stat.trend}</p>
                   </CardContent>
                 </Card>
               ))}

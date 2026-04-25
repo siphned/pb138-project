@@ -12,23 +12,19 @@ interface DashboardTabsProps {
   role?: Role;
 }
 
-export function DashboardTabs({ role = Role.WINEMAKER }: DashboardTabsProps) {
-  const isCustomer = role === Role.CUSTOMER;
+export function DashboardTabs({ role = Role.winemaker }: DashboardTabsProps) {
+  const isCustomer = role === Role.customer;
 
   return (
-    <div className="flex flex-col gap-6 space-y-6 mt-6">
-      <Tabs defaultValue="main" className="flex flex-col w-full">
+    <div class="flex flex-col gap-6 space-y-6 mt-6">
+      <Tabs defaultValue="main" class="flex flex-col w-full">
         {/* THE NAVBAR (TabsList) */}
-        <TabsList className="w-full justify-start h-14 bg-secondary/40 rounded-2xl p-1 gap-2">
+        <TabsList class="w-full justify-start h-14 bg-secondary/40 rounded-2xl p-1 gap-2">
           <TabsTrigger
             value="main"
-            className="flex-1 rounded-xl data-[state=active]:bg-background data-[state=active]:shadow-sm"
+            class="flex-1 rounded-xl data-[state=active]:bg-background data-[state=active]:shadow-sm"
           >
-            {isCustomer ? (
-              <ShoppingBag className="h-4 w-4 mr-2" />
-            ) : (
-              <Wine className="h-4 w-4 mr-2" />
-            )}
+            {isCustomer ? <ShoppingBag class="h-4 w-4 mr-2" /> : <Wine class="h-4 w-4 mr-2" />}
             {isCustomer ? "Order History" : "My Wines"}
           </TabsTrigger>
 
@@ -36,26 +32,26 @@ export function DashboardTabs({ role = Role.WINEMAKER }: DashboardTabsProps) {
           {!isCustomer && (
             <TabsTrigger
               value="bundles"
-              className="flex-1 rounded-xl data-[state=active]:bg-background data-[state=active]:shadow-sm"
+              class="flex-1 rounded-xl data-[state=active]:bg-background data-[state=active]:shadow-sm"
             >
-              <Package className="h-4 w-4 mr-2" />
+              <Package class="h-4 w-4 mr-2" />
               Bundles
             </TabsTrigger>
           )}
 
           <TabsTrigger
             value="events"
-            className="flex-1 rounded-xl data-[state=active]:bg-background data-[state=active]:shadow-sm"
+            class="flex-1 rounded-xl data-[state=active]:bg-background data-[state=active]:shadow-sm"
           >
-            <Calendar className="h-4 w-4 mr-2" />
+            <Calendar class="h-4 w-4 mr-2" />
             Events
           </TabsTrigger>
         </TabsList>
 
         {/* THE CONTENT AREAS */}
-        <TabsContent value="main" className="mt-6">
-          <Card className="bg-secondary/40 border-none shadow-none rounded-3xl">
-            <CardContent className="p-6 md:p-8">
+        <TabsContent value="main" class="mt-6">
+          <Card class="bg-secondary/40 border-none shadow-none rounded-3xl">
+            <CardContent class="p-6 md:p-8">
               {/* Inject the separated Wines component and pass the role down */}
               <WinesTab role={role} />
             </CardContent>
@@ -63,9 +59,9 @@ export function DashboardTabs({ role = Role.WINEMAKER }: DashboardTabsProps) {
         </TabsContent>
 
         {!isCustomer && (
-          <TabsContent value="bundles" className="mt-6">
-            <Card className="bg-secondary/40 border-none shadow-none rounded-3xl">
-              <CardContent className="p-6 md:p-8">
+          <TabsContent value="bundles" class="mt-6">
+            <Card class="bg-secondary/40 border-none shadow-none rounded-3xl">
+              <CardContent class="p-6 md:p-8">
                 {/* Inject the separated Bundles component */}
                 <MyBundlesTab role={role} />
               </CardContent>
@@ -73,9 +69,9 @@ export function DashboardTabs({ role = Role.WINEMAKER }: DashboardTabsProps) {
           </TabsContent>
         )}
 
-        <TabsContent value="events" className="mt-6">
+        <TabsContent value="events" class="mt-6">
           {/* Note: Events usually has its own background styling in your design, so we skip the Card wrapper here */}
-          <div className="space-y-6">
+          <div class="space-y-6">
             {/* Inject the separated Events component */}
 
             <EventsTab role={role} />

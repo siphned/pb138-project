@@ -70,8 +70,7 @@ export function ProfileEditForm({ onSuccess, onCancel }: ProfileEditFormProps) {
     try {
       await updateUser(formData);
       if (onSuccess) onSuccess();
-    } catch (error) {
-      console.error("Failed to update profile", error);
+    } catch (_error) {
       setErrors({ fname: "Failed to save changes" });
     } finally {
       setIsSaving(false);
@@ -79,41 +78,41 @@ export function ProfileEditForm({ onSuccess, onCancel }: ProfileEditFormProps) {
   };
 
   return (
-    <Card className="max-w-2xl mx-auto border-none shadow-none bg-background rounded-3xl">
-      <CardHeader className="px-6 pt-8 pb-4">
-        <CardTitle className="font-heading text-2xl">Edit Profile</CardTitle>
+    <Card class="max-w-2xl mx-auto border-none shadow-none bg-background rounded-3xl">
+      <CardHeader class="px-6 pt-8 pb-4">
+        <CardTitle class="font-heading text-2xl">Edit Profile</CardTitle>
         <CardDescription>Update your name.</CardDescription>
       </CardHeader>
       <form onSubmit={handleSubmit}>
-        <CardContent className="px-6 space-y-6">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div className="space-y-2">
-              <Label htmlFor="fname">First Name</Label>
+        <CardContent class="px-6 space-y-6">
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div class="space-y-2">
+              <Label for="fname">First Name</Label>
               <Input
                 id="fname"
                 name="fname"
                 value={formData.fname}
                 onChange={handleChange}
                 placeholder="John"
-                className={errors.fname ? "border-destructive focus-visible:ring-destructive" : ""}
+                class={errors.fname ? "border-destructive focus-visible:ring-destructive" : ""}
               />
-              {errors.fname && <p className="text-xs text-destructive mt-1">{errors.fname}</p>}
+              {errors.fname && <p class="text-xs text-destructive mt-1">{errors.fname}</p>}
             </div>
-            <div className="space-y-2">
-              <Label htmlFor="lname">Last Name</Label>
+            <div class="space-y-2">
+              <Label for="lname">Last Name</Label>
               <Input
                 id="lname"
                 name="lname"
                 value={formData.lname}
                 onChange={handleChange}
                 placeholder="Doe"
-                className={errors.lname ? "border-destructive focus-visible:ring-destructive" : ""}
+                class={errors.lname ? "border-destructive focus-visible:ring-destructive" : ""}
               />
-              {errors.lname && <p className="text-xs text-destructive mt-1">{errors.lname}</p>}
+              {errors.lname && <p class="text-xs text-destructive mt-1">{errors.lname}</p>}
             </div>
           </div>
         </CardContent>
-        <CardFooter className="px-6 py-8 flex justify-end gap-3 border-t">
+        <CardFooter class="px-6 py-8 flex justify-end gap-3 border-t">
           <Button type="button" variant="outline" onClick={onCancel} disabled={isSaving}>
             Cancel
           </Button>
