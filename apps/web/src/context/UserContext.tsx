@@ -1,8 +1,8 @@
 import { useQueryClient } from "@tanstack/react-query";
 import { createContext, type ReactNode, useContext, useEffect, useState } from "react";
 import { getUsersMeQueryKey, useGetUsersMe } from "@/generated/hooks/useGetUsersMe";
-import type { PutUsersMeMutationRequest } from "@/generated/types";
 import { usePutUsersMe } from "@/generated/hooks/usePutUsersMe";
+import type { PutUsersMeMutationRequest } from "@/generated/types";
 
 export interface UserProfile {
   id: string;
