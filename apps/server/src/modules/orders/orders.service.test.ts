@@ -2,7 +2,6 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 
 vi.mock("./orders.repository", () => ({
   ordersRepository: {
-    insertAddress: vi.fn(),
     createOrderWithItems: vi.fn(),
     findOrdersByUserId: vi.fn(),
     findOrderById: vi.fn(),
@@ -27,18 +26,6 @@ import { cartsRepository } from "../carts/carts.repository";
 import { ordersRepository } from "./orders.repository";
 import { ordersService } from "./orders.service";
 import { shopsRepository } from "../shops/shops.repository";
-
-const mockAddress = {
-  id: "addr-1",
-  country: "CZ",
-  city: "Brno",
-  street: "Náměstí Svobody",
-  postalCode: "60200",
-  houseNumber: "1",
-  createdAt: new Date(),
-  updatedAt: new Date(),
-  deletedAt: null,
-};
 
 const mockProduct = { id: "prod-1", name: "Wine", price: "25.00", shopId: "shop-1" };
 
@@ -149,26 +136,31 @@ describe("ordersService.checkout", () => {
     ).rejects.toThrow("MISSING_BILLING_ADDRESS");
   });
 
-  it("inserts new address when newShippingAddress is provided", async () => {
+  it("passes new address object to createOrderWithItems when newShippingAddress is provided", async () => {
     vi.mocked(cartsRepository.findByUserId).mockResolvedValue(mockCartWithItems as never);
-    vi.mocked(ordersRepository.insertAddress).mockResolvedValue(mockAddress);
     vi.mocked(ordersRepository.createOrderWithItems).mockResolvedValue(mockOrder);
     vi.mocked(ordersRepository.findOrderById).mockResolvedValue(mockOrderWithItems as never);
+
+    const newShippingAddress = {
+      country: "CZ",
+      city: "Brno",
+      street: "Náměstí Svobody",
+      postalCode: "60200",
+      houseNumber: "1",
+    };
 
     await ordersService.checkout("user-1", {
       paymentMethod: "card",
       deliveryType: "shipping",
-      newShippingAddress: {
-        country: "CZ",
-        city: "Brno",
-        street: "Náměstí Svobody",
-        postalCode: "60200",
-        houseNumber: "1",
-      },
+      newShippingAddress,
       billingAddressId: "addr-1",
     });
 
-    expect(ordersRepository.insertAddress).toHaveBeenCalledTimes(1);
+    expect(ordersRepository.createOrderWithItems).toHaveBeenCalledWith(
+      expect.objectContaining({ shippingAddress: newShippingAddress, billingAddress: "addr-1" }),
+      expect.any(Array),
+      "cart-1"
+    );
   });
 
   it("creates order with correct totalPrice and item data", async () => {

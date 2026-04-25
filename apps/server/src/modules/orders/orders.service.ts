@@ -34,14 +34,6 @@ export const ordersService = {
     if (!body.billingAddressId && !body.newBillingAddress)
       throw new Error("MISSING_BILLING_ADDRESS");
 
-    const shippingAddressId = body.newShippingAddress
-      ? (await ordersRepository.insertAddress(body.newShippingAddress)).id
-      : (body.shippingAddressId as string);
-
-    const billingAddressId = body.newBillingAddress
-      ? (await ordersRepository.insertAddress(body.newBillingAddress)).id
-      : (body.billingAddressId as string);
-
     const totalPrice = cart.items
       .reduce((sum, item) => sum + Number.parseFloat(item.product.price) * item.quantity, 0)
       .toFixed(2);
@@ -56,8 +48,8 @@ export const ordersService = {
     const order = await ordersRepository.createOrderWithItems(
       {
         userId,
-        shippingAddressId,
-        billingAddressId,
+        shippingAddress: body.newShippingAddress ?? (body.shippingAddressId as string),
+        billingAddress: body.newBillingAddress ?? (body.billingAddressId as string),
         paymentMethod: body.paymentMethod,
         deliveryType: body.deliveryType,
         totalPrice,
