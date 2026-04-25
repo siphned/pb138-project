@@ -1,4 +1,4 @@
-import type { Comment, Event, EventRegistration } from "../../db/schema";
+import type { Event, EventComment, EventRegistration } from "../../db/schema";
 import type { PaginatedResult } from "../../utils/pagination";
 import { parsePagination } from "../../utils/pagination";
 import type { CommentWithUser, EventWithDetails } from "./events.repository";
@@ -166,7 +166,7 @@ export const eventsService = {
     await eventsRepository.softDeleteRegistration(reg.id);
   },
 
-  async addComment(eventId: string, userId: string, body: string): Promise<Comment> {
+  async addComment(eventId: string, userId: string, body: string): Promise<EventComment> {
     const event = await eventsRepository.findById(eventId);
     if (!event || event.status !== "approved") throw new Error("EVENT_NOT_AVAILABLE");
     return eventsRepository.createComment(eventId, userId, body);

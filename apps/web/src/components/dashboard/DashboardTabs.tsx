@@ -12,8 +12,8 @@ interface DashboardTabsProps {
   role?: Role;
 }
 
-export function DashboardTabs({ role = Role.WINEMAKER }: DashboardTabsProps) {
-  const isCustomer = role === Role.CUSTOMER;
+export function DashboardTabs({ role = Role.winemaker }: DashboardTabsProps) {
+  const isCustomer = role === Role.customer;
 
   return (
     <div className="flex flex-col gap-6 space-y-6 mt-6">

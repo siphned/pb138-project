@@ -19,7 +19,7 @@ const userId = "11111111-1111-1111-1111-111111111111";
 const winemakerId = "22222222-2222-2222-2222-222222222222";
 const addressId = "33333333-3333-3333-3333-333333333333";
 
-const mockAddress = {
+const _mockAddress = {
   id: addressId,
   country: "CZ",
   city: "Brno",
@@ -45,7 +45,10 @@ const mockWinemaker = {
   deletedAt: null,
 };
 
-const mockWinemakerWithAddress = { ...mockWinemaker, address: mockAddress };
+const mockWinemakerWithAddress = {
+  ...mockWinemaker,
+  address: { country: "CZ", city: "B", postalCode: "1", street: "S", houseNumber: "1" },
+};
 
 const mockWinemakerWithRelations = {
   ...mockWinemakerWithAddress,

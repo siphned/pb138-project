@@ -5,6 +5,7 @@ vi.mock("./shops.repository", () => ({
     findAll: vi.fn(),
     findById: vi.fn(),
     findByOwnerUserId: vi.fn(),
+    findAllByOwnerUserId: vi.fn(),
     createShopWithAddress: vi.fn(),
     insertAddress: vi.fn(),
     updateById: vi.fn(),
@@ -38,7 +39,7 @@ const mockShop = {
   name: "Test Shop",
   description: "A description",
   addressId,
-  address: mockAddress,
+  address: { country: "CZ", city: "B", postalCode: "1", street: "S", houseNumber: "1" },
   createdAt: new Date(),
   updatedAt: null,
   deletedAt: null,
@@ -72,24 +73,27 @@ describe("createShop", () => {
     );
   });
 
-  it("throws ALREADY_HAS_SHOP when user already owns one", async () => {
-    vi.mocked(shopsRepository.findByOwnerUserId).mockResolvedValue(mockShop as never);
+  it("allows creating multiple shops for the same user", async () => {
+    vi.mocked(shopsRepository.findAllByOwnerUserId).mockResolvedValue([mockShop] as never);
+    vi.mocked(shopsRepository.createShopWithAddress).mockResolvedValue({
+      id: "new-shop-id",
+    } as never);
+    vi.mocked(shopsRepository.findById).mockResolvedValue({ id: "new-shop-id" } as never);
 
-    await expect(
-      shopsService.createShop(ownerId, {
-        name: "Another Shop",
-        description: "desc",
-        address: {
-          country: "CZ",
-          city: "Brno",
-          postalCode: "60200",
-          street: "X",
-          houseNumber: "1",
-        },
-      })
-    ).rejects.toThrow("ALREADY_HAS_SHOP");
+    const result = await shopsService.createShop(ownerId, {
+      name: "Second Shop",
+      description: "Another one",
+      address: {
+        country: "CZ",
+        city: "Brno",
+        postalCode: "60200",
+        street: "Masarykova",
+        houseNumber: "1",
+      },
+    });
 
-    expect(shopsRepository.createShopWithAddress).not.toHaveBeenCalled();
+    expect(result.id).toBe("new-shop-id");
+    expect(shopsRepository.createShopWithAddress).toHaveBeenCalled();
   });
 });
 
@@ -141,8 +145,8 @@ describe("updateShop", () => {
     expect(shopsRepository.insertAddress).toHaveBeenCalledWith({
       country: "CZ",
       city: "Prague",
-      postalCode: "60200",
-      street: "Masarykova",
+      postalCode: "1",
+      street: "S",
       houseNumber: "1",
     });
     expect(shopsRepository.updateById).toHaveBeenCalledWith(shopId, { addressId: newAddressId });

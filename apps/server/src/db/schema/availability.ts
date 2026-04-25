@@ -1,4 +1,5 @@
-import { date, pgTable, smallint, text, timestamp, uuid, varchar } from "drizzle-orm/pg-core";
+import { integer, pgTable, uuid, varchar } from "drizzle-orm/pg-core";
+import { timestamptz } from "./helpers";
 import { shops, winemakers } from "./sellers";
 
 export const availabilityRegular = pgTable("availability_regular", {
@@ -7,12 +8,14 @@ export const availabilityRegular = pgTable("availability_regular", {
   shopId: uuid("shop_id")
     .notNull()
     .references(() => shops.id),
-  dow: smallint("dow").notNull(),
-  startTime: timestamp("start_time").notNull(),
-  endTime: timestamp("end_time").notNull(),
-  validFrom: date("valid_from").notNull(),
-  validTo: date("valid_to"),
-  type: varchar("type", { length: 255 }).notNull(),
+  dow: integer("dow").notNull(), // day of week 0-6
+  startTime: timestamptz("start_time").notNull(),
+  endTime: timestamptz("end_time").notNull(),
+  validFrom: varchar("valid_from", { length: 10 }).notNull(), // YYYY-MM-DD
+  validTo: varchar("valid_to", { length: 10 }),
+  type: varchar("type", { length: 20 }).notNull(), // "open", "closed"
+  createdAt: timestamptz("created_at").notNull().defaultNow(),
+  deletedAt: timestamptz("deleted_at"),
 });
 
 export const availabilityExceptions = pgTable("availability_exceptions", {
@@ -21,8 +24,10 @@ export const availabilityExceptions = pgTable("availability_exceptions", {
   shopId: uuid("shop_id")
     .notNull()
     .references(() => shops.id),
-  startsAt: timestamp("starts_at").notNull(),
-  endsAt: timestamp("ends_at").notNull(),
-  action: varchar("action", { length: 255 }).notNull(),
-  reason: text("reason"),
+  startsAt: timestamptz("starts_at").notNull(),
+  endsAt: timestamptz("ends_at").notNull(),
+  action: varchar("action", { length: 20 }).notNull(), // "closed", "modified_hours"
+  reason: varchar("reason", { length: 255 }),
+  createdAt: timestamptz("created_at").notNull().defaultNow(),
+  deletedAt: timestamptz("deleted_at"),
 });

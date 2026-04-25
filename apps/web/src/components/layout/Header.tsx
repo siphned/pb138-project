@@ -1,19 +1,21 @@
-import { Show, useClerk } from "@clerk/react";
-import { Link } from "@tanstack/react-router";
-import { Search, ShoppingCart, User } from "lucide-react";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Search, ShoppingCart } from "lucide-react";
+import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
+import { useUser } from "@/context/UserContext";
 import { Role } from "@/types/roles";
-import { Sidebar } from "./Sidebar";
+import { Sidebar } from "./Sidebar"; // Import your new component here!
 
 interface HeaderProps {
   activeRole?: Role;
+  availableRoles?: Role[];
   onRoleChange?: (role: Role) => void;
 }
 
-export function Header({ activeRole, onRoleChange }: HeaderProps) {
-  const { user: clerkUser } = useClerk();
-  const initials = clerkUser ? (clerkUser.fullName || "User").substring(0, 2).toUpperCase() : "GU";
+export function Header({ activeRole, availableRoles, onRoleChange }: HeaderProps) {
+  const { user: contextUser } = useUser();
+  const fullName = `${contextUser.fname} ${contextUser.lname}`.trim();
+  const initials = fullName.substring(0, 2).toUpperCase() || "U";
+
   return (
     <header className="h-16 border-b bg-background flex items-center justify-between px-6 lg:px-12">
       {/* Left: Logo Area */}
@@ -33,27 +35,20 @@ export function Header({ activeRole, onRoleChange }: HeaderProps) {
           <ShoppingCart className="h-5 w-5" />
         </Button>
 
-        <Show when="signed-out">
-          <Link to="/auth/login">
-            <Button variant="ghost" size="icon" className="rounded-full">
-              <User className="h-5 w-5" />
-            </Button>
-          </Link>
-        </Show>
+        <a
+          href="/profile"
+          className="rounded-full focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2"
+        >
+          <Avatar className="h-9 w-9 hover:opacity-80 transition-opacity">
+            <AvatarFallback className="bg-secondary text-secondary-foreground">
+              {initials}
+            </AvatarFallback>
+          </Avatar>
+        </a>
 
-        <Show when="signed-in">
-          <Link to="/dashboard">
-            <Avatar className="h-8 w-8">
-              <AvatarImage src={clerkUser?.imageUrl} alt={clerkUser?.fullName || "User"} />
-              <AvatarFallback className="bg-primary text-primary-foreground font-heading text-xs">
-                {initials}
-              </AvatarFallback>
-            </Avatar>
-          </Link>
-        </Show>
-
+        {/* Drop the Sidebar right here! */}
         <Sidebar
-          userRoles={[Role.WINEMAKER, Role.SHOP_OWNER, Role.CUSTOMER]}
+          userRoles={availableRoles ?? [Role.customer]}
           activeRole={activeRole}
           onRoleChange={onRoleChange}
         />

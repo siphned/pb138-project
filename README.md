@@ -11,31 +11,26 @@ A multi-vendor wine marketplace platform with event management, multi-shop order
 
 WineMarket connects winemakers, shop owners, and customers in a single platform:
 
-- **Winemakers** manage wines, host events
-- **Shop Owners** manage inventory and process orders
-- **Customers** browse, order, and review wines
-- **Admins** moderate content and approve accounts
+- **Winemakers** manage production catalogs, host events, and fulfill B2B supply requests.
+- **Shop Owners** manage retail inventory, bundles, and process customer orders.
+- **Customers** browse, order, and review wines (with server-side guest session support).
+- **Admins** moderate content, approve role requests, and view statistics.
 
 ---
 
 ## Tech Stack
 
-*Currently installed & configured:*
-
 | Layer | Technology |
 |-------|-----------|
 | Runtime | Bun |
 | Frontend | React + Vite + TypeScript |
+| Routing | TanStack Router (File-based, pathless layout tree) |
+| Styling | Tailwind CSS + shadcn/ui |
 | Backend | Elysia + Zod (schemas & validation) |
-| Code Generation | Kubb (from OpenAPI spec) |
+| Auth | Clerk (JWT + RBAC via public metadata) |
+| Database | PostgreSQL + Drizzle ORM |
+| Code Gen | Orval (Hooks from OpenAPI spec) |
 | Monorepo | Turborepo |
-
-*Installed but not yet integrated:*
-- PostgreSQL + Drizzle ORM (dependencies present, database wiring coming Phase 2)
-
-*Coming soon (Phase 2):*
-- TanStack Router (frontend routing)
-- Tailwind CSS + shadcn/ui (styling)
 
 ---
 
@@ -44,50 +39,54 @@ WineMarket connects winemakers, shop owners, and customers in a single platform:
 ```
 winery/
 ├── apps/
-│   ├── web/                    # React frontend (Vite)
-│   └── server/                 # Elysia backend
+│   ├── web/                    # React frontend (nested routes, Orval hooks)
+│   └── server/                 # Elysia backend (modular structure, Drizzle)
 ├── packages/
-│   ├── typescript-config/      # Shared tsconfig
-│   └── ui/                     # Reusable UI components (stub)
+│   ├── shared/                 # Shared Zod schemas and TypeScript types
+│   ├── typescript-config/      # Base TS configurations
+│   └── ui/                     # Primitive UI components
 ├── .github/workflows/          # CI/CD pipelines
-├── docs/                       # Design docs & diagrams
-├── wiki/                       # Quick-reference guides
-└── CLAUDE.md                   # Development guidelines
+├── docs/                       # Design docs, architecture, sequences, and audit logs
+├── wiki/                       # Quick-reference patterns (React, Elysia, DB, etc.)
+└── CLAUDE.md                   # Development guidelines and project patterns
 ```
 
 ---
 
 ## Quick Start
 
-**Prerequisites:** [Bun](https://bun.sh)
+**Prerequisites:** [Bun](https://bun.sh), [Docker](https://www.docker.com/)
 
 ```bash
 # 1. Install dependencies
 bun install
 
-# 2. Start dev servers (frontend + backend)
+# 2. Start PostgreSQL
+docker compose up -d
+
+# 3. Setup database
+bun run db:migrate
+bun run db:seed
+
+# 4. Start dev servers
 bun dev
 ```
 
 Frontend: http://localhost:5173  
 Backend: http://localhost:3000
 
-**Current Status:** Frontend + Elysia backend running. Database schema exists but not connected to backend yet (Phase 2).
-
 ---
 
 ## Common Commands
 
 ```bash
-bun dev                # Start all dev servers (frontend + backend)
-bun build              # Build all packages for production
-
-bun lint               # Code quality check (Biome)
-bun format             # Auto-format code (Biome)
-bun check-types        # TypeScript type checking
-
-bun test               # Run unit tests (Vitest)
-bun test:e2e           # Run E2E tests (Playwright)
+bun dev                # Start dev servers (frontend + backend)
+bun run check          # Lint, format, and organize imports (Biome)
+bun run check-types    # TypeScript type checking (tsc)
+bun run generate       # Regenerate Orval API hooks
+bun run test           # Run all unit and integration tests (Vitest)
+bun run db:generate    # Create Drizzle migrations
+bun run db:migrate     # Apply Drizzle migrations
 ```
 
 ---
@@ -96,28 +95,19 @@ bun test:e2e           # Run E2E tests (Playwright)
 
 | Document | Description |
 |----------|-------------|
-| [docs/ARCHITECTURE/](docs/ARCHITECTURE/) | System design & layer diagram |
+| [docs/ARCHITECTURE/](docs/ARCHITECTURE/) | System design, layer diagrams, and data flow |
 | [docs/API/](docs/API/) | REST API endpoint specification |
-| [docs/ROLES/](docs/ROLES/) | Role-permission matrix |
-| [docs/MODULES/](docs/MODULES/) | Backend module breakdown |
-| [docs/ROUTES/](docs/ROUTES/) | Frontend route structure |
-| [wiki/](wiki/) | Quick-reference guides (React, Elysia, Drizzle, etc.) |
-| [CLAUDE.md](CLAUDE.md) | AI development guide & project conventions |
-
----
-
-## Environment
-
-**Frontend:** See `apps/web/.env.example` for configuration. Copy to `apps/web/.env.local` for local development.
-
-**Backend:** Environment wiring (database connection strings, etc.) coming in Phase 2 when database is integrated.
+| [docs/ROLES/](docs/ROLES/) | Role-permission matrix (RBAC) |
+| [docs/ROUTES/](docs/ROUTES/) | Frontend route structure and guards |
+| [docs/audit/](docs/audit/) | Architecture audit and redesign logs |
+| [wiki/](wiki/) | Pattern guides (React, Elysia, Drizzle, etc.) |
+| [CLAUDE.md](CLAUDE.md) | Primary source of truth for coding patterns |
 
 ---
 
 ## Git Workflow
 
-- Branch from `dev`: `WINE-XX-short-description`
-- PR targets `dev`, requires one approval + passing CI
-- Squash merge, delete branch after merge
-- `main` = production only, merged from `dev` at milestones
-
+- **Branch from `dev`**: `WINE-XX-short-description`
+- **Atomic Commits**: Group changes by module/logic; use conventional messages.
+- **PR targets `dev`**: Requires one approval + passing CI (Biome, TSC, Vitest).
+- **Release**: `main` = production-ready, merged from `dev` at milestones.
