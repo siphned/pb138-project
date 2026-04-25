@@ -4,7 +4,7 @@ import type { Cart, CartItem, Product } from "../../db/schema";
 import { cartItems, carts } from "../../db/schema";
 
 export type CartItemWithProduct = CartItem & {
-  product: Pick<Product, "id" | "name" | "price" | "shopId">;
+  product: Pick<Product, "id" | "name" | "price" | "shopId" | "quantity">;
 };
 
 export type CartWithItems = Cart & { items: CartItemWithProduct[] };
@@ -17,7 +17,7 @@ export const cartsRepository = {
         items: {
           with: {
             product: {
-              columns: { id: true, name: true, price: true, shopId: true },
+              columns: { id: true, name: true, price: true, shopId: true, quantity: true },
             },
           },
         },
@@ -26,14 +26,11 @@ export const cartsRepository = {
   },
 
   async upsertCart(userId: string): Promise<Cart> {
-    const existing = await db.query.carts.findFirst({
-      where: eq(carts.userId, userId),
-    });
-    if (existing) return existing;
-
-    const [created] = await db.insert(carts).values({ userId }).returning();
-    if (!created) throw new Error("Cart insert returned no rows");
-    return created;
+    const [inserted] = await db.insert(carts).values({ userId }).onConflictDoNothing().returning();
+    if (inserted) return inserted;
+    const existing = await db.query.carts.findFirst({ where: eq(carts.userId, userId) });
+    if (!existing) throw new Error("Failed to get or create cart");
+    return existing;
   },
 
   findItem(cartItemId: string): Promise<CartItem | undefined> {

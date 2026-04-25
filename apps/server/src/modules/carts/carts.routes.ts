@@ -1,18 +1,17 @@
 import { Elysia, status, t } from "elysia";
+import { handleError } from "../../utils/errors";
 import { authPlugin } from "../auth";
-import { addItemBody, mergeBody, updateItemBody } from "./carts.schema";
+import { addItemBody, cartResponse, mergeBody, updateItemBody } from "./carts.schema";
 import { cartsService } from "./carts.service";
 
-function handleError(e: unknown) {
-  if (e instanceof Error && e.message === "NOT_FOUND") return status(404, "Not found");
-  throw e;
-}
+const errorResponses = { 400: t.String(), 403: t.String(), 404: t.String(), 409: t.String() };
 
 export const cartsRoutes = new Elysia()
   .use(authPlugin)
 
   .get("/carts/me", async ({ dbUser }) => cartsService.getMyCart(dbUser.id), {
     requireAuth: true,
+    response: { 200: cartResponse },
     detail: {
       tags: ["carts"],
       summary: "Get current user's cart",
@@ -32,6 +31,7 @@ export const cartsRoutes = new Elysia()
     {
       requireAuth: true,
       body: addItemBody,
+      response: { 201: cartResponse, ...errorResponses },
       detail: {
         tags: ["carts"],
         summary: "Add item to cart",
@@ -53,6 +53,7 @@ export const cartsRoutes = new Elysia()
       requireAuth: true,
       params: t.Object({ id: t.String() }),
       body: updateItemBody,
+      response: { 200: cartResponse, ...errorResponses },
       detail: {
         tags: ["carts"],
         summary: "Update cart item quantity",
@@ -74,6 +75,7 @@ export const cartsRoutes = new Elysia()
     {
       requireAuth: true,
       params: t.Object({ id: t.String() }),
+      response: { 204: t.Null(), ...errorResponses },
       detail: {
         tags: ["carts"],
         summary: "Remove item from cart",
@@ -84,10 +86,17 @@ export const cartsRoutes = new Elysia()
 
   .post(
     "/carts/merge",
-    async ({ dbUser, body }) => cartsService.mergeGuestItems(dbUser.id, body.items),
+    async ({ dbUser, body }) => {
+      try {
+        return await cartsService.mergeGuestItems(dbUser.id, body.items);
+      } catch (e) {
+        return handleError(e);
+      }
+    },
     {
       requireAuth: true,
       body: mergeBody,
+      response: { 200: cartResponse, ...errorResponses },
       detail: {
         tags: ["carts"],
         summary: "Merge guest cart items into user cart (DB wins on conflict)",

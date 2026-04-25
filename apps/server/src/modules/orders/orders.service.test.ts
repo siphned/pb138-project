@@ -27,7 +27,7 @@ import { ordersRepository } from "./orders.repository";
 import { ordersService } from "./orders.service";
 import { shopsRepository } from "../shops/shops.repository";
 
-const mockProduct = { id: "prod-1", name: "Wine", price: "25.00", shopId: "shop-1" };
+const mockProduct = { id: "prod-1", name: "Wine", price: "25.00", shopId: "shop-1", quantity: 10 };
 
 const mockCartItem = {
   id: "ci-1",
@@ -72,6 +72,8 @@ const mockOrderItem = {
   quantity: 2,
   unitPriceAtPurchase: "25.00",
   status: "pending" as const,
+  createdAt: new Date(),
+  updatedAt: null,
 };
 
 const mockOrderWithItems = { ...mockOrder, items: [{ ...mockOrderItem, product: mockProduct }] };
@@ -134,6 +136,18 @@ describe("ordersService.checkout", () => {
         shippingAddressId: "addr-1",
       })
     ).rejects.toThrow("MISSING_BILLING_ADDRESS");
+  });
+
+  it("throws INSUFFICIENT_STOCK when cart item quantity exceeds product stock", async () => {
+    const lowStockProduct = { ...mockProduct, quantity: 1 };
+    vi.mocked(cartsRepository.findByUserId).mockResolvedValue({
+      ...mockCartWithItems,
+      items: [{ ...mockCartItem, quantity: 2, product: lowStockProduct }],
+    } as never);
+
+    await expect(ordersService.checkout("user-1", checkoutBody)).rejects.toThrow(
+      "INSUFFICIENT_STOCK"
+    );
   });
 
   it("passes new address object to createOrderWithItems when newShippingAddress is provided", async () => {
@@ -267,6 +281,30 @@ describe("ordersService.updateOrderItemStatus", () => {
     await expect(
       ordersService.updateOrderItemStatus("shop-owner-1", "order-1", "oi-1", "confirmed")
     ).rejects.toThrow("FORBIDDEN");
+  });
+
+  it("throws INVALID_TRANSITION when item is already delivered", async () => {
+    vi.mocked(shopsRepository.findByOwnerUserId).mockResolvedValue(mockShop as never);
+    vi.mocked(ordersRepository.findOrderItem).mockResolvedValue({
+      ...mockOrderItem,
+      status: "delivered",
+    } as never);
+
+    await expect(
+      ordersService.updateOrderItemStatus("shop-owner-1", "order-1", "oi-1", "confirmed")
+    ).rejects.toThrow("INVALID_TRANSITION");
+  });
+
+  it("throws INVALID_TRANSITION when item is already cancelled", async () => {
+    vi.mocked(shopsRepository.findByOwnerUserId).mockResolvedValue(mockShop as never);
+    vi.mocked(ordersRepository.findOrderItem).mockResolvedValue({
+      ...mockOrderItem,
+      status: "cancelled",
+    } as never);
+
+    await expect(
+      ordersService.updateOrderItemStatus("shop-owner-1", "order-1", "oi-1", "shipped")
+    ).rejects.toThrow("INVALID_TRANSITION");
   });
 
   it("updates status and returns the full order when ownership is valid", async () => {

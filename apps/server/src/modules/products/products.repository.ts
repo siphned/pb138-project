@@ -63,6 +63,16 @@ export const productsRepository = {
     }) as Promise<ProductWithWines[]>;
   },
 
+  async productIdsExist(ids: string[]): Promise<boolean> {
+    if (ids.length === 0) return true;
+    const uniqueIds = [...new Set(ids)];
+    const found = await db.query.products.findMany({
+      where: and(inArray(products.id, uniqueIds), isNull(products.deletedAt)),
+      columns: { id: true },
+    });
+    return found.length === uniqueIds.length;
+  },
+
   async winesExist(wineIds: string[]): Promise<boolean> {
     const uniqueIds = [...new Set(wineIds)];
     const found = await db.query.wines.findMany({

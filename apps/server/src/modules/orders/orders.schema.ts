@@ -21,6 +21,37 @@ export const checkoutBody = t.Object({
   newBillingAddress: t.Optional(addressInput),
 });
 
+export const orderItemResponse = t.Object({
+  id: t.String(),
+  orderId: t.String(),
+  shopId: t.String(),
+  productId: t.String(),
+  quantity: t.Integer(),
+  unitPriceAtPurchase: t.String(),
+  status: t.String(),
+  createdAt: t.Date(),
+  updatedAt: t.Union([t.Date(), t.Null()]),
+  product: t.Object({ id: t.String(), name: t.String() }),
+});
+
+export const orderResponse = t.Object({
+  id: t.String(),
+  userId: t.String(),
+  status: t.String(),
+  paymentStatus: t.String(),
+  paymentMethod: t.String(),
+  deliveryType: t.String(),
+  totalPrice: t.String(),
+  shippingFee: t.String(),
+  discount: t.String(),
+  shippingAddressId: t.String(),
+  billingAddressId: t.String(),
+  createdAt: t.Date(),
+  updatedAt: t.Union([t.Date(), t.Null()]),
+  deletedAt: t.Union([t.Date(), t.Null()]),
+  items: t.Array(orderItemResponse),
+});
+
 export const updateItemStatusBody = t.Object({
   status: t.Union([
     t.Literal("confirmed"),

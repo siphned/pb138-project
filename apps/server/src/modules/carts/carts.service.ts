@@ -23,9 +23,11 @@ export const cartsService = {
   },
 
   async updateItem(userId: string, cartItemId: string, quantity: number): Promise<CartWithItems> {
-    const cart = await cartsRepository.upsertCart(userId);
-    const item = await cartsRepository.findItem(cartItemId);
-    if (!item || item.cartId !== cart.id) throw new Error("NOT_FOUND");
+    const [cart, item] = await Promise.all([
+      cartsRepository.findByUserId(userId),
+      cartsRepository.findItem(cartItemId),
+    ]);
+    if (!cart || !item || item.cartId !== cart.id) throw new Error("NOT_FOUND");
 
     await cartsRepository.updateItem(cartItemId, quantity);
 
@@ -35,9 +37,11 @@ export const cartsService = {
   },
 
   async removeItem(userId: string, cartItemId: string): Promise<void> {
-    const cart = await cartsRepository.upsertCart(userId);
-    const item = await cartsRepository.findItem(cartItemId);
-    if (!item || item.cartId !== cart.id) throw new Error("NOT_FOUND");
+    const [cart, item] = await Promise.all([
+      cartsRepository.findByUserId(userId),
+      cartsRepository.findItem(cartItemId),
+    ]);
+    if (!cart || !item || item.cartId !== cart.id) throw new Error("NOT_FOUND");
 
     await cartsRepository.removeItem(cartItemId);
   },
@@ -46,6 +50,9 @@ export const cartsService = {
     userId: string,
     items: { productId: string; quantity: number }[]
   ): Promise<CartWithItems> {
+    const allExist = await productsRepository.productIdsExist(items.map((i) => i.productId));
+    if (!allExist) throw new Error("NOT_FOUND");
+
     const cart = await cartsRepository.upsertCart(userId);
     await cartsRepository.mergeGuestItems(cart.id, items);
 

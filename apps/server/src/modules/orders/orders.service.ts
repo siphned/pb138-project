@@ -29,10 +29,13 @@ export const ordersService = {
     const cart = await cartsRepository.findByUserId(userId);
     if (!cart || cart.items.length === 0) throw new Error("CART_EMPTY");
 
-    if (!body.shippingAddressId && !body.newShippingAddress)
-      throw new Error("MISSING_SHIPPING_ADDRESS");
-    if (!body.billingAddressId && !body.newBillingAddress)
-      throw new Error("MISSING_BILLING_ADDRESS");
+    const shippingAddress = body.newShippingAddress ?? body.shippingAddressId;
+    if (!shippingAddress) throw new Error("MISSING_SHIPPING_ADDRESS");
+    const billingAddress = body.newBillingAddress ?? body.billingAddressId;
+    if (!billingAddress) throw new Error("MISSING_BILLING_ADDRESS");
+
+    const insufficientItem = cart.items.find((item) => item.product.quantity < item.quantity);
+    if (insufficientItem) throw new Error("INSUFFICIENT_STOCK");
 
     const totalPrice = cart.items
       .reduce((sum, item) => sum + Number.parseFloat(item.product.price) * item.quantity, 0)
@@ -48,8 +51,8 @@ export const ordersService = {
     const order = await ordersRepository.createOrderWithItems(
       {
         userId,
-        shippingAddress: body.newShippingAddress ?? (body.shippingAddressId as string),
-        billingAddress: body.newBillingAddress ?? (body.billingAddressId as string),
+        shippingAddress,
+        billingAddress,
         paymentMethod: body.paymentMethod,
         deliveryType: body.deliveryType,
         totalPrice,
@@ -85,6 +88,8 @@ export const ordersService = {
     const item = await ordersRepository.findOrderItem(itemId);
     if (!item || item.orderId !== orderId) throw new Error("NOT_FOUND");
     if (item.shopId !== shop.id) throw new Error("FORBIDDEN");
+    if (item.status === "delivered" || item.status === "cancelled")
+      throw new Error("INVALID_TRANSITION");
 
     await ordersRepository.updateOrderItemStatus(itemId, newStatus);
 

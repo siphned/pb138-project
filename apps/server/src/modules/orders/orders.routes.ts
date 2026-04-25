@@ -1,19 +1,10 @@
 import { Elysia, status, t } from "elysia";
+import { handleError } from "../../utils/errors";
 import { authPlugin } from "../auth";
-import { checkoutBody, updateItemStatusBody } from "./orders.schema";
+import { checkoutBody, orderResponse, updateItemStatusBody } from "./orders.schema";
 import { ordersService } from "./orders.service";
 
-function handleError(e: unknown) {
-  if (e instanceof Error) {
-    if (e.message === "NOT_FOUND") return status(404, "Not found");
-    if (e.message === "FORBIDDEN") return status(403, "Forbidden");
-    if (e.message === "CART_EMPTY") return status(400, "Cart is empty");
-    if (e.message === "MISSING_SHIPPING_ADDRESS")
-      return status(400, "Shipping address is required");
-    if (e.message === "MISSING_BILLING_ADDRESS") return status(400, "Billing address is required");
-  }
-  throw e;
-}
+const errorResponses = { 400: t.String(), 403: t.String(), 404: t.String(), 409: t.String() };
 
 export const ordersRoutes = new Elysia()
   .use(authPlugin)
@@ -30,6 +21,7 @@ export const ordersRoutes = new Elysia()
     {
       requireAuth: true,
       body: checkoutBody,
+      response: { 201: orderResponse, ...errorResponses },
       detail: {
         tags: ["orders"],
         summary: "Checkout — convert cart to order",
@@ -40,6 +32,7 @@ export const ordersRoutes = new Elysia()
 
   .get("/orders", async ({ dbUser }) => ordersService.getMyOrders(dbUser.id), {
     requireAuth: true,
+    response: { 200: t.Array(orderResponse) },
     detail: {
       tags: ["orders"],
       summary: "List current user's orders",
@@ -59,6 +52,7 @@ export const ordersRoutes = new Elysia()
     {
       requireAuth: true,
       params: t.Object({ id: t.String() }),
+      response: { 200: orderResponse, ...errorResponses },
       detail: {
         tags: ["orders"],
         summary: "Get order by ID (own orders only)",
@@ -85,6 +79,7 @@ export const ordersRoutes = new Elysia()
       requireCapability: "shop_owner",
       params: t.Object({ id: t.String(), itemId: t.String() }),
       body: updateItemStatusBody,
+      response: { 200: orderResponse, ...errorResponses },
       detail: {
         tags: ["orders"],
         summary: "Update order item status (shop owner only)",
