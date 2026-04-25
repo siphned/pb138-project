@@ -1,8 +1,8 @@
 import { useQueryClient } from "@tanstack/react-query";
-import { createContext, type ReactNode, useContext, useEffect, useState } from "react";
+import { createContext, type ReactNode, useContext } from "react";
 import { getUsersMeQueryKey, useGetUsersMe } from "@/generated/hooks/useGetUsersMe";
-import type { PutUsersMeMutationRequest } from "@/generated/types";
 import { usePutUsersMe } from "@/generated/hooks/usePutUsersMe";
+import { useAuth } from "@clerk/react";
 
 export interface UserProfile {
   id: string;
@@ -13,24 +13,24 @@ export interface UserProfile {
 }
 
 interface UserContextType {
-  user: UserProfile;
+  user: UserProfile | null;
   updateUser: (newData: Partial<UserProfile>) => Promise<void>;
   isLoading: boolean;
 }
 
-const defaultUser: UserProfile = {
-  id: "",
-  fname: "",
-  lname: "",
-  email: "",
-  role: "user",
-};
-
 const UserContext = createContext<UserContextType | undefined>(undefined);
 
 export function UserProvider({ children }: { children: ReactNode }) {
-  const { data: profile, isLoading } = useGetUsersMe();
+  const { isSignedIn, isLoaded } = useAuth();
   const queryClient = useQueryClient();
+
+  // Only fetch the profile if the user is signed in and Clerk is loaded
+  const { data: profile, isLoading: isProfileLoading } = useGetUsersMe({
+    query: {
+      enabled: !!isSignedIn && isLoaded,
+    },
+  });
+
   const updateMutation = usePutUsersMe({
     mutation: {
       onSuccess: (): void => {
@@ -39,33 +39,24 @@ export function UserProvider({ children }: { children: ReactNode }) {
     },
   });
 
-  const [user, setUser] = useState<UserProfile>(defaultUser);
-  useEffect(() => {
-    if (profile) {
-      setUser({
-        id: profile.id,
-        fname: profile.fname,
-        lname: profile.lname,
-        email: profile.email,
-        role: profile.role,
-      });
-    }
-  }, [profile]);
-
   const updateUser = async (newData: Partial<UserProfile>): Promise<void> => {
-    const mutationData: PutUsersMeMutationRequest = {};
-    if (newData.fname !== undefined) {
-      mutationData.fname = newData.fname;
-    }
-    if (newData.lname !== undefined) {
-      mutationData.lname = newData.lname;
-    }
-    await updateMutation.mutateAsync({ data: mutationData });
+    if (!profile) return;
+
+    await updateMutation.mutateAsync({
+      data: {
+        fname: newData.fname,
+        lname: newData.lname,
+      },
+    });
   };
 
-  return (
-    <UserContext.Provider value={{ user, updateUser, isLoading }}>{children}</UserContext.Provider>
-  );
+  const value = {
+    user: profile ?? null,
+    updateUser,
+    isLoading: !isLoaded || isProfileLoading,
+  };
+
+  return <UserContext.Provider value={value}>{children}</UserContext.Provider>;
 }
 
 export function useUser() {
