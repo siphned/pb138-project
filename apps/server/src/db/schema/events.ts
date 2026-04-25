@@ -1,7 +1,6 @@
-import { sql } from "drizzle-orm";
-import { pgTable, smallint, text, uniqueIndex, uuid, varchar } from "drizzle-orm/pg-core";
+import { pgTable, smallint, text, uuid, varchar } from "drizzle-orm/pg-core";
 import { addresses } from "./addresses";
-import { eventInviteStatusEnum, eventStatusEnum, eventVisibilityEnum } from "./enums";
+import { eventStatusEnum, eventVisibilityEnum } from "./enums";
 import { timestamptz } from "./helpers";
 import { winemakers } from "./sellers";
 import { users } from "./users";
