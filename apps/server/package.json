@@ -28,7 +28,7 @@
     "build": "tsc",
     "check-types": "tsc --noEmit",
     "generate": "bun run scripts/export-spec.ts",
-    "test": "vitest || true",
+    "test": "vitest run",
     "test:e2e": "echo 'Run E2E tests from web package'",
     "lint": "biome lint .",
     "format": "biome format --write .",
