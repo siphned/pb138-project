@@ -25,13 +25,13 @@ export const winesService = {
   async replaceWine(
     id: string,
     userId: string,
-    userRole: string,
+    roles: string[],
     data: WineData
   ): Promise<WineWithWinemaker> {
     const wine = await winesRepository.findById(id);
     if (!wine) throw new Error("NOT_FOUND");
 
-    if (userRole !== "admin") {
+    if (!roles.includes("admin")) {
       const winemaker = await winesRepository.findWinemakerByUserId(userId);
       if (!winemaker || wine.winemakerId !== winemaker.id) throw new Error("FORBIDDEN");
     }
@@ -42,11 +42,11 @@ export const winesService = {
     return updated;
   },
 
-  async deleteWine(id: string, userId: string, userRole: string): Promise<void> {
+  async deleteWine(id: string, userId: string, roles: string[]): Promise<void> {
     const wine = await winesRepository.findById(id);
     if (!wine) throw new Error("NOT_FOUND");
 
-    if (userRole !== "admin") {
+    if (!roles.includes("admin")) {
       const winemaker = await winesRepository.findWinemakerByUserId(userId);
       if (!winemaker || wine.winemakerId !== winemaker.id) throw new Error("FORBIDDEN");
     }

@@ -101,7 +101,7 @@ describe("replaceWine", () => {
     vi.mocked(winesRepository.findById).mockResolvedValue(mockWine as never);
     vi.mocked(winesRepository.updateById).mockResolvedValue(mockWine as never);
 
-    await winesService.replaceWine(wineId, otherUserId, "admin", wineData);
+    await winesService.replaceWine(wineId, otherUserId, ["admin"], wineData);
 
     expect(winesRepository.findWinemakerByUserId).not.toHaveBeenCalled();
     expect(winesRepository.updateById).toHaveBeenCalledWith(wineId, wineData);
@@ -114,7 +114,7 @@ describe("replaceWine", () => {
     vi.mocked(winesRepository.findWinemakerByUserId).mockResolvedValue(mockWinemaker as never);
     vi.mocked(winesRepository.updateById).mockResolvedValue(mockWine as never);
 
-    await winesService.replaceWine(wineId, userId, "user", wineData);
+    await winesService.replaceWine(wineId, userId, ["customer"], wineData);
 
     expect(winesRepository.updateById).toHaveBeenCalledWith(wineId, wineData);
   });
@@ -124,7 +124,7 @@ describe("replaceWine", () => {
     vi.mocked(winesRepository.findById).mockResolvedValue(otherWine as never);
     vi.mocked(winesRepository.findWinemakerByUserId).mockResolvedValue(mockWinemaker as never);
 
-    await expect(winesService.replaceWine(wineId, userId, "user", wineData)).rejects.toThrow(
+    await expect(winesService.replaceWine(wineId, userId, ["customer"], wineData)).rejects.toThrow(
       "FORBIDDEN"
     );
     expect(winesRepository.updateById).not.toHaveBeenCalled();
@@ -133,7 +133,7 @@ describe("replaceWine", () => {
   it("throws NOT_FOUND when wine does not exist", async () => {
     vi.mocked(winesRepository.findById).mockResolvedValue(undefined);
 
-    await expect(winesService.replaceWine(wineId, userId, "user", wineData)).rejects.toThrow(
+    await expect(winesService.replaceWine(wineId, userId, ["customer"], wineData)).rejects.toThrow(
       "NOT_FOUND"
     );
   });
@@ -144,7 +144,7 @@ describe("deleteWine", () => {
     vi.mocked(winesRepository.findById).mockResolvedValue(mockWine as never);
     vi.mocked(winesRepository.findWinemakerByUserId).mockResolvedValue(mockWinemaker as never);
 
-    await winesService.deleteWine(wineId, userId, "user");
+    await winesService.deleteWine(wineId, userId, ["customer"]);
 
     expect(winesRepository.softDelete).toHaveBeenCalledWith(wineId);
   });
@@ -152,7 +152,7 @@ describe("deleteWine", () => {
   it("allows admin to delete any wine", async () => {
     vi.mocked(winesRepository.findById).mockResolvedValue(mockWine as never);
 
-    await winesService.deleteWine(wineId, otherUserId, "admin");
+    await winesService.deleteWine(wineId, otherUserId, ["admin"]);
 
     expect(winesRepository.findWinemakerByUserId).not.toHaveBeenCalled();
     expect(winesRepository.softDelete).toHaveBeenCalledWith(wineId);
@@ -163,14 +163,18 @@ describe("deleteWine", () => {
     vi.mocked(winesRepository.findById).mockResolvedValue(otherWine as never);
     vi.mocked(winesRepository.findWinemakerByUserId).mockResolvedValue(mockWinemaker as never);
 
-    await expect(winesService.deleteWine(wineId, userId, "user")).rejects.toThrow("FORBIDDEN");
+    await expect(winesService.deleteWine(wineId, userId, ["customer"])).rejects.toThrow(
+      "FORBIDDEN"
+    );
     expect(winesRepository.softDelete).not.toHaveBeenCalled();
   });
 
   it("throws NOT_FOUND when wine does not exist", async () => {
     vi.mocked(winesRepository.findById).mockResolvedValue(undefined);
 
-    await expect(winesService.deleteWine(wineId, userId, "user")).rejects.toThrow("NOT_FOUND");
+    await expect(winesService.deleteWine(wineId, userId, ["customer"])).rejects.toThrow(
+      "NOT_FOUND"
+    );
   });
 });
 

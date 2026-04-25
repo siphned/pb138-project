@@ -13,9 +13,10 @@
     "typescript": "^5"
   },
   "dependencies": {
-    "@elysiajs/cors": "^1.1.0",
     "@clerk/backend": "^3.2.12",
+    "@elysiajs/cors": "^1.1.0",
     "@elysiajs/openapi": "^1.4.14",
+    "@faker-js/faker": "^10.4.0",
     "drizzle-orm": "^0.45.1",
     "elysia": "^1.4.28",
     "pg": "^8.20.0",
@@ -26,12 +27,14 @@
     "generate:spec": "bun run scripts/export-spec.ts",
     "build": "tsc",
     "check-types": "tsc --noEmit",
-    "generate": "echo 'Backend does not generate code'",
+    "generate": "bun run scripts/export-spec.ts",
     "test": "vitest || true",
     "test:e2e": "echo 'Run E2E tests from web package'",
     "lint": "biome lint .",
+    "format": "biome format --write .",
     "db:generate": "drizzle-kit generate",
     "db:migrate": "drizzle-kit migrate",
-    "db:studio": "drizzle-kit studio"
+    "db:studio": "drizzle-kit studio",
+    "db:seed": "bun run src/db/seed.ts"
   }
 }

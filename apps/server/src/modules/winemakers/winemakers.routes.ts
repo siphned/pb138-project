@@ -58,7 +58,7 @@ export const winemakersRoutes = new Elysia()
       }
     },
     {
-      requireCapability: "winemaker",
+      requireRoles: ["winemaker"],
       body: updateWinemakerBody,
       response: { 200: winemakerListItemResponse, 404: t.String() },
       detail: {

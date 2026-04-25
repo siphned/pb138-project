@@ -15,6 +15,17 @@ export const shopsRoutes = new Elysia()
     },
   })
 
+  .get("/shops/me", ({ dbUser }) => shopsService.listMyShops(dbUser.id), {
+    requireRoles: ["shop_owner"],
+    response: { 200: t.Array(shopResponse) },
+    detail: {
+      tags: ["shops"],
+      summary: "List my shops",
+      description: "Returns all shops owned by the authenticated user.",
+      security: [{ bearerAuth: [] }],
+    },
+  })
+
   .get(
     "/shops/:id",
     async ({ params }) => {
@@ -39,22 +50,16 @@ export const shopsRoutes = new Elysia()
   .post(
     "/shops",
     async ({ dbUser, body }) => {
-      try {
-        return status(201, await shopsService.createShop(dbUser.id, body));
-      } catch (e: unknown) {
-        if (e instanceof Error && e.message === "ALREADY_HAS_SHOP")
-          return status(409, "You already own a shop");
-        throw e;
-      }
+      return status(201, await shopsService.createShop(dbUser.id, body));
     },
     {
-      requireCapability: "shop_owner",
+      requireRoles: ["shop_owner"],
       body: createShopBody,
-      response: { 201: shopResponse, 409: t.String() },
+      response: { 201: shopResponse },
       detail: {
         tags: ["shops"],
         summary: "Create a shop",
-        description: "Creates a new shop for the authenticated shop owner. One shop per user.",
+        description: "Creates a new shop for the authenticated shop owner.",
         security: [{ bearerAuth: [] }],
       },
     }
