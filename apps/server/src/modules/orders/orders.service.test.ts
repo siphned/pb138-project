@@ -123,7 +123,10 @@ describe("ordersService", () => {
     });
 
     it("throws FORBIDDEN if user does not own the order", async () => {
-      vi.mocked(ordersRepository.findById).mockResolvedValue({ id: "o1", userId: "other" } as never);
+      vi.mocked(ordersRepository.findById).mockResolvedValue({
+        id: "o1",
+        userId: "other",
+      } as never);
 
       await expect(ordersService.getOrder("o1", "u1")).rejects.toThrow("FORBIDDEN");
     });
@@ -137,7 +140,7 @@ describe("ordersService", () => {
         status: "shipped",
       } as never);
 
-      const result = await ordersService.updateStatus("o1", "u1", "shipped" as any);
+      const result = await ordersService.updateStatus("o1", "u1", "shipped" as never);
 
       expect(result.status).toBe("shipped");
       expect(ordersRepository.updateStatus).toHaveBeenCalledWith("o1", "shipped");
@@ -146,9 +149,9 @@ describe("ordersService", () => {
     it("throws NOT_FOUND when updating non-existent order", async () => {
       vi.mocked(ordersRepository.findById).mockResolvedValue(undefined);
 
-      await expect(
-        ordersService.updateStatus("o1", "u1", "shipped" as any)
-      ).rejects.toThrow("NOT_FOUND");
+      await expect(ordersService.updateStatus("o1", "u1", "shipped" as never)).rejects.toThrow(
+        "NOT_FOUND"
+      );
     });
   });
 });

@@ -24,9 +24,9 @@ vi.mock("../winemakers/winemakers.repository", () => ({
   },
 }));
 
-import { supplyAgreementsRepository } from "./supply-agreements.repository";
 import { shopsRepository } from "../shops/shops.repository";
 import { winemakersRepository } from "../winemakers/winemakers.repository";
+import { supplyAgreementsRepository } from "./supply-agreements.repository";
 import { supplyAgreementsService } from "./supply-agreements.service";
 
 describe("supplyAgreementsService", () => {
@@ -41,7 +41,9 @@ describe("supplyAgreementsService", () => {
         ownerUserId: "user-1",
       } as never);
       vi.mocked(supplyAgreementsRepository.findByShopAndWinemaker).mockResolvedValue(undefined);
-      vi.mocked(supplyAgreementsRepository.create).mockResolvedValue({ id: "agreement-1" } as never);
+      vi.mocked(supplyAgreementsRepository.create).mockResolvedValue({
+        id: "agreement-1",
+      } as never);
 
       const result = await supplyAgreementsService.createRequest("user-1", "winemaker-1", "shop-1");
 

@@ -64,7 +64,7 @@ describe("cartsService", () => {
   describe("addItem", () => {
     it("adds item to existing user cart", async () => {
       vi.mocked(cartsRepository.findByUserId).mockResolvedValue({ id: "c1" } as never);
-      
+
       await cartsService.addItem({ userId: "u1" }, "p1", 2);
 
       expect(cartsRepository.addItem).toHaveBeenCalledWith("c1", "p1", 2);
@@ -72,21 +72,23 @@ describe("cartsService", () => {
 
     it("adds item to existing session cart", async () => {
       vi.mocked(cartsRepository.findBySessionId).mockResolvedValue({ id: "c1" } as never);
-      
+
       await cartsService.addItem({ sessionId: "s1" }, "p1", 5);
 
       expect(cartsRepository.addItem).toHaveBeenCalledWith("c1", "p1", 5);
     });
 
     it("throws error if neither userId nor sessionId is provided", async () => {
-      await expect(cartsService.addItem({}, "p1", 1)).rejects.toThrow("Could not find or create cart");
+      await expect(cartsService.addItem({}, "p1", 1)).rejects.toThrow(
+        "Could not find or create cart"
+      );
     });
   });
 
   describe("updateItemQuantity", () => {
     it("updates quantity for user cart", async () => {
       vi.mocked(cartsRepository.findByUserId).mockResolvedValue({ id: "c1" } as never);
-      
+
       await cartsService.updateItemQuantity({ userId: "u1" }, "p1", 10);
 
       expect(cartsRepository.updateItemQuantity).toHaveBeenCalledWith("c1", "p1", 10);
@@ -94,14 +96,16 @@ describe("cartsService", () => {
 
     it("throws error if cart not found", async () => {
       vi.mocked(cartsRepository.findByUserId).mockResolvedValue(undefined);
-      await expect(cartsService.updateItemQuantity({ userId: "u1" }, "p1", 5)).rejects.toThrow("Cart not found");
+      await expect(cartsService.updateItemQuantity({ userId: "u1" }, "p1", 5)).rejects.toThrow(
+        "Cart not found"
+      );
     });
   });
 
   describe("removeItem", () => {
     it("removes item from session cart", async () => {
       vi.mocked(cartsRepository.findBySessionId).mockResolvedValue({ id: "c1" } as never);
-      
+
       await cartsService.removeItem({ sessionId: "s1" }, "p1");
 
       expect(cartsRepository.removeItem).toHaveBeenCalledWith("c1", "p1");
