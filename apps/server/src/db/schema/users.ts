@@ -1,6 +1,6 @@
 import { pgTable, text, timestamp, uuid, varchar } from "drizzle-orm/pg-core";
 import { addresses } from "./addresses";
-import { userRoleEnum } from "./enums";
+import { userRoleEnum, userStatusEnum } from "./enums";
 
 export const users = pgTable("users", {
   id: uuid("id").primaryKey().defaultRandom(),
@@ -9,6 +9,7 @@ export const users = pgTable("users", {
   lname: varchar("lname", { length: 30 }).notNull(),
   email: text("email").notNull().unique(),
   role: userRoleEnum("role").notNull().default("user"),
+  status: userStatusEnum("status").notNull().default("active"),
   shippingAddressId: uuid("shipping_address_id").references(() => addresses.id),
   billingAddressId: uuid("billing_address_id").references(() => addresses.id),
   createdAt: timestamp("created_at").notNull().defaultNow(),
