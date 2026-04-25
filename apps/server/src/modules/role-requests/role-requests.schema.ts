@@ -1,7 +1,7 @@
 import { t } from "elysia";
 
 export const submitRoleRequestBody = t.Object({
-  business_name: t.String({ minLength: 1 }),
+  businessName: t.String({ minLength: 1 }),
   details: t.Optional(t.String()),
 });
 

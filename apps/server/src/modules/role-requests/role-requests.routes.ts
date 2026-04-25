@@ -1,8 +1,10 @@
 import { Elysia, status, t } from "elysia";
 import { authPlugin } from "../auth";
 import { usersService } from "../users/users.service";
-import { submitRoleRequestBody } from "./role-requests.schema";
+import { roleRequestResponse, submitRoleRequestBody } from "./role-requests.schema";
 import { roleRequestsService } from "./role-requests.service";
+
+const successResponse = t.Object({ success: t.Boolean() });
 
 export const roleRequestsRoutes = new Elysia()
   .use(authPlugin)
@@ -15,7 +17,7 @@ export const roleRequestsRoutes = new Elysia()
         return await roleRequestsService.submitRequest(
           user.id,
           "winemaker",
-          body.business_name,
+          body.businessName,
           body.details
         );
       } catch (e: unknown) {
@@ -27,6 +29,7 @@ export const roleRequestsRoutes = new Elysia()
     {
       requireAuth: true,
       body: submitRoleRequestBody,
+      response: { 201: roleRequestResponse, 409: t.String() },
       detail: {
         tags: ["role-requests"],
         summary: "Apply for winemaker role",
@@ -45,7 +48,7 @@ export const roleRequestsRoutes = new Elysia()
         return await roleRequestsService.submitRequest(
           user.id,
           "shop_owner",
-          body.business_name,
+          body.businessName,
           body.details
         );
       } catch (e: unknown) {
@@ -57,6 +60,7 @@ export const roleRequestsRoutes = new Elysia()
     {
       requireAuth: true,
       body: submitRoleRequestBody,
+      response: { 201: roleRequestResponse, 409: t.String() },
       detail: {
         tags: ["role-requests"],
         summary: "Apply for shop-owner role",
@@ -68,7 +72,8 @@ export const roleRequestsRoutes = new Elysia()
   )
 
   .get("/role-requests", () => roleRequestsService.listPending(), {
-    requireRole: "admin",
+    requireRoles: ["admin"],
+    response: { 200: t.Array(roleRequestResponse) },
     detail: {
       tags: ["role-requests"],
       summary: "List pending role requests",
@@ -93,8 +98,9 @@ export const roleRequestsRoutes = new Elysia()
       }
     },
     {
-      requireRole: "admin",
+      requireRoles: ["admin"],
       params: t.Object({ id: t.String() }),
+      response: { 200: successResponse, 404: t.String(), 409: t.String() },
       detail: {
         tags: ["role-requests"],
         summary: "Approve a role request",
@@ -121,8 +127,9 @@ export const roleRequestsRoutes = new Elysia()
       }
     },
     {
-      requireRole: "admin",
+      requireRoles: ["admin"],
       params: t.Object({ id: t.String() }),
+      response: { 200: successResponse, 404: t.String(), 409: t.String() },
       detail: {
         tags: ["role-requests"],
         summary: "Reject a role request",
