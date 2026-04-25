@@ -29,6 +29,34 @@
       "when": 1776945861366,
       "tag": "0003_bored_lily_hollister",
       "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "7",
+      "when": 1776937975742,
+      "tag": "0004_quick_vargas",
+      "breakpoints": true
+    },
+    {
+      "idx": 5,
+      "version": "7",
+      "when": 1776942458851,
+      "tag": "0005_rare_caretaker",
+      "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "7",
+      "when": 1776951585399,
+      "tag": "0006_huge_black_queen",
+      "breakpoints": true
+    },
+    {
+      "idx": 7,
+      "version": "7",
+      "when": 1777137010320,
+      "tag": "0007_ambiguous_la_nuit",
+      "breakpoints": true
     }
   ]
 }

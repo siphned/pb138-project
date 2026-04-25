@@ -82,7 +82,7 @@ This matrix defines which user roles can perform which actions in the WineMarket
 | | Moderate reviews | RE-4 | ❌ | ❌ | ❌ | ❌ | ✅ |
 | **ADMIN / BACK-OFFICE** |
 | | View all users | BO-1 | ❌ | ❌ | ❌ | ❌ | ✅ |
-| | Deactivate user account | BO-1 | ❌ | ❌ | ❌ | ❌ | ✅ |
+| | Set user status (active/suspended/banned) | BO-1 | ❌ | ❌ | ❌ | ❌ | ✅ |
 | | View pending role requests | BO-6 | ❌ | ❌ | ❌ | ❌ | ✅ |
 | | Approve / Reject role request | BO-6 | ❌ | ❌ | ❌ | ❌ | ✅ |
 | | View/Manage all shops | BO-4 | ❌ | ❌ | ❌ | ❌ | ✅ |
