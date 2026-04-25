@@ -79,7 +79,7 @@ export const adminRepository = {
     const [updated] = await db
       .update(users)
       .set({ status: newStatus, updatedAt: new Date() })
-      .where(eq(users.id, id))
+      .where(and(eq(users.id, id), isNull(users.deletedAt)))
       .returning({
         id: users.id,
         fname: users.fname,
