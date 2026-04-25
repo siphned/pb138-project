@@ -1,6 +1,7 @@
 import { Link } from "@tanstack/react-router";
 import {
   Calendar,
+  LogOut,
   Menu,
   Moon,
   Package,
@@ -18,10 +19,9 @@ import {
   AccordionItem,
   AccordionTrigger,
 } from "@/components/ui/accordion";
-import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
-import { useUser } from "@/context/UserContext";
 
 import { Role } from "@/types/roles";
 
@@ -31,13 +31,13 @@ interface SidebarProps {
   onRoleChange?: (role: Role) => void;
 }
 
-export function Sidebar({ userRoles = [Role.customer], activeRole, onRoleChange }: SidebarProps) {
-  const { user } = useUser();
+export function Sidebar({ userRoles = [Role.CUSTOMER], activeRole, onRoleChange }: SidebarProps) {
+  // TODO: Re-enable user context once UserProvider is enabled
+  const user: any = null;
   const currentActiveRole = activeRole || userRoles[0];
   const [accordionState, setAccordionState] = useState<string[]>([]);
 
-  const fullName = `${user?.fname || ""} ${user?.lname || ""}`.trim() || "User";
-  const initials = fullName.substring(0, 2).toUpperCase();
+  const initials = "WE";
   const hasMultipleRoles = userRoles.length > 1;
 
   return (
@@ -55,12 +55,27 @@ export function Sidebar({ userRoles = [Role.customer], activeRole, onRoleChange 
         <div className="flex-none  border-b bg-background z-10">
           <SheetHeader className="text-left">
             <SheetTitle className="flex items-center gap-3 font-heading text-xl px-4 py-4">
-              <Avatar className="h-14 w-14">
-                <AvatarFallback className="bg-primary text-primary-foreground font-heading text-lg">
-                  {initials}
-                </AvatarFallback>
-              </Avatar>
-              {fullName}
+              {user && (
+                <>
+                  <Avatar className="h-14 w-14">
+                    <AvatarImage src={user.avatarUrl} alt={user.fname} />
+                    <AvatarFallback className="bg-primary text-primary-foreground font-heading text-lg">
+                      {initials}
+                    </AvatarFallback>
+                  </Avatar>
+                  {user.fname}
+                </>
+              )}
+              {!user && (
+                <>
+                  <Avatar className="h-14 w-14">
+                    <AvatarFallback className="bg-primary text-primary-foreground font-heading text-lg">
+                      {initials}
+                    </AvatarFallback>
+                  </Avatar>
+                  User
+                </>
+              )}
             </SheetTitle>
           </SheetHeader>
         </div>
@@ -113,7 +128,7 @@ export function Sidebar({ userRoles = [Role.customer], activeRole, onRoleChange 
             )}
 
             {/* ROLE-AWARE LINKS */}
-            {currentActiveRole === Role.customer ? (
+            {currentActiveRole === Role.CUSTOMER ? (
               <>
                 <Link
                   to="/orders"
@@ -131,16 +146,16 @@ export function Sidebar({ userRoles = [Role.customer], activeRole, onRoleChange 
             ) : (
               <>
                 <Link
-                  to="/wines"
+                  to="/inventory"
                   className="flex-none flex items-center gap-3 px-3 py-3 rounded-md bg-secondary hover:bg-secondary/80 transition-colors text-sm font-medium text-primary"
                 >
                   <Wine className="h-4 w-4" /> My Wines
                 </Link>
                 <Link
-                  to="/shops"
+                  to="/bundles"
                   className="flex-none flex items-center gap-3 px-3 py-3 rounded-md bg-secondary hover:bg-secondary/80 transition-colors text-sm font-medium text-primary"
                 >
-                  <Package className="h-4 w-4" /> Shops
+                  <Package className="h-4 w-4" /> Bundles
                 </Link>
               </>
             )}
@@ -181,6 +196,13 @@ export function Sidebar({ userRoles = [Role.customer], activeRole, onRoleChange 
             Theme
             <Moon className="h-4 w-4" />
           </button>
+
+          <Link
+            to="/logout"
+            className="flex items-center gap-3 px-3 py-2 rounded-md hover:bg-destructive/10 transition-colors text-sm font-medium text-muted-foreground hover:text-destructive mt-2"
+          >
+            <LogOut className="h-4 w-4" /> Log out
+          </Link>
         </div>
       </SheetContent>
     </Sheet>

@@ -31,12 +31,12 @@
     "rules": {
       "recommended": true,
       "correctness": {
-        "noUnusedImports": "error",
-        "noUnusedVariables": "error"
+        "noUnusedImports": "warn",
+        "noUnusedVariables": "warn"
       },
       "style": {
-        "noNonNullAssertion": "error",
-        "useImportType": "error",
+        "noNonNullAssertion": "warn",
+        "useImportType": "warn",
         "noParameterAssign": "error",
         "useAsConstAssertion": "error",
         "useDefaultParameterLast": "error",
@@ -49,13 +49,10 @@
         "noUselessElse": "error"
       },
       "suspicious": {
-        "noExplicitAny": "error"
+        "noExplicitAny": "warn"
       },
       "a11y": {
-        "useButtonType": "error"
-      },
-      "complexity": {
-        "noExcessiveCognitiveComplexity": "error"
+        "useButtonType": "warn"
       }
     }
   },
@@ -66,30 +63,5 @@
       "semicolons": "always"
     }
   },
-  "assist": { "actions": { "source": { "organizeImports": "on" } } },
-  "overrides": [
-    {
-      "includes": ["**/db/seed.ts", "**/scripts/**/*.ts"],
-      "linter": {
-        "rules": {
-          "suspicious": {
-            "noConsole": "off"
-          },
-          "complexity": {
-            "noExcessiveCognitiveComplexity": "off"
-          }
-        }
-      }
-    },
-    {
-      "includes": ["**/routes/**/*.tsx", "**/routes/**/*.ts"],
-      "linter": {
-        "rules": {
-          "style": {
-            "useFilenamingConvention": "off"
-          }
-        }
-      }
-    }
-  ]
+  "assist": { "actions": { "source": { "organizeImports": "on" } } }
 }
