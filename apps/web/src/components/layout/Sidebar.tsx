@@ -31,9 +31,15 @@ interface SidebarProps {
   onRoleChange?: (role: Role) => void;
 }
 
+interface SidebarUser {
+  fname?: string;
+  avatarUrl?: string;
+}
+
 export function Sidebar({ userRoles = [Role.customer], activeRole, onRoleChange }: SidebarProps) {
   // TODO: Re-enable user context once UserProvider is enabled
-  const user: any = null;
+  // const user = useUser();
+  const [user] = useState<SidebarUser | null>(null);
   const currentActiveRole = activeRole || userRoles[0];
   const [accordionState, setAccordionState] = useState<string[]>([]);
 
