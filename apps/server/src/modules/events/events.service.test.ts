@@ -1,4 +1,4 @@
-import { describe, it, expect, beforeEach, vi } from "vitest";
+import { beforeEach, describe, expect, it, vi } from "vitest";
 
 vi.mock("./events.repository", () => ({
   eventsRepository: {
@@ -20,9 +20,9 @@ vi.mock("./events.repository", () => ({
   },
 }));
 
-import { eventsService } from "./events.service";
-import { eventsRepository } from "./events.repository";
 import type { EventWithDetails } from "./events.repository";
+import { eventsRepository } from "./events.repository";
+import { eventsService } from "./events.service";
 
 const userId = "11111111-1111-1111-1111-111111111111";
 const winemakerId = "aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa";

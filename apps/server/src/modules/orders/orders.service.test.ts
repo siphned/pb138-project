@@ -23,9 +23,9 @@ vi.mock("../shops/shops.repository", () => ({
 }));
 
 import { cartsRepository } from "../carts/carts.repository";
+import { shopsRepository } from "../shops/shops.repository";
 import { ordersRepository } from "./orders.repository";
 import { ordersService } from "./orders.service";
-import { shopsRepository } from "../shops/shops.repository";
 
 const mockProduct = { id: "prod-1", name: "Wine", price: "25.00", shopId: "shop-1", quantity: 10 };
 
