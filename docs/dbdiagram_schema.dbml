@@ -218,8 +218,8 @@ Table Orders {
   user_id uuid [not null]
   shipping_fee numeric(10,2) [not null]
   discount numeric(10,2) [not null]
-  payment_status payment_status_enum [not null]
-  payment_method payment_method_enum [not null]
+  payment_status payment_status [not null]
+  payment_method payment_method [not null]
   total_price numeric(10,2) [not null]
   created_at timestamp [not null]
   updated_at timestamp
