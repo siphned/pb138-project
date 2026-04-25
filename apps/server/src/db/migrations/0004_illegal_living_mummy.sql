@@ -1,1 +1,0 @@
-ALTER TABLE "order_items" ADD COLUMN "status" "order_status" DEFAULT 'pending' NOT NULL;

@@ -1,6 +1,6 @@
 {
-  "id": "8510950b-6c19-45f8-be7f-7be4fe9a1a45",
-  "prevId": "77b23081-cabd-40ad-9488-892f4c77660a",
+  "id": "6995fec6-1721-4723-979c-b050d32b82ef",
+  "prevId": "d5539dd4-9dd9-4bfb-a616-5ef7e982a7ec",
   "version": "7",
   "dialect": "postgresql",
   "tables": {
@@ -115,6 +115,14 @@
           "primaryKey": false,
           "notNull": true,
           "default": "'user'"
+        },
+        "status": {
+          "name": "status",
+          "type": "user_status",
+          "typeSchema": "public",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "'active'"
         },
         "shipping_address_id": {
           "name": "shipping_address_id",
@@ -1125,7 +1133,30 @@
           "notNull": false
         }
       },
-      "indexes": {},
+      "indexes": {
+        "uq_event_reg_event_user_active": {
+          "name": "uq_event_reg_event_user_active",
+          "columns": [
+            {
+              "expression": "event_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            },
+            {
+              "expression": "user_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": true,
+          "where": "\"event_registrations\".\"deleted_at\" IS NULL",
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        }
+      },
       "foreignKeys": {
         "event_registrations_event_id_events_id_fk": {
           "name": "event_registrations_event_id_events_id_fk",
@@ -1860,6 +1891,11 @@
       "name": "user_role",
       "schema": "public",
       "values": ["user", "admin"]
+    },
+    "public.user_status": {
+      "name": "user_status",
+      "schema": "public",
+      "values": ["active", "suspended", "banned"]
     },
     "public.wine_color": {
       "name": "wine_color",
