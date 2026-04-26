@@ -40,33 +40,23 @@ export function UserProvider({ children }: { children: ReactNode }) {
   useEffect(() => {
     if (profile) {
       setUser({
-        clerkId: profile.clerkId,
-        email: profile.email,
-        fname: profile.fname,
         id: profile.id,
+        fname: profile.fname,
         lname: profile.lname,
+        email: profile.email,
+        clerkId: profile.clerkId,
         roles: profile.roles ?? [],
       });
     }
   }, [profile]);
 
-  const updateUser = async (
-    newData: Partial<Pick<UserProfile, "fname" | "lname">>
-  ): Promise<UserProfile> => {
+  const updateUser = async (newData: Partial<Pick<UserProfile, "fname" | "lname">>) => {
     if (!user) throw new Error("No user to update");
-    const updated = await updateMutation.mutateAsync({ data: newData });
-    return {
-      clerkId: updated.clerkId,
-      email: updated.email,
-      fname: updated.fname,
-      id: updated.id,
-      lname: updated.lname,
-      roles: updated.roles ?? [],
-    };
+    return updateMutation.mutateAsync({ data: newData });
   };
 
   return (
-    <UserContext.Provider value={{ isLoading, updateUser, user }}>{children}</UserContext.Provider>
+    <UserContext.Provider value={{ user, updateUser, isLoading }}>{children}</UserContext.Provider>
   );
 }
 

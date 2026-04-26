@@ -4,28 +4,26 @@ import { userStatusEnum } from "./enums";
 import { timestamptz } from "./helpers";
 
 export const users = pgTable("users", {
-  billingAddressId: uuid("billing_address_id").references(() => addresses.id),
-  clerkId: text("clerk_id").notNull().unique(),
-  createdAt: timestamptz("created_at").notNull().defaultNow(),
-  deletedAt: timestamptz("deleted_at"),
-  email: text("email").notNull().unique(),
-  fname: varchar("fname", { length: 30 }).notNull(),
   id: uuid("id").primaryKey().defaultRandom(),
+  clerkId: text("clerk_id").notNull().unique(),
+  fname: varchar("fname", { length: 30 }).notNull(),
   lname: varchar("lname", { length: 30 }).notNull(),
-  shippingAddressId: uuid("shipping_address_id").references(() => addresses.id),
+  email: text("email").notNull().unique(),
   status: userStatusEnum("status").notNull().default("active"),
+  shippingAddressId: uuid("shipping_address_id").references(() => addresses.id),
+  billingAddressId: uuid("billing_address_id").references(() => addresses.id),
+  createdAt: timestamptz("created_at").notNull().defaultNow(),
   updatedAt: timestamptz("updated_at"),
+  deletedAt: timestamptz("deleted_at"),
 });
 
 export const userRoles = pgTable("user_roles", {
-  createdAt: timestamptz("created_at").notNull().defaultNow(),
-  deletedAt: timestamptz("deleted_at"),
   id: uuid("id").primaryKey().defaultRandom(),
-  role: varchar("role", { length: 50 }).notNull(),
-  updatedAt: timestamptz("updated_at"),
   userId: uuid("user_id")
     .notNull()
     .references(() => users.id, { onDelete: "cascade" }),
+  role: varchar("role", { length: 50 }).notNull(),
+  createdAt: timestamptz("created_at").notNull().defaultNow(),
 });
 
 export type UserRole = typeof userRoles.$inferSelect;

@@ -1,75 +1,86 @@
-import type { ReviewWithUser } from "./reviews.repository";
+import type { ProductReviewWithUser, WinemakerReviewWithUser } from "./reviews.repository";
 import { reviewsRepository } from "./reviews.repository";
 
 type ReviewListResult<T> = { reviews: T[]; averageRating: number | null };
+type ReviewData = { rating: number; body?: string };
 
 export const reviewsService = {
+  async listProductReviews(productId: string): Promise<ReviewListResult<ProductReviewWithUser>> {
+    const [reviews, averageRating] = await Promise.all([
+      reviewsRepository.findProductReviews(productId),
+      reviewsRepository.averageProductRating(productId),
+    ]);
+    return { reviews, averageRating };
+  },
+
+  async listWinemakerReviews(
+    winemakerId: string
+  ): Promise<ReviewListResult<WinemakerReviewWithUser>> {
+    const [reviews, averageRating] = await Promise.all([
+      reviewsRepository.findWinemakerReviews(winemakerId),
+      reviewsRepository.averageWinemakerRating(winemakerId),
+    ]);
+    return { reviews, averageRating };
+  },
+
   async createProductReview(
     userId: string,
     productId: string,
-    data: { rating: number; body?: string }
-  ): Promise<ReviewWithUser> {
-    const [hasPurchased, existing] = await Promise.all([
-      reviewsRepository.hasPurchasedProduct(userId, productId),
-      reviewsRepository.findUserReview(userId, productId, "product"),
-    ]);
+    data: ReviewData
+  ): Promise<ProductReviewWithUser> {
+    const purchased = await reviewsRepository.hasPurchasedProduct(userId, productId);
+    if (!purchased) throw new Error("NOT_PURCHASED");
 
-    if (!hasPurchased) throw new Error("NOT_PURCHASED");
-    if (existing) throw new Error("ALREADY_REVIEWED");
+    const existing = await reviewsRepository.findProductReview(userId, productId);
+    if (existing) throw new Error("DUPLICATE_REVIEW");
 
-    const review = await reviewsRepository.insertReview(userId, productId, "product", data);
-    const withUser = await reviewsRepository.findReviewWithUser(review.id);
-    if (!withUser) throw new Error("NOT_FOUND");
-    return withUser;
+    const inserted = await reviewsRepository.insertProductReview(userId, productId, data);
+    const review = await reviewsRepository.findProductReviewWithUser(inserted.id);
+    if (!review) throw new Error("NOT_FOUND");
+    return review;
   },
 
   async createWinemakerReview(
     userId: string,
     winemakerId: string,
-    data: { rating: number; body?: string }
-  ): Promise<ReviewWithUser> {
-    const existing = await reviewsRepository.findUserReview(userId, winemakerId, "winemaker");
-    if (existing) throw new Error("ALREADY_REVIEWED");
+    data: ReviewData
+  ): Promise<WinemakerReviewWithUser> {
+    const existing = await reviewsRepository.findWinemakerReview(userId, winemakerId);
+    if (existing) throw new Error("DUPLICATE_REVIEW");
 
-    const review = await reviewsRepository.insertReview(userId, winemakerId, "winemaker", data);
-    const withUser = await reviewsRepository.findReviewWithUser(review.id);
-    if (!withUser) throw new Error("NOT_FOUND");
-    return withUser;
+    const inserted = await reviewsRepository.insertWinemakerReview(userId, winemakerId, data);
+    const review = await reviewsRepository.findWinemakerReviewWithUser(inserted.id);
+    if (!review) throw new Error("NOT_FOUND");
+    return review;
   },
 
-  async deleteReview(
+  async deleteProductReview(
     reviewId: string,
+    productId: string,
     userId: string,
-    userRole: string,
-    entityId: string,
-    entityType: "product" | "winemaker"
+    userRoles: string[]
   ): Promise<void> {
-    const review = await reviewsRepository.findUserReview(userId, entityId, entityType);
-    if (!review || review.id !== reviewId) {
-      // Also check by ID if it's admin
-      if (userRole === "admin") {
-        const byId = await reviewsRepository.findById(reviewId);
-        if (!byId) throw new Error("NOT_FOUND");
-      } else {
-        throw new Error("NOT_FOUND");
-      }
-    }
+    const review = await reviewsRepository.findProductReviewById(reviewId, productId);
+    if (!review) throw new Error("NOT_FOUND");
 
-    await reviewsRepository.softDelete(reviewId);
-  },
-  async listProductReviews(productId: string): Promise<ReviewListResult<ReviewWithUser>> {
-    const [reviews, averageRating] = await Promise.all([
-      reviewsRepository.findReviews(productId, "product"),
-      reviewsRepository.averageRating(productId, "product"),
-    ]);
-    return { averageRating, reviews };
+    const isAdmin = userRoles.includes("admin");
+    if (!isAdmin && review.userId !== userId) throw new Error("FORBIDDEN");
+
+    await reviewsRepository.softDeleteProductReview(reviewId);
   },
 
-  async listWinemakerReviews(winemakerId: string): Promise<ReviewListResult<ReviewWithUser>> {
-    const [reviews, averageRating] = await Promise.all([
-      reviewsRepository.findReviews(winemakerId, "winemaker"),
-      reviewsRepository.averageRating(winemakerId, "winemaker"),
-    ]);
-    return { averageRating, reviews };
+  async deleteWinemakerReview(
+    reviewId: string,
+    winemakerId: string,
+    userId: string,
+    userRoles: string[]
+  ): Promise<void> {
+    const review = await reviewsRepository.findWinemakerReviewById(reviewId, winemakerId);
+    if (!review) throw new Error("NOT_FOUND");
+
+    const isAdmin = userRoles.includes("admin");
+    if (!isAdmin && review.userId !== userId) throw new Error("FORBIDDEN");
+
+    await reviewsRepository.softDeleteWinemakerReview(reviewId);
   },
 };

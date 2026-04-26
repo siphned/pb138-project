@@ -9,45 +9,6 @@ const clerkClient = createClerkClient({
 });
 
 export const usersService = {
-  async getAddresses(
-    clerkId: string,
-    payload: ClerkPayload
-  ): Promise<{ shipping: Address | null; billing: Address | null }> {
-    const user = await usersService.lazyGetOrCreate(clerkId, payload);
-
-    const [shipping, billing] = await Promise.all([
-      user.shippingAddressId ? usersRepository.findAddressById(user.shippingAddressId) : null,
-      user.billingAddressId ? usersRepository.findAddressById(user.billingAddressId) : null,
-    ]);
-
-    return {
-      billing: billing ?? null,
-      shipping: shipping ?? null,
-    };
-  },
-
-  async getAddressesForUser(
-    user: User
-  ): Promise<{ shipping: Address | null; billing: Address | null }> {
-    const [shipping, billing] = await Promise.all([
-      user.shippingAddressId ? usersRepository.findAddressById(user.shippingAddressId) : null,
-      user.billingAddressId ? usersRepository.findAddressById(user.billingAddressId) : null,
-    ]);
-    return { billing: billing ?? null, shipping: shipping ?? null };
-  },
-
-  getById(id: string): Promise<User | undefined> {
-    return usersRepository.findById(id);
-  },
-
-  async getProfileWithRoles(
-    clerkId: string,
-    payload: ClerkPayload
-  ): Promise<User & { roles: string[] }> {
-    const user = await this.lazyGetOrCreate(clerkId, payload);
-    const roles = await userRolesRepository.findByUserId(user.id);
-    return { ...user, roles };
-  },
   async lazyGetOrCreate(clerkId: string, _payload: ClerkPayload): Promise<User> {
     const existing = await usersRepository.findByClerkId(clerkId);
     if (existing) return existing;
@@ -66,9 +27,9 @@ export const usersService = {
 
     const user = await usersRepository.upsert({
       clerkId,
-      email,
       fname: clerkUser.firstName ?? "",
       lname: clerkUser.lastName ?? "",
+      email,
     });
 
     // Sync Clerk roles to database
@@ -99,6 +60,19 @@ export const usersService = {
     }
   },
 
+  getById(id: string): Promise<User | undefined> {
+    return usersRepository.findById(id);
+  },
+
+  async getProfileWithRoles(
+    clerkId: string,
+    payload: ClerkPayload
+  ): Promise<User & { roles: string[] }> {
+    const user = await this.lazyGetOrCreate(clerkId, payload);
+    const roles = await userRolesRepository.findByUserId(user.id);
+    return { ...user, roles };
+  },
+
   async updateProfile(
     clerkId: string,
     payload: ClerkPayload,
@@ -108,8 +82,21 @@ export const usersService = {
     return usersRepository.updateById(user.id, data);
   },
 
-  updateProfileById(userId: string, data: { fname?: string; lname?: string }): Promise<User> {
-    return usersRepository.updateById(userId, data);
+  async getAddresses(
+    clerkId: string,
+    payload: ClerkPayload
+  ): Promise<{ shipping: Address | null; billing: Address | null }> {
+    const user = await usersService.lazyGetOrCreate(clerkId, payload);
+
+    const [shipping, billing] = await Promise.all([
+      user.shippingAddressId ? usersRepository.findAddressById(user.shippingAddressId) : null,
+      user.billingAddressId ? usersRepository.findAddressById(user.billingAddressId) : null,
+    ]);
+
+    return {
+      shipping: shipping ?? null,
+      billing: billing ?? null,
+    };
   },
 
   async upsertAddress(
@@ -132,6 +119,20 @@ export const usersService = {
     await usersRepository.updateById(user.id, { [field]: address.id });
 
     return address;
+  },
+
+  updateProfileById(userId: string, data: { fname?: string; lname?: string }): Promise<User> {
+    return usersRepository.updateById(userId, data);
+  },
+
+  async getAddressesForUser(
+    user: User
+  ): Promise<{ shipping: Address | null; billing: Address | null }> {
+    const [shipping, billing] = await Promise.all([
+      user.shippingAddressId ? usersRepository.findAddressById(user.shippingAddressId) : null,
+      user.billingAddressId ? usersRepository.findAddressById(user.billingAddressId) : null,
+    ]);
+    return { shipping: shipping ?? null, billing: billing ?? null };
   },
 
   async upsertAddressForUser(
