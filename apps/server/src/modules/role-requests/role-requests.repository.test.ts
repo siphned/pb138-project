@@ -24,19 +24,19 @@ const mockDb = db as unknown as MockDatabase;
 
 vi.mock("../../db", () => {
   const m = {
-    insert: vi.fn().mockReturnThis(),
-    values: vi.fn().mockReturnThis(),
-    returning: vi.fn().mockReturnThis(),
-    update: vi.fn().mockReturnThis(),
-    set: vi.fn().mockReturnThis(),
-    where: vi.fn().mockReturnThis(),
-    select: vi.fn().mockReturnThis(),
     from: vi.fn().mockReturnThis(),
+    insert: vi.fn().mockReturnThis(),
     query: {
       roleRequests: {
         findFirst: vi.fn(),
       },
     },
+    returning: vi.fn().mockReturnThis(),
+    select: vi.fn().mockReturnThis(),
+    set: vi.fn().mockReturnThis(),
+    update: vi.fn().mockReturnThis(),
+    values: vi.fn().mockReturnThis(),
+    where: vi.fn().mockReturnThis(),
   };
   return { db: m };
 });
@@ -61,9 +61,9 @@ describe("roleRequestsRepository", () => {
       vi.mocked(mockDb.returning).mockResolvedValueOnce([mockRequest]);
 
       const result = await roleRequestsRepository.create({
-        userId: "u1",
-        requestedRole: "winemaker",
         businessName: "Biz",
+        requestedRole: "winemaker",
+        userId: "u1",
       } as never);
 
       expect(result).toBe(mockRequest);

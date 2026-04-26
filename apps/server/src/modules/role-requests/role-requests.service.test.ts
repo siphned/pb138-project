@@ -6,11 +6,11 @@ const { mockUpdateUserMetadata } = vi.hoisted(() => ({
 
 vi.mock("./role-requests.repository", () => ({
   roleRequestsRepository: {
-    findById: vi.fn(),
     create: vi.fn(),
-    updateStatus: vi.fn(),
-    findPending: vi.fn(),
+    findById: vi.fn(),
     findByUserId: vi.fn(),
+    findPending: vi.fn(),
+    updateStatus: vi.fn(),
   },
 }));
 
@@ -58,16 +58,16 @@ describe("roleRequestsService", () => {
 
       expect(result.id).toBe(requestId);
       expect(roleRequestsRepository.create).toHaveBeenCalledWith({
-        userId,
-        type: "winemaker",
         businessName: "My Business",
         details: undefined,
+        type: "winemaker",
+        userId,
       });
     });
 
     it("throws ALREADY_HAS_PENDING_REQUEST if a pending request for the same role exists", async () => {
       vi.mocked(roleRequestsRepository.findByUserId).mockResolvedValue([
-        { type: "winemaker", status: "pending" },
+        { status: "pending", type: "winemaker" },
       ] as never);
 
       await expect(roleRequestsService.submitRequest(userId, "winemaker", "Other")).rejects.toThrow(
@@ -80,9 +80,9 @@ describe("roleRequestsService", () => {
     it("updates status to approved and grants role in Clerk", async () => {
       vi.mocked(roleRequestsRepository.findById).mockResolvedValue({
         id: requestId,
-        userId,
-        type: "winemaker",
         status: "pending",
+        type: "winemaker",
+        userId,
       } as never);
       vi.mocked(usersRepository.findById).mockResolvedValue({
         clerkId,
