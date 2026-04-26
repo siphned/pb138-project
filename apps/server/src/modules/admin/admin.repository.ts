@@ -6,7 +6,7 @@ import { events, reviews, users } from "../../db/schema";
 export type AdminUserRow = User;
 
 export type AdminEventRow = Event & {
-  winemaker: { id: string; name: string; email: string | null } | null;
+  winemaker: { id: string; name: string } | null;
   address: {
     country: string;
     city: string;
@@ -21,6 +21,86 @@ export type AdminReviewRow = Review & {
 };
 
 export const adminRepository = {
+  findEventById(id: string): Promise<Event | undefined> {
+    return db.query.events.findFirst({
+      where: and(eq(events.id, id), isNull(events.deletedAt)),
+    });
+  },
+
+  findEventWithDetailsById(id: string): Promise<AdminEventRow | undefined> {
+    return db.query.events.findFirst({
+      where: and(eq(events.id, id), isNull(events.deletedAt)),
+      with: {
+        address: {
+          columns: { city: true, country: true, houseNumber: true, postalCode: true, street: true },
+        },
+        winemaker: { columns: { id: true, name: true } },
+      },
+    }) as Promise<AdminEventRow | undefined>;
+  },
+
+  findReviewById(id: string) {
+    return db.query.reviews.findFirst({
+      where: and(eq(reviews.id, id), isNull(reviews.deletedAt)),
+    });
+  },
+
+  findUserById(id: string) {
+    return db.query.users.findFirst({ where: and(eq(users.id, id), isNull(users.deletedAt)) });
+  },
+
+  async listAllReviews(pagination: {
+    limit: number;
+    offset: number;
+  }): Promise<{ data: AdminReviewRow[]; total: number }> {
+    const where = isNull(reviews.deletedAt);
+
+    const [data, countResult] = await Promise.all([
+      db.query.reviews.findMany({
+        limit: pagination.limit,
+        offset: pagination.offset,
+        orderBy: (r, { desc }) => [desc(r.createdAt)],
+        where,
+        with: {
+          user: { columns: { fname: true, id: true, lname: true } },
+        },
+      }),
+      db.select({ value: count() }).from(reviews).where(where),
+    ]);
+
+    return { data: data as AdminReviewRow[], total: Number(countResult[0]?.value ?? 0) };
+  },
+
+  async listEvents(
+    filters: { status: "pending" | "approved" | "rejected" },
+    pagination: { limit: number; offset: number }
+  ): Promise<{ data: AdminEventRow[]; total: number }> {
+    const where = and(eq(events.status, filters.status), isNull(events.deletedAt));
+
+    const [data, countResult] = await Promise.all([
+      db.query.events.findMany({
+        limit: pagination.limit,
+        offset: pagination.offset,
+        orderBy: (e, { asc }) => [asc(e.startTime)],
+        where,
+        with: {
+          address: {
+            columns: {
+              city: true,
+              country: true,
+              houseNumber: true,
+              postalCode: true,
+              street: true,
+            },
+          },
+          winemaker: { columns: { id: true, name: true } },
+        },
+      }),
+      db.select({ value: count() }).from(events).where(where),
+    ]);
+
+    return { data: data as AdminEventRow[], total: Number(countResult[0]?.value ?? 0) };
+  },
   async listUsers(
     filters: { status?: "active" | "suspended" | "banned"; role?: string },
     pagination: { limit: number; offset: number }
@@ -34,10 +114,10 @@ export const adminRepository = {
 
     const [data, countResult] = await Promise.all([
       db.query.users.findMany({
-        where,
         limit: pagination.limit,
         offset: pagination.offset,
         orderBy: (u, { desc }) => [desc(u.createdAt)],
+        where,
       }),
       db.select({ value: count() }).from(users).where(where),
     ]);
@@ -45,8 +125,11 @@ export const adminRepository = {
     return { data: data as AdminUserRow[], total: Number(countResult[0]?.value ?? 0) };
   },
 
-  findUserById(id: string) {
-    return db.query.users.findFirst({ where: and(eq(users.id, id), isNull(users.deletedAt)) });
+  async setEventStatus(id: string, newStatus: "approved" | "rejected"): Promise<void> {
+    await db
+      .update(events)
+      .set({ status: newStatus, updatedAt: new Date() })
+      .where(eq(events.id, id));
   },
 
   async setUserStatus(
@@ -60,90 +143,6 @@ export const adminRepository = {
       .returning();
     if (!updated) throw new Error("User not found");
     return updated as AdminUserRow;
-  },
-
-  async listEvents(
-    filters: { status: "pending" | "approved" | "rejected" },
-    pagination: { limit: number; offset: number }
-  ): Promise<{ data: AdminEventRow[]; total: number }> {
-    const where = and(eq(events.status, filters.status), isNull(events.deletedAt));
-
-    const [data, countResult] = await Promise.all([
-      db.query.events.findMany({
-        where,
-        with: {
-          winemaker: { columns: { id: true, name: true, email: true } },
-          address: {
-            columns: {
-              country: true,
-              city: true,
-              postalCode: true,
-              street: true,
-              houseNumber: true,
-            },
-          },
-        },
-        limit: pagination.limit,
-        offset: pagination.offset,
-        orderBy: (e, { asc }) => [asc(e.startTime)],
-      }),
-      db.select({ value: count() }).from(events).where(where),
-    ]);
-
-    return { data: data as AdminEventRow[], total: Number(countResult[0]?.value ?? 0) };
-  },
-
-  findEventById(id: string): Promise<Event | undefined> {
-    return db.query.events.findFirst({
-      where: and(eq(events.id, id), isNull(events.deletedAt)),
-    });
-  },
-
-  findEventWithDetailsById(id: string): Promise<AdminEventRow | undefined> {
-    return db.query.events.findFirst({
-      where: and(eq(events.id, id), isNull(events.deletedAt)),
-      with: {
-        winemaker: { columns: { id: true, name: true, email: true } },
-        address: {
-          columns: { country: true, city: true, postalCode: true, street: true, houseNumber: true },
-        },
-      },
-    }) as Promise<AdminEventRow | undefined>;
-  },
-
-  async setEventStatus(id: string, newStatus: "approved" | "rejected"): Promise<void> {
-    await db
-      .update(events)
-      .set({ status: newStatus, updatedAt: new Date() })
-      .where(eq(events.id, id));
-  },
-
-  async listAllReviews(pagination: {
-    limit: number;
-    offset: number;
-  }): Promise<{ data: AdminReviewRow[]; total: number }> {
-    const where = isNull(reviews.deletedAt);
-
-    const [data, countResult] = await Promise.all([
-      db.query.reviews.findMany({
-        where,
-        with: {
-          user: { columns: { id: true, fname: true, lname: true } },
-        },
-        limit: pagination.limit,
-        offset: pagination.offset,
-        orderBy: (r, { desc }) => [desc(r.createdAt)],
-      }),
-      db.select({ value: count() }).from(reviews).where(where),
-    ]);
-
-    return { data: data as AdminReviewRow[], total: Number(countResult[0]?.value ?? 0) };
-  },
-
-  findReviewById(id: string) {
-    return db.query.reviews.findFirst({
-      where: and(eq(reviews.id, id), isNull(reviews.deletedAt)),
-    });
   },
 
   async softDeleteReview(id: string): Promise<void> {

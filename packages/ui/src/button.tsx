@@ -11,9 +11,10 @@ interface ButtonProps {
 export const Button = ({ children, className, appName }: ButtonProps) => {
   return (
     <button
-      type="button"
       className={className}
-      onClick={() => alert(`Hello from your ${appName} app!`)}
+      // biome-ignore lint/suspicious/noConsole: intentional for the starter template
+      onClick={() => console.log(`Hello from your ${appName} app!`)}
+      type="button"
     >
       {children}
     </button>

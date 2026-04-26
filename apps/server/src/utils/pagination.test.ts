@@ -9,7 +9,7 @@ describe("parsePagination", () => {
   });
 
   it("calculates offset correctly for page 2", () => {
-    const result = parsePagination({ page: 2, limit: 10 });
+    const result = parsePagination({ limit: 10, page: 2 });
     expect(result.limit).toBe(10);
     expect(result.offset).toBe(10);
   });

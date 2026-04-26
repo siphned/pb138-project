@@ -15,28 +15,28 @@ function MyShops() {
       <h1 className="mb-6 text-3xl font-bold">My Shops</h1>
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
         {shops?.map((shop) => (
-          <div key={shop.id} className="rounded-lg border p-4 shadow-sm">
+          <div className="rounded-lg border p-4 shadow-sm" key={shop.id}>
             <h2 className="text-xl font-semibold">{shop.name}</h2>
             <p className="text-muted-foreground">{shop.description}</p>
             <div className="mt-4 flex flex-wrap gap-2">
               <Link
-                to="/shops/$id/inventory"
-                params={{ id: shop.id }}
                 className="rounded bg-primary px-3 py-1 text-white hover:bg-primary/90"
+                params={{ id: shop.id }}
+                to="/shops/$id/inventory"
               >
                 Inventory
               </Link>
               <Link
-                to="/shops/$id/shop-orders"
-                params={{ id: shop.id }}
                 className="rounded bg-secondary px-3 py-1 hover:bg-secondary/80"
+                params={{ id: shop.id }}
+                to="/shops/$id/shop-orders"
               >
                 Orders
               </Link>
               <Link
-                to="/shops/$id/bundles"
-                params={{ id: shop.id }}
                 className="rounded bg-accent px-3 py-1 hover:bg-accent/80"
+                params={{ id: shop.id }}
+                to="/shops/$id/bundles"
               >
                 Bundles
               </Link>
@@ -46,8 +46,8 @@ function MyShops() {
       </div>
       <div className="mt-8">
         <Link
-          to="/shops" // In a real app this might be /shops/new or similar
-          className="rounded border border-primary px-4 py-2 text-primary hover:bg-primary/10"
+          className="rounded border border-primary px-4 py-2 text-primary hover:bg-primary/10" // In a real app this might be /shops/new or similar
+          to="/shops"
         >
           Create New Shop
         </Link>

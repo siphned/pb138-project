@@ -12,13 +12,13 @@ export const reviewsRoutes = new Elysia({ prefix: "/reviews", tags: ["reviews"] 
       return await reviewsService.listProductReviews(params.id);
     },
     {
+      detail: {
+        description: "Returns all reviews and average rating for a product.",
+        summary: "List product reviews",
+        tags: ["reviews"],
+      },
       params: t.Object({ id: t.String() }),
       response: { 200: reviewListResponse },
-      detail: {
-        tags: ["reviews"],
-        summary: "List product reviews",
-        description: "Returns all reviews and average rating for a product.",
-      },
     }
   )
 
@@ -28,18 +28,19 @@ export const reviewsRoutes = new Elysia({ prefix: "/reviews", tags: ["reviews"] 
       return await reviewsService.listWinemakerReviews(params.id);
     },
     {
+      detail: {
+        description: "Returns all reviews and average rating for a winemaker.",
+        summary: "List winemaker reviews",
+        tags: ["reviews"],
+      },
       params: t.Object({ id: t.String() }),
       response: { 200: reviewListResponse },
-      detail: {
-        tags: ["reviews"],
-        summary: "List winemaker reviews",
-        description: "Returns all reviews and average rating for a winemaker.",
-      },
     }
   )
 
   .post(
     "/product/:id",
+    // biome-ignore lint/suspicious/noExplicitAny: complex elysia type inference
     (async ({ dbUser, params, body }: any) => {
       try {
         if (!dbUser) return status(401, "Unauthorized");
@@ -55,20 +56,21 @@ export const reviewsRoutes = new Elysia({ prefix: "/reviews", tags: ["reviews"] 
       }
     }) as never,
     {
-      params: t.Object({ id: t.String() }),
       body: createReviewBody,
-      response: { 200: reviewResponse, 401: t.String(), 403: t.String(), 409: t.String() },
       detail: {
-        tags: ["reviews"],
-        summary: "Create product review",
         description: "Creates a review for a product. Requires verified purchase.",
         security: [{ bearerAuth: [] }],
+        summary: "Create product review",
+        tags: ["reviews"],
       },
+      params: t.Object({ id: t.String() }),
+      response: { 200: reviewResponse, 401: t.String(), 403: t.String(), 409: t.String() },
     }
   )
 
   .post(
     "/winemaker/:id",
+    // biome-ignore lint/suspicious/noExplicitAny: complex elysia type inference
     (async ({ dbUser, params, body }: any) => {
       try {
         if (!dbUser) return status(401, "Unauthorized");
@@ -80,20 +82,21 @@ export const reviewsRoutes = new Elysia({ prefix: "/reviews", tags: ["reviews"] 
       }
     }) as never,
     {
-      params: t.Object({ id: t.String() }),
       body: createReviewBody,
-      response: { 200: reviewResponse, 401: t.String(), 409: t.String() },
       detail: {
-        tags: ["reviews"],
-        summary: "Create winemaker review",
         description: "Creates a review for a winemaker.",
         security: [{ bearerAuth: [] }],
+        summary: "Create winemaker review",
+        tags: ["reviews"],
       },
+      params: t.Object({ id: t.String() }),
+      response: { 200: reviewResponse, 401: t.String(), 409: t.String() },
     }
   )
 
   .delete(
     "/product/:id/:reviewId",
+    // biome-ignore lint/suspicious/noExplicitAny: complex elysia type inference
     (async ({ dbUser, clerkPayload, params }: any) => {
       try {
         if (!dbUser) return status(401, "Unauthorized");
@@ -111,19 +114,20 @@ export const reviewsRoutes = new Elysia({ prefix: "/reviews", tags: ["reviews"] 
       }
     }) as never,
     {
-      params: t.Object({ id: t.String(), reviewId: t.String() }),
-      response: { 200: t.Object({ success: t.Boolean() }), 401: t.String(), 404: t.String() },
       detail: {
-        tags: ["reviews"],
-        summary: "Delete product review",
         description: "Soft-deletes a product review. Must be own review or admin.",
         security: [{ bearerAuth: [] }],
+        summary: "Delete product review",
+        tags: ["reviews"],
       },
+      params: t.Object({ id: t.String(), reviewId: t.String() }),
+      response: { 200: t.Object({ success: t.Boolean() }), 401: t.String(), 404: t.String() },
     }
   )
 
   .delete(
     "/winemaker/:id/:reviewId",
+    // biome-ignore lint/suspicious/noExplicitAny: complex elysia type inference
     (async ({ dbUser, clerkPayload, params }: any) => {
       try {
         if (!dbUser) return status(401, "Unauthorized");
@@ -141,13 +145,13 @@ export const reviewsRoutes = new Elysia({ prefix: "/reviews", tags: ["reviews"] 
       }
     }) as never,
     {
-      params: t.Object({ id: t.String(), reviewId: t.String() }),
-      response: { 200: t.Object({ success: t.Boolean() }), 401: t.String(), 404: t.String() },
       detail: {
-        tags: ["reviews"],
-        summary: "Delete winemaker review",
         description: "Soft-deletes a winemaker review. Must be own review or admin.",
         security: [{ bearerAuth: [] }],
+        summary: "Delete winemaker review",
+        tags: ["reviews"],
       },
+      params: t.Object({ id: t.String(), reviewId: t.String() }),
+      response: { 200: t.Object({ success: t.Boolean() }), 401: t.String(), 404: t.String() },
     }
   );

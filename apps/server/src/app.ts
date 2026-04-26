@@ -18,40 +18,40 @@ export const app = new Elysia()
   .use(cors({ origin: "http://localhost:5173" }))
   .use(
     openapi({
-      provider: "scalar",
-      specPath: "/swagger/json",
       documentation: {
-        info: {
-          title: "WineMarket API",
-          version: "0.1.0",
-          description: "Backend API for the WineMarket platform.",
-        },
-        tags: [
-          { name: "users", description: "Authenticated user profile endpoints" },
-          { name: "role-requests", description: "Winemaker/shop-owner role application flow" },
-          { name: "shops", description: "Shop management" },
-          { name: "products", description: "Products and bundles" },
-          { name: "availability", description: "Shop availability schedule" },
-          { name: "events", description: "Event management and registration" },
-          { name: "wines", description: "Wine catalog CRUD and filtering" },
-          { name: "winemakers", description: "Winemaker profiles and portfolios" },
-          { name: "carts", description: "Shopping cart management for guests and users" },
-          { name: "orders", description: "Order placement and history" },
-          { name: "guest-sessions", description: "Anonymous session management" },
-          { name: "supply-agreements", description: "B2B supply relationship management" },
-        ],
-        servers: [{ url: "http://localhost:3000", description: "Development" }],
         components: {
           securitySchemes: {
             bearerAuth: {
-              type: "http",
-              scheme: "bearer",
               bearerFormat: "JWT",
               description: "Clerk-issued JWT sent as `Authorization: Bearer <token>`",
+              scheme: "bearer",
+              type: "http",
             },
           },
         },
+        info: {
+          description: "Backend API for the WineMarket platform.",
+          title: "WineMarket API",
+          version: "0.1.0",
+        },
+        servers: [{ description: "Development", url: "http://localhost:3000" }],
+        tags: [
+          { description: "Authenticated user profile endpoints", name: "users" },
+          { description: "Winemaker/shop-owner role application flow", name: "role-requests" },
+          { description: "Shop management", name: "shops" },
+          { description: "Products and bundles", name: "products" },
+          { description: "Shop availability schedule", name: "availability" },
+          { description: "Event management and registration", name: "events" },
+          { description: "Wine catalog CRUD and filtering", name: "wines" },
+          { description: "Winemaker profiles and portfolios", name: "winemakers" },
+          { description: "Shopping cart management for guests and users", name: "carts" },
+          { description: "Order placement and history", name: "orders" },
+          { description: "Anonymous session management", name: "guest-sessions" },
+          { description: "B2B supply relationship management", name: "supply-agreements" },
+        ],
       },
+      provider: "scalar",
+      specPath: "/swagger/json",
     })
   )
   .use(usersRoutes)

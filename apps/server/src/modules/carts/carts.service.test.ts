@@ -19,12 +19,6 @@ vi.mock("../products/products.repository", () => ({
   },
 }));
 
-vi.mock("../products/products.repository", () => ({
-  productsRepository: {
-    isDeleted: vi.fn().mockResolvedValue(false),
-  },
-}));
-
 import { cartsRepository } from "./carts.repository";
 import { cartsService } from "./carts.service";
 

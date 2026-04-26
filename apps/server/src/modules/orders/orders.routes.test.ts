@@ -3,23 +3,23 @@ import { app } from "../../app";
 
 const { mockOrder } = vi.hoisted(() => ({
   mockOrder: {
-    id: "o1",
-    userId: null,
-    guestSessionId: "s1",
-    guestEmail: "test@example.com",
-    guestName: null,
-    shippingFee: "10.00",
-    discount: "0.00",
-    paymentStatus: "pending",
-    paymentMethod: "card",
-    totalPrice: "60.00",
-    status: "pending",
-    deliveryType: "shipping",
-    shippingAddressId: "addr-1",
     billingAddressId: "addr-1",
     createdAt: new Date(),
-    updatedAt: null,
     deletedAt: null,
+    deliveryType: "shipping",
+    discount: "0.00",
+    guestEmail: "test@example.com",
+    guestName: null,
+    guestSessionId: "s1",
+    id: "o1",
+    paymentMethod: "card",
+    paymentStatus: "pending",
+    shippingAddressId: "addr-1",
+    shippingFee: "10.00",
+    status: "pending",
+    totalPrice: "60.00",
+    updatedAt: null,
+    userId: null,
   },
 }));
 
@@ -38,23 +38,23 @@ describe("orders routes", () => {
   it("POST /orders/checkout performs guest checkout", async () => {
     const response = await app.handle(
       new Request("http://localhost/orders/checkout", {
-        method: "POST",
+        body: JSON.stringify({
+          deliveryType: "shipping",
+          guestEmail: "test@example.com",
+          paymentMethod: "card",
+          shippingAddress: {
+            city: "B",
+            country: "CZ",
+            houseNumber: "1",
+            postalCode: "1",
+            street: "S",
+          },
+        }),
         headers: {
           "Content-Type": "application/json",
           cookie: "guest_session_id=s1",
         },
-        body: JSON.stringify({
-          guestEmail: "test@example.com",
-          paymentMethod: "card",
-          deliveryType: "shipping",
-          shippingAddress: {
-            country: "CZ",
-            city: "B",
-            postalCode: "1",
-            street: "S",
-            houseNumber: "1",
-          },
-        }),
+        method: "POST",
       })
     );
 
@@ -66,22 +66,22 @@ describe("orders routes", () => {
   it("POST /orders/checkout returns 400 if guest email missing", async () => {
     const response = await app.handle(
       new Request("http://localhost/orders/checkout", {
-        method: "POST",
+        body: JSON.stringify({
+          deliveryType: "shipping",
+          paymentMethod: "card",
+          shippingAddress: {
+            city: "B",
+            country: "CZ",
+            houseNumber: "1",
+            postalCode: "1",
+            street: "S",
+          },
+        }),
         headers: {
           "Content-Type": "application/json",
           cookie: "guest_session_id=s1",
         },
-        body: JSON.stringify({
-          paymentMethod: "card",
-          deliveryType: "shipping",
-          shippingAddress: {
-            country: "CZ",
-            city: "B",
-            postalCode: "1",
-            street: "S",
-            houseNumber: "1",
-          },
-        }),
+        method: "POST",
       })
     );
 

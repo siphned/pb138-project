@@ -52,13 +52,13 @@ export function Sidebar({ userRoles = [Role.customer], activeRole, onRoleChange 
     <Sheet>
       <SheetTrigger
         render={
-          <Button variant="ghost" size="icon">
+          <Button size="icon" variant="ghost">
             <Menu className="h-6 w-6" />
           </Button>
         }
       />
 
-      <SheetContent side="right" className="flex flex-col w-80 p-0">
+      <SheetContent className="flex flex-col w-80 p-0" side="right">
         {/* FIXED HEADER */}
         <div className="flex-none  border-b bg-background z-10">
           <SheetHeader className="text-left">
@@ -66,7 +66,7 @@ export function Sidebar({ userRoles = [Role.customer], activeRole, onRoleChange 
               {user && (
                 <>
                   <Avatar className="h-14 w-14">
-                    <AvatarImage src={user.avatarUrl} alt={user.fname} />
+                    <AvatarImage alt={user.fname} src={user.avatarUrl} />
                     <AvatarFallback className="bg-primary text-primary-foreground font-heading text-lg">
                       {initials}
                     </AvatarFallback>
@@ -95,10 +95,10 @@ export function Sidebar({ userRoles = [Role.customer], activeRole, onRoleChange 
             {hasMultipleRoles ? (
               <Accordion
                 className="w-full flex-none"
-                value={accordionState}
                 onValueChange={setAccordionState}
+                value={accordionState}
               >
-                <AccordionItem value="user-roles" className="border-none">
+                <AccordionItem className="border-none" value="user-roles">
                   <AccordionTrigger className="flex items-center gap-3 px-3 py-3 rounded-md bg-secondary hover:bg-secondary/80 transition-colors text-sm font-medium hover:no-underline text-primary">
                     <div className="flex items-center gap-3">
                       <UserIcon className="h-4 w-4" />
@@ -112,6 +112,7 @@ export function Sidebar({ userRoles = [Role.customer], activeRole, onRoleChange 
                         .map((role) => (
                           // biome-ignore lint/a11y/useButtonType: This button does not need a type as it is not part of a form
                           <button
+                            className="w-full text-left px-3 py-2 text-sm font-medium rounded-md hover:bg-secondary/50 text-muted-foreground transition-colors"
                             key={role}
                             onClick={() => {
                               setAccordionState([]);
@@ -119,7 +120,6 @@ export function Sidebar({ userRoles = [Role.customer], activeRole, onRoleChange 
                                 onRoleChange(role);
                               }
                             }}
-                            className="w-full text-left px-3 py-2 text-sm font-medium rounded-md hover:bg-secondary/50 text-muted-foreground transition-colors"
                           >
                             {role}
                           </button>
@@ -139,14 +139,14 @@ export function Sidebar({ userRoles = [Role.customer], activeRole, onRoleChange 
             {currentActiveRole === Role.customer ? (
               <>
                 <Link
-                  to="/orders"
                   className="flex-none flex items-center gap-3 px-3 py-3 rounded-md bg-secondary hover:bg-secondary/80 transition-colors text-sm font-medium text-primary"
+                  to="/orders"
                 >
                   <ShoppingBag className="h-4 w-4" /> Order History
                 </Link>
                 <Link
-                  to="/explore"
                   className="flex-none flex items-center gap-3 px-3 py-3 rounded-md bg-secondary hover:bg-secondary/80 transition-colors text-sm font-medium text-primary sm:hidden"
+                  to="/explore"
                 >
                   <Search className="h-4 w-4" /> Explore Wines
                 </Link>
@@ -154,14 +154,14 @@ export function Sidebar({ userRoles = [Role.customer], activeRole, onRoleChange 
             ) : (
               <>
                 <Link
-                  to="/shops"
                   className="flex-none flex items-center gap-3 px-3 py-3 rounded-md bg-secondary hover:bg-secondary/80 transition-colors text-sm font-medium text-primary"
+                  to="/shops"
                 >
                   <Wine className="h-4 w-4" /> My Wines
                 </Link>
                 <Link
-                  to="/shops"
                   className="flex-none flex items-center gap-3 px-3 py-3 rounded-md bg-secondary hover:bg-secondary/80 transition-colors text-sm font-medium text-primary"
+                  to="/shops"
                 >
                   <Package className="h-4 w-4" /> Bundles
                 </Link>
@@ -169,28 +169,28 @@ export function Sidebar({ userRoles = [Role.customer], activeRole, onRoleChange 
             )}
 
             <Link
-              to="/events"
               className="flex-none flex items-center gap-3 px-3 py-3 rounded-md bg-secondary hover:bg-secondary/80 transition-colors text-sm font-medium text-primary"
+              to="/events"
             >
               <Calendar className="h-4 w-4" /> Events
             </Link>
 
             <Link
-              to="/search"
               className="flex-none flex items-center gap-3 px-3 py-3 rounded-md bg-secondary hover:bg-secondary/80 transition-colors text-sm font-medium text-primary sm:hidden"
+              to="/search"
             >
               <Search className="h-4 w-4" /> Search
             </Link>
             <Link
-              to="/cart"
               className="flex-none flex items-center gap-3 px-3 py-3 rounded-md bg-secondary hover:bg-secondary/80 transition-colors text-sm font-medium text-primary sm:hidden"
+              to="/cart"
             >
               <ShoppingCart className="h-4 w-4" /> Shopping cart
             </Link>
 
             <Link
-              to="/settings"
               className="flex-none flex items-center gap-3 px-3 py-3 rounded-md hover:bg-secondary/50 transition-colors text-sm font-medium text-muted-foreground mt-2"
+              to="/settings"
             >
               <Settings className="h-4 w-4" /> Settings
             </Link>
@@ -207,8 +207,8 @@ export function Sidebar({ userRoles = [Role.customer], activeRole, onRoleChange 
 
           {/* biome-ignore lint/a11y/useButtonType: logout action, not a form submission */}
           <button
-            onClick={() => signOut({ redirectUrl: "/" })}
             className="flex items-center gap-3 px-3 py-2 rounded-md hover:bg-destructive/10 transition-colors text-sm font-medium text-muted-foreground hover:text-destructive mt-2 w-full text-left"
+            onClick={() => signOut({ redirectUrl: "/" })}
           >
             <LogOut className="h-4 w-4" /> Log out
           </button>

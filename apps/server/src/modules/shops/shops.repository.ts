@@ -14,32 +14,6 @@ type AddressData = {
 };
 
 export const shopsRepository = {
-  findAll(): Promise<ShopWithAddress[]> {
-    return db.query.shops.findMany({
-      where: isNull(shops.deletedAt),
-      with: { address: true },
-    }) as Promise<ShopWithAddress[]>;
-  },
-
-  findById(id: string): Promise<ShopWithAddress | undefined> {
-    return db.query.shops.findFirst({
-      where: and(eq(shops.id, id), isNull(shops.deletedAt)),
-      with: { address: true },
-    }) as Promise<ShopWithAddress | undefined>;
-  },
-
-  findByOwnerUserId(ownerUserId: string): Promise<Shop | undefined> {
-    return db.query.shops.findFirst({
-      where: and(eq(shops.ownerUserId, ownerUserId), isNull(shops.deletedAt)),
-    });
-  },
-
-  findAllByOwnerUserId(ownerUserId: string): Promise<Shop[]> {
-    return db.query.shops.findMany({
-      where: and(eq(shops.ownerUserId, ownerUserId), isNull(shops.deletedAt)),
-    });
-  },
-
   async createShopWithAddress(
     shopData: { ownerUserId: string; name: string; description: string },
     addressData: AddressData
@@ -55,6 +29,31 @@ export const shopsRepository = {
       if (!shop) throw new Error("Shop insert returned no rows");
 
       return shop;
+    });
+  },
+  findAll(): Promise<ShopWithAddress[]> {
+    return db.query.shops.findMany({
+      where: isNull(shops.deletedAt),
+      with: { address: true },
+    }) as Promise<ShopWithAddress[]>;
+  },
+
+  findAllByOwnerUserId(ownerUserId: string): Promise<Shop[]> {
+    return db.query.shops.findMany({
+      where: and(eq(shops.ownerUserId, ownerUserId), isNull(shops.deletedAt)),
+    });
+  },
+
+  findById(id: string): Promise<ShopWithAddress | undefined> {
+    return db.query.shops.findFirst({
+      where: and(eq(shops.id, id), isNull(shops.deletedAt)),
+      with: { address: true },
+    }) as Promise<ShopWithAddress | undefined>;
+  },
+
+  findByOwnerUserId(ownerUserId: string): Promise<Shop | undefined> {
+    return db.query.shops.findFirst({
+      where: and(eq(shops.ownerUserId, ownerUserId), isNull(shops.deletedAt)),
     });
   },
 

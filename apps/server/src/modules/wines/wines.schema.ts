@@ -18,44 +18,44 @@ const wineColor = t.Union([
 ]);
 
 export const createWineBody = t.Object({
-  name: t.String({ minLength: 1, maxLength: 255 }),
-  description: t.String({ minLength: 1 }),
-  composition: t.String({ minLength: 1 }),
-  attribution: t.String({ minLength: 1 }),
-  region: t.String({ minLength: 1, maxLength: 255 }),
-  vintageYear: t.Integer({ minimum: 1800, maximum: 2100 }),
-  type: wineType,
-  color: wineColor,
   alcoholContent: t.String({ pattern: "^\\d{1,2}(\\.\\d{1,2})?$" }),
-  volumeMl: t.Integer({ minimum: 1 }),
+  attribution: t.String({ minLength: 1 }),
+  color: wineColor,
+  composition: t.String({ minLength: 1 }),
+  description: t.String({ minLength: 1 }),
+  name: t.String({ maxLength: 255, minLength: 1 }),
   quantity: t.Integer({ minimum: 0 }),
+  region: t.String({ maxLength: 255, minLength: 1 }),
+  type: wineType,
+  vintageYear: t.Integer({ maximum: 2100, minimum: 1800 }),
+  volumeMl: t.Integer({ minimum: 1 }),
 });
 
 export const updateWineBody = createWineBody;
 
 export const wineFiltersQuery = t.Object({
+  color: t.Optional(wineColor),
   region: t.Optional(t.String()),
   type: t.Optional(wineType),
-  color: t.Optional(wineColor),
   vintageYear: t.Optional(t.Numeric()),
   winemakerId: t.Optional(t.String()),
 });
 
 export const wineResponse = t.Object({
-  id: t.String(),
-  winemakerId: t.String(),
-  winemaker: t.Object({ id: t.String(), name: t.String() }),
-  name: t.String(),
-  description: t.String(),
-  composition: t.String(),
-  attribution: t.String(),
-  region: t.String(),
-  vintageYear: t.Integer(),
-  type: t.String(),
-  color: t.String(),
   alcoholContent: t.String(),
-  volumeMl: t.Integer(),
-  quantity: t.Integer(),
+  attribution: t.String(),
+  color: t.String(),
+  composition: t.String(),
   createdAt: t.Date(),
+  description: t.String(),
+  id: t.String(),
+  name: t.String(),
+  quantity: t.Integer(),
+  region: t.String(),
+  type: t.String(),
   updatedAt: t.Date(),
+  vintageYear: t.Integer(),
+  volumeMl: t.Integer(),
+  winemaker: t.Object({ id: t.String(), name: t.String() }),
+  winemakerId: t.String(),
 });

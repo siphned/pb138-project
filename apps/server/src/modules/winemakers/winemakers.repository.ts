@@ -43,8 +43,8 @@ export const winemakersRepository = {
       where: and(eq(winemakers.id, id), isNull(winemakers.deletedAt)),
       with: {
         address: true,
-        wines: { where: isNull(wines.deletedAt) },
         events: { where: isNull(events.deletedAt) },
+        wines: { where: isNull(wines.deletedAt) },
       },
     }) as Promise<WinemakerWithRelations | undefined>;
   },
@@ -62,16 +62,16 @@ export const winemakersRepository = {
     });
   },
 
-  findWinesByWinemakerId(winemakerId: string): Promise<Wine[]> {
-    return db.query.wines.findMany({
-      where: and(eq(wines.winemakerId, winemakerId), isNull(wines.deletedAt)),
-    });
-  },
-
   findEventsByWinemakerId(winemakerId: string): Promise<EventRow[]> {
     return db.query.events.findMany({
       where: and(eq(events.winemakerId, winemakerId), isNull(events.deletedAt)),
     }) as Promise<EventRow[]>;
+  },
+
+  findWinesByWinemakerId(winemakerId: string): Promise<Wine[]> {
+    return db.query.wines.findMany({
+      where: and(eq(wines.winemakerId, winemakerId), isNull(wines.deletedAt)),
+    });
   },
 
   async updateById(id: string, data: UpdateWinemakerData): Promise<Winemaker> {

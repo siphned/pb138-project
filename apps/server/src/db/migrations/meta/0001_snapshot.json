@@ -1,1717 +1,10 @@
 {
-  "id": "09fc08f7-c0e0-4455-a8ea-61c021450afc",
-  "prevId": "e7abe103-928e-4e19-b256-2b9a12be5e56",
-  "version": "7",
-  "dialect": "postgresql",
-  "tables": {
-    "public.addresses": {
-      "name": "addresses",
-      "schema": "",
-      "columns": {
-        "id": {
-          "name": "id",
-          "type": "uuid",
-          "primaryKey": true,
-          "notNull": true,
-          "default": "gen_random_uuid()"
-        },
-        "country": {
-          "name": "country",
-          "type": "varchar(50)",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "city": {
-          "name": "city",
-          "type": "varchar(255)",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "postal_code": {
-          "name": "postal_code",
-          "type": "varchar(20)",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "street": {
-          "name": "street",
-          "type": "varchar(255)",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "house_number": {
-          "name": "house_number",
-          "type": "varchar(20)",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "created_at": {
-          "name": "created_at",
-          "type": "timestamp",
-          "primaryKey": false,
-          "notNull": true,
-          "default": "now()"
-        },
-        "updated_at": {
-          "name": "updated_at",
-          "type": "timestamp",
-          "primaryKey": false,
-          "notNull": false
-        },
-        "deleted_at": {
-          "name": "deleted_at",
-          "type": "timestamp",
-          "primaryKey": false,
-          "notNull": false
-        }
-      },
-      "indexes": {},
-      "foreignKeys": {},
-      "compositePrimaryKeys": {},
-      "uniqueConstraints": {},
-      "policies": {},
-      "checkConstraints": {},
-      "isRLSEnabled": false
-    },
-    "public.users": {
-      "name": "users",
-      "schema": "",
-      "columns": {
-        "id": {
-          "name": "id",
-          "type": "uuid",
-          "primaryKey": true,
-          "notNull": true,
-          "default": "gen_random_uuid()"
-        },
-        "clerk_id": {
-          "name": "clerk_id",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "fname": {
-          "name": "fname",
-          "type": "varchar(30)",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "lname": {
-          "name": "lname",
-          "type": "varchar(30)",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "email": {
-          "name": "email",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "role": {
-          "name": "role",
-          "type": "user_role",
-          "typeSchema": "public",
-          "primaryKey": false,
-          "notNull": true,
-          "default": "'user'"
-        },
-        "shipping_address_id": {
-          "name": "shipping_address_id",
-          "type": "uuid",
-          "primaryKey": false,
-          "notNull": false
-        },
-        "billing_address_id": {
-          "name": "billing_address_id",
-          "type": "uuid",
-          "primaryKey": false,
-          "notNull": false
-        },
-        "created_at": {
-          "name": "created_at",
-          "type": "timestamp",
-          "primaryKey": false,
-          "notNull": true,
-          "default": "now()"
-        },
-        "updated_at": {
-          "name": "updated_at",
-          "type": "timestamp",
-          "primaryKey": false,
-          "notNull": false
-        },
-        "deleted_at": {
-          "name": "deleted_at",
-          "type": "timestamp",
-          "primaryKey": false,
-          "notNull": false
-        }
-      },
-      "indexes": {},
-      "foreignKeys": {
-        "users_shipping_address_id_addresses_id_fk": {
-          "name": "users_shipping_address_id_addresses_id_fk",
-          "tableFrom": "users",
-          "tableTo": "addresses",
-          "columnsFrom": ["shipping_address_id"],
-          "columnsTo": ["id"],
-          "onDelete": "no action",
-          "onUpdate": "no action"
-        },
-        "users_billing_address_id_addresses_id_fk": {
-          "name": "users_billing_address_id_addresses_id_fk",
-          "tableFrom": "users",
-          "tableTo": "addresses",
-          "columnsFrom": ["billing_address_id"],
-          "columnsTo": ["id"],
-          "onDelete": "no action",
-          "onUpdate": "no action"
-        }
-      },
-      "compositePrimaryKeys": {},
-      "uniqueConstraints": {
-        "users_clerk_id_unique": {
-          "name": "users_clerk_id_unique",
-          "nullsNotDistinct": false,
-          "columns": ["clerk_id"]
-        },
-        "users_email_unique": {
-          "name": "users_email_unique",
-          "nullsNotDistinct": false,
-          "columns": ["email"]
-        }
-      },
-      "policies": {},
-      "checkConstraints": {},
-      "isRLSEnabled": false
-    },
-    "public.shops": {
-      "name": "shops",
-      "schema": "",
-      "columns": {
-        "id": {
-          "name": "id",
-          "type": "uuid",
-          "primaryKey": true,
-          "notNull": true,
-          "default": "gen_random_uuid()"
-        },
-        "owner_user_id": {
-          "name": "owner_user_id",
-          "type": "uuid",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "name": {
-          "name": "name",
-          "type": "varchar(255)",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "description": {
-          "name": "description",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "address_id": {
-          "name": "address_id",
-          "type": "uuid",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "created_at": {
-          "name": "created_at",
-          "type": "timestamp",
-          "primaryKey": false,
-          "notNull": true,
-          "default": "now()"
-        },
-        "updated_at": {
-          "name": "updated_at",
-          "type": "timestamp",
-          "primaryKey": false,
-          "notNull": false
-        },
-        "deleted_at": {
-          "name": "deleted_at",
-          "type": "timestamp",
-          "primaryKey": false,
-          "notNull": false
-        }
-      },
-      "indexes": {},
-      "foreignKeys": {
-        "shops_owner_user_id_users_id_fk": {
-          "name": "shops_owner_user_id_users_id_fk",
-          "tableFrom": "shops",
-          "tableTo": "users",
-          "columnsFrom": ["owner_user_id"],
-          "columnsTo": ["id"],
-          "onDelete": "no action",
-          "onUpdate": "no action"
-        },
-        "shops_address_id_addresses_id_fk": {
-          "name": "shops_address_id_addresses_id_fk",
-          "tableFrom": "shops",
-          "tableTo": "addresses",
-          "columnsFrom": ["address_id"],
-          "columnsTo": ["id"],
-          "onDelete": "no action",
-          "onUpdate": "no action"
-        }
-      },
-      "compositePrimaryKeys": {},
-      "uniqueConstraints": {},
-      "policies": {},
-      "checkConstraints": {},
-      "isRLSEnabled": false
-    },
-    "public.winemakers": {
-      "name": "winemakers",
-      "schema": "",
-      "columns": {
-        "id": {
-          "name": "id",
-          "type": "uuid",
-          "primaryKey": true,
-          "notNull": true,
-          "default": "gen_random_uuid()"
-        },
-        "user_id": {
-          "name": "user_id",
-          "type": "uuid",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "name": {
-          "name": "name",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "description": {
-          "name": "description",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "websiteurl": {
-          "name": "websiteurl",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": false
-        },
-        "email": {
-          "name": "email",
-          "type": "varchar(255)",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "phone": {
-          "name": "phone",
-          "type": "varchar(30)",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "address_id": {
-          "name": "address_id",
-          "type": "uuid",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "created_at": {
-          "name": "created_at",
-          "type": "timestamp",
-          "primaryKey": false,
-          "notNull": true,
-          "default": "now()"
-        },
-        "updated_at": {
-          "name": "updated_at",
-          "type": "timestamp",
-          "primaryKey": false,
-          "notNull": false
-        },
-        "deleted_at": {
-          "name": "deleted_at",
-          "type": "timestamp",
-          "primaryKey": false,
-          "notNull": false
-        }
-      },
-      "indexes": {},
-      "foreignKeys": {
-        "winemakers_user_id_users_id_fk": {
-          "name": "winemakers_user_id_users_id_fk",
-          "tableFrom": "winemakers",
-          "tableTo": "users",
-          "columnsFrom": ["user_id"],
-          "columnsTo": ["id"],
-          "onDelete": "no action",
-          "onUpdate": "no action"
-        },
-        "winemakers_address_id_addresses_id_fk": {
-          "name": "winemakers_address_id_addresses_id_fk",
-          "tableFrom": "winemakers",
-          "tableTo": "addresses",
-          "columnsFrom": ["address_id"],
-          "columnsTo": ["id"],
-          "onDelete": "no action",
-          "onUpdate": "no action"
-        }
-      },
-      "compositePrimaryKeys": {},
-      "uniqueConstraints": {
-        "winemakers_user_id_unique": {
-          "name": "winemakers_user_id_unique",
-          "nullsNotDistinct": false,
-          "columns": ["user_id"]
-        },
-        "winemakers_name_unique": {
-          "name": "winemakers_name_unique",
-          "nullsNotDistinct": false,
-          "columns": ["name"]
-        }
-      },
-      "policies": {},
-      "checkConstraints": {},
-      "isRLSEnabled": false
-    },
-    "public.product_wines": {
-      "name": "product_wines",
-      "schema": "",
-      "columns": {
-        "id": {
-          "name": "id",
-          "type": "uuid",
-          "primaryKey": true,
-          "notNull": true,
-          "default": "gen_random_uuid()"
-        },
-        "product_id": {
-          "name": "product_id",
-          "type": "uuid",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "wine_id": {
-          "name": "wine_id",
-          "type": "uuid",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "quantity": {
-          "name": "quantity",
-          "type": "smallint",
-          "primaryKey": false,
-          "notNull": true
-        }
-      },
-      "indexes": {},
-      "foreignKeys": {
-        "product_wines_product_id_products_id_fk": {
-          "name": "product_wines_product_id_products_id_fk",
-          "tableFrom": "product_wines",
-          "tableTo": "products",
-          "columnsFrom": ["product_id"],
-          "columnsTo": ["id"],
-          "onDelete": "no action",
-          "onUpdate": "no action"
-        },
-        "product_wines_wine_id_wines_id_fk": {
-          "name": "product_wines_wine_id_wines_id_fk",
-          "tableFrom": "product_wines",
-          "tableTo": "wines",
-          "columnsFrom": ["wine_id"],
-          "columnsTo": ["id"],
-          "onDelete": "no action",
-          "onUpdate": "no action"
-        }
-      },
-      "compositePrimaryKeys": {},
-      "uniqueConstraints": {},
-      "policies": {},
-      "checkConstraints": {},
-      "isRLSEnabled": false
-    },
-    "public.products": {
-      "name": "products",
-      "schema": "",
-      "columns": {
-        "id": {
-          "name": "id",
-          "type": "uuid",
-          "primaryKey": true,
-          "notNull": true,
-          "default": "gen_random_uuid()"
-        },
-        "shop_id": {
-          "name": "shop_id",
-          "type": "uuid",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "name": {
-          "name": "name",
-          "type": "varchar(255)",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "description": {
-          "name": "description",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": false
-        },
-        "price": {
-          "name": "price",
-          "type": "numeric(10, 2)",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "quantity": {
-          "name": "quantity",
-          "type": "smallint",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "is_bundle": {
-          "name": "is_bundle",
-          "type": "boolean",
-          "primaryKey": false,
-          "notNull": true,
-          "default": false
-        },
-        "created_at": {
-          "name": "created_at",
-          "type": "timestamp",
-          "primaryKey": false,
-          "notNull": true,
-          "default": "now()"
-        },
-        "updated_at": {
-          "name": "updated_at",
-          "type": "timestamp",
-          "primaryKey": false,
-          "notNull": false
-        },
-        "deleted_at": {
-          "name": "deleted_at",
-          "type": "timestamp",
-          "primaryKey": false,
-          "notNull": false
-        }
-      },
-      "indexes": {},
-      "foreignKeys": {
-        "products_shop_id_shops_id_fk": {
-          "name": "products_shop_id_shops_id_fk",
-          "tableFrom": "products",
-          "tableTo": "shops",
-          "columnsFrom": ["shop_id"],
-          "columnsTo": ["id"],
-          "onDelete": "no action",
-          "onUpdate": "no action"
-        }
-      },
-      "compositePrimaryKeys": {},
-      "uniqueConstraints": {},
-      "policies": {},
-      "checkConstraints": {},
-      "isRLSEnabled": false
-    },
-    "public.wines": {
-      "name": "wines",
-      "schema": "",
-      "columns": {
-        "id": {
-          "name": "id",
-          "type": "uuid",
-          "primaryKey": true,
-          "notNull": true,
-          "default": "gen_random_uuid()"
-        },
-        "winemaker_id": {
-          "name": "winemaker_id",
-          "type": "uuid",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "name": {
-          "name": "name",
-          "type": "varchar(255)",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "description": {
-          "name": "description",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "composition": {
-          "name": "composition",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "attribution": {
-          "name": "attribution",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "vintage_year": {
-          "name": "vintage_year",
-          "type": "smallint",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "type": {
-          "name": "type",
-          "type": "wine_type",
-          "typeSchema": "public",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "color": {
-          "name": "color",
-          "type": "wine_color",
-          "typeSchema": "public",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "alcohol_content": {
-          "name": "alcohol_content",
-          "type": "numeric(4, 2)",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "volume_ml": {
-          "name": "volume_ml",
-          "type": "smallint",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "quantity": {
-          "name": "quantity",
-          "type": "smallint",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "created_at": {
-          "name": "created_at",
-          "type": "timestamp with time zone",
-          "primaryKey": false,
-          "notNull": true,
-          "default": "now()"
-        },
-        "updated_at": {
-          "name": "updated_at",
-          "type": "timestamp with time zone",
-          "primaryKey": false,
-          "notNull": true,
-          "default": "now()"
-        },
-        "deleted_at": {
-          "name": "deleted_at",
-          "type": "timestamp with time zone",
-          "primaryKey": false,
-          "notNull": false
-        }
-      },
-      "indexes": {},
-      "foreignKeys": {
-        "wines_winemaker_id_winemakers_id_fk": {
-          "name": "wines_winemaker_id_winemakers_id_fk",
-          "tableFrom": "wines",
-          "tableTo": "winemakers",
-          "columnsFrom": ["winemaker_id"],
-          "columnsTo": ["id"],
-          "onDelete": "no action",
-          "onUpdate": "no action"
-        }
-      },
-      "compositePrimaryKeys": {},
-      "uniqueConstraints": {},
-      "policies": {},
-      "checkConstraints": {},
-      "isRLSEnabled": false
-    },
-    "public.availability_exceptions": {
-      "name": "availability_exceptions",
-      "schema": "",
-      "columns": {
-        "id": {
-          "name": "id",
-          "type": "uuid",
-          "primaryKey": true,
-          "notNull": true,
-          "default": "gen_random_uuid()"
-        },
-        "winemaker_id": {
-          "name": "winemaker_id",
-          "type": "uuid",
-          "primaryKey": false,
-          "notNull": false
-        },
-        "shop_id": {
-          "name": "shop_id",
-          "type": "uuid",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "starts_at": {
-          "name": "starts_at",
-          "type": "timestamp",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "ends_at": {
-          "name": "ends_at",
-          "type": "timestamp",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "action": {
-          "name": "action",
-          "type": "varchar(255)",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "reason": {
-          "name": "reason",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": false
-        }
-      },
-      "indexes": {},
-      "foreignKeys": {
-        "availability_exceptions_winemaker_id_winemakers_id_fk": {
-          "name": "availability_exceptions_winemaker_id_winemakers_id_fk",
-          "tableFrom": "availability_exceptions",
-          "tableTo": "winemakers",
-          "columnsFrom": ["winemaker_id"],
-          "columnsTo": ["id"],
-          "onDelete": "no action",
-          "onUpdate": "no action"
-        },
-        "availability_exceptions_shop_id_shops_id_fk": {
-          "name": "availability_exceptions_shop_id_shops_id_fk",
-          "tableFrom": "availability_exceptions",
-          "tableTo": "shops",
-          "columnsFrom": ["shop_id"],
-          "columnsTo": ["id"],
-          "onDelete": "no action",
-          "onUpdate": "no action"
-        }
-      },
-      "compositePrimaryKeys": {},
-      "uniqueConstraints": {},
-      "policies": {},
-      "checkConstraints": {},
-      "isRLSEnabled": false
-    },
-    "public.availability_regular": {
-      "name": "availability_regular",
-      "schema": "",
-      "columns": {
-        "id": {
-          "name": "id",
-          "type": "uuid",
-          "primaryKey": true,
-          "notNull": true,
-          "default": "gen_random_uuid()"
-        },
-        "winemaker_id": {
-          "name": "winemaker_id",
-          "type": "uuid",
-          "primaryKey": false,
-          "notNull": false
-        },
-        "shop_id": {
-          "name": "shop_id",
-          "type": "uuid",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "dow": {
-          "name": "dow",
-          "type": "smallint",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "start_time": {
-          "name": "start_time",
-          "type": "timestamp",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "end_time": {
-          "name": "end_time",
-          "type": "timestamp",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "valid_from": {
-          "name": "valid_from",
-          "type": "date",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "valid_to": {
-          "name": "valid_to",
-          "type": "date",
-          "primaryKey": false,
-          "notNull": false
-        },
-        "type": {
-          "name": "type",
-          "type": "varchar(255)",
-          "primaryKey": false,
-          "notNull": true
-        }
-      },
-      "indexes": {},
-      "foreignKeys": {
-        "availability_regular_winemaker_id_winemakers_id_fk": {
-          "name": "availability_regular_winemaker_id_winemakers_id_fk",
-          "tableFrom": "availability_regular",
-          "tableTo": "winemakers",
-          "columnsFrom": ["winemaker_id"],
-          "columnsTo": ["id"],
-          "onDelete": "no action",
-          "onUpdate": "no action"
-        },
-        "availability_regular_shop_id_shops_id_fk": {
-          "name": "availability_regular_shop_id_shops_id_fk",
-          "tableFrom": "availability_regular",
-          "tableTo": "shops",
-          "columnsFrom": ["shop_id"],
-          "columnsTo": ["id"],
-          "onDelete": "no action",
-          "onUpdate": "no action"
-        }
-      },
-      "compositePrimaryKeys": {},
-      "uniqueConstraints": {},
-      "policies": {},
-      "checkConstraints": {},
-      "isRLSEnabled": false
-    },
-    "public.cart_items": {
-      "name": "cart_items",
-      "schema": "",
-      "columns": {
-        "id": {
-          "name": "id",
-          "type": "uuid",
-          "primaryKey": true,
-          "notNull": true,
-          "default": "gen_random_uuid()"
-        },
-        "cart_id": {
-          "name": "cart_id",
-          "type": "uuid",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "product_id": {
-          "name": "product_id",
-          "type": "uuid",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "quantity": {
-          "name": "quantity",
-          "type": "smallint",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "created_at": {
-          "name": "created_at",
-          "type": "timestamp with time zone",
-          "primaryKey": false,
-          "notNull": true,
-          "default": "now()"
-        },
-        "updated_at": {
-          "name": "updated_at",
-          "type": "timestamp with time zone",
-          "primaryKey": false,
-          "notNull": true,
-          "default": "now()"
-        }
-      },
-      "indexes": {},
-      "foreignKeys": {
-        "cart_items_cart_id_carts_id_fk": {
-          "name": "cart_items_cart_id_carts_id_fk",
-          "tableFrom": "cart_items",
-          "tableTo": "carts",
-          "columnsFrom": ["cart_id"],
-          "columnsTo": ["id"],
-          "onDelete": "no action",
-          "onUpdate": "no action"
-        },
-        "cart_items_product_id_products_id_fk": {
-          "name": "cart_items_product_id_products_id_fk",
-          "tableFrom": "cart_items",
-          "tableTo": "products",
-          "columnsFrom": ["product_id"],
-          "columnsTo": ["id"],
-          "onDelete": "no action",
-          "onUpdate": "no action"
-        }
-      },
-      "compositePrimaryKeys": {},
-      "uniqueConstraints": {},
-      "policies": {},
-      "checkConstraints": {},
-      "isRLSEnabled": false
-    },
-    "public.carts": {
-      "name": "carts",
-      "schema": "",
-      "columns": {
-        "id": {
-          "name": "id",
-          "type": "uuid",
-          "primaryKey": true,
-          "notNull": true,
-          "default": "gen_random_uuid()"
-        },
-        "user_id": {
-          "name": "user_id",
-          "type": "uuid",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "created_at": {
-          "name": "created_at",
-          "type": "timestamp with time zone",
-          "primaryKey": false,
-          "notNull": true,
-          "default": "now()"
-        },
-        "updated_at": {
-          "name": "updated_at",
-          "type": "timestamp with time zone",
-          "primaryKey": false,
-          "notNull": true,
-          "default": "now()"
-        }
-      },
-      "indexes": {},
-      "foreignKeys": {
-        "carts_user_id_users_id_fk": {
-          "name": "carts_user_id_users_id_fk",
-          "tableFrom": "carts",
-          "tableTo": "users",
-          "columnsFrom": ["user_id"],
-          "columnsTo": ["id"],
-          "onDelete": "no action",
-          "onUpdate": "no action"
-        }
-      },
-      "compositePrimaryKeys": {},
-      "uniqueConstraints": {
-        "carts_user_id_unique": {
-          "name": "carts_user_id_unique",
-          "nullsNotDistinct": false,
-          "columns": ["user_id"]
-        }
-      },
-      "policies": {},
-      "checkConstraints": {},
-      "isRLSEnabled": false
-    },
-    "public.comments": {
-      "name": "comments",
-      "schema": "",
-      "columns": {
-        "id": {
-          "name": "id",
-          "type": "uuid",
-          "primaryKey": true,
-          "notNull": true,
-          "default": "gen_random_uuid()"
-        },
-        "event_id": {
-          "name": "event_id",
-          "type": "uuid",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "user_id": {
-          "name": "user_id",
-          "type": "uuid",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "body": {
-          "name": "body",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "created_at": {
-          "name": "created_at",
-          "type": "timestamp",
-          "primaryKey": false,
-          "notNull": true,
-          "default": "now()"
-        },
-        "deleted_at": {
-          "name": "deleted_at",
-          "type": "timestamp",
-          "primaryKey": false,
-          "notNull": false
-        }
-      },
-      "indexes": {},
-      "foreignKeys": {
-        "comments_event_id_events_id_fk": {
-          "name": "comments_event_id_events_id_fk",
-          "tableFrom": "comments",
-          "tableTo": "events",
-          "columnsFrom": ["event_id"],
-          "columnsTo": ["id"],
-          "onDelete": "no action",
-          "onUpdate": "no action"
-        },
-        "comments_user_id_users_id_fk": {
-          "name": "comments_user_id_users_id_fk",
-          "tableFrom": "comments",
-          "tableTo": "users",
-          "columnsFrom": ["user_id"],
-          "columnsTo": ["id"],
-          "onDelete": "no action",
-          "onUpdate": "no action"
-        }
-      },
-      "compositePrimaryKeys": {},
-      "uniqueConstraints": {},
-      "policies": {},
-      "checkConstraints": {},
-      "isRLSEnabled": false
-    },
-    "public.event_invites": {
-      "name": "event_invites",
-      "schema": "",
-      "columns": {
-        "id": {
-          "name": "id",
-          "type": "uuid",
-          "primaryKey": true,
-          "notNull": true,
-          "default": "gen_random_uuid()"
-        },
-        "event_id": {
-          "name": "event_id",
-          "type": "uuid",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "winemaker_id_invited": {
-          "name": "winemaker_id_invited",
-          "type": "uuid",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "token": {
-          "name": "token",
-          "type": "uuid",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "created_at": {
-          "name": "created_at",
-          "type": "timestamp",
-          "primaryKey": false,
-          "notNull": true,
-          "default": "now()"
-        },
-        "expires_at": {
-          "name": "expires_at",
-          "type": "timestamp",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "status": {
-          "name": "status",
-          "type": "event_invite_status",
-          "typeSchema": "public",
-          "primaryKey": false,
-          "notNull": true
-        }
-      },
-      "indexes": {},
-      "foreignKeys": {
-        "event_invites_event_id_events_id_fk": {
-          "name": "event_invites_event_id_events_id_fk",
-          "tableFrom": "event_invites",
-          "tableTo": "events",
-          "columnsFrom": ["event_id"],
-          "columnsTo": ["id"],
-          "onDelete": "no action",
-          "onUpdate": "no action"
-        },
-        "event_invites_winemaker_id_invited_winemakers_id_fk": {
-          "name": "event_invites_winemaker_id_invited_winemakers_id_fk",
-          "tableFrom": "event_invites",
-          "tableTo": "winemakers",
-          "columnsFrom": ["winemaker_id_invited"],
-          "columnsTo": ["id"],
-          "onDelete": "no action",
-          "onUpdate": "no action"
-        }
-      },
-      "compositePrimaryKeys": {},
-      "uniqueConstraints": {
-        "event_invites_token_unique": {
-          "name": "event_invites_token_unique",
-          "nullsNotDistinct": false,
-          "columns": ["token"]
-        }
-      },
-      "policies": {},
-      "checkConstraints": {},
-      "isRLSEnabled": false
-    },
-    "public.events": {
-      "name": "events",
-      "schema": "",
-      "columns": {
-        "id": {
-          "name": "id",
-          "type": "uuid",
-          "primaryKey": true,
-          "notNull": true,
-          "default": "gen_random_uuid()"
-        },
-        "winemaker_id": {
-          "name": "winemaker_id",
-          "type": "uuid",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "name": {
-          "name": "name",
-          "type": "varchar(255)",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "description": {
-          "name": "description",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": false
-        },
-        "address_id": {
-          "name": "address_id",
-          "type": "uuid",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "start_time": {
-          "name": "start_time",
-          "type": "timestamp with time zone",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "end_time": {
-          "name": "end_time",
-          "type": "timestamp with time zone",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "created_at": {
-          "name": "created_at",
-          "type": "timestamp",
-          "primaryKey": false,
-          "notNull": true,
-          "default": "now()"
-        },
-        "deleted_at": {
-          "name": "deleted_at",
-          "type": "timestamp",
-          "primaryKey": false,
-          "notNull": false
-        },
-        "invite_type": {
-          "name": "invite_type",
-          "type": "varchar(255)",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "visibility": {
-          "name": "visibility",
-          "type": "event_visibility",
-          "typeSchema": "public",
-          "primaryKey": false,
-          "notNull": true
-        }
-      },
-      "indexes": {},
-      "foreignKeys": {
-        "events_winemaker_id_winemakers_id_fk": {
-          "name": "events_winemaker_id_winemakers_id_fk",
-          "tableFrom": "events",
-          "tableTo": "winemakers",
-          "columnsFrom": ["winemaker_id"],
-          "columnsTo": ["id"],
-          "onDelete": "no action",
-          "onUpdate": "no action"
-        },
-        "events_address_id_addresses_id_fk": {
-          "name": "events_address_id_addresses_id_fk",
-          "tableFrom": "events",
-          "tableTo": "addresses",
-          "columnsFrom": ["address_id"],
-          "columnsTo": ["id"],
-          "onDelete": "no action",
-          "onUpdate": "no action"
-        }
-      },
-      "compositePrimaryKeys": {},
-      "uniqueConstraints": {},
-      "policies": {},
-      "checkConstraints": {},
-      "isRLSEnabled": false
-    },
-    "public.order_items": {
-      "name": "order_items",
-      "schema": "",
-      "columns": {
-        "id": {
-          "name": "id",
-          "type": "uuid",
-          "primaryKey": true,
-          "notNull": true,
-          "default": "gen_random_uuid()"
-        },
-        "shop_id": {
-          "name": "shop_id",
-          "type": "uuid",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "order_id": {
-          "name": "order_id",
-          "type": "uuid",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "product_id": {
-          "name": "product_id",
-          "type": "uuid",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "quantity": {
-          "name": "quantity",
-          "type": "smallint",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "unit_price_at_purchase": {
-          "name": "unit_price_at_purchase",
-          "type": "numeric(10, 2)",
-          "primaryKey": false,
-          "notNull": true
-        }
-      },
-      "indexes": {},
-      "foreignKeys": {
-        "order_items_shop_id_shops_id_fk": {
-          "name": "order_items_shop_id_shops_id_fk",
-          "tableFrom": "order_items",
-          "tableTo": "shops",
-          "columnsFrom": ["shop_id"],
-          "columnsTo": ["id"],
-          "onDelete": "no action",
-          "onUpdate": "no action"
-        },
-        "order_items_order_id_orders_id_fk": {
-          "name": "order_items_order_id_orders_id_fk",
-          "tableFrom": "order_items",
-          "tableTo": "orders",
-          "columnsFrom": ["order_id"],
-          "columnsTo": ["id"],
-          "onDelete": "no action",
-          "onUpdate": "no action"
-        },
-        "order_items_product_id_products_id_fk": {
-          "name": "order_items_product_id_products_id_fk",
-          "tableFrom": "order_items",
-          "tableTo": "products",
-          "columnsFrom": ["product_id"],
-          "columnsTo": ["id"],
-          "onDelete": "no action",
-          "onUpdate": "no action"
-        }
-      },
-      "compositePrimaryKeys": {},
-      "uniqueConstraints": {},
-      "policies": {},
-      "checkConstraints": {},
-      "isRLSEnabled": false
-    },
-    "public.orders": {
-      "name": "orders",
-      "schema": "",
-      "columns": {
-        "id": {
-          "name": "id",
-          "type": "uuid",
-          "primaryKey": true,
-          "notNull": true,
-          "default": "gen_random_uuid()"
-        },
-        "user_id": {
-          "name": "user_id",
-          "type": "uuid",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "shipping_fee": {
-          "name": "shipping_fee",
-          "type": "numeric(10, 2)",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "discount": {
-          "name": "discount",
-          "type": "numeric(10, 2)",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "payment_status": {
-          "name": "payment_status",
-          "type": "payment_status",
-          "typeSchema": "public",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "payment_method": {
-          "name": "payment_method",
-          "type": "payment_method",
-          "typeSchema": "public",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "total_price": {
-          "name": "total_price",
-          "type": "numeric(10, 2)",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "created_at": {
-          "name": "created_at",
-          "type": "timestamp",
-          "primaryKey": false,
-          "notNull": true,
-          "default": "now()"
-        },
-        "updated_at": {
-          "name": "updated_at",
-          "type": "timestamp",
-          "primaryKey": false,
-          "notNull": false
-        },
-        "deleted_at": {
-          "name": "deleted_at",
-          "type": "timestamp",
-          "primaryKey": false,
-          "notNull": false
-        },
-        "status": {
-          "name": "status",
-          "type": "order_status",
-          "typeSchema": "public",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "delivery_type": {
-          "name": "delivery_type",
-          "type": "delivery_type",
-          "typeSchema": "public",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "shipping_address_id": {
-          "name": "shipping_address_id",
-          "type": "uuid",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "billing_address_id": {
-          "name": "billing_address_id",
-          "type": "uuid",
-          "primaryKey": false,
-          "notNull": true
-        }
-      },
-      "indexes": {},
-      "foreignKeys": {
-        "orders_user_id_users_id_fk": {
-          "name": "orders_user_id_users_id_fk",
-          "tableFrom": "orders",
-          "tableTo": "users",
-          "columnsFrom": ["user_id"],
-          "columnsTo": ["id"],
-          "onDelete": "no action",
-          "onUpdate": "no action"
-        },
-        "orders_shipping_address_id_addresses_id_fk": {
-          "name": "orders_shipping_address_id_addresses_id_fk",
-          "tableFrom": "orders",
-          "tableTo": "addresses",
-          "columnsFrom": ["shipping_address_id"],
-          "columnsTo": ["id"],
-          "onDelete": "no action",
-          "onUpdate": "no action"
-        },
-        "orders_billing_address_id_addresses_id_fk": {
-          "name": "orders_billing_address_id_addresses_id_fk",
-          "tableFrom": "orders",
-          "tableTo": "addresses",
-          "columnsFrom": ["billing_address_id"],
-          "columnsTo": ["id"],
-          "onDelete": "no action",
-          "onUpdate": "no action"
-        }
-      },
-      "compositePrimaryKeys": {},
-      "uniqueConstraints": {},
-      "policies": {},
-      "checkConstraints": {},
-      "isRLSEnabled": false
-    },
-    "public.product_reviews": {
-      "name": "product_reviews",
-      "schema": "",
-      "columns": {
-        "id": {
-          "name": "id",
-          "type": "uuid",
-          "primaryKey": true,
-          "notNull": true,
-          "default": "gen_random_uuid()"
-        },
-        "user_id": {
-          "name": "user_id",
-          "type": "uuid",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "product_id": {
-          "name": "product_id",
-          "type": "uuid",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "rating": {
-          "name": "rating",
-          "type": "smallint",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "body": {
-          "name": "body",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": false
-        },
-        "created_at": {
-          "name": "created_at",
-          "type": "timestamp",
-          "primaryKey": false,
-          "notNull": true,
-          "default": "now()"
-        },
-        "updated_at": {
-          "name": "updated_at",
-          "type": "timestamp",
-          "primaryKey": false,
-          "notNull": false
-        },
-        "deleted_at": {
-          "name": "deleted_at",
-          "type": "timestamp",
-          "primaryKey": false,
-          "notNull": false
-        }
-      },
-      "indexes": {},
-      "foreignKeys": {
-        "product_reviews_user_id_users_id_fk": {
-          "name": "product_reviews_user_id_users_id_fk",
-          "tableFrom": "product_reviews",
-          "tableTo": "users",
-          "columnsFrom": ["user_id"],
-          "columnsTo": ["id"],
-          "onDelete": "no action",
-          "onUpdate": "no action"
-        },
-        "product_reviews_product_id_products_id_fk": {
-          "name": "product_reviews_product_id_products_id_fk",
-          "tableFrom": "product_reviews",
-          "tableTo": "products",
-          "columnsFrom": ["product_id"],
-          "columnsTo": ["id"],
-          "onDelete": "no action",
-          "onUpdate": "no action"
-        }
-      },
-      "compositePrimaryKeys": {},
-      "uniqueConstraints": {},
-      "policies": {},
-      "checkConstraints": {},
-      "isRLSEnabled": false
-    },
-    "public.winemaker_reviews": {
-      "name": "winemaker_reviews",
-      "schema": "",
-      "columns": {
-        "id": {
-          "name": "id",
-          "type": "uuid",
-          "primaryKey": true,
-          "notNull": true,
-          "default": "gen_random_uuid()"
-        },
-        "user_id": {
-          "name": "user_id",
-          "type": "uuid",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "winemaker_id": {
-          "name": "winemaker_id",
-          "type": "uuid",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "rating": {
-          "name": "rating",
-          "type": "smallint",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "body": {
-          "name": "body",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": false
-        },
-        "created_at": {
-          "name": "created_at",
-          "type": "timestamp",
-          "primaryKey": false,
-          "notNull": true,
-          "default": "now()"
-        },
-        "updated_at": {
-          "name": "updated_at",
-          "type": "timestamp",
-          "primaryKey": false,
-          "notNull": false
-        },
-        "deleted_at": {
-          "name": "deleted_at",
-          "type": "timestamp",
-          "primaryKey": false,
-          "notNull": false
-        }
-      },
-      "indexes": {},
-      "foreignKeys": {
-        "winemaker_reviews_user_id_users_id_fk": {
-          "name": "winemaker_reviews_user_id_users_id_fk",
-          "tableFrom": "winemaker_reviews",
-          "tableTo": "users",
-          "columnsFrom": ["user_id"],
-          "columnsTo": ["id"],
-          "onDelete": "no action",
-          "onUpdate": "no action"
-        },
-        "winemaker_reviews_winemaker_id_winemakers_id_fk": {
-          "name": "winemaker_reviews_winemaker_id_winemakers_id_fk",
-          "tableFrom": "winemaker_reviews",
-          "tableTo": "winemakers",
-          "columnsFrom": ["winemaker_id"],
-          "columnsTo": ["id"],
-          "onDelete": "no action",
-          "onUpdate": "no action"
-        }
-      },
-      "compositePrimaryKeys": {},
-      "uniqueConstraints": {},
-      "policies": {},
-      "checkConstraints": {},
-      "isRLSEnabled": false
-    },
-    "public.images": {
-      "name": "images",
-      "schema": "",
-      "columns": {
-        "id": {
-          "name": "id",
-          "type": "uuid",
-          "primaryKey": true,
-          "notNull": true,
-          "default": "gen_random_uuid()"
-        },
-        "url": {
-          "name": "url",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "alt_text": {
-          "name": "alt_text",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": false
-        },
-        "entity_type": {
-          "name": "entity_type",
-          "type": "varchar(50)",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "entity_id": {
-          "name": "entity_id",
-          "type": "uuid",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "sort_order": {
-          "name": "sort_order",
-          "type": "integer",
-          "primaryKey": false,
-          "notNull": false,
-          "default": 0
-        },
-        "created_at": {
-          "name": "created_at",
-          "type": "timestamp",
-          "primaryKey": false,
-          "notNull": true,
-          "default": "now()"
-        },
-        "updated_at": {
-          "name": "updated_at",
-          "type": "timestamp",
-          "primaryKey": false,
-          "notNull": false
-        }
-      },
-      "indexes": {},
-      "foreignKeys": {},
-      "compositePrimaryKeys": {},
-      "uniqueConstraints": {},
-      "policies": {},
-      "checkConstraints": {},
-      "isRLSEnabled": false
-    },
-    "public.role_requests": {
-      "name": "role_requests",
-      "schema": "",
-      "columns": {
-        "id": {
-          "name": "id",
-          "type": "uuid",
-          "primaryKey": true,
-          "notNull": true,
-          "default": "gen_random_uuid()"
-        },
-        "user_id": {
-          "name": "user_id",
-          "type": "uuid",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "requested_role": {
-          "name": "requested_role",
-          "type": "role_request_type",
-          "typeSchema": "public",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "status": {
-          "name": "status",
-          "type": "role_request_status",
-          "typeSchema": "public",
-          "primaryKey": false,
-          "notNull": true,
-          "default": "'pending'"
-        },
-        "business_name": {
-          "name": "business_name",
-          "type": "varchar(255)",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "details": {
-          "name": "details",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": false
-        },
-        "submitted_at": {
-          "name": "submitted_at",
-          "type": "timestamp",
-          "primaryKey": false,
-          "notNull": true,
-          "default": "now()"
-        },
-        "reviewed_at": {
-          "name": "reviewed_at",
-          "type": "timestamp",
-          "primaryKey": false,
-          "notNull": false
-        },
-        "reviewed_by_admin_id": {
-          "name": "reviewed_by_admin_id",
-          "type": "uuid",
-          "primaryKey": false,
-          "notNull": false
-        }
-      },
-      "indexes": {},
-      "foreignKeys": {
-        "role_requests_user_id_users_id_fk": {
-          "name": "role_requests_user_id_users_id_fk",
-          "tableFrom": "role_requests",
-          "tableTo": "users",
-          "columnsFrom": ["user_id"],
-          "columnsTo": ["id"],
-          "onDelete": "no action",
-          "onUpdate": "no action"
-        },
-        "role_requests_reviewed_by_admin_id_users_id_fk": {
-          "name": "role_requests_reviewed_by_admin_id_users_id_fk",
-          "tableFrom": "role_requests",
-          "tableTo": "users",
-          "columnsFrom": ["reviewed_by_admin_id"],
-          "columnsTo": ["id"],
-          "onDelete": "no action",
-          "onUpdate": "no action"
-        }
-      },
-      "compositePrimaryKeys": {},
-      "uniqueConstraints": {},
-      "policies": {},
-      "checkConstraints": {},
-      "isRLSEnabled": false
-    }
+  "_meta": {
+    "columns": {},
+    "schemas": {},
+    "tables": {}
   },
+  "dialect": "postgresql",
   "enums": {
     "public.delivery_type": {
       "name": "delivery_type",
@@ -1777,14 +70,1721 @@
       "values": ["still", "sparkling", "fortified", "dessert"]
     }
   },
+  "id": "09fc08f7-c0e0-4455-a8ea-61c021450afc",
+  "policies": {},
+  "prevId": "e7abe103-928e-4e19-b256-2b9a12be5e56",
+  "roles": {},
   "schemas": {},
   "sequences": {},
-  "roles": {},
-  "policies": {},
-  "views": {},
-  "_meta": {
-    "columns": {},
-    "schemas": {},
-    "tables": {}
-  }
+  "tables": {
+    "public.addresses": {
+      "checkConstraints": {},
+      "columns": {
+        "city": {
+          "name": "city",
+          "notNull": true,
+          "primaryKey": false,
+          "type": "varchar(255)"
+        },
+        "country": {
+          "name": "country",
+          "notNull": true,
+          "primaryKey": false,
+          "type": "varchar(50)"
+        },
+        "created_at": {
+          "default": "now()",
+          "name": "created_at",
+          "notNull": true,
+          "primaryKey": false,
+          "type": "timestamp"
+        },
+        "deleted_at": {
+          "name": "deleted_at",
+          "notNull": false,
+          "primaryKey": false,
+          "type": "timestamp"
+        },
+        "house_number": {
+          "name": "house_number",
+          "notNull": true,
+          "primaryKey": false,
+          "type": "varchar(20)"
+        },
+        "id": {
+          "default": "gen_random_uuid()",
+          "name": "id",
+          "notNull": true,
+          "primaryKey": true,
+          "type": "uuid"
+        },
+        "postal_code": {
+          "name": "postal_code",
+          "notNull": true,
+          "primaryKey": false,
+          "type": "varchar(20)"
+        },
+        "street": {
+          "name": "street",
+          "notNull": true,
+          "primaryKey": false,
+          "type": "varchar(255)"
+        },
+        "updated_at": {
+          "name": "updated_at",
+          "notNull": false,
+          "primaryKey": false,
+          "type": "timestamp"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "foreignKeys": {},
+      "indexes": {},
+      "isRLSEnabled": false,
+      "name": "addresses",
+      "policies": {},
+      "schema": "",
+      "uniqueConstraints": {}
+    },
+    "public.availability_exceptions": {
+      "checkConstraints": {},
+      "columns": {
+        "action": {
+          "name": "action",
+          "notNull": true,
+          "primaryKey": false,
+          "type": "varchar(255)"
+        },
+        "ends_at": {
+          "name": "ends_at",
+          "notNull": true,
+          "primaryKey": false,
+          "type": "timestamp"
+        },
+        "id": {
+          "default": "gen_random_uuid()",
+          "name": "id",
+          "notNull": true,
+          "primaryKey": true,
+          "type": "uuid"
+        },
+        "reason": {
+          "name": "reason",
+          "notNull": false,
+          "primaryKey": false,
+          "type": "text"
+        },
+        "shop_id": {
+          "name": "shop_id",
+          "notNull": true,
+          "primaryKey": false,
+          "type": "uuid"
+        },
+        "starts_at": {
+          "name": "starts_at",
+          "notNull": true,
+          "primaryKey": false,
+          "type": "timestamp"
+        },
+        "winemaker_id": {
+          "name": "winemaker_id",
+          "notNull": false,
+          "primaryKey": false,
+          "type": "uuid"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "foreignKeys": {
+        "availability_exceptions_shop_id_shops_id_fk": {
+          "columnsFrom": ["shop_id"],
+          "columnsTo": ["id"],
+          "name": "availability_exceptions_shop_id_shops_id_fk",
+          "onDelete": "no action",
+          "onUpdate": "no action",
+          "tableFrom": "availability_exceptions",
+          "tableTo": "shops"
+        },
+        "availability_exceptions_winemaker_id_winemakers_id_fk": {
+          "columnsFrom": ["winemaker_id"],
+          "columnsTo": ["id"],
+          "name": "availability_exceptions_winemaker_id_winemakers_id_fk",
+          "onDelete": "no action",
+          "onUpdate": "no action",
+          "tableFrom": "availability_exceptions",
+          "tableTo": "winemakers"
+        }
+      },
+      "indexes": {},
+      "isRLSEnabled": false,
+      "name": "availability_exceptions",
+      "policies": {},
+      "schema": "",
+      "uniqueConstraints": {}
+    },
+    "public.availability_regular": {
+      "checkConstraints": {},
+      "columns": {
+        "dow": {
+          "name": "dow",
+          "notNull": true,
+          "primaryKey": false,
+          "type": "smallint"
+        },
+        "end_time": {
+          "name": "end_time",
+          "notNull": true,
+          "primaryKey": false,
+          "type": "timestamp"
+        },
+        "id": {
+          "default": "gen_random_uuid()",
+          "name": "id",
+          "notNull": true,
+          "primaryKey": true,
+          "type": "uuid"
+        },
+        "shop_id": {
+          "name": "shop_id",
+          "notNull": true,
+          "primaryKey": false,
+          "type": "uuid"
+        },
+        "start_time": {
+          "name": "start_time",
+          "notNull": true,
+          "primaryKey": false,
+          "type": "timestamp"
+        },
+        "type": {
+          "name": "type",
+          "notNull": true,
+          "primaryKey": false,
+          "type": "varchar(255)"
+        },
+        "valid_from": {
+          "name": "valid_from",
+          "notNull": true,
+          "primaryKey": false,
+          "type": "date"
+        },
+        "valid_to": {
+          "name": "valid_to",
+          "notNull": false,
+          "primaryKey": false,
+          "type": "date"
+        },
+        "winemaker_id": {
+          "name": "winemaker_id",
+          "notNull": false,
+          "primaryKey": false,
+          "type": "uuid"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "foreignKeys": {
+        "availability_regular_shop_id_shops_id_fk": {
+          "columnsFrom": ["shop_id"],
+          "columnsTo": ["id"],
+          "name": "availability_regular_shop_id_shops_id_fk",
+          "onDelete": "no action",
+          "onUpdate": "no action",
+          "tableFrom": "availability_regular",
+          "tableTo": "shops"
+        },
+        "availability_regular_winemaker_id_winemakers_id_fk": {
+          "columnsFrom": ["winemaker_id"],
+          "columnsTo": ["id"],
+          "name": "availability_regular_winemaker_id_winemakers_id_fk",
+          "onDelete": "no action",
+          "onUpdate": "no action",
+          "tableFrom": "availability_regular",
+          "tableTo": "winemakers"
+        }
+      },
+      "indexes": {},
+      "isRLSEnabled": false,
+      "name": "availability_regular",
+      "policies": {},
+      "schema": "",
+      "uniqueConstraints": {}
+    },
+    "public.cart_items": {
+      "checkConstraints": {},
+      "columns": {
+        "cart_id": {
+          "name": "cart_id",
+          "notNull": true,
+          "primaryKey": false,
+          "type": "uuid"
+        },
+        "created_at": {
+          "default": "now()",
+          "name": "created_at",
+          "notNull": true,
+          "primaryKey": false,
+          "type": "timestamp with time zone"
+        },
+        "id": {
+          "default": "gen_random_uuid()",
+          "name": "id",
+          "notNull": true,
+          "primaryKey": true,
+          "type": "uuid"
+        },
+        "product_id": {
+          "name": "product_id",
+          "notNull": true,
+          "primaryKey": false,
+          "type": "uuid"
+        },
+        "quantity": {
+          "name": "quantity",
+          "notNull": true,
+          "primaryKey": false,
+          "type": "smallint"
+        },
+        "updated_at": {
+          "default": "now()",
+          "name": "updated_at",
+          "notNull": true,
+          "primaryKey": false,
+          "type": "timestamp with time zone"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "foreignKeys": {
+        "cart_items_cart_id_carts_id_fk": {
+          "columnsFrom": ["cart_id"],
+          "columnsTo": ["id"],
+          "name": "cart_items_cart_id_carts_id_fk",
+          "onDelete": "no action",
+          "onUpdate": "no action",
+          "tableFrom": "cart_items",
+          "tableTo": "carts"
+        },
+        "cart_items_product_id_products_id_fk": {
+          "columnsFrom": ["product_id"],
+          "columnsTo": ["id"],
+          "name": "cart_items_product_id_products_id_fk",
+          "onDelete": "no action",
+          "onUpdate": "no action",
+          "tableFrom": "cart_items",
+          "tableTo": "products"
+        }
+      },
+      "indexes": {},
+      "isRLSEnabled": false,
+      "name": "cart_items",
+      "policies": {},
+      "schema": "",
+      "uniqueConstraints": {}
+    },
+    "public.carts": {
+      "checkConstraints": {},
+      "columns": {
+        "created_at": {
+          "default": "now()",
+          "name": "created_at",
+          "notNull": true,
+          "primaryKey": false,
+          "type": "timestamp with time zone"
+        },
+        "id": {
+          "default": "gen_random_uuid()",
+          "name": "id",
+          "notNull": true,
+          "primaryKey": true,
+          "type": "uuid"
+        },
+        "updated_at": {
+          "default": "now()",
+          "name": "updated_at",
+          "notNull": true,
+          "primaryKey": false,
+          "type": "timestamp with time zone"
+        },
+        "user_id": {
+          "name": "user_id",
+          "notNull": true,
+          "primaryKey": false,
+          "type": "uuid"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "foreignKeys": {
+        "carts_user_id_users_id_fk": {
+          "columnsFrom": ["user_id"],
+          "columnsTo": ["id"],
+          "name": "carts_user_id_users_id_fk",
+          "onDelete": "no action",
+          "onUpdate": "no action",
+          "tableFrom": "carts",
+          "tableTo": "users"
+        }
+      },
+      "indexes": {},
+      "isRLSEnabled": false,
+      "name": "carts",
+      "policies": {},
+      "schema": "",
+      "uniqueConstraints": {
+        "carts_user_id_unique": {
+          "columns": ["user_id"],
+          "name": "carts_user_id_unique",
+          "nullsNotDistinct": false
+        }
+      }
+    },
+    "public.comments": {
+      "checkConstraints": {},
+      "columns": {
+        "body": {
+          "name": "body",
+          "notNull": true,
+          "primaryKey": false,
+          "type": "text"
+        },
+        "created_at": {
+          "default": "now()",
+          "name": "created_at",
+          "notNull": true,
+          "primaryKey": false,
+          "type": "timestamp"
+        },
+        "deleted_at": {
+          "name": "deleted_at",
+          "notNull": false,
+          "primaryKey": false,
+          "type": "timestamp"
+        },
+        "event_id": {
+          "name": "event_id",
+          "notNull": true,
+          "primaryKey": false,
+          "type": "uuid"
+        },
+        "id": {
+          "default": "gen_random_uuid()",
+          "name": "id",
+          "notNull": true,
+          "primaryKey": true,
+          "type": "uuid"
+        },
+        "user_id": {
+          "name": "user_id",
+          "notNull": true,
+          "primaryKey": false,
+          "type": "uuid"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "foreignKeys": {
+        "comments_event_id_events_id_fk": {
+          "columnsFrom": ["event_id"],
+          "columnsTo": ["id"],
+          "name": "comments_event_id_events_id_fk",
+          "onDelete": "no action",
+          "onUpdate": "no action",
+          "tableFrom": "comments",
+          "tableTo": "events"
+        },
+        "comments_user_id_users_id_fk": {
+          "columnsFrom": ["user_id"],
+          "columnsTo": ["id"],
+          "name": "comments_user_id_users_id_fk",
+          "onDelete": "no action",
+          "onUpdate": "no action",
+          "tableFrom": "comments",
+          "tableTo": "users"
+        }
+      },
+      "indexes": {},
+      "isRLSEnabled": false,
+      "name": "comments",
+      "policies": {},
+      "schema": "",
+      "uniqueConstraints": {}
+    },
+    "public.event_invites": {
+      "checkConstraints": {},
+      "columns": {
+        "created_at": {
+          "default": "now()",
+          "name": "created_at",
+          "notNull": true,
+          "primaryKey": false,
+          "type": "timestamp"
+        },
+        "event_id": {
+          "name": "event_id",
+          "notNull": true,
+          "primaryKey": false,
+          "type": "uuid"
+        },
+        "expires_at": {
+          "name": "expires_at",
+          "notNull": true,
+          "primaryKey": false,
+          "type": "timestamp"
+        },
+        "id": {
+          "default": "gen_random_uuid()",
+          "name": "id",
+          "notNull": true,
+          "primaryKey": true,
+          "type": "uuid"
+        },
+        "status": {
+          "name": "status",
+          "notNull": true,
+          "primaryKey": false,
+          "type": "event_invite_status",
+          "typeSchema": "public"
+        },
+        "token": {
+          "name": "token",
+          "notNull": true,
+          "primaryKey": false,
+          "type": "uuid"
+        },
+        "winemaker_id_invited": {
+          "name": "winemaker_id_invited",
+          "notNull": true,
+          "primaryKey": false,
+          "type": "uuid"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "foreignKeys": {
+        "event_invites_event_id_events_id_fk": {
+          "columnsFrom": ["event_id"],
+          "columnsTo": ["id"],
+          "name": "event_invites_event_id_events_id_fk",
+          "onDelete": "no action",
+          "onUpdate": "no action",
+          "tableFrom": "event_invites",
+          "tableTo": "events"
+        },
+        "event_invites_winemaker_id_invited_winemakers_id_fk": {
+          "columnsFrom": ["winemaker_id_invited"],
+          "columnsTo": ["id"],
+          "name": "event_invites_winemaker_id_invited_winemakers_id_fk",
+          "onDelete": "no action",
+          "onUpdate": "no action",
+          "tableFrom": "event_invites",
+          "tableTo": "winemakers"
+        }
+      },
+      "indexes": {},
+      "isRLSEnabled": false,
+      "name": "event_invites",
+      "policies": {},
+      "schema": "",
+      "uniqueConstraints": {
+        "event_invites_token_unique": {
+          "columns": ["token"],
+          "name": "event_invites_token_unique",
+          "nullsNotDistinct": false
+        }
+      }
+    },
+    "public.events": {
+      "checkConstraints": {},
+      "columns": {
+        "address_id": {
+          "name": "address_id",
+          "notNull": true,
+          "primaryKey": false,
+          "type": "uuid"
+        },
+        "created_at": {
+          "default": "now()",
+          "name": "created_at",
+          "notNull": true,
+          "primaryKey": false,
+          "type": "timestamp"
+        },
+        "deleted_at": {
+          "name": "deleted_at",
+          "notNull": false,
+          "primaryKey": false,
+          "type": "timestamp"
+        },
+        "description": {
+          "name": "description",
+          "notNull": false,
+          "primaryKey": false,
+          "type": "text"
+        },
+        "end_time": {
+          "name": "end_time",
+          "notNull": true,
+          "primaryKey": false,
+          "type": "timestamp with time zone"
+        },
+        "id": {
+          "default": "gen_random_uuid()",
+          "name": "id",
+          "notNull": true,
+          "primaryKey": true,
+          "type": "uuid"
+        },
+        "invite_type": {
+          "name": "invite_type",
+          "notNull": true,
+          "primaryKey": false,
+          "type": "varchar(255)"
+        },
+        "name": {
+          "name": "name",
+          "notNull": true,
+          "primaryKey": false,
+          "type": "varchar(255)"
+        },
+        "start_time": {
+          "name": "start_time",
+          "notNull": true,
+          "primaryKey": false,
+          "type": "timestamp with time zone"
+        },
+        "visibility": {
+          "name": "visibility",
+          "notNull": true,
+          "primaryKey": false,
+          "type": "event_visibility",
+          "typeSchema": "public"
+        },
+        "winemaker_id": {
+          "name": "winemaker_id",
+          "notNull": true,
+          "primaryKey": false,
+          "type": "uuid"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "foreignKeys": {
+        "events_address_id_addresses_id_fk": {
+          "columnsFrom": ["address_id"],
+          "columnsTo": ["id"],
+          "name": "events_address_id_addresses_id_fk",
+          "onDelete": "no action",
+          "onUpdate": "no action",
+          "tableFrom": "events",
+          "tableTo": "addresses"
+        },
+        "events_winemaker_id_winemakers_id_fk": {
+          "columnsFrom": ["winemaker_id"],
+          "columnsTo": ["id"],
+          "name": "events_winemaker_id_winemakers_id_fk",
+          "onDelete": "no action",
+          "onUpdate": "no action",
+          "tableFrom": "events",
+          "tableTo": "winemakers"
+        }
+      },
+      "indexes": {},
+      "isRLSEnabled": false,
+      "name": "events",
+      "policies": {},
+      "schema": "",
+      "uniqueConstraints": {}
+    },
+    "public.images": {
+      "checkConstraints": {},
+      "columns": {
+        "alt_text": {
+          "name": "alt_text",
+          "notNull": false,
+          "primaryKey": false,
+          "type": "text"
+        },
+        "created_at": {
+          "default": "now()",
+          "name": "created_at",
+          "notNull": true,
+          "primaryKey": false,
+          "type": "timestamp"
+        },
+        "entity_id": {
+          "name": "entity_id",
+          "notNull": true,
+          "primaryKey": false,
+          "type": "uuid"
+        },
+        "entity_type": {
+          "name": "entity_type",
+          "notNull": true,
+          "primaryKey": false,
+          "type": "varchar(50)"
+        },
+        "id": {
+          "default": "gen_random_uuid()",
+          "name": "id",
+          "notNull": true,
+          "primaryKey": true,
+          "type": "uuid"
+        },
+        "sort_order": {
+          "default": 0,
+          "name": "sort_order",
+          "notNull": false,
+          "primaryKey": false,
+          "type": "integer"
+        },
+        "updated_at": {
+          "name": "updated_at",
+          "notNull": false,
+          "primaryKey": false,
+          "type": "timestamp"
+        },
+        "url": {
+          "name": "url",
+          "notNull": true,
+          "primaryKey": false,
+          "type": "text"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "foreignKeys": {},
+      "indexes": {},
+      "isRLSEnabled": false,
+      "name": "images",
+      "policies": {},
+      "schema": "",
+      "uniqueConstraints": {}
+    },
+    "public.order_items": {
+      "checkConstraints": {},
+      "columns": {
+        "id": {
+          "default": "gen_random_uuid()",
+          "name": "id",
+          "notNull": true,
+          "primaryKey": true,
+          "type": "uuid"
+        },
+        "order_id": {
+          "name": "order_id",
+          "notNull": true,
+          "primaryKey": false,
+          "type": "uuid"
+        },
+        "product_id": {
+          "name": "product_id",
+          "notNull": true,
+          "primaryKey": false,
+          "type": "uuid"
+        },
+        "quantity": {
+          "name": "quantity",
+          "notNull": true,
+          "primaryKey": false,
+          "type": "smallint"
+        },
+        "shop_id": {
+          "name": "shop_id",
+          "notNull": true,
+          "primaryKey": false,
+          "type": "uuid"
+        },
+        "unit_price_at_purchase": {
+          "name": "unit_price_at_purchase",
+          "notNull": true,
+          "primaryKey": false,
+          "type": "numeric(10, 2)"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "foreignKeys": {
+        "order_items_order_id_orders_id_fk": {
+          "columnsFrom": ["order_id"],
+          "columnsTo": ["id"],
+          "name": "order_items_order_id_orders_id_fk",
+          "onDelete": "no action",
+          "onUpdate": "no action",
+          "tableFrom": "order_items",
+          "tableTo": "orders"
+        },
+        "order_items_product_id_products_id_fk": {
+          "columnsFrom": ["product_id"],
+          "columnsTo": ["id"],
+          "name": "order_items_product_id_products_id_fk",
+          "onDelete": "no action",
+          "onUpdate": "no action",
+          "tableFrom": "order_items",
+          "tableTo": "products"
+        },
+        "order_items_shop_id_shops_id_fk": {
+          "columnsFrom": ["shop_id"],
+          "columnsTo": ["id"],
+          "name": "order_items_shop_id_shops_id_fk",
+          "onDelete": "no action",
+          "onUpdate": "no action",
+          "tableFrom": "order_items",
+          "tableTo": "shops"
+        }
+      },
+      "indexes": {},
+      "isRLSEnabled": false,
+      "name": "order_items",
+      "policies": {},
+      "schema": "",
+      "uniqueConstraints": {}
+    },
+    "public.orders": {
+      "checkConstraints": {},
+      "columns": {
+        "billing_address_id": {
+          "name": "billing_address_id",
+          "notNull": true,
+          "primaryKey": false,
+          "type": "uuid"
+        },
+        "created_at": {
+          "default": "now()",
+          "name": "created_at",
+          "notNull": true,
+          "primaryKey": false,
+          "type": "timestamp"
+        },
+        "deleted_at": {
+          "name": "deleted_at",
+          "notNull": false,
+          "primaryKey": false,
+          "type": "timestamp"
+        },
+        "delivery_type": {
+          "name": "delivery_type",
+          "notNull": true,
+          "primaryKey": false,
+          "type": "delivery_type",
+          "typeSchema": "public"
+        },
+        "discount": {
+          "name": "discount",
+          "notNull": true,
+          "primaryKey": false,
+          "type": "numeric(10, 2)"
+        },
+        "id": {
+          "default": "gen_random_uuid()",
+          "name": "id",
+          "notNull": true,
+          "primaryKey": true,
+          "type": "uuid"
+        },
+        "payment_method": {
+          "name": "payment_method",
+          "notNull": true,
+          "primaryKey": false,
+          "type": "payment_method",
+          "typeSchema": "public"
+        },
+        "payment_status": {
+          "name": "payment_status",
+          "notNull": true,
+          "primaryKey": false,
+          "type": "payment_status",
+          "typeSchema": "public"
+        },
+        "shipping_address_id": {
+          "name": "shipping_address_id",
+          "notNull": true,
+          "primaryKey": false,
+          "type": "uuid"
+        },
+        "shipping_fee": {
+          "name": "shipping_fee",
+          "notNull": true,
+          "primaryKey": false,
+          "type": "numeric(10, 2)"
+        },
+        "status": {
+          "name": "status",
+          "notNull": true,
+          "primaryKey": false,
+          "type": "order_status",
+          "typeSchema": "public"
+        },
+        "total_price": {
+          "name": "total_price",
+          "notNull": true,
+          "primaryKey": false,
+          "type": "numeric(10, 2)"
+        },
+        "updated_at": {
+          "name": "updated_at",
+          "notNull": false,
+          "primaryKey": false,
+          "type": "timestamp"
+        },
+        "user_id": {
+          "name": "user_id",
+          "notNull": true,
+          "primaryKey": false,
+          "type": "uuid"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "foreignKeys": {
+        "orders_billing_address_id_addresses_id_fk": {
+          "columnsFrom": ["billing_address_id"],
+          "columnsTo": ["id"],
+          "name": "orders_billing_address_id_addresses_id_fk",
+          "onDelete": "no action",
+          "onUpdate": "no action",
+          "tableFrom": "orders",
+          "tableTo": "addresses"
+        },
+        "orders_shipping_address_id_addresses_id_fk": {
+          "columnsFrom": ["shipping_address_id"],
+          "columnsTo": ["id"],
+          "name": "orders_shipping_address_id_addresses_id_fk",
+          "onDelete": "no action",
+          "onUpdate": "no action",
+          "tableFrom": "orders",
+          "tableTo": "addresses"
+        },
+        "orders_user_id_users_id_fk": {
+          "columnsFrom": ["user_id"],
+          "columnsTo": ["id"],
+          "name": "orders_user_id_users_id_fk",
+          "onDelete": "no action",
+          "onUpdate": "no action",
+          "tableFrom": "orders",
+          "tableTo": "users"
+        }
+      },
+      "indexes": {},
+      "isRLSEnabled": false,
+      "name": "orders",
+      "policies": {},
+      "schema": "",
+      "uniqueConstraints": {}
+    },
+    "public.product_reviews": {
+      "checkConstraints": {},
+      "columns": {
+        "body": {
+          "name": "body",
+          "notNull": false,
+          "primaryKey": false,
+          "type": "text"
+        },
+        "created_at": {
+          "default": "now()",
+          "name": "created_at",
+          "notNull": true,
+          "primaryKey": false,
+          "type": "timestamp"
+        },
+        "deleted_at": {
+          "name": "deleted_at",
+          "notNull": false,
+          "primaryKey": false,
+          "type": "timestamp"
+        },
+        "id": {
+          "default": "gen_random_uuid()",
+          "name": "id",
+          "notNull": true,
+          "primaryKey": true,
+          "type": "uuid"
+        },
+        "product_id": {
+          "name": "product_id",
+          "notNull": true,
+          "primaryKey": false,
+          "type": "uuid"
+        },
+        "rating": {
+          "name": "rating",
+          "notNull": true,
+          "primaryKey": false,
+          "type": "smallint"
+        },
+        "updated_at": {
+          "name": "updated_at",
+          "notNull": false,
+          "primaryKey": false,
+          "type": "timestamp"
+        },
+        "user_id": {
+          "name": "user_id",
+          "notNull": true,
+          "primaryKey": false,
+          "type": "uuid"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "foreignKeys": {
+        "product_reviews_product_id_products_id_fk": {
+          "columnsFrom": ["product_id"],
+          "columnsTo": ["id"],
+          "name": "product_reviews_product_id_products_id_fk",
+          "onDelete": "no action",
+          "onUpdate": "no action",
+          "tableFrom": "product_reviews",
+          "tableTo": "products"
+        },
+        "product_reviews_user_id_users_id_fk": {
+          "columnsFrom": ["user_id"],
+          "columnsTo": ["id"],
+          "name": "product_reviews_user_id_users_id_fk",
+          "onDelete": "no action",
+          "onUpdate": "no action",
+          "tableFrom": "product_reviews",
+          "tableTo": "users"
+        }
+      },
+      "indexes": {},
+      "isRLSEnabled": false,
+      "name": "product_reviews",
+      "policies": {},
+      "schema": "",
+      "uniqueConstraints": {}
+    },
+    "public.product_wines": {
+      "checkConstraints": {},
+      "columns": {
+        "id": {
+          "default": "gen_random_uuid()",
+          "name": "id",
+          "notNull": true,
+          "primaryKey": true,
+          "type": "uuid"
+        },
+        "product_id": {
+          "name": "product_id",
+          "notNull": true,
+          "primaryKey": false,
+          "type": "uuid"
+        },
+        "quantity": {
+          "name": "quantity",
+          "notNull": true,
+          "primaryKey": false,
+          "type": "smallint"
+        },
+        "wine_id": {
+          "name": "wine_id",
+          "notNull": true,
+          "primaryKey": false,
+          "type": "uuid"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "foreignKeys": {
+        "product_wines_product_id_products_id_fk": {
+          "columnsFrom": ["product_id"],
+          "columnsTo": ["id"],
+          "name": "product_wines_product_id_products_id_fk",
+          "onDelete": "no action",
+          "onUpdate": "no action",
+          "tableFrom": "product_wines",
+          "tableTo": "products"
+        },
+        "product_wines_wine_id_wines_id_fk": {
+          "columnsFrom": ["wine_id"],
+          "columnsTo": ["id"],
+          "name": "product_wines_wine_id_wines_id_fk",
+          "onDelete": "no action",
+          "onUpdate": "no action",
+          "tableFrom": "product_wines",
+          "tableTo": "wines"
+        }
+      },
+      "indexes": {},
+      "isRLSEnabled": false,
+      "name": "product_wines",
+      "policies": {},
+      "schema": "",
+      "uniqueConstraints": {}
+    },
+    "public.products": {
+      "checkConstraints": {},
+      "columns": {
+        "created_at": {
+          "default": "now()",
+          "name": "created_at",
+          "notNull": true,
+          "primaryKey": false,
+          "type": "timestamp"
+        },
+        "deleted_at": {
+          "name": "deleted_at",
+          "notNull": false,
+          "primaryKey": false,
+          "type": "timestamp"
+        },
+        "description": {
+          "name": "description",
+          "notNull": false,
+          "primaryKey": false,
+          "type": "text"
+        },
+        "id": {
+          "default": "gen_random_uuid()",
+          "name": "id",
+          "notNull": true,
+          "primaryKey": true,
+          "type": "uuid"
+        },
+        "is_bundle": {
+          "default": false,
+          "name": "is_bundle",
+          "notNull": true,
+          "primaryKey": false,
+          "type": "boolean"
+        },
+        "name": {
+          "name": "name",
+          "notNull": true,
+          "primaryKey": false,
+          "type": "varchar(255)"
+        },
+        "price": {
+          "name": "price",
+          "notNull": true,
+          "primaryKey": false,
+          "type": "numeric(10, 2)"
+        },
+        "quantity": {
+          "name": "quantity",
+          "notNull": true,
+          "primaryKey": false,
+          "type": "smallint"
+        },
+        "shop_id": {
+          "name": "shop_id",
+          "notNull": true,
+          "primaryKey": false,
+          "type": "uuid"
+        },
+        "updated_at": {
+          "name": "updated_at",
+          "notNull": false,
+          "primaryKey": false,
+          "type": "timestamp"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "foreignKeys": {
+        "products_shop_id_shops_id_fk": {
+          "columnsFrom": ["shop_id"],
+          "columnsTo": ["id"],
+          "name": "products_shop_id_shops_id_fk",
+          "onDelete": "no action",
+          "onUpdate": "no action",
+          "tableFrom": "products",
+          "tableTo": "shops"
+        }
+      },
+      "indexes": {},
+      "isRLSEnabled": false,
+      "name": "products",
+      "policies": {},
+      "schema": "",
+      "uniqueConstraints": {}
+    },
+    "public.role_requests": {
+      "checkConstraints": {},
+      "columns": {
+        "business_name": {
+          "name": "business_name",
+          "notNull": true,
+          "primaryKey": false,
+          "type": "varchar(255)"
+        },
+        "details": {
+          "name": "details",
+          "notNull": false,
+          "primaryKey": false,
+          "type": "text"
+        },
+        "id": {
+          "default": "gen_random_uuid()",
+          "name": "id",
+          "notNull": true,
+          "primaryKey": true,
+          "type": "uuid"
+        },
+        "requested_role": {
+          "name": "requested_role",
+          "notNull": true,
+          "primaryKey": false,
+          "type": "role_request_type",
+          "typeSchema": "public"
+        },
+        "reviewed_at": {
+          "name": "reviewed_at",
+          "notNull": false,
+          "primaryKey": false,
+          "type": "timestamp"
+        },
+        "reviewed_by_admin_id": {
+          "name": "reviewed_by_admin_id",
+          "notNull": false,
+          "primaryKey": false,
+          "type": "uuid"
+        },
+        "status": {
+          "default": "'pending'",
+          "name": "status",
+          "notNull": true,
+          "primaryKey": false,
+          "type": "role_request_status",
+          "typeSchema": "public"
+        },
+        "submitted_at": {
+          "default": "now()",
+          "name": "submitted_at",
+          "notNull": true,
+          "primaryKey": false,
+          "type": "timestamp"
+        },
+        "user_id": {
+          "name": "user_id",
+          "notNull": true,
+          "primaryKey": false,
+          "type": "uuid"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "foreignKeys": {
+        "role_requests_reviewed_by_admin_id_users_id_fk": {
+          "columnsFrom": ["reviewed_by_admin_id"],
+          "columnsTo": ["id"],
+          "name": "role_requests_reviewed_by_admin_id_users_id_fk",
+          "onDelete": "no action",
+          "onUpdate": "no action",
+          "tableFrom": "role_requests",
+          "tableTo": "users"
+        },
+        "role_requests_user_id_users_id_fk": {
+          "columnsFrom": ["user_id"],
+          "columnsTo": ["id"],
+          "name": "role_requests_user_id_users_id_fk",
+          "onDelete": "no action",
+          "onUpdate": "no action",
+          "tableFrom": "role_requests",
+          "tableTo": "users"
+        }
+      },
+      "indexes": {},
+      "isRLSEnabled": false,
+      "name": "role_requests",
+      "policies": {},
+      "schema": "",
+      "uniqueConstraints": {}
+    },
+    "public.shops": {
+      "checkConstraints": {},
+      "columns": {
+        "address_id": {
+          "name": "address_id",
+          "notNull": true,
+          "primaryKey": false,
+          "type": "uuid"
+        },
+        "created_at": {
+          "default": "now()",
+          "name": "created_at",
+          "notNull": true,
+          "primaryKey": false,
+          "type": "timestamp"
+        },
+        "deleted_at": {
+          "name": "deleted_at",
+          "notNull": false,
+          "primaryKey": false,
+          "type": "timestamp"
+        },
+        "description": {
+          "name": "description",
+          "notNull": true,
+          "primaryKey": false,
+          "type": "text"
+        },
+        "id": {
+          "default": "gen_random_uuid()",
+          "name": "id",
+          "notNull": true,
+          "primaryKey": true,
+          "type": "uuid"
+        },
+        "name": {
+          "name": "name",
+          "notNull": true,
+          "primaryKey": false,
+          "type": "varchar(255)"
+        },
+        "owner_user_id": {
+          "name": "owner_user_id",
+          "notNull": true,
+          "primaryKey": false,
+          "type": "uuid"
+        },
+        "updated_at": {
+          "name": "updated_at",
+          "notNull": false,
+          "primaryKey": false,
+          "type": "timestamp"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "foreignKeys": {
+        "shops_address_id_addresses_id_fk": {
+          "columnsFrom": ["address_id"],
+          "columnsTo": ["id"],
+          "name": "shops_address_id_addresses_id_fk",
+          "onDelete": "no action",
+          "onUpdate": "no action",
+          "tableFrom": "shops",
+          "tableTo": "addresses"
+        },
+        "shops_owner_user_id_users_id_fk": {
+          "columnsFrom": ["owner_user_id"],
+          "columnsTo": ["id"],
+          "name": "shops_owner_user_id_users_id_fk",
+          "onDelete": "no action",
+          "onUpdate": "no action",
+          "tableFrom": "shops",
+          "tableTo": "users"
+        }
+      },
+      "indexes": {},
+      "isRLSEnabled": false,
+      "name": "shops",
+      "policies": {},
+      "schema": "",
+      "uniqueConstraints": {}
+    },
+    "public.users": {
+      "checkConstraints": {},
+      "columns": {
+        "billing_address_id": {
+          "name": "billing_address_id",
+          "notNull": false,
+          "primaryKey": false,
+          "type": "uuid"
+        },
+        "clerk_id": {
+          "name": "clerk_id",
+          "notNull": true,
+          "primaryKey": false,
+          "type": "text"
+        },
+        "created_at": {
+          "default": "now()",
+          "name": "created_at",
+          "notNull": true,
+          "primaryKey": false,
+          "type": "timestamp"
+        },
+        "deleted_at": {
+          "name": "deleted_at",
+          "notNull": false,
+          "primaryKey": false,
+          "type": "timestamp"
+        },
+        "email": {
+          "name": "email",
+          "notNull": true,
+          "primaryKey": false,
+          "type": "text"
+        },
+        "fname": {
+          "name": "fname",
+          "notNull": true,
+          "primaryKey": false,
+          "type": "varchar(30)"
+        },
+        "id": {
+          "default": "gen_random_uuid()",
+          "name": "id",
+          "notNull": true,
+          "primaryKey": true,
+          "type": "uuid"
+        },
+        "lname": {
+          "name": "lname",
+          "notNull": true,
+          "primaryKey": false,
+          "type": "varchar(30)"
+        },
+        "role": {
+          "default": "'user'",
+          "name": "role",
+          "notNull": true,
+          "primaryKey": false,
+          "type": "user_role",
+          "typeSchema": "public"
+        },
+        "shipping_address_id": {
+          "name": "shipping_address_id",
+          "notNull": false,
+          "primaryKey": false,
+          "type": "uuid"
+        },
+        "updated_at": {
+          "name": "updated_at",
+          "notNull": false,
+          "primaryKey": false,
+          "type": "timestamp"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "foreignKeys": {
+        "users_billing_address_id_addresses_id_fk": {
+          "columnsFrom": ["billing_address_id"],
+          "columnsTo": ["id"],
+          "name": "users_billing_address_id_addresses_id_fk",
+          "onDelete": "no action",
+          "onUpdate": "no action",
+          "tableFrom": "users",
+          "tableTo": "addresses"
+        },
+        "users_shipping_address_id_addresses_id_fk": {
+          "columnsFrom": ["shipping_address_id"],
+          "columnsTo": ["id"],
+          "name": "users_shipping_address_id_addresses_id_fk",
+          "onDelete": "no action",
+          "onUpdate": "no action",
+          "tableFrom": "users",
+          "tableTo": "addresses"
+        }
+      },
+      "indexes": {},
+      "isRLSEnabled": false,
+      "name": "users",
+      "policies": {},
+      "schema": "",
+      "uniqueConstraints": {
+        "users_clerk_id_unique": {
+          "columns": ["clerk_id"],
+          "name": "users_clerk_id_unique",
+          "nullsNotDistinct": false
+        },
+        "users_email_unique": {
+          "columns": ["email"],
+          "name": "users_email_unique",
+          "nullsNotDistinct": false
+        }
+      }
+    },
+    "public.winemaker_reviews": {
+      "checkConstraints": {},
+      "columns": {
+        "body": {
+          "name": "body",
+          "notNull": false,
+          "primaryKey": false,
+          "type": "text"
+        },
+        "created_at": {
+          "default": "now()",
+          "name": "created_at",
+          "notNull": true,
+          "primaryKey": false,
+          "type": "timestamp"
+        },
+        "deleted_at": {
+          "name": "deleted_at",
+          "notNull": false,
+          "primaryKey": false,
+          "type": "timestamp"
+        },
+        "id": {
+          "default": "gen_random_uuid()",
+          "name": "id",
+          "notNull": true,
+          "primaryKey": true,
+          "type": "uuid"
+        },
+        "rating": {
+          "name": "rating",
+          "notNull": true,
+          "primaryKey": false,
+          "type": "smallint"
+        },
+        "updated_at": {
+          "name": "updated_at",
+          "notNull": false,
+          "primaryKey": false,
+          "type": "timestamp"
+        },
+        "user_id": {
+          "name": "user_id",
+          "notNull": true,
+          "primaryKey": false,
+          "type": "uuid"
+        },
+        "winemaker_id": {
+          "name": "winemaker_id",
+          "notNull": true,
+          "primaryKey": false,
+          "type": "uuid"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "foreignKeys": {
+        "winemaker_reviews_user_id_users_id_fk": {
+          "columnsFrom": ["user_id"],
+          "columnsTo": ["id"],
+          "name": "winemaker_reviews_user_id_users_id_fk",
+          "onDelete": "no action",
+          "onUpdate": "no action",
+          "tableFrom": "winemaker_reviews",
+          "tableTo": "users"
+        },
+        "winemaker_reviews_winemaker_id_winemakers_id_fk": {
+          "columnsFrom": ["winemaker_id"],
+          "columnsTo": ["id"],
+          "name": "winemaker_reviews_winemaker_id_winemakers_id_fk",
+          "onDelete": "no action",
+          "onUpdate": "no action",
+          "tableFrom": "winemaker_reviews",
+          "tableTo": "winemakers"
+        }
+      },
+      "indexes": {},
+      "isRLSEnabled": false,
+      "name": "winemaker_reviews",
+      "policies": {},
+      "schema": "",
+      "uniqueConstraints": {}
+    },
+    "public.winemakers": {
+      "checkConstraints": {},
+      "columns": {
+        "address_id": {
+          "name": "address_id",
+          "notNull": true,
+          "primaryKey": false,
+          "type": "uuid"
+        },
+        "created_at": {
+          "default": "now()",
+          "name": "created_at",
+          "notNull": true,
+          "primaryKey": false,
+          "type": "timestamp"
+        },
+        "deleted_at": {
+          "name": "deleted_at",
+          "notNull": false,
+          "primaryKey": false,
+          "type": "timestamp"
+        },
+        "description": {
+          "name": "description",
+          "notNull": true,
+          "primaryKey": false,
+          "type": "text"
+        },
+        "email": {
+          "name": "email",
+          "notNull": true,
+          "primaryKey": false,
+          "type": "varchar(255)"
+        },
+        "id": {
+          "default": "gen_random_uuid()",
+          "name": "id",
+          "notNull": true,
+          "primaryKey": true,
+          "type": "uuid"
+        },
+        "name": {
+          "name": "name",
+          "notNull": true,
+          "primaryKey": false,
+          "type": "text"
+        },
+        "phone": {
+          "name": "phone",
+          "notNull": true,
+          "primaryKey": false,
+          "type": "varchar(30)"
+        },
+        "updated_at": {
+          "name": "updated_at",
+          "notNull": false,
+          "primaryKey": false,
+          "type": "timestamp"
+        },
+        "user_id": {
+          "name": "user_id",
+          "notNull": true,
+          "primaryKey": false,
+          "type": "uuid"
+        },
+        "websiteurl": {
+          "name": "websiteurl",
+          "notNull": false,
+          "primaryKey": false,
+          "type": "text"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "foreignKeys": {
+        "winemakers_address_id_addresses_id_fk": {
+          "columnsFrom": ["address_id"],
+          "columnsTo": ["id"],
+          "name": "winemakers_address_id_addresses_id_fk",
+          "onDelete": "no action",
+          "onUpdate": "no action",
+          "tableFrom": "winemakers",
+          "tableTo": "addresses"
+        },
+        "winemakers_user_id_users_id_fk": {
+          "columnsFrom": ["user_id"],
+          "columnsTo": ["id"],
+          "name": "winemakers_user_id_users_id_fk",
+          "onDelete": "no action",
+          "onUpdate": "no action",
+          "tableFrom": "winemakers",
+          "tableTo": "users"
+        }
+      },
+      "indexes": {},
+      "isRLSEnabled": false,
+      "name": "winemakers",
+      "policies": {},
+      "schema": "",
+      "uniqueConstraints": {
+        "winemakers_name_unique": {
+          "columns": ["name"],
+          "name": "winemakers_name_unique",
+          "nullsNotDistinct": false
+        },
+        "winemakers_user_id_unique": {
+          "columns": ["user_id"],
+          "name": "winemakers_user_id_unique",
+          "nullsNotDistinct": false
+        }
+      }
+    },
+    "public.wines": {
+      "checkConstraints": {},
+      "columns": {
+        "alcohol_content": {
+          "name": "alcohol_content",
+          "notNull": true,
+          "primaryKey": false,
+          "type": "numeric(4, 2)"
+        },
+        "attribution": {
+          "name": "attribution",
+          "notNull": true,
+          "primaryKey": false,
+          "type": "text"
+        },
+        "color": {
+          "name": "color",
+          "notNull": true,
+          "primaryKey": false,
+          "type": "wine_color",
+          "typeSchema": "public"
+        },
+        "composition": {
+          "name": "composition",
+          "notNull": true,
+          "primaryKey": false,
+          "type": "text"
+        },
+        "created_at": {
+          "default": "now()",
+          "name": "created_at",
+          "notNull": true,
+          "primaryKey": false,
+          "type": "timestamp with time zone"
+        },
+        "deleted_at": {
+          "name": "deleted_at",
+          "notNull": false,
+          "primaryKey": false,
+          "type": "timestamp with time zone"
+        },
+        "description": {
+          "name": "description",
+          "notNull": true,
+          "primaryKey": false,
+          "type": "text"
+        },
+        "id": {
+          "default": "gen_random_uuid()",
+          "name": "id",
+          "notNull": true,
+          "primaryKey": true,
+          "type": "uuid"
+        },
+        "name": {
+          "name": "name",
+          "notNull": true,
+          "primaryKey": false,
+          "type": "varchar(255)"
+        },
+        "quantity": {
+          "name": "quantity",
+          "notNull": true,
+          "primaryKey": false,
+          "type": "smallint"
+        },
+        "type": {
+          "name": "type",
+          "notNull": true,
+          "primaryKey": false,
+          "type": "wine_type",
+          "typeSchema": "public"
+        },
+        "updated_at": {
+          "default": "now()",
+          "name": "updated_at",
+          "notNull": true,
+          "primaryKey": false,
+          "type": "timestamp with time zone"
+        },
+        "vintage_year": {
+          "name": "vintage_year",
+          "notNull": true,
+          "primaryKey": false,
+          "type": "smallint"
+        },
+        "volume_ml": {
+          "name": "volume_ml",
+          "notNull": true,
+          "primaryKey": false,
+          "type": "smallint"
+        },
+        "winemaker_id": {
+          "name": "winemaker_id",
+          "notNull": true,
+          "primaryKey": false,
+          "type": "uuid"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "foreignKeys": {
+        "wines_winemaker_id_winemakers_id_fk": {
+          "columnsFrom": ["winemaker_id"],
+          "columnsTo": ["id"],
+          "name": "wines_winemaker_id_winemakers_id_fk",
+          "onDelete": "no action",
+          "onUpdate": "no action",
+          "tableFrom": "wines",
+          "tableTo": "winemakers"
+        }
+      },
+      "indexes": {},
+      "isRLSEnabled": false,
+      "name": "wines",
+      "policies": {},
+      "schema": "",
+      "uniqueConstraints": {}
+    }
+  },
+  "version": "7",
+  "views": {}
 }

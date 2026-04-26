@@ -5,12 +5,12 @@ import { Card, CardContent } from "@/components/ui/card";
 export function ShopOwnerEvents() {
   const shopEvents = [
     {
-      id: 1,
-      title: "Chateau Margaux Masterclass",
-      date: "Fri, May 22",
-      time: "7:00 PM - 9:00 PM",
       capacity: "12 / 20 registered",
+      date: "Fri, May 22",
       desc: "An exclusive guided tasting of recent arrivals hosted at our central Paris location.",
+      id: 1,
+      time: "7:00 PM - 9:00 PM",
+      title: "Chateau Margaux Masterclass",
     },
   ];
 
@@ -35,8 +35,8 @@ export function ShopOwnerEvents() {
           <div className="flex flex-col">
             {shopEvents.map((event) => (
               <div
-                key={event.id}
                 className="p-6 md:p-8 border-b border-border/50 last:border-0 flex justify-between items-start gap-4"
+                key={event.id}
               >
                 <div className="flex flex-col gap-3 w-full pr-4">
                   <h3 className="font-heading font-semibold text-[17px] text-primary">
@@ -58,9 +58,9 @@ export function ShopOwnerEvents() {
                   </p>
                 </div>
                 <Button
-                  variant="ghost"
-                  size="icon"
                   className="h-8 w-8 text-muted-foreground shrink-0 -mr-2"
+                  size="icon"
+                  variant="ghost"
                 >
                   <MoreHorizontal className="h-5 w-5" />
                 </Button>

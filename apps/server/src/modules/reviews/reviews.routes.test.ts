@@ -4,11 +4,11 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 // Mock the service
 vi.mock("./reviews.service", () => ({
   reviewsService: {
-    listProductReviews: vi.fn(),
-    listWinemakerReviews: vi.fn(),
     createProductReview: vi.fn(),
     createWinemakerReview: vi.fn(),
     deleteReview: vi.fn(),
+    listProductReviews: vi.fn(),
+    listWinemakerReviews: vi.fn(),
   },
 }));
 
@@ -21,7 +21,7 @@ describe("reviews.routes integration", () => {
 
   const app = new Elysia()
     .derive(() => ({
-      clerkPayload: { sub: "test", roles: ["user"] },
+      clerkPayload: { roles: ["user"], sub: "test" },
       dbUser: mockUser,
     }))
     .use(reviewsRoutes);
@@ -34,8 +34,8 @@ describe("reviews.routes integration", () => {
   describe("GET /reviews/product/:id", () => {
     it("returns product reviews", async () => {
       vi.mocked(reviewsService.listProductReviews).mockResolvedValue({
-        reviews: [],
         averageRating: 5,
+        reviews: [],
       });
       const res = await app.handle(new Request("http://localhost/reviews/product/p1"));
       expect(res.status).toBe(200);
