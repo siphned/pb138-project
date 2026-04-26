@@ -1,4 +1,4 @@
-import { and, eq } from "drizzle-orm";
+import { and, eq, isNull } from "drizzle-orm";
 import { db } from "../../db";
 import type { SupplyAgreement } from "../../db/schema";
 import { supplyAgreements } from "../../db/schema";
@@ -6,7 +6,7 @@ import { supplyAgreements } from "../../db/schema";
 export const supplyAgreementsRepository = {
   findById(id: string): Promise<SupplyAgreement | undefined> {
     return db.query.supplyAgreements.findFirst({
-      where: eq(supplyAgreements.id, id),
+      where: and(eq(supplyAgreements.id, id), isNull(supplyAgreements.deletedAt)),
     });
   },
 
@@ -17,17 +17,26 @@ export const supplyAgreementsRepository = {
     return db.query.supplyAgreements.findFirst({
       where: and(
         eq(supplyAgreements.shopId, shopId),
-        eq(supplyAgreements.winemakerId, winemakerId)
+        eq(supplyAgreements.winemakerId, winemakerId),
+        isNull(supplyAgreements.deletedAt)
       ),
     });
   },
 
   listForShop(shopId: string): Promise<SupplyAgreement[]> {
-    return db.select().from(supplyAgreements).where(eq(supplyAgreements.shopId, shopId));
+    return db
+      .select()
+      .from(supplyAgreements)
+      .where(and(eq(supplyAgreements.shopId, shopId), isNull(supplyAgreements.deletedAt)));
   },
 
   listForWinemaker(winemakerId: string): Promise<SupplyAgreement[]> {
-    return db.select().from(supplyAgreements).where(eq(supplyAgreements.winemakerId, winemakerId));
+    return db
+      .select()
+      .from(supplyAgreements)
+      .where(
+        and(eq(supplyAgreements.winemakerId, winemakerId), isNull(supplyAgreements.deletedAt))
+      );
   },
 
   async create(data: { shopId: string; winemakerId: string }): Promise<SupplyAgreement> {

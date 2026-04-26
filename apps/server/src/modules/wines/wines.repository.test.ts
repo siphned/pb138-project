@@ -60,14 +60,34 @@ describe("winesRepository", () => {
 
       expect(db.query.wines.findMany).toHaveBeenCalled();
     });
+
+    it("filters out deleted winemakers in-memory", async () => {
+      const mockRows = [
+        { id: "w1", winemaker: { id: "wm1", deletedAt: null } },
+        { id: "w2", winemaker: { id: "wm2", deletedAt: new Date() } },
+      ];
+      vi.mocked(db.query.wines.findMany).mockResolvedValue(mockRows as never);
+
+      const result = await winesRepository.findAll({});
+
+      expect(result).toHaveLength(1);
+      expect(result[0]!.id).toBe("w1");
+    });
   });
 
   describe("findById", () => {
-    it("delegates to db.query", async () => {
-      const mockWine = { id: "w1" };
+    it("delegates to db.query and filters deleted winemaker", async () => {
+      const mockWine = { id: "w1", winemaker: { id: "wm1", deletedAt: null } };
       vi.mocked(db.query.wines.findFirst).mockResolvedValue(mockWine as never);
       const result = await winesRepository.findById("w1");
-      expect(result).toBe(mockWine);
+      expect(result?.id).toBe("w1");
+    });
+
+    it("returns undefined if winemaker is deleted", async () => {
+      const mockWine = { id: "w1", winemaker: { id: "wm1", deletedAt: new Date() } };
+      vi.mocked(db.query.wines.findFirst).mockResolvedValue(mockWine as never);
+      const result = await winesRepository.findById("w1");
+      expect(result).toBeUndefined();
     });
   });
 
