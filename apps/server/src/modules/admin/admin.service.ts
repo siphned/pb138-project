@@ -1,3 +1,5 @@
+import { emailService } from "../email";
+import { winemakersRepository } from "../winemakers/winemakers.repository";
 import type { AdminEventRow, AdminReviewRow, AdminUserRow } from "./admin.repository";
 import { adminRepository } from "./admin.repository";
 
@@ -10,6 +12,23 @@ export const adminService = {
     await adminRepository.setEventStatus(eventId, "approved");
     const updated = await adminRepository.findEventWithDetailsById(eventId);
     if (!updated) throw new Error("NOT_FOUND");
+
+    // Notify winemaker
+    const winemaker = await winemakersRepository.findById(updated.winemakerId);
+    if (winemaker?.email) {
+      await emailService
+        .sendEventApproval(winemaker.email, {
+          endTime: updated.endTime,
+          eventName: updated.name,
+          startTime: updated.startTime,
+          winemakerName: winemaker.name,
+        })
+        // biome-ignore lint/suspicious/noExplicitAny: error handling
+        .catch((_err: any) => {
+          // Silently fail email
+        });
+    }
+
     return updated;
   },
 
