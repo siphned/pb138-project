@@ -1,213 +1,172 @@
 import { Elysia, status, t } from "elysia";
 import { authPlugin } from "../auth";
-import { adminEventResponse, adminReviewResponse, adminUserResponse } from "./admin.schema";
+import {
+  adminEventSchema,
+  adminUserSchema,
+  paginatedEventsSchema,
+  paginatedReviewsSchema,
+  paginatedUsersSchema,
+  updateEventStatusBody,
+  updateUserStatusBody,
+} from "./admin.schema";
 import { adminService } from "./admin.service";
 
-export const createAdminRoutes = (auth = authPlugin) => {
-  return (
-    new Elysia({ prefix: "/admin", tags: ["admin"] })
-      .use(auth)
-      // User Management
-      .get(
-        "/users",
-        (async ({ query }: { query: Record<string, string | undefined> }) => {
-          const { limit, offset, status, role } = query;
-          return await adminService.listUsers(
-            {
-              role: role as "user" | "admin" | undefined,
-              status: status as "active" | "suspended" | "banned" | undefined,
-            },
-            {
-              limit: limit ? Number(limit) : undefined,
-              offset: offset ? Number(offset) : undefined,
-            }
-          );
-        }) as never,
-        {
-          detail: {
-            security: [{ bearerAuth: [] }],
-            summary: "List and filter users",
-          },
-          query: t.Object({
-            limit: t.Optional(t.String()),
-            offset: t.Optional(t.String()),
-            role: t.Optional(t.String()),
-            status: t.Optional(t.String()),
-          }),
-          requireRoles: ["admin"],
-          response: {
-            200: t.Object({
-              data: t.Array(adminUserResponse),
-              total: t.Number(),
-            }),
-          },
-        }
-      )
+function handleError(e: unknown) {
+  if (e instanceof Error) {
+    if (e.message === "NOT_FOUND") return status(404, "Not found");
+    if (e.message === "CONFLICT") return status(409, "Conflict");
+  }
+  throw e;
+}
 
-      .patch(
-        "/users/:id/status",
-        (async ({
-          params,
-          body,
-        }: {
-          params: { id: string };
-          body: { status: "active" | "suspended" | "banned" };
-        }) => {
-          try {
-            return await adminService.setUserStatus(params.id, body.status);
-          } catch (e: unknown) {
-            if (e instanceof Error && e.message === "NOT_FOUND")
-              return status(404, "User not found");
-            throw e;
-          }
-        }) as never,
-        {
-          body: t.Object({
-            status: t.Union([t.Literal("active"), t.Literal("suspended"), t.Literal("banned")]),
-          }),
-          detail: {
-            security: [{ bearerAuth: [] }],
-            summary: "Update user status",
-          },
-          params: t.Object({ id: t.String() }),
-          requireRoles: ["admin"],
-          response: { 200: adminUserResponse, 404: t.String() },
-        }
-      )
+export const adminRoutes = new Elysia({ prefix: "/admin" })
+  .use(authPlugin)
 
-      // Content Moderation - Events
-      .get(
-        "/events",
-        (async ({ query }: { query: Record<string, string | undefined> }) => {
-          const { limit, offset, status = "pending" } = query;
-          return await adminService.listEvents(
-            { status: status as "pending" | "approved" | "rejected" },
-            {
-              limit: limit ? Number(limit) : undefined,
-              offset: offset ? Number(offset) : undefined,
-            }
-          );
-        }) as never,
-        {
-          detail: {
-            security: [{ bearerAuth: [] }],
-            summary: "List events for moderation",
-          },
-          query: t.Object({
-            limit: t.Optional(t.String()),
-            offset: t.Optional(t.String()),
-            status: t.Optional(t.String()),
-          }),
-          requireRoles: ["admin"],
-          response: {
-            200: t.Object({
-              data: t.Array(adminEventResponse),
-              total: t.Number(),
-            }),
-          },
-        }
-      )
+  .get(
+    "/users",
+    async ({ query }) => {
+      const { page, limit, status: userStatus } = query;
+      return adminService.listUsers({ status: userStatus }, { page, limit });
+    },
+    {
+      requireRole: "admin",
+      query: t.Object({
+        page: t.Optional(t.Number({ minimum: 1 })),
+        limit: t.Optional(t.Number({ minimum: 1, maximum: 100 })),
+        status: t.Optional(
+          t.Union([t.Literal("active"), t.Literal("suspended"), t.Literal("banned")])
+        ),
+      }),
+      response: { 200: paginatedUsersSchema },
+      detail: {
+        tags: ["admin"],
+        summary: "List all users",
+        description:
+          "Admin-only. Returns a paginated list of all non-deleted users. Filter by status.",
+        security: [{ bearerAuth: [] }],
+      },
+    }
+  )
 
-      .patch(
-        "/events/:id/approve",
-        (async ({ params }: { params: { id: string } }) => {
-          try {
-            return await adminService.approveEvent(params.id);
-          } catch (e: unknown) {
-            if (e instanceof Error) {
-              if (e.message === "NOT_FOUND") return status(404, "Event not found");
-              if (e.message === "NOT_PENDING") return status(400, "Event is not pending");
-            }
-            throw e;
-          }
-        }) as never,
-        {
-          detail: {
-            security: [{ bearerAuth: [] }],
-            summary: "Approve a pending event",
-          },
-          params: t.Object({ id: t.String() }),
-          requireRoles: ["admin"],
-          response: { 200: adminEventResponse, 400: t.String(), 404: t.String() },
-        }
-      )
+  .patch(
+    "/users/:id/status",
+    async ({ params, body }) => {
+      try {
+        return await adminService.changeUserStatus(params.id, body.status);
+      } catch (e: unknown) {
+        return handleError(e);
+      }
+    },
+    {
+      requireRole: "admin",
+      params: t.Object({ id: t.String() }),
+      body: updateUserStatusBody,
+      response: { 200: adminUserSchema, 404: t.String(), 409: t.String() },
+      detail: {
+        tags: ["admin"],
+        summary: "Update user status",
+        description: "Admin-only. Sets a user's status to active, suspended, or banned.",
+        security: [{ bearerAuth: [] }],
+      },
+    }
+  )
 
-      .patch(
-        "/events/:id/reject",
-        (async ({ params }: { params: { id: string } }) => {
-          try {
-            return await adminService.rejectEvent(params.id);
-          } catch (e: unknown) {
-            if (e instanceof Error) {
-              if (e.message === "NOT_FOUND") return status(404, "Event not found");
-              if (e.message === "NOT_PENDING") return status(400, "Event is not pending");
-            }
-            throw e;
-          }
-        }) as never,
-        {
-          detail: {
-            security: [{ bearerAuth: [] }],
-            summary: "Reject a pending event",
-          },
-          params: t.Object({ id: t.String() }),
-          requireRoles: ["admin"],
-          response: { 200: adminEventResponse, 400: t.String(), 404: t.String() },
-        }
-      )
+  .get(
+    "/events",
+    async ({ query }) => {
+      const { page, limit, status: eventStatus } = query;
+      return adminService.listEvents({ status: eventStatus }, { page, limit });
+    },
+    {
+      requireRole: "admin",
+      query: t.Object({
+        page: t.Optional(t.Number({ minimum: 1 })),
+        limit: t.Optional(t.Number({ minimum: 1, maximum: 100 })),
+        status: t.Optional(
+          t.Union([t.Literal("pending"), t.Literal("approved"), t.Literal("rejected")])
+        ),
+      }),
+      response: { 200: paginatedEventsSchema },
+      detail: {
+        tags: ["admin"],
+        summary: "List events by status",
+        description:
+          "Admin-only. Returns paginated events. Defaults to pending events requiring moderation.",
+        security: [{ bearerAuth: [] }],
+      },
+    }
+  )
 
-      // Content Moderation - Reviews
-      .get(
-        "/reviews",
-        (async ({ query }: { query: Record<string, string | undefined> }) => {
-          const { limit, offset } = query;
-          return await adminService.listAllReviews({
-            limit: limit ? Number(limit) : undefined,
-            offset: offset ? Number(offset) : undefined,
-          });
-        }) as never,
-        {
-          detail: {
-            security: [{ bearerAuth: [] }],
-            summary: "List all reviews for moderation",
-          },
-          query: t.Object({
-            limit: t.Optional(t.String()),
-            offset: t.Optional(t.String()),
-          }),
-          requireRoles: ["admin"],
-          response: {
-            200: t.Object({
-              data: t.Array(adminReviewResponse),
-              total: t.Number(),
-            }),
-          },
-        }
-      )
+  .patch(
+    "/events/:id/status",
+    async ({ params, body }) => {
+      try {
+        return await adminService.setEventStatus(params.id, body.status);
+      } catch (e: unknown) {
+        return handleError(e);
+      }
+    },
+    {
+      requireRole: "admin",
+      params: t.Object({ id: t.String() }),
+      body: updateEventStatusBody,
+      response: { 200: adminEventSchema, 404: t.String(), 409: t.String() },
+      detail: {
+        tags: ["admin"],
+        summary: "Approve or reject an event",
+        description:
+          "Admin-only. Transitions a pending event to approved or rejected. Returns 409 if event is not pending.",
+        security: [{ bearerAuth: [] }],
+      },
+    }
+  )
 
-      .delete(
-        "/reviews/:id",
-        (async ({ params }: { params: { id: string } }) => {
-          try {
-            await adminService.deleteReview(params.id);
-            return { success: true };
-          } catch (e: unknown) {
-            if (e instanceof Error && e.message === "NOT_FOUND")
-              return status(404, "Review not found");
-            throw e;
-          }
-        }) as never,
-        {
-          detail: {
-            security: [{ bearerAuth: [] }],
-            summary: "Soft-delete a review",
-          },
-          params: t.Object({ id: t.String() }),
-          requireRoles: ["admin"],
-          response: { 200: t.Object({ success: t.Boolean() }), 404: t.String() },
-        }
-      )
+  .get(
+    "/reviews",
+    async ({ query }) => {
+      const { page, limit } = query;
+      return adminService.listReviews({ page, limit });
+    },
+    {
+      requireRole: "admin",
+      query: t.Object({
+        page: t.Optional(t.Number({ minimum: 1 })),
+        limit: t.Optional(t.Number({ minimum: 1, maximum: 100 })),
+      }),
+      response: { 200: paginatedReviewsSchema },
+      detail: {
+        tags: ["admin"],
+        summary: "List all reviews",
+        description:
+          "Admin-only. Returns all product and winemaker reviews combined, ordered by createdAt descending.",
+        security: [{ bearerAuth: [] }],
+      },
+    }
+  )
+
+  .delete(
+    "/reviews/:id",
+    async ({ params, query }) => {
+      try {
+        await adminService.deleteReview(params.id, query.type);
+        return status(204, null);
+      } catch (e: unknown) {
+        return handleError(e);
+      }
+    },
+    {
+      requireRole: "admin",
+      params: t.Object({ id: t.String() }),
+      query: t.Object({
+        type: t.Union([t.Literal("product"), t.Literal("winemaker")]),
+      }),
+      response: { 204: t.Null(), 404: t.String(), 409: t.String() },
+      detail: {
+        tags: ["admin"],
+        summary: "Delete a review",
+        description:
+          "Admin-only. Soft-deletes a product or winemaker review. Requires ?type=product|winemaker.",
+        security: [{ bearerAuth: [] }],
+      },
+    }
   );
-};
-
-export const adminRoutes = createAdminRoutes();
