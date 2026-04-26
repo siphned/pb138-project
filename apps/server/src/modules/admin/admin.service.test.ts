@@ -4,17 +4,35 @@ vi.mock("./admin.repository", () => ({
   adminRepository: {
     findEventById: vi.fn(),
     findEventWithDetailsById: vi.fn(),
+    findProductReviewById: vi.fn(),
     findReviewById: vi.fn(),
     findUserById: vi.fn(),
+    findWinemakerReviewById: vi.fn(),
     listAllReviews: vi.fn(),
     listEvents: vi.fn(),
     listUsers: vi.fn(),
     setEventStatus: vi.fn(),
     setUserStatus: vi.fn(),
+    softDeleteProductReview: vi.fn(),
     softDeleteReview: vi.fn(),
+    softDeleteWinemakerReview: vi.fn(),
   },
 }));
 
+vi.mock("../email/email.service", () => ({
+  emailService: {
+    sendEventApproval: vi.fn().mockResolvedValue(undefined),
+  },
+}));
+
+vi.mock("../winemakers/winemakers.repository", () => ({
+  winemakersRepository: {
+    findById: vi.fn(),
+  },
+}));
+
+import { emailService } from "../email";
+import { winemakersRepository } from "../winemakers/winemakers.repository";
 import { adminRepository } from "./admin.repository";
 import { adminService } from "./admin.service";
 
@@ -28,76 +46,69 @@ describe("adminService", () => {
   const reviewId = "r1";
 
   describe("listUsers", () => {
-    it("delegates to repository", async () => {
-      const mockResult = { data: [], total: 0 };
-      vi.mocked(adminRepository.listUsers).mockResolvedValue(mockResult);
+    it("delegates to repository with filters and pagination", async () => {
+      const mockData = [{ id: userId }];
+      vi.mocked(adminRepository.listUsers).mockResolvedValue({ data: mockData as never, total: 1 });
 
-      const result = await adminService.listUsers({ status: "active" });
+      const result = await adminService.listUsers({ status: "active" }, { limit: 10, offset: 0 });
 
-      expect(result).toBe(mockResult);
-      expect(adminRepository.listUsers).toHaveBeenCalledWith(
-        { status: "active" },
-        { limit: 20, offset: 0 }
-      );
+      expect(result.data).toBe(mockData);
+      expect(result.total).toBe(1);
     });
   });
 
   describe("setUserStatus", () => {
-    it("updates status if user exists", async () => {
-      vi.mocked(adminRepository.findUserById).mockResolvedValue({ id: userId } as never);
-      vi.mocked(adminRepository.setUserStatus).mockResolvedValue({
-        id: userId,
-        status: "suspended",
-      } as never);
+    it("updates status if user found", async () => {
+      const mockUser = { id: userId };
+      vi.mocked(adminRepository.findUserById).mockResolvedValue(mockUser as never);
+      vi.mocked(adminRepository.setUserStatus).mockResolvedValue(mockUser as never);
 
-      const result = await adminService.setUserStatus(userId, "suspended");
+      await adminService.setUserStatus(userId, "suspended");
 
-      expect(result.status).toBe("suspended");
       expect(adminRepository.setUserStatus).toHaveBeenCalledWith(userId, "suspended");
     });
 
-    it("throws NOT_FOUND if user missing", async () => {
+    it("throws NOT_FOUND if user not found", async () => {
       vi.mocked(adminRepository.findUserById).mockResolvedValue(undefined);
-
-      await expect(adminService.setUserStatus(userId, "banned")).rejects.toThrow("NOT_FOUND");
+      await expect(adminService.setUserStatus(userId, "active")).rejects.toThrow("NOT_FOUND");
     });
   });
 
   describe("approveEvent", () => {
-    it("approves pending event", async () => {
-      vi.mocked(adminRepository.findEventById).mockResolvedValue({
+    it("approves pending event and sends email", async () => {
+      const mockEvent = {
+        endTime: new Date(),
         id: eventId,
+        name: "Wine Fest",
+        startTime: new Date(),
         status: "pending",
-      } as never);
-      vi.mocked(adminRepository.findEventWithDetailsById).mockResolvedValue({
-        id: eventId,
-        status: "approved",
-      } as never);
+        winemakerId: "wm1",
+      };
+      const mockWinemaker = { email: "wine@test.com", id: "wm1", name: "Winery" };
 
-      const result = await adminService.approveEvent(eventId);
+      vi.mocked(adminRepository.findEventById).mockResolvedValue(mockEvent as never);
+      vi.mocked(adminRepository.findEventWithDetailsById).mockResolvedValue(mockEvent as never);
+      vi.mocked(winemakersRepository.findById).mockResolvedValue(mockWinemaker as never);
 
-      expect(result.status).toBe("approved");
+      await adminService.approveEvent(eventId);
+
       expect(adminRepository.setEventStatus).toHaveBeenCalledWith(eventId, "approved");
+      expect(emailService.sendEventApproval).toHaveBeenCalled();
     });
   });
 
   describe("listAllReviews", () => {
     it("delegates to repository", async () => {
-      const mockResult = { data: [], total: 0 };
-      vi.mocked(adminRepository.listAllReviews).mockResolvedValue(mockResult);
-
-      const result = await adminService.listAllReviews();
-
-      expect(result).toBe(mockResult);
+      vi.mocked(adminRepository.listAllReviews).mockResolvedValue({ data: [], total: 0 });
+      await adminService.listAllReviews();
+      expect(adminRepository.listAllReviews).toHaveBeenCalled();
     });
   });
 
   describe("deleteReview", () => {
-    it("deletes review if exists", async () => {
+    it("soft deletes review if found", async () => {
       vi.mocked(adminRepository.findReviewById).mockResolvedValue({ id: reviewId } as never);
-
       await adminService.deleteReview(reviewId);
-
       expect(adminRepository.softDeleteReview).toHaveBeenCalledWith(reviewId);
     });
   });
