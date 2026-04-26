@@ -45,7 +45,14 @@ describe("ordersService", () => {
           {
             productId: "p1",
             quantity: 2,
-            product: { id: "p1", shopId: "s1", price: "100", quantity: 10, name: "Wine" },
+            product: {
+              id: "p1",
+              shopId: "s1",
+              price: "100",
+              quantity: 10,
+              name: "Wine",
+              deletedAt: null,
+            },
           },
         ],
       };
@@ -65,7 +72,14 @@ describe("ordersService", () => {
           {
             productId: "p1",
             quantity: 1,
-            product: { id: "p1", shopId: "s1", price: "50", quantity: 5, name: "Wine" },
+            product: {
+              id: "p1",
+              shopId: "s1",
+              price: "50",
+              quantity: 5,
+              name: "Wine",
+              deletedAt: null,
+            },
           },
         ],
       };
@@ -93,7 +107,14 @@ describe("ordersService", () => {
           {
             productId: "p1",
             quantity: 20,
-            product: { id: "p1", shopId: "s1", price: "100", quantity: 10, name: "Wine" },
+            product: {
+              id: "p1",
+              shopId: "s1",
+              price: "100",
+              quantity: 10,
+              name: "Wine",
+              deletedAt: null,
+            },
           },
         ],
       };
