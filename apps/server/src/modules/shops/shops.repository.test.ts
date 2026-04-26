@@ -49,7 +49,7 @@ describe("shopsRepository", () => {
 
   describe("findById", () => {
     it("delegates to db.query", async () => {
-      const mockShop = { id: "s1" };
+      const mockShop = { address: { deletedAt: null, id: "a1" }, id: "s1" };
       vi.mocked(db.query.shops.findFirst).mockResolvedValue(mockShop as never);
       const result = await shopsRepository.findById("s1");
       expect(result).toBe(mockShop);
