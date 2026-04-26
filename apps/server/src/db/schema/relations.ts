@@ -154,9 +154,15 @@ export const orderItemsRelations = relations(orderItems, ({ one }) => ({
 
 export const reviewsRelations = relations(reviews, ({ one, many }) => ({
   comments: many(comments),
-  product: one(products, { fields: [reviews.entityId], references: [products.id] }),
+  product: one(products, {
+    fields: [reviews.entityId],
+    references: [products.id],
+  }),
   user: one(users, { fields: [reviews.userId], references: [users.id] }),
-  winemaker: one(winemakers, { fields: [reviews.entityId], references: [winemakers.id] }),
+  winemaker: one(winemakers, {
+    fields: [reviews.entityId],
+    references: [winemakers.id],
+  }),
 }));
 
 export const commentsRelations = relations(comments, ({ one }) => ({

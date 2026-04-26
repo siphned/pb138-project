@@ -28,6 +28,7 @@ export const events = pgTable("events", {
 
 export const eventInvitations = pgTable("event_invitations", {
   createdAt: timestamptz("created_at").notNull().defaultNow(),
+  deletedAt: timestamptz("deleted_at"),
   email: text("email").notNull(),
   eventId: uuid("event_id")
     .notNull()
@@ -35,6 +36,7 @@ export const eventInvitations = pgTable("event_invitations", {
   expiresAt: timestamptz("expires_at").notNull(),
   id: uuid("id").primaryKey().defaultRandom(),
   token: text("token").notNull().unique(),
+  updatedAt: timestamptz("updated_at"),
 });
 
 export const eventRegistrations = pgTable("event_registrations", {

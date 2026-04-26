@@ -19,8 +19,10 @@ export const users = pgTable("users", {
 
 export const userRoles = pgTable("user_roles", {
   createdAt: timestamptz("created_at").notNull().defaultNow(),
+  deletedAt: timestamptz("deleted_at"),
   id: uuid("id").primaryKey().defaultRandom(),
   role: varchar("role", { length: 50 }).notNull(),
+  updatedAt: timestamptz("updated_at"),
   userId: uuid("user_id")
     .notNull()
     .references(() => users.id, { onDelete: "cascade" }),

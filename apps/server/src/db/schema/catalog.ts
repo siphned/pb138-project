@@ -49,11 +49,14 @@ export const products = pgTable("products", {
 });
 
 export const productWines = pgTable("product_wines", {
+  createdAt: timestamptz("created_at").notNull().defaultNow(),
+  deletedAt: timestamptz("deleted_at"),
   id: uuid("id").primaryKey().defaultRandom(),
   productId: uuid("product_id")
     .notNull()
     .references(() => products.id),
   quantity: smallint("quantity").notNull(),
+  updatedAt: timestamptz("updated_at"),
   wineId: uuid("wine_id")
     .notNull()
     .references(() => wines.id),
