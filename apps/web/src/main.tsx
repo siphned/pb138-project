@@ -4,7 +4,6 @@ import { createRouter, RouterProvider } from "@tanstack/react-router";
 import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
 import "./index.css";
-import { AxiosInterceptor } from "./components/AxiosInterceptor.tsx";
 import { UserProvider } from "./context/UserContext.tsx";
 import { routeTree } from "./routeTree.gen.ts";
 
@@ -27,13 +26,11 @@ if (!PUBLISHABLE_KEY) {
 createRoot(document.getElementById("root")!).render(
   <StrictMode>
     <ClerkProvider publishableKey={PUBLISHABLE_KEY} afterSignOutUrl="/">
-      <AxiosInterceptor>
-        <QueryClientProvider client={queryClient}>
-          <UserProvider>
-            <RouterProvider router={router} />
-          </UserProvider>
-        </QueryClientProvider>
-      </AxiosInterceptor>
+      <QueryClientProvider client={queryClient}>
+        <UserProvider>
+          <RouterProvider router={router} />
+        </UserProvider>
+      </QueryClientProvider>
     </ClerkProvider>
   </StrictMode>
 );
