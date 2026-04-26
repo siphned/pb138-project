@@ -12,7 +12,7 @@ export function AuthenticatedLayout() {
 
   useEffect(() => {
     if (isLoaded && !isSignedIn) {
-      navigate({ to: "/auth/login" }).catch(() => {
+      navigate({ to: "/login" }).catch(() => {
         // redirect errors are intentionally swallowed; Clerk will re-check on next render
       });
     }
@@ -22,9 +22,9 @@ export function AuthenticatedLayout() {
     return (
       <div className="flex h-screen w-full items-center justify-center bg-background">
         <div
+          role="status"
           aria-label="Loading"
           className="h-12 w-12 animate-spin rounded-full border-4 border-primary border-t-transparent"
-          role="status"
         />
       </div>
     );
