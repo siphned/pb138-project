@@ -12,7 +12,7 @@ export interface UserProfile {
   lname: string;
   email: string;
   clerkId: string;
-  role: "user" | "admin";
+  roles: string[];
 }
 
 interface UserContextType {
@@ -45,7 +45,7 @@ export function UserProvider({ children }: { children: ReactNode }) {
         lname: profile.lname,
         email: profile.email,
         clerkId: profile.clerkId,
-        role: profile.role as "user" | "admin",
+        roles: profile.roles ?? [],
       });
     }
   }, [profile]);
