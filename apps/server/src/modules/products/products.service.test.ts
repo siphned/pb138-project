@@ -202,3 +202,25 @@ describe("deleteProduct", () => {
     );
   });
 });
+
+describe("getProduct", () => {
+  it("returns product when found", async () => {
+    vi.mocked(productsRepository.findById).mockResolvedValue(mockProduct);
+    const result = await productsService.getProduct(productId);
+    expect(result).toEqual(mockProduct);
+  });
+
+  it("throws NOT_FOUND when product not found", async () => {
+    vi.mocked(productsRepository.findById).mockResolvedValue(undefined);
+    await expect(productsService.getProduct(productId)).rejects.toThrow("NOT_FOUND");
+  });
+});
+
+describe("listProducts", () => {
+  it("returns products for a shop", async () => {
+    vi.mocked(productsRepository.findByShopId).mockResolvedValue([mockProduct]);
+    const result = await productsService.listProducts(shopId);
+    expect(result).toHaveLength(1);
+    expect(productsRepository.findByShopId).toHaveBeenCalledWith(shopId, undefined);
+  });
+});

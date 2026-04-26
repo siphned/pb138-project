@@ -78,6 +78,13 @@ describe("createWine", () => {
     await expect(winesService.createWine(userId, wineData)).rejects.toThrow("NOT_FOUND");
     expect(winesRepository.insert).not.toHaveBeenCalled();
   });
+
+  it("throws Error if insert returns no record", async () => {
+    vi.mocked(winesRepository.findWinemakerByUserId).mockResolvedValue(mockWinemaker as never);
+    vi.mocked(winesRepository.insert).mockResolvedValue(undefined as never);
+
+    await expect(winesService.createWine(userId, wineData)).rejects.toThrow();
+  });
 });
 
 describe("getWine", () => {

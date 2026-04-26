@@ -70,5 +70,27 @@ describe("availabilityService", () => {
 
       expect(availabilityRepository.deleteRegular).toHaveBeenCalledWith(entryId);
     });
+
+    it("throws NOT_FOUND if shop doesn't exist", async () => {
+      vi.mocked(availabilityRepository.findShopById).mockResolvedValue(undefined);
+      await expect(availabilityService.deleteRegular(shopId, entryId, ownerId)).rejects.toThrow(
+        "NOT_FOUND"
+      );
+    });
+
+    it("throws FORBIDDEN if user doesn't own the shop", async () => {
+      vi.mocked(availabilityRepository.findShopById).mockResolvedValue(mockShop);
+      await expect(
+        availabilityService.deleteRegular(shopId, entryId, "wrong-owner")
+      ).rejects.toThrow("FORBIDDEN");
+    });
+
+    it("throws NOT_FOUND if entry doesn't exist", async () => {
+      vi.mocked(availabilityRepository.findShopById).mockResolvedValue(mockShop);
+      vi.mocked(availabilityRepository.findRegularById).mockResolvedValue(undefined);
+      await expect(availabilityService.deleteRegular(shopId, entryId, ownerId)).rejects.toThrow(
+        "NOT_FOUND"
+      );
+    });
   });
 });

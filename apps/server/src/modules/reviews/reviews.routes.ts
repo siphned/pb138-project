@@ -40,8 +40,9 @@ export const reviewsRoutes = new Elysia({ prefix: "/reviews", tags: ["reviews"] 
 
   .post(
     "/product/:id",
-    async ({ dbUser, params, body }) => {
+    (async ({ dbUser, params, body }: any) => {
       try {
+        if (!dbUser) return status(401, "Unauthorized");
         return await reviewsService.createProductReview(dbUser.id, params.id, body);
       } catch (e: unknown) {
         if (e instanceof Error) {
@@ -52,12 +53,11 @@ export const reviewsRoutes = new Elysia({ prefix: "/reviews", tags: ["reviews"] 
         }
         throw e;
       }
-    },
+    }) as never,
     {
-      requireAuth: true,
       params: t.Object({ id: t.String() }),
       body: createReviewBody,
-      response: { 200: reviewResponse, 403: t.String(), 409: t.String() },
+      response: { 200: reviewResponse, 401: t.String(), 403: t.String(), 409: t.String() },
       detail: {
         tags: ["reviews"],
         summary: "Create product review",
@@ -69,20 +69,20 @@ export const reviewsRoutes = new Elysia({ prefix: "/reviews", tags: ["reviews"] 
 
   .post(
     "/winemaker/:id",
-    async ({ dbUser, params, body }) => {
+    (async ({ dbUser, params, body }: any) => {
       try {
+        if (!dbUser) return status(401, "Unauthorized");
         return await reviewsService.createWinemakerReview(dbUser.id, params.id, body);
       } catch (e: unknown) {
         if (e instanceof Error && e.message === "ALREADY_REVIEWED")
           return status(409, "You have already reviewed this winemaker");
         throw e;
       }
-    },
+    }) as never,
     {
-      requireAuth: true,
       params: t.Object({ id: t.String() }),
       body: createReviewBody,
-      response: { 200: reviewResponse, 409: t.String() },
+      response: { 200: reviewResponse, 401: t.String(), 409: t.String() },
       detail: {
         tags: ["reviews"],
         summary: "Create winemaker review",
@@ -94,25 +94,25 @@ export const reviewsRoutes = new Elysia({ prefix: "/reviews", tags: ["reviews"] 
 
   .delete(
     "/product/:id/:reviewId",
-    async ({ dbUser, clerkPayload, params }) => {
+    (async ({ dbUser, clerkPayload, params }: any) => {
       try {
+        if (!dbUser) return status(401, "Unauthorized");
         await reviewsService.deleteReview(
           params.reviewId,
           dbUser.id,
-          clerkPayload.roles?.[0] ?? "user",
+          clerkPayload?.roles?.[0] ?? "user",
           params.id,
           "product"
         );
-        return status(204, null);
+        return { success: true };
       } catch (e: unknown) {
         if (e instanceof Error && e.message === "NOT_FOUND") return status(404, "Review not found");
         throw e;
       }
-    },
+    }) as never,
     {
-      requireAuth: true,
       params: t.Object({ id: t.String(), reviewId: t.String() }),
-      response: { 204: t.Null(), 404: t.String() },
+      response: { 200: t.Object({ success: t.Boolean() }), 401: t.String(), 404: t.String() },
       detail: {
         tags: ["reviews"],
         summary: "Delete product review",
@@ -124,25 +124,25 @@ export const reviewsRoutes = new Elysia({ prefix: "/reviews", tags: ["reviews"] 
 
   .delete(
     "/winemaker/:id/:reviewId",
-    async ({ dbUser, clerkPayload, params }) => {
+    (async ({ dbUser, clerkPayload, params }: any) => {
       try {
+        if (!dbUser) return status(401, "Unauthorized");
         await reviewsService.deleteReview(
           params.reviewId,
           dbUser.id,
-          clerkPayload.roles?.[0] ?? "user",
+          clerkPayload?.roles?.[0] ?? "user",
           params.id,
           "winemaker"
         );
-        return status(204, null);
+        return { success: true };
       } catch (e: unknown) {
         if (e instanceof Error && e.message === "NOT_FOUND") return status(404, "Review not found");
         throw e;
       }
-    },
+    }) as never,
     {
-      requireAuth: true,
       params: t.Object({ id: t.String(), reviewId: t.String() }),
-      response: { 204: t.Null(), 404: t.String() },
+      response: { 200: t.Object({ success: t.Boolean() }), 401: t.String(), 404: t.String() },
       detail: {
         tags: ["reviews"],
         summary: "Delete winemaker review",
