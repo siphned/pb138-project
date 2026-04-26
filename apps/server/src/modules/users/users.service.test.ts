@@ -37,6 +37,14 @@ vi.mock("./user-roles.repository", () => ({
   },
 }));
 
+vi.mock("./user-roles.repository", () => ({
+  userRolesRepository: {
+    findByUserId: vi.fn().mockResolvedValue([]),
+    addRole: vi.fn().mockResolvedValue(undefined),
+    removeRole: vi.fn().mockResolvedValue(undefined),
+  },
+}));
+
 import { usersRepository } from "./users.repository";
 import { usersService } from "./users.service";
 
