@@ -3,19 +3,19 @@
  */
 
 import { faker } from "@faker-js/faker";
-import { userRolesRepository } from "../modules/users/user-roles.repository";
 import { db } from "./index";
 import {
   addresses,
   availabilityRegular,
   cartItems,
   carts,
+  comments,
   events,
   orderItems,
   orders,
-  productReviews,
   products,
   productWines,
+  reviews,
   roleRequests,
   shops,
   users,
@@ -47,9 +47,14 @@ function pick<T>(arr: T[]): T {
   return faker.helpers.arrayElement(arr);
 }
 
+function _pickN<T>(arr: T[], min: number, max: number): T[] {
+  return faker.helpers.arrayElements(arr, { min, max });
+}
+
 async function teardown() {
   console.log("Clearing existing seed data...");
-  await db.delete(productReviews);
+  await db.delete(comments);
+  await db.delete(reviews);
   await db.delete(orderItems);
   await db.delete(orders);
   await db.delete(cartItems);
@@ -88,8 +93,6 @@ async function insertUser(override: { fname: string; lname: string }) {
     })
     .returning();
   if (!row) throw new Error("User insert failed");
-  // Assign customer role to all seeded users
-  await userRolesRepository.addRole(row.id, "customer");
   return row;
 }
 
@@ -177,12 +180,12 @@ async function insertEvents(winemakerId: string, count: number) {
       .values({
         winemakerId,
         name: `Tasting ${i}`,
-        capacity: 50,
         startTime: new Date(),
         endTime: new Date(),
         visibility: pick(["public", "private"] as const),
         inviteType: "open",
         addressId: addr.id,
+        capacity: 50,
       })
       .returning();
     if (row) rows.push(row);
@@ -192,8 +195,11 @@ async function insertEvents(winemakerId: string, count: number) {
 
 async function main() {
   await teardown();
+
   const customers = await Promise.all(
-    Array.from({ length: 2 }, () => insertUser({ fname: "C", lname: "U" }))
+    Array.from({ length: 2 }, () =>
+      insertUser({ fname: faker.person.firstName(), lname: faker.person.lastName() })
+    )
   );
   const victor = await insertUser({ fname: "Victor", lname: "W" });
   const wm = await insertWinemaker(victor.id);
@@ -205,12 +211,23 @@ async function main() {
   const firstProd = prodRows[0];
   if (firstProd) {
     for (const customer of customers) {
-      await db.insert(productReviews).values({
-        userId: customer.id,
-        productId: firstProd.id,
-        rating: 5,
-        body: "Nice wine!",
-      });
+      const [review] = await db
+        .insert(reviews)
+        .values({
+          userId: customer.id,
+          entityId: firstProd.id,
+          entityType: "product",
+          rating: 5,
+          body: "Nice",
+        })
+        .returning();
+      if (review) {
+        await db.insert(comments).values({
+          userId: victor.id,
+          reviewId: review.id,
+          body: "Thanks!",
+        });
+      }
     }
   }
 }
