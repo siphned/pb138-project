@@ -7,6 +7,12 @@ export function handleError(e: unknown) {
         return status(404, "Not found");
       case "FORBIDDEN":
         return status(403, "Forbidden");
+      case "NOT_PENDING":
+        return status(400, "Resource is not in pending state");
+      case "NOT_PURCHASED":
+        return status(403, "You must purchase the product to review it");
+      case "ALREADY_REVIEWED":
+        return status(409, "You have already reviewed this resource");
       case "CART_EMPTY":
         return status(400, "Cart is empty");
       case "MISSING_SHIPPING_ADDRESS":

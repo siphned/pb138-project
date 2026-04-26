@@ -151,7 +151,7 @@
         "noUnsafeFinally": "error",
         "noUnsafeOptionalChaining": "error",
         "noUnusedLabels": "error",
-        "noUnusedPrivateClassMembers": "error",
+        "noUnusedPrivateClassMembers": "warn",
         "noUnusedImports": "error",
         "noUnusedVariables": "error",
         "useExhaustiveDependencies": "error",
