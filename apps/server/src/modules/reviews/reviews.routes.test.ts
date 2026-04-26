@@ -1,50 +1,58 @@
+import { Elysia } from "elysia";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
+// Mock the service
 vi.mock("./reviews.service", () => ({
   reviewsService: {
-    createProductReview: vi.fn(),
-    createWinemakerReview: vi.fn(),
-    deleteProductReview: vi.fn(),
-    deleteWinemakerReview: vi.fn(),
     listProductReviews: vi.fn(),
     listWinemakerReviews: vi.fn(),
+    createProductReview: vi.fn(),
+    createWinemakerReview: vi.fn(),
+    deleteReview: vi.fn(),
   },
 }));
 
-vi.mock("../../utils/auth", () => ({
-  authPlugin: {
-    macro: () => ({}),
-  },
-}));
-
+// Use a simple parent app that provides context instead of mocking authPlugin globally
+import { reviewsRoutes } from "./reviews.routes";
 import { reviewsService } from "./reviews.service";
 
-describe("reviewsService method signatures", () => {
+describe("reviews.routes integration", () => {
+  let mockUser: any = { id: "u1" };
+
+  const app = new Elysia()
+    .derive(() => ({
+      clerkPayload: { sub: "test", roles: ["user"] },
+      dbUser: mockUser,
+    }))
+    .use(reviewsRoutes);
+
   beforeEach(() => {
     vi.clearAllMocks();
+    mockUser = { id: "u1" };
   });
 
-  it("listProductReviews is callable with a productId", async () => {
-    vi.mocked(reviewsService.listProductReviews).mockResolvedValue({
-      averageRating: 4.5,
-      reviews: [],
+  describe("GET /reviews/product/:id", () => {
+    it("returns product reviews", async () => {
+      vi.mocked(reviewsService.listProductReviews).mockResolvedValue({
+        reviews: [],
+        averageRating: 5,
+      });
+      const res = await app.handle(new Request("http://localhost/reviews/product/p1"));
+      expect(res.status).toBe(200);
     });
-
-    const result = await reviewsService.listProductReviews("p1");
-    expect(result.averageRating).toBe(4.5);
   });
 
-  it("createProductReview is callable with userId, productId, data", async () => {
-    vi.mocked(reviewsService.createProductReview).mockResolvedValue({ id: "r1" } as never);
+  describe("DELETE /reviews/product/:id/:reviewId", () => {
+    it("deletes product review", async () => {
+      vi.mocked(reviewsService.deleteReview).mockResolvedValue(undefined);
 
-    const result = await reviewsService.createProductReview("u1", "p1", { rating: 5 });
-    expect(result.id).toBe("r1");
-  });
+      const res = await app.handle(
+        new Request("http://localhost/reviews/product/p1/r1", {
+          method: "DELETE",
+        })
+      );
 
-  it("deleteProductReview is callable with reviewId, productId, userId, role", async () => {
-    vi.mocked(reviewsService.deleteProductReview).mockResolvedValue(undefined);
-
-    await reviewsService.deleteProductReview("r1", "p1", "u1", "customer");
-    expect(reviewsService.deleteProductReview).toHaveBeenCalledWith("r1", "p1", "u1", "customer");
+      expect(res.status).toBe(200);
+    });
   });
 });

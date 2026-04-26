@@ -1,7 +1,7 @@
 import { render, screen } from "@testing-library/react";
 import { describe, expect, it, vi } from "vitest";
 import { UserInfoCard } from "../components/dashboard/UserInfoCard";
-import { useUser } from "../context/UserContext";
+import { UserProvider, useUser } from "../context/UserContext";
 
 // Mock the context
 vi.mock("../context/UserContext", async () => {
@@ -14,22 +14,18 @@ vi.mock("../context/UserContext", async () => {
 
 describe("UserInfoCard", () => {
   it("renders nothing when user is null", () => {
-    vi.mocked(useUser).mockReturnValue({ loading: false, refetch: vi.fn(), user: null } as never);
+    vi.mocked(useUser).mockReturnValue({ user: null, loading: false, refetch: vi.fn() } as any);
     const { container } = render(<UserInfoCard />);
     expect(container.firstChild).toBeNull();
   });
 
   it("renders user information correctly", () => {
     const mockUser = {
-      email: "john@example.com",
       fname: "John",
       lname: "Doe",
+      email: "john@example.com",
     };
-    vi.mocked(useUser).mockReturnValue({
-      loading: false,
-      refetch: vi.fn(),
-      user: mockUser,
-    } as never);
+    vi.mocked(useUser).mockReturnValue({ user: mockUser, loading: false, refetch: vi.fn() } as any);
 
     render(<UserInfoCard />);
 

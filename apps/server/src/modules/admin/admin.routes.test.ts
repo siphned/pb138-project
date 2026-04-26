@@ -1,50 +1,70 @@
+import { Elysia } from "elysia";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
+// 1. Mock the service
 vi.mock("./admin.service", () => ({
   adminService: {
-    changeUserStatus: vi.fn(),
-    deleteReview: vi.fn(),
-    listEvents: vi.fn(),
-    listReviews: vi.fn(),
     listUsers: vi.fn(),
-    setEventStatus: vi.fn(),
+    setUserStatus: vi.fn(),
+    listEvents: vi.fn(),
+    approveEvent: vi.fn(),
+    rejectEvent: vi.fn(),
+    listAllReviews: vi.fn(),
+    deleteReview: vi.fn(),
   },
 }));
 
+// 2. Mock auth plugin to be a simple plugin that provides the required context and macros
+// In Elysia, macros are executed during route registration.
+// To mock them, we need to ensure the macro is available when the plugin is .use()'d
+vi.mock("../auth", () => {
+  const plugin = new Elysia({ name: "auth-mock" })
+    .derive(() => ({
+      clerkPayload: { sub: "test-admin", roles: ["admin"] },
+      dbUser: { id: "test-id" },
+    }))
+    .macro(
+      () =>
+        ({
+          requireRoles: () => ({}),
+          requireAuth: () => ({}),
+        }) as any
+    );
+
+  return { authPlugin: plugin };
+});
+
+import { adminRoutes } from "./admin.routes";
 import { adminService } from "./admin.service";
 
-describe("adminService route-level contracts", () => {
+describe("admin.routes integration", () => {
+  // Use a local app to ensure clean state
+  const getApp = () => new Elysia().use(adminRoutes);
+
   beforeEach(() => {
     vi.clearAllMocks();
   });
 
-  it("listUsers accepts filters and pagination", async () => {
-    vi.mocked(adminService.listUsers).mockResolvedValue({
-      data: [],
-      limit: 20,
-      page: 1,
-      total: 0,
-    });
-
-    const result = await adminService.listUsers({}, { page: 1, limit: 20 });
-    expect(result.data).toEqual([]);
-    expect(result.total).toBe(0);
+  it("GET /admin/users returns 200", async () => {
+    vi.mocked(adminService.listUsers).mockResolvedValue({ data: [], total: 0 });
+    const app = getApp();
+    const res = await app.handle(new Request("http://localhost/admin/users"));
+    expect(res.status).toBe(200);
   });
 
-  it("deleteReview is called with id and type", async () => {
+  it("DELETE /admin/reviews/:id returns 200", async () => {
     vi.mocked(adminService.deleteReview).mockResolvedValue(undefined);
+    const app = getApp();
+    const res = await app.handle(
+      new Request("http://localhost/admin/reviews/r1", {
+        method: "DELETE",
+      })
+    );
 
-    await adminService.deleteReview("r1", "product");
-    expect(adminService.deleteReview).toHaveBeenCalledWith("r1", "product");
-  });
+    if (res.status === 500) {
+      console.log(await res.text());
+    }
 
-  it("setEventStatus is called with id and status", async () => {
-    vi.mocked(adminService.setEventStatus).mockResolvedValue({
-      id: "e1",
-      status: "approved",
-    } as never);
-
-    await adminService.setEventStatus("e1", "approved");
-    expect(adminService.setEventStatus).toHaveBeenCalledWith("e1", "approved");
+    expect(res.status).toBe(200);
   });
 });
