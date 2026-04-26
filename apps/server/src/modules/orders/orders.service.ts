@@ -1,7 +1,6 @@
 import type { Order, orders } from "../../db/schema";
 import type { CartWithItems } from "../carts/carts.repository";
 import { cartsService } from "../carts/carts.service";
-import { productsRepository } from "../products/products.repository";
 import type { CreateOrderData, CreateOrderItem, OrderWithItems } from "./orders.repository";
 import { ordersRepository } from "./orders.repository";
 
