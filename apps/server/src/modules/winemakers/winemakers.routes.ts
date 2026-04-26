@@ -6,18 +6,25 @@ import { winemakersService } from "./winemakers.service";
 export const winemakersRoutes = new Elysia({ prefix: "/winemakers", tags: ["winemakers"] })
   .use(authPlugin)
 
-  .get("/", () => winemakersService.listWinemakers() as never, {
-    detail: {
-      summary: "List all winemakers",
+  .get(
+    "/",
+    async () => {
+      return await winemakersService.listWinemakers();
     },
-    response: { 200: t.Array(winemakerListItemResponse) },
-  })
+    {
+      detail: {
+        summary: "List all winemakers",
+      },
+      response: { 200: t.Array(winemakerListItemResponse) },
+    }
+  )
 
   .patch(
     "/me",
-    async ({ dbUser, body }) => {
+    // biome-ignore lint/suspicious/noExplicitAny: complex elysia type inference
+    async ({ dbUser, body }: { dbUser: { id: string }; body: any }) => {
       try {
-        return (await winemakersService.updateMyProfile(dbUser.id, body)) as never;
+        return await winemakersService.updateMyProfile(dbUser.id, body);
       } catch (e: unknown) {
         if (e instanceof Error && e.message === "NOT_FOUND") {
           return status(404, "Winemaker profile not found");
@@ -46,9 +53,9 @@ export const winemakersRoutes = new Elysia({ prefix: "/winemakers", tags: ["wine
 
   .get(
     "/:id",
-    async ({ params }) => {
+    async ({ params }: { params: { id: string } }) => {
       try {
-        return (await winemakersService.getWinemaker(params.id)) as never;
+        return await winemakersService.getWinemaker(params.id);
       } catch (e: unknown) {
         if (e instanceof Error && e.message === "NOT_FOUND") {
           return status(404, "Winemaker not found");
