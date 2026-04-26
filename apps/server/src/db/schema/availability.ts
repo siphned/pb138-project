@@ -29,5 +29,6 @@ export const availabilityExceptions = pgTable("availability_exceptions", {
     .notNull()
     .references(() => shops.id),
   startsAt: timestamptz("starts_at").notNull(),
+  updatedAt: timestamptz("updated_at"),
   winemakerId: uuid("winemaker_id").references(() => winemakers.id),
 });
