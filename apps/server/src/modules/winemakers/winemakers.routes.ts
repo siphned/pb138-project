@@ -6,8 +6,7 @@ import { winemakersService } from "./winemakers.service";
 export const winemakersRoutes = new Elysia({ prefix: "/winemakers", tags: ["winemakers"] })
   .use(authPlugin)
 
-  // biome-ignore lint/suspicious/noExplicitAny: Elysia cannot infer Drizzle relation types against TypeBox schemas
-  .get("/", () => winemakersService.listWinemakers() as any, {
+  .get("/", () => winemakersService.listWinemakers() as never, {
     response: { 200: t.Array(winemakerListItemResponse) },
     detail: {
       summary: "List all winemakers",
@@ -18,8 +17,7 @@ export const winemakersRoutes = new Elysia({ prefix: "/winemakers", tags: ["wine
     "/me",
     async ({ dbUser, body }) => {
       try {
-        // biome-ignore lint/suspicious/noExplicitAny: Elysia cannot infer Drizzle relation types against TypeBox schemas
-        return (await winemakersService.updateMyProfile(dbUser.id, body)) as any;
+        return (await winemakersService.updateMyProfile(dbUser.id, body)) as never;
       } catch (e: unknown) {
         if (e instanceof Error && e.message === "NOT_FOUND") {
           return status(404, "Winemaker profile not found");
@@ -50,8 +48,7 @@ export const winemakersRoutes = new Elysia({ prefix: "/winemakers", tags: ["wine
     "/:id",
     async ({ params }) => {
       try {
-        // biome-ignore lint/suspicious/noExplicitAny: Elysia cannot infer Drizzle relation types against TypeBox schemas
-        return (await winemakersService.getWinemaker(params.id)) as any;
+        return (await winemakersService.getWinemaker(params.id)) as never;
       } catch (e: unknown) {
         if (e instanceof Error && e.message === "NOT_FOUND") {
           return status(404, "Winemaker not found");
