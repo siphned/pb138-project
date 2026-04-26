@@ -144,8 +144,8 @@ export const eventsRepository = {
     });
   },
 
-  findById(id: string): Promise<EventWithDetails | undefined> {
-    return db.query.events.findFirst({
+  async findById(id: string): Promise<EventWithDetails | undefined> {
+    const event = await db.query.events.findFirst({
       where: and(eq(events.id, id), isNull(events.deletedAt)),
       with: {
         address: {
@@ -161,7 +161,12 @@ export const eventsRepository = {
           columns: { deletedAt: true, id: true, name: true },
         },
       },
-    }) as Promise<EventWithDetails | undefined>;
+    });
+
+    if (event?.winemaker && !event.winemaker.deletedAt) {
+      return event as EventWithDetails;
+    }
+    return undefined;
   },
 
   findComments(

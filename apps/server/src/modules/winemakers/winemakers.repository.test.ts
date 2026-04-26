@@ -57,19 +57,19 @@ describe("winemakersRepository", () => {
 
   describe("findAll", () => {
     it("delegates to db.query.findMany", async () => {
-      const mockList = [{ id: "wm1" }];
+      const mockList = [{ address: { deletedAt: null, id: "a1" }, id: "wm1" }];
       vi.mocked(db.query.winemakers.findMany).mockResolvedValue(mockList as never);
       const result = await winemakersRepository.findAll();
-      expect(result).toBe(mockList);
+      expect(result).toStrictEqual(mockList);
     });
   });
 
   describe("findById", () => {
     it("delegates to db.query.findFirst", async () => {
-      const mockWinemaker = { id: "wm1" };
+      const mockWinemaker = { address: { deletedAt: null, id: "a1" }, id: "wm1" };
       vi.mocked(db.query.winemakers.findFirst).mockResolvedValue(mockWinemaker as never);
       const result = await winemakersRepository.findById("wm1");
-      expect(result).toBe(mockWinemaker);
+      expect(result).toStrictEqual(mockWinemaker);
     });
   });
 
