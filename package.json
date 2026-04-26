@@ -24,6 +24,8 @@
     "check": "biome check --write .",
     "check-types": "turbo run check-types",
     "dev": "turbo run dev",
+    "dev:web": "turbo run dev --filter=web",
+    "dev:server": "turbo run dev --filter=server",
     "format": "biome format --write .",
     "generate": "turbo run generate",
     "lint": "biome lint .",
