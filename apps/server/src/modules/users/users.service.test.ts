@@ -19,21 +19,13 @@ vi.mock("@clerk/backend", () => ({
 
 vi.mock("./users.repository", () => ({
   usersRepository: {
-    create: vi.fn(),
-    createAddress: vi.fn(),
-    findAddressById: vi.fn(),
     findByClerkId: vi.fn(),
-    findById: vi.fn(),
-    updateById: vi.fn(),
+    create: vi.fn(),
     upsert: vi.fn(),
-  },
-}));
-
-vi.mock("./user-roles.repository", () => ({
-  userRolesRepository: {
-    addRole: vi.fn().mockResolvedValue(undefined),
-    findByUserId: vi.fn().mockResolvedValue([]),
-    removeRole: vi.fn().mockResolvedValue(undefined),
+    updateById: vi.fn(),
+    findById: vi.fn(),
+    findAddressById: vi.fn(),
+    createAddress: vi.fn(),
   },
 }));
 
@@ -56,13 +48,13 @@ describe("usersService", () => {
   const clerkId = "user_123";
   const payload = (roles: string[]) =>
     ({
-      roles,
       sub: clerkId,
+      roles,
     }) as unknown as ClerkPayload;
 
   describe("lazyGetOrCreate", () => {
     it("returns the existing user and never calls Clerk when the user is already in the DB", async () => {
-      const existingUser = { clerkId, id: "uuid" };
+      const existingUser = { id: "uuid", clerkId };
       vi.mocked(usersRepository.findByClerkId).mockResolvedValue(existingUser as never);
 
       const result = await usersService.lazyGetOrCreate(clerkId, payload(["customer"]));
@@ -74,9 +66,9 @@ describe("usersService", () => {
     it("fetches Clerk profile and creates a new user when not found locally", async () => {
       vi.mocked(usersRepository.findByClerkId).mockResolvedValue(undefined);
       mockGetUser.mockResolvedValue({
-        emailAddresses: [{ emailAddress: "new@example.com" }],
         firstName: "New",
         lastName: "User",
+        emailAddresses: [{ emailAddress: "new@example.com" }],
         publicMetadata: { roles: ["customer"] },
       });
       vi.mocked(usersRepository.upsert).mockResolvedValue({ id: "new-uuid" } as never);
@@ -90,9 +82,9 @@ describe("usersService", () => {
     it("seeds customer role in Clerk metadata on first login when metadata has no roles", async () => {
       vi.mocked(usersRepository.findByClerkId).mockResolvedValue(undefined);
       mockGetUser.mockResolvedValue({
-        emailAddresses: [{ emailAddress: "new@example.com" }],
         firstName: "New",
         lastName: "User",
+        emailAddresses: [{ emailAddress: "new@example.com" }],
         publicMetadata: {},
       });
       vi.mocked(usersRepository.upsert).mockResolvedValue({ id: "new-uuid" } as never);
@@ -118,7 +110,7 @@ describe("usersService", () => {
 
   describe("updateProfile", () => {
     it("updates basic profile fields", async () => {
-      const existingUser = { clerkId, id: "uuid" };
+      const existingUser = { id: "uuid", clerkId };
       const updated = { ...existingUser, lname: "Smith" };
       vi.mocked(usersRepository.findByClerkId).mockResolvedValue(existingUser as never);
       vi.mocked(usersRepository.updateById).mockResolvedValue(updated as never);
@@ -131,14 +123,14 @@ describe("usersService", () => {
 
   describe("upsertAddress", () => {
     it("creates a new address and links it to user", async () => {
-      const existingUser = { clerkId, id: "uuid" };
+      const existingUser = { id: "uuid", clerkId };
       const createdAddr = { id: "new-addr" };
       const addrData = {
-        city: "B",
         country: "CZ",
-        houseNumber: "1",
+        city: "B",
         postalCode: "1",
         street: "S",
+        houseNumber: "1",
       };
 
       vi.mocked(usersRepository.findByClerkId).mockResolvedValue(existingUser as never);
@@ -159,7 +151,7 @@ describe("usersService", () => {
 
   describe("getById", () => {
     it("returns user for db id", async () => {
-      const mockUser = { clerkId, id: "u1" };
+      const mockUser = { id: "u1", clerkId };
       vi.mocked(usersRepository.findById).mockResolvedValue(mockUser as never);
       const result = await usersService.getById("u1");
       expect(result).toEqual(mockUser);

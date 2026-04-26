@@ -188,7 +188,7 @@ export const adminRoutes = new Elysia({ prefix: "/admin", tags: ["admin"] })
     (async ({ params }: { params: { id: string } }) => {
       try {
         await adminService.deleteReview(params.id);
-        return status(204, null);
+        return { success: true };
       } catch (e: unknown) {
         if (e instanceof Error && e.message === "NOT_FOUND") return status(404, "Review not found");
         throw e;
@@ -197,7 +197,7 @@ export const adminRoutes = new Elysia({ prefix: "/admin", tags: ["admin"] })
     {
       requireRoles: ["admin"],
       params: t.Object({ id: t.String() }),
-      response: { 204: t.Null(), 404: t.String() },
+      response: { 200: t.Object({ success: t.Boolean() }), 404: t.String() },
       detail: {
         summary: "Soft-delete a review",
         security: [{ bearerAuth: [] }],
