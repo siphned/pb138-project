@@ -59,7 +59,7 @@ const mockEventWithDetails = {
   visibility: "public",
   createdAt: new Date("2026-01-01"),
   updatedAt: null,
-  winemaker: { id: winemakerId, name: "Test Winery" },
+  winemaker: { id: winemakerId, name: "Test Winery", email: "winery@test.com" },
   address: null,
 } as unknown as AdminEventRow;
 
