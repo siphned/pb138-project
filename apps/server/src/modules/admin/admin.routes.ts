@@ -1,5 +1,4 @@
 import { Elysia, status, t } from "elysia";
-import { handleError } from "../../utils/errors";
 import { authPlugin } from "../auth";
 import { adminEventResponse, adminReviewResponse, adminUserResponse } from "./admin.schema";
 import { adminService } from "./admin.service";
@@ -11,13 +10,12 @@ export const createAdminRoutes = (auth = authPlugin) => {
       // User Management
       .get(
         "/users",
-        // biome-ignore lint/suspicious/noExplicitAny: complex elysia type inference
-        (async ({ query }: any) => {
-          const { limit, offset, status: userStatus, role } = query;
+        (async ({ query }: { query: Record<string, string | undefined> }) => {
+          const { limit, offset, status, role } = query;
           return await adminService.listUsers(
             {
               role: role as "user" | "admin" | undefined,
-              status: userStatus as "active" | "suspended" | "banned" | undefined,
+              status: status as "active" | "suspended" | "banned" | undefined,
             },
             {
               limit: limit ? Number(limit) : undefined,
@@ -48,8 +46,13 @@ export const createAdminRoutes = (auth = authPlugin) => {
 
       .patch(
         "/users/:id/status",
-        // biome-ignore lint/suspicious/noExplicitAny: complex elysia type inference
-        (async ({ params, body }: any) => {
+        (async ({
+          params,
+          body,
+        }: {
+          params: { id: string };
+          body: { status: "active" | "suspended" | "banned" };
+        }) => {
           try {
             return await adminService.setUserStatus(params.id, body.status);
           } catch (e: unknown) {
@@ -75,11 +78,10 @@ export const createAdminRoutes = (auth = authPlugin) => {
       // Content Moderation - Events
       .get(
         "/events",
-        // biome-ignore lint/suspicious/noExplicitAny: complex elysia type inference
-        (async ({ query }: any) => {
-          const { limit, offset, status: eventStatus = "pending" } = query;
+        (async ({ query }: { query: Record<string, string | undefined> }) => {
+          const { limit, offset, status = "pending" } = query;
           return await adminService.listEvents(
-            { status: eventStatus as "pending" | "approved" | "rejected" },
+            { status: status as "pending" | "approved" | "rejected" },
             {
               limit: limit ? Number(limit) : undefined,
               offset: offset ? Number(offset) : undefined,
@@ -108,12 +110,15 @@ export const createAdminRoutes = (auth = authPlugin) => {
 
       .patch(
         "/events/:id/approve",
-        // biome-ignore lint/suspicious/noExplicitAny: complex elysia type inference
-        (async ({ params }: any) => {
+        (async ({ params }: { params: { id: string } }) => {
           try {
             return await adminService.approveEvent(params.id);
           } catch (e: unknown) {
-            return handleError(e);
+            if (e instanceof Error) {
+              if (e.message === "NOT_FOUND") return status(404, "Event not found");
+              if (e.message === "NOT_PENDING") return status(400, "Event is not pending");
+            }
+            throw e;
           }
         }) as never,
         {
@@ -129,12 +134,15 @@ export const createAdminRoutes = (auth = authPlugin) => {
 
       .patch(
         "/events/:id/reject",
-        // biome-ignore lint/suspicious/noExplicitAny: complex elysia type inference
-        (async ({ params }: any) => {
+        (async ({ params }: { params: { id: string } }) => {
           try {
             return await adminService.rejectEvent(params.id);
           } catch (e: unknown) {
-            return handleError(e);
+            if (e instanceof Error) {
+              if (e.message === "NOT_FOUND") return status(404, "Event not found");
+              if (e.message === "NOT_PENDING") return status(400, "Event is not pending");
+            }
+            throw e;
           }
         }) as never,
         {
@@ -151,8 +159,7 @@ export const createAdminRoutes = (auth = authPlugin) => {
       // Content Moderation - Reviews
       .get(
         "/reviews",
-        // biome-ignore lint/suspicious/noExplicitAny: complex elysia type inference
-        (async ({ query }: any) => {
+        (async ({ query }: { query: Record<string, string | undefined> }) => {
           const { limit, offset } = query;
           return await adminService.listAllReviews({
             limit: limit ? Number(limit) : undefined,
@@ -180,13 +187,14 @@ export const createAdminRoutes = (auth = authPlugin) => {
 
       .delete(
         "/reviews/:id",
-        // biome-ignore lint/suspicious/noExplicitAny: complex elysia type inference
-        (async ({ params }: any) => {
+        (async ({ params }: { params: { id: string } }) => {
           try {
             await adminService.deleteReview(params.id);
             return { success: true };
           } catch (e: unknown) {
-            return handleError(e);
+            if (e instanceof Error && e.message === "NOT_FOUND")
+              return status(404, "Review not found");
+            throw e;
           }
         }) as never,
         {

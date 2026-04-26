@@ -50,7 +50,6 @@ export const app = new Elysia()
           { description: "Order placement and history", name: "orders" },
           { description: "Anonymous session management", name: "guest-sessions" },
           { description: "B2B supply relationship management", name: "supply-agreements" },
-          { description: "Admin moderation: users, events, reviews", name: "admin" },
         ],
       },
       provider: "scalar",

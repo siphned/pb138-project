@@ -7,11 +7,13 @@ This document specifies all REST API endpoints for the WineMarket platform. Each
 - Authorization requirements (from `docs/roles.md`)
 - Database operations (repository layer)
 
-**Technology**: Elysia + Zod + OpenAPI → Auto-generated documentation via Scalar
+**Technology**: Elysia + Zod + OpenAPI → Auto-generated documentation via Scalar at `/swagger`. Frontend hooks generated via Orval (`apps/web/orval.config.ts`, `bun run generate`).
+
+**Auth**: Clerk (replaces JWT/bcrypt). Tokens are Clerk-issued JWTs. The `authPlugin` Elysia macro handles validation and injects `dbUser` + `clerkPayload` into route context.
 
 **Notes on Authorization:**
 - `❌` = Public, no authentication required
-- `✅` = Authentication required (JWT token)
+- `✅` = Authentication required (Clerk JWT)
 - `✅ (Admin)` = Admin role only
 - `✅ (own)` = Own resource or Admin
 - `✅ (WINEMAKER)` = Winemaker role required
@@ -110,7 +112,7 @@ This document specifies all REST API endpoints for the WineMarket platform. Each
 ## Module: CARTS & ORDERS
 **Responsibility**: Shopping cart, checkout, orders
 
-**Cart Notes:** The server only stores carts for authenticated users (JWT required for all cart endpoints). There is no server-side guest cart. Guest cart functionality must be implemented on the **frontend** using `localStorage` — items added while unauthenticated are stored locally, then synced to the server via `POST /carts/merge` immediately after login. **This frontend localStorage cart is not yet implemented.**
+**Cart Notes:** Guest carts are **server-side** — on the first cart action by an unauthenticated user, the backend creates a `guest_session` record and returns a `guest_session_id` cookie. Cart endpoints accept either a valid Clerk JWT (authenticated user) or the guest session cookie. On login, `POST /carts/merge` merges the guest cart into the user's account and clears the session. Stock is validated and atomically decremented at checkout.
 
 | Method | Path | Description | Auth |
 |--------|------|---|---|
@@ -162,14 +164,27 @@ This document specifies all REST API endpoints for the WineMarket platform. Each
 
 | Method | Path | Description | Auth |
 |--------|------|---|---|
-| GET | `/products/:id/reviews` | Product reviews | ❌ |
-| POST | `/products/:id/reviews` | Write review | ✅ |
-| GET | `/winemakers/:id/reviews` | Winemaker reviews | ❌ |
-| POST | `/winemakers/:id/reviews` | Write review | ✅ |
-| DELETE | `/products/:productId/reviews/:reviewId` | Delete product review | ✅ (own/Admin) |
-| DELETE | `/winemakers/:winemakerId/reviews/:reviewId` | Delete winemaker review | ✅ (own/Admin) |
-| DELETE | `/reviews/:id` | Delete own review | ✅ (own) |
-| PATCH | `/reviews/:id/hide` | Hide review | ✅ (Admin) |
+| GET | `/reviews/product/:id` | Product reviews + avg rating | ❌ |
+| POST | `/reviews/product/:id` | Write product review (requires verified purchase) | ✅ |
+| GET | `/reviews/winemaker/:id` | Winemaker reviews + avg rating | ❌ |
+| POST | `/reviews/winemaker/:id` | Write winemaker review | ✅ |
+| DELETE | `/reviews/product/:id/:reviewId` | Soft-delete product review | ✅ (own/Admin) |
+| DELETE | `/reviews/winemaker/:id/:reviewId` | Soft-delete winemaker review | ✅ (own/Admin) |
+
+**Notes:** Routes live under `/reviews/` prefix (not `/products/:id/reviews`). Reviews are soft-deleted (retain record, set `deletedAt`). Admins can delete any review; users can only delete their own.
+
+---
+
+## Module: SUPPLY AGREEMENTS
+**Responsibility**: B2B winemaker-to-shop supply relationships
+
+| Method | Path | Description | Auth |
+|--------|------|---|---|
+| GET | `/supply-agreements` | List agreements (own winemaker or shop) | ✅ |
+| POST | `/supply-agreements` | Create supply agreement | ✅ (WINEMAKER) |
+| GET | `/supply-agreements/:id` | Agreement detail | ✅ (own) |
+| PATCH | `/supply-agreements/:id` | Update agreement | ✅ (own) |
+| DELETE | `/supply-agreements/:id` | Cancel agreement | ✅ (own) |
 
 ---
 
@@ -181,9 +196,10 @@ This document specifies all REST API endpoints for the WineMarket platform. Each
 | GET | `/admin/users` | List users (filterable by status/role) | ✅ (Admin) |
 | PATCH | `/admin/users/:id/status` | Set user status (active/suspended/banned) | ✅ (Admin) |
 | GET | `/admin/events` | List events by status (default: pending) | ✅ (Admin) |
-| PATCH | `/admin/events/:id/status` | Approve or reject a pending event | ✅ (Admin) |
+| PATCH | `/admin/events/:id/approve` | Approve a pending event | ✅ (Admin) |
+| PATCH | `/admin/events/:id/reject` | Reject a pending event | ✅ (Admin) |
 | GET | `/admin/reviews` | List all reviews (product + winemaker) | ✅ (Admin) |
-| DELETE | `/admin/reviews/:id` | Soft-delete a review (?type=product\|winemaker) | ✅ (Admin) |
+| DELETE | `/admin/reviews/:id` | Soft-delete a review | ✅ (Admin) |
 
 ---
 
@@ -205,4 +221,5 @@ This document specifies all REST API endpoints for the WineMarket platform. Each
 ## Revision History
 - **v1.0** (Week 6) — Initial API design from PRD requirements
 - **v1.1** (Week 9, WINE-79) — Admin module: event moderation moved from /events to /admin/events; user deactivate replaced with full status lifecycle (active/suspended/banned); review admin endpoints added under /admin/reviews; role-request admin routes removed (live at /role-requests without prefix); GET /admin/statistics deferred
-- **v1.2** (Week 10, WINE-65) — Carts & Orders implemented: paths changed from /cart to /carts/me; PUT replaces PATCH for item updates; guest cart is localStorage-only (no server sessions) with POST /carts/merge for login sync; order status update is per-item (PUT /orders/:id/items/:itemId/status) not per-order; /shops/:id/orders and DELETE /cart (clear) not implemented
+- **v1.2** (Week 10, WINE-65) — Carts & Orders implemented: paths changed from /cart to /carts/me; PUT replaces PATCH for item updates; order status update is per-item; stock decremented at checkout
+- **v1.3** (Week 11) — Guest cart corrected: server-side guest_session (cookie-based), not localStorage. Reviews paths corrected to `/reviews/product/:id` and `/reviews/winemaker/:id`. Supply-agreements module added. Admin event endpoints split into separate approve/reject routes. Auth updated to Clerk (not JWT/bcrypt).
