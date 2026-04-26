@@ -25,7 +25,7 @@ export function UserInfoCard({ onEdit }: { onEdit?: () => void }) {
       <CardContent className="p-6 md:p-8">
         <div className="flex flex-col md:flex-row gap-6 md:gap-8 items-start">
           <Avatar className="h-24 w-24 md:h-28 md:w-28 flex-none">
-            <AvatarImage src="" alt={fullName} />
+            <AvatarImage alt={fullName} src="" />
             <AvatarFallback className="bg-primary text-primary-foreground font-heading text-2xl font-medium">
               {initials}
             </AvatarFallback>
@@ -41,11 +41,10 @@ export function UserInfoCard({ onEdit }: { onEdit?: () => void }) {
               </div>
 
               {/* 4. WRAP THE BUTTON IN THE DIALOG */}
-              <Dialog open={isEditDialogOpen} onOpenChange={setIsEditDialogOpen}>
+              <Dialog onOpenChange={setIsEditDialogOpen} open={isEditDialogOpen}>
                 <DialogTrigger
                   render={
                     <Button
-                      variant="outline"
                       className="bg-background shrink-0 rounded-full px-5"
                       onClick={(e) => {
                         if (onEdit) {
@@ -53,6 +52,7 @@ export function UserInfoCard({ onEdit }: { onEdit?: () => void }) {
                           onEdit();
                         }
                       }}
+                      variant="outline"
                     >
                       <Pencil className="h-4 w-4 mr-2" />
                       Edit Profile

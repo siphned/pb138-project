@@ -21,22 +21,22 @@ export function ShopOwnerBundles() {
   // Mock data for shop owner (shows winemaker info)
   const shopBundlesData = [
     {
+      badgeClasses: "bg-[#E8F5E9] text-[#2E7D32] hover:bg-[#E8F5E9]",
+      creatableQty: 5,
       id: 1,
-      name: "Holiday Red Trio",
-      winemaker: "Chateau Montrose",
-      creatableQty: 5, // How many the shop can assemble from their specific stock
+      name: "Holiday Red Trio", // How many the shop can assemble from their specific stock
       price: "€350.00", // Shop retail price
       status: "In Stock",
-      badgeClasses: "bg-[#E8F5E9] text-[#2E7D32] hover:bg-[#E8F5E9]",
+      winemaker: "Chateau Montrose",
     },
     {
+      badgeClasses: "bg-[#FFF3E0] text-[#EF6C00] hover:bg-[#FFF3E0]",
+      creatableQty: 2,
       id: 2,
       name: "Bordeaux Discovery Box",
-      winemaker: "Multiple Estates",
-      creatableQty: 2,
       price: "€180.00",
       status: "Low Stock",
-      badgeClasses: "bg-[#FFF3E0] text-[#EF6C00] hover:bg-[#FFF3E0]",
+      winemaker: "Multiple Estates",
     },
   ];
 
@@ -84,7 +84,7 @@ export function ShopOwnerBundles() {
           </TableHeader>
           <TableBody>
             {shopBundlesData.map((bundle) => (
-              <TableRow key={bundle.id} className="border-border/50 border-b">
+              <TableRow className="border-border/50 border-b" key={bundle.id}>
                 <TableCell className="font-medium text-sm">{bundle.name}</TableCell>
                 <TableCell className="text-muted-foreground text-sm">{bundle.winemaker}</TableCell>
                 <TableCell className="text-center font-medium text-sm">
@@ -95,7 +95,7 @@ export function ShopOwnerBundles() {
                   <Badge className={`${bundle.badgeClasses} border-none`}>{bundle.status}</Badge>
                 </TableCell>
                 <TableCell className="text-right">
-                  <Button variant="ghost" size="icon" className="h-8 w-8 text-muted-foreground">
+                  <Button className="h-8 w-8 text-muted-foreground" size="icon" variant="ghost">
                     <MoreHorizontal className="h-4 w-4" />
                   </Button>
                 </TableCell>
@@ -109,8 +109,8 @@ export function ShopOwnerBundles() {
       <div className="md:hidden flex flex-col">
         {shopBundlesData.map((bundle) => (
           <div
-            key={bundle.id}
             className="flex justify-between py-5 border-b border-border/50 last:border-0"
+            key={bundle.id}
           >
             <div className="flex flex-col gap-1.5 w-full pr-4">
               <span className="font-heading font-semibold text-[15px] truncate">{bundle.name}</span>
@@ -128,9 +128,9 @@ export function ShopOwnerBundles() {
               </div>
             </div>
             <Button
-              variant="ghost"
-              size="icon"
               className="h-8 w-8 shrink-0 -mr-2 text-muted-foreground"
+              size="icon"
+              variant="ghost"
             >
               <MoreHorizontal className="h-5 w-5" />
             </Button>

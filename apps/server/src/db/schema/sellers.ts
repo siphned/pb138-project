@@ -4,35 +4,35 @@ import { timestamptz } from "./helpers";
 import { users } from "./users";
 
 export const winemakers = pgTable("winemakers", {
+  addressId: uuid("address_id")
+    .notNull()
+    .references(() => addresses.id),
+  createdAt: timestamptz("created_at").notNull().defaultNow(),
+  deletedAt: timestamptz("deleted_at"),
+  description: text("description").notNull(),
+  email: text("email"),
   id: uuid("id").primaryKey().defaultRandom(),
+  name: varchar("name", { length: 255 }).notNull(),
+  phone: varchar("phone", { length: 20 }),
+  updatedAt: timestamptz("updated_at"),
   userId: uuid("user_id")
     .notNull()
     .unique()
     .references(() => users.id),
-  name: varchar("name", { length: 255 }).notNull(),
-  description: text("description").notNull(),
   websiteUrl: text("website_url"),
-  phone: varchar("phone", { length: 20 }),
-  email: text("email"),
-  addressId: uuid("address_id")
-    .notNull()
-    .references(() => addresses.id),
-  createdAt: timestamptz("created_at").notNull().defaultNow(),
-  updatedAt: timestamptz("updated_at"),
-  deletedAt: timestamptz("deleted_at"),
 });
 
 export const shops = pgTable("shops", {
-  id: uuid("id").primaryKey().defaultRandom(),
-  ownerUserId: uuid("owner_user_id")
-    .notNull()
-    .references(() => users.id),
-  name: varchar("name", { length: 255 }).notNull(),
-  description: text("description").notNull(),
   addressId: uuid("address_id")
     .notNull()
     .references(() => addresses.id),
   createdAt: timestamptz("created_at").notNull().defaultNow(),
-  updatedAt: timestamptz("updated_at"),
   deletedAt: timestamptz("deleted_at"),
+  description: text("description").notNull(),
+  id: uuid("id").primaryKey().defaultRandom(),
+  name: varchar("name", { length: 255 }).notNull(),
+  ownerUserId: uuid("owner_user_id")
+    .notNull()
+    .references(() => users.id),
+  updatedAt: timestamptz("updated_at"),
 });

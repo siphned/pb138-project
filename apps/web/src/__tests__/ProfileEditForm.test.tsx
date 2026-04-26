@@ -16,11 +16,11 @@ describe("ProfileEditForm", () => {
   beforeEach(() => {
     vi.clearAllMocks();
     vi.mocked(useUser).mockReturnValue({
-      user: { fname: "John", lname: "Doe" },
-      updateUser: mockUpdateUser,
       loading: false,
       refetch: vi.fn(),
-    } as any);
+      updateUser: mockUpdateUser,
+      user: { fname: "John", lname: "Doe" },
+    } as never);
   });
 
   it("renders with initial user data", () => {

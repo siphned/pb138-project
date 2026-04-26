@@ -2,21 +2,21 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 
 vi.mock("./events.repository", () => ({
   eventsRepository: {
+    countActiveRegistrations: vi.fn(),
+    countComments: vi.fn(),
+    countMany: vi.fn(),
+    createComment: vi.fn(),
+    createEventWithAddress: vi.fn(),
+    createRegistration: vi.fn(),
+    findActiveRegistration: vi.fn(),
+    findById: vi.fn(),
+    findComments: vi.fn(),
+    findMany: vi.fn(),
     findWinemakerByUserId: vi.fn(),
     resolveWinemakerIdsByName: vi.fn(),
-    findById: vi.fn(),
-    findMany: vi.fn(),
-    countMany: vi.fn(),
-    createEventWithAddress: vi.fn(),
-    update: vi.fn(),
     softDelete: vi.fn(),
-    countActiveRegistrations: vi.fn(),
-    findActiveRegistration: vi.fn(),
-    createRegistration: vi.fn(),
     softDeleteRegistration: vi.fn(),
-    findComments: vi.fn(),
-    countComments: vi.fn(),
-    createComment: vi.fn(),
+    update: vi.fn(),
   },
 }));
 
@@ -38,30 +38,30 @@ const mockWinemaker = { id: winemakerId, name: "Test Winery" };
 const mockOtherWinemaker = { id: otherWinemakerId, name: "Other Winery" };
 
 const mockApprovedEvent = {
-  id: eventId,
-  winemakerId,
-  status: "approved",
   capacity: 10,
-  startTime: futureStart,
   deletedAt: null,
+  id: eventId,
+  startTime: futureStart,
+  status: "approved",
+  winemakerId,
 } as unknown as EventWithDetails;
 
 const mockPendingEvent = { ...mockApprovedEvent, status: "pending" } as unknown as EventWithDetails;
 
 const validCreateInput = {
-  name: "Wine Tasting",
-  capacity: 20,
-  startTime: futureStart.toISOString(),
-  endTime: futureEnd.toISOString(),
-  inviteType: "open",
-  visibility: "public" as const,
   address: {
-    country: "SK",
     city: "Bratislava",
+    country: "SK",
+    houseNumber: "1",
     postalCode: "81000",
     street: "Main St",
-    houseNumber: "1",
   },
+  capacity: 20,
+  endTime: futureEnd.toISOString(),
+  inviteType: "open",
+  name: "Wine Tasting",
+  startTime: futureStart.toISOString(),
+  visibility: "public" as const,
 };
 
 beforeEach(() => {
@@ -79,8 +79,8 @@ describe("createEvent", () => {
 
     expect(eventsRepository.createEventWithAddress).toHaveBeenCalledWith(
       winemakerId,
-      expect.objectContaining({ name: "Wine Tasting", capacity: 20 }),
-      expect.objectContaining({ country: "SK", city: "Bratislava" })
+      expect.objectContaining({ capacity: 20, name: "Wine Tasting" }),
+      expect.objectContaining({ city: "Bratislava", country: "SK" })
     );
   });
 
@@ -108,8 +108,8 @@ describe("createEvent", () => {
     await expect(
       eventsService.createEvent(userId, {
         ...validCreateInput,
-        startTime: futureEnd.toISOString(),
         endTime: futureStart.toISOString(),
+        startTime: futureEnd.toISOString(),
       })
     ).rejects.toThrow("INVALID_DATES");
   });
@@ -222,7 +222,7 @@ describe("listEvents", () => {
     vi.mocked(eventsRepository.findMany).mockResolvedValue([mockApprovedEvent]);
     vi.mocked(eventsRepository.countMany).mockResolvedValue(1);
 
-    await eventsService.listEvents({}, { page: 1, limit: 20 });
+    await eventsService.listEvents({}, { limit: 20, page: 1 });
 
     expect(eventsRepository.findMany).toHaveBeenCalledWith(
       expect.objectContaining({ status: "approved" }),
@@ -235,10 +235,10 @@ describe("listEvents", () => {
 
     const result = await eventsService.listEvents(
       { winemakerName: "nobody" },
-      { page: 1, limit: 20 }
+      { limit: 20, page: 1 }
     );
 
-    expect(result).toEqual({ data: [], page: 1, limit: 20, total: 0 });
+    expect(result).toEqual({ data: [], limit: 20, page: 1, total: 0 });
     expect(eventsRepository.findMany).not.toHaveBeenCalled();
   });
 });
@@ -304,7 +304,7 @@ describe("registerForEvent", () => {
 // ─── unregisterFromEvent ─────────────────────────────────────────────────────
 
 describe("unregisterFromEvent", () => {
-  const mockRegistration = { id: registrationId, eventId, userId, deletedAt: null } as never;
+  const mockRegistration = { deletedAt: null, eventId, id: registrationId, userId } as never;
 
   it("soft deletes active registration", async () => {
     vi.mocked(eventsRepository.findActiveRegistration).mockResolvedValue(mockRegistration);
@@ -352,9 +352,9 @@ describe("listComments", () => {
     vi.mocked(eventsRepository.findComments).mockResolvedValue([]);
     vi.mocked(eventsRepository.countComments).mockResolvedValue(0);
 
-    const result = await eventsService.listComments(eventId, { page: 1, limit: 10 });
+    const result = await eventsService.listComments(eventId, { limit: 10, page: 1 });
 
-    expect(result).toEqual({ data: [], page: 1, limit: 10, total: 0 });
+    expect(result).toEqual({ data: [], limit: 10, page: 1, total: 0 });
   });
 
   it("throws NOT_FOUND when event does not exist", async () => {

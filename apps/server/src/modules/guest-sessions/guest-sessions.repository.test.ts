@@ -22,12 +22,12 @@ const mockDb = db as unknown as MockDatabase;
 
 vi.mock("../../db", () => {
   const m = {
-    insert: vi.fn().mockReturnThis(),
-    values: vi.fn().mockReturnThis(),
-    returning: vi.fn().mockReturnThis(),
     delete: vi.fn().mockReturnThis(),
-    select: vi.fn().mockReturnThis(),
     from: vi.fn().mockReturnThis(),
+    insert: vi.fn().mockReturnThis(),
+    returning: vi.fn().mockReturnThis(),
+    select: vi.fn().mockReturnThis(),
+    values: vi.fn().mockReturnThis(),
     where: vi.fn().mockReturnThis(),
   };
   return { db: m };

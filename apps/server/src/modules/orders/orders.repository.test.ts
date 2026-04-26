@@ -36,21 +36,21 @@ const mockDb = db as unknown as MockDatabase;
 
 vi.mock("../../db", () => {
   const m = {
-    transaction: vi.fn((cb) => cb(m)),
-    insert: vi.fn().mockReturnThis(),
-    values: vi.fn().mockReturnThis(),
-    returning: vi.fn().mockReturnThis(),
-    update: vi.fn().mockReturnThis(),
-    set: vi.fn().mockReturnThis(),
-    where: vi.fn().mockReturnThis(),
-    selectDistinct: vi.fn().mockReturnThis(),
     innerJoin: vi.fn().mockReturnThis(),
+    insert: vi.fn().mockReturnThis(),
     query: {
       orders: {
         findFirst: vi.fn(),
         findMany: vi.fn(),
       },
     },
+    returning: vi.fn().mockReturnThis(),
+    selectDistinct: vi.fn().mockReturnThis(),
+    set: vi.fn().mockReturnThis(),
+    transaction: vi.fn((cb) => cb(m)),
+    update: vi.fn().mockReturnThis(),
+    values: vi.fn().mockReturnThis(),
+    where: vi.fn().mockReturnThis(),
   };
   return { db: m };
 });
@@ -102,29 +102,29 @@ describe("ordersRepository", () => {
 
       const result = await ordersRepository.create(
         {
-          shippingFee: "10",
-          discount: "0",
-          paymentStatus: "pending",
-          paymentMethod: "card",
-          totalPrice: "100",
-          status: "pending",
-          deliveryType: "shipping",
-          shippingAddress: {
-            country: "CZ",
-            city: "B",
-            postalCode: "1",
-            street: "S",
-            houseNumber: "1",
-          },
           billingAddress: {
-            country: "CZ",
             city: "B",
+            country: "CZ",
+            houseNumber: "1",
             postalCode: "1",
             street: "S",
-            houseNumber: "1",
           },
+          deliveryType: "shipping",
+          discount: "0",
+          paymentMethod: "card",
+          paymentStatus: "pending",
+          shippingAddress: {
+            city: "B",
+            country: "CZ",
+            houseNumber: "1",
+            postalCode: "1",
+            street: "S",
+          },
+          shippingFee: "10",
+          status: "pending",
+          totalPrice: "100",
         } as never,
-        [{ shopId: "s1", productId: "p1", quantity: 1, unitPrice: "90" }]
+        [{ productId: "p1", quantity: 1, shopId: "s1", unitPrice: "90" }]
       );
 
       expect(result.id).toBe("order-1");

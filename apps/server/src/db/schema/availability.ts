@@ -3,31 +3,31 @@ import { timestamptz } from "./helpers";
 import { shops, winemakers } from "./sellers";
 
 export const availabilityRegular = pgTable("availability_regular", {
+  createdAt: timestamptz("created_at").notNull().defaultNow(),
+  deletedAt: timestamptz("deleted_at"),
+  dow: integer("dow").notNull(),
+  endTime: timestamptz("end_time").notNull(), // day of week 0-6
   id: uuid("id").primaryKey().defaultRandom(),
-  winemakerId: uuid("winemaker_id").references(() => winemakers.id),
   shopId: uuid("shop_id")
     .notNull()
     .references(() => shops.id),
-  dow: integer("dow").notNull(), // day of week 0-6
-  startTime: timestamptz("start_time").notNull(),
-  endTime: timestamptz("end_time").notNull(),
-  validFrom: varchar("valid_from", { length: 10 }).notNull(), // YYYY-MM-DD
+  startTime: timestamptz("start_time").notNull(), // YYYY-MM-DD
+  type: varchar("type", { length: 20 }).notNull(),
+  validFrom: varchar("valid_from", { length: 10 }).notNull(), // "open", "closed"
   validTo: varchar("valid_to", { length: 10 }),
-  type: varchar("type", { length: 20 }).notNull(), // "open", "closed"
-  createdAt: timestamptz("created_at").notNull().defaultNow(),
-  deletedAt: timestamptz("deleted_at"),
+  winemakerId: uuid("winemaker_id").references(() => winemakers.id),
 });
 
 export const availabilityExceptions = pgTable("availability_exceptions", {
+  action: varchar("action", { length: 20 }).notNull(),
+  createdAt: timestamptz("created_at").notNull().defaultNow(),
+  deletedAt: timestamptz("deleted_at"),
+  endsAt: timestamptz("ends_at").notNull(),
   id: uuid("id").primaryKey().defaultRandom(),
-  winemakerId: uuid("winemaker_id").references(() => winemakers.id),
+  reason: varchar("reason", { length: 255 }), // "closed", "modified_hours"
   shopId: uuid("shop_id")
     .notNull()
     .references(() => shops.id),
   startsAt: timestamptz("starts_at").notNull(),
-  endsAt: timestamptz("ends_at").notNull(),
-  action: varchar("action", { length: 20 }).notNull(), // "closed", "modified_hours"
-  reason: varchar("reason", { length: 255 }),
-  createdAt: timestamptz("created_at").notNull().defaultNow(),
-  deletedAt: timestamptz("deleted_at"),
+  winemakerId: uuid("winemaker_id").references(() => winemakers.id),
 });

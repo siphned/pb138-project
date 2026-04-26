@@ -2,15 +2,15 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 
 vi.mock("./availability.repository", () => ({
   availabilityRepository: {
-    findShopById: vi.fn(),
-    findRegularByShopId: vi.fn(),
+    deleteException: vi.fn(),
+    deleteRegular: vi.fn(),
+    findExceptionById: vi.fn(),
     findExceptionsByShopId: vi.fn(),
     findRegularById: vi.fn(),
-    findExceptionById: vi.fn(),
-    insertRegular: vi.fn(),
+    findRegularByShopId: vi.fn(),
+    findShopById: vi.fn(),
     insertException: vi.fn(),
-    deleteRegular: vi.fn(),
-    deleteException: vi.fn(),
+    insertRegular: vi.fn(),
   },
 }));
 
@@ -22,7 +22,7 @@ const _otherId = "22222222-2222-2222-2222-222222222222";
 const shopId = "33333333-3333-3333-3333-333333333333";
 const entryId = "44444444-4444-4444-4444-444444444444";
 
-const mockShop = { id: shopId, ownerUserId: ownerId, deletedAt: null } as never;
+const mockShop = { deletedAt: null, id: shopId, ownerUserId: ownerId } as never;
 const mockRegular = { id: entryId, shopId } as never;
 const mockException = { id: entryId, shopId } as never;
 
@@ -38,10 +38,10 @@ describe("availabilityService", () => {
 
       await availabilityService.addRegular(shopId, ownerId, {
         dow: 1,
-        startTime: "09:00",
         endTime: "17:00",
-        validFrom: "2026-01-01",
+        startTime: "09:00",
         type: "open",
+        validFrom: "2026-01-01",
       });
 
       expect(availabilityRepository.insertRegular).toHaveBeenCalled();

@@ -26,14 +26,14 @@ export const guestSessionsRoutes = new Elysia({
     },
     {
       detail: {
-        summary: "Get or create a guest session",
         description:
           "Returns an existing valid guest session or creates a new one. Sets a guest_session_id cookie.",
+        summary: "Get or create a guest session",
       },
       response: t.Object({
-        id: t.String(),
         createdAt: t.Date(),
         expiresAt: t.Date(),
+        id: t.String(),
       }),
     }
   )
@@ -54,14 +54,14 @@ export const guestSessionsRoutes = new Elysia({
     },
     {
       detail: {
-        summary: "Get current guest session",
         description: "Returns the guest session associated with the guest_session_id cookie.",
+        summary: "Get current guest session",
       },
       response: {
         200: t.Object({
-          id: t.String(),
           createdAt: t.Date(),
           expiresAt: t.Date(),
+          id: t.String(),
         }),
         404: t.String(),
       },
@@ -74,12 +74,12 @@ export const guestSessionsRoutes = new Elysia({
       return status(204, null);
     },
     {
-      requireRoles: ["admin"],
       detail: {
-        summary: "Cleanup expired guest sessions",
         description:
           "Removes all guest sessions that have passed their expiresAt date. Admin only.",
         security: [{ bearerAuth: [] }],
+        summary: "Cleanup expired guest sessions",
       },
+      requireRoles: ["admin"],
     }
   );

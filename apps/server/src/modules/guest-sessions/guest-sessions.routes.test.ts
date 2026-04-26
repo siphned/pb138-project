@@ -4,14 +4,14 @@ import { app } from "../../app";
 vi.mock("./guest-sessions.service", () => ({
   guestSessionsService: {
     getOrCreateSession: vi.fn().mockResolvedValue({
-      id: "test-session-id",
       createdAt: new Date(),
       expiresAt: new Date(Date.now() + 1000000),
+      id: "test-session-id",
     }),
     validateSession: vi.fn().mockResolvedValue({
-      id: "test-session-id",
       createdAt: new Date(),
       expiresAt: new Date(Date.now() + 1000000),
+      id: "test-session-id",
     }),
   },
 }));
@@ -35,10 +35,10 @@ describe("guest-sessions routes", () => {
   it("GET /guest-sessions/me returns session from cookie", async () => {
     const response = await app.handle(
       new Request("http://localhost/guest-sessions/me", {
-        method: "GET",
         headers: {
           cookie: "guest_session_id=test-session-id",
         },
+        method: "GET",
       })
     );
 

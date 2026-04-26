@@ -1,55 +1,55 @@
 {
-  "version": "7",
   "dialect": "postgresql",
   "entries": [
     {
+      "breakpoints": true,
       "idx": 0,
-      "version": "7",
-      "when": 1776384390989,
       "tag": "0000_lean_captain_cross",
-      "breakpoints": true
+      "version": "7",
+      "when": 1776384390989
     },
     {
+      "breakpoints": true,
       "idx": 1,
-      "version": "7",
-      "when": 1776888817297,
       "tag": "0001_romantic_mantis",
-      "breakpoints": true
+      "version": "7",
+      "when": 1776888817297
     },
     {
+      "breakpoints": true,
       "idx": 2,
-      "version": "7",
-      "when": 1776889065328,
       "tag": "0002_living_onslaught",
-      "breakpoints": true
+      "version": "7",
+      "when": 1776889065328
     },
     {
+      "breakpoints": true,
       "idx": 3,
-      "version": "7",
-      "when": 1776945861366,
       "tag": "0003_audit_integrity",
-      "breakpoints": true
+      "version": "7",
+      "when": 1776945861366
     },
     {
+      "breakpoints": true,
       "idx": 4,
-      "version": "7",
-      "when": 1776937975742,
       "tag": "0004_quick_vargas",
-      "breakpoints": true
+      "version": "7",
+      "when": 1776937975742
     },
     {
+      "breakpoints": true,
       "idx": 5,
-      "version": "7",
-      "when": 1776942458851,
       "tag": "0005_rare_caretaker",
-      "breakpoints": true
+      "version": "7",
+      "when": 1776942458851
     },
     {
+      "breakpoints": true,
       "idx": 6,
-      "version": "7",
-      "when": 1777109106420,
       "tag": "0006_gray_titanium_man",
-      "breakpoints": true
+      "version": "7",
+      "when": 1777109106420
     }
-  ]
+  ],
+  "version": "7"
 }

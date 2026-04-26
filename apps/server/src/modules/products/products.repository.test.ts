@@ -28,22 +28,22 @@ const mockDb = db as unknown as MockDatabase;
 
 vi.mock("../../db", () => {
   const m = {
-    transaction: vi.fn((cb) => cb(m)),
-    insert: vi.fn().mockReturnThis(),
-    values: vi.fn().mockReturnThis(),
-    returning: vi.fn().mockReturnThis(),
-    update: vi.fn().mockReturnThis(),
-    set: vi.fn().mockReturnThis(),
-    where: vi.fn().mockReturnThis(),
-    select: vi.fn().mockReturnThis(),
-    from: vi.fn().mockReturnThis(),
-    for: vi.fn().mockReturnThis(),
     delete: vi.fn().mockReturnThis(),
+    for: vi.fn().mockReturnThis(),
+    from: vi.fn().mockReturnThis(),
+    insert: vi.fn().mockReturnThis(),
     query: {
       products: {
         findFirst: vi.fn(),
       },
     },
+    returning: vi.fn().mockReturnThis(),
+    select: vi.fn().mockReturnThis(),
+    set: vi.fn().mockReturnThis(),
+    transaction: vi.fn((cb) => cb(m)),
+    update: vi.fn().mockReturnThis(),
+    values: vi.fn().mockReturnThis(),
+    where: vi.fn().mockReturnThis(),
   };
   return { db: m };
 });
@@ -56,9 +56,9 @@ describe("productsRepository", () => {
   describe("createProductWithWine", () => {
     it("successfully creates product and decrements wine quantity", async () => {
       vi.mocked(mockDb.select).mockReturnValueOnce({
+        for: vi.fn().mockResolvedValue([{ quantity: 100 }]),
         from: vi.fn().mockReturnThis(),
         where: vi.fn().mockReturnThis(),
-        for: vi.fn().mockResolvedValue([{ quantity: 100 }]),
       } as unknown as MockChained);
 
       vi.mocked(mockDb.returning).mockResolvedValueOnce([{ id: "p1", name: "Wine Product" }]);
@@ -75,9 +75,9 @@ describe("productsRepository", () => {
 
     it("throws NOT_ENOUGH_STOCK if wine quantity is insufficient", async () => {
       vi.mocked(mockDb.select).mockReturnValueOnce({
+        for: vi.fn().mockResolvedValue([{ quantity: 2 }]),
         from: vi.fn().mockReturnThis(),
         where: vi.fn().mockReturnThis(),
-        for: vi.fn().mockResolvedValue([{ quantity: 2 }]),
       } as unknown as MockChained);
 
       await expect(
@@ -94,14 +94,14 @@ describe("productsRepository", () => {
     it("successfully creates bundle and decrements multiple wines", async () => {
       vi.mocked(mockDb.select)
         .mockReturnValueOnce({
+          for: vi.fn().mockResolvedValue([{ quantity: 10 }]),
           from: vi.fn().mockReturnThis(),
           where: vi.fn().mockReturnThis(),
-          for: vi.fn().mockResolvedValue([{ quantity: 10 }]),
         } as unknown as MockChained)
         .mockReturnValueOnce({
+          for: vi.fn().mockResolvedValue([{ quantity: 20 }]),
           from: vi.fn().mockReturnThis(),
           where: vi.fn().mockReturnThis(),
-          for: vi.fn().mockResolvedValue([{ quantity: 20 }]),
         } as unknown as MockChained);
 
       vi.mocked(mockDb.returning).mockResolvedValueOnce([{ id: "b1", isBundle: true }]);
@@ -110,8 +110,8 @@ describe("productsRepository", () => {
         "s1",
         { name: "Bundle", price: "50", quantity: 2 },
         [
-          { wineId: "w1", quantity: 1 },
-          { wineId: "w2", quantity: 2 },
+          { quantity: 1, wineId: "w1" },
+          { quantity: 2, wineId: "w2" },
         ]
       );
 
@@ -124,15 +124,15 @@ describe("productsRepository", () => {
     it("handles quantity change for the same wine", async () => {
       const mockProduct = {
         id: "p1",
-        quantity: 10,
         productWines: [{ wineId: "w1" }],
+        quantity: 10,
       };
       vi.mocked(db.query.products.findFirst).mockResolvedValue(mockProduct as never);
 
       vi.mocked(mockDb.select).mockReturnValueOnce({
+        for: vi.fn().mockResolvedValue([{ quantity: 100 }]),
         from: vi.fn().mockReturnThis(),
         where: vi.fn().mockReturnThis(),
-        for: vi.fn().mockResolvedValue([{ quantity: 100 }]),
       } as unknown as MockChained);
 
       vi.mocked(mockDb.returning).mockResolvedValueOnce([{ id: "p1", quantity: 15 }]);
@@ -147,15 +147,15 @@ describe("productsRepository", () => {
     it("handles wine ID change", async () => {
       const mockProduct = {
         id: "p1",
-        quantity: 10,
         productWines: [{ wineId: "w1" }],
+        quantity: 10,
       };
       vi.mocked(db.query.products.findFirst).mockResolvedValue(mockProduct as never);
 
       vi.mocked(mockDb.select).mockReturnValueOnce({
+        for: vi.fn().mockResolvedValue([{ quantity: 100 }]),
         from: vi.fn().mockReturnThis(),
         where: vi.fn().mockReturnThis(),
-        for: vi.fn().mockResolvedValue([{ quantity: 100 }]),
       } as unknown as MockChained);
 
       vi.mocked(mockDb.returning).mockResolvedValueOnce([{ id: "p1" }]);
@@ -170,8 +170,8 @@ describe("productsRepository", () => {
     it("reverts stock before soft deleting", async () => {
       const mockProduct = {
         id: "p1",
+        productWines: [{ quantity: 1, wineId: "w1" }],
         quantity: 5,
-        productWines: [{ wineId: "w1", quantity: 1 }],
       };
       vi.mocked(db.query.products.findFirst).mockResolvedValue(mockProduct as never);
 
