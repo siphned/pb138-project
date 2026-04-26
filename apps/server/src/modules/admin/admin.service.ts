@@ -2,6 +2,7 @@ import type { PaginatedResult } from "../../utils/pagination";
 import { parsePagination } from "../../utils/pagination";
 import type { AdminEventRow, AdminReviewRow, AdminUserRow } from "./admin.repository";
 import { adminRepository } from "./admin.repository";
+import { emailService } from "../email";
 
 export const adminService = {
   async listUsers(
@@ -44,6 +45,17 @@ export const adminService = {
     await adminRepository.setEventStatus(eventId, newStatus);
     const updated = await adminRepository.findEventWithDetailsById(eventId);
     if (!updated) throw new Error("NOT_FOUND");
+
+    if (newStatus === "approved" && updated.winemaker?.email) {
+      emailService
+        .sendEventApproval(updated.winemaker.email, {
+          eventName: updated.name,
+          startTime: updated.startTime,
+          endTime: updated.endTime,
+        })
+        .catch(console.error);
+    }
+
     return updated;
   },
 

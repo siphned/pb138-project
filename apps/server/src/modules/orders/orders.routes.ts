@@ -71,7 +71,15 @@ export const ordersRoutes = new Elysia({ prefix: "/orders", tags: ["orders"] })
 
       try {
         const checkoutData = body as CheckoutData;
-        return await ordersService.createOrder({ userId: user?.id, sessionId }, checkoutData);
+        return await ordersService.createOrder(
+          {
+            userId: user?.id,
+            sessionId,
+            userEmail: user?.email,
+            customerName: user ? `${user.fname} ${user.lname}`.trim() : undefined,
+          },
+          checkoutData
+        );
       } catch (e: unknown) {
         if (e instanceof Error && e.message.startsWith("INSUFFICIENT_STOCK")) {
           return status(422, e.message);

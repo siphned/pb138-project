@@ -15,7 +15,7 @@ export type AdminUserRow = {
 };
 
 export type AdminEventRow = Event & {
-  winemaker: { id: string; name: string } | null;
+  winemaker: { id: string; name: string; email: string | null } | null;
   address: {
     country: string;
     city: string;
@@ -107,7 +107,7 @@ export const adminRepository = {
       db.query.events.findMany({
         where,
         with: {
-          winemaker: { columns: { id: true, name: true } },
+          winemaker: { columns: { id: true, name: true, email: true } },
           address: {
             columns: {
               country: true,
@@ -138,7 +138,7 @@ export const adminRepository = {
     return db.query.events.findFirst({
       where: and(eq(events.id, id), isNull(events.deletedAt)),
       with: {
-        winemaker: { columns: { id: true, name: true } },
+        winemaker: { columns: { id: true, name: true, email: true } },
         address: {
           columns: { country: true, city: true, postalCode: true, street: true, houseNumber: true },
         },

@@ -1,5 +1,7 @@
 import type { Order, orders } from "../../db/schema";
 import { cartsService } from "../carts/carts.service";
+import { emailService } from "../email";
+import { usersRepository } from "../users/users.repository";
 import type { CreateOrderData, CreateOrderItem, OrderWithItems } from "./orders.repository";
 import { ordersRepository } from "./orders.repository";
 
@@ -26,7 +28,17 @@ export interface CheckoutData {
 
 export const ordersService = {
   async createOrder(
-    { userId, sessionId }: { userId?: string; sessionId?: string },
+    {
+      userId,
+      sessionId,
+      userEmail,
+      customerName,
+    }: {
+      userId?: string;
+      sessionId?: string;
+      userEmail?: string;
+      customerName?: string;
+    },
     data: CheckoutData
   ): Promise<Order> {
     const cart = userId
@@ -38,6 +50,7 @@ export const ordersService = {
     if (!cart || cart.items.length === 0) throw new Error("CART_EMPTY");
 
     const items: CreateOrderItem[] = [];
+    const emailItems: { name: string; quantity: number; unitPrice: string }[] = [];
     let subtotal = 0;
 
     for (const cartItem of cart.items) {
@@ -48,6 +61,12 @@ export const ordersService = {
       items.push({
         shopId: cartItem.product.shopId,
         productId: cartItem.productId,
+        quantity: cartItem.quantity,
+        unitPrice: cartItem.product.price,
+      });
+
+      emailItems.push({
+        name: cartItem.product.name,
         quantity: cartItem.quantity,
         unitPrice: cartItem.product.price,
       });
@@ -79,7 +98,22 @@ export const ordersService = {
       billingAddress: data.billingAddress || data.shippingAddress,
     };
 
-    return await ordersRepository.create(orderData, items);
+    const order = await ordersRepository.create(orderData, items);
+
+    const recipientEmail = userEmail ?? data.guestEmail;
+    const recipientName = customerName ?? data.guestName ?? "Customer";
+    if (recipientEmail) {
+      emailService
+        .sendOrderConfirmation(recipientEmail, {
+          customerName: recipientName,
+          orderId: order.id,
+          items: emailItems,
+          totalPrice,
+        })
+        .catch(console.error);
+    }
+
+    return order;
   },
 
   async getOrder(id: string, userId: string): Promise<OrderWithItems> {
@@ -99,6 +133,17 @@ export const ordersService = {
     const order = await ordersRepository.findById(orderId);
     if (!order) throw new Error("NOT_FOUND");
 
-    return ordersRepository.updateStatus(orderId, status);
+    const updated = await ordersRepository.updateStatus(orderId, status);
+
+    if (order.userId) {
+      usersRepository
+        .findById(order.userId)
+        .then((user) => {
+          if (user) emailService.sendOrderStatusUpdate(user.email, { orderId, status });
+        })
+        .catch(console.error);
+    }
+
+    return updated;
   },
 };

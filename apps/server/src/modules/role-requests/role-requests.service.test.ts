@@ -28,6 +28,13 @@ vi.mock("@clerk/backend", () => ({
   }),
 }));
 
+vi.mock("../email", () => ({
+  emailService: {
+    sendRoleRequestApproved: vi.fn().mockResolvedValue(undefined),
+    sendRoleRequestRejected: vi.fn().mockResolvedValue(undefined),
+  },
+}));
+
 import { usersRepository } from "../users/users.repository";
 import { roleRequestsRepository } from "./role-requests.repository";
 import { roleRequestsService } from "./role-requests.service";
@@ -77,7 +84,11 @@ describe("roleRequestsService", () => {
         type: "winemaker",
         status: "pending",
       } as never);
-      vi.mocked(usersRepository.findById).mockResolvedValue({ clerkId } as never);
+      vi.mocked(usersRepository.findById).mockResolvedValue({
+        clerkId,
+        email: "test@example.com",
+        fname: "Test",
+      } as never);
 
       await roleRequestsService.approve(requestId, adminId);
 
@@ -107,14 +118,46 @@ describe("roleRequestsService", () => {
         "ALREADY_RESPONDED"
       );
     });
+
+    it("sends role approved email after updating status", async () => {
+      vi.mocked(roleRequestsRepository.findById).mockResolvedValue({
+        id: requestId,
+        userId,
+        type: "winemaker",
+        status: "pending",
+      } as never);
+      vi.mocked(usersRepository.findById).mockResolvedValue({
+        clerkId,
+        email: "test@example.com",
+        fname: "Test",
+      } as never);
+      vi.mocked(roleRequestsRepository.updateStatus).mockResolvedValue({ id: requestId } as never);
+
+      await roleRequestsService.approve(requestId, adminId);
+
+      await Promise.resolve();
+
+      const { emailService } = await import("../email");
+      expect(emailService.sendRoleRequestApproved).toHaveBeenCalledWith("test@example.com", {
+        fname: "Test",
+        role: "winemaker",
+      });
+    });
   });
 
   describe("reject", () => {
     it("updates status to rejected", async () => {
       vi.mocked(roleRequestsRepository.findById).mockResolvedValue({
         id: requestId,
+        userId,
+        type: "winemaker",
         status: "pending",
       } as never);
+      vi.mocked(usersRepository.findById).mockResolvedValue({
+        email: "test@example.com",
+        fname: "Test",
+      } as never);
+      vi.mocked(roleRequestsRepository.updateStatus).mockResolvedValue({ id: requestId } as never);
 
       await roleRequestsService.reject(requestId, adminId);
 
@@ -124,6 +167,30 @@ describe("roleRequestsService", () => {
         "rejected",
         adminId
       );
+    });
+
+    it("sends role rejected email after updating status", async () => {
+      vi.mocked(roleRequestsRepository.findById).mockResolvedValue({
+        id: requestId,
+        userId,
+        type: "shop_owner",
+        status: "pending",
+      } as never);
+      vi.mocked(usersRepository.findById).mockResolvedValue({
+        email: "test@example.com",
+        fname: "Test",
+      } as never);
+      vi.mocked(roleRequestsRepository.updateStatus).mockResolvedValue({ id: requestId } as never);
+
+      await roleRequestsService.reject(requestId, adminId);
+
+      await Promise.resolve();
+
+      const { emailService } = await import("../email");
+      expect(emailService.sendRoleRequestRejected).toHaveBeenCalledWith("test@example.com", {
+        fname: "Test",
+        role: "shop_owner",
+      });
     });
   });
 

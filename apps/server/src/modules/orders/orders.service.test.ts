@@ -16,6 +16,19 @@ vi.mock("../carts/carts.service", () => ({
   },
 }));
 
+vi.mock("../email", () => ({
+  emailService: {
+    sendOrderConfirmation: vi.fn().mockResolvedValue(undefined),
+    sendOrderStatusUpdate: vi.fn().mockResolvedValue(undefined),
+  },
+}));
+
+vi.mock("../users/users.repository", () => ({
+  usersRepository: {
+    findById: vi.fn(),
+  },
+}));
+
 import { cartsService } from "../carts/carts.service";
 import { ordersRepository } from "./orders.repository";
 import type { CheckoutData } from "./orders.service";
