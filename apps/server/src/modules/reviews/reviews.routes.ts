@@ -3,155 +3,161 @@ import { authPlugin } from "../auth";
 import { createReviewBody, reviewListResponse, reviewResponse } from "./reviews.schema";
 import { reviewsService } from "./reviews.service";
 
-export const reviewsRoutes = new Elysia({ prefix: "/reviews", tags: ["reviews"] })
-  .use(authPlugin)
+export const createReviewsRoutes = (auth = authPlugin) => {
+  return new Elysia({ prefix: "/reviews", tags: ["reviews"] })
+    .use(auth)
 
-  .get(
-    "/product/:id",
-    async ({ params }) => {
-      return await reviewsService.listProductReviews(params.id);
-    },
-    {
-      detail: {
-        description: "Returns all reviews and average rating for a product.",
-        summary: "List product reviews",
-        tags: ["reviews"],
+    .get(
+      "/product/:id",
+      async ({ params }) => {
+        return await reviewsService.listProductReviews(params.id);
       },
-      params: t.Object({ id: t.String() }),
-      response: { 200: reviewListResponse },
-    }
-  )
+      {
+        detail: {
+          description: "Returns all reviews and average rating for a product.",
+          summary: "List product reviews",
+          tags: ["reviews"],
+        },
+        params: t.Object({ id: t.String() }),
+        response: { 200: reviewListResponse },
+      }
+    )
 
-  .get(
-    "/winemaker/:id",
-    async ({ params }) => {
-      return await reviewsService.listWinemakerReviews(params.id);
-    },
-    {
-      detail: {
-        description: "Returns all reviews and average rating for a winemaker.",
-        summary: "List winemaker reviews",
-        tags: ["reviews"],
+    .get(
+      "/winemaker/:id",
+      async ({ params }) => {
+        return await reviewsService.listWinemakerReviews(params.id);
       },
-      params: t.Object({ id: t.String() }),
-      response: { 200: reviewListResponse },
-    }
-  )
+      {
+        detail: {
+          description: "Returns all reviews and average rating for a winemaker.",
+          summary: "List winemaker reviews",
+          tags: ["reviews"],
+        },
+        params: t.Object({ id: t.String() }),
+        response: { 200: reviewListResponse },
+      }
+    )
 
-  .post(
-    "/product/:id",
-    // biome-ignore lint/suspicious/noExplicitAny: complex elysia type inference
-    (async ({ dbUser, params, body }: any) => {
-      try {
-        if (!dbUser) return status(401, "Unauthorized");
-        return await reviewsService.createProductReview(dbUser.id, params.id, body);
-      } catch (e: unknown) {
-        if (e instanceof Error) {
-          if (e.message === "NOT_PURCHASED")
-            return status(403, "You must purchase the product to review it");
-          if (e.message === "ALREADY_REVIEWED")
-            return status(409, "You have already reviewed this product");
+    .post(
+      "/product/:id",
+      // biome-ignore lint/suspicious/noExplicitAny: complex elysia type inference
+      (async ({ dbUser, params, body }: any) => {
+        try {
+          return await reviewsService.createProductReview(dbUser.id, params.id, body);
+        } catch (e: unknown) {
+          if (e instanceof Error) {
+            if (e.message === "NOT_PURCHASED")
+              return status(403, "You must purchase the product to review it");
+            if (e.message === "ALREADY_REVIEWED")
+              return status(409, "You have already reviewed this product");
+          }
+          throw e;
         }
-        throw e;
+      }) as never,
+      {
+        body: createReviewBody,
+        detail: {
+          description: "Creates a review for a product. Requires verified purchase.",
+          security: [{ bearerAuth: [] }],
+          summary: "Create product review",
+          tags: ["reviews"],
+        },
+        params: t.Object({ id: t.String() }),
+        requireAuth: true,
+        response: { 200: reviewResponse, 401: t.String(), 403: t.String(), 409: t.String() },
       }
-    }) as never,
-    {
-      body: createReviewBody,
-      detail: {
-        description: "Creates a review for a product. Requires verified purchase.",
-        security: [{ bearerAuth: [] }],
-        summary: "Create product review",
-        tags: ["reviews"],
-      },
-      params: t.Object({ id: t.String() }),
-      response: { 200: reviewResponse, 401: t.String(), 403: t.String(), 409: t.String() },
-    }
-  )
+    )
 
-  .post(
-    "/winemaker/:id",
-    // biome-ignore lint/suspicious/noExplicitAny: complex elysia type inference
-    (async ({ dbUser, params, body }: any) => {
-      try {
-        if (!dbUser) return status(401, "Unauthorized");
-        return await reviewsService.createWinemakerReview(dbUser.id, params.id, body);
-      } catch (e: unknown) {
-        if (e instanceof Error && e.message === "ALREADY_REVIEWED")
-          return status(409, "You have already reviewed this winemaker");
-        throw e;
+    .post(
+      "/winemaker/:id",
+      // biome-ignore lint/suspicious/noExplicitAny: complex elysia type inference
+      (async ({ dbUser, params, body }: any) => {
+        try {
+          return await reviewsService.createWinemakerReview(dbUser.id, params.id, body);
+        } catch (e: unknown) {
+          if (e instanceof Error && e.message === "ALREADY_REVIEWED")
+            return status(409, "You have already reviewed this winemaker");
+          throw e;
+        }
+      }) as never,
+      {
+        body: createReviewBody,
+        detail: {
+          description: "Creates a review for a winemaker.",
+          security: [{ bearerAuth: [] }],
+          summary: "Create winemaker review",
+          tags: ["reviews"],
+        },
+        params: t.Object({ id: t.String() }),
+        requireAuth: true,
+        response: { 200: reviewResponse, 401: t.String(), 409: t.String() },
       }
-    }) as never,
-    {
-      body: createReviewBody,
-      detail: {
-        description: "Creates a review for a winemaker.",
-        security: [{ bearerAuth: [] }],
-        summary: "Create winemaker review",
-        tags: ["reviews"],
-      },
-      params: t.Object({ id: t.String() }),
-      response: { 200: reviewResponse, 401: t.String(), 409: t.String() },
-    }
-  )
+    )
 
-  .delete(
-    "/product/:id/:reviewId",
-    // biome-ignore lint/suspicious/noExplicitAny: complex elysia type inference
-    (async ({ dbUser, clerkPayload, params }: any) => {
-      try {
-        if (!dbUser) return status(401, "Unauthorized");
-        await reviewsService.deleteReview(
-          params.reviewId,
-          dbUser.id,
-          clerkPayload?.roles?.[0] ?? "user",
-          params.id,
-          "product"
-        );
-        return { success: true };
-      } catch (e: unknown) {
-        if (e instanceof Error && e.message === "NOT_FOUND") return status(404, "Review not found");
-        throw e;
+    .delete(
+      "/product/:id/:reviewId",
+      // biome-ignore lint/suspicious/noExplicitAny: complex elysia type inference
+      (async ({ dbUser, clerkPayload, params }: any) => {
+        try {
+          await reviewsService.deleteReview(
+            params.reviewId,
+            dbUser.id,
+            clerkPayload?.roles?.[0] ?? "user",
+            params.id,
+            "product"
+          );
+          return { success: true };
+        } catch (e: unknown) {
+          if (e instanceof Error && e.message === "NOT_FOUND")
+            return status(404, "Review not found");
+          throw e;
+        }
+      }) as never,
+      {
+        detail: {
+          description: "Soft-deletes a product review. Must be own review or admin.",
+          security: [{ bearerAuth: [] }],
+          summary: "Delete product review",
+          tags: ["reviews"],
+        },
+        params: t.Object({ id: t.String(), reviewId: t.String() }),
+        requireAuth: true,
+        response: { 200: t.Object({ success: t.Boolean() }), 401: t.String(), 404: t.String() },
       }
-    }) as never,
-    {
-      detail: {
-        description: "Soft-deletes a product review. Must be own review or admin.",
-        security: [{ bearerAuth: [] }],
-        summary: "Delete product review",
-        tags: ["reviews"],
-      },
-      params: t.Object({ id: t.String(), reviewId: t.String() }),
-      response: { 200: t.Object({ success: t.Boolean() }), 401: t.String(), 404: t.String() },
-    }
-  )
+    )
 
-  .delete(
-    "/winemaker/:id/:reviewId",
-    // biome-ignore lint/suspicious/noExplicitAny: complex elysia type inference
-    (async ({ dbUser, clerkPayload, params }: any) => {
-      try {
-        if (!dbUser) return status(401, "Unauthorized");
-        await reviewsService.deleteReview(
-          params.reviewId,
-          dbUser.id,
-          clerkPayload?.roles?.[0] ?? "user",
-          params.id,
-          "winemaker"
-        );
-        return { success: true };
-      } catch (e: unknown) {
-        if (e instanceof Error && e.message === "NOT_FOUND") return status(404, "Review not found");
-        throw e;
+    .delete(
+      "/winemaker/:id/:reviewId",
+      // biome-ignore lint/suspicious/noExplicitAny: complex elysia type inference
+      (async ({ dbUser, clerkPayload, params }: any) => {
+        try {
+          await reviewsService.deleteReview(
+            params.reviewId,
+            dbUser.id,
+            clerkPayload?.roles?.[0] ?? "user",
+            params.id,
+            "winemaker"
+          );
+          return { success: true };
+        } catch (e: unknown) {
+          if (e instanceof Error && e.message === "NOT_FOUND")
+            return status(404, "Review not found");
+          throw e;
+        }
+      }) as never,
+      {
+        detail: {
+          description: "Soft-deletes a winemaker review. Must be own review or admin.",
+          security: [{ bearerAuth: [] }],
+          summary: "Delete winemaker review",
+          tags: ["reviews"],
+        },
+        params: t.Object({ id: t.String(), reviewId: t.String() }),
+        requireAuth: true,
+        response: { 200: t.Object({ success: t.Boolean() }), 401: t.String(), 404: t.String() },
       }
-    }) as never,
-    {
-      detail: {
-        description: "Soft-deletes a winemaker review. Must be own review or admin.",
-        security: [{ bearerAuth: [] }],
-        summary: "Delete winemaker review",
-        tags: ["reviews"],
-      },
-      params: t.Object({ id: t.String(), reviewId: t.String() }),
-      response: { 200: t.Object({ success: t.Boolean() }), 401: t.String(), 404: t.String() },
-    }
-  );
+    );
+};
+
+export const reviewsRoutes = createReviewsRoutes();
