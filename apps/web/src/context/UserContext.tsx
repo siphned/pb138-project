@@ -40,11 +40,11 @@ export function UserProvider({ children }: { children: ReactNode }) {
   useEffect(() => {
     if (profile) {
       setUser({
-        id: profile.id,
-        fname: profile.fname,
-        lname: profile.lname,
-        email: profile.email,
         clerkId: profile.clerkId,
+        email: profile.email,
+        fname: profile.fname,
+        id: profile.id,
+        lname: profile.lname,
         roles: profile.roles ?? [],
       });
     }
@@ -56,17 +56,17 @@ export function UserProvider({ children }: { children: ReactNode }) {
     if (!user) throw new Error("No user to update");
     const updated = await updateMutation.mutateAsync({ data: newData });
     return {
-      id: updated.id,
-      fname: updated.fname,
-      lname: updated.lname,
-      email: updated.email,
       clerkId: updated.clerkId,
+      email: updated.email,
+      fname: updated.fname,
+      id: updated.id,
+      lname: updated.lname,
       roles: updated.roles ?? [],
     };
   };
 
   return (
-    <UserContext.Provider value={{ user, updateUser, isLoading }}>{children}</UserContext.Provider>
+    <UserContext.Provider value={{ isLoading, updateUser, user }}>{children}</UserContext.Provider>
   );
 }
 

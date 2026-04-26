@@ -32,7 +32,6 @@ export const orders = pgTable("orders", {
 });
 
 export const orderItems = pgTable("order_items", {
-  createdAt: timestamptz("created_at").notNull().defaultNow(),
   deletedAt: timestamptz("deleted_at"),
   id: uuid("id").primaryKey().defaultRandom(),
   orderId: uuid("order_id")
@@ -46,5 +45,4 @@ export const orderItems = pgTable("order_items", {
     .notNull()
     .references(() => shops.id),
   unitPriceAtPurchase: numeric("unit_price_at_purchase", { precision: 10, scale: 2 }).notNull(),
-  updatedAt: timestamptz("updated_at"),
 });

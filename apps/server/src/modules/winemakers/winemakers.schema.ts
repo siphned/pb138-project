@@ -19,52 +19,52 @@ const addressResponse = t.Object({
 
 export const winemakerListItemResponse = t.Object({
   address: addressResponse,
-  createdAt: t.Any(),
+  createdAt: t.Date(),
   description: t.String(),
-  email: t.Nullable(t.String()),
+  email: t.String(),
   id: t.String(),
   name: t.String(),
-  phone: t.Nullable(t.String()),
-  updatedAt: t.Nullable(t.Any()),
+  phone: t.String(),
+  updatedAt: t.Nullable(t.Date()),
   websiteUrl: t.Nullable(t.String()),
 });
 
 const wineInProfile = t.Object({
   alcoholContent: t.String(),
   color: t.String(),
-  createdAt: t.Any(),
+  createdAt: t.Date(),
   description: t.String(),
   id: t.String(),
   name: t.String(),
   quantity: t.Integer(),
   region: t.String(),
   type: t.String(),
-  updatedAt: t.Nullable(t.Any()),
+  updatedAt: t.Date(),
   vintageYear: t.Integer(),
   volumeMl: t.Integer(),
 });
 
 const eventInProfile = t.Object({
-  createdAt: t.Any(),
+  createdAt: t.Date(),
   description: t.Nullable(t.String()),
-  endTime: t.Any(),
+  endTime: t.Date(),
   id: t.String(),
   inviteType: t.String(),
   name: t.String(),
-  startTime: t.Any(),
+  startTime: t.Date(),
   visibility: t.String(),
 });
 
 export const winemakerProfileResponse = t.Object({
   address: addressResponse,
-  createdAt: t.Any(),
+  createdAt: t.Date(),
   description: t.String(),
-  email: t.Nullable(t.String()),
+  email: t.String(),
   events: t.Array(eventInProfile),
   id: t.String(),
   name: t.String(),
-  phone: t.Nullable(t.String()),
-  updatedAt: t.Nullable(t.Any()),
+  phone: t.String(),
+  updatedAt: t.Nullable(t.Date()),
   websiteUrl: t.Nullable(t.String()),
   wines: t.Array(wineInProfile),
 });

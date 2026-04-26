@@ -13,8 +13,8 @@ export const adminRoutes = new Elysia({ prefix: "/admin", tags: ["admin"] })
       const { limit, offset, status, role } = query;
       return await adminService.listUsers(
         {
-          status: status as "active" | "suspended" | "banned" | undefined,
           role: role as "user" | "admin" | undefined,
+          status: status as "active" | "suspended" | "banned" | undefined,
         },
         {
           limit: limit ? Number(limit) : undefined,
@@ -23,22 +23,22 @@ export const adminRoutes = new Elysia({ prefix: "/admin", tags: ["admin"] })
       );
     }) as never,
     {
-      requireRoles: ["admin"],
+      detail: {
+        security: [{ bearerAuth: [] }],
+        summary: "List and filter users",
+      },
       query: t.Object({
         limit: t.Optional(t.String()),
         offset: t.Optional(t.String()),
-        status: t.Optional(t.String()),
         role: t.Optional(t.String()),
+        status: t.Optional(t.String()),
       }),
+      requireRoles: ["admin"],
       response: {
         200: t.Object({
           data: t.Array(adminUserResponse),
           total: t.Number(),
         }),
-      },
-      detail: {
-        summary: "List and filter users",
-        security: [{ bearerAuth: [] }],
       },
     }
   )
@@ -60,16 +60,16 @@ export const adminRoutes = new Elysia({ prefix: "/admin", tags: ["admin"] })
       }
     }) as never,
     {
-      requireRoles: ["admin"],
-      params: t.Object({ id: t.String() }),
       body: t.Object({
         status: t.Union([t.Literal("active"), t.Literal("suspended"), t.Literal("banned")]),
       }),
-      response: { 200: adminUserResponse, 404: t.String() },
       detail: {
-        summary: "Update user status",
         security: [{ bearerAuth: [] }],
+        summary: "Update user status",
       },
+      params: t.Object({ id: t.String() }),
+      requireRoles: ["admin"],
+      response: { 200: adminUserResponse, 404: t.String() },
     }
   )
 
@@ -87,21 +87,21 @@ export const adminRoutes = new Elysia({ prefix: "/admin", tags: ["admin"] })
       );
     }) as never,
     {
-      requireRoles: ["admin"],
+      detail: {
+        security: [{ bearerAuth: [] }],
+        summary: "List events for moderation",
+      },
       query: t.Object({
         limit: t.Optional(t.String()),
         offset: t.Optional(t.String()),
         status: t.Optional(t.String()),
       }),
+      requireRoles: ["admin"],
       response: {
         200: t.Object({
           data: t.Array(adminEventResponse),
           total: t.Number(),
         }),
-      },
-      detail: {
-        summary: "List events for moderation",
-        security: [{ bearerAuth: [] }],
       },
     }
   )
@@ -120,13 +120,13 @@ export const adminRoutes = new Elysia({ prefix: "/admin", tags: ["admin"] })
       }
     }) as never,
     {
-      requireRoles: ["admin"],
-      params: t.Object({ id: t.String() }),
-      response: { 200: adminEventResponse, 400: t.String(), 404: t.String() },
       detail: {
-        summary: "Approve a pending event",
         security: [{ bearerAuth: [] }],
+        summary: "Approve a pending event",
       },
+      params: t.Object({ id: t.String() }),
+      requireRoles: ["admin"],
+      response: { 200: adminEventResponse, 400: t.String(), 404: t.String() },
     }
   )
 
@@ -144,13 +144,13 @@ export const adminRoutes = new Elysia({ prefix: "/admin", tags: ["admin"] })
       }
     }) as never,
     {
-      requireRoles: ["admin"],
-      params: t.Object({ id: t.String() }),
-      response: { 200: adminEventResponse, 400: t.String(), 404: t.String() },
       detail: {
-        summary: "Reject a pending event",
         security: [{ bearerAuth: [] }],
+        summary: "Reject a pending event",
       },
+      params: t.Object({ id: t.String() }),
+      requireRoles: ["admin"],
+      response: { 200: adminEventResponse, 400: t.String(), 404: t.String() },
     }
   )
 
@@ -165,20 +165,20 @@ export const adminRoutes = new Elysia({ prefix: "/admin", tags: ["admin"] })
       });
     }) as never,
     {
-      requireRoles: ["admin"],
+      detail: {
+        security: [{ bearerAuth: [] }],
+        summary: "List all reviews for moderation",
+      },
       query: t.Object({
         limit: t.Optional(t.String()),
         offset: t.Optional(t.String()),
       }),
+      requireRoles: ["admin"],
       response: {
         200: t.Object({
           data: t.Array(adminReviewResponse),
           total: t.Number(),
         }),
-      },
-      detail: {
-        summary: "List all reviews for moderation",
-        security: [{ bearerAuth: [] }],
       },
     }
   )
@@ -195,12 +195,12 @@ export const adminRoutes = new Elysia({ prefix: "/admin", tags: ["admin"] })
       }
     }) as never,
     {
-      requireRoles: ["admin"],
-      params: t.Object({ id: t.String() }),
-      response: { 200: t.Object({ success: t.Boolean() }), 404: t.String() },
       detail: {
-        summary: "Soft-delete a review",
         security: [{ bearerAuth: [] }],
+        summary: "Soft-delete a review",
       },
+      params: t.Object({ id: t.String() }),
+      requireRoles: ["admin"],
+      response: { 200: t.Object({ success: t.Boolean() }), 404: t.String() },
     }
   );

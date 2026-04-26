@@ -70,9 +70,9 @@
       "values": ["still", "sparkling", "fortified", "dessert"]
     }
   },
-  "id": "09fc08f7-c0e0-4455-a8ea-61c021450afc",
+  "id": "ef5ae552-0f37-4caf-9c03-236c2b3ec71e",
   "policies": {},
-  "prevId": "e7abe103-928e-4e19-b256-2b9a12be5e56",
+  "prevId": "09fc08f7-c0e0-4455-a8ea-61c021450afc",
   "roles": {},
   "schemas": {},
   "sequences": {},
@@ -1109,13 +1109,13 @@
           "name": "created_at",
           "notNull": true,
           "primaryKey": false,
-          "type": "timestamp"
+          "type": "timestamp with time zone"
         },
         "deleted_at": {
           "name": "deleted_at",
           "notNull": false,
           "primaryKey": false,
-          "type": "timestamp"
+          "type": "timestamp with time zone"
         },
         "description": {
           "name": "description",
@@ -1165,7 +1165,7 @@
           "name": "updated_at",
           "notNull": false,
           "primaryKey": false,
-          "type": "timestamp"
+          "type": "timestamp with time zone"
         }
       },
       "compositePrimaryKeys": {},

@@ -7,10 +7,10 @@ export const winemakersRoutes = new Elysia({ prefix: "/winemakers", tags: ["wine
   .use(authPlugin)
 
   .get("/", () => winemakersService.listWinemakers() as never, {
-    response: { 200: t.Array(winemakerListItemResponse) },
     detail: {
       summary: "List all winemakers",
     },
+    response: { 200: t.Array(winemakerListItemResponse) },
   })
 
   .patch(
@@ -26,21 +26,21 @@ export const winemakersRoutes = new Elysia({ prefix: "/winemakers", tags: ["wine
       }
     },
     {
-      requireRoles: ["winemaker"],
       body: t.Partial(
         t.Object({
-          name: t.String(),
           description: t.String(),
-          websiteUrl: t.Union([t.String(), t.Null()]),
-          phone: t.String(),
           email: t.String(),
+          name: t.String(),
+          phone: t.String(),
+          websiteUrl: t.Union([t.String(), t.Null()]),
         })
       ),
-      response: { 200: winemakerListItemResponse, 404: t.String() },
       detail: {
-        summary: "Update own winemaker profile",
         security: [{ bearerAuth: [] }],
+        summary: "Update own winemaker profile",
       },
+      requireRoles: ["winemaker"],
+      response: { 200: winemakerListItemResponse, 404: t.String() },
     }
   )
 
@@ -57,10 +57,10 @@ export const winemakersRoutes = new Elysia({ prefix: "/winemakers", tags: ["wine
       }
     },
     {
-      params: t.Object({ id: t.String() }),
-      response: { 200: winemakerProfileResponse, 404: t.String() },
       detail: {
         summary: "Get winemaker by ID",
       },
+      params: t.Object({ id: t.String() }),
+      response: { 200: winemakerProfileResponse, 404: t.String() },
     }
   );

@@ -28,7 +28,7 @@ function resolveAnyOf(processed: AnyNode): AnyNode {
   const { anyOf: _anyOf, ...rest } = processed;
   const nullable = hasNull ? { nullable: true } : {};
 
-  if (cleaned.length === 0) return { ...rest, type: "string", format: "date-time", ...nullable };
+  if (cleaned.length === 0) return { ...rest, format: "date-time", type: "string", ...nullable };
   if (cleaned.length === 1) return { ...rest, ...cleaned[0], ...nullable };
   return { ...rest, anyOf: cleaned, ...nullable };
 }
@@ -46,8 +46,6 @@ const req = new Request("http://localhost/swagger/json");
 const res = await app.handle(req);
 
 if (!res.ok) {
-  console.error(`❌ Failed to fetch OpenAPI spec: ${res.status}`);
-  console.error(await res.text());
   process.exit(1);
 }
 
@@ -73,5 +71,4 @@ for (const pathItem of Object.values(normalized.paths ?? {})) {
 const spec = normalized;
 
 await writeFile(OUTPUT_PATH, JSON.stringify(spec, null, 2));
-console.log(`✅ OpenAPI spec exported to ${OUTPUT_PATH}`);
 process.exit(0);

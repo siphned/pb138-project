@@ -2,13 +2,13 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 
 vi.mock("./reviews.repository", () => ({
   reviewsRepository: {
-    findReviews: vi.fn(),
     averageRating: vi.fn(),
-    findUserReview: vi.fn(),
-    insertReview: vi.fn(),
-    findReviewWithUser: vi.fn(),
-    hasPurchasedProduct: vi.fn(),
     findById: vi.fn(),
+    findReviews: vi.fn(),
+    findReviewWithUser: vi.fn(),
+    findUserReview: vi.fn(),
+    hasPurchasedProduct: vi.fn(),
+    insertReview: vi.fn(),
     softDelete: vi.fn(),
   },
 }));

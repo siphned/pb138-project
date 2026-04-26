@@ -2,15 +2,15 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 
 vi.mock("./admin.repository", () => ({
   adminRepository: {
-    listUsers: vi.fn(),
-    findUserById: vi.fn(),
-    setUserStatus: vi.fn(),
-    listEvents: vi.fn(),
     findEventById: vi.fn(),
     findEventWithDetailsById: vi.fn(),
-    setEventStatus: vi.fn(),
-    listAllReviews: vi.fn(),
     findReviewById: vi.fn(),
+    findUserById: vi.fn(),
+    listAllReviews: vi.fn(),
+    listEvents: vi.fn(),
+    listUsers: vi.fn(),
+    setEventStatus: vi.fn(),
+    setUserStatus: vi.fn(),
     softDeleteReview: vi.fn(),
   },
 }));
