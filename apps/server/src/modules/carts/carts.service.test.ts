@@ -2,14 +2,20 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 
 vi.mock("./carts.repository", () => ({
   cartsRepository: {
-    findByUserId: vi.fn(),
-    findBySessionId: vi.fn(),
-    findByIdWithItems: vi.fn(),
-    create: vi.fn(),
     addItem: vi.fn(),
-    updateItemQuantity: vi.fn(),
-    removeItem: vi.fn(),
+    create: vi.fn(),
+    findByIdWithItems: vi.fn(),
+    findBySessionId: vi.fn(),
+    findByUserId: vi.fn(),
     mergeCarts: vi.fn(),
+    removeItem: vi.fn(),
+    updateItemQuantity: vi.fn(),
+  },
+}));
+
+vi.mock("../products/products.repository", () => ({
+  productsRepository: {
+    isDeleted: vi.fn().mockResolvedValue(false),
   },
 }));
 

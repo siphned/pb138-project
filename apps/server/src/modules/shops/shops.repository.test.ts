@@ -25,19 +25,19 @@ const mockDb = db as unknown as MockDatabase;
 
 vi.mock("../../db", () => {
   const m = {
-    transaction: vi.fn((cb) => cb(m)),
     insert: vi.fn().mockReturnThis(),
-    values: vi.fn().mockReturnThis(),
-    returning: vi.fn().mockReturnThis(),
-    update: vi.fn().mockReturnThis(),
-    set: vi.fn().mockReturnThis(),
-    where: vi.fn().mockReturnThis(),
     query: {
       shops: {
         findFirst: vi.fn(),
         findMany: vi.fn(),
       },
     },
+    returning: vi.fn().mockReturnThis(),
+    set: vi.fn().mockReturnThis(),
+    transaction: vi.fn((cb) => cb(m)),
+    update: vi.fn().mockReturnThis(),
+    values: vi.fn().mockReturnThis(),
+    where: vi.fn().mockReturnThis(),
   };
   return { db: m };
 });
@@ -49,7 +49,7 @@ describe("shopsRepository", () => {
 
   describe("findById", () => {
     it("delegates to db.query", async () => {
-      const mockShop = { id: "s1" };
+      const mockShop = { address: { deletedAt: null, id: "a1" }, id: "s1" };
       vi.mocked(db.query.shops.findFirst).mockResolvedValue(mockShop as never);
       const result = await shopsRepository.findById("s1");
       expect(result).toBe(mockShop);
@@ -72,8 +72,8 @@ describe("shopsRepository", () => {
         .mockResolvedValueOnce([{ id: "s1" }]); // shop
 
       const result = await shopsRepository.createShopWithAddress(
-        { ownerUserId: "u1", name: "Shop", description: "Desc" },
-        { country: "CZ", city: "B", postalCode: "1", street: "S", houseNumber: "1" }
+        { description: "Desc", name: "Shop", ownerUserId: "u1" },
+        { city: "B", country: "CZ", houseNumber: "1", postalCode: "1", street: "S" }
       );
 
       expect(result.id).toBe("s1");

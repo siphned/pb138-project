@@ -25,16 +25,16 @@ const mockDb = db as unknown as MockDatabase;
 vi.mock("../../db", () => {
   const m = {
     insert: vi.fn().mockReturnThis(),
-    values: vi.fn().mockReturnThis(),
-    returning: vi.fn().mockReturnThis(),
-    update: vi.fn().mockReturnThis(),
-    set: vi.fn().mockReturnThis(),
-    where: vi.fn().mockReturnThis(),
     query: {
       users: {
         findFirst: vi.fn(),
       },
     },
+    returning: vi.fn().mockReturnThis(),
+    set: vi.fn().mockReturnThis(),
+    update: vi.fn().mockReturnThis(),
+    values: vi.fn().mockReturnThis(),
+    where: vi.fn().mockReturnThis(),
   };
   return { db: m };
 });
@@ -60,9 +60,9 @@ describe("usersRepository", () => {
 
       const result = await usersRepository.create({
         clerkId: "c1",
+        email: "a@b.com",
         fname: "A",
         lname: "B",
-        email: "a@b.com",
       } as never);
 
       expect(result).toBe(mockUser);
@@ -76,11 +76,11 @@ describe("usersRepository", () => {
       vi.mocked(mockDb.returning).mockResolvedValueOnce([mockAddr]);
 
       const result = await usersRepository.createAddress({
-        country: "CZ",
         city: "B",
+        country: "CZ",
+        houseNumber: "1",
         postalCode: "1",
         street: "S",
-        houseNumber: "1",
       });
 
       expect(result).toBe(mockAddr);

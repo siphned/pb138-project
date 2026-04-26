@@ -2,8 +2,8 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 
 vi.mock("./guest-sessions.repository", () => ({
   guestSessionsRepository: {
-    findById: vi.fn(),
     create: vi.fn(),
+    findById: vi.fn(),
   },
 }));
 
@@ -19,7 +19,7 @@ describe("guestSessionsService", () => {
     it("returns an existing valid session if sessionId is provided", async () => {
       const futureDate = new Date();
       futureDate.setDate(futureDate.getDate() + 1);
-      const mockSession = { id: "session-123", expiresAt: futureDate };
+      const mockSession = { expiresAt: futureDate, id: "session-123" };
 
       vi.mocked(guestSessionsRepository.findById).mockResolvedValue(mockSession as never);
 
@@ -33,8 +33,8 @@ describe("guestSessionsService", () => {
     it("creates a new session if provided sessionId is invalid/expired", async () => {
       const pastDate = new Date();
       pastDate.setDate(pastDate.getDate() - 1);
-      const expiredSession = { id: "expired-123", expiresAt: pastDate };
-      const newSession = { id: "new-123", expiresAt: new Date() };
+      const expiredSession = { expiresAt: pastDate, id: "expired-123" };
+      const newSession = { expiresAt: new Date(), id: "new-123" };
 
       vi.mocked(guestSessionsRepository.findById).mockResolvedValue(expiredSession as never);
       vi.mocked(guestSessionsRepository.create).mockResolvedValue(newSession as never);
@@ -46,7 +46,7 @@ describe("guestSessionsService", () => {
     });
 
     it("creates a new session if no sessionId is provided", async () => {
-      const newSession = { id: "new-123", expiresAt: new Date() };
+      const newSession = { expiresAt: new Date(), id: "new-123" };
       vi.mocked(guestSessionsRepository.create).mockResolvedValue(newSession as never);
 
       const result = await guestSessionsService.getOrCreateSession();
@@ -61,7 +61,7 @@ describe("guestSessionsService", () => {
     it("returns session if valid and not expired", async () => {
       const futureDate = new Date();
       futureDate.setDate(futureDate.getDate() + 1);
-      const mockSession = { id: "session-123", expiresAt: futureDate };
+      const mockSession = { expiresAt: futureDate, id: "session-123" };
 
       vi.mocked(guestSessionsRepository.findById).mockResolvedValue(mockSession as never);
 
@@ -73,7 +73,7 @@ describe("guestSessionsService", () => {
     it("returns null if session is expired", async () => {
       const pastDate = new Date();
       pastDate.setDate(pastDate.getDate() - 1);
-      const expiredSession = { id: "expired-123", expiresAt: pastDate };
+      const expiredSession = { expiresAt: pastDate, id: "expired-123" };
 
       vi.mocked(guestSessionsRepository.findById).mockResolvedValue(expiredSession as never);
 
