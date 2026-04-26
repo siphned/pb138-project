@@ -13,7 +13,7 @@ const roleRequestResponse = t.Object({
   details: t.Union([t.String(), t.Null()]),
   id: t.String(),
   status: t.Union([t.Literal("pending"), t.Literal("approved"), t.Literal("rejected")]),
-  submittedAt: t.Date(),
+  submittedAt: t.Any(),
   type: t.Union([t.Literal("winemaker"), t.Literal("shop_owner")]),
   userId: t.String(),
 });
@@ -26,17 +26,16 @@ export const roleRequestsRoutes = new Elysia({
 
   .post(
     "/",
-    async ({ dbUser, body }) => {
+    // biome-ignore lint/suspicious/noExplicitAny: complex elysia type inference
+    async ({ dbUser, body }: { dbUser: { id: string }; body: any }) => {
       try {
-        return status(
-          201,
-          await roleRequestsService.submitRequest(
-            dbUser.id,
-            body.type,
-            body.businessName,
-            body.details
-          )
+        const result = await roleRequestsService.submitRequest(
+          dbUser.id,
+          body.type,
+          body.businessName,
+          body.details
         );
+        return status(201, result);
       } catch (e: unknown) {
         if (e instanceof Error && e.message === "ALREADY_HAS_PENDING_REQUEST") {
           return status(409, "You already have a pending request for this role");
@@ -56,18 +55,24 @@ export const roleRequestsRoutes = new Elysia({
     }
   )
 
-  .get("/", () => roleRequestsService.listPending(), {
-    detail: {
-      security: [{ bearerAuth: [] }],
-      summary: "List pending role requests",
+  .get(
+    "/",
+    async () => {
+      return await roleRequestsService.listPending();
     },
-    requireRoles: ["admin"],
-    response: { 200: t.Array(roleRequestResponse) },
-  })
+    {
+      detail: {
+        security: [{ bearerAuth: [] }],
+        summary: "List pending role requests",
+      },
+      requireRoles: ["admin"],
+      response: { 200: t.Array(roleRequestResponse) },
+    }
+  )
 
   .patch(
     "/:id/approve",
-    async ({ dbUser, params }) => {
+    async ({ dbUser, params }: { dbUser: { id: string }; params: { id: string } }) => {
       try {
         return await roleRequestsService.approve(params.id, dbUser.id);
       } catch (e: unknown) {
@@ -91,7 +96,7 @@ export const roleRequestsRoutes = new Elysia({
 
   .patch(
     "/:id/reject",
-    async ({ dbUser, params }) => {
+    async ({ dbUser, params }: { dbUser: { id: string }; params: { id: string } }) => {
       try {
         return await roleRequestsService.reject(params.id, dbUser.id);
       } catch (e: unknown) {
