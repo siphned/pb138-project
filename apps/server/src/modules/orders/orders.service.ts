@@ -84,7 +84,16 @@ export const ordersService = {
       billingAddress: data.billingAddress || data.shippingAddress,
     };
 
-    return await ordersRepository.create(orderData, items);
+    const order = await ordersRepository.create(orderData, items);
+
+    // Clear cart after successful order
+    if (userId) {
+      await cartsService.clearCart(userId);
+    } else if (sessionId) {
+      await cartsService.clearCartBySession(sessionId);
+    }
+
+    return order;
   },
 
   async getOrder(id: string, userId: string): Promise<OrderWithItems> {
