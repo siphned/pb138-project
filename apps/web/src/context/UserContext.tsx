@@ -50,9 +50,19 @@ export function UserProvider({ children }: { children: ReactNode }) {
     }
   }, [profile]);
 
-  const updateUser = async (newData: Partial<Pick<UserProfile, "fname" | "lname">>) => {
+  const updateUser = async (
+    newData: Partial<Pick<UserProfile, "fname" | "lname">>
+  ): Promise<UserProfile> => {
     if (!user) throw new Error("No user to update");
-    return updateMutation.mutateAsync({ data: newData });
+    const updated = await updateMutation.mutateAsync({ data: newData });
+    return {
+      id: updated.id,
+      fname: updated.fname,
+      lname: updated.lname,
+      email: updated.email,
+      clerkId: updated.clerkId,
+      roles: updated.roles ?? [],
+    };
   };
 
   return (
