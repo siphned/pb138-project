@@ -199,10 +199,10 @@
         "useFragmentSyntax": "warn",
         "useLiteralEnumMembers": "error",
         "useNodejsImportProtocol": "off",
-        "useShorthandAssign": "warn",
+        "useShorthandAssign": "error",
         "useTemplate": "warn",
-        "noNestedTernary": "off",
-        "useCollapsedIf": "info",
+        "noNestedTernary": "error",
+        "useCollapsedIf": "warn",
         "noRestrictedImports": {
           "level": "warn",
           "options": { "paths": { "lodash": "Use lodash/<name> instead." } }

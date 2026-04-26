@@ -1,6 +1,7 @@
 import { Elysia } from "elysia";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
+// Mock the service
 vi.mock("./admin.service", () => ({
   adminService: {
     approveEvent: vi.fn(),
@@ -13,48 +14,44 @@ vi.mock("./admin.service", () => ({
   },
 }));
 
-vi.mock("../auth", () => ({
-  authPlugin: new Elysia({ name: "auth" }).derive(() => ({
-    clerkPayload: { roles: ["admin"], sub: "test-admin" },
-    dbUser: {
-      email: "admin@test.com",
-      fname: "Admin",
-      id: "test-id",
-      lname: "User",
-      role: "admin",
-      status: "active",
-    },
-  })),
-}));
-
-import { adminRoutes } from "./admin.routes";
+import { createAdminRoutes } from "./admin.routes";
 import { adminService } from "./admin.service";
 
 describe("admin.routes integration", () => {
-  const getApp = () => new Elysia().use(adminRoutes);
+  const mockAuthState = {
+    clerkPayload: { roles: ["admin"], sub: "test-admin" },
+    dbUser: { id: "admin1", role: "admin" },
+  };
+
+  const mockAuth = new Elysia({ name: "auth-mock" })
+    .derive(() => mockAuthState)
+    .macro(
+      () =>
+        ({
+          requireAuth: () => ({}),
+          requireRoles: () => ({}),
+        }) as any
+    );
+
+  const app = createAdminRoutes(mockAuth as any);
 
   beforeEach(() => {
     vi.clearAllMocks();
   });
 
-  it("GET /admin/users returns 200", async () => {
-    vi.mocked(adminService.listUsers).mockResolvedValue({
-      data: [],
-      total: 0,
-    });
-    const app = getApp();
+  it("GET /admin/users returns 200 for admin", async () => {
+    vi.mocked(adminService.listUsers).mockResolvedValue({ data: [], total: 0 });
     const res = await app.handle(new Request("http://localhost/admin/users"));
     expect(res.status).toBe(200);
   });
 
   it("DELETE /admin/reviews/:id returns 200", async () => {
     vi.mocked(adminService.deleteReview).mockResolvedValue(undefined);
-    const app = getApp();
     const res = await app.handle(
       new Request("http://localhost/admin/reviews/r1", {
         method: "DELETE",
       })
     );
-    expect([200, 204]).toContain(res.status);
+    expect(res.status).toBe(200);
   });
 });

@@ -19,18 +19,6 @@ const userId = "11111111-1111-1111-1111-111111111111";
 const winemakerId = "22222222-2222-2222-2222-222222222222";
 const addressId = "33333333-3333-3333-3333-333333333333";
 
-const _mockAddress = {
-  city: "Brno",
-  country: "CZ",
-  createdAt: new Date(),
-  deletedAt: null,
-  houseNumber: "1",
-  id: addressId,
-  postalCode: "60200",
-  street: "Vinařská",
-  updatedAt: null,
-};
-
 const mockWinemaker = {
   addressId,
   createdAt: new Date(),
