@@ -2,12 +2,12 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 
 vi.mock("./supply-agreements.repository", () => ({
   supplyAgreementsRepository: {
+    create: vi.fn(),
     findById: vi.fn(),
     findByShopAndWinemaker: vi.fn(),
-    create: vi.fn(),
-    updateStatus: vi.fn(),
     listForShop: vi.fn(),
     listForWinemaker: vi.fn(),
+    updateStatus: vi.fn(),
   },
 }));
 
@@ -107,7 +107,7 @@ describe("supplyAgreementsService", () => {
 
   describe("respondToRequest", () => {
     it("approves a request if user is the winemaker", async () => {
-      const mockAgreement = { id: "agreement-1", winemakerId: "winemaker-1", status: "pending" };
+      const mockAgreement = { id: "agreement-1", status: "pending", winemakerId: "winemaker-1" };
       vi.mocked(supplyAgreementsRepository.findById).mockResolvedValue(mockAgreement as never);
       vi.mocked(winemakersRepository.findById).mockResolvedValue({
         id: "winemaker-1",
@@ -142,8 +142,8 @@ describe("supplyAgreementsService", () => {
     it("throws FORBIDDEN if user is not the winemaker of the agreement", async () => {
       vi.mocked(supplyAgreementsRepository.findById).mockResolvedValue({
         id: "a1",
-        winemakerId: "wm1",
         status: "pending",
+        winemakerId: "wm1",
       } as never);
       vi.mocked(winemakersRepository.findById).mockResolvedValue({
         id: "wm1",
@@ -158,8 +158,8 @@ describe("supplyAgreementsService", () => {
     it("throws ALREADY_RESPONDED if status is not pending", async () => {
       vi.mocked(supplyAgreementsRepository.findById).mockResolvedValue({
         id: "a1",
-        winemakerId: "wm1",
         status: "approved",
+        winemakerId: "wm1",
       } as never);
       vi.mocked(winemakersRepository.findById).mockResolvedValue({
         id: "wm1",
