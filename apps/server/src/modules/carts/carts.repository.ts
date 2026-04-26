@@ -19,28 +19,16 @@ export interface CartWithItems extends Cart {
 }
 
 export const cartsRepository = {
-  async addItem(cartId: string, productId: string, quantity: number): Promise<void> {
-    await db
-      .insert(cartItems)
-      .values({ cartId, productId, quantity })
-      .onConflictDoUpdate({
-        set: { quantity: sql`${cartItems.quantity} + ${quantity}`, updatedAt: new Date() },
-        target: [cartItems.cartId, cartItems.productId],
-      });
+  async findByUserId(userId: string): Promise<Cart | undefined> {
+    return db.query.carts.findFirst({
+      where: and(eq(carts.userId, userId), isNull(carts.deletedAt)),
+    });
   },
 
-  async clear(cartId: string): Promise<void> {
-    await db.delete(cartItems).where(eq(cartItems.cartId, cartId));
-  },
-
-  async clearCart(cartId: string): Promise<void> {
-    await db.delete(cartItems).where(eq(cartItems.cartId, cartId));
-  },
-
-  async create(data: { userId?: string; sessionId?: string }): Promise<Cart> {
-    const [cart] = await db.insert(carts).values(data).returning();
-    if (!cart) throw new Error("Failed to create cart");
-    return cart;
+  async findBySessionId(sessionId: string): Promise<Cart | undefined> {
+    return db.query.carts.findFirst({
+      where: and(eq(carts.sessionId, sessionId), isNull(carts.deletedAt)),
+    });
   },
 
   async findByIdWithItems(id: string): Promise<CartWithItems | undefined> {
@@ -67,40 +55,20 @@ export const cartsRepository = {
     return undefined;
   },
 
-  findBySessionId(sessionId: string): Promise<Cart | undefined> {
-    return db.query.carts.findFirst({
-      where: and(eq(carts.sessionId, sessionId), isNull(carts.deletedAt)),
-    });
-  },
-  findByUserId(userId: string): Promise<Cart | undefined> {
-    return db.query.carts.findFirst({
-      where: and(eq(carts.userId, userId), isNull(carts.deletedAt)),
-    });
+  async create(data: { userId?: string; sessionId?: string }): Promise<Cart> {
+    const [cart] = await db.insert(carts).values(data).returning();
+    if (!cart) throw new Error("Failed to create cart");
+    return cart;
   },
 
-  async mergeCarts(fromCartId: string, toCartId: string): Promise<void> {
-    await db.transaction(async (tx) => {
-      const fromItems = await tx.select().from(cartItems).where(eq(cartItems.cartId, fromCartId));
-
-      for (const item of fromItems) {
-        await tx
-          .insert(cartItems)
-          .values({ cartId: toCartId, productId: item.productId, quantity: item.quantity })
-          .onConflictDoUpdate({
-            set: { quantity: sql`${cartItems.quantity} + ${item.quantity}`, updatedAt: new Date() },
-            target: [cartItems.cartId, cartItems.productId],
-          });
-      }
-
-      await tx.delete(cartItems).where(eq(cartItems.cartId, fromCartId));
-      await tx.update(carts).set({ deletedAt: new Date() }).where(eq(carts.id, fromCartId));
-    });
-  },
-
-  async removeItem(cartId: string, productId: string): Promise<void> {
+  async addItem(cartId: string, productId: string, quantity: number): Promise<void> {
     await db
-      .delete(cartItems)
-      .where(and(eq(cartItems.cartId, cartId), eq(cartItems.productId, productId)));
+      .insert(cartItems)
+      .values({ cartId, productId, quantity })
+      .onConflictDoUpdate({
+        target: [cartItems.cartId, cartItems.productId],
+        set: { quantity: sql`${cartItems.quantity} + ${quantity}`, updatedAt: new Date() },
+      });
   },
 
   async updateItemQuantity(cartId: string, productId: string, quantity: number): Promise<void> {
@@ -114,5 +82,38 @@ export const cartsRepository = {
         .set({ quantity, updatedAt: new Date() })
         .where(and(eq(cartItems.cartId, cartId), eq(cartItems.productId, productId)));
     }
+  },
+
+  async removeItem(cartId: string, productId: string): Promise<void> {
+    await db
+      .delete(cartItems)
+      .where(and(eq(cartItems.cartId, cartId), eq(cartItems.productId, productId)));
+  },
+
+  async clear(cartId: string): Promise<void> {
+    await db.delete(cartItems).where(eq(cartItems.cartId, cartId));
+  },
+
+  async mergeCarts(fromCartId: string, toCartId: string): Promise<void> {
+    await db.transaction(async (tx) => {
+      const fromItems = await tx.select().from(cartItems).where(eq(cartItems.cartId, fromCartId));
+
+      for (const item of fromItems) {
+        await tx
+          .insert(cartItems)
+          .values({ cartId: toCartId, productId: item.productId, quantity: item.quantity })
+          .onConflictDoUpdate({
+            target: [cartItems.cartId, cartItems.productId],
+            set: { quantity: sql`${cartItems.quantity} + ${item.quantity}`, updatedAt: new Date() },
+          });
+      }
+
+      await tx.delete(cartItems).where(eq(cartItems.cartId, fromCartId));
+      await tx.update(carts).set({ deletedAt: new Date() }).where(eq(carts.id, fromCartId));
+    });
+  },
+
+  async clearCart(cartId: string): Promise<void> {
+    await db.delete(cartItems).where(eq(cartItems.cartId, cartId));
   },
 };

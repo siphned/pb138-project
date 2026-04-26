@@ -13,6 +13,8 @@ vi.mock("../carts/carts.service", () => ({
   cartsService: {
     getCartForUser: vi.fn(),
     getCartForSession: vi.fn(),
+    clearCart: vi.fn(),
+    clearCartBySession: vi.fn(),
   },
 }));
 
