@@ -42,7 +42,7 @@ export const winesRepository = {
       where: and(...conditions),
       with: {
         winemaker: {
-          columns: { deletedAt: true, id: true, name: true },
+          columns: { id: true, name: true, deletedAt: true },
         },
       },
     });
@@ -55,12 +55,12 @@ export const winesRepository = {
       where: and(eq(wines.id, id), isNull(wines.deletedAt)),
       with: {
         winemaker: {
-          columns: { deletedAt: true, id: true, name: true },
+          columns: { id: true, name: true, deletedAt: true },
         },
       },
     });
 
-    if (wine?.winemaker && !wine.winemaker.deletedAt) {
+    if (wine && wine.winemaker && !wine.winemaker.deletedAt) {
       return wine as WineWithWinemaker;
     }
     return undefined;
@@ -81,10 +81,6 @@ export const winesRepository = {
     return wine;
   },
 
-  async softDelete(id: string): Promise<void> {
-    await db.update(wines).set({ deletedAt: new Date() }).where(eq(wines.id, id));
-  },
-
   async updateById(id: string, data: WineData): Promise<Wine> {
     const [updated] = await db
       .update(wines)
@@ -93,5 +89,9 @@ export const winesRepository = {
       .returning();
     if (!updated) throw new Error("Wine not found");
     return updated;
+  },
+
+  async softDelete(id: string): Promise<void> {
+    await db.update(wines).set({ deletedAt: new Date() }).where(eq(wines.id, id));
   },
 };
