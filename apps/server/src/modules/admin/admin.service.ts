@@ -1,48 +1,40 @@
-import type { PaginatedResult } from "../../utils/pagination";
-import { parsePagination } from "../../utils/pagination";
 import type { AdminEventRow, AdminReviewRow, AdminUserRow } from "./admin.repository";
 import { adminRepository } from "./admin.repository";
 import { emailService } from "../email";
 
 export const adminService = {
+  // Users
   async listUsers(
     filters: { status?: "active" | "suspended" | "banned"; role?: "user" | "admin" },
-    paginationQuery: { page?: number; limit?: number }
-  ): Promise<PaginatedResult<AdminUserRow>> {
-    const { limit, offset } = parsePagination(paginationQuery);
-    const page = Math.max(1, paginationQuery.page ?? 1);
-    const { data, total } = await adminRepository.listUsers(filters, { limit, offset });
-    return { data, page, limit, total };
+    { limit = 20, offset = 0 } = {}
+  ): Promise<{ data: AdminUserRow[]; total: number }> {
+    return adminRepository.listUsers(filters, { limit, offset });
   },
 
-  async changeUserStatus(
+  async setUserStatus(
     userId: string,
     newStatus: "active" | "suspended" | "banned"
   ): Promise<AdminUserRow> {
     const user = await adminRepository.findUserById(userId);
     if (!user) throw new Error("NOT_FOUND");
+
     return adminRepository.setUserStatus(userId, newStatus);
   },
 
+  // Events
   async listEvents(
-    filters: { status?: "pending" | "approved" | "rejected" },
-    paginationQuery: { page?: number; limit?: number }
-  ): Promise<PaginatedResult<AdminEventRow>> {
-    const { limit, offset } = parsePagination(paginationQuery);
-    const page = Math.max(1, paginationQuery.page ?? 1);
-    const status = filters.status ?? "pending";
-    const { data, total } = await adminRepository.listEvents({ status }, { limit, offset });
-    return { data, page, limit, total };
+    { status }: { status: "pending" | "approved" | "rejected" },
+    { limit = 20, offset = 0 } = {}
+  ): Promise<{ data: AdminEventRow[]; total: number }> {
+    return adminRepository.listEvents({ status }, { limit, offset });
   },
 
-  async setEventStatus(
-    eventId: string,
-    newStatus: "approved" | "rejected"
-  ): Promise<AdminEventRow> {
+  async approveEvent(eventId: string): Promise<AdminEventRow> {
     const event = await adminRepository.findEventById(eventId);
     if (!event) throw new Error("NOT_FOUND");
-    if (event.status !== "pending") throw new Error("CONFLICT");
-    await adminRepository.setEventStatus(eventId, newStatus);
+    if (event.status !== "pending") throw new Error("NOT_PENDING");
+
+    await adminRepository.setEventStatus(eventId, "approved");
     const updated = await adminRepository.findEventWithDetailsById(eventId);
     if (!updated) throw new Error("NOT_FOUND");
 
@@ -59,25 +51,29 @@ export const adminService = {
     return updated;
   },
 
-  async listReviews(paginationQuery: {
-    page?: number;
-    limit?: number;
-  }): Promise<PaginatedResult<AdminReviewRow>> {
-    const { limit, offset } = parsePagination(paginationQuery);
-    const page = Math.max(1, paginationQuery.page ?? 1);
-    const { data, total } = await adminRepository.listAllReviews({ limit, offset });
-    return { data, page, limit, total };
+  async rejectEvent(eventId: string): Promise<AdminEventRow> {
+    const event = await adminRepository.findEventById(eventId);
+    if (!event) throw new Error("NOT_FOUND");
+    if (event.status !== "pending") throw new Error("NOT_PENDING");
+
+    await adminRepository.setEventStatus(eventId, "rejected");
+    const updated = await adminRepository.findEventWithDetailsById(eventId);
+    if (!updated) throw new Error("NOT_FOUND");
+    return updated;
   },
 
-  async deleteReview(reviewId: string, type: "product" | "winemaker"): Promise<void> {
-    if (type === "product") {
-      const review = await adminRepository.findProductReviewById(reviewId);
-      if (!review) throw new Error("NOT_FOUND");
-      await adminRepository.softDeleteProductReview(reviewId);
-    } else {
-      const review = await adminRepository.findWinemakerReviewById(reviewId);
-      if (!review) throw new Error("NOT_FOUND");
-      await adminRepository.softDeleteWinemakerReview(reviewId);
-    }
+  // Reviews
+  async listAllReviews({ limit = 20, offset = 0 } = {}): Promise<{
+    data: AdminReviewRow[];
+    total: number;
+  }> {
+    return adminRepository.listAllReviews({ limit, offset });
+  },
+
+  async deleteReview(reviewId: string): Promise<void> {
+    const review = await adminRepository.findReviewById(reviewId);
+    if (!review) throw new Error("NOT_FOUND");
+
+    await adminRepository.softDeleteReview(reviewId);
   },
 };

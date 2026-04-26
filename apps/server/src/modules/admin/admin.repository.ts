@@ -1,17 +1,9 @@
 import { and, count, eq, isNull } from "drizzle-orm";
 import { db } from "../../db";
-import type { Event } from "../../db/schema";
-import { events, productReviews, users, winemakerReviews } from "../../db/schema";
+import type { Event, Review, User } from "../../db/schema";
+import { events, reviews, users } from "../../db/schema";
 
-export type AdminUserRow = {
-  id: string;
-  fname: string;
-  lname: string;
-  email: string;
-  status: "active" | "suspended" | "banned";
-  createdAt: Date;
-  deletedAt: Date | null;
-};
+export type AdminUserRow = User;
 
 export type AdminEventRow = Event & {
   winemaker: { id: string; name: string; email: string | null } | null;
@@ -24,19 +16,13 @@ export type AdminEventRow = Event & {
   } | null;
 };
 
-export type AdminReviewRow = {
-  id: string;
-  type: "product" | "winemaker";
-  userId: string;
-  targetId: string;
-  rating: number;
-  body: string | null;
-  createdAt: Date;
+export type AdminReviewRow = Review & {
+  user: { id: string; fname: string; lname: string } | null;
 };
 
 export const adminRepository = {
   async listUsers(
-    filters: { status?: "active" | "suspended" | "banned" },
+    filters: { status?: "active" | "suspended" | "banned"; role?: string },
     pagination: { limit: number; offset: number }
   ): Promise<{ data: AdminUserRow[]; total: number }> {
     const conditions = [
@@ -49,15 +35,6 @@ export const adminRepository = {
     const [data, countResult] = await Promise.all([
       db.query.users.findMany({
         where,
-        columns: {
-          id: true,
-          fname: true,
-          lname: true,
-          email: true,
-          status: true,
-          createdAt: true,
-          deletedAt: true,
-        },
         limit: pagination.limit,
         offset: pagination.offset,
         orderBy: (u, { desc }) => [desc(u.createdAt)],
@@ -80,17 +57,9 @@ export const adminRepository = {
       .update(users)
       .set({ status: newStatus, updatedAt: new Date() })
       .where(and(eq(users.id, id), isNull(users.deletedAt)))
-      .returning({
-        id: users.id,
-        fname: users.fname,
-        lname: users.lname,
-        email: users.email,
-        status: users.status,
-        createdAt: users.createdAt,
-        deletedAt: users.deletedAt,
-      });
+      .returning();
     if (!updated) throw new Error("User not found");
-    return updated;
+    return updated as AdminUserRow;
   },
 
   async listEvents(
@@ -153,85 +122,31 @@ export const adminRepository = {
     limit: number;
     offset: number;
   }): Promise<{ data: AdminReviewRow[]; total: number }> {
-    const [productRows, winemakerRows, productCount, winemakerCount] = await Promise.all([
-      db.query.productReviews.findMany({
-        where: isNull(productReviews.deletedAt),
-        columns: {
-          id: true,
-          userId: true,
-          productId: true,
-          rating: true,
-          body: true,
-          createdAt: true,
+    const where = isNull(reviews.deletedAt);
+
+    const [data, countResult] = await Promise.all([
+      db.query.reviews.findMany({
+        where,
+        with: {
+          user: { columns: { id: true, fname: true, lname: true } },
         },
+        limit: pagination.limit,
+        offset: pagination.offset,
+        orderBy: (r, { desc }) => [desc(r.createdAt)],
       }),
-      db.query.winemakerReviews.findMany({
-        where: isNull(winemakerReviews.deletedAt),
-        columns: {
-          id: true,
-          userId: true,
-          winemakerId: true,
-          rating: true,
-          body: true,
-          createdAt: true,
-        },
-      }),
-      db.select({ value: count() }).from(productReviews).where(isNull(productReviews.deletedAt)),
-      db
-        .select({ value: count() })
-        .from(winemakerReviews)
-        .where(isNull(winemakerReviews.deletedAt)),
+      db.select({ value: count() }).from(reviews).where(where),
     ]);
 
-    const combined: AdminReviewRow[] = [
-      ...productRows.map((r) => ({
-        id: r.id,
-        type: "product" as const,
-        userId: r.userId,
-        targetId: r.productId,
-        rating: r.rating,
-        body: r.body,
-        createdAt: r.createdAt,
-      })),
-      ...winemakerRows.map((r) => ({
-        id: r.id,
-        type: "winemaker" as const,
-        userId: r.userId,
-        targetId: r.winemakerId,
-        rating: r.rating,
-        body: r.body,
-        createdAt: r.createdAt,
-      })),
-    ].sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime());
-
-    const total = Number(productCount[0]?.value ?? 0) + Number(winemakerCount[0]?.value ?? 0);
-
-    return {
-      data: combined.slice(pagination.offset, pagination.offset + pagination.limit),
-      total,
-    };
+    return { data: data as AdminReviewRow[], total: Number(countResult[0]?.value ?? 0) };
   },
 
-  findProductReviewById(id: string) {
-    return db.query.productReviews.findFirst({
-      where: and(eq(productReviews.id, id), isNull(productReviews.deletedAt)),
+  findReviewById(id: string) {
+    return db.query.reviews.findFirst({
+      where: and(eq(reviews.id, id), isNull(reviews.deletedAt)),
     });
   },
 
-  findWinemakerReviewById(id: string) {
-    return db.query.winemakerReviews.findFirst({
-      where: and(eq(winemakerReviews.id, id), isNull(winemakerReviews.deletedAt)),
-    });
-  },
-
-  async softDeleteProductReview(id: string): Promise<void> {
-    await db.update(productReviews).set({ deletedAt: new Date() }).where(eq(productReviews.id, id));
-  },
-
-  async softDeleteWinemakerReview(id: string): Promise<void> {
-    await db
-      .update(winemakerReviews)
-      .set({ deletedAt: new Date() })
-      .where(eq(winemakerReviews.id, id));
+  async softDeleteReview(id: string): Promise<void> {
+    await db.update(reviews).set({ deletedAt: new Date() }).where(eq(reviews.id, id));
   },
 };
