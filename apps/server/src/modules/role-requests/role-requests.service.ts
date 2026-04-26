@@ -1,5 +1,6 @@
 import { createClerkClient } from "@clerk/backend";
 import type { RoleRequest } from "../../db/schema";
+import { emailService } from "../email";
 import { usersRepository } from "../users/users.repository";
 import { roleRequestsRepository } from "./role-requests.repository";
 
@@ -45,7 +46,16 @@ export const roleRequestsService = {
       publicMetadata: { [metadataKey]: true },
     });
 
-    return roleRequestsRepository.updateStatus(requestId, "approved", adminUserId);
+    const result = await roleRequestsRepository.updateStatus(requestId, "approved", adminUserId);
+
+    emailService
+      .sendRoleRequestApproved(user.email, {
+        fname: user.fname,
+        role: request.type,
+      })
+      .catch(console.error);
+
+    return result;
   },
 
   async reject(requestId: string, adminUserId: string): Promise<RoleRequest> {
