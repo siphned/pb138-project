@@ -1,6 +1,7 @@
 import { createClerkClient } from "@clerk/backend";
 import type { Address, User } from "../../db/schema";
 import type { ClerkPayload } from "../auth/auth.utils";
+import { userRolesRepository } from "./user-roles.repository";
 import { usersRepository } from "./users.repository";
 
 const clerkClient = createClerkClient({
@@ -24,16 +25,52 @@ export const usersService = {
       });
     }
 
-    return usersRepository.upsert({
+    const user = await usersRepository.upsert({
       clerkId,
       fname: clerkUser.firstName ?? "",
       lname: clerkUser.lastName ?? "",
       email,
     });
+
+    // Sync Clerk roles to database
+    await this.syncRolesToDatabase(
+      user.id,
+      (clerkUser.publicMetadata?.roles as string[]) || ["customer"]
+    );
+
+    return user;
+  },
+
+  async syncRolesToDatabase(userId: string, clerkRoles: string[]): Promise<void> {
+    // Get existing roles in DB
+    const existingRoles = await userRolesRepository.findByUserId(userId);
+
+    // Add missing roles
+    for (const role of clerkRoles) {
+      if (!existingRoles.includes(role)) {
+        await userRolesRepository.addRole(userId, role);
+      }
+    }
+
+    // Remove roles that are no longer in Clerk
+    for (const role of existingRoles) {
+      if (!clerkRoles.includes(role)) {
+        await userRolesRepository.removeRole(userId, role);
+      }
+    }
   },
 
   getById(id: string): Promise<User | undefined> {
     return usersRepository.findById(id);
+  },
+
+  async getProfileWithRoles(
+    clerkId: string,
+    payload: ClerkPayload
+  ): Promise<User & { roles: string[] }> {
+    const user = await this.lazyGetOrCreate(clerkId, payload);
+    const roles = await userRolesRepository.findByUserId(user.id);
+    return { ...user, roles };
   },
 
   async updateProfile(

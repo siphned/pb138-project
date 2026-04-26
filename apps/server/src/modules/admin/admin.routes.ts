@@ -25,8 +25,8 @@ export const adminRoutes = new Elysia({ prefix: "/admin" })
   .get(
     "/users",
     async ({ query }) => {
-      const { page, limit, status: userStatus, role } = query;
-      return adminService.listUsers({ status: userStatus, role }, { page, limit });
+      const { page, limit, status: userStatus } = query;
+      return adminService.listUsers({ status: userStatus }, { page, limit });
     },
     {
       requireRole: "admin",
@@ -36,14 +36,13 @@ export const adminRoutes = new Elysia({ prefix: "/admin" })
         status: t.Optional(
           t.Union([t.Literal("active"), t.Literal("suspended"), t.Literal("banned")])
         ),
-        role: t.Optional(t.Union([t.Literal("user"), t.Literal("admin")])),
       }),
       response: { 200: paginatedUsersSchema },
       detail: {
         tags: ["admin"],
         summary: "List all users",
         description:
-          "Admin-only. Returns a paginated list of all non-deleted users. Filter by status or role.",
+          "Admin-only. Returns a paginated list of all non-deleted users. Filter by status.",
         security: [{ bearerAuth: [] }],
       },
     }

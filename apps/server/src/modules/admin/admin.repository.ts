@@ -8,7 +8,6 @@ export type AdminUserRow = {
   fname: string;
   lname: string;
   email: string;
-  role: "user" | "admin";
   status: "active" | "suspended" | "banned";
   createdAt: Date;
   deletedAt: Date | null;
@@ -37,13 +36,12 @@ export type AdminReviewRow = {
 
 export const adminRepository = {
   async listUsers(
-    filters: { status?: "active" | "suspended" | "banned"; role?: "user" | "admin" },
+    filters: { status?: "active" | "suspended" | "banned" },
     pagination: { limit: number; offset: number }
   ): Promise<{ data: AdminUserRow[]; total: number }> {
     const conditions = [
       isNull(users.deletedAt),
       filters.status !== undefined ? eq(users.status, filters.status) : undefined,
-      filters.role !== undefined ? eq(users.role, filters.role) : undefined,
     ].filter((c): c is NonNullable<typeof c> => c !== undefined);
 
     const where = and(...conditions);
@@ -56,7 +54,6 @@ export const adminRepository = {
           fname: true,
           lname: true,
           email: true,
-          role: true,
           status: true,
           createdAt: true,
           deletedAt: true,
@@ -88,7 +85,6 @@ export const adminRepository = {
         fname: users.fname,
         lname: users.lname,
         email: users.email,
-        role: users.role,
         status: users.status,
         createdAt: users.createdAt,
         deletedAt: users.deletedAt,

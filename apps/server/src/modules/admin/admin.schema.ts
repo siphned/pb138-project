@@ -13,7 +13,6 @@ export const adminUserSchema = t.Object({
   fname: t.String(),
   lname: t.String(),
   email: t.String(),
-  role: t.Union([t.Literal("user"), t.Literal("admin")]),
   status: t.Union([t.Literal("active"), t.Literal("suspended"), t.Literal("banned")]),
   createdAt: t.Date(),
   deletedAt: t.Union([t.Date(), t.Null()]),

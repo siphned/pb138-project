@@ -58,12 +58,13 @@ export const reviewsService = {
     reviewId: string,
     productId: string,
     userId: string,
-    userRole: string
+    userRoles: string[]
   ): Promise<void> {
     const review = await reviewsRepository.findProductReviewById(reviewId, productId);
     if (!review) throw new Error("NOT_FOUND");
 
-    if (userRole !== "admin" && review.userId !== userId) throw new Error("FORBIDDEN");
+    const isAdmin = userRoles.includes("admin");
+    if (!isAdmin && review.userId !== userId) throw new Error("FORBIDDEN");
 
     await reviewsRepository.softDeleteProductReview(reviewId);
   },
@@ -72,12 +73,13 @@ export const reviewsService = {
     reviewId: string,
     winemakerId: string,
     userId: string,
-    userRole: string
+    userRoles: string[]
   ): Promise<void> {
     const review = await reviewsRepository.findWinemakerReviewById(reviewId, winemakerId);
     if (!review) throw new Error("NOT_FOUND");
 
-    if (userRole !== "admin" && review.userId !== userId) throw new Error("FORBIDDEN");
+    const isAdmin = userRoles.includes("admin");
+    if (!isAdmin && review.userId !== userId) throw new Error("FORBIDDEN");
 
     await reviewsRepository.softDeleteWinemakerReview(reviewId);
   },

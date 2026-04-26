@@ -1,5 +1,6 @@
 import { Elysia, status, t } from "elysia";
 import { authPlugin } from "../auth";
+import { userRolesRepository } from "../users/user-roles.repository";
 import { createReviewBody, reviewListResponse, reviewResponse } from "./reviews.schema";
 import { reviewsService } from "./reviews.service";
 
@@ -50,11 +51,12 @@ export const reviewsRoutes = new Elysia()
     "/products/:productId/reviews/:reviewId",
     async ({ params, dbUser }) => {
       try {
+        const roles = await userRolesRepository.findByUserId(dbUser.id);
         await reviewsService.deleteProductReview(
           params.reviewId,
           params.productId,
           dbUser.id,
-          dbUser.role
+          roles
         );
         return status(204, null);
       } catch (e: unknown) {
@@ -120,11 +122,12 @@ export const reviewsRoutes = new Elysia()
     "/winemakers/:winemakerId/reviews/:reviewId",
     async ({ params, dbUser }) => {
       try {
+        const roles = await userRolesRepository.findByUserId(dbUser.id);
         await reviewsService.deleteWinemakerReview(
           params.reviewId,
           params.winemakerId,
           dbUser.id,
-          dbUser.role
+          roles
         );
         return status(204, null);
       } catch (e: unknown) {
