@@ -81,15 +81,20 @@ export const ordersRoutes = new Elysia({ prefix: "/orders", tags: ["orders"] })
           checkoutData
         );
       } catch (e: unknown) {
-        if (e instanceof Error && e.message.startsWith("INSUFFICIENT_STOCK")) {
-          return status(422, e.message);
+        if (e instanceof Error) {
+          if (e.message.startsWith("PRODUCT_DELETED")) {
+            return status(410, e.message);
+          }
+          if (e.message.startsWith("INSUFFICIENT_STOCK")) {
+            return status(422, e.message);
+          }
         }
         throw e;
       }
     },
     {
       body: checkoutBody,
-      response: { 200: orderResponse, 400: t.String(), 422: t.String() },
+      response: { 200: orderResponse, 400: t.String(), 410: t.String(), 422: t.String() },
       detail: {
         summary: "Checkout",
         description:
