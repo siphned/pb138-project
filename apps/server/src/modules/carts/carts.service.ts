@@ -1,4 +1,5 @@
 import type { Cart } from "../../db/schema";
+import { productsRepository } from "../products/products.repository";
 import type { CartWithItems } from "./carts.repository";
 import { cartsRepository } from "./carts.repository";
 
@@ -24,6 +25,10 @@ export const cartsService = {
     productId: string,
     quantity: number
   ): Promise<void> {
+    // Check if product is deleted
+    const isDeleted = await productsRepository.isDeleted(productId);
+    if (isDeleted) throw new Error("PRODUCT_DELETED");
+
     let cart: Cart | undefined;
     if (userId) {
       cart = await cartsRepository.findByUserId(userId);

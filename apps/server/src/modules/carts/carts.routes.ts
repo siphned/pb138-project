@@ -78,12 +78,21 @@ export const cartsRoutes = new Elysia({ prefix: "/carts", tags: ["carts"] })
   .post(
     "/items",
     async ({ user, sessionId, body }) => {
-      await cartsService.addItem({ userId: user?.id, sessionId }, body.productId, body.quantity);
-      return status(201, "Item added");
+      try {
+        await cartsService.addItem({ userId: user?.id, sessionId }, body.productId, body.quantity);
+        return status(201, "Item added");
+      } catch (e: unknown) {
+        if (e instanceof Error) {
+          if (e.message === "PRODUCT_DELETED") {
+            return status(410, "Product is no longer available");
+          }
+        }
+        throw e;
+      }
     },
     {
       body: cartItemSchema,
-      response: { 201: t.String() },
+      response: { 201: t.String(), 410: t.String() },
       detail: {
         summary: "Add item to cart",
       },

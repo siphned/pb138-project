@@ -352,4 +352,12 @@ export const productsRepository = {
       await tx.update(products).set({ deletedAt: new Date() }).where(eq(products.id, id));
     });
   },
+
+  async isDeleted(id: string): Promise<boolean> {
+    const product = await db.query.products.findFirst({
+      where: eq(products.id, id),
+      columns: { deletedAt: true },
+    });
+    return product?.deletedAt !== null && product?.deletedAt !== undefined;
+  },
 };
