@@ -1,6 +1,7 @@
 import type { Order, orders } from "../../db/schema";
 import { cartsService } from "../carts/carts.service";
 import { emailService } from "../email";
+import { usersRepository } from "../users/users.repository";
 import type { CreateOrderData, CreateOrderItem, OrderWithItems } from "./orders.repository";
 import { ordersRepository } from "./orders.repository";
 
@@ -132,6 +133,17 @@ export const ordersService = {
     const order = await ordersRepository.findById(orderId);
     if (!order) throw new Error("NOT_FOUND");
 
-    return ordersRepository.updateStatus(orderId, status);
+    const updated = await ordersRepository.updateStatus(orderId, status);
+
+    if (order.userId) {
+      usersRepository
+        .findById(order.userId)
+        .then((user) => {
+          if (user) emailService.sendOrderStatusUpdate(user.email, { orderId, status });
+        })
+        .catch(console.error);
+    }
+
+    return updated;
   },
 };
