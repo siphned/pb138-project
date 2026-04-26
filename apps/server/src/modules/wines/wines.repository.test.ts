@@ -71,7 +71,7 @@ describe("winesRepository", () => {
       const result = await winesRepository.findAll({});
 
       expect(result).toHaveLength(1);
-      expect(result[0]!.id).toBe("w1");
+      expect(result[0]?.id).toBe("w1");
     });
   });
 
