@@ -6,8 +6,8 @@ import { cn } from "@/lib/utils";
 function Accordion({ className, ...props }: AccordionPrimitive.Root.Props) {
   return (
     <AccordionPrimitive.Root
-      data-slot="accordion"
       className={cn("flex w-full flex-col overflow-hidden rounded-2xl border", className)}
+      data-slot="accordion"
       {...props}
     />
   );
@@ -16,8 +16,8 @@ function Accordion({ className, ...props }: AccordionPrimitive.Root.Props) {
 function AccordionItem({ className, ...props }: AccordionPrimitive.Item.Props) {
   return (
     <AccordionPrimitive.Item
-      data-slot="accordion-item"
       className={cn("not-last:border-b data-open:bg-muted/50", className)}
+      data-slot="accordion-item"
       {...props}
     />
   );
@@ -27,25 +27,25 @@ function AccordionTrigger({ className, children, ...props }: AccordionPrimitive.
   return (
     <AccordionPrimitive.Header className="flex">
       <AccordionPrimitive.Trigger
-        data-slot="accordion-trigger"
         className={cn(
           "group/accordion-trigger relative flex flex-1 items-start justify-between gap-6 border border-transparent p-4 text-left text-sm font-medium transition-all outline-none hover:underline aria-disabled:pointer-events-none aria-disabled:opacity-50 **:data-[slot=accordion-trigger-icon]:ml-auto **:data-[slot=accordion-trigger-icon]:size-4 **:data-[slot=accordion-trigger-icon]:text-muted-foreground",
           className
         )}
+        data-slot="accordion-trigger"
         {...props}
       >
         {children}
         <HugeiconsIcon
+          className="pointer-events-none shrink-0 group-aria-expanded/accordion-trigger:hidden"
+          data-slot="accordion-trigger-icon"
           icon={ArrowDown01Icon}
           strokeWidth={2}
-          data-slot="accordion-trigger-icon"
-          className="pointer-events-none shrink-0 group-aria-expanded/accordion-trigger:hidden"
         />
         <HugeiconsIcon
+          className="pointer-events-none hidden shrink-0 group-aria-expanded/accordion-trigger:inline"
+          data-slot="accordion-trigger-icon"
           icon={ArrowUp01Icon}
           strokeWidth={2}
-          data-slot="accordion-trigger-icon"
-          className="pointer-events-none hidden shrink-0 group-aria-expanded/accordion-trigger:inline"
         />
       </AccordionPrimitive.Trigger>
     </AccordionPrimitive.Header>
@@ -55,8 +55,8 @@ function AccordionTrigger({ className, children, ...props }: AccordionPrimitive.
 function AccordionContent({ className, children, ...props }: AccordionPrimitive.Panel.Props) {
   return (
     <AccordionPrimitive.Panel
-      data-slot="accordion-content"
       className="overflow-hidden px-4 text-sm data-open:animate-accordion-down data-closed:animate-accordion-up"
+      data-slot="accordion-content"
       {...props}
     >
       <div

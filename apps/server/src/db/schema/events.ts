@@ -6,58 +6,60 @@ import { winemakers } from "./sellers";
 import { users } from "./users";
 
 export const events = pgTable("events", {
-  id: uuid("id").primaryKey().defaultRandom(),
-  winemakerId: uuid("winemaker_id")
-    .notNull()
-    .references(() => winemakers.id),
-  name: varchar("name", { length: 255 }).notNull(),
-  description: text("description"),
   addressId: uuid("address_id")
     .notNull()
     .references(() => addresses.id),
   capacity: smallint("capacity").notNull(),
-  startTime: timestamptz("start_time").notNull(),
-  endTime: timestamptz("end_time").notNull(),
-  status: eventStatusEnum("status").notNull().default("pending"),
   createdAt: timestamptz("created_at").notNull().defaultNow(),
-  updatedAt: timestamptz("updated_at"),
   deletedAt: timestamptz("deleted_at"),
+  description: text("description"),
+  endTime: timestamptz("end_time").notNull(),
+  id: uuid("id").primaryKey().defaultRandom(),
   inviteType: varchar("invite_type", { length: 255 }).notNull(),
+  name: varchar("name", { length: 255 }).notNull(),
+  startTime: timestamptz("start_time").notNull(),
+  status: eventStatusEnum("status").notNull().default("pending"),
+  updatedAt: timestamptz("updated_at"),
   visibility: eventVisibilityEnum("visibility").notNull(),
+  winemakerId: uuid("winemaker_id")
+    .notNull()
+    .references(() => winemakers.id),
 });
 
 export const eventInvitations = pgTable("event_invitations", {
-  id: uuid("id").primaryKey().defaultRandom(),
+  createdAt: timestamptz("created_at").notNull().defaultNow(),
+  deletedAt: timestamptz("deleted_at"),
+  email: text("email").notNull(),
   eventId: uuid("event_id")
     .notNull()
     .references(() => events.id),
-  email: text("email").notNull(),
-  token: text("token").notNull().unique(),
-  createdAt: timestamptz("created_at").notNull().defaultNow(),
   expiresAt: timestamptz("expires_at").notNull(),
+  id: uuid("id").primaryKey().defaultRandom(),
+  token: text("token").notNull().unique(),
+  updatedAt: timestamptz("updated_at"),
 });
 
 export const eventRegistrations = pgTable("event_registrations", {
-  id: uuid("id").primaryKey().defaultRandom(),
+  createdAt: timestamptz("created_at").notNull().defaultNow(),
+  deletedAt: timestamptz("deleted_at"),
   eventId: uuid("event_id")
     .notNull()
     .references(() => events.id),
+  id: uuid("id").primaryKey().defaultRandom(),
   userId: uuid("user_id")
     .notNull()
     .references(() => users.id),
-  createdAt: timestamptz("created_at").notNull().defaultNow(),
-  deletedAt: timestamptz("deleted_at"),
 });
 
 export const eventComments = pgTable("event_comments", {
-  id: uuid("id").primaryKey().defaultRandom(),
-  eventId: uuid("event_id")
-    .notNull()
-    .references(() => events.id),
-  userId: uuid("user_id")
-    .notNull()
-    .references(() => users.id),
   body: text("body").notNull(),
   createdAt: timestamptz("created_at").notNull().defaultNow(),
   deletedAt: timestamptz("deleted_at"),
+  eventId: uuid("event_id")
+    .notNull()
+    .references(() => events.id),
+  id: uuid("id").primaryKey().defaultRandom(),
+  userId: uuid("user_id")
+    .notNull()
+    .references(() => users.id),
 });

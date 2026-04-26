@@ -5,32 +5,32 @@ import { timestamptz } from "./helpers";
 import { users } from "./users";
 
 export const carts = pgTable("carts", {
+  createdAt: timestamptz("created_at").notNull().defaultNow(),
+  deletedAt: timestamptz("deleted_at"),
   id: uuid("id").primaryKey().defaultRandom(),
-  userId: uuid("user_id")
-    .unique()
-    .references(() => users.id),
   sessionId: uuid("session_id")
     .unique()
     .references(() => guestSessions.id),
-  createdAt: timestamptz("created_at").notNull().defaultNow(),
   updatedAt: timestamptz("updated_at").notNull().defaultNow(),
-  deletedAt: timestamptz("deleted_at"),
+  userId: uuid("user_id")
+    .unique()
+    .references(() => users.id),
 });
 
 export const cartItems = pgTable(
   "cart_items",
   {
-    id: uuid("id").primaryKey().defaultRandom(),
     cartId: uuid("cart_id")
       .notNull()
       .references(() => carts.id),
+    createdAt: timestamptz("created_at").notNull().defaultNow(),
+    deletedAt: timestamptz("deleted_at"),
+    id: uuid("id").primaryKey().defaultRandom(),
     productId: uuid("product_id")
       .notNull()
       .references(() => products.id),
     quantity: smallint("quantity").notNull(),
-    createdAt: timestamptz("created_at").notNull().defaultNow(),
     updatedAt: timestamptz("updated_at").notNull().defaultNow(),
-    deletedAt: timestamptz("deleted_at"),
   },
   (t) => ({
     unq: uniqueIndex("cart_items_cart_id_product_id_key").on(t.cartId, t.productId),

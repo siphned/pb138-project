@@ -22,48 +22,48 @@ export function CustomerOrderHistory() {
 
   const allOrders = [
     {
-      id: 1,
-      orderId: "#ORD-7392",
+      badgeClasses: "bg-[#E8F5E9] text-[#2E7D32] hover:bg-[#E8F5E9]",
       date: "April 12, 2026",
+      id: 1,
+      isRecent: true,
       items: "3 Bottles",
+      orderId: "#ORD-7392",
+      status: "Delivered",
       total: "€425.00",
-      status: "Delivered",
-      badgeClasses: "bg-[#E8F5E9] text-[#2E7D32] hover:bg-[#E8F5E9]",
       year: "2026",
-      isRecent: true,
     },
     {
-      id: 2,
-      orderId: "#ORD-7391",
-      date: "March 28, 2026",
-      items: "1 Bottle",
-      total: "€150.00",
-      status: "Processing",
       badgeClasses: "bg-[#FFF3E0] text-[#EF6C00] hover:bg-[#FFF3E0]",
-      year: "2026",
+      date: "March 28, 2026",
+      id: 2,
       isRecent: true,
+      items: "1 Bottle",
+      orderId: "#ORD-7391",
+      status: "Processing",
+      total: "€150.00",
+      year: "2026",
     },
     {
-      id: 3,
-      orderId: "#ORD-6210",
+      badgeClasses: "bg-[#E8F5E9] text-[#2E7D32] hover:bg-[#E8F5E9]",
       date: "November 15, 2025",
-      items: "2 Bottles",
-      total: "€280.00",
-      status: "Delivered",
-      badgeClasses: "bg-[#E8F5E9] text-[#2E7D32] hover:bg-[#E8F5E9]",
-      year: "2025",
+      id: 3,
       isRecent: false,
+      items: "2 Bottles",
+      orderId: "#ORD-6210",
+      status: "Delivered",
+      total: "€280.00",
+      year: "2025",
     },
     {
-      id: 4,
-      orderId: "#ORD-5102",
-      date: "June 04, 2024",
-      items: "6 Bottles",
-      total: "€890.00",
-      status: "Delivered",
       badgeClasses: "bg-[#E8F5E9] text-[#2E7D32] hover:bg-[#E8F5E9]",
-      year: "2024",
+      date: "June 04, 2024",
+      id: 4,
       isRecent: false,
+      items: "6 Bottles",
+      orderId: "#ORD-5102",
+      status: "Delivered",
+      total: "€890.00",
+      year: "2024",
     },
   ];
 
@@ -79,7 +79,7 @@ export function CustomerOrderHistory() {
           <ShoppingBag className="h-5 w-5" /> Past Orders
         </div>
         <div className="flex w-full md:w-auto">
-          <Select value={timeframe} onValueChange={(val) => setTimeframe(val || "6months")}>
+          <Select onValueChange={(val) => setTimeframe(val || "6months")} value={timeframe}>
             <SelectTrigger className="w-full sm:w-40 bg-background border-none rounded-lg h-10 focus:ring-1 focus:ring-primary/20">
               <SelectValue placeholder="Timeframe" />
             </SelectTrigger>
@@ -114,7 +114,7 @@ export function CustomerOrderHistory() {
               </TableHeader>
               <TableBody>
                 {filteredOrders.map((order) => (
-                  <TableRow key={order.id} className="border-border/50 border-b">
+                  <TableRow className="border-border/50 border-b" key={order.id}>
                     <TableCell className="font-medium text-primary flex items-center gap-1 hover:underline cursor-pointer text-sm">
                       {order.orderId} <ArrowUpRight className="h-3 w-3" />
                     </TableCell>
@@ -134,8 +134,8 @@ export function CustomerOrderHistory() {
           <div className="md:hidden flex flex-col">
             {filteredOrders.map((order) => (
               <div
-                key={order.id}
                 className="flex justify-between items-center py-5 border-b border-border/50 last:border-0"
+                key={order.id}
               >
                 <div className="flex flex-col gap-1.5">
                   <span className="font-heading font-semibold text-[15px] text-primary flex items-center gap-1">

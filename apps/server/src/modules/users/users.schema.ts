@@ -1,41 +1,42 @@
 import { t } from "elysia";
 
 export const userResponseSchema = t.Object({
-  id: t.String(),
-  clerkId: t.String(),
-  fname: t.String(),
-  lname: t.String(),
-  email: t.String(),
-  shippingAddressId: t.Union([t.String(), t.Null()]),
   billingAddressId: t.Union([t.String(), t.Null()]),
+  clerkId: t.String(),
   createdAt: t.Date(),
+  email: t.String(),
+  fname: t.String(),
+  id: t.String(),
+  lname: t.String(),
+  roles: t.Array(t.String()),
+  shippingAddressId: t.Union([t.String(), t.Null()]),
 });
 
 export const updateProfileBody = t.Object({
-  fname: t.Optional(t.String({ minLength: 1, maxLength: 30 })),
-  lname: t.Optional(t.String({ minLength: 1, maxLength: 30 })),
+  fname: t.Optional(t.String({ maxLength: 30, minLength: 1 })),
+  lname: t.Optional(t.String({ maxLength: 30, minLength: 1 })),
 });
 
 export const addressBody = t.Object({
+  city: t.String({ maxLength: 255, minLength: 1 }),
+  country: t.String({ maxLength: 50, minLength: 1 }),
+  houseNumber: t.String({ maxLength: 20, minLength: 1 }),
+  postalCode: t.String({ maxLength: 20, minLength: 1 }),
+  street: t.String({ maxLength: 255, minLength: 1 }),
   type: t.Union([t.Literal("shipping"), t.Literal("billing")]),
-  country: t.String({ minLength: 1, maxLength: 50 }),
-  city: t.String({ minLength: 1, maxLength: 255 }),
-  postalCode: t.String({ minLength: 1, maxLength: 20 }),
-  street: t.String({ minLength: 1, maxLength: 255 }),
-  houseNumber: t.String({ minLength: 1, maxLength: 20 }),
 });
 
 export const addressResponseSchema = t.Object({
-  id: t.String(),
-  country: t.String(),
   city: t.String(),
+  country: t.String(),
+  createdAt: t.Date(),
+  houseNumber: t.String(),
+  id: t.String(),
   postalCode: t.String(),
   street: t.String(),
-  houseNumber: t.String(),
-  createdAt: t.Date(),
 });
 
 export const addressesResponseSchema = t.Object({
-  shipping: t.Union([addressResponseSchema, t.Null()]),
   billing: t.Union([addressResponseSchema, t.Null()]),
+  shipping: t.Union([addressResponseSchema, t.Null()]),
 });

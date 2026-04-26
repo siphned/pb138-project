@@ -5,12 +5,12 @@ import { Card, CardContent } from "@/components/ui/card";
 export function CustomerEvents() {
   const myRegistrations = [
     {
-      id: 1,
-      title: "Grand Vin Vertical Tasting",
       date: "Wed, Apr 15",
-      time: "6:00 PM - 9:00 PM",
-      location: "Chateau Montrose Estate",
       desc: "You are registered for 2 tickets.",
+      id: 1,
+      location: "Chateau Montrose Estate",
+      time: "6:00 PM - 9:00 PM",
+      title: "Grand Vin Vertical Tasting",
     },
   ];
 
@@ -20,7 +20,7 @@ export function CustomerEvents() {
         <div className="flex items-center gap-2 font-heading text-xl font-semibold text-primary">
           <Calendar className="h-5 w-5" /> My Registrations
         </div>
-        <Button variant="outline" className="w-full sm:w-auto bg-background rounded-lg h-10 px-5">
+        <Button className="w-full sm:w-auto bg-background rounded-lg h-10 px-5" variant="outline">
           <Search className="h-4 w-4 mr-2" /> Browse Events
         </Button>
       </div>
@@ -35,8 +35,8 @@ export function CustomerEvents() {
           <div className="flex flex-col">
             {myRegistrations.map((event) => (
               <div
-                key={event.id}
                 className="p-6 md:p-8 border-b border-border/50 last:border-0 flex justify-between items-start gap-4"
+                key={event.id}
               >
                 <div className="flex flex-col gap-3 w-full pr-4">
                   <h3 className="font-heading font-semibold text-[17px] text-primary">
@@ -58,9 +58,9 @@ export function CustomerEvents() {
                   </p>
                 </div>
                 <Button
-                  variant="ghost"
-                  size="icon"
                   className="h-8 w-8 text-muted-foreground shrink-0 -mr-2"
+                  size="icon"
+                  variant="ghost"
                 >
                   <MoreHorizontal className="h-5 w-5" />
                 </Button>

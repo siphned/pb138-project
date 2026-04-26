@@ -28,13 +28,13 @@ export const authPlugin = new Elysia({ name: "auth" }).macro({
     },
   },
 
-  requireRoles: (roles: AppRole[]) => ({
+  requireCapability: (capability: AppRole) => ({
     async resolve({ headers, status, cookie: { guest_session_id: guestSessionId } }) {
       const payload = await verifyClerkToken(headers.authorization);
       if (!payload) return status(401);
 
-      const hasRole = roles.some((role) => payload.roles?.includes(role));
-      if (!hasRole) return status(403);
+      const hasCapability = payload.roles?.includes(capability);
+      if (!hasCapability) return status(403);
 
       const dbUser = await usersService.lazyGetOrCreate(payload.sub, payload);
 
@@ -52,13 +52,13 @@ export const authPlugin = new Elysia({ name: "auth" }).macro({
     },
   }),
 
-  requireCapability: (capability: AppRole) => ({
+  requireRoles: (roles: AppRole[]) => ({
     async resolve({ headers, status, cookie: { guest_session_id: guestSessionId } }) {
       const payload = await verifyClerkToken(headers.authorization);
       if (!payload) return status(401);
 
-      const hasCapability = payload.roles?.includes(capability);
-      if (!hasCapability) return status(403);
+      const hasRole = roles.some((role) => payload.roles?.includes(role));
+      if (!hasRole) return status(403);
 
       const dbUser = await usersService.lazyGetOrCreate(payload.sub, payload);
 

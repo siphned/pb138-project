@@ -12,7 +12,7 @@ export interface UserProfile {
   lname: string;
   email: string;
   clerkId: string;
-  role: "user" | "admin";
+  roles: string[];
 }
 
 interface UserContextType {
@@ -40,23 +40,33 @@ export function UserProvider({ children }: { children: ReactNode }) {
   useEffect(() => {
     if (profile) {
       setUser({
-        id: profile.id,
-        fname: profile.fname,
-        lname: profile.lname,
-        email: profile.email,
         clerkId: profile.clerkId,
-        role: profile.role as "user" | "admin",
+        email: profile.email,
+        fname: profile.fname,
+        id: profile.id,
+        lname: profile.lname,
+        roles: profile.roles ?? [],
       });
     }
   }, [profile]);
 
-  const updateUser = async (newData: Partial<Pick<UserProfile, "fname" | "lname">>) => {
+  const updateUser = async (
+    newData: Partial<Pick<UserProfile, "fname" | "lname">>
+  ): Promise<UserProfile> => {
     if (!user) throw new Error("No user to update");
-    return updateMutation.mutateAsync({ data: newData });
+    const updated = await updateMutation.mutateAsync({ data: newData });
+    return {
+      clerkId: updated.clerkId,
+      email: updated.email,
+      fname: updated.fname,
+      id: updated.id,
+      lname: updated.lname,
+      roles: updated.roles ?? [],
+    };
   };
 
   return (
-    <UserContext.Provider value={{ user, updateUser, isLoading }}>{children}</UserContext.Provider>
+    <UserContext.Provider value={{ isLoading, updateUser, user }}>{children}</UserContext.Provider>
   );
 }
 

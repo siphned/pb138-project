@@ -1,26 +1,26 @@
 import { t } from "elysia";
 
 export const createReviewBody = t.Object({
-  rating: t.Integer({ minimum: 1, maximum: 5 }),
-  body: t.Optional(t.String({ minLength: 1, maxLength: 2000 })),
+  body: t.Optional(t.String({ maxLength: 2000, minLength: 1 })),
+  rating: t.Integer({ maximum: 5, minimum: 1 }),
 });
 
 const reviewUserInfo = t.Object({
-  id: t.String(),
   fname: t.String(),
+  id: t.String(),
   lname: t.String(),
 });
 
 export const reviewResponse = t.Object({
-  id: t.String(),
-  userId: t.String(),
-  user: reviewUserInfo,
-  rating: t.Integer(),
   body: t.Nullable(t.String()),
   createdAt: t.Date(),
+  id: t.String(),
+  rating: t.Integer(),
+  user: reviewUserInfo,
+  userId: t.String(),
 });
 
 export const reviewListResponse = t.Object({
-  reviews: t.Array(reviewResponse),
   averageRating: t.Nullable(t.Number()),
+  reviews: t.Array(reviewResponse),
 });

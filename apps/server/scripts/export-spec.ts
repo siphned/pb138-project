@@ -11,7 +11,6 @@ import { writeFile } from "node:fs/promises";
 import { app } from "../src/app";
 
 const OUTPUT_PATH = "./openapi.json";
-const SPEC_PORT = 3001;
 
 // biome-ignore lint/suspicious/noExplicitAny: OpenAPI spec traversal uses unknown shape
 type AnyNode = any;
@@ -29,7 +28,7 @@ function resolveAnyOf(processed: AnyNode): AnyNode {
   const { anyOf: _anyOf, ...rest } = processed;
   const nullable = hasNull ? { nullable: true } : {};
 
-  if (cleaned.length === 0) return { ...rest, type: "string", format: "date-time", ...nullable };
+  if (cleaned.length === 0) return { ...rest, format: "date-time", type: "string", ...nullable };
   if (cleaned.length === 1) return { ...rest, ...cleaned[0], ...nullable };
   return { ...rest, anyOf: cleaned, ...nullable };
 }
@@ -42,10 +41,14 @@ function normalizeSpec(node: AnyNode): AnyNode {
   return Array.isArray(processed.anyOf) ? resolveAnyOf(processed) : processed;
 }
 
-app.listen(SPEC_PORT);
-await new Promise((resolve) => setTimeout(resolve, 500));
+// Simulate a request to get the OpenAPI JSON without starting a server
+const req = new Request("http://localhost/swagger/json");
+const res = await app.handle(req);
 
-const res = await fetch(`http://localhost:${SPEC_PORT}/swagger/json`);
+if (!res.ok) {
+  process.exit(1);
+}
+
 const raw = await res.json();
 const normalized = normalizeSpec(raw);
 
@@ -68,5 +71,4 @@ for (const pathItem of Object.values(normalized.paths ?? {})) {
 const spec = normalized;
 
 await writeFile(OUTPUT_PATH, JSON.stringify(spec, null, 2));
-app.stop();
 process.exit(0);

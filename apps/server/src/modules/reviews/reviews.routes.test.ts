@@ -1,50 +1,88 @@
+import type { Elysia } from "elysia";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
+// Mock the service
 vi.mock("./reviews.service", () => ({
   reviewsService: {
     createProductReview: vi.fn(),
     createWinemakerReview: vi.fn(),
-    deleteProductReview: vi.fn(),
-    deleteWinemakerReview: vi.fn(),
+    deleteReview: vi.fn(),
     listProductReviews: vi.fn(),
     listWinemakerReviews: vi.fn(),
   },
 }));
 
-vi.mock("../../utils/auth", () => ({
-  authPlugin: {
-    macro: () => ({}),
-  },
-}));
-
+import { createReviewsRoutes } from "./reviews.routes";
 import { reviewsService } from "./reviews.service";
 
-describe("reviewsService method signatures", () => {
+describe("reviews.routes integration", () => {
+  const mockAuthState = {
+    clerkPayload: { roles: ["customer"], sub: "test" },
+    dbUser: {
+      deletedAt: null,
+      email: "user@test.com",
+      fname: "Test",
+      id: "u1",
+      lname: "User",
+      role: "customer",
+      status: "active",
+      updatedAt: null,
+    },
+  };
+
+  const mockAuthPlugin = (app: Elysia) =>
+    app
+      .derive(() => mockAuthState)
+      .macro(
+        () =>
+          ({
+            requireAuth: () => ({}),
+            requireRoles: () => ({}),
+          }) as any
+      );
+
+  const app = createReviewsRoutes(mockAuthPlugin as any);
+
   beforeEach(() => {
     vi.clearAllMocks();
   });
 
-  it("listProductReviews is callable with a productId", async () => {
-    vi.mocked(reviewsService.listProductReviews).mockResolvedValue({
-      averageRating: 4.5,
-      reviews: [],
-    });
+  it("POST /reviews/product/:id returns 200", async () => {
+    const mockFullReview = {
+      body: "test",
+      createdAt: new Date().toISOString(),
+      deletedAt: null,
+      entityId: "p1",
+      entityType: "product",
+      id: "r1",
+      rating: 5,
+      updatedAt: null,
+      user: { fname: "Test", id: "u1", lname: "User" },
+      userId: "u1",
+    };
 
-    const result = await reviewsService.listProductReviews("p1");
-    expect(result.averageRating).toBe(4.5);
+    vi.mocked(reviewsService.createProductReview).mockResolvedValue(mockFullReview as any);
+
+    const res = await app.handle(
+      new Request("http://localhost/reviews/product/p1", {
+        body: JSON.stringify({ body: "test", rating: 5 }),
+        headers: { "Content-Type": "application/json" },
+        method: "POST",
+      })
+    );
+
+    expect(res.status).toBe(200);
   });
 
-  it("createProductReview is callable with userId, productId, data", async () => {
-    vi.mocked(reviewsService.createProductReview).mockResolvedValue({ id: "r1" } as never);
+  it("DELETE /reviews/product/:id/:reviewId returns 200", async () => {
+    vi.mocked(reviewsService.deleteReview).mockResolvedValue(undefined);
 
-    const result = await reviewsService.createProductReview("u1", "p1", { rating: 5 });
-    expect(result.id).toBe("r1");
-  });
+    const res = await app.handle(
+      new Request("http://localhost/reviews/product/p1/r1", {
+        method: "DELETE",
+      })
+    );
 
-  it("deleteProductReview is callable with reviewId, productId, userId, role", async () => {
-    vi.mocked(reviewsService.deleteProductReview).mockResolvedValue(undefined);
-
-    await reviewsService.deleteProductReview("r1", "p1", "u1", "customer");
-    expect(reviewsService.deleteProductReview).toHaveBeenCalledWith("r1", "p1", "u1", "customer");
+    expect(res.status).toBe(200);
   });
 });

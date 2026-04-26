@@ -11,14 +11,14 @@ import {
 import { eventsService } from "./events.service";
 
 const errorMessages: Record<string, [number, string]> = {
-  NOT_FOUND: [404, "Not found"],
-  FORBIDDEN: [403, "Forbidden"],
-  CONFLICT: [409, "Event cannot be edited in its current status"],
-  CAPACITY_TOO_LOW: [409, "Capacity cannot be lower than current registration count"],
   ALREADY_REGISTERED: [409, "Already registered for this event"],
   CAPACITY_FULL: [409, "Event is at full capacity"],
+  CAPACITY_TOO_LOW: [409, "Capacity cannot be lower than current registration count"],
+  CONFLICT: [409, "Event cannot be edited in its current status"],
   EVENT_NOT_AVAILABLE: [409, "Event is not available for this action"],
+  FORBIDDEN: [403, "Forbidden"],
   INVALID_DATES: [422, "Invalid dates: start must be in future, end must be after start"],
+  NOT_FOUND: [404, "Not found"],
 };
 
 function handleError(e: unknown) {
@@ -40,14 +40,14 @@ export const eventsRoutes = new Elysia()
     async ({ query }) => {
       try {
         const { page, limit, ...filters } = query;
-        return await eventsService.listEvents(filters, { page, limit });
+        return await eventsService.listEvents(filters, { limit, page });
       } catch (e) {
         return handleError(e);
       }
     },
     {
+      detail: { summary: "List approved events", tags: ["events"] },
       query: listEventsQuery,
-      detail: { tags: ["events"], summary: "List approved events" },
     }
   )
 
@@ -61,8 +61,8 @@ export const eventsRoutes = new Elysia()
       }
     },
     {
+      detail: { summary: "Get event by ID", tags: ["events"] },
       params: eventParams,
-      detail: { tags: ["events"], summary: "Get event by ID" },
     }
   )
 
@@ -76,13 +76,13 @@ export const eventsRoutes = new Elysia()
       }
     },
     {
-      requireCapability: "winemaker",
       body: createEventBody,
       detail: {
-        tags: ["events"],
-        summary: "Create event (winemaker only)",
         security: [{ bearerAuth: [] }],
+        summary: "Create event (winemaker only)",
+        tags: ["events"],
       },
+      requireCapability: "winemaker",
     }
   )
 
@@ -96,14 +96,14 @@ export const eventsRoutes = new Elysia()
       }
     },
     {
-      requireCapability: "winemaker",
-      params: eventParams,
       body: updateEventBody,
       detail: {
-        tags: ["events"],
-        summary: "Update own pending event",
         security: [{ bearerAuth: [] }],
+        summary: "Update own pending event",
+        tags: ["events"],
       },
+      params: eventParams,
+      requireCapability: "winemaker",
     }
   )
 
@@ -118,13 +118,13 @@ export const eventsRoutes = new Elysia()
       }
     },
     {
-      requireCapability: "winemaker",
-      params: eventParams,
       detail: {
-        tags: ["events"],
-        summary: "Cancel own event (soft delete)",
         security: [{ bearerAuth: [] }],
+        summary: "Cancel own event (soft delete)",
+        tags: ["events"],
       },
+      params: eventParams,
+      requireCapability: "winemaker",
     }
   )
 
@@ -138,13 +138,13 @@ export const eventsRoutes = new Elysia()
       }
     },
     {
-      requireAuth: true,
-      params: eventParams,
       detail: {
-        tags: ["events"],
-        summary: "Register for an event",
         security: [{ bearerAuth: [] }],
+        summary: "Register for an event",
+        tags: ["events"],
       },
+      params: eventParams,
+      requireAuth: true,
     }
   )
 
@@ -159,13 +159,13 @@ export const eventsRoutes = new Elysia()
       }
     },
     {
-      requireAuth: true,
-      params: eventParams,
       detail: {
-        tags: ["events"],
-        summary: "Unregister from an event",
         security: [{ bearerAuth: [] }],
+        summary: "Unregister from an event",
+        tags: ["events"],
       },
+      params: eventParams,
+      requireAuth: true,
     }
   )
 
@@ -174,17 +174,17 @@ export const eventsRoutes = new Elysia()
     async ({ params, query }) => {
       try {
         return await eventsService.listComments(params.id, {
-          page: query.page,
           limit: query.limit,
+          page: query.page,
         });
       } catch (e) {
         return handleError(e);
       }
     },
     {
+      detail: { summary: "List event comments", tags: ["events"] },
       params: eventParams,
       query: paginationQuery,
-      detail: { tags: ["events"], summary: "List event comments" },
     }
   )
 
@@ -198,13 +198,13 @@ export const eventsRoutes = new Elysia()
       }
     },
     {
-      requireAuth: true,
-      params: eventParams,
       body: createCommentBody,
       detail: {
-        tags: ["events"],
-        summary: "Post a comment on an event",
         security: [{ bearerAuth: [] }],
+        summary: "Post a comment on an event",
+        tags: ["events"],
       },
+      params: eventParams,
+      requireAuth: true,
     }
   );

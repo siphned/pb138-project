@@ -6,16 +6,16 @@ export const API_ENDPOINTS = {
   auth: {
     login: "/auth/login",
     logout: "/auth/logout",
-    register: "/auth/register",
     refresh: "/auth/refresh",
+    register: "/auth/register",
   },
   // Users
   users: {
+    create: "/users",
+    delete: (id: string) => `/users/${id}`,
     getAll: "/users",
     getOne: (id: string) => `/users/${id}`,
-    create: "/users",
     update: (id: string) => `/users/${id}`,
-    delete: (id: string) => `/users/${id}`,
   },
   // Add more as needed
 };
