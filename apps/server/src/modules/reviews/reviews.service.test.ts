@@ -23,7 +23,6 @@ describe("reviewsService", () => {
 
   const userId = "u1";
   const productId = "p1";
-  const _winemakerId = "wm1";
   const reviewId = "r1";
 
   describe("listProductReviews", () => {

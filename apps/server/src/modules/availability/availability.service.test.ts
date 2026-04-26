@@ -18,7 +18,6 @@ import { availabilityRepository } from "./availability.repository";
 import { availabilityService } from "./availability.service";
 
 const ownerId = "11111111-1111-1111-1111-111111111111";
-const _otherId = "22222222-2222-2222-2222-222222222222";
 const shopId = "33333333-3333-3333-3333-333333333333";
 const entryId = "44444444-4444-4444-4444-444444444444";
 
