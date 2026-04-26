@@ -1,1 +1,0 @@
-CREATE UNIQUE INDEX "uq_event_reg_event_user_active" ON "event_registrations" USING btree ("event_id","user_id") WHERE "event_registrations"."deleted_at" IS NULL;
