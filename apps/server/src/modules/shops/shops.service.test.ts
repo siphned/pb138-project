@@ -152,3 +152,34 @@ describe("updateShop", () => {
     expect(shopsRepository.updateById).toHaveBeenCalledWith(shopId, { addressId: newAddressId });
   });
 });
+
+describe("getShop", () => {
+  it("returns shop when found", async () => {
+    vi.mocked(shopsRepository.findById).mockResolvedValue(mockShop as never);
+    const result = await shopsService.getShop(shopId);
+    expect(result).toEqual(mockShop);
+  });
+
+  it("throws NOT_FOUND when shop not found", async () => {
+    vi.mocked(shopsRepository.findById).mockResolvedValue(undefined);
+    await expect(shopsService.getShop(shopId)).rejects.toThrow("NOT_FOUND");
+  });
+});
+
+describe("listShops", () => {
+  it("returns all shops", async () => {
+    vi.mocked(shopsRepository.findAll).mockResolvedValue([mockShop] as never);
+    const result = await shopsService.listShops();
+    expect(result).toHaveLength(1);
+    expect(shopsRepository.findAll).toHaveBeenCalled();
+  });
+});
+
+describe("listMyShops", () => {
+  it("returns shops for owner", async () => {
+    vi.mocked(shopsRepository.findAllByOwnerUserId).mockResolvedValue([mockShop] as never);
+    const result = await shopsService.listMyShops(ownerId);
+    expect(result).toHaveLength(1);
+    expect(shopsRepository.findAllByOwnerUserId).toHaveBeenCalledWith(ownerId);
+  });
+});

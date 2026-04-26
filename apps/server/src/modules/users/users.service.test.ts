@@ -148,4 +148,13 @@ describe("usersService", () => {
       expect(usersRepository.createAddress).toHaveBeenCalledWith(addrData);
     });
   });
+
+  describe("getById", () => {
+    it("returns user for db id", async () => {
+      const mockUser = { id: "u1", clerkId };
+      vi.mocked(usersRepository.findById).mockResolvedValue(mockUser as never);
+      const result = await usersService.getById("u1");
+      expect(result).toEqual(mockUser);
+    });
+  });
 });
