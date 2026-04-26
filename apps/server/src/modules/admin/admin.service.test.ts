@@ -180,6 +180,56 @@ describe("setEventStatus", () => {
     expect(adminRepository.setEventStatus).toHaveBeenCalledWith(eventId, "approved");
     expect(adminRepository.findEventWithDetailsById).toHaveBeenCalledWith(eventId);
   });
+
+  it("sends approval email to winemaker when event is approved", async () => {
+    vi.mocked(adminRepository.findEventById).mockResolvedValue(mockPendingEvent as never);
+    vi.mocked(adminRepository.setEventStatus).mockResolvedValue(undefined);
+    vi.mocked(adminRepository.findEventWithDetailsById).mockResolvedValue(mockEventWithDetails);
+
+    await adminService.setEventStatus(eventId, "approved");
+
+    // give the fire-and-forget promise a tick to settle
+    await Promise.resolve();
+
+    const { emailService } = await import("../email");
+    expect(emailService.sendEventApproval).toHaveBeenCalledWith("winery@test.com", {
+      eventName: mockEventWithDetails.name,
+      startTime: mockEventWithDetails.startTime,
+      endTime: mockEventWithDetails.endTime,
+    });
+  });
+
+  it("does not send email when event is rejected", async () => {
+    vi.mocked(adminRepository.findEventById).mockResolvedValue(mockPendingEvent as never);
+    vi.mocked(adminRepository.setEventStatus).mockResolvedValue(undefined);
+    vi.mocked(adminRepository.findEventWithDetailsById).mockResolvedValue({
+      ...mockEventWithDetails,
+      status: "rejected" as const,
+    });
+
+    await adminService.setEventStatus(eventId, "rejected");
+
+    await Promise.resolve();
+
+    const { emailService } = await import("../email");
+    expect(emailService.sendEventApproval).not.toHaveBeenCalled();
+  });
+
+  it("does not send email when winemaker has no email", async () => {
+    vi.mocked(adminRepository.findEventById).mockResolvedValue(mockPendingEvent as never);
+    vi.mocked(adminRepository.setEventStatus).mockResolvedValue(undefined);
+    vi.mocked(adminRepository.findEventWithDetailsById).mockResolvedValue({
+      ...mockEventWithDetails,
+      winemaker: { id: winemakerId, name: "Test Winery", email: null },
+    } as never);
+
+    await adminService.setEventStatus(eventId, "approved");
+
+    await Promise.resolve();
+
+    const { emailService } = await import("../email");
+    expect(emailService.sendEventApproval).not.toHaveBeenCalled();
+  });
 });
 
 // ─── listReviews ─────────────────────────────────────────────────────────────
