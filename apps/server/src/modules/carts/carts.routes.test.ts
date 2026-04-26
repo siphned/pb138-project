@@ -3,23 +3,23 @@ import { app } from "../../app";
 
 const { mockCart } = vi.hoisted(() => ({
   mockCart: {
-    createdAt: new Date(),
-    deletedAt: null,
     id: "gc1",
-    items: [],
-    sessionId: "s1",
-    updatedAt: new Date(),
     userId: null,
+    sessionId: "s1",
+    createdAt: new Date(),
+    updatedAt: new Date(),
+    deletedAt: null,
+    items: [],
   },
 }));
 
 vi.mock("./carts.service", () => ({
   cartsService: {
-    addItem: vi.fn().mockResolvedValue(undefined),
-    getCartForSession: vi.fn().mockResolvedValue(mockCart),
     getCartForUser: vi
       .fn()
-      .mockResolvedValue({ ...mockCart, id: "c1", sessionId: null, userId: "u1" }),
+      .mockResolvedValue({ ...mockCart, id: "c1", userId: "u1", sessionId: null }),
+    getCartForSession: vi.fn().mockResolvedValue(mockCart),
+    addItem: vi.fn().mockResolvedValue(undefined),
   },
 }));
 
@@ -31,10 +31,10 @@ describe("carts routes", () => {
   it("GET /carts returns guest cart if no auth but session cookie", async () => {
     const response = await app.handle(
       new Request("http://localhost/carts", {
+        method: "GET",
         headers: {
           cookie: "guest_session_id=s1",
         },
-        method: "GET",
       })
     );
 
@@ -46,12 +46,12 @@ describe("carts routes", () => {
   it("POST /carts/items adds an item", async () => {
     const response = await app.handle(
       new Request("http://localhost/carts/items", {
-        body: JSON.stringify({ productId: "p1", quantity: 1 }),
+        method: "POST",
         headers: {
           "Content-Type": "application/json",
           cookie: "guest_session_id=s1",
         },
-        method: "POST",
+        body: JSON.stringify({ productId: "p1", quantity: 1 }),
       })
     );
 
