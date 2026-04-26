@@ -63,11 +63,11 @@ export type OrderStatusData = {
 };
 
 const STATUS_LABELS: Record<string, string> = {
-  pending: "Pending — we have received your order.",
-  confirmed: "Confirmed — your order is being prepared.",
-  shipped: "Shipped — your order is on its way.",
-  delivered: "Delivered — your order has arrived.",
   cancelled: "Cancelled — your order has been cancelled.",
+  confirmed: "Confirmed — your order is being prepared.",
+  delivered: "Delivered — your order has arrived.",
+  pending: "Pending — we have received your order.",
+  shipped: "Shipped — your order is on its way.",
 };
 
 export function orderStatusUpdateTemplate(data: OrderStatusData): string {
@@ -87,8 +87,7 @@ export type EventApprovalData = {
 };
 
 export function eventApprovalTemplate(data: EventApprovalData): string {
-  const fmt = (d: Date) =>
-    d.toLocaleString("en-GB", { dateStyle: "medium", timeStyle: "short" });
+  const fmt = (d: Date) => d.toLocaleString("en-GB", { dateStyle: "medium", timeStyle: "short" });
   return wrap(`
     <h2 style="margin-top:0;">Your Event Has Been Approved</h2>
     <p>Great news! Your event has been reviewed and approved by the WineMarket team.</p>
@@ -116,8 +115,8 @@ export type RoleRequestData = {
 };
 
 const ROLE_LABELS: Record<RoleRequestData["role"], string> = {
-  winemaker: "Winemaker",
   shop_owner: "Shop Owner",
+  winemaker: "Winemaker",
 };
 
 export function roleRequestApprovedTemplate(data: RoleRequestData): string {

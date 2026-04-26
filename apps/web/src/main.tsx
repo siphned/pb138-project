@@ -17,7 +17,7 @@ if (!PUBLISHABLE_KEY) {
 // biome-ignore lint/style/noNonNullAssertion: root element is guaranteed to exist in index.html
 createRoot(document.getElementById("root")!).render(
   <StrictMode>
-    <ClerkProvider publishableKey={PUBLISHABLE_KEY} afterSignOutUrl="/">
+    <ClerkProvider afterSignOutUrl="/" publishableKey={PUBLISHABLE_KEY}>
       <QueryClientProvider client={queryClient}>
         <UserProvider>
           <App />

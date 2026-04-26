@@ -36,7 +36,7 @@ export function WineFiltersSidebar({ search }: WineFiltersSidebarProps) {
   };
 
   const applyFilters = () => {
-    navigate({ to: "/wines", search: localSearch });
+    navigate({ search: localSearch, to: "/wines" });
   };
 
   return (
@@ -44,12 +44,12 @@ export function WineFiltersSidebar({ search }: WineFiltersSidebarProps) {
       <div className="flex items-center justify-between">
         <h2 className="text-lg font-bold">Filters</h2>
         <Button
-          variant="ghost"
-          size="sm"
           onClick={() => {
-            setLocalSearch({ sort: "newest", page: 1 });
-            navigate({ to: "/wines", search: { sort: "newest", page: 1 } });
+            setLocalSearch({ page: 1, sort: "newest" });
+            navigate({ search: { page: 1, sort: "newest" }, to: "/wines" });
           }}
+          size="sm"
+          variant="ghost"
         >
           Clear All
         </Button>
@@ -62,17 +62,17 @@ export function WineFiltersSidebar({ search }: WineFiltersSidebarProps) {
         <h3 className="font-bold text-sm uppercase tracking-wider">Wine Type</h3>
         <div className="space-y-2">
           {WINE_TYPES.map((type) => (
-            <div key={type.id} className="flex items-center space-x-2">
+            <div className="flex items-center space-x-2" key={type.id}>
               <Checkbox
-                id={`type-${type.id}`}
                 checked={localSearch.type === type.id}
+                id={`type-${type.id}`}
                 onCheckedChange={(checked) =>
                   handleFilterChange("type", checked ? type.id : undefined)
                 }
               />
               <Label
-                htmlFor={`type-${type.id}`}
                 className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+                htmlFor={`type-${type.id}`}
               >
                 {type.label}
               </Label>
@@ -88,23 +88,23 @@ export function WineFiltersSidebar({ search }: WineFiltersSidebarProps) {
         <h3 className="font-bold text-sm uppercase tracking-wider">Price Range</h3>
         <div className="flex items-center gap-2">
           <Input
-            type="number"
-            placeholder="Min"
-            value={localSearch.minPrice || ""}
+            className="h-8"
             onChange={(e) =>
               handleFilterChange("minPrice", e.target.value ? Number(e.target.value) : undefined)
             }
-            className="h-8"
+            placeholder="Min"
+            type="number"
+            value={localSearch.minPrice || ""}
           />
           <span>-</span>
           <Input
-            type="number"
-            placeholder="Max"
-            value={localSearch.maxPrice || ""}
+            className="h-8"
             onChange={(e) =>
               handleFilterChange("maxPrice", e.target.value ? Number(e.target.value) : undefined)
             }
-            className="h-8"
+            placeholder="Max"
+            type="number"
+            value={localSearch.maxPrice || ""}
           />
         </div>
       </div>
@@ -116,17 +116,17 @@ export function WineFiltersSidebar({ search }: WineFiltersSidebarProps) {
         <h3 className="font-bold text-sm uppercase tracking-wider">Region</h3>
         <div className="space-y-2">
           {REGIONS.map((region) => (
-            <div key={region.id} className="flex items-center space-x-2">
+            <div className="flex items-center space-x-2" key={region.id}>
               <Checkbox
-                id={`region-${region.id}`}
                 checked={localSearch.region === region.id}
+                id={`region-${region.id}`}
                 onCheckedChange={(checked) =>
                   handleFilterChange("region", checked ? region.id : undefined)
                 }
               />
               <Label
-                htmlFor={`region-${region.id}`}
                 className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+                htmlFor={`region-${region.id}`}
               >
                 {region.label}
               </Label>

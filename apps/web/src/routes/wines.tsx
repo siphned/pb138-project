@@ -3,19 +3,19 @@ import { z } from "zod";
 import { WineCatalog } from "./-components/WineCatalog";
 
 const winesSearchSchema = z.object({
-  search: z.string().optional(),
-  minPrice: z.number().optional(),
   maxPrice: z.number().optional(),
-  type: z.string().optional(),
-  region: z.string().optional(),
-  rating: z.number().optional(),
-  sort: z.string().optional().default("newest"),
+  minPrice: z.number().optional(),
   page: z.number().optional().default(1),
+  rating: z.number().optional(),
+  region: z.string().optional(),
+  search: z.string().optional(),
+  sort: z.string().optional().default("newest"),
+  type: z.string().optional(),
 });
 
 export const Route = createFileRoute("/wines")({
-  validateSearch: (search) => winesSearchSchema.parse(search),
   component: WinesPage,
+  validateSearch: (search) => winesSearchSchema.parse(search),
 });
 
 function WinesPage() {

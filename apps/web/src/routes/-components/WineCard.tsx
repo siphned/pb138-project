@@ -19,8 +19,8 @@ export function WineCard({ product }: WineCardProps) {
         <div className="aspect-[4/5] w-full bg-muted flex items-center justify-center overflow-hidden">
           {/* Heart Icon */}
           <button
-            type="button"
             className="absolute top-4 right-4 z-10 rounded-full bg-white/80 p-2 text-muted-foreground hover:text-primary transition-colors"
+            type="button"
           >
             <Heart className="h-5 w-5" />
           </button>
@@ -40,11 +40,11 @@ export function WineCard({ product }: WineCardProps) {
           <div className="flex items-center">
             {[1, 2, 3, 4, 5].map((star) => (
               <Star
-                key={`star-${star}`}
                 className={cn(
                   "h-3.5 w-3.5",
                   star <= Math.floor(rating) ? "fill-star text-star" : "text-muted border-muted"
                 )}
+                key={`star-${star}`}
               />
             ))}
           </div>
@@ -65,12 +65,12 @@ export function WineCard({ product }: WineCardProps) {
 
       <CardFooter className="p-4 pt-0 flex items-center justify-between">
         <div className="text-xl font-bold text-foreground">
-          {Number(product.price).toLocaleString("cs-CZ", { style: "currency", currency: "EUR" })}
+          {Number(product.price).toLocaleString("cs-CZ", { currency: "EUR", style: "currency" })}
         </div>
         <Button
+          className="rounded-full px-4 hover:bg-primary hover:text-primary-foreground"
           size="sm"
           variant="outline"
-          className="rounded-full px-4 hover:bg-primary hover:text-primary-foreground"
         >
           View Detail
         </Button>
