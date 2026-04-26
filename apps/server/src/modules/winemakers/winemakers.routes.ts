@@ -6,25 +6,18 @@ import { winemakersService } from "./winemakers.service";
 export const winemakersRoutes = new Elysia({ prefix: "/winemakers", tags: ["winemakers"] })
   .use(authPlugin)
 
-  .get(
-    "/",
-    async () => {
-      return await winemakersService.listWinemakers();
+  .get("/", () => winemakersService.listWinemakers() as never, {
+    response: { 200: t.Array(winemakerListItemResponse) },
+    detail: {
+      summary: "List all winemakers",
     },
-    {
-      detail: {
-        summary: "List all winemakers",
-      },
-      response: { 200: t.Array(winemakerListItemResponse) },
-    }
-  )
+  })
 
   .patch(
     "/me",
-    // biome-ignore lint/suspicious/noExplicitAny: complex elysia type inference
-    async ({ dbUser, body }: { dbUser: { id: string }; body: any }) => {
+    async ({ dbUser, body }) => {
       try {
-        return await winemakersService.updateMyProfile(dbUser.id, body);
+        return (await winemakersService.updateMyProfile(dbUser.id, body)) as never;
       } catch (e: unknown) {
         if (e instanceof Error && e.message === "NOT_FOUND") {
           return status(404, "Winemaker profile not found");
@@ -33,29 +26,29 @@ export const winemakersRoutes = new Elysia({ prefix: "/winemakers", tags: ["wine
       }
     },
     {
+      requireRoles: ["winemaker"],
       body: t.Partial(
         t.Object({
-          description: t.String(),
-          email: t.String(),
           name: t.String(),
-          phone: t.String(),
+          description: t.String(),
           websiteUrl: t.Union([t.String(), t.Null()]),
+          phone: t.String(),
+          email: t.String(),
         })
       ),
-      detail: {
-        security: [{ bearerAuth: [] }],
-        summary: "Update own winemaker profile",
-      },
-      requireRoles: ["winemaker"],
       response: { 200: winemakerListItemResponse, 404: t.String() },
+      detail: {
+        summary: "Update own winemaker profile",
+        security: [{ bearerAuth: [] }],
+      },
     }
   )
 
   .get(
     "/:id",
-    async ({ params }: { params: { id: string } }) => {
+    async ({ params }) => {
       try {
-        return await winemakersService.getWinemaker(params.id);
+        return (await winemakersService.getWinemaker(params.id)) as never;
       } catch (e: unknown) {
         if (e instanceof Error && e.message === "NOT_FOUND") {
           return status(404, "Winemaker not found");
@@ -64,10 +57,10 @@ export const winemakersRoutes = new Elysia({ prefix: "/winemakers", tags: ["wine
       }
     },
     {
+      params: t.Object({ id: t.String() }),
+      response: { 200: winemakerProfileResponse, 404: t.String() },
       detail: {
         summary: "Get winemaker by ID",
       },
-      params: t.Object({ id: t.String() }),
-      response: { 200: winemakerProfileResponse, 404: t.String() },
     }
   );
