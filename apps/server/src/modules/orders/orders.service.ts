@@ -1,5 +1,6 @@
 import type { Order, orders } from "../../db/schema";
 import { cartsService } from "../carts/carts.service";
+import { productsRepository } from "../products/products.repository";
 import type { CreateOrderData, CreateOrderItem, OrderWithItems } from "./orders.repository";
 import { ordersRepository } from "./orders.repository";
 
@@ -41,6 +42,11 @@ export const ordersService = {
     let subtotal = 0;
 
     for (const cartItem of cart.items) {
+      // Check if product is deleted
+      if (cartItem.product.deletedAt !== null) {
+        throw new Error(`PRODUCT_DELETED:${cartItem.product.name}`);
+      }
+
       if (cartItem.product.quantity < cartItem.quantity) {
         throw new Error(`INSUFFICIENT_STOCK:${cartItem.product.name}`);
       }
