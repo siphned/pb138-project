@@ -29,20 +29,20 @@ const mockDb = db as unknown as MockDatabase;
 vi.mock("../../db", () => {
   const m = {
     insert: vi.fn().mockReturnThis(),
+    values: vi.fn().mockReturnThis(),
+    returning: vi.fn().mockReturnThis(),
+    update: vi.fn().mockReturnThis(),
+    set: vi.fn().mockReturnThis(),
+    where: vi.fn().mockReturnThis(),
     query: {
-      winemakers: {
-        findFirst: vi.fn(),
-      },
       wines: {
         findFirst: vi.fn(),
         findMany: vi.fn(),
       },
+      winemakers: {
+        findFirst: vi.fn(),
+      },
     },
-    returning: vi.fn().mockReturnThis(),
-    set: vi.fn().mockReturnThis(),
-    update: vi.fn().mockReturnThis(),
-    values: vi.fn().mockReturnThis(),
-    where: vi.fn().mockReturnThis(),
   };
   return { db: m };
 });
@@ -63,28 +63,28 @@ describe("winesRepository", () => {
 
     it("filters out deleted winemakers in-memory", async () => {
       const mockRows = [
-        { id: "w1", winemaker: { deletedAt: null, id: "wm1" } },
-        { id: "w2", winemaker: { deletedAt: new Date(), id: "wm2" } },
+        { id: "w1", winemaker: { id: "wm1", deletedAt: null } },
+        { id: "w2", winemaker: { id: "wm2", deletedAt: new Date() } },
       ];
       vi.mocked(db.query.wines.findMany).mockResolvedValue(mockRows as never);
 
       const result = await winesRepository.findAll({});
 
       expect(result).toHaveLength(1);
-      expect(result[0]?.id).toBe("w1");
+      expect(result[0]!.id).toBe("w1");
     });
   });
 
   describe("findById", () => {
     it("delegates to db.query and filters deleted winemaker", async () => {
-      const mockWine = { id: "w1", winemaker: { deletedAt: null, id: "wm1" } };
+      const mockWine = { id: "w1", winemaker: { id: "wm1", deletedAt: null } };
       vi.mocked(db.query.wines.findFirst).mockResolvedValue(mockWine as never);
       const result = await winesRepository.findById("w1");
       expect(result?.id).toBe("w1");
     });
 
     it("returns undefined if winemaker is deleted", async () => {
-      const mockWine = { id: "w1", winemaker: { deletedAt: new Date(), id: "wm1" } };
+      const mockWine = { id: "w1", winemaker: { id: "wm1", deletedAt: new Date() } };
       vi.mocked(db.query.wines.findFirst).mockResolvedValue(mockWine as never);
       const result = await winesRepository.findById("w1");
       expect(result).toBeUndefined();
@@ -97,17 +97,17 @@ describe("winesRepository", () => {
       vi.mocked(mockDb.returning).mockResolvedValueOnce([mockWine]);
 
       const result = await winesRepository.insert("wm1", {
-        alcoholContent: "13.5",
-        attribution: "Attr",
-        color: "red",
-        composition: "Comp",
-        description: "Desc",
         name: "Wine",
-        quantity: 100,
+        description: "Desc",
+        composition: "Comp",
+        attribution: "Attr",
         region: "Reg",
-        type: "still",
         vintageYear: 2020,
+        type: "still",
+        color: "red",
+        alcoholContent: "13.5",
         volumeMl: 750,
+        quantity: 100,
       });
 
       expect(result.id).toBe("new-w");

@@ -4,17 +4,9 @@ import type { AvailabilityException, AvailabilityRegular } from "../../db/schema
 import { availabilityExceptions, availabilityRegular, shops } from "../../db/schema";
 
 export const availabilityRepository = {
-  async deleteException(id: string): Promise<void> {
-    await db.delete(availabilityExceptions).where(eq(availabilityExceptions.id, id));
-  },
-
-  async deleteRegular(id: string): Promise<void> {
-    await db.delete(availabilityRegular).where(eq(availabilityRegular.id, id));
-  },
-
-  findExceptionById(id: string): Promise<AvailabilityException | undefined> {
-    return db.query.availabilityExceptions.findFirst({
-      where: and(eq(availabilityExceptions.id, id), isNull(availabilityExceptions.deletedAt)),
+  findRegularByShopId(shopId: string): Promise<AvailabilityRegular[]> {
+    return db.query.availabilityRegular.findMany({
+      where: eq(availabilityRegular.shopId, shopId),
     });
   },
 
@@ -24,33 +16,10 @@ export const availabilityRepository = {
     });
   },
 
-  findRegularById(id: string): Promise<AvailabilityRegular | undefined> {
-    return db.query.availabilityRegular.findFirst({
-      where: and(eq(availabilityRegular.id, id), isNull(availabilityRegular.deletedAt)),
-    });
-  },
-  findRegularByShopId(shopId: string): Promise<AvailabilityRegular[]> {
-    return db.query.availabilityRegular.findMany({
-      where: eq(availabilityRegular.shopId, shopId),
-    });
-  },
-
   findShopById(id: string) {
     return db.query.shops.findFirst({
       where: and(eq(shops.id, id), isNull(shops.deletedAt)),
     });
-  },
-
-  async insertException(data: {
-    shopId: string;
-    startsAt: Date;
-    endsAt: Date;
-    action: string;
-    reason?: string;
-  }): Promise<AvailabilityException> {
-    const [entry] = await db.insert(availabilityExceptions).values(data).returning();
-    if (!entry) throw new Error("Insert returned no rows");
-    return entry;
   },
 
   async insertRegular(data: {
@@ -65,5 +34,37 @@ export const availabilityRepository = {
     const [entry] = await db.insert(availabilityRegular).values(data).returning();
     if (!entry) throw new Error("Insert returned no rows");
     return entry;
+  },
+
+  async insertException(data: {
+    shopId: string;
+    startsAt: Date;
+    endsAt: Date;
+    action: string;
+    reason?: string;
+  }): Promise<AvailabilityException> {
+    const [entry] = await db.insert(availabilityExceptions).values(data).returning();
+    if (!entry) throw new Error("Insert returned no rows");
+    return entry;
+  },
+
+  async deleteRegular(id: string): Promise<void> {
+    await db.delete(availabilityRegular).where(eq(availabilityRegular.id, id));
+  },
+
+  async deleteException(id: string): Promise<void> {
+    await db.delete(availabilityExceptions).where(eq(availabilityExceptions.id, id));
+  },
+
+  findRegularById(id: string): Promise<AvailabilityRegular | undefined> {
+    return db.query.availabilityRegular.findFirst({
+      where: and(eq(availabilityRegular.id, id), isNull(availabilityRegular.deletedAt)),
+    });
+  },
+
+  findExceptionById(id: string): Promise<AvailabilityException | undefined> {
+    return db.query.availabilityExceptions.findFirst({
+      where: and(eq(availabilityExceptions.id, id), isNull(availabilityExceptions.deletedAt)),
+    });
   },
 };
