@@ -175,7 +175,7 @@ describe("deleteProductReview", () => {
       mockProductReview as never
     );
 
-    await reviewsService.deleteProductReview(reviewId, productId, userId, "user");
+    await reviewsService.deleteProductReview(reviewId, productId, userId, ["user"]);
 
     expect(reviewsRepository.softDeleteProductReview).toHaveBeenCalledWith(reviewId);
   });
@@ -184,7 +184,7 @@ describe("deleteProductReview", () => {
     const otherReview = { ...mockProductReview, userId: otherUser };
     vi.mocked(reviewsRepository.findProductReviewById).mockResolvedValue(otherReview as never);
 
-    await reviewsService.deleteProductReview(reviewId, productId, userId, "admin");
+    await reviewsService.deleteProductReview(reviewId, productId, userId, ["admin"]);
 
     expect(reviewsRepository.softDeleteProductReview).toHaveBeenCalledWith(reviewId);
   });
@@ -195,7 +195,7 @@ describe("deleteProductReview", () => {
     );
 
     await expect(
-      reviewsService.deleteProductReview(reviewId, productId, otherUser, "user")
+      reviewsService.deleteProductReview(reviewId, productId, otherUser, ["user"])
     ).rejects.toThrow("FORBIDDEN");
 
     expect(reviewsRepository.softDeleteProductReview).not.toHaveBeenCalled();
@@ -205,7 +205,7 @@ describe("deleteProductReview", () => {
     vi.mocked(reviewsRepository.findProductReviewById).mockResolvedValue(undefined);
 
     await expect(
-      reviewsService.deleteProductReview(reviewId, productId, userId, "user")
+      reviewsService.deleteProductReview(reviewId, productId, userId, ["user"])
     ).rejects.toThrow("NOT_FOUND");
   });
 });
@@ -216,7 +216,7 @@ describe("deleteWinemakerReview", () => {
       mockWinemakerReview as never
     );
 
-    await reviewsService.deleteWinemakerReview(reviewId, winemakerId, userId, "user");
+    await reviewsService.deleteWinemakerReview(reviewId, winemakerId, userId, ["user"]);
 
     expect(reviewsRepository.softDeleteWinemakerReview).toHaveBeenCalledWith(reviewId);
   });
@@ -225,7 +225,7 @@ describe("deleteWinemakerReview", () => {
     const otherReview = { ...mockWinemakerReview, userId: otherUser };
     vi.mocked(reviewsRepository.findWinemakerReviewById).mockResolvedValue(otherReview as never);
 
-    await reviewsService.deleteWinemakerReview(reviewId, winemakerId, userId, "admin");
+    await reviewsService.deleteWinemakerReview(reviewId, winemakerId, userId, ["admin"]);
 
     expect(reviewsRepository.softDeleteWinemakerReview).toHaveBeenCalledWith(reviewId);
   });
@@ -236,7 +236,7 @@ describe("deleteWinemakerReview", () => {
     );
 
     await expect(
-      reviewsService.deleteWinemakerReview(reviewId, winemakerId, otherUser, "user")
+      reviewsService.deleteWinemakerReview(reviewId, winemakerId, otherUser, ["user"])
     ).rejects.toThrow("FORBIDDEN");
 
     expect(reviewsRepository.softDeleteWinemakerReview).not.toHaveBeenCalled();
@@ -246,7 +246,7 @@ describe("deleteWinemakerReview", () => {
     vi.mocked(reviewsRepository.findWinemakerReviewById).mockResolvedValue(undefined);
 
     await expect(
-      reviewsService.deleteWinemakerReview(reviewId, winemakerId, userId, "user")
+      reviewsService.deleteWinemakerReview(reviewId, winemakerId, userId, ["user"])
     ).rejects.toThrow("NOT_FOUND");
   });
 });

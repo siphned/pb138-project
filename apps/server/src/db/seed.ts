@@ -3,6 +3,7 @@
  */
 
 import { faker } from "@faker-js/faker";
+import { userRolesRepository } from "../modules/users/user-roles.repository";
 import { db } from "./index";
 import {
   addresses,
@@ -87,6 +88,8 @@ async function insertUser(override: { fname: string; lname: string }) {
     })
     .returning();
   if (!row) throw new Error("User insert failed");
+  // Assign customer role to all seeded users
+  await userRolesRepository.addRole(row.id, "customer");
   return row;
 }
 

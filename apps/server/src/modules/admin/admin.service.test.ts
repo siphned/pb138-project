@@ -31,7 +31,6 @@ const mockUser: AdminUserRow = {
   fname: "Test",
   lname: "User",
   email: "test@example.com",
-  role: "user",
   status: "active",
   createdAt: new Date("2026-01-01"),
   deletedAt: null,

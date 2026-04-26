@@ -9,6 +9,7 @@ export const userResponseSchema = t.Object({
   shippingAddressId: t.Union([t.String(), t.Null()]),
   billingAddressId: t.Union([t.String(), t.Null()]),
   createdAt: t.Date(),
+  roles: t.Array(t.String()),
 });
 
 export const updateProfileBody = t.Object({

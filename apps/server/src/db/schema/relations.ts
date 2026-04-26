@@ -9,7 +9,7 @@ import { orderItems, orders } from "./orders";
 import { productReviews, winemakerReviews } from "./reviews";
 import { roleRequests } from "./role-requests";
 import { shops, winemakers } from "./sellers";
-import { users } from "./users";
+import { userRoles, users } from "./users";
 
 export const addressesRelations = relations(addresses, ({ many }) => ({
   usersShipping: many(users, { relationName: "userShippingAddress" }),
@@ -41,6 +41,14 @@ export const usersRelations = relations(users, ({ one, many }) => ({
   roleRequests: many(roleRequests, { relationName: "roleRequestUser" }),
   reviewedRoleRequests: many(roleRequests, { relationName: "roleRequestReviewer" }),
   eventRegistrations: many(eventRegistrations),
+  roles: many(userRoles),
+}));
+
+export const userRolesRelations = relations(userRoles, ({ one }) => ({
+  user: one(users, {
+    fields: [userRoles.userId],
+    references: [users.id],
+  }),
 }));
 
 export const winemakersRelations = relations(winemakers, ({ one, many }) => ({
