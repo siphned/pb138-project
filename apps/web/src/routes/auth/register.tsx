@@ -8,7 +8,7 @@ export const Route = createFileRoute("/auth/register")({
 function RegisterComponent() {
   return (
     <div className="flex min-h-[80vh] items-center justify-center py-12">
-      <SignUp signInUrl="/auth/login" forceRedirectUrl="/dashboard" />
+      <SignUp forceRedirectUrl="/dashboard" signInUrl="/auth/login" />
     </div>
   );
 }

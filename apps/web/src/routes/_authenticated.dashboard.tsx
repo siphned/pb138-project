@@ -40,29 +40,29 @@ function DashboardPage() {
     switch (role) {
       case Role.customer:
         return [
-          { title: "Total Orders", value: "15", icon: ShoppingBag, trend: "5 new this month" },
-          { title: "Events Attended", value: "4", icon: Calendar, trend: "Next: May 12" },
+          { icon: ShoppingBag, title: "Total Orders", trend: "5 new this month", value: "15" },
+          { icon: Calendar, title: "Events Attended", trend: "Next: May 12", value: "4" },
         ];
       case Role.shopOwner:
         return [
           {
-            title: "Total Revenue",
-            value: "$12,450",
             icon: DollarSign,
+            title: "Total Revenue",
             trend: "+12% vs last month",
+            value: "$12,450",
           },
-          { title: "Total Orders", value: "156", icon: ShoppingBag, trend: "24 pending" },
+          { icon: ShoppingBag, title: "Total Orders", trend: "24 pending", value: "156" },
         ];
       default:
         return [
-          { title: "My Wines", value: "24", icon: Wine, trend: "+2 this month" },
+          { icon: Wine, title: "My Wines", trend: "+2 this month", value: "24" },
           {
-            title: "Total Wine Sales",
-            value: "842",
             icon: TrendingUp,
+            title: "Total Wine Sales",
             trend: "Best seller: Merlot",
+            value: "842",
           },
-          { title: "Events Participated", value: "3", icon: Calendar, trend: "Next: Jun 05" },
+          { icon: Calendar, title: "Events Participated", trend: "Next: Jun 05", value: "3" },
         ];
     }
   };
@@ -92,8 +92,8 @@ function DashboardPage() {
       <div className="space-y-8 pb-12">
         {isEditing ? (
           <ProfileEditForm
-            onSuccess={() => setIsEditing(false)}
             onCancel={() => setIsEditing(false)}
+            onSuccess={() => setIsEditing(false)}
           />
         ) : (
           <>
@@ -102,8 +102,8 @@ function DashboardPage() {
             <div className="grid gap-4 grid-cols-1 lg:grid-flow-col lg:auto-cols-fr">
               {stats.map((stat) => (
                 <Card
-                  key={stat.title}
                   className="border-none shadow-sm bg-secondary/20 rounded-2xl"
+                  key={stat.title}
                 >
                   <CardHeader className="flex flex-row items-center justify-between pb-2 space-y-0">
                     <CardTitle className="text-sm font-medium text-muted-foreground">

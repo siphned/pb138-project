@@ -4,16 +4,16 @@ import { timestamptz } from "./helpers";
 import { users } from "./users";
 
 export const roleRequests = pgTable("role_requests", {
+  adminUserId: uuid("admin_user_id").references(() => users.id),
+  businessName: varchar("business_name", { length: 255 }).notNull(),
+  deletedAt: timestamptz("deleted_at"),
+  details: text("details"),
   id: uuid("id").primaryKey().defaultRandom(),
+  reviewedAt: timestamptz("reviewed_at"),
+  status: roleRequestStatusEnum("status").notNull().default("pending"),
+  submittedAt: timestamptz("submitted_at").notNull().defaultNow(),
+  type: roleRequestTypeEnum("type").notNull(),
   userId: uuid("user_id")
     .notNull()
     .references(() => users.id),
-  type: roleRequestTypeEnum("type").notNull(),
-  status: roleRequestStatusEnum("status").notNull().default("pending"),
-  businessName: varchar("business_name", { length: 255 }).notNull(),
-  details: text("details"),
-  adminUserId: uuid("admin_user_id").references(() => users.id),
-  submittedAt: timestamptz("submitted_at").notNull().defaultNow(),
-  reviewedAt: timestamptz("reviewed_at"),
-  deletedAt: timestamptz("deleted_at"),
 });

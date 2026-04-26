@@ -26,6 +26,24 @@ export const supplyAgreementsService = {
     return supplyAgreementsRepository.create({ shopId, winemakerId });
   },
 
+  async listForShop(userId: string, shopId: string): Promise<SupplyAgreement[]> {
+    const shop = await shopsRepository.findById(shopId);
+    if (!shop || shop.ownerUserId !== userId) {
+      throw new Error("FORBIDDEN");
+    }
+
+    return supplyAgreementsRepository.listForShop(shopId);
+  },
+
+  async listForWinemaker(userId: string): Promise<SupplyAgreement[]> {
+    const winemaker = await winemakersRepository.findByUserId(userId);
+    if (!winemaker) {
+      throw new Error("NOT_A_WINEMAKER");
+    }
+
+    return supplyAgreementsRepository.listForWinemaker(winemaker.id);
+  },
+
   async respondToRequest(
     userId: string,
     agreementId: string,
@@ -47,23 +65,5 @@ export const supplyAgreementsService = {
     if (!updated) throw new Error("NOT_FOUND");
 
     return updated;
-  },
-
-  async listForShop(userId: string, shopId: string): Promise<SupplyAgreement[]> {
-    const shop = await shopsRepository.findById(shopId);
-    if (!shop || shop.ownerUserId !== userId) {
-      throw new Error("FORBIDDEN");
-    }
-
-    return supplyAgreementsRepository.listForShop(shopId);
-  },
-
-  async listForWinemaker(userId: string): Promise<SupplyAgreement[]> {
-    const winemaker = await winemakersRepository.findByUserId(userId);
-    if (!winemaker) {
-      throw new Error("NOT_A_WINEMAKER");
-    }
-
-    return supplyAgreementsRepository.listForWinemaker(winemaker.id);
   },
 };

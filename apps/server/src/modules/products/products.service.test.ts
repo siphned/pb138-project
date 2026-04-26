@@ -2,10 +2,10 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 
 vi.mock("../shops/shops.repository", () => ({
   shopsRepository: {
+    createShopWithAddress: vi.fn(),
     findAll: vi.fn(),
     findById: vi.fn(),
     findByOwnerUserId: vi.fn(),
-    createShopWithAddress: vi.fn(),
     insertAddress: vi.fn(),
     updateById: vi.fn(),
   },
@@ -13,14 +13,14 @@ vi.mock("../shops/shops.repository", () => ({
 
 vi.mock("./products.repository", () => ({
   productsRepository: {
+    createBundleWithWines: vi.fn(),
+    createProductWithWine: vi.fn(),
     findById: vi.fn(),
     findByShopId: vi.fn(),
-    winesExist: vi.fn(),
-    createProductWithWine: vi.fn(),
-    createBundleWithWines: vi.fn(),
-    updateProduct: vi.fn(),
-    updateBundle: vi.fn(),
     softDelete: vi.fn(),
+    updateBundle: vi.fn(),
+    updateProduct: vi.fn(),
+    winesExist: vi.fn(),
   },
 }));
 
@@ -36,9 +36,9 @@ const bundleId = "55555555-5555-5555-5555-555555555555";
 const wineId1 = "aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa";
 const wineId2 = "bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbbbb";
 
-const mockShop = { id: shopId, ownerUserId: ownerId, deletedAt: null } as never;
-const mockProduct = { id: productId, shopId, isBundle: false, deletedAt: null } as never;
-const mockBundle = { id: bundleId, shopId, isBundle: true, deletedAt: null } as never;
+const mockShop = { deletedAt: null, id: shopId, ownerUserId: ownerId } as never;
+const mockProduct = { deletedAt: null, id: productId, isBundle: false, shopId } as never;
+const mockBundle = { deletedAt: null, id: bundleId, isBundle: true, shopId } as never;
 
 beforeEach(() => {
   vi.clearAllMocks();
@@ -100,8 +100,8 @@ describe("createProduct", () => {
 
 describe("createBundle", () => {
   const bundleWines = [
-    { wineId: wineId1, quantity: 2 },
-    { wineId: wineId2, quantity: 1 },
+    { quantity: 2, wineId: wineId1 },
+    { quantity: 1, wineId: wineId2 },
   ];
 
   it("creates bundle with 2+ wines and isBundle=true", async () => {
@@ -145,7 +145,7 @@ describe("createBundle", () => {
         name: "Solo Pack",
         price: "10.00",
         quantity: 1,
-        wines: [{ wineId: wineId1, quantity: 1 }],
+        wines: [{ quantity: 1, wineId: wineId1 }],
       })
     ).rejects.toThrow("BUNDLE_MIN_WINES");
 
@@ -163,8 +163,8 @@ describe("updateBundle", () => {
     vi.mocked(productsRepository.updateBundle).mockResolvedValue(mockBundle);
 
     const newWines = [
-      { wineId: wineId1, quantity: 3 },
-      { wineId: wineId2, quantity: 1 },
+      { quantity: 3, wineId: wineId1 },
+      { quantity: 1, wineId: wineId2 },
     ];
     await productsService.updateBundle(shopId, bundleId, ownerId, { wines: newWines });
 

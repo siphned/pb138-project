@@ -6,8 +6,8 @@ vi.mock("./winemakers.repository", () => ({
     findById: vi.fn(),
     findByIdWithAddress: vi.fn(),
     findByUserId: vi.fn(),
-    findWinesByWinemakerId: vi.fn(),
     findEventsByWinemakerId: vi.fn(),
+    findWinesByWinemakerId: vi.fn(),
     updateById: vi.fn(),
   },
 }));
@@ -20,40 +20,40 @@ const winemakerId = "22222222-2222-2222-2222-222222222222";
 const addressId = "33333333-3333-3333-3333-333333333333";
 
 const _mockAddress = {
-  id: addressId,
-  country: "CZ",
   city: "Brno",
+  country: "CZ",
+  createdAt: new Date(),
+  deletedAt: null,
+  houseNumber: "1",
+  id: addressId,
   postalCode: "60200",
   street: "Vinařská",
-  houseNumber: "1",
-  createdAt: new Date(),
   updatedAt: null,
-  deletedAt: null,
 };
 
 const mockWinemaker = {
-  id: winemakerId,
-  userId,
-  name: "Test Winery",
-  description: "A winery",
-  websiteUrl: null,
-  email: "wine@test.com",
-  phone: "+420123456789",
   addressId,
   createdAt: new Date(),
-  updatedAt: null,
   deletedAt: null,
+  description: "A winery",
+  email: "wine@test.com",
+  id: winemakerId,
+  name: "Test Winery",
+  phone: "+420123456789",
+  updatedAt: null,
+  userId,
+  websiteUrl: null,
 };
 
 const mockWinemakerWithAddress = {
   ...mockWinemaker,
-  address: { country: "CZ", city: "B", postalCode: "1", street: "S", houseNumber: "1" },
+  address: { city: "B", country: "CZ", houseNumber: "1", postalCode: "1", street: "S" },
 };
 
 const mockWinemakerWithRelations = {
   ...mockWinemakerWithAddress,
-  wines: [],
   events: [],
+  wines: [],
 };
 
 beforeEach(() => vi.clearAllMocks());

@@ -4,9 +4,8 @@ import type { GuestSession } from "../../db/schema";
 import { guestSessions } from "../../db/schema";
 
 export const guestSessionsRepository = {
-  async findById(id: string): Promise<GuestSession | undefined> {
-    const [session] = await db.select().from(guestSessions).where(eq(guestSessions.id, id));
-    return session;
+  async cleanupExpired(): Promise<void> {
+    await db.delete(guestSessions).where(lt(guestSessions.expiresAt, new Date()));
   },
 
   async create(data: { expiresAt: Date }): Promise<GuestSession> {
@@ -18,8 +17,8 @@ export const guestSessionsRepository = {
   async delete(id: string): Promise<void> {
     await db.delete(guestSessions).where(eq(guestSessions.id, id));
   },
-
-  async cleanupExpired(): Promise<void> {
-    await db.delete(guestSessions).where(lt(guestSessions.expiresAt, new Date()));
+  async findById(id: string): Promise<GuestSession | undefined> {
+    const [session] = await db.select().from(guestSessions).where(eq(guestSessions.id, id));
+    return session;
   },
 };

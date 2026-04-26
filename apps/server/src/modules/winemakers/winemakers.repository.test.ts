@@ -30,11 +30,10 @@ const mockDb = db as unknown as MockDatabase;
 
 vi.mock("../../db", () => {
   const m = {
-    update: vi.fn().mockReturnThis(),
-    set: vi.fn().mockReturnThis(),
-    where: vi.fn().mockReturnThis(),
-    returning: vi.fn().mockReturnThis(),
     query: {
+      events: {
+        findMany: vi.fn(),
+      },
       winemakers: {
         findFirst: vi.fn(),
         findMany: vi.fn(),
@@ -42,10 +41,11 @@ vi.mock("../../db", () => {
       wines: {
         findMany: vi.fn(),
       },
-      events: {
-        findMany: vi.fn(),
-      },
     },
+    returning: vi.fn().mockReturnThis(),
+    set: vi.fn().mockReturnThis(),
+    update: vi.fn().mockReturnThis(),
+    where: vi.fn().mockReturnThis(),
   };
   return { db: m };
 });

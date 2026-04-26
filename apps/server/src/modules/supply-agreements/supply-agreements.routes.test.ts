@@ -2,59 +2,59 @@ import { describe, expect, it, vi } from "vitest";
 import { app } from "../../app";
 
 const _mockAgreement = {
-  id: "a1",
-  shopId: "s1",
-  winemakerId: "wm1",
-  status: "pending",
   createdAt: new Date(),
+  id: "a1",
   respondedAt: null,
+  shopId: "s1",
+  status: "pending",
+  winemakerId: "wm1",
 };
 
 vi.mock("./supply-agreements.service", () => ({
   supplyAgreementsService: {
     createRequest: vi.fn().mockResolvedValue({
-      id: "a1",
-      shopId: "s1",
-      winemakerId: "wm1",
-      status: "pending",
       createdAt: new Date(),
+      id: "a1",
       respondedAt: null,
-    }),
-    respondToRequest: vi.fn().mockResolvedValue({
-      id: "a1",
       shopId: "s1",
+      status: "pending",
       winemakerId: "wm1",
-      status: "approved",
-      createdAt: new Date(),
-      respondedAt: new Date(),
     }),
     listForShop: vi.fn().mockResolvedValue([
       {
-        id: "a1",
-        shopId: "s1",
-        winemakerId: "wm1",
-        status: "pending",
         createdAt: new Date(),
+        id: "a1",
         respondedAt: null,
+        shopId: "s1",
+        status: "pending",
+        winemakerId: "wm1",
       },
     ]),
     listForWinemaker: vi.fn().mockResolvedValue([
       {
-        id: "a1",
-        shopId: "s1",
-        winemakerId: "wm1",
-        status: "pending",
         createdAt: new Date(),
+        id: "a1",
         respondedAt: null,
+        shopId: "s1",
+        status: "pending",
+        winemakerId: "wm1",
       },
     ]),
+    respondToRequest: vi.fn().mockResolvedValue({
+      createdAt: new Date(),
+      id: "a1",
+      respondedAt: new Date(),
+      shopId: "s1",
+      status: "approved",
+      winemakerId: "wm1",
+    }),
   },
 }));
 
 vi.mock("../auth/auth.utils", () => ({
   verifyClerkToken: vi.fn().mockResolvedValue({
-    sub: "user_1",
     roles: ["shop_owner", "winemaker"],
+    sub: "user_1",
   }),
 }));
 
@@ -68,15 +68,15 @@ describe("supply-agreements routes", () => {
   it("POST /supply-agreements creates a request", async () => {
     const response = await app.handle(
       new Request("http://localhost/supply-agreements", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: "Bearer token",
-        },
         body: JSON.stringify({
-          winemakerId: "wm1",
           shopId: "s1",
+          winemakerId: "wm1",
         }),
+        headers: {
+          Authorization: "Bearer token",
+          "Content-Type": "application/json",
+        },
+        method: "POST",
       })
     );
 
@@ -88,10 +88,10 @@ describe("supply-agreements routes", () => {
   it("GET /supply-agreements/winemaker lists agreements", async () => {
     const response = await app.handle(
       new Request("http://localhost/supply-agreements/winemaker", {
-        method: "GET",
         headers: {
           Authorization: "Bearer token",
         },
+        method: "GET",
       })
     );
 

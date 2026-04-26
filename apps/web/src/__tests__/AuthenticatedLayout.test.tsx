@@ -4,8 +4,8 @@ import { describe, expect, it, vi } from "vitest";
 const mockNavigate = vi.fn().mockResolvedValue(undefined);
 
 vi.mock("@clerk/react", () => ({
-  useAuth: vi.fn(),
   ClerkProvider: ({ children }: { children: React.ReactNode }) => <>{children}</>,
+  useAuth: vi.fn(),
 }));
 
 vi.mock("@tanstack/react-router", () => ({

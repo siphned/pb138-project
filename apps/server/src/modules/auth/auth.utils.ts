@@ -21,8 +21,8 @@ export async function verifyClerkToken(
 
   try {
     const payload = await verifyToken(token, {
-      jwtKey: CLERK_JWT_KEY,
       authorizedParties: [FRONTEND_URL],
+      jwtKey: CLERK_JWT_KEY,
     });
     return payload as ClerkPayload;
   } catch {

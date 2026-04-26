@@ -2,11 +2,11 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 
 vi.mock("./shops.repository", () => ({
   shopsRepository: {
+    createShopWithAddress: vi.fn(),
     findAll: vi.fn(),
+    findAllByOwnerUserId: vi.fn(),
     findById: vi.fn(),
     findByOwnerUserId: vi.fn(),
-    findAllByOwnerUserId: vi.fn(),
-    createShopWithAddress: vi.fn(),
     insertAddress: vi.fn(),
     updateById: vi.fn(),
   },
@@ -22,27 +22,27 @@ const addressId = "44444444-4444-4444-4444-444444444444";
 const newAddressId = "55555555-5555-5555-5555-555555555555";
 
 const mockAddress = {
-  id: addressId,
-  country: "CZ",
   city: "Brno",
+  country: "CZ",
+  createdAt: new Date(),
+  deletedAt: null,
+  houseNumber: "1",
+  id: addressId,
   postalCode: "60200",
   street: "Masarykova",
-  houseNumber: "1",
-  createdAt: new Date(),
   updatedAt: null,
-  deletedAt: null,
 };
 
 const mockShop = {
-  id: shopId,
-  ownerUserId: ownerId,
-  name: "Test Shop",
-  description: "A description",
+  address: { city: "B", country: "CZ", houseNumber: "1", postalCode: "1", street: "S" },
   addressId,
-  address: { country: "CZ", city: "B", postalCode: "1", street: "S", houseNumber: "1" },
   createdAt: new Date(),
-  updatedAt: null,
   deletedAt: null,
+  description: "A description",
+  id: shopId,
+  name: "Test Shop",
+  ownerUserId: ownerId,
+  updatedAt: null,
 };
 
 beforeEach(() => {
@@ -56,20 +56,20 @@ describe("createShop", () => {
     vi.mocked(shopsRepository.findById).mockResolvedValue(mockShop as never);
 
     await shopsService.createShop(ownerId, {
-      name: "Test Shop",
-      description: "A description",
       address: {
-        country: "CZ",
         city: "Brno",
+        country: "CZ",
+        houseNumber: "1",
         postalCode: "60200",
         street: "Masarykova",
-        houseNumber: "1",
       },
+      description: "A description",
+      name: "Test Shop",
     });
 
     expect(shopsRepository.createShopWithAddress).toHaveBeenCalledWith(
-      { ownerUserId: ownerId, name: "Test Shop", description: "A description" },
-      { country: "CZ", city: "Brno", postalCode: "60200", street: "Masarykova", houseNumber: "1" }
+      { description: "A description", name: "Test Shop", ownerUserId: ownerId },
+      { city: "Brno", country: "CZ", houseNumber: "1", postalCode: "60200", street: "Masarykova" }
     );
   });
 
@@ -81,15 +81,15 @@ describe("createShop", () => {
     vi.mocked(shopsRepository.findById).mockResolvedValue({ id: "new-shop-id" } as never);
 
     const result = await shopsService.createShop(ownerId, {
-      name: "Second Shop",
-      description: "Another one",
       address: {
-        country: "CZ",
         city: "Brno",
+        country: "CZ",
+        houseNumber: "1",
         postalCode: "60200",
         street: "Masarykova",
-        houseNumber: "1",
       },
+      description: "Another one",
+      name: "Second Shop",
     });
 
     expect(result.id).toBe("new-shop-id");
@@ -143,11 +143,11 @@ describe("updateShop", () => {
     });
 
     expect(shopsRepository.insertAddress).toHaveBeenCalledWith({
-      country: "CZ",
       city: "Prague",
+      country: "CZ",
+      houseNumber: "1",
       postalCode: "1",
       street: "S",
-      houseNumber: "1",
     });
     expect(shopsRepository.updateById).toHaveBeenCalledWith(shopId, { addressId: newAddressId });
   });

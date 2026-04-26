@@ -1,4 +1,5 @@
 import type { Order, orders } from "../../db/schema";
+import type { CartWithItems } from "../carts/carts.repository";
 import { cartsService } from "../carts/carts.service";
 import type { CreateOrderData, CreateOrderItem, OrderWithItems } from "./orders.repository";
 import { ordersRepository } from "./orders.repository";
@@ -29,11 +30,12 @@ export const ordersService = {
     { userId, sessionId }: { userId?: string; sessionId?: string },
     data: CheckoutData
   ): Promise<Order> {
-    const cart = userId
-      ? await cartsService.getCartForUser(userId)
-      : sessionId
-        ? await cartsService.getCartForSession(sessionId)
-        : null;
+    let cart: CartWithItems | undefined | null = null;
+    if (userId) {
+      cart = await cartsService.getCartForUser(userId);
+    } else if (sessionId) {
+      cart = await cartsService.getCartForSession(sessionId);
+    }
 
     if (!cart || cart.items.length === 0) throw new Error("CART_EMPTY");
 
@@ -51,9 +53,9 @@ export const ordersService = {
       }
 
       items.push({
-        shopId: cartItem.product.shopId,
         productId: cartItem.productId,
         quantity: cartItem.quantity,
+        shopId: cartItem.product.shopId,
         unitPrice: cartItem.product.price,
       });
 
@@ -69,19 +71,19 @@ export const ordersService = {
     ).toFixed(2);
 
     const orderData: CreateOrderData = {
-      userId,
-      guestSessionId: sessionId,
+      billingAddress: data.billingAddress || data.shippingAddress,
+      deliveryType: data.deliveryType,
+      discount,
       guestEmail: data.guestEmail,
       guestName: data.guestName,
-      shippingFee,
-      discount,
-      paymentStatus: "pending",
+      guestSessionId: sessionId,
       paymentMethod: data.paymentMethod,
-      totalPrice,
-      status: "pending",
-      deliveryType: data.deliveryType,
+      paymentStatus: "pending",
       shippingAddress: data.shippingAddress,
-      billingAddress: data.billingAddress || data.shippingAddress,
+      shippingFee,
+      status: "pending",
+      totalPrice,
+      userId,
     };
 
     const order = await ordersRepository.create(orderData, items);

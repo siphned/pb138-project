@@ -25,16 +25,16 @@ export function ShopOwnerInventory() {
     {
       id: 1,
       name: "Chateau Montrose 2018",
-      winemaker: "Chateau Montrose",
-      vintage: "2018",
       qty: 24,
+      vintage: "2018",
+      winemaker: "Chateau Montrose",
     },
     {
       id: 2,
       name: "La Dame de Montrose 2019",
-      winemaker: "Chateau Margaux",
-      vintage: "2019",
       qty: 8,
+      vintage: "2019",
+      winemaker: "Chateau Margaux",
     },
   ];
 
@@ -51,7 +51,7 @@ export function ShopOwnerInventory() {
           <Wine className="h-5 w-5" /> Shop Inventory
         </div>
         <div className="flex items-center gap-3 w-full md:w-auto">
-          <Select value={statusFilter} onValueChange={(val) => setStatusFilter(val || "all")}>
+          <Select onValueChange={(val) => setStatusFilter(val || "all")} value={statusFilter}>
             <SelectTrigger className="w-full sm:w-40 bg-background border-none rounded-lg h-10">
               <SelectValue placeholder="Filter Status" />
             </SelectTrigger>
@@ -94,8 +94,8 @@ export function ShopOwnerInventory() {
               const status = getStockStatus(wine.qty);
               return (
                 <TableRow
-                  key={wine.id}
                   className="border-border/50 border-b last:border-0 md:last:border-b flex flex-col md:table-row py-4 md:py-0 relative group"
+                  key={wine.id}
                 >
                   {/* Name & Mobile secondary info */}
                   <TableCell className="font-medium text-[15px] md:text-sm py-1 md:py-4">
@@ -132,9 +132,9 @@ export function ShopOwnerInventory() {
                   {/* Actions - positioned top-right on mobile, normal cell on desktop */}
                   <TableCell className="text-right absolute right-2 top-4 md:static py-1 md:py-4">
                     <Button
-                      variant="ghost"
-                      size="icon"
                       className="h-8 w-8 text-muted-foreground hover:text-primary"
+                      size="icon"
+                      variant="ghost"
                     >
                       <MoreHorizontal className="h-5 w-5 md:h-4 md:w-4" />
                     </Button>

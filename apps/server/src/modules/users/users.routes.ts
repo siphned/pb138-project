@@ -20,15 +20,15 @@ export const usersRoutes = new Elysia({ prefix: "/users" })
       return { ...dbUser, roles };
     },
     {
-      requireAuth: true,
-      response: userResponseSchema,
       detail: {
-        tags: ["users"],
-        summary: "Get current authenticated user",
         description:
           "Returns the caller's user record with their roles. If no local row exists yet, one is lazily created from Clerk profile data on first call.",
         security: [{ bearerAuth: [] }],
+        summary: "Get current authenticated user",
+        tags: ["users"],
       },
+      requireAuth: true,
+      response: userResponseSchema,
     }
   )
 
@@ -41,15 +41,15 @@ export const usersRoutes = new Elysia({ prefix: "/users" })
     },
 
     {
-      requireAuth: true,
       body: updateProfileBody,
-      response: userResponseSchema,
       detail: {
-        tags: ["users"],
-        summary: "Update current user profile",
         description: "Updates the first or last name of the authenticated user.",
         security: [{ bearerAuth: [] }],
+        summary: "Update current user profile",
+        tags: ["users"],
       },
+      requireAuth: true,
+      response: userResponseSchema,
     }
   )
 
@@ -59,14 +59,14 @@ export const usersRoutes = new Elysia({ prefix: "/users" })
       return await usersService.getAddressesForUser(dbUser);
     },
     {
-      requireAuth: true,
-      response: addressesResponseSchema,
       detail: {
-        tags: ["users"],
-        summary: "Get current user addresses",
         description: "Returns the shipping and billing addresses linked to the authenticated user.",
         security: [{ bearerAuth: [] }],
+        summary: "Get current user addresses",
+        tags: ["users"],
       },
+      requireAuth: true,
+      response: addressesResponseSchema,
     }
   )
 
@@ -77,15 +77,15 @@ export const usersRoutes = new Elysia({ prefix: "/users" })
       return await usersService.upsertAddressForUser(dbUser.id, type, addressData);
     },
     {
-      requireAuth: true,
       body: addressBody,
-      response: addressResponseSchema,
       detail: {
-        tags: ["users"],
-        summary: "Set a shipping or billing address",
         description:
           "Creates a new address and links it as the shipping or billing address for the authenticated user. Replaces any previously linked address of the same type.",
         security: [{ bearerAuth: [] }],
+        summary: "Set a shipping or billing address",
+        tags: ["users"],
       },
+      requireAuth: true,
+      response: addressResponseSchema,
     }
   );

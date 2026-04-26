@@ -4,22 +4,6 @@ import { reviewsRepository } from "./reviews.repository";
 type ReviewListResult<T> = { reviews: T[]; averageRating: number | null };
 
 export const reviewsService = {
-  async listProductReviews(productId: string): Promise<ReviewListResult<ReviewWithUser>> {
-    const [reviews, averageRating] = await Promise.all([
-      reviewsRepository.findReviews(productId, "product"),
-      reviewsRepository.averageRating(productId, "product"),
-    ]);
-    return { reviews, averageRating };
-  },
-
-  async listWinemakerReviews(winemakerId: string): Promise<ReviewListResult<ReviewWithUser>> {
-    const [reviews, averageRating] = await Promise.all([
-      reviewsRepository.findReviews(winemakerId, "winemaker"),
-      reviewsRepository.averageRating(winemakerId, "winemaker"),
-    ]);
-    return { reviews, averageRating };
-  },
-
   async createProductReview(
     userId: string,
     productId: string,
@@ -72,5 +56,20 @@ export const reviewsService = {
     }
 
     await reviewsRepository.softDelete(reviewId);
+  },
+  async listProductReviews(productId: string): Promise<ReviewListResult<ReviewWithUser>> {
+    const [reviews, averageRating] = await Promise.all([
+      reviewsRepository.findReviews(productId, "product"),
+      reviewsRepository.averageRating(productId, "product"),
+    ]);
+    return { averageRating, reviews };
+  },
+
+  async listWinemakerReviews(winemakerId: string): Promise<ReviewListResult<ReviewWithUser>> {
+    const [reviews, averageRating] = await Promise.all([
+      reviewsRepository.findReviews(winemakerId, "winemaker"),
+      reviewsRepository.averageRating(winemakerId, "winemaker"),
+    ]);
+    return { averageRating, reviews };
   },
 };
