@@ -46,7 +46,10 @@ export const eventsRepository = {
     return db.query.events.findFirst({
       where: and(eq(events.id, id), isNull(events.deletedAt)),
       with: {
-        winemaker: { columns: { id: true, name: true } },
+        winemaker: {
+          columns: { id: true, name: true, deletedAt: true },
+        },
+
         address: {
           columns: {
             country: true,
@@ -60,7 +63,7 @@ export const eventsRepository = {
     }) as Promise<EventWithDetails | undefined>;
   },
 
-  findMany(
+  async findMany(
     filters: RepoFilters,
     pagination: { limit: number; offset: number }
   ): Promise<EventWithDetails[]> {
@@ -72,10 +75,12 @@ export const eventsRepository = {
       filters.winemakerIds ? inArray(events.winemakerId, filters.winemakerIds) : undefined,
     ].filter((c): c is NonNullable<typeof c> => c !== undefined);
 
-    return db.query.events.findMany({
+    const rows = await db.query.events.findMany({
       where: and(...conditions),
       with: {
-        winemaker: { columns: { id: true, name: true } },
+        winemaker: {
+          columns: { id: true, name: true, deletedAt: true },
+        },
         address: {
           columns: {
             country: true,
@@ -89,7 +94,9 @@ export const eventsRepository = {
       limit: pagination.limit,
       offset: pagination.offset,
       orderBy: (e, { asc }) => [asc(e.startTime)],
-    }) as Promise<EventWithDetails[]>;
+    });
+
+    return rows.filter((r) => r.winemaker && !r.winemaker.deletedAt) as EventWithDetails[];
   },
 
   async countMany(filters: RepoFilters): Promise<number> {

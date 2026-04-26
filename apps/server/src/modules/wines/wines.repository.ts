@@ -30,7 +30,7 @@ export type WineFilters = {
 };
 
 export const winesRepository = {
-  findAll(filters: WineFilters): Promise<WineWithWinemaker[]> {
+  async findAll(filters: WineFilters): Promise<WineWithWinemaker[]> {
     const conditions = [isNull(wines.deletedAt)];
     if (filters.region) conditions.push(eq(wines.region, filters.region));
     if (filters.type) conditions.push(eq(wines.type, filters.type as WineData["type"]));
@@ -38,17 +38,32 @@ export const winesRepository = {
     if (filters.vintageYear) conditions.push(eq(wines.vintageYear, filters.vintageYear));
     if (filters.winemakerId) conditions.push(eq(wines.winemakerId, filters.winemakerId));
 
-    return db.query.wines.findMany({
+    const rows = await db.query.wines.findMany({
       where: and(...conditions),
-      with: { winemaker: { columns: { id: true, name: true } } },
-    }) as Promise<WineWithWinemaker[]>;
+      with: {
+        winemaker: {
+          columns: { id: true, name: true, deletedAt: true },
+        },
+      },
+    });
+
+    return rows.filter((r) => r.winemaker && !r.winemaker.deletedAt) as WineWithWinemaker[];
   },
 
-  findById(id: string): Promise<WineWithWinemaker | undefined> {
-    return db.query.wines.findFirst({
+  async findById(id: string): Promise<WineWithWinemaker | undefined> {
+    const wine = await db.query.wines.findFirst({
       where: and(eq(wines.id, id), isNull(wines.deletedAt)),
-      with: { winemaker: { columns: { id: true, name: true } } },
-    }) as Promise<WineWithWinemaker | undefined>;
+      with: {
+        winemaker: {
+          columns: { id: true, name: true, deletedAt: true },
+        },
+      },
+    });
+
+    if (wine && wine.winemaker && !wine.winemaker.deletedAt) {
+      return wine as WineWithWinemaker;
+    }
+    return undefined;
   },
 
   findWinemakerByUserId(userId: string): Promise<Winemaker | undefined> {

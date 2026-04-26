@@ -45,19 +45,32 @@ export interface CreateOrderData {
 }
 
 export const ordersRepository = {
-  findById(id: string): Promise<OrderWithItems | undefined> {
-    return db.query.orders.findFirst({
+  async findById(id: string): Promise<OrderWithItems | undefined> {
+    const order = await db.query.orders.findFirst({
       where: and(eq(orders.id, id), isNull(orders.deletedAt)),
       with: {
         items: {
           with: {
-            product: true,
+            product: {
+              columns: { id: true, name: true, deletedAt: true },
+            },
           },
         },
         shippingAddress: true,
         billingAddress: true,
       },
-    }) as Promise<OrderWithItems | undefined>;
+    });
+
+    if (order) {
+      const typedOrder = order as unknown as OrderWithItems;
+      if (typedOrder.items) {
+        typedOrder.items = typedOrder.items.filter(
+          (item) => item.product && !item.product.deletedAt
+        );
+      }
+      return typedOrder;
+    }
+    return undefined;
   },
 
   listForUser(userId: string): Promise<Order[]> {

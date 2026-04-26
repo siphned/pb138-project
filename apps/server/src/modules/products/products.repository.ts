@@ -5,7 +5,7 @@ import { products, productWines, wines } from "../../db/schema";
 
 export type WineInfo = Pick<
   Wine,
-  "id" | "name" | "type" | "color" | "vintageYear" | "alcoholContent" | "volumeMl"
+  "id" | "name" | "type" | "color" | "vintageYear" | "alcoholContent" | "volumeMl" | "deletedAt"
 >;
 
 export type ProductWineWithInfo = ProductWine & { wine: WineInfo };
@@ -15,8 +15,8 @@ export type ProductWithWines = Product & { productWines: ProductWineWithInfo[] }
 type Transaction = Parameters<Parameters<typeof db.transaction>[0]>[0];
 
 export const productsRepository = {
-  findById(id: string): Promise<ProductWithWines | undefined> {
-    return db.query.products.findFirst({
+  async findById(id: string): Promise<ProductWithWines | undefined> {
+    const product = await db.query.products.findFirst({
       where: and(eq(products.id, id), isNull(products.deletedAt)),
       with: {
         productWines: {
@@ -30,12 +30,24 @@ export const productsRepository = {
                 vintageYear: true,
                 alcoholContent: true,
                 volumeMl: true,
+                deletedAt: true,
               },
             },
           },
         },
       },
-    }) as Promise<ProductWithWines | undefined>;
+    });
+
+    if (product) {
+      const typedProduct = product as unknown as ProductWithWines;
+      if (typedProduct.productWines) {
+        typedProduct.productWines = typedProduct.productWines.filter(
+          (pw) => pw.wine && !pw.wine.deletedAt
+        );
+      }
+      return typedProduct;
+    }
+    return undefined;
   },
 
   findByShopId(shopId: string, isBundle?: boolean): Promise<ProductWithWines[]> {
@@ -57,6 +69,7 @@ export const productsRepository = {
                 vintageYear: true,
                 alcoholContent: true,
                 volumeMl: true,
+                deletedAt: true,
               },
             },
           },
