@@ -373,4 +373,29 @@ export const productsRepository = {
     });
     return product?.deletedAt !== null && product?.deletedAt !== undefined;
   },
+
+  async decrementStock(tx: Transaction, productId: string, quantity: number): Promise<void> {
+    const product = await tx.query.products.findFirst({
+      where: eq(products.id, productId),
+      with: { productWines: true },
+    });
+
+    if (!product) throw new Error("PRODUCT_NOT_FOUND");
+    if (product.quantity < quantity) throw new Error("INSUFFICIENT_STOCK");
+
+    // Decrement product quantity
+    await tx
+      .update(products)
+      .set({ quantity: sql`${products.quantity} - ${quantity}` })
+      .where(eq(products.id, productId));
+
+    // Decrement underlying wine quantities
+    for (const pw of product.productWines) {
+      const totalWineNeeded = pw.quantity * quantity;
+      await tx
+        .update(wines)
+        .set({ quantity: sql`${wines.quantity} - ${totalWineNeeded}` })
+        .where(eq(wines.id, pw.wineId));
+    }
+  },
 };

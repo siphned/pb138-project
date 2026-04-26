@@ -112,4 +112,8 @@ export const cartsRepository = {
       await tx.update(carts).set({ deletedAt: new Date() }).where(eq(carts.id, fromCartId));
     });
   },
+
+  async clearCart(cartId: string): Promise<void> {
+    await db.delete(cartItems).where(eq(cartItems.cartId, cartId));
+  },
 };
