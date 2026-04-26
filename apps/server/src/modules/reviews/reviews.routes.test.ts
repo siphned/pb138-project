@@ -40,6 +40,7 @@ describe("reviews.routes integration", () => {
             requireRoles: () => ({}),
           }) as any
       );
+
   const app = createReviewsRoutes(mockAuthPlugin as any);
 
   beforeEach(() => {
@@ -69,10 +70,6 @@ describe("reviews.routes integration", () => {
         method: "POST",
       })
     );
-
-    if (res.status !== 200) {
-      // Error body handled in assertion
-    }
 
     expect(res.status).toBe(200);
   });

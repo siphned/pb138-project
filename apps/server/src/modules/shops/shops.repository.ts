@@ -31,11 +31,16 @@ export const shopsRepository = {
       return shop;
     });
   },
-  findAll(): Promise<ShopWithAddress[]> {
-    return db.query.shops.findMany({
+
+  async findAll(): Promise<ShopWithAddress[]> {
+    const results = await db.query.shops.findMany({
       where: isNull(shops.deletedAt),
-      with: { address: true },
-    }) as Promise<ShopWithAddress[]>;
+      with: {
+        address: true,
+      },
+    });
+
+    return results.filter((s) => s.address && !s.address.deletedAt) as ShopWithAddress[];
   },
 
   findAllByOwnerUserId(ownerUserId: string): Promise<Shop[]> {
@@ -44,11 +49,18 @@ export const shopsRepository = {
     });
   },
 
-  findById(id: string): Promise<ShopWithAddress | undefined> {
-    return db.query.shops.findFirst({
+  async findById(id: string): Promise<ShopWithAddress | undefined> {
+    const result = await db.query.shops.findFirst({
       where: and(eq(shops.id, id), isNull(shops.deletedAt)),
-      with: { address: true },
-    }) as Promise<ShopWithAddress | undefined>;
+      with: {
+        address: true,
+      },
+    });
+
+    if (result?.address && !result.address.deletedAt) {
+      return result as ShopWithAddress;
+    }
+    return undefined;
   },
 
   findByOwnerUserId(ownerUserId: string): Promise<Shop | undefined> {
