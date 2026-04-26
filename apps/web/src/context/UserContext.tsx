@@ -1,45 +1,42 @@
-import { useQueryClient } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { createContext, type ReactNode, useContext, useEffect, useState } from "react";
-import { getUsersMeQueryKey, useGetUsersMe } from "@/generated/hooks/useGetUsersMe";
-import type { PutUsersMeMutationRequest } from "@/generated/types";
-import { usePutUsersMe } from "@/generated/hooks/usePutUsersMe";
+import {
+  getGetUsersMeQueryKey,
+  getGetUsersMeQueryOptions,
+  usePutUsersMe,
+} from "@/generated/users/users";
 
 export interface UserProfile {
   id: string;
   fname: string;
   lname: string;
   email: string;
+  clerkId: string;
   role: "user" | "admin";
 }
 
 interface UserContextType {
-  user: UserProfile;
-  updateUser: (newData: Partial<UserProfile>) => Promise<void>;
+  user: UserProfile | null;
+  updateUser: (newData: Partial<Pick<UserProfile, "fname" | "lname">>) => Promise<UserProfile>;
   isLoading: boolean;
 }
 
-const defaultUser: UserProfile = {
-  id: "",
-  fname: "",
-  lname: "",
-  email: "",
-  role: "user",
-};
+const defaultUser: UserProfile | null = null;
 
 const UserContext = createContext<UserContextType | undefined>(undefined);
 
 export function UserProvider({ children }: { children: ReactNode }) {
-  const { data: profile, isLoading } = useGetUsersMe();
+  const { data: profile, isLoading } = useQuery(getGetUsersMeQueryOptions());
   const queryClient = useQueryClient();
   const updateMutation = usePutUsersMe({
     mutation: {
-      onSuccess: (): void => {
-        void queryClient.invalidateQueries({ queryKey: getUsersMeQueryKey() });
+      onSuccess: () => {
+        queryClient.invalidateQueries({ queryKey: getGetUsersMeQueryKey() });
       },
     },
   });
 
-  const [user, setUser] = useState<UserProfile>(defaultUser);
+  const [user, setUser] = useState<UserProfile | null>(defaultUser);
   useEffect(() => {
     if (profile) {
       setUser({
@@ -47,20 +44,15 @@ export function UserProvider({ children }: { children: ReactNode }) {
         fname: profile.fname,
         lname: profile.lname,
         email: profile.email,
-        role: profile.role,
+        clerkId: profile.clerkId,
+        role: profile.role as "user" | "admin",
       });
     }
   }, [profile]);
 
-  const updateUser = async (newData: Partial<UserProfile>): Promise<void> => {
-    const mutationData: PutUsersMeMutationRequest = {};
-    if (newData.fname !== undefined) {
-      mutationData.fname = newData.fname;
-    }
-    if (newData.lname !== undefined) {
-      mutationData.lname = newData.lname;
-    }
-    await updateMutation.mutateAsync({ data: mutationData });
+  const updateUser = async (newData: Partial<Pick<UserProfile, "fname" | "lname">>) => {
+    if (!user) throw new Error("No user to update");
+    return updateMutation.mutateAsync({ data: newData });
   };
 
   return (

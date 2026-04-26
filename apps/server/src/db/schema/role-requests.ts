@@ -1,5 +1,6 @@
-import { pgTable, text, timestamp, uuid, varchar } from "drizzle-orm/pg-core";
+import { pgTable, text, uuid, varchar } from "drizzle-orm/pg-core";
 import { roleRequestStatusEnum, roleRequestTypeEnum } from "./enums";
+import { timestamptz } from "./helpers";
 import { users } from "./users";
 
 export const roleRequests = pgTable("role_requests", {
@@ -7,11 +8,12 @@ export const roleRequests = pgTable("role_requests", {
   userId: uuid("user_id")
     .notNull()
     .references(() => users.id),
-  requestedRole: roleRequestTypeEnum("requested_role").notNull(),
+  type: roleRequestTypeEnum("type").notNull(),
   status: roleRequestStatusEnum("status").notNull().default("pending"),
   businessName: varchar("business_name", { length: 255 }).notNull(),
   details: text("details"),
-  submittedAt: timestamp("submitted_at").notNull().defaultNow(),
-  reviewedAt: timestamp("reviewed_at"),
-  reviewedByAdminId: uuid("reviewed_by_admin_id").references(() => users.id),
+  adminUserId: uuid("admin_user_id").references(() => users.id),
+  submittedAt: timestamptz("submitted_at").notNull().defaultNow(),
+  reviewedAt: timestamptz("reviewed_at"),
+  deletedAt: timestamptz("deleted_at"),
 });

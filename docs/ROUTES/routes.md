@@ -3,47 +3,45 @@
 ## Route Hierarchy
 
 ```
-/                    (home, public)
-├── /wines           (catalog, public)
-├── /wines/:id       (detail, public)
-├── /winemakers      (browse, public)
-├── /winemakers/:id  (profile, public)
-├── /shops           (browse, public)
-├── /shops/:id       (detail, public)
-├── /events          (listing, public)
-└── /events/:id      (detail, public)
+/                         (home, public)
+├── /wines                (catalog, public)
+├── /wines/:id            (detail, public)
+├── /winemakers           (browse, public)
+├── /winemakers/:id       (profile, public)
+├── /shops                (browse, public)
+├── /shops/:id            (detail, public)
+├── /events               (listing, public)
+└── /events/:id           (detail, public)
 
 /auth
-├── /auth/login      (form)
-└── /auth/register   (form)
+├── /auth/login           (form)
+└── /auth/register        (form)
 
-/cart                (guest + user)
+/cart                     (guest + user)
 
-/checkout            (customer+ only)
+/checkout                 (guest + user)
 
-/orders              (customer+ only)
-├── /orders/:id      (detail)
+/orders                   (customer+ only)
+├── /orders/:id           (detail)
 
-/dashboard           (customer+ only)
+/dashboard                (customer+ only)
 ├── /dashboard/profile
 ├── /dashboard/addresses
 └── /dashboard/role-request
 
-/winemaker           (winemaker role)
+/winemaker                (winemaker role)
 ├── /winemaker/wines
 ├── /winemaker/wines/:id
 ├── /winemaker/events
 └── /winemaker/events/:id
 
-/shop                (shop owner role)
-├── /shop/products
-├── /shop/products/:id
-├── /shop/bundles
-├── /shop/bundles/:id
-├── /shop/hours
-└── /shop/orders
+/shops/:id/management     (shop owner role - pathless layout tree)
+├── /shops/:id/inventory
+├── /shops/:id/bundles
+├── /shops/:id/shop-orders
+└── /shops/:id/supply-browse
 
-/admin               (admin role)
+/admin                    (admin role)
 ├── /admin/users
 ├── /admin/role-requests
 ├── /admin/events
@@ -96,10 +94,10 @@ Global, imported from anywhere:
 |-------|-------|----------|-----------|------------|-------|
 | / | ✅ | ✅ | ✅ | ✅ | ✅ |
 | /wines | ✅ | ✅ | ✅ | ✅ | ✅ |
-| /checkout | ❌ | ✅ | ✅ | ✅ | ✅ |
+| /checkout | ✅ | ✅ | ✅ | ✅ | ✅ |
 | /dashboard/* | ❌ | ✅ | ✅ | ✅ | ✅ |
 | /winemaker/* | ❌ | ❌ | ✅ | ❌ | ✅ |
-| /shop/* | ❌ | ❌ | ❌ | ✅ | ✅ |
+| /shops/:id/* | ❌ | ❌ | ❌ | 🔒 | ✅ |
 | /admin/* | ❌ | ❌ | ❌ | ❌ | ✅ |
 
 ---
@@ -131,10 +129,10 @@ Use Tailwind responsive classes: `sm:`, `md:`, `lg:`, `xl:`
 
 ## API Integration
 
-Every route uses Kubb-generated hooks:
+Every route uses Orval-generated hooks:
 
 ```typescript
-import { useGetWines, useCreateWine } from '@repo/api/hooks';
+import { useGetWines, useCreateWine } from '@/generated/catalog/catalog';
 
 export default function WineCatalog() {
   const { data: wines } = useGetWines({ region: 'Burgundy' });
@@ -160,3 +158,4 @@ data → Render content
 
 ## Revision History
 - **v1.0** (Week 6) — Frontend route structure from PRD
+- **v1.1** (Week 8) — Updated for multiple shops and guest checkout

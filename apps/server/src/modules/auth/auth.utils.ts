@@ -1,9 +1,9 @@
 import { verifyToken } from "@clerk/backend";
 
+export type AppRole = "customer" | "winemaker" | "shop_owner" | "admin";
+
 export type ClerkPayload = Awaited<ReturnType<typeof verifyToken>> & {
-  role?: "user" | "admin";
-  is_winemaker?: boolean;
-  is_shop_owner?: boolean;
+  roles?: AppRole[];
 };
 
 export async function verifyClerkToken(

@@ -48,6 +48,9 @@ yarn-error.log*
 .DS_Store
 *.pem
 
-# LLM resources (tracked in git for AI reference)
-# raw/
+# LLM resources (not tracked - may contain embedded repos/files)
+raw/
 .claude/settings*
+
+# local gemini
+GEMINI.md

@@ -50,7 +50,7 @@ export const winesRoutes = new Elysia()
       }
     },
     {
-      requireCapability: "winemaker",
+      requireRoles: ["winemaker"],
       body: createWineBody,
       response: { 201: wineResponse, 404: t.String() },
       detail: {
@@ -64,9 +64,9 @@ export const winesRoutes = new Elysia()
 
   .put(
     "/wines/:id",
-    async ({ params, dbUser, body }) => {
+    async ({ params, dbUser, clerkPayload, body }) => {
       try {
-        return await winesService.replaceWine(params.id, dbUser.id, dbUser.role, body);
+        return await winesService.replaceWine(params.id, dbUser.id, clerkPayload.roles ?? [], body);
       } catch (e: unknown) {
         if (e instanceof Error) {
           if (e.message === "NOT_FOUND") return status(404, "Wine not found");
@@ -76,7 +76,7 @@ export const winesRoutes = new Elysia()
       }
     },
     {
-      requireAuth: true,
+      requireRoles: ["winemaker", "admin"],
       params: t.Object({ id: t.String() }),
       body: updateWineBody,
       response: { 200: wineResponse, 403: t.String(), 404: t.String() },
@@ -91,9 +91,9 @@ export const winesRoutes = new Elysia()
 
   .delete(
     "/wines/:id",
-    async ({ params, dbUser }) => {
+    async ({ params, dbUser, clerkPayload }) => {
       try {
-        await winesService.deleteWine(params.id, dbUser.id, dbUser.role);
+        await winesService.deleteWine(params.id, dbUser.id, clerkPayload.roles ?? []);
         return status(204, null);
       } catch (e: unknown) {
         if (e instanceof Error) {
@@ -104,7 +104,7 @@ export const winesRoutes = new Elysia()
       }
     },
     {
-      requireAuth: true,
+      requireRoles: ["winemaker", "admin"],
       params: t.Object({ id: t.String() }),
       response: { 204: t.Null(), 403: t.String(), 404: t.String() },
       detail: {

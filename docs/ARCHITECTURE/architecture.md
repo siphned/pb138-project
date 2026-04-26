@@ -53,7 +53,7 @@ apps/server/src/
 
 - **File-based Routing** (TanStack Router)
 - **Component Isolation** (`-components/`, `-hooks/`)
-- **API Integration** (Kubb-generated hooks from OpenAPI)
+- **API Integration** (Orval-generated hooks from OpenAPI)
 - **State Management** (TanStack Query for server state)
 
 ## Database Design
@@ -72,7 +72,7 @@ Database Schema → Drizzle ORM → Service Layer → API Routes
     ↓
 OpenAPI Spec (auto-generated)
     ↓
-Kubb Code Generation
+Orval Code Generation
     ↓
 React Hooks (@repo/api)
     ↓

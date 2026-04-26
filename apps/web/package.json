@@ -9,11 +9,12 @@
     "preview": "vite preview",
     "check-types": "tsc --noEmit",
     "generate": "kubb generate",
-    "test": "vitest",
+    "test": "vitest run",
     "test:e2e": "playwright test || true"
   },
   "dependencies": {
     "@base-ui/react": "^1.4.0",
+    "@clerk/react": "^6.4.5",
     "@fontsource-variable/figtree": "^5.2.10",
     "@hugeicons/core-free-icons": "^4.1.1",
     "@hugeicons/react": "^1.1.6",
@@ -41,14 +42,16 @@
     "@kubb/plugin-ts": "^4.37.2",
     "@playwright/test": "^1.48.0",
     "@tanstack/router-plugin": "^1.167.22",
+    "@testing-library/react": "^16.3.2",
     "@types/node": "^24.12.0",
     "@types/react": "^19.2.14",
     "@types/react-dom": "^19.2.3",
     "@vitejs/plugin-react": "^6.0.1",
     "@vitest/ui": "^2.1.8",
+    "jsdom": "^29.0.2",
+    "orval": "^7.10.0",
     "typescript": "~5.9.3",
     "vite": "^8.0.1",
     "vitest": "^2.1.8"
-  }
   }
 }

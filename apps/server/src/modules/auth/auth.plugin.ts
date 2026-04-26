@@ -1,18 +1,24 @@
 import { Elysia } from "elysia";
+import { cartsService } from "../carts/carts.service";
 import { usersService } from "../users/users.service";
-import type { ClerkPayload } from "./auth.utils";
+import type { AppRole, ClerkPayload } from "./auth.utils";
 import { verifyClerkToken } from "./auth.utils";
 
-export type { ClerkPayload };
-export type AppRole = "user" | "admin" | "winemaker" | "shop_owner";
+export type { AppRole, ClerkPayload };
 
 export const authPlugin = new Elysia({ name: "auth" }).macro({
   requireAuth: {
-    async resolve({ headers, status }) {
+    async resolve({ headers, status, cookie: { guest_session_id: guestSessionId } }) {
       const payload = await verifyClerkToken(headers.authorization);
       if (!payload) return status(401);
 
       const dbUser = await usersService.lazyGetOrCreate(payload.sub, payload);
+
+      const sessionId = guestSessionId?.value;
+      if (typeof sessionId === "string") {
+        await cartsService.mergeOnLogin(dbUser.id, sessionId);
+        guestSessionId?.remove();
+      }
 
       return {
         clerkId: payload.sub,
@@ -22,13 +28,21 @@ export const authPlugin = new Elysia({ name: "auth" }).macro({
     },
   },
 
-  requireRole: (role: "admin") => ({
-    async resolve({ headers, status }) {
+  requireRoles: (roles: AppRole[]) => ({
+    async resolve({ headers, status, cookie: { guest_session_id: guestSessionId } }) {
       const payload = await verifyClerkToken(headers.authorization);
       if (!payload) return status(401);
-      if (payload.role !== role) return status(403);
+
+      const hasRole = roles.some((role) => payload.roles?.includes(role));
+      if (!hasRole) return status(403);
 
       const dbUser = await usersService.lazyGetOrCreate(payload.sub, payload);
+
+      const sessionId = guestSessionId?.value;
+      if (typeof sessionId === "string") {
+        await cartsService.mergeOnLogin(dbUser.id, sessionId);
+        guestSessionId?.remove();
+      }
 
       return {
         clerkId: payload.sub,
@@ -38,17 +52,21 @@ export const authPlugin = new Elysia({ name: "auth" }).macro({
     },
   }),
 
-  requireCapability: (capability: "winemaker" | "shop_owner") => ({
-    async resolve({ headers, status }) {
+  requireCapability: (capability: AppRole) => ({
+    async resolve({ headers, status, cookie: { guest_session_id: guestSessionId } }) {
       const payload = await verifyClerkToken(headers.authorization);
       if (!payload) return status(401);
 
-      const hasCapability =
-        capability === "winemaker" ? payload.is_winemaker === true : payload.is_shop_owner === true;
-
+      const hasCapability = payload.roles?.includes(capability);
       if (!hasCapability) return status(403);
 
       const dbUser = await usersService.lazyGetOrCreate(payload.sub, payload);
+
+      const sessionId = guestSessionId?.value;
+      if (typeof sessionId === "string") {
+        await cartsService.mergeOnLogin(dbUser.id, sessionId);
+        guestSessionId?.remove();
+      }
 
       return {
         clerkId: payload.sub,

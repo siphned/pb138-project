@@ -19,10 +19,9 @@ import {
   AccordionItem,
   AccordionTrigger,
 } from "@/components/ui/accordion";
-import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
-import { useUser } from "@/context/UserContext";
 
 import { Role } from "@/types/roles";
 
@@ -32,13 +31,19 @@ interface SidebarProps {
   onRoleChange?: (role: Role) => void;
 }
 
-export function Sidebar({ userRoles = [Role.CUSTOMER], activeRole, onRoleChange }: SidebarProps) {
-  const { user } = useUser();
+interface SidebarUser {
+  fname?: string;
+  avatarUrl?: string;
+}
+
+export function Sidebar({ userRoles = [Role.customer], activeRole, onRoleChange }: SidebarProps) {
+  // TODO: Re-enable user context once UserProvider is enabled
+  // const user = useUser();
+  const [user] = useState<SidebarUser | null>(null);
   const currentActiveRole = activeRole || userRoles[0];
   const [accordionState, setAccordionState] = useState<string[]>([]);
 
-  const fullName = `${user?.fname || ""} ${user?.lname || ""}`.trim() || "User";
-  const initials = fullName.substring(0, 2).toUpperCase();
+  const initials = "WE";
   const hasMultipleRoles = userRoles.length > 1;
 
   return (
@@ -56,12 +61,27 @@ export function Sidebar({ userRoles = [Role.CUSTOMER], activeRole, onRoleChange 
         <div className="flex-none  border-b bg-background z-10">
           <SheetHeader className="text-left">
             <SheetTitle className="flex items-center gap-3 font-heading text-xl px-4 py-4">
-              <Avatar className="h-14 w-14">
-                <AvatarFallback className="bg-primary text-primary-foreground font-heading text-lg">
-                  {initials}
-                </AvatarFallback>
-              </Avatar>
-              {fullName}
+              {user && (
+                <>
+                  <Avatar className="h-14 w-14">
+                    <AvatarImage src={user.avatarUrl} alt={user.fname} />
+                    <AvatarFallback className="bg-primary text-primary-foreground font-heading text-lg">
+                      {initials}
+                    </AvatarFallback>
+                  </Avatar>
+                  {user.fname}
+                </>
+              )}
+              {!user && (
+                <>
+                  <Avatar className="h-14 w-14">
+                    <AvatarFallback className="bg-primary text-primary-foreground font-heading text-lg">
+                      {initials}
+                    </AvatarFallback>
+                  </Avatar>
+                  User
+                </>
+              )}
             </SheetTitle>
           </SheetHeader>
         </div>
@@ -114,7 +134,7 @@ export function Sidebar({ userRoles = [Role.CUSTOMER], activeRole, onRoleChange 
             )}
 
             {/* ROLE-AWARE LINKS */}
-            {currentActiveRole === Role.CUSTOMER ? (
+            {currentActiveRole === Role.customer ? (
               <>
                 <Link
                   to="/orders"

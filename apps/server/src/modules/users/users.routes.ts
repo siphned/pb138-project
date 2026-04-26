@@ -27,8 +27,9 @@ export const usersRoutes = new Elysia({ prefix: "/users" })
   .put(
     "/me",
     async ({ dbUser, body }) => {
-      return usersService.updateProfileById(dbUser.id, body);
+      return await usersService.updateProfileById(dbUser.id, body);
     },
+
     {
       requireAuth: true,
       body: updateProfileBody,
@@ -45,7 +46,7 @@ export const usersRoutes = new Elysia({ prefix: "/users" })
   .get(
     "/me/addresses",
     async ({ dbUser }) => {
-      return usersService.getAddressesForUser(dbUser);
+      return await usersService.getAddressesForUser(dbUser);
     },
     {
       requireAuth: true,
@@ -63,7 +64,7 @@ export const usersRoutes = new Elysia({ prefix: "/users" })
     "/me/addresses",
     async ({ dbUser, body }) => {
       const { type, ...addressData } = body;
-      return usersService.upsertAddressForUser(dbUser.id, type, addressData);
+      return await usersService.upsertAddressForUser(dbUser.id, type, addressData);
     },
     {
       requireAuth: true,

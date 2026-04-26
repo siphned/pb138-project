@@ -1,4 +1,4 @@
-# CI Workflow - Updated 2026-04-19
+# CI Workflow - Optimized for GitHub Actions free tier
 name: CI
 
 on:
@@ -8,6 +8,11 @@ on:
     branches: [ dev, main ]
   workflow_dispatch: {}
 
+# Concurrency: cancel in-progress runs if a new one is triggered
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
   install:
     runs-on: ubuntu-latest
@@ -16,7 +21,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - name: Setup Bun
-        uses: oven-sh/setup-bun@v3
+        uses: oven-sh/setup-bun@v2
         with:
           bun-version: 1.3.11
       - name: Cache bun and node_modules
@@ -71,6 +76,7 @@ jobs:
             apps/web/node_modules
             packages/*/node_modules
           key: ${{ runner.os }}-bun-${{ hashFiles('**/bun.lock') }}
+          fail-on-cache-miss: true
       - name: Start backend server
         run: bun run apps/server/src/index.ts &
       - name: Wait for server to be ready
@@ -92,7 +98,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - name: Setup Bun
-        uses: oven-sh/setup-bun@v3
+        uses: oven-sh/setup-bun@v2
         with:
           bun-version: 1.3.11
       - name: Restore cache
@@ -105,6 +111,7 @@ jobs:
             apps/web/node_modules
             packages/*/node_modules
           key: ${{ runner.os }}-bun-${{ hashFiles('**/bun.lock') }}
+          fail-on-cache-miss: true
       - name: Run biome lint
         run: bun run lint
 
@@ -114,7 +121,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - name: Setup Bun
-        uses: oven-sh/setup-bun@v3
+        uses: oven-sh/setup-bun@v2
         with:
           bun-version: 1.3.11
       - name: Restore cache
@@ -127,6 +134,7 @@ jobs:
             apps/web/node_modules
             packages/*/node_modules
           key: ${{ runner.os }}-bun-${{ hashFiles('**/bun.lock') }}
+          fail-on-cache-miss: true
       - name: Download generated code
         uses: actions/download-artifact@v4
         with:
@@ -142,7 +150,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - name: Setup Bun
-        uses: oven-sh/setup-bun@v3
+        uses: oven-sh/setup-bun@v2
         with:
           bun-version: 1.3.11
       - name: Restore cache
@@ -155,6 +163,7 @@ jobs:
             apps/web/node_modules
             packages/*/node_modules
           key: ${{ runner.os }}-bun-${{ hashFiles('**/bun.lock') }}
+          fail-on-cache-miss: true
       - name: Download generated code
         uses: actions/download-artifact@v4
         with:
@@ -171,12 +180,13 @@ jobs:
             apps/web/dist/
 
   test:
+    if: github.event_name == 'push'
     needs: install
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
       - name: Setup Bun
-        uses: oven-sh/setup-bun@v3
+        uses: oven-sh/setup-bun@v2
         with:
           bun-version: 1.3.11
       - name: Restore cache
@@ -189,6 +199,7 @@ jobs:
             apps/web/node_modules
             packages/*/node_modules
           key: ${{ runner.os }}-bun-${{ hashFiles('**/bun.lock') }}
+          fail-on-cache-miss: true
       - name: Run unit tests
         run: bun run test
       - name: Upload junit results
