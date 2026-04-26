@@ -41,7 +41,7 @@ describe("AuthenticatedLayout", () => {
     mockNavigate.mockClear();
     vi.mocked(useAuth).mockReturnValue({ isLoaded: true, isSignedIn: false } as never);
     render(<AuthenticatedLayout />);
-    expect(mockNavigate).toHaveBeenCalledWith({ to: "/login" });
+    expect(mockNavigate).toHaveBeenCalledWith({ to: "/auth/login" });
   });
 
   it("does not navigate while still loading", () => {
