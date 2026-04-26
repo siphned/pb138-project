@@ -50,4 +50,4 @@ yarn-error.log*
 
 # LLM resources (not tracked - may contain embedded repos/files)
 raw/
-.claude/settings*
+.claude/

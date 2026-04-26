@@ -3,49 +3,49 @@ import { t } from "elysia";
 // ─── Shared sub-schemas ───────────────────────────────────────────────────────
 
 const addressBody = t.Object({
-  country: t.String({ minLength: 1, maxLength: 50 }),
-  city: t.String({ minLength: 1, maxLength: 255 }),
-  postalCode: t.String({ minLength: 1, maxLength: 20 }),
-  street: t.String({ minLength: 1, maxLength: 255 }),
-  houseNumber: t.String({ minLength: 1, maxLength: 20 }),
+  city: t.String({ maxLength: 255, minLength: 1 }),
+  country: t.String({ maxLength: 50, minLength: 1 }),
+  houseNumber: t.String({ maxLength: 20, minLength: 1 }),
+  postalCode: t.String({ maxLength: 20, minLength: 1 }),
+  street: t.String({ maxLength: 255, minLength: 1 }),
 });
 
 // ─── Request schemas ──────────────────────────────────────────────────────────
 
 export const createEventBody = t.Object({
-  name: t.String({ minLength: 1, maxLength: 255 }),
-  description: t.Optional(t.String({ minLength: 1, maxLength: 10000 })),
-  capacity: t.Integer({ minimum: 1, maximum: 32767 }),
-  startTime: t.String({ format: "date-time" }),
+  address: addressBody,
+  capacity: t.Integer({ maximum: 32767, minimum: 1 }),
+  description: t.Optional(t.String({ maxLength: 10000, minLength: 1 })),
   endTime: t.String({ format: "date-time" }),
   inviteType: t.Union([t.Literal("open"), t.Literal("invite_only")]),
+  name: t.String({ maxLength: 255, minLength: 1 }),
+  startTime: t.String({ format: "date-time" }),
   visibility: t.Union([t.Literal("public"), t.Literal("private")]),
-  address: addressBody,
 });
 
 export const updateEventBody = t.Object({
-  name: t.Optional(t.String({ minLength: 1, maxLength: 255 })),
-  description: t.Optional(t.Nullable(t.String({ minLength: 1, maxLength: 10000 }))),
-  capacity: t.Optional(t.Integer({ minimum: 1, maximum: 32767 })),
-  startTime: t.Optional(t.String({ format: "date-time" })),
+  capacity: t.Optional(t.Integer({ maximum: 32767, minimum: 1 })),
+  description: t.Optional(t.Nullable(t.String({ maxLength: 10000, minLength: 1 }))),
   endTime: t.Optional(t.String({ format: "date-time" })),
+  name: t.Optional(t.String({ maxLength: 255, minLength: 1 })),
+  startTime: t.Optional(t.String({ format: "date-time" })),
 });
 
 export const listEventsQuery = t.Object({
-  winemakerName: t.Optional(t.String({ maxLength: 255 })),
   from: t.Optional(t.String({ format: "date-time" })),
-  to: t.Optional(t.String({ format: "date-time" })),
+  limit: t.Optional(t.Number({ maximum: 100, minimum: 1 })),
   page: t.Optional(t.Number({ minimum: 1 })),
-  limit: t.Optional(t.Number({ minimum: 1, maximum: 100 })),
+  to: t.Optional(t.String({ format: "date-time" })),
+  winemakerName: t.Optional(t.String({ maxLength: 255 })),
 });
 
 export const paginationQuery = t.Object({
+  limit: t.Optional(t.Number({ maximum: 100, minimum: 1 })),
   page: t.Optional(t.Number({ minimum: 1 })),
-  limit: t.Optional(t.Number({ minimum: 1, maximum: 100 })),
 });
 
 export const createCommentBody = t.Object({
-  body: t.String({ minLength: 1, maxLength: 2000 }),
+  body: t.String({ maxLength: 2000, minLength: 1 }),
 });
 
 export const eventParams = t.Object({ id: t.String() });
@@ -53,65 +53,65 @@ export const eventParams = t.Object({ id: t.String() });
 // ─── Response schemas ─────────────────────────────────────────────────────────
 
 export const eventResponse = t.Object({
-  id: t.String(),
-  winemakerId: t.String(),
-  name: t.String(),
-  description: t.Nullable(t.String()),
-  addressId: t.String(),
-  capacity: t.Number(),
-  startTime: t.Date(),
-  endTime: t.Date(),
-  status: t.Union([t.Literal("pending"), t.Literal("approved"), t.Literal("rejected")]),
-  createdAt: t.Date(),
-  updatedAt: t.Nullable(t.Date()),
-  inviteType: t.String(),
-  visibility: t.Union([t.Literal("public"), t.Literal("private")]),
-  winemaker: t.Nullable(t.Object({ id: t.String(), name: t.String() })),
   address: t.Nullable(
     t.Object({
-      country: t.String(),
       city: t.String(),
+      country: t.String(),
+      houseNumber: t.String(),
       postalCode: t.String(),
       street: t.String(),
-      houseNumber: t.String(),
     })
   ),
+  addressId: t.String(),
+  capacity: t.Number(),
+  createdAt: t.Date(),
+  description: t.Nullable(t.String()),
+  endTime: t.Date(),
+  id: t.String(),
+  inviteType: t.String(),
+  name: t.String(),
+  startTime: t.Date(),
+  status: t.Union([t.Literal("pending"), t.Literal("approved"), t.Literal("rejected")]),
+  updatedAt: t.Nullable(t.Date()),
+  visibility: t.Union([t.Literal("public"), t.Literal("private")]),
+  winemaker: t.Nullable(t.Object({ id: t.String(), name: t.String() })),
+  winemakerId: t.String(),
 });
 
 export const paginatedEventsResponse = t.Object({
   data: t.Array(eventResponse),
-  page: t.Number(),
   limit: t.Number(),
+  page: t.Number(),
   total: t.Number(),
 });
 
 export const registrationResponse = t.Object({
-  id: t.String(),
-  eventId: t.String(),
-  userId: t.String(),
   createdAt: t.Date(),
+  eventId: t.String(),
+  id: t.String(),
+  userId: t.String(),
 });
 
 const commentWithUserResponse = t.Object({
-  id: t.String(),
-  eventId: t.String(),
-  userId: t.String(),
   body: t.String(),
   createdAt: t.Date(),
-  user: t.Object({ id: t.String(), fname: t.String(), lname: t.String() }),
+  eventId: t.String(),
+  id: t.String(),
+  user: t.Object({ fname: t.String(), id: t.String(), lname: t.String() }),
+  userId: t.String(),
 });
 
 export const commentResponse = t.Object({
-  id: t.String(),
-  eventId: t.String(),
-  userId: t.String(),
   body: t.String(),
   createdAt: t.Date(),
+  eventId: t.String(),
+  id: t.String(),
+  userId: t.String(),
 });
 
 export const paginatedCommentsResponse = t.Object({
   data: t.Array(commentWithUserResponse),
-  page: t.Number(),
   limit: t.Number(),
+  page: t.Number(),
   total: t.Number(),
 });

@@ -13,12 +13,12 @@ function handleError(e: unknown) {
 }
 
 const agreementResponse = t.Object({
-  id: t.String(),
-  shopId: t.String(),
-  winemakerId: t.String(),
-  status: t.String(),
   createdAt: t.Date(),
+  id: t.String(),
   respondedAt: t.Union([t.Date(), t.Null()]),
+  shopId: t.String(),
+  status: t.String(),
+  winemakerId: t.String(),
 });
 
 const errorResponse = {
@@ -47,17 +47,17 @@ export const supplyAgreementsRoutes = new Elysia({
       }
     },
     {
-      requireRoles: ["shop_owner"],
       body: t.Object({
-        winemakerId: t.String(),
         shopId: t.String(),
+        winemakerId: t.String(),
       }),
-      response: { 200: agreementResponse, ...errorResponse },
       detail: {
-        summary: "Create a supply agreement request",
         description: "A shop owner requests a supply agreement from a winemaker.",
         security: [{ bearerAuth: [] }],
+        summary: "Create a supply agreement request",
       },
+      requireRoles: ["shop_owner"],
+      response: { 200: agreementResponse, ...errorResponse },
     }
   )
 
@@ -71,17 +71,17 @@ export const supplyAgreementsRoutes = new Elysia({
       }
     },
     {
-      requireRoles: ["winemaker"],
-      params: t.Object({ id: t.String() }),
       body: t.Object({
         status: t.Union([t.Literal("approved"), t.Literal("rejected")]),
       }),
-      response: { 200: agreementResponse, ...errorResponse },
       detail: {
-        summary: "Respond to a supply agreement request",
         description: "A winemaker approves or rejects a supply agreement request.",
         security: [{ bearerAuth: [] }],
+        summary: "Respond to a supply agreement request",
       },
+      params: t.Object({ id: t.String() }),
+      requireRoles: ["winemaker"],
+      response: { 200: agreementResponse, ...errorResponse },
     }
   )
 
@@ -95,13 +95,13 @@ export const supplyAgreementsRoutes = new Elysia({
       }
     },
     {
-      requireRoles: ["shop_owner"],
-      params: t.Object({ shopId: t.String() }),
-      response: { 200: t.Array(agreementResponse), ...errorResponse },
       detail: {
-        summary: "List supply agreements for a shop",
         security: [{ bearerAuth: [] }],
+        summary: "List supply agreements for a shop",
       },
+      params: t.Object({ shopId: t.String() }),
+      requireRoles: ["shop_owner"],
+      response: { 200: t.Array(agreementResponse), ...errorResponse },
     }
   )
 
@@ -115,11 +115,11 @@ export const supplyAgreementsRoutes = new Elysia({
       }
     },
     {
+      detail: {
+        security: [{ bearerAuth: [] }],
+        summary: "List supply agreements for the authenticated winemaker",
+      },
       requireRoles: ["winemaker"],
       response: { 200: t.Array(agreementResponse), ...errorResponse },
-      detail: {
-        summary: "List supply agreements for the authenticated winemaker",
-        security: [{ bearerAuth: [] }],
-      },
     }
   );

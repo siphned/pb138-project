@@ -31,29 +31,43 @@ export type UpdateWinemakerData = {
 };
 
 export const winemakersRepository = {
-  findAll(): Promise<WinemakerListItem[]> {
-    return db.query.winemakers.findMany({
+  async findAll(): Promise<WinemakerListItem[]> {
+    const results = await db.query.winemakers.findMany({
       where: isNull(winemakers.deletedAt),
-      with: { address: true },
-    }) as Promise<WinemakerListItem[]>;
+      with: {
+        address: true,
+      },
+    });
+
+    return results.filter((w) => w.address && !w.address.deletedAt) as WinemakerListItem[];
   },
 
-  findById(id: string): Promise<WinemakerWithRelations | undefined> {
-    return db.query.winemakers.findFirst({
+  async findById(id: string): Promise<WinemakerWithRelations | undefined> {
+    const result = await db.query.winemakers.findFirst({
       where: and(eq(winemakers.id, id), isNull(winemakers.deletedAt)),
       with: {
         address: true,
-        wines: { where: isNull(wines.deletedAt) },
         events: { where: isNull(events.deletedAt) },
+        wines: { where: isNull(wines.deletedAt) },
       },
-    }) as Promise<WinemakerWithRelations | undefined>;
+    });
+
+    if (result?.address && !result.address.deletedAt) {
+      return result as WinemakerWithRelations;
+    }
+    return undefined;
   },
 
-  findByIdWithAddress(id: string): Promise<WinemakerListItem | undefined> {
-    return db.query.winemakers.findFirst({
+  async findByIdWithAddress(id: string): Promise<WinemakerListItem | undefined> {
+    const result = await db.query.winemakers.findFirst({
       where: and(eq(winemakers.id, id), isNull(winemakers.deletedAt)),
       with: { address: true },
-    }) as Promise<WinemakerListItem | undefined>;
+    });
+
+    if (result?.address && !result.address.deletedAt) {
+      return result as WinemakerListItem;
+    }
+    return undefined;
   },
 
   findByUserId(userId: string): Promise<Winemaker | undefined> {
@@ -62,16 +76,16 @@ export const winemakersRepository = {
     });
   },
 
-  findWinesByWinemakerId(winemakerId: string): Promise<Wine[]> {
-    return db.query.wines.findMany({
-      where: and(eq(wines.winemakerId, winemakerId), isNull(wines.deletedAt)),
-    });
-  },
-
   findEventsByWinemakerId(winemakerId: string): Promise<EventRow[]> {
     return db.query.events.findMany({
       where: and(eq(events.winemakerId, winemakerId), isNull(events.deletedAt)),
     }) as Promise<EventRow[]>;
+  },
+
+  findWinesByWinemakerId(winemakerId: string): Promise<Wine[]> {
+    return db.query.wines.findMany({
+      where: and(eq(wines.winemakerId, winemakerId), isNull(wines.deletedAt)),
+    });
   },
 
   async updateById(id: string, data: UpdateWinemakerData): Promise<Winemaker> {

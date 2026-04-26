@@ -1,7 +1,6 @@
 import type { Order, orders } from "../../db/schema";
+import type { CartWithItems } from "../carts/carts.repository";
 import { cartsService } from "../carts/carts.service";
-import { emailService } from "../email";
-import { usersRepository } from "../users/users.repository";
 import type { CreateOrderData, CreateOrderItem, OrderWithItems } from "./orders.repository";
 import { ordersRepository } from "./orders.repository";
 
@@ -28,46 +27,35 @@ export interface CheckoutData {
 
 export const ordersService = {
   async createOrder(
-    {
-      userId,
-      sessionId,
-      userEmail,
-      customerName,
-    }: {
-      userId?: string;
-      sessionId?: string;
-      userEmail?: string;
-      customerName?: string;
-    },
+    { userId, sessionId }: { userId?: string; sessionId?: string },
     data: CheckoutData
   ): Promise<Order> {
-    const cart = userId
-      ? await cartsService.getCartForUser(userId)
-      : sessionId
-        ? await cartsService.getCartForSession(sessionId)
-        : null;
+    let cart: CartWithItems | undefined | null = null;
+    if (userId) {
+      cart = await cartsService.getCartForUser(userId);
+    } else if (sessionId) {
+      cart = await cartsService.getCartForSession(sessionId);
+    }
 
     if (!cart || cart.items.length === 0) throw new Error("CART_EMPTY");
 
     const items: CreateOrderItem[] = [];
-    const emailItems: { name: string; quantity: number; unitPrice: string }[] = [];
     let subtotal = 0;
 
     for (const cartItem of cart.items) {
+      // Check if product is deleted
+      if (cartItem.product.deletedAt !== null) {
+        throw new Error(`PRODUCT_DELETED:${cartItem.product.name}`);
+      }
+
       if (cartItem.product.quantity < cartItem.quantity) {
         throw new Error(`INSUFFICIENT_STOCK:${cartItem.product.name}`);
       }
 
       items.push({
-        shopId: cartItem.product.shopId,
         productId: cartItem.productId,
         quantity: cartItem.quantity,
-        unitPrice: cartItem.product.price,
-      });
-
-      emailItems.push({
-        name: cartItem.product.name,
-        quantity: cartItem.quantity,
+        shopId: cartItem.product.shopId,
         unitPrice: cartItem.product.price,
       });
 
@@ -83,34 +71,28 @@ export const ordersService = {
     ).toFixed(2);
 
     const orderData: CreateOrderData = {
-      userId,
-      guestSessionId: sessionId,
+      billingAddress: data.billingAddress || data.shippingAddress,
+      deliveryType: data.deliveryType,
+      discount,
       guestEmail: data.guestEmail,
       guestName: data.guestName,
-      shippingFee,
-      discount,
-      paymentStatus: "pending",
+      guestSessionId: sessionId,
       paymentMethod: data.paymentMethod,
-      totalPrice,
-      status: "pending",
-      deliveryType: data.deliveryType,
+      paymentStatus: "pending",
       shippingAddress: data.shippingAddress,
-      billingAddress: data.billingAddress || data.shippingAddress,
+      shippingFee,
+      status: "pending",
+      totalPrice,
+      userId,
     };
 
     const order = await ordersRepository.create(orderData, items);
 
-    const recipientEmail = userEmail ?? data.guestEmail;
-    const recipientName = customerName ?? data.guestName ?? "Customer";
-    if (recipientEmail) {
-      emailService
-        .sendOrderConfirmation(recipientEmail, {
-          customerName: recipientName,
-          orderId: order.id,
-          items: emailItems,
-          totalPrice,
-        })
-        .catch(console.error);
+    // Clear cart after successful order
+    if (userId) {
+      await cartsService.clearCart(userId);
+    } else if (sessionId) {
+      await cartsService.clearCartBySession(sessionId);
     }
 
     return order;
@@ -133,17 +115,6 @@ export const ordersService = {
     const order = await ordersRepository.findById(orderId);
     if (!order) throw new Error("NOT_FOUND");
 
-    const updated = await ordersRepository.updateStatus(orderId, status);
-
-    if (order.userId) {
-      usersRepository
-        .findById(order.userId)
-        .then((user) => {
-          if (user) emailService.sendOrderStatusUpdate(user.email, { orderId, status });
-        })
-        .catch(console.error);
-    }
-
-    return updated;
+    return ordersRepository.updateStatus(orderId, status);
   },
 };

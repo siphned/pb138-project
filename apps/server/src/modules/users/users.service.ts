@@ -1,6 +1,7 @@
 import { createClerkClient } from "@clerk/backend";
 import type { Address, User } from "../../db/schema";
 import type { ClerkPayload } from "../auth/auth.utils";
+import { userRolesRepository } from "./user-roles.repository";
 import { usersRepository } from "./users.repository";
 
 const clerkClient = createClerkClient({
@@ -8,6 +9,45 @@ const clerkClient = createClerkClient({
 });
 
 export const usersService = {
+  async getAddresses(
+    clerkId: string,
+    payload: ClerkPayload
+  ): Promise<{ shipping: Address | null; billing: Address | null }> {
+    const user = await usersService.lazyGetOrCreate(clerkId, payload);
+
+    const [shipping, billing] = await Promise.all([
+      user.shippingAddressId ? usersRepository.findAddressById(user.shippingAddressId) : null,
+      user.billingAddressId ? usersRepository.findAddressById(user.billingAddressId) : null,
+    ]);
+
+    return {
+      billing: billing ?? null,
+      shipping: shipping ?? null,
+    };
+  },
+
+  async getAddressesForUser(
+    user: User
+  ): Promise<{ shipping: Address | null; billing: Address | null }> {
+    const [shipping, billing] = await Promise.all([
+      user.shippingAddressId ? usersRepository.findAddressById(user.shippingAddressId) : null,
+      user.billingAddressId ? usersRepository.findAddressById(user.billingAddressId) : null,
+    ]);
+    return { billing: billing ?? null, shipping: shipping ?? null };
+  },
+
+  getById(id: string): Promise<User | undefined> {
+    return usersRepository.findById(id);
+  },
+
+  async getProfileWithRoles(
+    clerkId: string,
+    payload: ClerkPayload
+  ): Promise<User & { roles: string[] }> {
+    const user = await this.lazyGetOrCreate(clerkId, payload);
+    const roles = await userRolesRepository.findByUserId(user.id);
+    return { ...user, roles };
+  },
   async lazyGetOrCreate(clerkId: string, _payload: ClerkPayload): Promise<User> {
     const existing = await usersRepository.findByClerkId(clerkId);
     if (existing) return existing;
@@ -24,16 +64,39 @@ export const usersService = {
       });
     }
 
-    return usersRepository.upsert({
+    const user = await usersRepository.upsert({
       clerkId,
+      email,
       fname: clerkUser.firstName ?? "",
       lname: clerkUser.lastName ?? "",
-      email,
     });
+
+    // Sync Clerk roles to database
+    await this.syncRolesToDatabase(
+      user.id,
+      (clerkUser.publicMetadata?.roles as string[]) || ["customer"]
+    );
+
+    return user;
   },
 
-  getById(id: string): Promise<User | undefined> {
-    return usersRepository.findById(id);
+  async syncRolesToDatabase(userId: string, clerkRoles: string[]): Promise<void> {
+    // Get existing roles in DB
+    const existingRoles = await userRolesRepository.findByUserId(userId);
+
+    // Add missing roles
+    for (const role of clerkRoles) {
+      if (!existingRoles.includes(role)) {
+        await userRolesRepository.addRole(userId, role);
+      }
+    }
+
+    // Remove roles that are no longer in Clerk
+    for (const role of existingRoles) {
+      if (!clerkRoles.includes(role)) {
+        await userRolesRepository.removeRole(userId, role);
+      }
+    }
   },
 
   async updateProfile(
@@ -45,21 +108,8 @@ export const usersService = {
     return usersRepository.updateById(user.id, data);
   },
 
-  async getAddresses(
-    clerkId: string,
-    payload: ClerkPayload
-  ): Promise<{ shipping: Address | null; billing: Address | null }> {
-    const user = await usersService.lazyGetOrCreate(clerkId, payload);
-
-    const [shipping, billing] = await Promise.all([
-      user.shippingAddressId ? usersRepository.findAddressById(user.shippingAddressId) : null,
-      user.billingAddressId ? usersRepository.findAddressById(user.billingAddressId) : null,
-    ]);
-
-    return {
-      shipping: shipping ?? null,
-      billing: billing ?? null,
-    };
+  updateProfileById(userId: string, data: { fname?: string; lname?: string }): Promise<User> {
+    return usersRepository.updateById(userId, data);
   },
 
   async upsertAddress(
@@ -82,20 +132,6 @@ export const usersService = {
     await usersRepository.updateById(user.id, { [field]: address.id });
 
     return address;
-  },
-
-  updateProfileById(userId: string, data: { fname?: string; lname?: string }): Promise<User> {
-    return usersRepository.updateById(userId, data);
-  },
-
-  async getAddressesForUser(
-    user: User
-  ): Promise<{ shipping: Address | null; billing: Address | null }> {
-    const [shipping, billing] = await Promise.all([
-      user.shippingAddressId ? usersRepository.findAddressById(user.shippingAddressId) : null,
-      user.billingAddressId ? usersRepository.findAddressById(user.billingAddressId) : null,
-    ]);
-    return { shipping: shipping ?? null, billing: billing ?? null };
   },
 
   async upsertAddressForUser(
