@@ -8,6 +8,17 @@ export type ReviewWithUser = Review & {
 };
 
 export const reviewsRepository = {
+  findReviews(entityId: string, entityType: "product" | "winemaker"): Promise<ReviewWithUser[]> {
+    return db.query.reviews.findMany({
+      where: and(
+        eq(reviews.entityId, entityId),
+        eq(reviews.entityType, entityType),
+        isNull(reviews.deletedAt)
+      ),
+      with: { user: { columns: { id: true, fname: true, lname: true } } },
+    }) as Promise<ReviewWithUser[]>;
+  },
+
   async averageRating(
     entityId: string,
     entityType: "product" | "winemaker"
@@ -25,29 +36,6 @@ export const reviewsRepository = {
     return row?.avg !== null && row?.avg !== undefined ? Number.parseFloat(row.avg) : null;
   },
 
-  findById(id: string): Promise<Review | undefined> {
-    return db.query.reviews.findFirst({
-      where: and(eq(reviews.id, id), isNull(reviews.deletedAt)),
-    });
-  },
-  findReviews(entityId: string, entityType: "product" | "winemaker"): Promise<ReviewWithUser[]> {
-    return db.query.reviews.findMany({
-      where: and(
-        eq(reviews.entityId, entityId),
-        eq(reviews.entityType, entityType),
-        isNull(reviews.deletedAt)
-      ),
-      with: { user: { columns: { fname: true, id: true, lname: true } } },
-    }) as Promise<ReviewWithUser[]>;
-  },
-
-  findReviewWithUser(reviewId: string): Promise<ReviewWithUser | undefined> {
-    return db.query.reviews.findFirst({
-      where: and(eq(reviews.id, reviewId), isNull(reviews.deletedAt)),
-      with: { user: { columns: { fname: true, id: true, lname: true } } },
-    }) as Promise<ReviewWithUser | undefined>;
-  },
-
   findUserReview(
     userId: string,
     entityId: string,
@@ -60,6 +48,12 @@ export const reviewsRepository = {
         eq(reviews.entityType, entityType),
         isNull(reviews.deletedAt)
       ),
+    });
+  },
+
+  findById(id: string): Promise<Review | undefined> {
+    return db.query.reviews.findFirst({
+      where: and(eq(reviews.id, id), isNull(reviews.deletedAt)),
     });
   },
 
@@ -82,15 +76,22 @@ export const reviewsRepository = {
     const [review] = await db
       .insert(reviews)
       .values({
-        body: data.body ?? null,
+        userId,
         entityId,
         entityType,
         rating: data.rating,
-        userId,
+        body: data.body ?? null,
       })
       .returning();
     if (!review) throw new Error("Review insert returned no rows");
     return review;
+  },
+
+  findReviewWithUser(reviewId: string): Promise<ReviewWithUser | undefined> {
+    return db.query.reviews.findFirst({
+      where: and(eq(reviews.id, reviewId), isNull(reviews.deletedAt)),
+      with: { user: { columns: { id: true, fname: true, lname: true } } },
+    }) as Promise<ReviewWithUser | undefined>;
   },
 
   async softDelete(reviewId: string): Promise<void> {

@@ -1,32 +1,53 @@
 import { Elysia, status, t } from "elysia";
 import { authPlugin } from "../auth";
-import { userRolesRepository } from "../users/user-roles.repository";
 import { createReviewBody, reviewListResponse, reviewResponse } from "./reviews.schema";
 import { reviewsService } from "./reviews.service";
 
-export const reviewsRoutes = new Elysia()
+export const reviewsRoutes = new Elysia({ prefix: "/reviews", tags: ["reviews"] })
   .use(authPlugin)
 
-  .get("/products/:id/reviews", ({ params }) => reviewsService.listProductReviews(params.id), {
-    params: t.Object({ id: t.String() }),
-    response: { 200: reviewListResponse },
-    detail: {
-      tags: ["reviews"],
-      summary: "List product reviews",
-      description: "Returns all reviews for a product with average rating.",
+  .get(
+    "/product/:id",
+    async ({ params }) => {
+      return await reviewsService.listProductReviews(params.id);
     },
-  })
+    {
+      params: t.Object({ id: t.String() }),
+      response: { 200: reviewListResponse },
+      detail: {
+        tags: ["reviews"],
+        summary: "List product reviews",
+        description: "Returns all reviews and average rating for a product.",
+      },
+    }
+  )
+
+  .get(
+    "/winemaker/:id",
+    async ({ params }) => {
+      return await reviewsService.listWinemakerReviews(params.id);
+    },
+    {
+      params: t.Object({ id: t.String() }),
+      response: { 200: reviewListResponse },
+      detail: {
+        tags: ["reviews"],
+        summary: "List winemaker reviews",
+        description: "Returns all reviews and average rating for a winemaker.",
+      },
+    }
+  )
 
   .post(
-    "/products/:id/reviews",
-    async ({ params, dbUser, body }) => {
+    "/product/:id",
+    async ({ dbUser, params, body }) => {
       try {
-        return status(201, await reviewsService.createProductReview(dbUser.id, params.id, body));
+        return await reviewsService.createProductReview(dbUser.id, params.id, body);
       } catch (e: unknown) {
         if (e instanceof Error) {
           if (e.message === "NOT_PURCHASED")
-            return status(403, "You have not purchased this product");
-          if (e.message === "DUPLICATE_REVIEW")
+            return status(403, "You must purchase the product to review it");
+          if (e.message === "ALREADY_REVIEWED")
             return status(409, "You have already reviewed this product");
         }
         throw e;
@@ -36,41 +57,62 @@ export const reviewsRoutes = new Elysia()
       requireAuth: true,
       params: t.Object({ id: t.String() }),
       body: createReviewBody,
-      response: { 201: reviewResponse, 403: t.String(), 409: t.String() },
+      response: { 200: reviewResponse, 403: t.String(), 409: t.String() },
       detail: {
         tags: ["reviews"],
         summary: "Create product review",
-        description:
-          "Creates a review for a product. Requires authentication and a completed purchase. One review per user per product.",
+        description: "Creates a review for a product. Requires verified purchase.",
+        security: [{ bearerAuth: [] }],
+      },
+    }
+  )
+
+  .post(
+    "/winemaker/:id",
+    async ({ dbUser, params, body }) => {
+      try {
+        return await reviewsService.createWinemakerReview(dbUser.id, params.id, body);
+      } catch (e: unknown) {
+        if (e instanceof Error && e.message === "ALREADY_REVIEWED")
+          return status(409, "You have already reviewed this winemaker");
+        throw e;
+      }
+    },
+    {
+      requireAuth: true,
+      params: t.Object({ id: t.String() }),
+      body: createReviewBody,
+      response: { 200: reviewResponse, 409: t.String() },
+      detail: {
+        tags: ["reviews"],
+        summary: "Create winemaker review",
+        description: "Creates a review for a winemaker.",
         security: [{ bearerAuth: [] }],
       },
     }
   )
 
   .delete(
-    "/products/:productId/reviews/:reviewId",
-    async ({ params, dbUser }) => {
+    "/product/:id/:reviewId",
+    async ({ dbUser, clerkPayload, params }) => {
       try {
-        const roles = await userRolesRepository.findByUserId(dbUser.id);
-        await reviewsService.deleteProductReview(
+        await reviewsService.deleteReview(
           params.reviewId,
-          params.productId,
           dbUser.id,
-          roles
+          clerkPayload.roles?.[0] ?? "user",
+          params.id,
+          "product"
         );
         return status(204, null);
       } catch (e: unknown) {
-        if (e instanceof Error) {
-          if (e.message === "NOT_FOUND") return status(404, "Review not found");
-          if (e.message === "FORBIDDEN") return status(403, "You do not own this review");
-        }
+        if (e instanceof Error && e.message === "NOT_FOUND") return status(404, "Review not found");
         throw e;
       }
     },
     {
       requireAuth: true,
-      params: t.Object({ productId: t.String(), reviewId: t.String() }),
-      response: { 204: t.Null(), 403: t.String(), 404: t.String() },
+      params: t.Object({ id: t.String(), reviewId: t.String() }),
+      response: { 204: t.Null(), 404: t.String() },
       detail: {
         tags: ["reviews"],
         summary: "Delete product review",
@@ -80,68 +122,27 @@ export const reviewsRoutes = new Elysia()
     }
   )
 
-  .get("/winemakers/:id/reviews", ({ params }) => reviewsService.listWinemakerReviews(params.id), {
-    params: t.Object({ id: t.String() }),
-    response: { 200: reviewListResponse },
-    detail: {
-      tags: ["reviews"],
-      summary: "List winemaker reviews",
-      description: "Returns all reviews for a winemaker with average rating.",
-    },
-  })
-
-  .post(
-    "/winemakers/:id/reviews",
-    async ({ params, dbUser, body }) => {
-      try {
-        return status(201, await reviewsService.createWinemakerReview(dbUser.id, params.id, body));
-      } catch (e: unknown) {
-        if (e instanceof Error) {
-          if (e.message === "DUPLICATE_REVIEW")
-            return status(409, "You have already reviewed this winemaker");
-        }
-        throw e;
-      }
-    },
-    {
-      requireAuth: true,
-      params: t.Object({ id: t.String() }),
-      body: createReviewBody,
-      response: { 201: reviewResponse, 409: t.String() },
-      detail: {
-        tags: ["reviews"],
-        summary: "Create winemaker review",
-        description:
-          "Creates a review for a winemaker. Requires authentication. One review per user per winemaker.",
-        security: [{ bearerAuth: [] }],
-      },
-    }
-  )
-
   .delete(
-    "/winemakers/:winemakerId/reviews/:reviewId",
-    async ({ params, dbUser }) => {
+    "/winemaker/:id/:reviewId",
+    async ({ dbUser, clerkPayload, params }) => {
       try {
-        const roles = await userRolesRepository.findByUserId(dbUser.id);
-        await reviewsService.deleteWinemakerReview(
+        await reviewsService.deleteReview(
           params.reviewId,
-          params.winemakerId,
           dbUser.id,
-          roles
+          clerkPayload.roles?.[0] ?? "user",
+          params.id,
+          "winemaker"
         );
         return status(204, null);
       } catch (e: unknown) {
-        if (e instanceof Error) {
-          if (e.message === "NOT_FOUND") return status(404, "Review not found");
-          if (e.message === "FORBIDDEN") return status(403, "You do not own this review");
-        }
+        if (e instanceof Error && e.message === "NOT_FOUND") return status(404, "Review not found");
         throw e;
       }
     },
     {
       requireAuth: true,
-      params: t.Object({ winemakerId: t.String(), reviewId: t.String() }),
-      response: { 204: t.Null(), 403: t.String(), 404: t.String() },
+      params: t.Object({ id: t.String(), reviewId: t.String() }),
+      response: { 204: t.Null(), 404: t.String() },
       detail: {
         tags: ["reviews"],
         summary: "Delete winemaker review",
