@@ -26,7 +26,7 @@ function UserDisplay() {
     <div>
       <p data-testid="fname">{user.fname}</p>
       <p data-testid="roles">{user.roles.join(",")}</p>
-      <button onClick={() => updateUser({ fname: "Updated" })} type="button">
+      <button type="button" onClick={() => updateUser({ fname: "Updated" })}>
         Update
       </button>
     </div>
@@ -57,11 +57,11 @@ describe("UserContext", () => {
   it("renders user fname and roles from API", async () => {
     vi.mocked(useQuery).mockReturnValue({
       data: {
-        clerkId: "clerk_1",
-        email: "jan@test.cz",
-        fname: "Jan",
         id: "1",
+        fname: "Jan",
         lname: "Novák",
+        email: "jan@test.cz",
+        clerkId: "clerk_1",
         roles: ["customer", "winemaker"],
       },
       isLoading: false,
@@ -76,11 +76,11 @@ describe("UserContext", () => {
   it("defaults roles to empty array when API returns undefined roles", async () => {
     vi.mocked(useQuery).mockReturnValue({
       data: {
-        clerkId: "clerk_1",
-        email: "jan@test.cz",
-        fname: "Jan",
         id: "1",
+        fname: "Jan",
         lname: "Novák",
+        email: "jan@test.cz",
+        clerkId: "clerk_1",
         roles: undefined,
       },
       isLoading: false,
@@ -94,20 +94,20 @@ describe("UserContext", () => {
   it("calls mutateAsync when updateUser is invoked", async () => {
     const user = userEvent.setup();
     mockMutateAsync.mockResolvedValue({
-      clerkId: "clerk_1",
-      email: "jan@test.cz",
-      fname: "Updated",
       id: "1",
+      fname: "Updated",
       lname: "Novák",
+      email: "jan@test.cz",
+      clerkId: "clerk_1",
       roles: ["customer"],
     });
     vi.mocked(useQuery).mockReturnValue({
       data: {
-        clerkId: "clerk_1",
-        email: "jan@test.cz",
-        fname: "Jan",
         id: "1",
+        fname: "Jan",
         lname: "Novák",
+        email: "jan@test.cz",
+        clerkId: "clerk_1",
         roles: ["customer"],
       },
       isLoading: false,
@@ -121,14 +121,14 @@ describe("UserContext", () => {
   it("updateUser returns a UserProfile shape (not raw API response)", async () => {
     const user = userEvent.setup();
     const rawApiResponse = {
+      id: "1",
+      fname: "Updated",
+      lname: "Novák",
+      email: "jan@test.cz",
       clerkId: "clerk_1",
+      roles: ["customer"],
       // raw API might have extra fields we don't care about
       createdAt: "2026-01-01",
-      email: "jan@test.cz",
-      fname: "Updated",
-      id: "1",
-      lname: "Novák",
-      roles: ["customer"],
     };
     mockMutateAsync.mockResolvedValue(rawApiResponse);
     vi.mocked(useQuery).mockReturnValue({
@@ -141,10 +141,10 @@ describe("UserContext", () => {
       const { updateUser } = useUser();
       return (
         <button
+          type="button"
           onClick={async () => {
             returnValue = await updateUser({ fname: "Updated" });
           }}
-          type="button"
         >
           Update
         </button>
@@ -158,11 +158,11 @@ describe("UserContext", () => {
     await user.click(screen.getByText("Update"));
     await waitFor(() => {
       expect(returnValue).toMatchObject({
-        clerkId: "clerk_1",
-        email: "jan@test.cz",
-        fname: "Updated",
         id: "1",
+        fname: "Updated",
         lname: "Novák",
+        email: "jan@test.cz",
+        clerkId: "clerk_1",
         roles: ["customer"],
       });
       // must not have extra raw fields

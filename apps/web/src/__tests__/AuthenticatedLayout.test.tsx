@@ -4,8 +4,8 @@ import { describe, expect, it, vi } from "vitest";
 const mockNavigate = vi.fn().mockResolvedValue(undefined);
 
 vi.mock("@clerk/react", () => ({
-  ClerkProvider: ({ children }: { children: React.ReactNode }) => <>{children}</>,
   useAuth: vi.fn(),
+  ClerkProvider: ({ children }: { children: React.ReactNode }) => <>{children}</>,
 }));
 
 vi.mock("@tanstack/react-router", () => ({
@@ -41,7 +41,7 @@ describe("AuthenticatedLayout", () => {
     mockNavigate.mockClear();
     vi.mocked(useAuth).mockReturnValue({ isLoaded: true, isSignedIn: false } as never);
     render(<AuthenticatedLayout />);
-    expect(mockNavigate).toHaveBeenCalledWith({ to: "/auth/login" });
+    expect(mockNavigate).toHaveBeenCalledWith({ to: "/login" });
   });
 
   it("does not navigate while still loading", () => {
