@@ -123,7 +123,9 @@ export const ordersRepository = {
       .selectDistinct({ order: orders })
       .from(orders)
       .innerJoin(orderItems, eq(orders.id, orderItems.orderId))
-      .where(and(eq(orderItems.shopId, shopId), isNull(orders.deletedAt)));
+      .where(
+        and(eq(orderItems.shopId, shopId), isNull(orders.deletedAt), isNull(orderItems.deletedAt))
+      );
   },
 
   listForUser(userId: string): Promise<Order[]> {
