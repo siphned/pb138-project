@@ -152,13 +152,13 @@ export function Sidebar({ userRoles = [Role.customer], activeRole, onRoleChange 
             ) : (
               <>
                 <Link
-                  to="/inventory"
+                  to="/dashboard"
                   className="flex-none flex items-center gap-3 px-3 py-3 rounded-md bg-secondary hover:bg-secondary/80 transition-colors text-sm font-medium text-primary"
                 >
                   <Wine className="h-4 w-4" /> My Wines
                 </Link>
                 <Link
-                  to="/bundles"
+                  to="/dashboard"
                   className="flex-none flex items-center gap-3 px-3 py-3 rounded-md bg-secondary hover:bg-secondary/80 transition-colors text-sm font-medium text-primary"
                 >
                   <Package className="h-4 w-4" /> Bundles
@@ -204,7 +204,7 @@ export function Sidebar({ userRoles = [Role.customer], activeRole, onRoleChange 
           </button>
 
           <Link
-            to="/logout"
+            to="/explore"
             className="flex items-center gap-3 px-3 py-2 rounded-md hover:bg-destructive/10 transition-colors text-sm font-medium text-muted-foreground hover:text-destructive mt-2"
           >
             <LogOut className="h-4 w-4" /> Log out
