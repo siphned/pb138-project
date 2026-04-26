@@ -13,12 +13,12 @@ import type {
   RoleRequestData,
 } from "./email.templates";
 
-const resend = new Resend(process.env.RESEND_API_KEY);
+const getResend = () => new Resend(process.env.RESEND_API_KEY ?? "");
 const FROM = process.env.FROM_EMAIL ?? "noreply@winemarket.com";
 
 export const emailService = {
   async sendOrderConfirmation(to: string, data: OrderConfirmationData): Promise<void> {
-    await resend.emails.send({
+    await getResend().emails.send({
       from: FROM,
       to,
       subject: `Order confirmed — #${data.orderId.slice(0, 8)}`,
@@ -28,7 +28,7 @@ export const emailService = {
   },
 
   async sendOrderStatusUpdate(to: string, data: OrderStatusData): Promise<void> {
-    await resend.emails.send({
+    await getResend().emails.send({
       from: FROM,
       to,
       subject: "Your order status has been updated",
@@ -38,7 +38,7 @@ export const emailService = {
   },
 
   async sendEventApproval(to: string, data: EventApprovalData): Promise<void> {
-    await resend.emails.send({
+    await getResend().emails.send({
       from: FROM,
       to,
       subject: `Your event "${data.eventName}" has been approved`,
@@ -48,7 +48,7 @@ export const emailService = {
   },
 
   async sendRoleRequestApproved(to: string, data: RoleRequestData): Promise<void> {
-    await resend.emails.send({
+    await getResend().emails.send({
       from: FROM,
       to,
       subject: "Your WineMarket application has been approved",
@@ -58,7 +58,7 @@ export const emailService = {
   },
 
   async sendRoleRequestRejected(to: string, data: RoleRequestData): Promise<void> {
-    await resend.emails.send({
+    await getResend().emails.send({
       from: FROM,
       to,
       subject: "Update on your WineMarket application",
