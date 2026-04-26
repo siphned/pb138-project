@@ -17,6 +17,12 @@ vi.mock("./admin.repository", () => ({
   },
 }));
 
+vi.mock("../email", () => ({
+  emailService: {
+    sendEventApproval: vi.fn().mockResolvedValue(undefined),
+  },
+}));
+
 import type { AdminEventRow, AdminUserRow } from "./admin.repository";
 import { adminRepository } from "./admin.repository";
 import { adminService } from "./admin.service";
