@@ -199,10 +199,10 @@
         "useFragmentSyntax": "warn",
         "useLiteralEnumMembers": "error",
         "useNodejsImportProtocol": "off",
-        "useShorthandAssign": "error",
+        "useShorthandAssign": "warn",
         "useTemplate": "warn",
-        "noNestedTernary": "error",
-        "useCollapsedIf": "warn",
+        "noNestedTernary": "off",
+        "useCollapsedIf": "info",
         "noRestrictedImports": {
           "level": "warn",
           "options": { "paths": { "lodash": "Use lodash/<name> instead." } }
@@ -210,7 +210,7 @@
       },
       "suspicious": {
         "noAlert": "error",
-        "noConsole": "warn",
+        "noConsole": "error",
         "noDebugger": "error",
         "noDoubleEquals": "error",
         "noExplicitAny": "error",

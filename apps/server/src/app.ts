@@ -1,14 +1,12 @@
 import { cors } from "@elysiajs/cors";
 import { openapi } from "@elysiajs/openapi";
 import { Elysia } from "elysia";
-import { adminRoutes } from "./modules/admin";
 import { availabilityRoutes } from "./modules/availability";
 import { cartsRoutes } from "./modules/carts";
 import { eventsRoutes } from "./modules/events";
 import { guestSessionsRoutes } from "./modules/guest-sessions";
 import { ordersRoutes } from "./modules/orders";
 import { productsRoutes } from "./modules/products";
-import { reviewsRoutes } from "./modules/reviews";
 import { roleRequestsRoutes } from "./modules/role-requests";
 import { shopsRoutes } from "./modules/shops";
 import { supplyAgreementsRoutes } from "./modules/supply-agreements";
@@ -50,7 +48,6 @@ export const app = new Elysia()
           { description: "Order placement and history", name: "orders" },
           { description: "Anonymous session management", name: "guest-sessions" },
           { description: "B2B supply relationship management", name: "supply-agreements" },
-          { description: "Admin moderation: users, events, reviews", name: "admin" },
         ],
       },
       provider: "scalar",
@@ -68,6 +65,4 @@ export const app = new Elysia()
   .use(winesRoutes)
   .use(winemakersRoutes)
   .use(guestSessionsRoutes)
-  .use(supplyAgreementsRoutes)
-  .use(reviewsRoutes)
-  .use(adminRoutes);
+  .use(supplyAgreementsRoutes);

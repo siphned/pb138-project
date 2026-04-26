@@ -5,17 +5,6 @@ import { userRoles } from "../../db/schema";
 
 export const userRolesRepository = {
   /**
-   * Get all roles for a user
-   */
-  async findByUserId(userId: string): Promise<string[]> {
-    const rows = await db
-      .select({ role: userRoles.role })
-      .from(userRoles)
-      .where(eq(userRoles.userId, userId));
-    return rows.map((r) => r.role);
-  },
-
-  /**
    * Add a role to a user (idempotent - doesn't error if already exists)
    */
   async addRole(userId: string, role: string): Promise<UserRole> {
@@ -27,17 +16,27 @@ export const userRolesRepository = {
     if (existing) return existing;
 
     // Add new role
-    const [newRole] = await db.insert(userRoles).values({ userId, role }).returning();
+    const [newRole] = await db.insert(userRoles).values({ role, userId }).returning();
 
     if (!newRole) throw new Error("Failed to add role");
     return newRole;
   },
 
   /**
-   * Remove a role from a user
+   * Delete all roles for a user (e.g., when user is deleted)
    */
-  async removeRole(userId: string, role: string): Promise<void> {
-    await db.delete(userRoles).where(and(eq(userRoles.userId, userId), eq(userRoles.role, role)));
+  async deleteAllRoles(userId: string): Promise<void> {
+    await db.delete(userRoles).where(eq(userRoles.userId, userId));
+  },
+  /**
+   * Get all roles for a user
+   */
+  async findByUserId(userId: string): Promise<string[]> {
+    const rows = await db
+      .select({ role: userRoles.role })
+      .from(userRoles)
+      .where(eq(userRoles.userId, userId));
+    return rows.map((r) => r.role);
   },
 
   /**
@@ -51,9 +50,9 @@ export const userRolesRepository = {
   },
 
   /**
-   * Delete all roles for a user (e.g., when user is deleted)
+   * Remove a role from a user
    */
-  async deleteAllRoles(userId: string): Promise<void> {
-    await db.delete(userRoles).where(eq(userRoles.userId, userId));
+  async removeRole(userId: string, role: string): Promise<void> {
+    await db.delete(userRoles).where(and(eq(userRoles.userId, userId), eq(userRoles.role, role)));
   },
 };

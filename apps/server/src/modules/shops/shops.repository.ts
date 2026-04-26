@@ -31,6 +31,31 @@ export const shopsRepository = {
       return shop;
     });
   },
+  findAll(): Promise<ShopWithAddress[]> {
+    return db.query.shops.findMany({
+      where: isNull(shops.deletedAt),
+      with: { address: true },
+    }) as Promise<ShopWithAddress[]>;
+  },
+
+  findAllByOwnerUserId(ownerUserId: string): Promise<Shop[]> {
+    return db.query.shops.findMany({
+      where: and(eq(shops.ownerUserId, ownerUserId), isNull(shops.deletedAt)),
+    });
+  },
+
+  findById(id: string): Promise<ShopWithAddress | undefined> {
+    return db.query.shops.findFirst({
+      where: and(eq(shops.id, id), isNull(shops.deletedAt)),
+      with: { address: true },
+    }) as Promise<ShopWithAddress | undefined>;
+  },
+
+  findByOwnerUserId(ownerUserId: string): Promise<Shop | undefined> {
+    return db.query.shops.findFirst({
+      where: and(eq(shops.ownerUserId, ownerUserId), isNull(shops.deletedAt)),
+    });
+  },
 
   async findAll(): Promise<ShopWithAddress[]> {
     const results = await db.query.shops.findMany({

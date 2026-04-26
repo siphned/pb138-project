@@ -16,6 +16,11 @@
       "schema": "public",
       "values": ["pending", "accepted", "declined", "expired"]
     },
+    "public.event_status": {
+      "name": "event_status",
+      "schema": "public",
+      "values": ["pending", "approved", "rejected"]
+    },
     "public.event_visibility": {
       "name": "event_visibility",
       "schema": "public",
@@ -59,6 +64,11 @@
       "schema": "public",
       "values": ["user", "admin"]
     },
+    "public.user_status": {
+      "name": "user_status",
+      "schema": "public",
+      "values": ["active", "suspended", "banned"]
+    },
     "public.wine_color": {
       "name": "wine_color",
       "schema": "public",
@@ -70,9 +80,9 @@
       "values": ["still", "sparkling", "fortified", "dessert"]
     }
   },
-  "id": "09fc08f7-c0e0-4455-a8ea-61c021450afc",
+  "id": "6172e46f-c2c1-4a7e-b991-b9c8ddb91c1e",
   "policies": {},
-  "prevId": "e7abe103-928e-4e19-b256-2b9a12be5e56",
+  "prevId": "6995fec6-1721-4723-979c-b050d32b82ef",
   "roles": {},
   "schemas": {},
   "sequences": {},
@@ -588,6 +598,93 @@
         }
       }
     },
+    "public.event_registrations": {
+      "checkConstraints": {},
+      "columns": {
+        "created_at": {
+          "default": "now()",
+          "name": "created_at",
+          "notNull": true,
+          "primaryKey": false,
+          "type": "timestamp"
+        },
+        "deleted_at": {
+          "name": "deleted_at",
+          "notNull": false,
+          "primaryKey": false,
+          "type": "timestamp"
+        },
+        "event_id": {
+          "name": "event_id",
+          "notNull": true,
+          "primaryKey": false,
+          "type": "uuid"
+        },
+        "id": {
+          "default": "gen_random_uuid()",
+          "name": "id",
+          "notNull": true,
+          "primaryKey": true,
+          "type": "uuid"
+        },
+        "user_id": {
+          "name": "user_id",
+          "notNull": true,
+          "primaryKey": false,
+          "type": "uuid"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "foreignKeys": {
+        "event_registrations_event_id_events_id_fk": {
+          "columnsFrom": ["event_id"],
+          "columnsTo": ["id"],
+          "name": "event_registrations_event_id_events_id_fk",
+          "onDelete": "no action",
+          "onUpdate": "no action",
+          "tableFrom": "event_registrations",
+          "tableTo": "events"
+        },
+        "event_registrations_user_id_users_id_fk": {
+          "columnsFrom": ["user_id"],
+          "columnsTo": ["id"],
+          "name": "event_registrations_user_id_users_id_fk",
+          "onDelete": "no action",
+          "onUpdate": "no action",
+          "tableFrom": "event_registrations",
+          "tableTo": "users"
+        }
+      },
+      "indexes": {
+        "uq_event_reg_event_user_active": {
+          "columns": [
+            {
+              "asc": true,
+              "expression": "event_id",
+              "isExpression": false,
+              "nulls": "last"
+            },
+            {
+              "asc": true,
+              "expression": "user_id",
+              "isExpression": false,
+              "nulls": "last"
+            }
+          ],
+          "concurrently": false,
+          "isUnique": true,
+          "method": "btree",
+          "name": "uq_event_reg_event_user_active",
+          "where": "\"event_registrations\".\"deleted_at\" IS NULL",
+          "with": {}
+        }
+      },
+      "isRLSEnabled": false,
+      "name": "event_registrations",
+      "policies": {},
+      "schema": "",
+      "uniqueConstraints": {}
+    },
     "public.events": {
       "checkConstraints": {},
       "columns": {
@@ -596,6 +693,12 @@
           "notNull": true,
           "primaryKey": false,
           "type": "uuid"
+        },
+        "capacity": {
+          "name": "capacity",
+          "notNull": true,
+          "primaryKey": false,
+          "type": "smallint"
         },
         "created_at": {
           "default": "now()",
@@ -646,6 +749,20 @@
           "notNull": true,
           "primaryKey": false,
           "type": "timestamp with time zone"
+        },
+        "status": {
+          "default": "'pending'",
+          "name": "status",
+          "notNull": true,
+          "primaryKey": false,
+          "type": "event_status",
+          "typeSchema": "public"
+        },
+        "updated_at": {
+          "name": "updated_at",
+          "notNull": false,
+          "primaryKey": false,
+          "type": "timestamp"
         },
         "visibility": {
           "name": "visibility",
@@ -756,6 +873,13 @@
     "public.order_items": {
       "checkConstraints": {},
       "columns": {
+        "created_at": {
+          "default": "now()",
+          "name": "created_at",
+          "notNull": true,
+          "primaryKey": false,
+          "type": "timestamp with time zone"
+        },
         "id": {
           "default": "gen_random_uuid()",
           "name": "id",
@@ -787,11 +911,25 @@
           "primaryKey": false,
           "type": "uuid"
         },
+        "status": {
+          "default": "'pending'",
+          "name": "status",
+          "notNull": true,
+          "primaryKey": false,
+          "type": "order_status",
+          "typeSchema": "public"
+        },
         "unit_price_at_purchase": {
           "name": "unit_price_at_purchase",
           "notNull": true,
           "primaryKey": false,
           "type": "numeric(10, 2)"
+        },
+        "updated_at": {
+          "name": "updated_at",
+          "notNull": false,
+          "primaryKey": false,
+          "type": "timestamp with time zone"
         }
       },
       "compositePrimaryKeys": {},
@@ -845,13 +983,13 @@
           "name": "created_at",
           "notNull": true,
           "primaryKey": false,
-          "type": "timestamp"
+          "type": "timestamp with time zone"
         },
         "deleted_at": {
           "name": "deleted_at",
           "notNull": false,
           "primaryKey": false,
-          "type": "timestamp"
+          "type": "timestamp with time zone"
         },
         "delivery_type": {
           "name": "delivery_type",
@@ -916,7 +1054,7 @@
           "name": "updated_at",
           "notNull": false,
           "primaryKey": false,
-          "type": "timestamp"
+          "type": "timestamp with time zone"
         },
         "user_id": {
           "name": "user_id",
@@ -1109,13 +1247,13 @@
           "name": "created_at",
           "notNull": true,
           "primaryKey": false,
-          "type": "timestamp"
+          "type": "timestamp with time zone"
         },
         "deleted_at": {
           "name": "deleted_at",
           "notNull": false,
           "primaryKey": false,
-          "type": "timestamp"
+          "type": "timestamp with time zone"
         },
         "description": {
           "name": "description",
@@ -1165,7 +1303,7 @@
           "name": "updated_at",
           "notNull": false,
           "primaryKey": false,
-          "type": "timestamp"
+          "type": "timestamp with time zone"
         }
       },
       "compositePrimaryKeys": {},
@@ -1358,7 +1496,13 @@
       "name": "shops",
       "policies": {},
       "schema": "",
-      "uniqueConstraints": {}
+      "uniqueConstraints": {
+        "shops_owner_user_id_unique": {
+          "columns": ["owner_user_id"],
+          "name": "shops_owner_user_id_unique",
+          "nullsNotDistinct": false
+        }
+      }
     },
     "public.users": {
       "checkConstraints": {},
@@ -1426,6 +1570,14 @@
           "notNull": false,
           "primaryKey": false,
           "type": "uuid"
+        },
+        "status": {
+          "default": "'active'",
+          "name": "status",
+          "notNull": true,
+          "primaryKey": false,
+          "type": "user_status",
+          "typeSchema": "public"
         },
         "updated_at": {
           "name": "updated_at",
@@ -1731,6 +1883,12 @@
           "notNull": true,
           "primaryKey": false,
           "type": "smallint"
+        },
+        "region": {
+          "name": "region",
+          "notNull": true,
+          "primaryKey": false,
+          "type": "varchar(255)"
         },
         "type": {
           "name": "type",

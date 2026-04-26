@@ -26,77 +26,20 @@ type RepoFilters = {
 };
 
 export const eventsRepository = {
-  findWinemakerByUserId(userId: string) {
-    return db.query.winemakers.findFirst({
-      where: and(eq(winemakers.userId, userId), isNull(winemakers.deletedAt)),
-      columns: { id: true, name: true },
-    });
+  async countActiveRegistrations(eventId: string): Promise<number> {
+    const [result] = await db
+      .select({ value: count() })
+      .from(eventRegistrations)
+      .where(and(eq(eventRegistrations.eventId, eventId), isNull(eventRegistrations.deletedAt)));
+    return Number(result?.value ?? 0);
   },
 
-  resolveWinemakerIdsByName(name: string): Promise<string[]> {
-    return db.query.winemakers
-      .findMany({
-        where: and(ilike(winemakers.name, `%${name}%`), isNull(winemakers.deletedAt)),
-        columns: { id: true },
-      })
-      .then((rows) => rows.map((r) => r.id));
-  },
-
-  findById(id: string): Promise<EventWithDetails | undefined> {
-    return db.query.events.findFirst({
-      where: and(eq(events.id, id), isNull(events.deletedAt)),
-      with: {
-        winemaker: {
-          columns: { id: true, name: true, deletedAt: true },
-        },
-
-        address: {
-          columns: {
-            country: true,
-            city: true,
-            postalCode: true,
-            street: true,
-            houseNumber: true,
-          },
-        },
-      },
-    }) as Promise<EventWithDetails | undefined>;
-  },
-
-  async findMany(
-    filters: RepoFilters,
-    pagination: { limit: number; offset: number }
-  ): Promise<EventWithDetails[]> {
-    const conditions = [
-      isNull(events.deletedAt),
-      eq(events.status, filters.status),
-      filters.from ? gte(events.startTime, filters.from) : undefined,
-      filters.to ? lte(events.startTime, filters.to) : undefined,
-      filters.winemakerIds ? inArray(events.winemakerId, filters.winemakerIds) : undefined,
-    ].filter((c): c is NonNullable<typeof c> => c !== undefined);
-
-    const rows = await db.query.events.findMany({
-      where: and(...conditions),
-      with: {
-        winemaker: {
-          columns: { id: true, name: true, deletedAt: true },
-        },
-        address: {
-          columns: {
-            country: true,
-            city: true,
-            postalCode: true,
-            street: true,
-            houseNumber: true,
-          },
-        },
-      },
-      limit: pagination.limit,
-      offset: pagination.offset,
-      orderBy: (e, { asc }) => [asc(e.startTime)],
-    });
-
-    return rows.filter((r) => r.winemaker && !r.winemaker.deletedAt) as EventWithDetails[];
+  async countComments(eventId: string): Promise<number> {
+    const [result] = await db
+      .select({ value: count() })
+      .from(eventComments)
+      .where(and(eq(eventComments.eventId, eventId), isNull(eventComments.deletedAt)));
+    return Number(result?.value ?? 0);
   },
 
   async countMany(filters: RepoFilters): Promise<number> {
@@ -113,6 +56,12 @@ export const eventsRepository = {
       .from(events)
       .where(and(...conditions));
     return Number(result?.value ?? 0);
+  },
+
+  async createComment(eventId: string, userId: string, body: string): Promise<EventComment> {
+    const [comment] = await db.insert(eventComments).values({ body, eventId, userId }).returning();
+    if (!comment) throw new Error("Comment insert returned no rows");
+    return comment;
   },
 
   async createEventWithAddress(
@@ -141,61 +90,20 @@ export const eventsRepository = {
       const [event] = await tx
         .insert(events)
         .values({
-          winemakerId,
           addressId: address.id,
-          name: data.name,
-          description: data.description ?? null,
           capacity: data.capacity,
-          startTime: data.startTime,
+          description: data.description ?? null,
           endTime: data.endTime,
           inviteType: data.inviteType,
-          visibility: data.visibility,
+          name: data.name,
+          startTime: data.startTime,
           status: "pending",
+          visibility: data.visibility,
+          winemakerId,
         })
         .returning();
       if (!event) throw new Error("Event insert returned no rows");
       return event;
-    });
-  },
-
-  async update(
-    id: string,
-    fields: {
-      name?: string;
-      description?: string | null;
-      capacity?: number;
-      startTime?: Date;
-      endTime?: Date;
-    }
-  ): Promise<Event> {
-    const [updated] = await db
-      .update(events)
-      .set({ ...fields, updatedAt: new Date() })
-      .where(eq(events.id, id))
-      .returning();
-    if (!updated) throw new Error("Event not found");
-    return updated;
-  },
-
-  async softDelete(id: string): Promise<void> {
-    await db.update(events).set({ deletedAt: new Date() }).where(eq(events.id, id));
-  },
-
-  async countActiveRegistrations(eventId: string): Promise<number> {
-    const [result] = await db
-      .select({ value: count() })
-      .from(eventRegistrations)
-      .where(and(eq(eventRegistrations.eventId, eventId), isNull(eventRegistrations.deletedAt)));
-    return Number(result?.value ?? 0);
-  },
-
-  findActiveRegistration(eventId: string, userId: string): Promise<EventRegistration | undefined> {
-    return db.query.eventRegistrations.findFirst({
-      where: and(
-        eq(eventRegistrations.eventId, eventId),
-        eq(eventRegistrations.userId, userId),
-        isNull(eventRegistrations.deletedAt)
-      ),
     });
   },
 
@@ -226,11 +134,34 @@ export const eventsRepository = {
     });
   },
 
-  async softDeleteRegistration(id: string): Promise<void> {
-    await db
-      .update(eventRegistrations)
-      .set({ deletedAt: new Date() })
-      .where(eq(eventRegistrations.id, id));
+  findActiveRegistration(eventId: string, userId: string): Promise<EventRegistration | undefined> {
+    return db.query.eventRegistrations.findFirst({
+      where: and(
+        eq(eventRegistrations.eventId, eventId),
+        eq(eventRegistrations.userId, userId),
+        isNull(eventRegistrations.deletedAt)
+      ),
+    });
+  },
+
+  findById(id: string): Promise<EventWithDetails | undefined> {
+    return db.query.events.findFirst({
+      where: and(eq(events.id, id), isNull(events.deletedAt)),
+      with: {
+        address: {
+          columns: {
+            city: true,
+            country: true,
+            houseNumber: true,
+            postalCode: true,
+            street: true,
+          },
+        },
+        winemaker: {
+          columns: { deletedAt: true, id: true, name: true },
+        },
+      },
+    }) as Promise<EventWithDetails | undefined>;
   },
 
   findComments(
@@ -238,25 +169,92 @@ export const eventsRepository = {
     pagination: { limit: number; offset: number }
   ): Promise<CommentWithUser[]> {
     return db.query.eventComments.findMany({
-      where: and(eq(eventComments.eventId, eventId), isNull(eventComments.deletedAt)),
-      with: { user: { columns: { id: true, fname: true, lname: true } } },
       limit: pagination.limit,
       offset: pagination.offset,
       orderBy: (c, { asc }) => [asc(c.createdAt)],
+      where: and(eq(eventComments.eventId, eventId), isNull(eventComments.deletedAt)),
+      with: { user: { columns: { fname: true, id: true, lname: true } } },
     }) as Promise<CommentWithUser[]>;
   },
 
-  async countComments(eventId: string): Promise<number> {
-    const [result] = await db
-      .select({ value: count() })
-      .from(eventComments)
-      .where(and(eq(eventComments.eventId, eventId), isNull(eventComments.deletedAt)));
-    return Number(result?.value ?? 0);
+  async findMany(
+    filters: RepoFilters,
+    pagination: { limit: number; offset: number }
+  ): Promise<EventWithDetails[]> {
+    const conditions = [
+      isNull(events.deletedAt),
+      eq(events.status, filters.status),
+      filters.from ? gte(events.startTime, filters.from) : undefined,
+      filters.to ? lte(events.startTime, filters.to) : undefined,
+      filters.winemakerIds ? inArray(events.winemakerId, filters.winemakerIds) : undefined,
+    ].filter((c): c is NonNullable<typeof c> => c !== undefined);
+
+    const rows = await db.query.events.findMany({
+      limit: pagination.limit,
+      offset: pagination.offset,
+      orderBy: (e, { asc }) => [asc(e.startTime)],
+      where: and(...conditions),
+      with: {
+        address: {
+          columns: {
+            city: true,
+            country: true,
+            houseNumber: true,
+            postalCode: true,
+            street: true,
+          },
+        },
+        winemaker: {
+          columns: { deletedAt: true, id: true, name: true },
+        },
+      },
+    });
+
+    return rows.filter((r) => r.winemaker && !r.winemaker.deletedAt) as EventWithDetails[];
+  },
+  findWinemakerByUserId(userId: string) {
+    return db.query.winemakers.findFirst({
+      columns: { id: true, name: true },
+      where: and(eq(winemakers.userId, userId), isNull(winemakers.deletedAt)),
+    });
   },
 
-  async createComment(eventId: string, userId: string, body: string): Promise<EventComment> {
-    const [comment] = await db.insert(eventComments).values({ eventId, userId, body }).returning();
-    if (!comment) throw new Error("Comment insert returned no rows");
-    return comment;
+  resolveWinemakerIdsByName(name: string): Promise<string[]> {
+    return db.query.winemakers
+      .findMany({
+        columns: { id: true },
+        where: and(ilike(winemakers.name, `%${name}%`), isNull(winemakers.deletedAt)),
+      })
+      .then((rows) => rows.map((r) => r.id));
+  },
+
+  async softDelete(id: string): Promise<void> {
+    await db.update(events).set({ deletedAt: new Date() }).where(eq(events.id, id));
+  },
+
+  async softDeleteRegistration(id: string): Promise<void> {
+    await db
+      .update(eventRegistrations)
+      .set({ deletedAt: new Date() })
+      .where(eq(eventRegistrations.id, id));
+  },
+
+  async update(
+    id: string,
+    fields: {
+      name?: string;
+      description?: string | null;
+      capacity?: number;
+      startTime?: Date;
+      endTime?: Date;
+    }
+  ): Promise<Event> {
+    const [updated] = await db
+      .update(events)
+      .set({ ...fields, updatedAt: new Date() })
+      .where(eq(events.id, id))
+      .returning();
+    if (!updated) throw new Error("Event not found");
+    return updated;
   },
 };

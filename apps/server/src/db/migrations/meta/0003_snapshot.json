@@ -70,9 +70,9 @@
       "values": ["still", "sparkling", "fortified", "dessert"]
     }
   },
-  "id": "09fc08f7-c0e0-4455-a8ea-61c021450afc",
+  "id": "813974c7-94ec-4620-bac3-d66a71893729",
   "policies": {},
-  "prevId": "e7abe103-928e-4e19-b256-2b9a12be5e56",
+  "prevId": "77b23081-cabd-40ad-9488-892f4c77660a",
   "roles": {},
   "schemas": {},
   "sequences": {},
@@ -1109,13 +1109,13 @@
           "name": "created_at",
           "notNull": true,
           "primaryKey": false,
-          "type": "timestamp"
+          "type": "timestamp with time zone"
         },
         "deleted_at": {
           "name": "deleted_at",
           "notNull": false,
           "primaryKey": false,
-          "type": "timestamp"
+          "type": "timestamp with time zone"
         },
         "description": {
           "name": "description",
@@ -1165,7 +1165,7 @@
           "name": "updated_at",
           "notNull": false,
           "primaryKey": false,
-          "type": "timestamp"
+          "type": "timestamp with time zone"
         }
       },
       "compositePrimaryKeys": {},
@@ -1358,7 +1358,13 @@
       "name": "shops",
       "policies": {},
       "schema": "",
-      "uniqueConstraints": {}
+      "uniqueConstraints": {
+        "shops_owner_user_id_unique": {
+          "columns": ["owner_user_id"],
+          "name": "shops_owner_user_id_unique",
+          "nullsNotDistinct": false
+        }
+      }
     },
     "public.users": {
       "checkConstraints": {},
@@ -1731,6 +1737,12 @@
           "notNull": true,
           "primaryKey": false,
           "type": "smallint"
+        },
+        "region": {
+          "name": "region",
+          "notNull": true,
+          "primaryKey": false,
+          "type": "varchar(255)"
         },
         "type": {
           "name": "type",

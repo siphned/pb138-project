@@ -43,6 +43,10 @@ export const roleRequestsService = {
     return roleRequestsRepository.findPending();
   },
 
+  listPending(): Promise<RoleRequest[]> {
+    return roleRequestsRepository.findPending();
+  },
+
   async reject(requestId: string, adminUserId: string): Promise<RoleRequest> {
     const request = await roleRequestsRepository.findById(requestId);
     if (!request) throw new Error("NOT_FOUND");
@@ -63,6 +67,24 @@ export const roleRequestsService = {
       .catch(console.error);
 
     return result;
+  },
+  async submitRequest(
+    userId: string,
+    type: "winemaker" | "shop_owner",
+    businessName: string,
+    details?: string
+  ): Promise<RoleRequest> {
+    const existing = await roleRequestsRepository.findByUserId(userId);
+    const pending = existing.find((r) => r.type === type && r.status === "pending");
+
+    if (pending) throw new Error("ALREADY_HAS_PENDING_REQUEST");
+
+    return roleRequestsRepository.create({
+      businessName,
+      details,
+      type,
+      userId,
+    });
   },
   async submitRequest(
     userId: string,

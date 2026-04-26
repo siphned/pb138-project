@@ -17,30 +17,30 @@ vi.mock("@tanstack/react-router", () => ({
 // Stub shadcn Sheet so the sidebar content is always visible
 vi.mock("@/components/ui/sheet", () => ({
   Sheet: ({ children }: { children: React.ReactNode }) => <div>{children}</div>,
-  SheetTrigger: ({ children }: { children: React.ReactNode }) => <div>{children}</div>,
   SheetContent: ({ children }: { children: React.ReactNode }) => <div>{children}</div>,
   SheetHeader: ({ children }: { children: React.ReactNode }) => <div>{children}</div>,
   SheetTitle: ({ children }: { children: React.ReactNode }) => <div>{children}</div>,
+  SheetTrigger: ({ children }: { children: React.ReactNode }) => <div>{children}</div>,
 }));
 
 vi.mock("@/components/ui/accordion", () => ({
   Accordion: ({ children }: { children: React.ReactNode }) => <div>{children}</div>,
+  AccordionContent: ({ children }: { children: React.ReactNode }) => <div>{children}</div>,
   AccordionItem: ({ children }: { children: React.ReactNode }) => <div>{children}</div>,
   AccordionTrigger: ({ children }: { children: React.ReactNode }) => (
     <button type="button">{children}</button>
   ),
-  AccordionContent: ({ children }: { children: React.ReactNode }) => <div>{children}</div>,
 }));
 
 vi.mock("@/components/ui/avatar", () => ({
   Avatar: ({ children }: { children: React.ReactNode }) => <div>{children}</div>,
-  AvatarImage: () => null,
   AvatarFallback: ({ children }: { children: React.ReactNode }) => <span>{children}</span>,
+  AvatarImage: () => null,
 }));
 
 vi.mock("@/components/ui/button", () => ({
   Button: ({ children, onClick }: { children: React.ReactNode; onClick?: () => void }) => (
-    <button type="button" onClick={onClick}>
+    <button onClick={onClick} type="button">
       {children}
     </button>
   ),
@@ -64,18 +64,18 @@ describe("Sidebar", () => {
   });
 
   it("shows Order History link for customer role", () => {
-    render(<Sidebar userRoles={[Role.customer]} activeRole={Role.customer} />);
+    render(<Sidebar activeRole={Role.customer} userRoles={[Role.customer]} />);
     expect(screen.getByText("Order History")).toBeInTheDocument();
   });
 
   it("shows My Wines and Bundles links for non-customer roles", () => {
-    render(<Sidebar userRoles={[Role.winemaker]} activeRole={Role.winemaker} />);
+    render(<Sidebar activeRole={Role.winemaker} userRoles={[Role.winemaker]} />);
     expect(screen.getByText("My Wines")).toBeInTheDocument();
     expect(screen.getByText("Bundles")).toBeInTheDocument();
   });
 
   it("My Wines and Bundles link to /shops not invalid routes", () => {
-    render(<Sidebar userRoles={[Role.winemaker]} activeRole={Role.winemaker} />);
+    render(<Sidebar activeRole={Role.winemaker} userRoles={[Role.winemaker]} />);
     const winesLink = screen.getByText("My Wines").closest("a");
     const bundlesLink = screen.getByText("Bundles").closest("a");
     expect(winesLink).toHaveAttribute("href", "/shops");

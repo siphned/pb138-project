@@ -54,11 +54,6 @@
       "schema": "public",
       "values": ["winemaker", "shop_owner"]
     },
-    "public.user_role": {
-      "name": "user_role",
-      "schema": "public",
-      "values": ["user", "admin"]
-    },
     "public.wine_color": {
       "name": "wine_color",
       "schema": "public",
@@ -70,9 +65,9 @@
       "values": ["still", "sparkling", "fortified", "dessert"]
     }
   },
-  "id": "09fc08f7-c0e0-4455-a8ea-61c021450afc",
+  "id": "b16b41c9-901d-4843-81b6-19b26d800db9",
   "policies": {},
-  "prevId": "e7abe103-928e-4e19-b256-2b9a12be5e56",
+  "prevId": "813974c7-94ec-4620-bac3-d66a71893729",
   "roles": {},
   "schemas": {},
   "sequences": {},
@@ -1109,13 +1104,13 @@
           "name": "created_at",
           "notNull": true,
           "primaryKey": false,
-          "type": "timestamp"
+          "type": "timestamp with time zone"
         },
         "deleted_at": {
           "name": "deleted_at",
           "notNull": false,
           "primaryKey": false,
-          "type": "timestamp"
+          "type": "timestamp with time zone"
         },
         "description": {
           "name": "description",
@@ -1165,7 +1160,7 @@
           "name": "updated_at",
           "notNull": false,
           "primaryKey": false,
-          "type": "timestamp"
+          "type": "timestamp with time zone"
         }
       },
       "compositePrimaryKeys": {},
@@ -1358,7 +1353,13 @@
       "name": "shops",
       "policies": {},
       "schema": "",
-      "uniqueConstraints": {}
+      "uniqueConstraints": {
+        "shops_owner_user_id_unique": {
+          "columns": ["owner_user_id"],
+          "name": "shops_owner_user_id_unique",
+          "nullsNotDistinct": false
+        }
+      }
     },
     "public.users": {
       "checkConstraints": {},
@@ -1412,14 +1413,6 @@
           "notNull": true,
           "primaryKey": false,
           "type": "varchar(30)"
-        },
-        "role": {
-          "default": "'user'",
-          "name": "role",
-          "notNull": true,
-          "primaryKey": false,
-          "type": "user_role",
-          "typeSchema": "public"
         },
         "shipping_address_id": {
           "name": "shipping_address_id",
@@ -1731,6 +1724,12 @@
           "notNull": true,
           "primaryKey": false,
           "type": "smallint"
+        },
+        "region": {
+          "name": "region",
+          "notNull": true,
+          "primaryKey": false,
+          "type": "varchar(255)"
         },
         "type": {
           "name": "type",

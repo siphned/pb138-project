@@ -12,7 +12,6 @@ export const supplyAgreements = pgTable("supply_agreements", {
     .notNull()
     .references(() => shops.id),
   status: supplyAgreementStatusEnum("status").notNull().default("pending"),
-  updatedAt: timestamptz("updated_at"),
   winemakerId: uuid("winemaker_id")
     .notNull()
     .references(() => winemakers.id),

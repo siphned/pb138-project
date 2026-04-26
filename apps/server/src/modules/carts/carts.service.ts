@@ -100,18 +100,4 @@ export const cartsService = {
 
     await cartsRepository.updateItemQuantity(cart.id, productId, quantity);
   },
-
-  async clearCart(userId: string): Promise<void> {
-    const cart = await cartsRepository.findByUserId(userId);
-    if (cart) {
-      await cartsRepository.clearCart(cart.id);
-    }
-  },
-
-  async clearCartBySession(sessionId: string): Promise<void> {
-    const cart = await cartsRepository.findBySessionId(sessionId);
-    if (cart) {
-      await cartsRepository.clearCart(cart.id);
-    }
-  },
 };
