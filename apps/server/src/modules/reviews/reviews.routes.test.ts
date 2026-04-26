@@ -1,4 +1,4 @@
-import { Elysia } from "elysia";
+import type { Elysia } from "elysia";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
 // Mock the service
@@ -12,47 +12,80 @@ vi.mock("./reviews.service", () => ({
   },
 }));
 
-// Use a simple parent app that provides context instead of mocking authPlugin globally
-import { reviewsRoutes } from "./reviews.routes";
+import { createReviewsRoutes } from "./reviews.routes";
 import { reviewsService } from "./reviews.service";
 
 describe("reviews.routes integration", () => {
-  let mockUser: any = { id: "u1" };
+  const mockAuthState = {
+    clerkPayload: { roles: ["customer"], sub: "test" },
+    dbUser: {
+      deletedAt: null,
+      email: "user@test.com",
+      fname: "Test",
+      id: "u1",
+      lname: "User",
+      role: "customer",
+      status: "active",
+      updatedAt: null,
+    },
+  };
 
-  const app = new Elysia()
-    .derive(() => ({
-      clerkPayload: { roles: ["user"], sub: "test" },
-      dbUser: mockUser,
-    }))
-    .use(reviewsRoutes);
+  const mockAuthPlugin = (app: Elysia) =>
+    app
+      .derive(() => mockAuthState)
+      .macro(
+        () =>
+          ({
+            requireAuth: () => ({}),
+            requireRoles: () => ({}),
+          }) as any
+      );
+  const app = createReviewsRoutes(mockAuthPlugin as any);
 
   beforeEach(() => {
     vi.clearAllMocks();
-    mockUser = { id: "u1" };
   });
 
-  describe("GET /reviews/product/:id", () => {
-    it("returns product reviews", async () => {
-      vi.mocked(reviewsService.listProductReviews).mockResolvedValue({
-        averageRating: 5,
-        reviews: [],
-      });
-      const res = await app.handle(new Request("http://localhost/reviews/product/p1"));
-      expect(res.status).toBe(200);
-    });
+  it("POST /reviews/product/:id returns 200", async () => {
+    const mockFullReview = {
+      body: "test",
+      createdAt: new Date().toISOString(),
+      deletedAt: null,
+      entityId: "p1",
+      entityType: "product",
+      id: "r1",
+      rating: 5,
+      updatedAt: null,
+      user: { fname: "Test", id: "u1", lname: "User" },
+      userId: "u1",
+    };
+
+    vi.mocked(reviewsService.createProductReview).mockResolvedValue(mockFullReview as any);
+
+    const res = await app.handle(
+      new Request("http://localhost/reviews/product/p1", {
+        body: JSON.stringify({ body: "test", rating: 5 }),
+        headers: { "Content-Type": "application/json" },
+        method: "POST",
+      })
+    );
+
+    if (res.status !== 200) {
+      // Error body handled in assertion
+    }
+
+    expect(res.status).toBe(200);
   });
 
-  describe("DELETE /reviews/product/:id/:reviewId", () => {
-    it("deletes product review", async () => {
-      vi.mocked(reviewsService.deleteReview).mockResolvedValue(undefined);
+  it("DELETE /reviews/product/:id/:reviewId returns 200", async () => {
+    vi.mocked(reviewsService.deleteReview).mockResolvedValue(undefined);
 
-      const res = await app.handle(
-        new Request("http://localhost/reviews/product/p1/r1", {
-          method: "DELETE",
-        })
-      );
+    const res = await app.handle(
+      new Request("http://localhost/reviews/product/p1/r1", {
+        method: "DELETE",
+      })
+    );
 
-      expect(res.status).toBe(200);
-    });
+    expect(res.status).toBe(200);
   });
 });

@@ -46,10 +46,6 @@ function pick<T>(arr: T[]): T {
   return faker.helpers.arrayElement(arr);
 }
 
-function _pickN<T>(arr: T[], min: number, max: number): T[] {
-  return faker.helpers.arrayElements(arr, { max, min });
-}
-
 async function teardown() {
   await db.delete(comments);
   await db.delete(reviews);

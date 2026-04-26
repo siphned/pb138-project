@@ -1,15 +1,6 @@
 import { describe, expect, it, vi } from "vitest";
 import { app } from "../../app";
 
-const _mockAgreement = {
-  createdAt: new Date(),
-  id: "a1",
-  respondedAt: null,
-  shopId: "s1",
-  status: "pending",
-  winemakerId: "wm1",
-};
-
 vi.mock("./supply-agreements.service", () => ({
   supplyAgreementsService: {
     createRequest: vi.fn().mockResolvedValue({
