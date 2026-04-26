@@ -7,36 +7,34 @@ import type { CheckoutData } from "./orders.service";
 import { ordersService } from "./orders.service";
 
 const addressSchema = t.Object({
-  city: t.String(),
   country: t.String(),
-  houseNumber: t.String(),
+  city: t.String(),
   postalCode: t.String(),
   street: t.String(),
+  houseNumber: t.String(),
 });
 
 const orderResponse = t.Object({
-  billingAddressId: t.String(),
-  createdAt: t.Date(),
-  deletedAt: t.Union([t.Date(), t.Null()]),
-  deliveryType: t.String(),
-  discount: t.String(),
+  id: t.String(),
+  userId: t.Union([t.String(), t.Null()]),
+  guestSessionId: t.Union([t.String(), t.Null()]),
   guestEmail: t.Union([t.String(), t.Null()]),
   guestName: t.Union([t.String(), t.Null()]),
-  guestSessionId: t.Union([t.String(), t.Null()]),
-  id: t.String(),
-  paymentMethod: t.String(),
-  paymentStatus: t.String(),
-  shippingAddressId: t.String(),
   shippingFee: t.String(),
-  status: t.String(),
+  discount: t.String(),
+  paymentStatus: t.String(),
+  paymentMethod: t.String(),
   totalPrice: t.String(),
+  status: t.String(),
+  deliveryType: t.String(),
+  shippingAddressId: t.String(),
+  billingAddressId: t.String(),
+  createdAt: t.Date(),
   updatedAt: t.Union([t.Date(), t.Null()]),
-  userId: t.Union([t.String(), t.Null()]),
+  deletedAt: t.Union([t.Date(), t.Null()]),
 });
 
 const checkoutBody = t.Object({
-  billingAddress: t.Optional(addressSchema),
-  deliveryType: t.Union([t.Literal("pickup"), t.Literal("shipping")]),
   guestEmail: t.Optional(t.String()),
   guestName: t.Optional(t.String()),
   paymentMethod: t.Union([
@@ -44,7 +42,9 @@ const checkoutBody = t.Object({
     t.Literal("bank_transfer"),
     t.Literal("cash_on_delivery"),
   ]),
+  deliveryType: t.Union([t.Literal("pickup"), t.Literal("shipping")]),
   shippingAddress: addressSchema,
+  billingAddress: t.Optional(addressSchema),
 });
 
 export const ordersRoutes = new Elysia({ prefix: "/orders", tags: ["orders"] })
@@ -58,9 +58,9 @@ export const ordersRoutes = new Elysia({ prefix: "/orders", tags: ["orders"] })
         await cartsService.mergeOnLogin(dbUser.id, guestSessionId);
         guest_session_id?.remove();
       }
-      return { sessionId: undefined as string | undefined, user: dbUser };
+      return { user: dbUser, sessionId: undefined as string | undefined };
     }
-    return { sessionId: guest_session_id?.value as string | undefined, user: undefined };
+    return { user: undefined, sessionId: guest_session_id?.value as string | undefined };
   })
 
   .post(
@@ -71,7 +71,7 @@ export const ordersRoutes = new Elysia({ prefix: "/orders", tags: ["orders"] })
 
       try {
         const checkoutData = body as CheckoutData;
-        return await ordersService.createOrder({ sessionId, userId: user?.id }, checkoutData);
+        return await ordersService.createOrder({ userId: user?.id, sessionId }, checkoutData);
       } catch (e: unknown) {
         if (e instanceof Error) {
           if (e.message.startsWith("PRODUCT_DELETED")) {
@@ -86,12 +86,12 @@ export const ordersRoutes = new Elysia({ prefix: "/orders", tags: ["orders"] })
     },
     {
       body: checkoutBody,
+      response: { 200: orderResponse, 400: t.String(), 410: t.String(), 422: t.String() },
       detail: {
+        summary: "Checkout",
         description:
           "Create an order from the current cart. Works for both authenticated users and guests.",
-        summary: "Checkout",
       },
-      response: { 200: orderResponse, 400: t.String(), 410: t.String(), 422: t.String() },
     }
   )
 
@@ -110,11 +110,11 @@ export const ordersRoutes = new Elysia({ prefix: "/orders", tags: ["orders"] })
       }
     },
     {
-      detail: {
-        description: "Returns an order by ID. Only the owning user can access it.",
-        summary: "Get order by ID",
-      },
       params: t.Object({ id: t.String() }),
       response: { 200: orderResponse, 401: t.String(), 403: t.String(), 404: t.String() },
+      detail: {
+        summary: "Get order by ID",
+        description: "Returns an order by ID. Only the owning user can access it.",
+      },
     }
   );
