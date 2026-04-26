@@ -63,6 +63,20 @@ export const roleRequestsService = {
     if (!request) throw new Error("NOT_FOUND");
     if (request.status !== "pending") throw new Error("ALREADY_RESPONDED");
 
-    return roleRequestsRepository.updateStatus(requestId, "rejected", adminUserId);
+    const result = await roleRequestsRepository.updateStatus(requestId, "rejected", adminUserId);
+
+    usersRepository
+      .findById(request.userId)
+      .then((user) => {
+        if (user) {
+          emailService.sendRoleRequestRejected(user.email, {
+            fname: user.fname,
+            role: request.type,
+          });
+        }
+      })
+      .catch(console.error);
+
+    return result;
   },
 };
