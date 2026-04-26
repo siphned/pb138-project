@@ -58,13 +58,13 @@ export const availabilityRepository = {
 
   findRegularById(id: string): Promise<AvailabilityRegular | undefined> {
     return db.query.availabilityRegular.findFirst({
-      where: eq(availabilityRegular.id, id),
+      where: and(eq(availabilityRegular.id, id), isNull(availabilityRegular.deletedAt)),
     });
   },
 
   findExceptionById(id: string): Promise<AvailabilityException | undefined> {
     return db.query.availabilityExceptions.findFirst({
-      where: eq(availabilityExceptions.id, id),
+      where: and(eq(availabilityExceptions.id, id), isNull(availabilityExceptions.deletedAt)),
     });
   },
 };
