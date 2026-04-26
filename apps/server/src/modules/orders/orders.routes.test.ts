@@ -1,10 +1,32 @@
 import { describe, expect, it, vi } from "vitest";
 import { app } from "../../app";
 
+const { mockOrder } = vi.hoisted(() => ({
+  mockOrder: {
+    id: "o1",
+    userId: null,
+    guestSessionId: "s1",
+    guestEmail: "test@example.com",
+    guestName: null,
+    shippingFee: "10.00",
+    discount: "0.00",
+    paymentStatus: "pending",
+    paymentMethod: "card",
+    totalPrice: "60.00",
+    status: "pending",
+    deliveryType: "shipping",
+    shippingAddressId: "addr-1",
+    billingAddressId: "addr-1",
+    createdAt: new Date(),
+    updatedAt: null,
+    deletedAt: null,
+  },
+}));
+
 vi.mock("./orders.service", () => ({
   ordersService: {
-    createOrder: vi.fn().mockResolvedValue({ id: "o1" }),
-    getOrder: vi.fn().mockResolvedValue({ id: "o1" }),
+    createOrder: vi.fn().mockResolvedValue(mockOrder),
+    getOrder: vi.fn().mockResolvedValue(mockOrder),
   },
 }));
 

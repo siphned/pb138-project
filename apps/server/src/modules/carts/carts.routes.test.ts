@@ -1,10 +1,24 @@
 import { describe, expect, it, vi } from "vitest";
 import { app } from "../../app";
 
+const { mockCart } = vi.hoisted(() => ({
+  mockCart: {
+    id: "gc1",
+    userId: null,
+    sessionId: "s1",
+    createdAt: new Date(),
+    updatedAt: new Date(),
+    deletedAt: null,
+    items: [],
+  },
+}));
+
 vi.mock("./carts.service", () => ({
   cartsService: {
-    getCartForUser: vi.fn().mockResolvedValue({ id: "c1", items: [] }),
-    getCartForSession: vi.fn().mockResolvedValue({ id: "gc1", items: [] }),
+    getCartForUser: vi
+      .fn()
+      .mockResolvedValue({ ...mockCart, id: "c1", userId: "u1", sessionId: null }),
+    getCartForSession: vi.fn().mockResolvedValue(mockCart),
     addItem: vi.fn().mockResolvedValue(undefined),
   },
 }));

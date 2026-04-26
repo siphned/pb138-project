@@ -36,7 +36,7 @@ test.describe("Public routes", () => {
 
   test("homepage shows the Wine Enjoyers branding", async ({ page }) => {
     await page.goto("/");
-    await expect(page.getByText("Wine Enjoyers")).toBeVisible();
+    await expect(page.getByText("Wine Enjoyers").first()).toBeVisible();
   });
 
   test("/explore is accessible without auth", async ({ page }) => {
