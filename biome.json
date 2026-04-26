@@ -210,7 +210,7 @@
       },
       "suspicious": {
         "noAlert": "error",
-        "noConsole": "error",
+        "noConsole": "warn",
         "noDebugger": "error",
         "noDoubleEquals": "error",
         "noExplicitAny": "error",

@@ -1,9 +1,11 @@
 import { and, count, eq, isNull } from "drizzle-orm";
 import { db } from "../../db";
 import type { Event, Review, User } from "../../db/schema";
-import { events, reviews, users } from "../../db/schema";
+import { events, reviews, userRoles, users } from "../../db/schema";
 
-export type AdminUserRow = User;
+export type AdminUserRow = User & {
+  roles: { id: string; role: string }[];
+};
 
 export type AdminEventRow = Event & {
   winemaker: { id: string; name: string } | null;
@@ -45,8 +47,16 @@ export const adminRepository = {
     });
   },
 
-  findUserById(id: string) {
-    return db.query.users.findFirst({ where: and(eq(users.id, id), isNull(users.deletedAt)) });
+  findUserById(id: string): Promise<AdminUserRow | undefined> {
+    return db.query.users.findFirst({
+      where: and(eq(users.id, id), isNull(users.deletedAt)),
+      with: {
+        roles: {
+          columns: { id: true, role: true },
+          where: isNull(userRoles.deletedAt),
+        },
+      },
+    }) as Promise<AdminUserRow | undefined>;
   },
 
   async listAllReviews(pagination: {
@@ -118,6 +128,12 @@ export const adminRepository = {
         offset: pagination.offset,
         orderBy: (u, { desc }) => [desc(u.createdAt)],
         where,
+        with: {
+          roles: {
+            columns: { id: true, role: true },
+            where: isNull(userRoles.deletedAt),
+          },
+        },
       }),
       db.select({ value: count() }).from(users).where(where),
     ]);
