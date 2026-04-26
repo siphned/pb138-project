@@ -14,7 +14,7 @@ test.describe("Routing", () => {
   });
 
   test("navigating to an unknown route shows 404 or redirects", async ({ page }) => {
-    const _response = await page.goto("/this-route-does-not-exist");
+    await page.goto("/this-route-does-not-exist");
     await page.waitForLoadState("networkidle");
     // TanStack Router renders a not-found state — page should not crash
     await expect(page.locator("body")).not.toContainText("Missing Publishable Key");
