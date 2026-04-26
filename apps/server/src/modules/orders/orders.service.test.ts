@@ -33,7 +33,6 @@ import { cartsService } from "../carts/carts.service";
 import { ordersRepository } from "./orders.repository";
 import type { CheckoutData } from "./orders.service";
 import { ordersService } from "./orders.service";
-import { usersRepository } from "../users/users.repository";
 
 describe("ordersService", () => {
   beforeEach(() => {
