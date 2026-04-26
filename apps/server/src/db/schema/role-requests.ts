@@ -13,6 +13,7 @@ export const roleRequests = pgTable("role_requests", {
   status: roleRequestStatusEnum("status").notNull().default("pending"),
   submittedAt: timestamptz("submitted_at").notNull().defaultNow(),
   type: roleRequestTypeEnum("type").notNull(),
+  updatedAt: timestamptz("updated_at"),
   userId: uuid("user_id")
     .notNull()
     .references(() => users.id),
