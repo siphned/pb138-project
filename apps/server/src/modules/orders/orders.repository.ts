@@ -2,6 +2,7 @@ import { and, eq, isNull } from "drizzle-orm";
 import { db } from "../../db";
 import type { Address, Order, Product } from "../../db/schema";
 import { addresses, orderItems, orders } from "../../db/schema";
+import { productsRepository } from "../products/products.repository";
 
 export type OrderItemWithProduct = typeof orderItems.$inferSelect & {
   product: Product;
@@ -123,6 +124,11 @@ export const ordersRepository = {
       }));
 
       await tx.insert(orderItems).values(orderItemsData);
+
+      // Decrement stock for each item
+      for (const item of items) {
+        await productsRepository.decrementStock(tx as never, item.productId, item.quantity);
+      }
 
       return order;
     });
