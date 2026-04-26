@@ -60,7 +60,7 @@ export const winesRepository = {
       },
     });
 
-    if (wine && wine.winemaker && !wine.winemaker.deletedAt) {
+    if (wine?.winemaker && !wine.winemaker.deletedAt) {
       return wine as WineWithWinemaker;
     }
     return undefined;
