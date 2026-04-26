@@ -12,10 +12,10 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
-import type { GetProductsParams } from "@/generated/model";
 import { useGetProducts } from "@/generated/products/products";
 import { WineCard } from "./WineCard";
 import { WineFiltersSidebar } from "./WineFiltersSidebar";
+import type { GetProductsParams } from "@/generated/model";
 
 interface WineCatalogProps {
   search: GetProductsParams;
@@ -44,6 +44,54 @@ export function WineCatalog({ search }: WineCatalogProps) {
     if (value) {
       navigate({ to: "/wines", search: { ...search, sort: value, page: 1 } });
     }
+  };
+
+  const renderContent = () => {
+    if (isLoading) {
+      return (
+        <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
+          {["s1", "s2", "s3", "s4", "s5", "s6"].map((s) => (
+            <div key={s} className="h-[400px] w-full rounded-2xl bg-secondary/20 animate-pulse" />
+          ))}
+        </div>
+      );
+    }
+
+    if (error) {
+      return (
+        <div className="flex flex-col items-center justify-center py-20 text-center">
+          <p className="text-destructive font-bold">Error loading products.</p>
+          <Button variant="link" onClick={() => window.location.reload()}>
+            Try again
+          </Button>
+        </div>
+      );
+    }
+
+    if (!products || products.length === 0) {
+      return (
+        <div className="flex flex-col items-center justify-center py-20 text-center space-y-4">
+          <div className="h-20 w-20 bg-secondary/20 rounded-full flex items-center justify-center">
+            <SearchIcon className="h-10 w-10 text-muted-foreground" />
+          </div>
+          <h3 className="text-xl font-bold">No products found</h3>
+          <p className="text-muted-foreground max-w-xs">
+            We couldn't find any wines matching your current filters. Try clearing some filters.
+          </p>
+          <Button onClick={() => navigate({ to: "/wines", search: { sort: "newest", page: 1 } })}>
+            Clear all filters
+          </Button>
+        </div>
+      );
+    }
+
+    return (
+      <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
+        {products.map((product) => (
+          <WineCard key={product.id} product={product} />
+        ))}
+      </div>
+    );
   };
 
   return (
@@ -105,46 +153,8 @@ export function WineCatalog({ search }: WineCatalogProps) {
               products
             </div>
 
-            {/* Grid */}
-            {isLoading ? (
-              <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
-                {["s1", "s2", "s3", "s4", "s5", "s6"].map((s) => (
-                  <div
-                    key={s}
-                    className="h-[400px] w-full rounded-2xl bg-secondary/20 animate-pulse"
-                  />
-                ))}
-              </div>
-            ) : error ? (
-              <div className="flex flex-col items-center justify-center py-20 text-center">
-                <p className="text-destructive font-bold">Error loading products.</p>
-                <Button variant="link" onClick={() => window.location.reload()}>
-                  Try again
-                </Button>
-              </div>
-            ) : products?.length === 0 ? (
-              <div className="flex flex-col items-center justify-center py-20 text-center space-y-4">
-                <div className="h-20 w-20 bg-secondary/20 rounded-full flex items-center justify-center">
-                  <SearchIcon className="h-10 w-10 text-muted-foreground" />
-                </div>
-                <h3 className="text-xl font-bold">No products found</h3>
-                <p className="text-muted-foreground max-w-xs">
-                  We couldn't find any wines matching your current filters. Try clearing some
-                  filters.
-                </p>
-                <Button
-                  onClick={() => navigate({ to: "/wines", search: { sort: "newest", page: 1 } })}
-                >
-                  Clear all filters
-                </Button>
-              </div>
-            ) : (
-              <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
-                {products?.map((product) => (
-                  <WineCard key={product.id} product={product} />
-                ))}
-              </div>
-            )}
+            {/* Content Area */}
+            {renderContent()}
 
             {/* Pagination Placeholder */}
             {products && products.length >= 12 && (
