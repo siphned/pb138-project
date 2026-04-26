@@ -50,6 +50,7 @@ yarn-error.log*
 
 # LLM resources (not tracked - may contain embedded repos/files)
 raw/
+.claude/
 .claude/settings*
 
 # local gemini

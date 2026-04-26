@@ -35,20 +35,20 @@ export function Header({ user: propUser, activeRole, onRoleChange }: HeaderProps
 
       {/* Right: Icons & Menus */}
       <div className="flex items-center gap-4">
-        <Button variant="ghost" size="icon" className="hidden sm:flex">
+        <Button className="hidden sm:flex" size="icon" variant="ghost">
           <Search className="h-5 w-5" />
         </Button>
-        <Button variant="ghost" size="icon" className="hidden sm:flex">
+        <Button className="hidden sm:flex" size="icon" variant="ghost">
           <ShoppingCart className="h-5 w-5" />
         </Button>
 
         {currentUser && (
           <a
-            href="/profile"
             className="rounded-full focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2"
+            href="/profile"
           >
             <Avatar className="h-9 w-9 hover:opacity-80 transition-opacity">
-              <AvatarImage src={currentUser.avatarUrl} alt={displayName} />
+              <AvatarImage alt={displayName} src={currentUser.avatarUrl} />
               <AvatarFallback className="bg-secondary text-secondary-foreground">
                 {initials}
               </AvatarFallback>
@@ -58,9 +58,9 @@ export function Header({ user: propUser, activeRole, onRoleChange }: HeaderProps
 
         {/* Drop the Sidebar right here! */}
         <Sidebar
-          userRoles={[Role.winemaker, Role.shopOwner, Role.customer]}
           activeRole={activeRole}
           onRoleChange={onRoleChange}
+          userRoles={[Role.winemaker, Role.shopOwner, Role.customer]}
         />
       </div>
     </header>

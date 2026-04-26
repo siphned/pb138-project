@@ -6,41 +6,41 @@ import { Card, CardContent } from "@/components/ui/card";
 export function WinemakerEvents() {
   const upcomingEvents = [
     {
-      id: 1,
-      title: "Grand Vin Vertical Tasting",
       approvalStatus: "Approved",
-      date: "Wed, Apr 15",
-      time: "6:00 PM - 9:00 PM",
       capacity: "15 / 15 registered",
+      date: "Wed, Apr 15",
       desc: "Join us for an exclusive tasting of our Grand Vin across five exceptional vintages.",
+      id: 1,
+      time: "6:00 PM - 9:00 PM",
+      title: "Grand Vin Vertical Tasting",
     },
     {
-      id: 2,
-      title: "Spring Wine & Food Pairing",
       approvalStatus: "Pending Approval",
-      date: "Tue, Apr 28",
-      time: "7:00 PM - 10:00 PM",
       capacity: "0 / 42 registered",
+      date: "Tue, Apr 28",
       desc: "Discover perfect pairings with seasonal cuisine from our guest chef.",
+      id: 2,
+      time: "7:00 PM - 10:00 PM",
+      title: "Spring Wine & Food Pairing",
     },
     {
-      id: 3,
-      title: "Winemaker Dinner",
       approvalStatus: "Approved",
-      date: "Sun, May 10",
-      time: "6:30 PM - 10:30 PM",
       capacity: "54 / 210 registered",
+      date: "Sun, May 10",
       desc: "An intimate dinner with our head winemaker featuring rare library selections.",
+      id: 3,
+      time: "6:30 PM - 10:30 PM",
+      title: "Winemaker Dinner",
     },
   ];
 
   const pastEvents = [
     {
-      id: 4,
-      title: "Holiday Tasting Event 2025",
-      date: "Sun, May 10",
-      time: "6:30 PM - 10:30 PM",
       capacity: "210 registered",
+      date: "Sun, May 10",
+      id: 4,
+      time: "6:30 PM - 10:30 PM",
+      title: "Holiday Tasting Event 2025",
     },
   ];
 
@@ -49,8 +49,8 @@ export function WinemakerEvents() {
     if (status === "Approved") {
       return (
         <Badge
-          variant="outline"
           className="border-[#A7F3D0] bg-[#ECFDF5] text-[#059669] hover:bg-[#ECFDF5] px-2 py-0.5 text-[10px] font-medium rounded"
+          variant="outline"
         >
           <CheckCircle2 className="w-3 h-3 mr-1" /> Approved
         </Badge>
@@ -58,8 +58,8 @@ export function WinemakerEvents() {
     }
     return (
       <Badge
-        variant="outline"
         className="border-[#FDE68A] bg-[#FFFBEB] text-[#D97706] hover:bg-[#FFFBEB] px-2 py-0.5 text-[10px] font-medium rounded"
+        variant="outline"
       >
         <Clock4 className="w-3 h-3 mr-1" /> Pending Approval
       </Badge>
@@ -89,8 +89,8 @@ export function WinemakerEvents() {
           <div className="flex flex-col">
             {upcomingEvents.map((event) => (
               <div
-                key={event.id}
                 className="p-6 md:p-8 border-b border-[#E5DFDD] last:border-0 flex justify-between items-start gap-4"
+                key={event.id}
               >
                 <div className="flex flex-col gap-3 w-full pr-4">
                   {/* Title and Badge Row */}
@@ -120,9 +120,9 @@ export function WinemakerEvents() {
                 </div>
 
                 <Button
-                  variant="ghost"
-                  size="icon"
                   className="h-8 w-8 text-muted-foreground shrink-0 -mr-2"
+                  size="icon"
+                  variant="ghost"
                 >
                   <MoreVertical className="h-5 w-5" />
                 </Button>
@@ -141,7 +141,7 @@ export function WinemakerEvents() {
 
           <div className="flex flex-col">
             {pastEvents.map((event) => (
-              <div key={event.id} className="p-6 md:p-8 flex justify-between items-center gap-4">
+              <div className="p-6 md:p-8 flex justify-between items-center gap-4" key={event.id}>
                 <div className="flex flex-col gap-3">
                   <h3 className="font-heading font-medium text-[15px] text-muted-foreground">
                     {event.title}

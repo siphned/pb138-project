@@ -6,20 +6,25 @@ import { winemakersService } from "./winemakers.service";
 export const winemakersRoutes = new Elysia({ prefix: "/winemakers", tags: ["winemakers"] })
   .use(authPlugin)
 
-  // biome-ignore lint/suspicious/noExplicitAny: Elysia cannot infer Drizzle relation types against TypeBox schemas
-  .get("/", () => winemakersService.listWinemakers() as any, {
-    response: { 200: t.Array(winemakerListItemResponse) },
-    detail: {
-      summary: "List all winemakers",
+  .get(
+    "/",
+    async () => {
+      return await winemakersService.listWinemakers();
     },
-  })
+    {
+      detail: {
+        summary: "List all winemakers",
+      },
+      response: { 200: t.Array(winemakerListItemResponse) },
+    }
+  )
 
   .patch(
     "/me",
-    async ({ dbUser, body }) => {
+    // biome-ignore lint/suspicious/noExplicitAny: complex elysia type inference
+    async ({ dbUser, body }: { dbUser: { id: string }; body: any }) => {
       try {
-        // biome-ignore lint/suspicious/noExplicitAny: Elysia cannot infer Drizzle relation types against TypeBox schemas
-        return (await winemakersService.updateMyProfile(dbUser.id, body)) as any;
+        return await winemakersService.updateMyProfile(dbUser.id, body);
       } catch (e: unknown) {
         if (e instanceof Error && e.message === "NOT_FOUND") {
           return status(404, "Winemaker profile not found");
@@ -28,30 +33,29 @@ export const winemakersRoutes = new Elysia({ prefix: "/winemakers", tags: ["wine
       }
     },
     {
-      requireRoles: ["winemaker"],
       body: t.Partial(
         t.Object({
-          name: t.String(),
           description: t.String(),
-          websiteUrl: t.Union([t.String(), t.Null()]),
-          phone: t.String(),
           email: t.String(),
+          name: t.String(),
+          phone: t.String(),
+          websiteUrl: t.Union([t.String(), t.Null()]),
         })
       ),
-      response: { 200: winemakerListItemResponse, 404: t.String() },
       detail: {
-        summary: "Update own winemaker profile",
         security: [{ bearerAuth: [] }],
+        summary: "Update own winemaker profile",
       },
+      requireRoles: ["winemaker"],
+      response: { 200: winemakerListItemResponse, 404: t.String() },
     }
   )
 
   .get(
     "/:id",
-    async ({ params }) => {
+    async ({ params }: { params: { id: string } }) => {
       try {
-        // biome-ignore lint/suspicious/noExplicitAny: Elysia cannot infer Drizzle relation types against TypeBox schemas
-        return (await winemakersService.getWinemaker(params.id)) as any;
+        return await winemakersService.getWinemaker(params.id);
       } catch (e: unknown) {
         if (e instanceof Error && e.message === "NOT_FOUND") {
           return status(404, "Winemaker not found");
@@ -60,10 +64,10 @@ export const winemakersRoutes = new Elysia({ prefix: "/winemakers", tags: ["wine
       }
     },
     {
-      params: t.Object({ id: t.String() }),
-      response: { 200: winemakerProfileResponse, 404: t.String() },
       detail: {
         summary: "Get winemaker by ID",
       },
+      params: t.Object({ id: t.String() }),
+      response: { 200: winemakerProfileResponse, 404: t.String() },
     }
   );

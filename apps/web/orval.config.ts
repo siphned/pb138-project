@@ -6,24 +6,24 @@ export default defineConfig({
       target: "../server/openapi.json",
     },
     output: {
-      mode: "tags-split",
-      target: "src/generated",
-      schemas: "src/generated/model",
       client: "react-query",
       httpClient: "axios",
+      mode: "tags-split",
       override: {
         mutator: {
-          path: "./src/lib/custom-instance.ts",
           name: "customInstance",
+          path: "./src/lib/custom-instance.ts",
         },
         query: {
-          useQuery: true,
-          useMutation: true,
+          signal: true,
           useInfinite: false,
           useInvalidate: true,
-          signal: true,
+          useMutation: true,
+          useQuery: true,
         },
       },
+      schemas: "src/generated/model",
+      target: "src/generated",
     },
   },
 });

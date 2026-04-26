@@ -27,19 +27,19 @@ const mockDb = db as unknown as MockDatabase;
 
 vi.mock("../../db", () => {
   const m = {
-    insert: vi.fn().mockReturnThis(),
-    values: vi.fn().mockReturnThis(),
-    returning: vi.fn().mockReturnThis(),
     delete: vi.fn().mockReturnThis(),
-    where: vi.fn().mockReturnThis(),
+    insert: vi.fn().mockReturnThis(),
     query: {
-      availabilityRegular: {
-        findMany: vi.fn(),
-      },
       availabilityExceptions: {
         findMany: vi.fn(),
       },
+      availabilityRegular: {
+        findMany: vi.fn(),
+      },
     },
+    returning: vi.fn().mockReturnThis(),
+    values: vi.fn().mockReturnThis(),
+    where: vi.fn().mockReturnThis(),
   };
   return { db: m };
 });
@@ -55,12 +55,12 @@ describe("availabilityRepository", () => {
       vi.mocked(mockDb.returning).mockResolvedValueOnce([mockRecord]);
 
       const result = await availabilityRepository.insertRegular({
-        shopId: "s1",
         dow: 1,
-        startTime: new Date(),
         endTime: new Date(),
-        validFrom: "2024-01-01",
+        shopId: "s1",
+        startTime: new Date(),
         type: "open",
+        validFrom: "2024-01-01",
       } as never);
 
       expect(result).toBe(mockRecord);
@@ -74,10 +74,10 @@ describe("availabilityRepository", () => {
       vi.mocked(mockDb.returning).mockResolvedValueOnce([mockRecord]);
 
       const result = await availabilityRepository.insertException({
+        action: "close",
+        endsAt: new Date(),
         shopId: "s1",
         startsAt: new Date(),
-        endsAt: new Date(),
-        action: "close",
       } as never);
 
       expect(result).toBe(mockRecord);

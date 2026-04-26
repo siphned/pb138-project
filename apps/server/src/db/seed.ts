@@ -9,12 +9,13 @@ import {
   availabilityRegular,
   cartItems,
   carts,
+  comments,
   events,
   orderItems,
   orders,
-  productReviews,
   products,
   productWines,
+  reviews,
   roleRequests,
   shops,
   users,
@@ -25,7 +26,6 @@ import {
 const seed = process.env.SEED_FAKER_SEED ? Number(process.env.SEED_FAKER_SEED) : undefined;
 if (seed !== undefined) {
   faker.seed(seed);
-  console.log(`Faker seed: ${seed}`);
 }
 
 function clerkId() {
@@ -34,11 +34,11 @@ function clerkId() {
 
 function czechAddress() {
   return {
-    country: "Czech Republic",
     city: faker.helpers.arrayElement(["Praha", "Brno", "Ostrava", "Olomouc"]),
+    country: "Czech Republic",
+    houseNumber: faker.location.buildingNumber(),
     postalCode: `${faker.string.numeric(3)} ${faker.string.numeric(2)}`,
     street: faker.location.street(),
-    houseNumber: faker.location.buildingNumber(),
   };
 }
 
@@ -47,8 +47,8 @@ function pick<T>(arr: T[]): T {
 }
 
 async function teardown() {
-  console.log("Clearing existing seed data...");
-  await db.delete(productReviews);
+  await db.delete(comments);
+  await db.delete(reviews);
   await db.delete(orderItems);
   await db.delete(orders);
   await db.delete(cartItems);
@@ -63,7 +63,6 @@ async function teardown() {
   await db.delete(winemakers);
   await db.delete(users);
   await db.delete(addresses);
-  console.log("Done.");
 }
 
 async function insertAddress() {
@@ -78,11 +77,11 @@ async function insertUser(override: { fname: string; lname: string }) {
     .insert(users)
     .values({
       clerkId: clerkId(),
-      fname: override.fname,
-      lname: override.lname,
       email: faker.internet
         .email({ firstName: override.fname, lastName: override.lname })
         .toLowerCase(),
+      fname: override.fname,
+      lname: override.lname,
       shippingAddressId: addr.id,
     })
     .returning();
@@ -95,12 +94,12 @@ async function insertWinemaker(userId: string) {
   const [row] = await db
     .insert(winemakers)
     .values({
-      userId,
-      name: `${faker.company.name()} Winery`,
-      description: faker.lorem.paragraph(),
       addressId: addr.id,
+      description: faker.lorem.paragraph(),
       email: faker.internet.email().toLowerCase(),
+      name: `${faker.company.name()} Winery`,
       phone: faker.phone.number(),
+      userId,
     })
     .returning();
   if (!row) throw new Error("Winemaker insert failed");
@@ -112,10 +111,10 @@ async function insertShop(ownerUserId: string) {
   const [row] = await db
     .insert(shops)
     .values({
-      ownerUserId,
-      name: `${faker.company.name()} Wine Shop`,
-      description: faker.lorem.paragraph(),
       addressId: addr.id,
+      description: faker.lorem.paragraph(),
+      name: `${faker.company.name()} Wine Shop`,
+      ownerUserId,
     })
     .returning();
   if (!row) throw new Error("Shop insert failed");
@@ -127,18 +126,18 @@ async function insertWines(winemakerId: string, count: number) {
     .insert(wines)
     .values(
       Array.from({ length: count }, () => ({
-        winemakerId,
-        name: `${faker.commerce.productName()}`,
-        description: faker.lorem.paragraph(),
-        composition: "Grape",
-        attribution: "Estate",
-        region: "Moravia",
-        vintageYear: 2022,
-        type: "still" as const,
-        color: "red" as const,
         alcoholContent: "12.5",
-        volumeMl: 750,
+        attribution: "Estate",
+        color: "red" as const,
+        composition: "Grape",
+        description: faker.lorem.paragraph(),
+        name: `${faker.commerce.productName()}`,
         quantity: 100,
+        region: "Moravia",
+        type: "still" as const,
+        vintageYear: 2022,
+        volumeMl: 750,
+        winemakerId,
       }))
     )
     .returning();
@@ -150,15 +149,15 @@ async function insertProductsForShop(shopId: string, wineRows: (typeof wines.$in
     const [product] = await db
       .insert(products)
       .values({
-        shopId,
+        isBundle: false,
         name: wine.name,
         price: "15.00",
         quantity: 50,
-        isBundle: false,
+        shopId,
       })
       .returning();
     if (product) {
-      await db.insert(productWines).values({ productId: product.id, wineId: wine.id, quantity: 1 });
+      await db.insert(productWines).values({ productId: product.id, quantity: 1, wineId: wine.id });
       productsList.push(product);
     }
   }
@@ -172,14 +171,14 @@ async function insertEvents(winemakerId: string, count: number) {
     const [row] = await db
       .insert(events)
       .values({
-        winemakerId,
-        name: `Tasting ${i}`,
-        capacity: 50,
-        startTime: new Date(),
-        endTime: new Date(),
-        visibility: pick(["public", "private"] as const),
-        inviteType: "open",
         addressId: addr.id,
+        capacity: 50,
+        endTime: new Date(),
+        inviteType: "open",
+        name: `Tasting ${i}`,
+        startTime: new Date(),
+        visibility: pick(["public", "private"] as const),
+        winemakerId,
       })
       .returning();
     if (row) rows.push(row);
@@ -189,8 +188,11 @@ async function insertEvents(winemakerId: string, count: number) {
 
 async function main() {
   await teardown();
+
   const customers = await Promise.all(
-    Array.from({ length: 2 }, () => insertUser({ fname: "C", lname: "U" }))
+    Array.from({ length: 2 }, () =>
+      insertUser({ fname: faker.person.firstName(), lname: faker.person.lastName() })
+    )
   );
   const victor = await insertUser({ fname: "Victor", lname: "W" });
   const wm = await insertWinemaker(victor.id);
@@ -202,14 +204,26 @@ async function main() {
   const firstProd = prodRows[0];
   if (firstProd) {
     for (const customer of customers) {
-      await db.insert(productReviews).values({
-        userId: customer.id,
-        productId: firstProd.id,
-        rating: 5,
-        body: "Nice wine!",
-      });
+      const [review] = await db
+        .insert(reviews)
+        .values({
+          body: "Nice",
+          entityId: firstProd.id,
+          entityType: "product",
+          rating: 5,
+          userId: customer.id,
+        })
+        .returning();
+      if (review) {
+        await db.insert(comments).values({
+          body: "Thanks!",
+          reviewId: review.id,
+          userId: victor.id,
+        });
+      }
     }
   }
 }
 
+// biome-ignore lint/suspicious/noConsole: entry point needs to log errors
 main().catch(console.error);

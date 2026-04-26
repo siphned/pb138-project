@@ -4,26 +4,26 @@ const cartProductResponse = t.Object({
   id: t.String(),
   name: t.String(),
   price: t.String(),
-  shopId: t.String(),
   quantity: t.Integer(),
+  shopId: t.String(),
 });
 
 export const cartItemResponse = t.Object({
-  id: t.String(),
   cartId: t.String(),
+  createdAt: t.Date(),
+  id: t.String(),
+  product: cartProductResponse,
   productId: t.String(),
   quantity: t.Integer(),
-  createdAt: t.Date(),
   updatedAt: t.Date(),
-  product: cartProductResponse,
 });
 
 export const cartResponse = t.Object({
-  id: t.String(),
-  userId: t.String(),
   createdAt: t.Date(),
-  updatedAt: t.Date(),
+  id: t.String(),
   items: t.Array(cartItemResponse),
+  updatedAt: t.Date(),
+  userId: t.String(),
 });
 
 export const addItemBody = t.Object({

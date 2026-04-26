@@ -2,17 +2,19 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 
 vi.mock("./orders.repository", () => ({
   ordersRepository: {
-    findById: vi.fn(),
     create: vi.fn(),
-    updateStatus: vi.fn(),
+    findById: vi.fn(),
     listForUser: vi.fn(),
+    updateStatus: vi.fn(),
   },
 }));
 
 vi.mock("../carts/carts.service", () => ({
   cartsService: {
-    getCartForUser: vi.fn(),
+    clearCart: vi.fn(),
+    clearCartBySession: vi.fn(),
     getCartForSession: vi.fn(),
+    getCartForUser: vi.fn(),
   },
 }));
 
@@ -27,14 +29,14 @@ describe("ordersService", () => {
   });
 
   const mockCheckoutData: CheckoutData = {
-    paymentMethod: "card",
     deliveryType: "shipping",
+    paymentMethod: "card",
     shippingAddress: {
-      country: "CZ",
       city: "Brno",
+      country: "CZ",
+      houseNumber: "68a",
       postalCode: "60200",
       street: "Botanicka",
-      houseNumber: "68a",
     },
   };
 
@@ -43,9 +45,16 @@ describe("ordersService", () => {
       const mockCart = {
         items: [
           {
+            product: {
+              deletedAt: null,
+              id: "p1",
+              name: "Wine",
+              price: "100",
+              quantity: 10,
+              shopId: "s1",
+            },
             productId: "p1",
             quantity: 2,
-            product: { id: "p1", shopId: "s1", price: "100", quantity: 10, name: "Wine" },
           },
         ],
       };
@@ -63,9 +72,16 @@ describe("ordersService", () => {
       const mockCart = {
         items: [
           {
+            product: {
+              deletedAt: null,
+              id: "p1",
+              name: "Wine",
+              price: "50",
+              quantity: 5,
+              shopId: "s1",
+            },
             productId: "p1",
             quantity: 1,
-            product: { id: "p1", shopId: "s1", price: "50", quantity: 5, name: "Wine" },
           },
         ],
       };
@@ -91,9 +107,16 @@ describe("ordersService", () => {
       const mockCart = {
         items: [
           {
+            product: {
+              deletedAt: null,
+              id: "p1",
+              name: "Wine",
+              price: "100",
+              quantity: 10,
+              shopId: "s1",
+            },
             productId: "p1",
             quantity: 20,
-            product: { id: "p1", shopId: "s1", price: "100", quantity: 10, name: "Wine" },
           },
         ],
       };

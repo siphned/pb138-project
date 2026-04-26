@@ -1,35 +1,31 @@
-import { pgTable, smallint, text, uuid } from "drizzle-orm/pg-core";
-import { products } from "./catalog";
+import { pgTable, smallint, text, uuid, varchar } from "drizzle-orm/pg-core";
 import { timestamptz } from "./helpers";
-import { winemakers } from "./sellers";
 import { users } from "./users";
 
-export const productReviews = pgTable("product_reviews", {
+export const reviews = pgTable("reviews", {
+  body: text("body"),
+  createdAt: timestamptz("created_at").notNull().defaultNow(),
+  deletedAt: timestamptz("deleted_at"),
+  entityId: uuid("entity_id").notNull(), // "product", "winemaker"
+  entityType: varchar("entity_type", { length: 20 }).notNull(),
   id: uuid("id").primaryKey().defaultRandom(),
+  rating: smallint("rating").notNull(),
+  updatedAt: timestamptz("updated_at"),
   userId: uuid("user_id")
     .notNull()
     .references(() => users.id),
-  productId: uuid("product_id")
-    .notNull()
-    .references(() => products.id),
-  rating: smallint("rating").notNull(),
-  body: text("body"),
-  createdAt: timestamptz("created_at").notNull().defaultNow(),
-  updatedAt: timestamptz("updated_at"),
-  deletedAt: timestamptz("deleted_at"),
 });
 
-export const winemakerReviews = pgTable("winemaker_reviews", {
+export const comments = pgTable("comments", {
+  body: text("body").notNull(),
+  createdAt: timestamptz("created_at").notNull().defaultNow(),
+  deletedAt: timestamptz("deleted_at"),
   id: uuid("id").primaryKey().defaultRandom(),
+  reviewId: uuid("review_id")
+    .notNull()
+    .references(() => reviews.id),
+  updatedAt: timestamptz("updated_at"),
   userId: uuid("user_id")
     .notNull()
     .references(() => users.id),
-  winemakerId: uuid("winemaker_id")
-    .notNull()
-    .references(() => winemakers.id),
-  rating: smallint("rating").notNull(),
-  body: text("body"),
-  createdAt: timestamptz("created_at").notNull().defaultNow(),
-  updatedAt: timestamptz("updated_at"),
-  deletedAt: timestamptz("deleted_at"),
 });
