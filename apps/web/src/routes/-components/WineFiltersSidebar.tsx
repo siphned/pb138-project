@@ -69,7 +69,10 @@ export function WineFiltersSidebar({ search }: WineFiltersSidebarProps) {
 
   const handleChange = (key: string, value: unknown) => {
     navigate({
-      search: { ...(search as Record<string, unknown>), [key]: value, page: 1 },
+      search: (prev) => {
+        const next = { ...prev, [key]: value, page: 1 };
+        return { ...next, sort: next.sort ?? "newest" };
+      },
       to: "/wines",
     });
   };

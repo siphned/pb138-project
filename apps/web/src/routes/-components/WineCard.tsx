@@ -24,13 +24,9 @@ export function WineCard({ product, shopName }: WineCardProps) {
 
   return (
     <CatalogCard
-      actionSlot={
-        <Button className="rounded-full px-4 pointer-events-none" size="sm" variant="outline">
-          View Detail
-        </Button>
-      }
+      
       imageSlot={
-        <div className="flex h-full w-full items-center justify-center bg-gradient-to-b from-secondary/10 to-secondary/30">
+        <div className="flex h-full w-full  items-center justify-center bg-gradient-to-b from-secondary/10 to-secondary/30">
           <span className="rotate-[-90deg] text-4xl font-bold uppercase tracking-widest text-secondary-foreground/20">
             {wine?.color ?? wine?.type ?? "Wine"}
           </span>

@@ -58,12 +58,12 @@ export function CatalogCard({
   return (
     <Card
       className={cn(
-        "group relative overflow-hidden rounded-2xl border-none bg-secondary/20 shadow-sm transition-all hover:shadow-md",
+        "group relative overflow-hidden p-0 rounded-2xl border-none bg-secondary/20 shadow-sm transition-all hover:shadow-md",
         className
       )}
     >
-      <CardHeader className="p-0">
-        <div className="relative aspect-[3/4] w-full overflow-hidden bg-muted">
+      <CardHeader className="p-2">
+        <div className="relative rounded-md aspect-square w-full overflow-hidden bg-muted">
           {imageSlot}
 
           {topRightSlot && <div className="absolute top-3 right-3 z-10">{topRightSlot}</div>}
