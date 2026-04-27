@@ -117,10 +117,7 @@ function PriceRangeSection({
 
     const timer = setTimeout(() => {
       onChange(section.minKey, localValue[0] === 0 ? undefined : localValue[0]);
-      onChange(
-        section.maxKey,
-        localValue[1] === MAX_PRICE ? undefined : localValue[1]
-      );
+      onChange(section.maxKey, localValue[1] === MAX_PRICE ? undefined : localValue[1]);
     }, 500); // 500ms debounce time
 
     return () => clearTimeout(timer);
@@ -129,12 +126,7 @@ function PriceRangeSection({
   return (
     <div className="space-y-4">
       <SectionHeading>{section.label}</SectionHeading>
-      <Slider
-        value={localValue}
-        max={MAX_PRICE}
-        step={10}
-        onValueChange={setLocalValue}
-      />
+      <Slider max={MAX_PRICE} onValueChange={setLocalValue} step={10} value={localValue} />
       <div className="text-sm text-muted-foreground">
         Price: €{localValue[0]} -{" "}
         {localValue[1] === MAX_PRICE ? `${MAX_PRICE}+` : `€${localValue[1]}`}
@@ -142,7 +134,6 @@ function PriceRangeSection({
     </div>
   );
 }
-
 
 function RatingSection({
   section,
