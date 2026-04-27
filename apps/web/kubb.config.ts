@@ -6,7 +6,7 @@ import { pluginTs } from "@kubb/plugin-ts";
 
 export default defineConfig({
   input: {
-    path: "http://localhost:3000/swagger/json",
+    path: "../server/openapi.json",
   },
   output: {
     path: "src/generated",
