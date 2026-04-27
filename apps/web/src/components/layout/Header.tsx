@@ -18,26 +18,24 @@ export function Header({ activeRole, onRoleChange }: HeaderProps) {
     <header className="h-16 border-b bg-background flex items-center justify-between px-6 lg:px-12">
       {/* Left: Logo Area */}
       <Link to="/">
-
-      <div className="flex items-center gap-2 font-heading font-bold text-xl">
-        <img src="/logo.png" alt="Wine Enjoyers Logo" className="h-8 w-8 rounded-full" />
-
-        Wine Enjoyers
-      </div>
+        <div className="flex items-center gap-2 font-heading font-bold text-xl">
+          <img alt="Wine Enjoyers Logo" className="h-8 w-8 rounded-full" src="/logo.png" />
+          Wine Enjoyers
+        </div>
       </Link>
 
       {/* Right: Icons & Menus */}
       <div className="flex items-center gap-4">
-        <Button variant="ghost" size="icon" className="hidden sm:flex">
+        <Button className="hidden sm:flex" size="icon" variant="ghost">
           <Search className="h-5 w-5" />
         </Button>
-        <Button variant="ghost" size="icon" className="hidden sm:flex">
+        <Button className="hidden sm:flex" size="icon" variant="ghost">
           <ShoppingCart className="h-5 w-5" />
         </Button>
 
         <Show when="signed-out">
           <Link to="/auth/login">
-            <Button variant="ghost" size="icon" className="rounded-full">
+            <Button className="rounded-full" size="icon" variant="ghost">
               <User className="h-5 w-5" />
             </Button>
           </Link>
@@ -46,7 +44,7 @@ export function Header({ activeRole, onRoleChange }: HeaderProps) {
         <Show when="signed-in">
           <Link to="/dashboard">
             <Avatar className="h-8 w-8">
-              <AvatarImage src={clerkUser?.imageUrl} alt={clerkUser?.fullName || "User"} />
+              <AvatarImage alt={clerkUser?.fullName || "User"} src={clerkUser?.imageUrl} />
               <AvatarFallback className="bg-primary text-primary-foreground font-heading text-xs">
                 {initials}
               </AvatarFallback>
@@ -55,9 +53,9 @@ export function Header({ activeRole, onRoleChange }: HeaderProps) {
         </Show>
 
         <Sidebar
-          userRoles={[Role.winemaker, Role.shopOwner, Role.customer]}
           activeRole={activeRole}
           onRoleChange={onRoleChange}
+          userRoles={[Role.winemaker, Role.shopOwner, Role.customer]}
         />
       </div>
     </header>

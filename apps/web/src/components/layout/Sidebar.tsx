@@ -56,19 +56,19 @@ export function Sidebar({ userRoles = [Role.customer], activeRole, onRoleChange 
     <Sheet>
       <SheetTrigger
         render={
-          <Button variant="ghost" size="icon">
+          <Button size="icon" variant="ghost">
             <Menu className="h-6 w-6" />
           </Button>
         }
       />
 
-      <SheetContent side="right" className="flex flex-col w-80 p-0">
+      <SheetContent className="flex flex-col w-80 p-0" side="right">
         <Show when="signed-in">
           <div className="flex-none border-b bg-background z-10">
             <SheetHeader className="text-left">
               <SheetTitle className="flex items-center gap-3 font-heading text-xl px-4 py-4">
                 <Avatar className="h-14 w-14">
-                  <AvatarImage src={clerkUser?.imageUrl} alt={clerkUser?.fullName || "User"} />
+                  <AvatarImage alt={clerkUser?.fullName || "User"} src={clerkUser?.imageUrl} />
                   <AvatarFallback className="bg-primary text-primary-foreground font-heading text-lg">
                     {initials}
                   </AvatarFallback>
@@ -87,7 +87,7 @@ export function Sidebar({ userRoles = [Role.customer], activeRole, onRoleChange 
             <p className="text-sm text-muted-foreground">
               Sign in to manage your wines and orders.
             </p>
-            <Link to="/auth/login" className="mt-4 block">
+            <Link className="mt-4 block" to="/auth/login">
               <Button className="w-full">Sign In</Button>
             </Link>
           </div>
@@ -99,10 +99,10 @@ export function Sidebar({ userRoles = [Role.customer], activeRole, onRoleChange 
               {hasMultipleRoles ? (
                 <Accordion
                   className="w-full flex-none"
-                  value={accordionState}
                   onValueChange={setAccordionState}
+                  value={accordionState}
                 >
-                  <AccordionItem value="user-roles" className="border-none">
+                  <AccordionItem className="border-none" value="user-roles">
                     <AccordionTrigger className="flex items-center gap-3 px-3 py-3 rounded-md bg-secondary hover:bg-secondary/80 transition-colors text-sm font-medium hover:no-underline text-primary">
                       <div className="flex items-center gap-3">
                         <UserIcon className="h-4 w-4" />
@@ -115,15 +115,15 @@ export function Sidebar({ userRoles = [Role.customer], activeRole, onRoleChange 
                           .filter((role) => role !== currentActiveRole)
                           .map((role) => (
                             <button
+                              className="w-full text-left px-3 py-2 text-sm font-medium rounded-md hover:bg-secondary/50 text-muted-foreground transition-colors"
                               key={role}
-                              type="button"
                               onClick={() => {
                                 setAccordionState([]);
                                 if (onRoleChange) {
                                   onRoleChange(role);
                                 }
                               }}
-                              className="w-full text-left px-3 py-2 text-sm font-medium rounded-md hover:bg-secondary/50 text-muted-foreground transition-colors"
+                              type="button"
                             >
                               {role}
                             </button>
@@ -142,45 +142,45 @@ export function Sidebar({ userRoles = [Role.customer], activeRole, onRoleChange 
 
             {/* SHARED PUBLIC LINKS */}
             <Link
-              to="/search"
               className="flex-none flex items-center gap-3 px-3 py-3 rounded-md bg-secondary hover:bg-secondary/80 transition-colors text-sm font-medium text-primary sm:hidden"
+              to="/search"
             >
               <Search className="h-4 w-4" /> Search
             </Link>
 
             <Link
-              to="/cart"
               className="flex-none flex items-center gap-3 px-3 py-3 rounded-md bg-secondary hover:bg-secondary/80 transition-colors text-sm font-medium text-primary sm:hidden"
+              to="/cart"
             >
               <ShoppingCart className="h-4 w-4" /> Shopping cart
             </Link>
 
             <Link
-              to="/explore"
               className="flex-none flex items-center gap-3 px-3 py-3 rounded-md bg-secondary hover:bg-secondary/80 transition-colors text-sm font-medium text-primary"
+              to="/explore"
             >
               <Wine className="h-4 w-4" /> Explore Wines
             </Link>
 
             <Link
-              to="/bundles"
               className="flex-none flex items-center gap-3 px-3 py-3 rounded-md bg-secondary hover:bg-secondary/80 transition-colors text-sm font-medium text-primary"
+              to="/bundles"
             >
               <Package className="h-4 w-4" /> Bundles
             </Link>
 
             <Link
-              to="/events"
               className="flex-none flex items-center gap-3 px-3 py-3 rounded-md bg-secondary hover:bg-secondary/80 transition-colors text-sm font-medium text-primary"
+              to="/events"
             >
               <Calendar className="h-4 w-4" /> Events
             </Link>
 
             <Show when="signed-in">
               <button
-                type="button"
-                onClick={() => openUserProfile()}
                 className="flex-none flex items-center gap-3 px-3 py-3 rounded-md hover:bg-secondary/50 transition-colors text-sm font-medium text-muted-foreground mt-2"
+                onClick={() => openUserProfile()}
+                type="button"
               >
                 <Settings className="h-4 w-4" /> Settings
               </button>
@@ -190,8 +190,8 @@ export function Sidebar({ userRoles = [Role.customer], activeRole, onRoleChange 
 
         <div className="flex-none border-t pt-4 pb-6 px-6 flex flex-col gap-1 bg-background z-10">
           <button
-            type="button"
             className="flex items-center justify-between px-3 py-2 rounded-md hover:bg-secondary/50 transition-colors text-sm font-medium text-muted-foreground w-full text-left"
+            type="button"
           >
             Theme
             <Moon className="h-4 w-4" />
@@ -199,9 +199,9 @@ export function Sidebar({ userRoles = [Role.customer], activeRole, onRoleChange 
 
           <Show when="signed-in">
             <button
-              type="button"
-              onClick={handleLogout}
               className="flex items-center gap-3 px-3 py-2 rounded-md hover:bg-destructive/10 transition-colors text-sm font-medium text-muted-foreground hover:text-destructive mt-2 w-full text-left"
+              onClick={handleLogout}
+              type="button"
             >
               <LogOut className="h-4 w-4" /> Log out
             </button>
