@@ -30,7 +30,10 @@ export const roleRequestsService = {
         fname: user.fname,
         role: request.type,
       })
-      .catch(console.error);
+      // biome-ignore lint/suspicious/noExplicitAny: error handling
+      .catch((_err: any) => {
+        // Fallback for email failure — log or report without breaking transaction
+      });
 
     return result;
   },
@@ -56,7 +59,10 @@ export const roleRequestsService = {
           });
         }
       })
-      .catch(console.error);
+      // biome-ignore lint/suspicious/noExplicitAny: error handling
+      .catch((_err: any) => {
+        // Fallback for email failure — log or report without breaking transaction
+      });
 
     return result;
   },

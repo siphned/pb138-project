@@ -28,6 +28,13 @@ vi.mock("@clerk/backend", () => ({
   }),
 }));
 
+vi.mock("../email/email.service", () => ({
+  emailService: {
+    sendRoleRequestApproved: vi.fn().mockResolvedValue(undefined),
+    sendRoleRequestRejected: vi.fn().mockResolvedValue(undefined),
+  },
+}));
+
 import { usersRepository } from "../users/users.repository";
 import { roleRequestsRepository } from "./role-requests.repository";
 import { roleRequestsService } from "./role-requests.service";

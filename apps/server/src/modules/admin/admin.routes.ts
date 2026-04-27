@@ -1,4 +1,5 @@
-import { Elysia, status, t } from "elysia";
+import { Elysia, t } from "elysia";
+import { handleError } from "../../utils/errors";
 import { authPlugin } from "../auth";
 import { adminEventResponse, adminReviewResponse, adminUserResponse } from "./admin.schema";
 import { adminService } from "./admin.service";
@@ -56,9 +57,7 @@ export const createAdminRoutes = (auth = authPlugin) => {
           try {
             return await adminService.setUserStatus(params.id, body.status);
           } catch (e: unknown) {
-            if (e instanceof Error && e.message === "NOT_FOUND")
-              return status(404, "User not found");
-            throw e;
+            return handleError(e);
           }
         }) as never,
         {
@@ -114,11 +113,7 @@ export const createAdminRoutes = (auth = authPlugin) => {
           try {
             return await adminService.approveEvent(params.id);
           } catch (e: unknown) {
-            if (e instanceof Error) {
-              if (e.message === "NOT_FOUND") return status(404, "Event not found");
-              if (e.message === "NOT_PENDING") return status(400, "Event is not pending");
-            }
-            throw e;
+            return handleError(e);
           }
         }) as never,
         {
@@ -138,11 +133,7 @@ export const createAdminRoutes = (auth = authPlugin) => {
           try {
             return await adminService.rejectEvent(params.id);
           } catch (e: unknown) {
-            if (e instanceof Error) {
-              if (e.message === "NOT_FOUND") return status(404, "Event not found");
-              if (e.message === "NOT_PENDING") return status(400, "Event is not pending");
-            }
-            throw e;
+            return handleError(e);
           }
         }) as never,
         {
@@ -192,9 +183,7 @@ export const createAdminRoutes = (auth = authPlugin) => {
             await adminService.deleteReview(params.id);
             return { success: true };
           } catch (e: unknown) {
-            if (e instanceof Error && e.message === "NOT_FOUND")
-              return status(404, "Review not found");
-            throw e;
+            return handleError(e);
           }
         }) as never,
         {

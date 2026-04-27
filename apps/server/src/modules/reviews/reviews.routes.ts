@@ -1,4 +1,5 @@
-import { Elysia, status, t } from "elysia";
+import { Elysia, t } from "elysia";
+import { handleError } from "../../utils/errors";
 import { authPlugin } from "../auth";
 import { createReviewBody, reviewListResponse, reviewResponse } from "./reviews.schema";
 import { reviewsService } from "./reviews.service";
@@ -46,13 +47,7 @@ export const createReviewsRoutes = (auth = authPlugin) => {
         try {
           return await reviewsService.createProductReview(dbUser.id, params.id, body);
         } catch (e: unknown) {
-          if (e instanceof Error) {
-            if (e.message === "NOT_PURCHASED")
-              return status(403, "You must purchase the product to review it");
-            if (e.message === "ALREADY_REVIEWED")
-              return status(409, "You have already reviewed this product");
-          }
-          throw e;
+          return handleError(e);
         }
       }) as never,
       {
@@ -76,9 +71,7 @@ export const createReviewsRoutes = (auth = authPlugin) => {
         try {
           return await reviewsService.createWinemakerReview(dbUser.id, params.id, body);
         } catch (e: unknown) {
-          if (e instanceof Error && e.message === "ALREADY_REVIEWED")
-            return status(409, "You have already reviewed this winemaker");
-          throw e;
+          return handleError(e);
         }
       }) as never,
       {
@@ -109,9 +102,7 @@ export const createReviewsRoutes = (auth = authPlugin) => {
           );
           return { success: true };
         } catch (e: unknown) {
-          if (e instanceof Error && e.message === "NOT_FOUND")
-            return status(404, "Review not found");
-          throw e;
+          return handleError(e);
         }
       }) as never,
       {
@@ -141,9 +132,7 @@ export const createReviewsRoutes = (auth = authPlugin) => {
           );
           return { success: true };
         } catch (e: unknown) {
-          if (e instanceof Error && e.message === "NOT_FOUND")
-            return status(404, "Review not found");
-          throw e;
+          return handleError(e);
         }
       }) as never,
       {

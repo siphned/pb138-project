@@ -1,4 +1,8 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
+import { cartsService } from "../carts/carts.service";
+import { ordersRepository } from "./orders.repository";
+import type { CheckoutData } from "./orders.service";
+import { ordersService } from "./orders.service";
 
 vi.mock("./orders.repository", () => ({
   ordersRepository: {
@@ -18,10 +22,18 @@ vi.mock("../carts/carts.service", () => ({
   },
 }));
 
-import { cartsService } from "../carts/carts.service";
-import { ordersRepository } from "./orders.repository";
-import type { CheckoutData } from "./orders.service";
-import { ordersService } from "./orders.service";
+vi.mock("../email/email.service", () => ({
+  emailService: {
+    sendOrderConfirmation: vi.fn().mockResolvedValue(undefined),
+    sendOrderStatusUpdate: vi.fn().mockResolvedValue(undefined),
+  },
+}));
+
+vi.mock("../users/users.repository", () => ({
+  usersRepository: {
+    findById: vi.fn(),
+  },
+}));
 
 describe("ordersService", () => {
   beforeEach(() => {

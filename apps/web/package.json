@@ -1,17 +1,4 @@
 {
-  "name": "web",
-  "private": true,
-  "version": "0.0.0",
-  "type": "module",
-  "scripts": {
-    "dev": "vite",
-    "build": "tsc -b && vite build",
-    "preview": "vite preview",
-    "check-types": "tsc --noEmit",
-    "generate": "orval",
-    "test": "vitest run",
-    "test:e2e": "playwright test || true"
-  },
   "dependencies": {
     "@base-ui/react": "^1.4.0",
     "@clerk/react": "^6.4.5",
@@ -55,5 +42,18 @@
     "typescript": "~5.9.3",
     "vite": "^8.0.1",
     "vitest": "^2.1.8"
-  }
+  },
+  "name": "web",
+  "private": true,
+  "scripts": {
+    "build": "tsc -b && vite build",
+    "check-types": "tsc --noEmit",
+    "dev": "vite",
+    "generate": "orval",
+    "preview": "vite preview",
+    "test": "vitest run",
+    "test:e2e": "playwright test || true"
+  },
+  "type": "module",
+  "version": "0.0.0"
 }

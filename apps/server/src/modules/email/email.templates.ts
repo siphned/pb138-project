@@ -82,6 +82,7 @@ export function orderStatusUpdateTemplate(data: OrderStatusData): string {
 
 export type EventApprovalData = {
   eventName: string;
+  winemakerName: string;
   startTime: Date;
   endTime: Date;
 };
@@ -90,6 +91,7 @@ export function eventApprovalTemplate(data: EventApprovalData): string {
   const fmt = (d: Date) => d.toLocaleString("en-GB", { dateStyle: "medium", timeStyle: "short" });
   return wrap(`
     <h2 style="margin-top:0;">Your Event Has Been Approved</h2>
+    <p>Hi <strong>${data.winemakerName}</strong>,</p>
     <p>Great news! Your event has been reviewed and approved by the WineMarket team.</p>
     <table style="border-collapse:collapse;margin:16px 0;">
       <tr>
