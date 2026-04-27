@@ -51,3 +51,5 @@ yarn-error.log*
 # LLM resources (not tracked - may contain embedded repos/files)
 raw/
 .claude/
+CLAUDE.md
+GEMINI.md
