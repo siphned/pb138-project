@@ -9,6 +9,7 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as WinesRouteImport } from './routes/wines'
 import { Route as SearchRouteImport } from './routes/search'
 import { Route as ExploreRouteImport } from './routes/explore'
 import { Route as EventsRouteImport } from './routes/events'
@@ -23,8 +24,8 @@ import { Route as AuthenticatedDashboardRouteImport } from './routes/_authentica
 import { Route as AuthenticatedWinemakerRouteImport } from './routes/_authenticated._winemaker'
 import { Route as AuthenticatedShop_ownerRouteImport } from './routes/_authenticated._shop_owner'
 import { Route as AuthenticatedAdminRouteImport } from './routes/_authenticated._admin'
-import { Route as AuthenticatedWinemakerWinesRouteImport } from './routes/_authenticated._winemaker.wines'
 import { Route as AuthenticatedWinemakerSupplyRouteImport } from './routes/_authenticated._winemaker.supply'
+import { Route as AuthenticatedWinemakerManageWinesRouteImport } from './routes/_authenticated._winemaker.manage-wines'
 import { Route as AuthenticatedAdminUsersRouteImport } from './routes/_authenticated._admin.users'
 import { Route as AuthenticatedAdminRoleRequestsRouteImport } from './routes/_authenticated._admin.role-requests'
 import { Route as AuthenticatedAdminModerationRouteImport } from './routes/_authenticated._admin.moderation'
@@ -36,6 +37,11 @@ import { Route as AuthenticatedShop_ownerShopsIdShopOrdersRouteImport } from './
 import { Route as AuthenticatedShop_ownerShopsIdInventoryRouteImport } from './routes/_authenticated._shop_owner.shops.$id.inventory'
 import { Route as AuthenticatedShop_ownerShopsIdBundlesRouteImport } from './routes/_authenticated._shop_owner.shops.$id.bundles'
 
+const WinesRoute = WinesRouteImport.update({
+  id: '/wines',
+  path: '/wines',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const SearchRoute = SearchRouteImport.update({
   id: '/search',
   path: '/search',
@@ -102,16 +108,16 @@ const AuthenticatedAdminRoute = AuthenticatedAdminRouteImport.update({
   id: '/_admin',
   getParentRoute: () => AuthenticatedRoute,
 } as any)
-const AuthenticatedWinemakerWinesRoute =
-  AuthenticatedWinemakerWinesRouteImport.update({
-    id: '/wines',
-    path: '/wines',
-    getParentRoute: () => AuthenticatedWinemakerRoute,
-  } as any)
 const AuthenticatedWinemakerSupplyRoute =
   AuthenticatedWinemakerSupplyRouteImport.update({
     id: '/supply',
     path: '/supply',
+    getParentRoute: () => AuthenticatedWinemakerRoute,
+  } as any)
+const AuthenticatedWinemakerManageWinesRoute =
+  AuthenticatedWinemakerManageWinesRouteImport.update({
+    id: '/manage-wines',
+    path: '/manage-wines',
     getParentRoute: () => AuthenticatedWinemakerRoute,
   } as any)
 const AuthenticatedAdminUsersRoute = AuthenticatedAdminUsersRouteImport.update({
@@ -179,6 +185,7 @@ export interface FileRoutesByFullPath {
   '/events': typeof EventsRoute
   '/explore': typeof ExploreRoute
   '/search': typeof SearchRoute
+  '/wines': typeof WinesRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
   '/orders': typeof AuthenticatedOrdersRoute
   '/settings': typeof AuthenticatedSettingsRoute
@@ -188,8 +195,8 @@ export interface FileRoutesByFullPath {
   '/moderation': typeof AuthenticatedAdminModerationRoute
   '/role-requests': typeof AuthenticatedAdminRoleRequestsRoute
   '/users': typeof AuthenticatedAdminUsersRoute
+  '/manage-wines': typeof AuthenticatedWinemakerManageWinesRoute
   '/supply': typeof AuthenticatedWinemakerSupplyRoute
-  '/wines': typeof AuthenticatedWinemakerWinesRoute
   '/shops/$id': typeof AuthenticatedShop_ownerShopsIdRouteWithChildren
   '/shops/': typeof AuthenticatedShop_ownerShopsIndexRoute
   '/shops/$id/bundles': typeof AuthenticatedShop_ownerShopsIdBundlesRoute
@@ -203,6 +210,7 @@ export interface FileRoutesByTo {
   '/events': typeof EventsRoute
   '/explore': typeof ExploreRoute
   '/search': typeof SearchRoute
+  '/wines': typeof WinesRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
   '/orders': typeof AuthenticatedOrdersRoute
   '/settings': typeof AuthenticatedSettingsRoute
@@ -212,8 +220,8 @@ export interface FileRoutesByTo {
   '/moderation': typeof AuthenticatedAdminModerationRoute
   '/role-requests': typeof AuthenticatedAdminRoleRequestsRoute
   '/users': typeof AuthenticatedAdminUsersRoute
+  '/manage-wines': typeof AuthenticatedWinemakerManageWinesRoute
   '/supply': typeof AuthenticatedWinemakerSupplyRoute
-  '/wines': typeof AuthenticatedWinemakerWinesRoute
   '/shops/$id': typeof AuthenticatedShop_ownerShopsIdRouteWithChildren
   '/shops': typeof AuthenticatedShop_ownerShopsIndexRoute
   '/shops/$id/bundles': typeof AuthenticatedShop_ownerShopsIdBundlesRoute
@@ -229,6 +237,7 @@ export interface FileRoutesById {
   '/events': typeof EventsRoute
   '/explore': typeof ExploreRoute
   '/search': typeof SearchRoute
+  '/wines': typeof WinesRoute
   '/_authenticated/_admin': typeof AuthenticatedAdminRouteWithChildren
   '/_authenticated/_shop_owner': typeof AuthenticatedShop_ownerRouteWithChildren
   '/_authenticated/_winemaker': typeof AuthenticatedWinemakerRouteWithChildren
@@ -241,8 +250,8 @@ export interface FileRoutesById {
   '/_authenticated/_admin/moderation': typeof AuthenticatedAdminModerationRoute
   '/_authenticated/_admin/role-requests': typeof AuthenticatedAdminRoleRequestsRoute
   '/_authenticated/_admin/users': typeof AuthenticatedAdminUsersRoute
+  '/_authenticated/_winemaker/manage-wines': typeof AuthenticatedWinemakerManageWinesRoute
   '/_authenticated/_winemaker/supply': typeof AuthenticatedWinemakerSupplyRoute
-  '/_authenticated/_winemaker/wines': typeof AuthenticatedWinemakerWinesRoute
   '/_authenticated/_shop_owner/shops/$id': typeof AuthenticatedShop_ownerShopsIdRouteWithChildren
   '/_authenticated/_shop_owner/shops/': typeof AuthenticatedShop_ownerShopsIndexRoute
   '/_authenticated/_shop_owner/shops/$id/bundles': typeof AuthenticatedShop_ownerShopsIdBundlesRoute
@@ -258,6 +267,7 @@ export interface FileRouteTypes {
     | '/events'
     | '/explore'
     | '/search'
+    | '/wines'
     | '/dashboard'
     | '/orders'
     | '/settings'
@@ -267,8 +277,8 @@ export interface FileRouteTypes {
     | '/moderation'
     | '/role-requests'
     | '/users'
+    | '/manage-wines'
     | '/supply'
-    | '/wines'
     | '/shops/$id'
     | '/shops/'
     | '/shops/$id/bundles'
@@ -282,6 +292,7 @@ export interface FileRouteTypes {
     | '/events'
     | '/explore'
     | '/search'
+    | '/wines'
     | '/dashboard'
     | '/orders'
     | '/settings'
@@ -291,8 +302,8 @@ export interface FileRouteTypes {
     | '/moderation'
     | '/role-requests'
     | '/users'
+    | '/manage-wines'
     | '/supply'
-    | '/wines'
     | '/shops/$id'
     | '/shops'
     | '/shops/$id/bundles'
@@ -307,6 +318,7 @@ export interface FileRouteTypes {
     | '/events'
     | '/explore'
     | '/search'
+    | '/wines'
     | '/_authenticated/_admin'
     | '/_authenticated/_shop_owner'
     | '/_authenticated/_winemaker'
@@ -319,8 +331,8 @@ export interface FileRouteTypes {
     | '/_authenticated/_admin/moderation'
     | '/_authenticated/_admin/role-requests'
     | '/_authenticated/_admin/users'
+    | '/_authenticated/_winemaker/manage-wines'
     | '/_authenticated/_winemaker/supply'
-    | '/_authenticated/_winemaker/wines'
     | '/_authenticated/_shop_owner/shops/$id'
     | '/_authenticated/_shop_owner/shops/'
     | '/_authenticated/_shop_owner/shops/$id/bundles'
@@ -336,12 +348,20 @@ export interface RootRouteChildren {
   EventsRoute: typeof EventsRoute
   ExploreRoute: typeof ExploreRoute
   SearchRoute: typeof SearchRoute
+  WinesRoute: typeof WinesRoute
   AuthLoginRoute: typeof AuthLoginRoute
   AuthRegisterRoute: typeof AuthRegisterRoute
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/wines': {
+      id: '/wines'
+      path: '/wines'
+      fullPath: '/wines'
+      preLoaderRoute: typeof WinesRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/search': {
       id: '/search'
       path: '/search'
@@ -440,18 +460,18 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAdminRouteImport
       parentRoute: typeof AuthenticatedRoute
     }
-    '/_authenticated/_winemaker/wines': {
-      id: '/_authenticated/_winemaker/wines'
-      path: '/wines'
-      fullPath: '/wines'
-      preLoaderRoute: typeof AuthenticatedWinemakerWinesRouteImport
-      parentRoute: typeof AuthenticatedWinemakerRoute
-    }
     '/_authenticated/_winemaker/supply': {
       id: '/_authenticated/_winemaker/supply'
       path: '/supply'
       fullPath: '/supply'
       preLoaderRoute: typeof AuthenticatedWinemakerSupplyRouteImport
+      parentRoute: typeof AuthenticatedWinemakerRoute
+    }
+    '/_authenticated/_winemaker/manage-wines': {
+      id: '/_authenticated/_winemaker/manage-wines'
+      path: '/manage-wines'
+      fullPath: '/manage-wines'
+      preLoaderRoute: typeof AuthenticatedWinemakerManageWinesRouteImport
       parentRoute: typeof AuthenticatedWinemakerRoute
     }
     '/_authenticated/_admin/users': {
@@ -587,14 +607,15 @@ const AuthenticatedShop_ownerRouteWithChildren =
   )
 
 interface AuthenticatedWinemakerRouteChildren {
+  AuthenticatedWinemakerManageWinesRoute: typeof AuthenticatedWinemakerManageWinesRoute
   AuthenticatedWinemakerSupplyRoute: typeof AuthenticatedWinemakerSupplyRoute
-  AuthenticatedWinemakerWinesRoute: typeof AuthenticatedWinemakerWinesRoute
 }
 
 const AuthenticatedWinemakerRouteChildren: AuthenticatedWinemakerRouteChildren =
   {
+    AuthenticatedWinemakerManageWinesRoute:
+      AuthenticatedWinemakerManageWinesRoute,
     AuthenticatedWinemakerSupplyRoute: AuthenticatedWinemakerSupplyRoute,
-    AuthenticatedWinemakerWinesRoute: AuthenticatedWinemakerWinesRoute,
   }
 
 const AuthenticatedWinemakerRouteWithChildren =
@@ -631,6 +652,7 @@ const rootRouteChildren: RootRouteChildren = {
   EventsRoute: EventsRoute,
   ExploreRoute: ExploreRoute,
   SearchRoute: SearchRoute,
+  WinesRoute: WinesRoute,
   AuthLoginRoute: AuthLoginRoute,
   AuthRegisterRoute: AuthRegisterRoute,
 }
