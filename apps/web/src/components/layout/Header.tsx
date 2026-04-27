@@ -17,12 +17,14 @@ export function Header({ activeRole, onRoleChange }: HeaderProps) {
   return (
     <header className="h-16 border-b bg-background flex items-center justify-between px-6 lg:px-12">
       {/* Left: Logo Area */}
+      <Link to="/">
+      
       <div className="flex items-center gap-2 font-heading font-bold text-xl">
-        <div className="h-8 w-8 bg-primary rounded-full flex items-center justify-center text-primary-foreground text-xs">
-          WE
-        </div>
+        <img src="/logo.png" alt="Wine Enjoyers Logo" className="h-8 w-8 rounded-full" />
+        
         Wine Enjoyers
       </div>
+      </Link>
 
       {/* Right: Icons & Menus */}
       <div className="flex items-center gap-4">
