@@ -1,32 +1,39 @@
 import { useAuth } from "@clerk/react";
-import axios from "axios";
 import { useEffect } from "react";
-
-// Configure global axios defaults
-axios.defaults.baseURL = import.meta.env.VITE_API_URL || "http://localhost:3000";
+import axiosInstance from "../api/client";
 
 export function AxiosInterceptor({ children }: { children: React.ReactNode }) {
-  const { getToken, isSignedIn, isLoaded } = useAuth();
+  const { getToken } = useAuth();
 
   useEffect(() => {
-    const injectToken = async () => {
-      if (!isLoaded) return;
-
-      if (isSignedIn) {
-        try {
-          const token = await getToken();
-          axios.defaults.headers.common.Authorization = token ? `Bearer ${token}` : "";
-        } catch (error) {
-          console.error("Error fetching Clerk token:", error);
-          axios.defaults.headers.common.Authorization = "";
+    const requestInterceptor = axiosInstance.interceptors.request.use(async (config) => {
+      try {
+        const token = await getToken();
+        if (token) {
+          config.headers.Authorization = `Bearer ${token}`;
         }
-      } else {
-        axios.defaults.headers.common.Authorization = "";
+      } catch (error) {
+        console.error("Error fetching Clerk token:", error);
       }
-    };
+      return config;
+    });
 
-    injectToken();
-  }, [getToken, isSignedIn, isLoaded]);
+    const responseInterceptor = axiosInstance.interceptors.response.use(
+      (response) => response,
+      (error) => {
+        if (error.response?.status === 401) {
+          console.error("401 Unauthorized detected by AxiosInterceptor");
+          console.debug("Request Headers:", error.config?.headers);
+        }
+        return Promise.reject(error);
+      }
+    );
+
+    return () => {
+      axiosInstance.interceptors.request.eject(requestInterceptor);
+      axiosInstance.interceptors.response.eject(responseInterceptor);
+    };
+  }, [getToken]);
 
   return <>{children}</>;
 }
