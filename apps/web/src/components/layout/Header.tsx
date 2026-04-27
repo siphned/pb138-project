@@ -1,10 +1,10 @@
-import { Search, ShoppingCart } from "lucide-react";
+import { Show, useClerk } from "@clerk/react";
 import { Link } from "@tanstack/react-router";
+import { Search, ShoppingCart, User } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { Role } from "@/types/roles";
 import { Sidebar } from "./Sidebar";
-import { useUser } from "@/context/UserContext";
 
 interface HeaderProps {
   activeRole?: Role;
@@ -12,56 +12,52 @@ interface HeaderProps {
 }
 
 export function Header({ activeRole, onRoleChange }: HeaderProps) {
-  const { user } = useUser();
-  
-  const displayName = user ? `${user.fname} ${user.lname}` : "";
-  const initials = user ? `${user.fname[0]}${user.lname[0]}`.toUpperCase() : "WE";
-
+  const { user: clerkUser } = useClerk();
+  const initials = clerkUser ? (clerkUser.fullName || "User").substring(0, 2).toUpperCase() : "GU";
   return (
     <header className="h-16 border-b bg-background flex items-center justify-between px-6 lg:px-12">
       {/* Left: Logo Area */}
       <Link to="/">
-        <div className="flex items-center gap-2 font-heading font-bold text-xl">
-          <img src="/logo.png" alt="Wine Enjoyers Logo" className="h-8 w-8 rounded-full" />
-          Wine Enjoyers
-        </div>
+
+      <div className="flex items-center gap-2 font-heading font-bold text-xl">
+        <img src="/logo.png" alt="Wine Enjoyers Logo" className="h-8 w-8 rounded-full" />
+
+        Wine Enjoyers
+      </div>
       </Link>
 
       {/* Right: Icons & Menus */}
       <div className="flex items-center gap-4">
-        <Button className="hidden sm:flex" size="icon" variant="ghost">
+        <Button variant="ghost" size="icon" className="hidden sm:flex">
           <Search className="h-5 w-5" />
         </Button>
-        <Button className="hidden sm:flex" size="icon" variant="ghost">
+        <Button variant="ghost" size="icon" className="hidden sm:flex">
           <ShoppingCart className="h-5 w-5" />
         </Button>
 
-        {user && (
-          <Link
-            to="/dashboard"
-            className="rounded-full focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2"
-          >
-            <Avatar className="h-9 w-9 hover:opacity-80 transition-opacity">
-              <AvatarImage alt={displayName} src="" />
-              <AvatarFallback className="bg-secondary text-secondary-foreground">
+        <Show when="signed-out">
+          <Link to="/auth/login">
+            <Button variant="ghost" size="icon" className="rounded-full">
+              <User className="h-5 w-5" />
+            </Button>
+          </Link>
+        </Show>
+
+        <Show when="signed-in">
+          <Link to="/dashboard">
+            <Avatar className="h-8 w-8">
+              <AvatarImage src={clerkUser?.imageUrl} alt={clerkUser?.fullName || "User"} />
+              <AvatarFallback className="bg-primary text-primary-foreground font-heading text-xs">
                 {initials}
               </AvatarFallback>
             </Avatar>
           </Link>
-        )}
-
-        {!user && (
-          <Link to="/auth/login">
-            <Button variant="outline" size="sm" className="rounded-full px-4">
-              Sign In
-            </Button>
-          </Link>
-        )}
+        </Show>
 
         <Sidebar
+          userRoles={[Role.winemaker, Role.shopOwner, Role.customer]}
           activeRole={activeRole}
           onRoleChange={onRoleChange}
-          userRoles={[Role.winemaker, Role.shopOwner, Role.customer]}
         />
       </div>
     </header>
