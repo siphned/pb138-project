@@ -6,9 +6,10 @@
  * reflects the actual server routes — no duplication.
  */
 import { writeFile } from "node:fs/promises";
+import path from "node:path";
 import { app } from "../src/app";
 
-const OUTPUT_PATH = "./openapi.json";
+const OUTPUT_PATH = path.join(import.meta.dir, "../openapi.json");
 const SPEC_PORT = 3001;
 
 // Override the port so it doesn't clash with a running dev server

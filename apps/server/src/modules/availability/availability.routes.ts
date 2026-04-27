@@ -42,6 +42,7 @@ export const availabilityRoutes = new Elysia()
       requireAuth: true,
       params: shopParams,
       body: addRegularBody,
+      response: { 201: t.Any(), 403: t.String(), 404: t.String(), 422: t.String() },
       detail: {
         tags: ["availability"],
         summary: "Add regular schedule entry",
@@ -59,6 +60,7 @@ export const availabilityRoutes = new Elysia()
     {
       requireAuth: true,
       params: shopEntryParams,
+      response: { 204: t.Null(), 403: t.String(), 404: t.String() },
       detail: {
         tags: ["availability"],
         summary: "Remove regular schedule entry",
@@ -76,6 +78,7 @@ export const availabilityRoutes = new Elysia()
       requireAuth: true,
       params: shopParams,
       body: addExceptionBody,
+      response: { 201: t.Any(), 403: t.String(), 404: t.String(), 422: t.String() },
       detail: {
         tags: ["availability"],
         summary: "Add availability exception",
@@ -93,6 +96,7 @@ export const availabilityRoutes = new Elysia()
     {
       requireAuth: true,
       params: shopEntryParams,
+      response: { 204: t.Null(), 403: t.String(), 404: t.String() },
       detail: {
         tags: ["availability"],
         summary: "Remove availability exception",

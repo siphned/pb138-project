@@ -93,6 +93,7 @@ export const productsRoutes = new Elysia()
       requireCapability: "shop_owner",
       params: shopParams,
       body: createProductBody,
+      response: { 201: t.Any(), 403: t.String(), 404: t.String(), 422: t.String() },
       detail: {
         tags: ["products"],
         summary: "Create a product",
@@ -114,6 +115,7 @@ export const productsRoutes = new Elysia()
       requireAuth: true,
       params: shopProductParams,
       body: updateProductBody,
+      response: { 200: t.Any(), 403: t.String(), 404: t.String(), 422: t.String() },
       detail: {
         tags: ["products"],
         summary: "Update a product",
@@ -135,6 +137,7 @@ export const productsRoutes = new Elysia()
     {
       requireAuth: true,
       params: shopProductParams,
+      response: { 204: t.Null(), 403: t.String(), 404: t.String() },
       detail: {
         tags: ["products"],
         summary: "Delete a product",
@@ -158,6 +161,7 @@ export const productsRoutes = new Elysia()
       requireCapability: "shop_owner",
       params: shopParams,
       body: createBundleBody,
+      response: { 201: t.Any(), 403: t.String(), 404: t.String(), 422: t.String() },
       detail: {
         tags: ["products"],
         summary: "Create a bundle",
@@ -201,6 +205,7 @@ export const productsRoutes = new Elysia()
     {
       requireAuth: true,
       params: shopBundleParams,
+      response: { 204: t.Null(), 403: t.String(), 404: t.String() },
       detail: {
         tags: ["products"],
         summary: "Delete a bundle",
