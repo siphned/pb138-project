@@ -21,6 +21,7 @@ import { WineFiltersSidebar } from "./WineFiltersSidebar";
 
 interface WineCatalogProps {
   search: {
+    color?: string[];
     maxPrice?: number;
     minPrice?: number;
     page?: number;
@@ -39,6 +40,10 @@ export function WineCatalog({ search, shopId, shopName }: WineCatalogProps) {
   const [searchInput, setSearchInput] = useState(search.search ?? "");
 
   const winesResult = useGetWines({
+    color:
+      typeof search.color === "string"
+        ? (search.color as "red" | "white" | "rosé" | "orange" | undefined)
+        : (search.color?.[0] as "red" | "white" | "rosé" | "orange" | undefined),
     region: typeof search.region === "string" ? search.region : search.region?.[0],
     type:
       typeof search.type === "string"

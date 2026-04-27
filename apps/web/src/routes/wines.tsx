@@ -3,6 +3,7 @@ import { z } from "zod";
 import { WineCatalog } from "./-components/WineCatalog";
 
 const winesSearchSchema = z.object({
+  color: z.array(z.string()).optional(),
   maxPrice: z.number().optional(),
   minPrice: z.number().optional(),
   page: z.number().optional().default(1),

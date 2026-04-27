@@ -4,13 +4,23 @@ import { FilterSidebar } from "@/components/catalog/FilterSidebar";
 
 const WINE_FILTERS: FilterSection[] = [
   {
+    key: "color",
+    label: "Wine Color",
+    options: [
+      { id: "red", label: "Red" },
+      { id: "white", label: "White" },
+      { id: "rosé", label: "Rosé" },
+      { id: "orange", label: "Orange" },
+    ],
+    type: "checkbox",
+  },
+  {
     key: "type",
     label: "Wine Type",
     options: [
-      { id: "red", label: "Red Wine" },
-      { id: "white", label: "White Wine" },
-      { id: "rosé", label: "Rosé Wine" },
+      { id: "still", label: "Still Wine" },
       { id: "sparkling", label: "Sparkling" },
+      { id: "fortified", label: "Fortified" },
       { id: "dessert", label: "Dessert Wine" },
     ],
     type: "checkbox",
@@ -42,6 +52,7 @@ const WINE_FILTERS: FilterSection[] = [
 
 interface WineFiltersSidebarProps {
   search: {
+    color?: string[];
     maxPrice?: number;
     minPrice?: number;
     page?: number;
