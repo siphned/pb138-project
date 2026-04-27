@@ -4,7 +4,7 @@ import { addExceptionBody, addRegularBody, getAvailabilityResponse } from "./ava
 import { availabilityService } from "./availability.service";
 
 const shopParams = t.Object({ id: t.String() });
-const shopEntryParams = t.Object({ id: t.String(), entryId: t.String() });
+const shopEntryParams = t.Object({ entryId: t.String(), id: t.String() });
 
 export const availabilityRoutes = new Elysia()
   .use(authPlugin)
@@ -23,13 +23,13 @@ export const availabilityRoutes = new Elysia()
       return await availabilityService.getAvailability(params.id);
     },
     {
+      detail: {
+        description: "Returns regular schedule and one-off exceptions for the shop.",
+        summary: "Get shop availability",
+        tags: ["availability"],
+      },
       params: shopParams,
       response: getAvailabilityResponse,
-      detail: {
-        tags: ["availability"],
-        summary: "Get shop availability",
-        description: "Returns regular schedule and one-off exceptions for the shop.",
-      },
     }
   )
 
@@ -39,15 +39,14 @@ export const availabilityRoutes = new Elysia()
       return status(201, await availabilityService.addRegular(params.id, dbUser.id, body));
     },
     {
-      requireAuth: true,
-      params: shopParams,
       body: addRegularBody,
-      response: { 201: t.Any(), 403: t.String(), 404: t.String(), 422: t.String() },
       detail: {
-        tags: ["availability"],
-        summary: "Add regular schedule entry",
         security: [{ bearerAuth: [] }],
+        summary: "Add regular schedule entry",
+        tags: ["availability"],
       },
+      params: shopParams,
+      requireAuth: true,
     }
   )
 
@@ -58,14 +57,13 @@ export const availabilityRoutes = new Elysia()
       return status(204, null);
     },
     {
-      requireAuth: true,
-      params: shopEntryParams,
-      response: { 204: t.Null(), 403: t.String(), 404: t.String() },
       detail: {
-        tags: ["availability"],
-        summary: "Remove regular schedule entry",
         security: [{ bearerAuth: [] }],
+        summary: "Remove regular schedule entry",
+        tags: ["availability"],
       },
+      params: shopEntryParams,
+      requireAuth: true,
     }
   )
 
@@ -75,15 +73,14 @@ export const availabilityRoutes = new Elysia()
       return status(201, await availabilityService.addException(params.id, dbUser.id, body));
     },
     {
-      requireAuth: true,
-      params: shopParams,
       body: addExceptionBody,
-      response: { 201: t.Any(), 403: t.String(), 404: t.String(), 422: t.String() },
       detail: {
-        tags: ["availability"],
-        summary: "Add availability exception",
         security: [{ bearerAuth: [] }],
+        summary: "Add availability exception",
+        tags: ["availability"],
       },
+      params: shopParams,
+      requireAuth: true,
     }
   )
 
@@ -94,13 +91,12 @@ export const availabilityRoutes = new Elysia()
       return status(204, null);
     },
     {
-      requireAuth: true,
-      params: shopEntryParams,
-      response: { 204: t.Null(), 403: t.String(), 404: t.String() },
       detail: {
-        tags: ["availability"],
-        summary: "Remove availability exception",
         security: [{ bearerAuth: [] }],
+        summary: "Remove availability exception",
+        tags: ["availability"],
       },
+      params: shopEntryParams,
+      requireAuth: true,
     }
   );

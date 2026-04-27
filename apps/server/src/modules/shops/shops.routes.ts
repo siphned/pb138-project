@@ -7,12 +7,23 @@ export const shopsRoutes = new Elysia()
   .use(authPlugin)
 
   .get("/shops", () => shopsService.listShops(), {
-    response: { 200: t.Array(shopResponse) },
     detail: {
-      tags: ["shops"],
-      summary: "List all shops",
       description: "Returns all non-deleted shops with their addresses.",
+      summary: "List all shops",
+      tags: ["shops"],
     },
+    response: { 200: t.Array(shopResponse) },
+  })
+
+  .get("/shops/me", ({ dbUser }) => shopsService.listMyShops(dbUser.id), {
+    detail: {
+      description: "Returns all shops owned by the authenticated user.",
+      security: [{ bearerAuth: [] }],
+      summary: "List my shops",
+      tags: ["shops"],
+    },
+    requireRoles: ["shop_owner"],
+    response: { 200: t.Array(shopResponse) },
   })
 
   .get(
@@ -26,37 +37,31 @@ export const shopsRoutes = new Elysia()
       }
     },
     {
+      detail: {
+        description: "Returns a single shop with address. 404 if not found or deleted.",
+        summary: "Get shop by ID",
+        tags: ["shops"],
+      },
       params: t.Object({ id: t.String() }),
       response: { 200: shopResponse, 404: t.String() },
-      detail: {
-        tags: ["shops"],
-        summary: "Get shop by ID",
-        description: "Returns a single shop with address. 404 if not found or deleted.",
-      },
     }
   )
 
   .post(
     "/shops",
     async ({ dbUser, body }) => {
-      try {
-        return status(201, await shopsService.createShop(dbUser.id, body));
-      } catch (e: unknown) {
-        if (e instanceof Error && e.message === "ALREADY_HAS_SHOP")
-          return status(409, "You already own a shop");
-        throw e;
-      }
+      return status(201, await shopsService.createShop(dbUser.id, body));
     },
     {
-      requireCapability: "shop_owner",
       body: createShopBody,
-      response: { 201: shopResponse, 409: t.String() },
       detail: {
-        tags: ["shops"],
-        summary: "Create a shop",
-        description: "Creates a new shop for the authenticated shop owner. One shop per user.",
+        description: "Creates a new shop for the authenticated shop owner.",
         security: [{ bearerAuth: [] }],
+        summary: "Create a shop",
+        tags: ["shops"],
       },
+      requireRoles: ["shop_owner"],
+      response: { 201: shopResponse },
     }
   )
 
@@ -74,15 +79,15 @@ export const shopsRoutes = new Elysia()
       }
     },
     {
-      requireAuth: true,
-      params: t.Object({ id: t.String() }),
       body: updateShopBody,
-      response: { 200: shopResponse, 403: t.String(), 404: t.String() },
       detail: {
-        tags: ["shops"],
-        summary: "Update shop",
         description: "Update name, description, or address of own shop.",
         security: [{ bearerAuth: [] }],
+        summary: "Update shop",
+        tags: ["shops"],
       },
+      params: t.Object({ id: t.String() }),
+      requireRoles: ["shop_owner", "admin"],
+      response: { 200: shopResponse, 403: t.String(), 404: t.String() },
     }
   );

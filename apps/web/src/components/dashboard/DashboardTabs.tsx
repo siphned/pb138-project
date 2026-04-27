@@ -12,17 +12,17 @@ interface DashboardTabsProps {
   role?: Role;
 }
 
-export function DashboardTabs({ role = Role.WINEMAKER }: DashboardTabsProps) {
-  const isCustomer = role === Role.CUSTOMER;
+export function DashboardTabs({ role = Role.winemaker }: DashboardTabsProps) {
+  const isCustomer = role === Role.customer;
 
   return (
     <div className="flex flex-col gap-6 space-y-6 mt-6">
-      <Tabs defaultValue="main" className="flex flex-col w-full">
+      <Tabs className="flex flex-col w-full" defaultValue="main">
         {/* THE NAVBAR (TabsList) */}
         <TabsList className="w-full justify-start h-14 bg-secondary/40 rounded-2xl p-1 gap-2">
           <TabsTrigger
-            value="main"
             className="flex-1 rounded-xl data-[state=active]:bg-background data-[state=active]:shadow-sm"
+            value="main"
           >
             {isCustomer ? (
               <ShoppingBag className="h-4 w-4 mr-2" />
@@ -35,8 +35,8 @@ export function DashboardTabs({ role = Role.WINEMAKER }: DashboardTabsProps) {
           {/* Hide Bundles tab entirely if the user is a Customer */}
           {!isCustomer && (
             <TabsTrigger
-              value="bundles"
               className="flex-1 rounded-xl data-[state=active]:bg-background data-[state=active]:shadow-sm"
+              value="bundles"
             >
               <Package className="h-4 w-4 mr-2" />
               Bundles
@@ -44,8 +44,8 @@ export function DashboardTabs({ role = Role.WINEMAKER }: DashboardTabsProps) {
           )}
 
           <TabsTrigger
-            value="events"
             className="flex-1 rounded-xl data-[state=active]:bg-background data-[state=active]:shadow-sm"
+            value="events"
           >
             <Calendar className="h-4 w-4 mr-2" />
             Events
@@ -53,7 +53,7 @@ export function DashboardTabs({ role = Role.WINEMAKER }: DashboardTabsProps) {
         </TabsList>
 
         {/* THE CONTENT AREAS */}
-        <TabsContent value="main" className="mt-6">
+        <TabsContent className="mt-6" value="main">
           <Card className="bg-secondary/40 border-none shadow-none rounded-3xl">
             <CardContent className="p-6 md:p-8">
               {/* Inject the separated Wines component and pass the role down */}
@@ -63,7 +63,7 @@ export function DashboardTabs({ role = Role.WINEMAKER }: DashboardTabsProps) {
         </TabsContent>
 
         {!isCustomer && (
-          <TabsContent value="bundles" className="mt-6">
+          <TabsContent className="mt-6" value="bundles">
             <Card className="bg-secondary/40 border-none shadow-none rounded-3xl">
               <CardContent className="p-6 md:p-8">
                 {/* Inject the separated Bundles component */}
@@ -73,7 +73,7 @@ export function DashboardTabs({ role = Role.WINEMAKER }: DashboardTabsProps) {
           </TabsContent>
         )}
 
-        <TabsContent value="events" className="mt-6">
+        <TabsContent className="mt-6" value="events">
           {/* Note: Events usually has its own background styling in your design, so we skip the Card wrapper here */}
           <div className="space-y-6">
             {/* Inject the separated Events component */}

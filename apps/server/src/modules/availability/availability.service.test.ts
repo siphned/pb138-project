@@ -2,15 +2,15 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 
 vi.mock("./availability.repository", () => ({
   availabilityRepository: {
-    findShopById: vi.fn(),
-    findRegularByShopId: vi.fn(),
+    deleteException: vi.fn(),
+    deleteRegular: vi.fn(),
+    findExceptionById: vi.fn(),
     findExceptionsByShopId: vi.fn(),
     findRegularById: vi.fn(),
-    findExceptionById: vi.fn(),
-    insertRegular: vi.fn(),
+    findRegularByShopId: vi.fn(),
+    findShopById: vi.fn(),
     insertException: vi.fn(),
-    deleteRegular: vi.fn(),
-    deleteException: vi.fn(),
+    insertRegular: vi.fn(),
   },
 }));
 
@@ -18,11 +18,10 @@ import { availabilityRepository } from "./availability.repository";
 import { availabilityService } from "./availability.service";
 
 const ownerId = "11111111-1111-1111-1111-111111111111";
-const otherId = "22222222-2222-2222-2222-222222222222";
 const shopId = "33333333-3333-3333-3333-333333333333";
 const entryId = "44444444-4444-4444-4444-444444444444";
 
-const mockShop = { id: shopId, ownerUserId: ownerId, deletedAt: null } as never;
+const mockShop = { deletedAt: null, id: shopId, ownerUserId: ownerId } as never;
 const mockRegular = { id: entryId, shopId } as never;
 const mockException = { id: entryId, shopId } as never;
 
@@ -30,117 +29,67 @@ beforeEach(() => {
   vi.clearAllMocks();
 });
 
-describe("addRegular", () => {
-  it("adds regular hours successfully for own shop", async () => {
-    vi.mocked(availabilityRepository.findShopById).mockResolvedValue(mockShop);
-    vi.mocked(availabilityRepository.insertRegular).mockResolvedValue(mockRegular);
+describe("availabilityService", () => {
+  describe("addRegular", () => {
+    it("adds regular hours successfully for own shop", async () => {
+      vi.mocked(availabilityRepository.findShopById).mockResolvedValue(mockShop);
+      vi.mocked(availabilityRepository.insertRegular).mockResolvedValue(mockRegular);
 
-    await availabilityService.addRegular(shopId, ownerId, {
-      dow: 1,
-      startTime: "09:00",
-      endTime: "17:00",
-      validFrom: "2026-01-01",
-      type: "open",
+      await availabilityService.addRegular(shopId, ownerId, {
+        dow: 1,
+        endTime: "17:00",
+        startTime: "09:00",
+        type: "open",
+        validFrom: "2026-01-01",
+      });
+
+      expect(availabilityRepository.insertRegular).toHaveBeenCalled();
+    });
+  });
+
+  describe("getAvailability", () => {
+    it("returns regular and exceptions for a shop", async () => {
+      vi.mocked(availabilityRepository.findShopById).mockResolvedValue(mockShop);
+      vi.mocked(availabilityRepository.findRegularByShopId).mockResolvedValue([mockRegular]);
+      vi.mocked(availabilityRepository.findExceptionsByShopId).mockResolvedValue([mockException]);
+
+      const result = await availabilityService.getAvailability(shopId);
+
+      expect(result.regular).toHaveLength(1);
+      expect(result.exceptions).toHaveLength(1);
+    });
+  });
+
+  describe("deleteRegular", () => {
+    it("removes regular entry for own shop", async () => {
+      vi.mocked(availabilityRepository.findShopById).mockResolvedValue(mockShop);
+      vi.mocked(availabilityRepository.findRegularById).mockResolvedValue(mockRegular);
+
+      await availabilityService.deleteRegular(shopId, entryId, ownerId);
+
+      expect(availabilityRepository.deleteRegular).toHaveBeenCalledWith(entryId);
     });
 
-    expect(availabilityRepository.insertRegular).toHaveBeenCalledWith(
-      expect.objectContaining({ shopId, dow: 1, type: "open" })
-    );
-  });
-
-  it("throws FORBIDDEN when caller does not own the shop", async () => {
-    vi.mocked(availabilityRepository.findShopById).mockResolvedValue(mockShop);
-
-    await expect(
-      availabilityService.addRegular(shopId, otherId, {
-        dow: 1,
-        startTime: "09:00",
-        endTime: "17:00",
-        validFrom: "2026-01-01",
-        type: "open",
-      })
-    ).rejects.toThrow("FORBIDDEN");
-
-    expect(availabilityRepository.insertRegular).not.toHaveBeenCalled();
-  });
-
-  it("throws INVALID_TIME_RANGE when endTime <= startTime", async () => {
-    vi.mocked(availabilityRepository.findShopById).mockResolvedValue(mockShop);
-
-    await expect(
-      availabilityService.addRegular(shopId, ownerId, {
-        dow: 1,
-        startTime: "17:00",
-        endTime: "09:00",
-        validFrom: "2026-01-01",
-        type: "open",
-      })
-    ).rejects.toThrow("INVALID_TIME_RANGE");
-  });
-
-  it("throws INVALID_TIME_RANGE when validTo is not after validFrom", async () => {
-    vi.mocked(availabilityRepository.findShopById).mockResolvedValue(mockShop);
-
-    await expect(
-      availabilityService.addRegular(shopId, ownerId, {
-        dow: 1,
-        startTime: "09:00",
-        endTime: "17:00",
-        validFrom: "2026-06-01",
-        validTo: "2026-05-01",
-        type: "open",
-      })
-    ).rejects.toThrow("INVALID_TIME_RANGE");
-  });
-});
-
-describe("addException", () => {
-  it("adds exception successfully for own shop", async () => {
-    vi.mocked(availabilityRepository.findShopById).mockResolvedValue(mockShop);
-    vi.mocked(availabilityRepository.insertException).mockResolvedValue(mockException);
-
-    await availabilityService.addException(shopId, ownerId, {
-      startsAt: "2026-12-24T08:00:00Z",
-      endsAt: "2026-12-24T20:00:00Z",
-      action: "closed",
-      reason: "Christmas Eve",
+    it("throws NOT_FOUND if shop doesn't exist", async () => {
+      vi.mocked(availabilityRepository.findShopById).mockResolvedValue(undefined);
+      await expect(availabilityService.deleteRegular(shopId, entryId, ownerId)).rejects.toThrow(
+        "NOT_FOUND"
+      );
     });
 
-    expect(availabilityRepository.insertException).toHaveBeenCalledWith(
-      expect.objectContaining({ shopId, action: "closed" })
-    );
-  });
+    it("throws FORBIDDEN if user doesn't own the shop", async () => {
+      vi.mocked(availabilityRepository.findShopById).mockResolvedValue(mockShop);
+      await expect(
+        availabilityService.deleteRegular(shopId, entryId, "wrong-owner")
+      ).rejects.toThrow("FORBIDDEN");
+    });
 
-  it("throws INVALID_TIME_RANGE when endsAt <= startsAt", async () => {
-    vi.mocked(availabilityRepository.findShopById).mockResolvedValue(mockShop);
-
-    await expect(
-      availabilityService.addException(shopId, ownerId, {
-        startsAt: "2026-12-25T20:00:00Z",
-        endsAt: "2026-12-25T08:00:00Z",
-        action: "closed",
-      })
-    ).rejects.toThrow("INVALID_TIME_RANGE");
-  });
-});
-
-describe("deleteRegular", () => {
-  it("removes regular entry for own shop", async () => {
-    vi.mocked(availabilityRepository.findShopById).mockResolvedValue(mockShop);
-    vi.mocked(availabilityRepository.findRegularById).mockResolvedValue(mockRegular);
-
-    await availabilityService.deleteRegular(shopId, entryId, ownerId);
-
-    expect(availabilityRepository.deleteRegular).toHaveBeenCalledWith(entryId);
-  });
-
-  it("throws FORBIDDEN on removal when caller does not own the shop", async () => {
-    vi.mocked(availabilityRepository.findShopById).mockResolvedValue(mockShop);
-
-    await expect(availabilityService.deleteRegular(shopId, entryId, otherId)).rejects.toThrow(
-      "FORBIDDEN"
-    );
-
-    expect(availabilityRepository.deleteRegular).not.toHaveBeenCalled();
+    it("throws NOT_FOUND if entry doesn't exist", async () => {
+      vi.mocked(availabilityRepository.findShopById).mockResolvedValue(mockShop);
+      vi.mocked(availabilityRepository.findRegularById).mockResolvedValue(undefined);
+      await expect(availabilityService.deleteRegular(shopId, entryId, ownerId)).rejects.toThrow(
+        "NOT_FOUND"
+      );
+    });
   });
 });

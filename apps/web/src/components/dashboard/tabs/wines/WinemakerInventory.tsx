@@ -25,32 +25,32 @@ export function WinemakerInventory() {
   // Store data in an array
   const inventoryData = [
     {
+      category: "Red",
       id: 1,
       name: "Chateau Montrose 2018",
-      vintage: "2018",
       qty: 82,
-      category: "Red",
+      vintage: "2018",
     },
     {
+      category: "white",
       id: 2,
       name: "La Dame de Montrose 2019",
-      vintage: "2019",
       qty: 8,
-      category: "white",
+      vintage: "2019",
     },
     {
+      category: "Red",
       id: 3,
       name: "Tertio de Montrose 2020",
-      vintage: "2020",
       qty: 0,
-      category: "Red",
+      vintage: "2020",
     },
     {
+      category: "white",
       id: 4,
       name: "Montrose Rose 2021",
-      vintage: "2021",
       qty: 156,
-      category: "white",
+      vintage: "2021",
     },
   ];
 
@@ -68,7 +68,7 @@ export function WinemakerInventory() {
           <Wine className="h-5 w-5" /> My Wines
         </div>
         <div className="flex items-center gap-3 w-full md:w-auto">
-          <Select value={statusFilter} onValueChange={(val) => setStatusFilter(val || "all")}>
+          <Select onValueChange={(val) => setStatusFilter(val || "all")} value={statusFilter}>
             <SelectTrigger className="w-full sm:w-40 bg-background border-none rounded-lg h-10">
               <SelectValue placeholder="Filter Status" />
             </SelectTrigger>
@@ -110,8 +110,8 @@ export function WinemakerInventory() {
               const status = getStockStatus(wine.qty);
               return (
                 <TableRow
-                  key={wine.id}
                   className="border-border/50 border-b last:border-0 md:last:border-b flex flex-col md:table-row py-4 md:py-0 relative group"
+                  key={wine.id}
                 >
                   {/* Name & Mobile secondary info */}
                   <TableCell className="font-medium text-[15px] md:text-sm py-1 md:py-4">
@@ -144,9 +144,9 @@ export function WinemakerInventory() {
                   {/* Actions - positioned top-right on mobile, normal cell on desktop */}
                   <TableCell className="text-right absolute right-2 top-4 md:static py-1 md:py-4">
                     <Button
-                      variant="ghost"
-                      size="icon"
                       className="h-8 w-8 text-muted-foreground hover:text-primary"
+                      size="icon"
+                      variant="ghost"
                     >
                       <MoreHorizontal className="h-5 w-5 md:h-4 md:w-4" />
                     </Button>

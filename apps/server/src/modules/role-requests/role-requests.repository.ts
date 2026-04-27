@@ -1,46 +1,45 @@
-import { eq } from "drizzle-orm";
+import { and, eq, isNull } from "drizzle-orm";
 import { db } from "../../db";
 import type { RoleRequest } from "../../db/schema";
 import { roleRequests } from "../../db/schema";
 
 export const roleRequestsRepository = {
+  async create(data: {
+    userId: string;
+    type: "winemaker" | "shop_owner";
+    businessName: string;
+    details?: string;
+  }): Promise<RoleRequest> {
+    const [request] = await db.insert(roleRequests).values(data).returning();
+    if (!request) throw new Error("Failed to create role request");
+    return request;
+  },
   findById(id: string): Promise<RoleRequest | undefined> {
     return db.query.roleRequests.findFirst({
-      where: eq(roleRequests.id, id),
-    });
-  },
-
-  findPending(): Promise<RoleRequest[]> {
-    return db.query.roleRequests.findMany({
-      where: eq(roleRequests.status, "pending"),
+      where: and(eq(roleRequests.id, id), isNull(roleRequests.deletedAt)),
     });
   },
 
   findByUserId(userId: string): Promise<RoleRequest[]> {
     return db.query.roleRequests.findMany({
-      where: eq(roleRequests.userId, userId),
+      where: and(eq(roleRequests.userId, userId), isNull(roleRequests.deletedAt)),
     });
   },
 
-  async create(data: {
-    userId: string;
-    requestedRole: "winemaker" | "shop_owner";
-    businessName: string;
-    details?: string;
-  }): Promise<RoleRequest> {
-    const [request] = await db.insert(roleRequests).values(data).returning();
-    if (!request) throw new Error("Insert returned no rows");
-    return request;
+  async findPending(): Promise<RoleRequest[]> {
+    return db.query.roleRequests.findMany({
+      where: and(eq(roleRequests.status, "pending"), isNull(roleRequests.deletedAt)),
+    });
   },
 
   async updateStatus(
     id: string,
     status: "approved" | "rejected",
-    reviewedByAdminId: string
+    adminUserId: string
   ): Promise<RoleRequest> {
     const [updated] = await db
       .update(roleRequests)
-      .set({ status, reviewedAt: new Date(), reviewedByAdminId })
+      .set({ adminUserId, reviewedAt: new Date(), status })
       .where(eq(roleRequests.id, id))
       .returning();
     if (!updated) throw new Error("Role request not found");

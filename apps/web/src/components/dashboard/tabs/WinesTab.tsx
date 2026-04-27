@@ -6,9 +6,9 @@ import { WinemakerInventory } from "./wines/WinemakerInventory";
 export function WinesTab({ role }: { role: Role }) {
   const renderTableContent = () => {
     switch (role) {
-      case Role.CUSTOMER:
+      case Role.customer:
         return <CustomerOrderHistory />;
-      case Role.SHOP_OWNER:
+      case Role.shopOwner:
         return <ShopOwnerInventory />;
       default:
         return <WinemakerInventory />;

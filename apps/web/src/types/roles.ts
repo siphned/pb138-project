@@ -1,7 +1,9 @@
+export type AppRole = "customer" | "winemaker" | "shop_owner" | "admin";
+
 export const Role = {
-  WINEMAKER: "Winemaker",
-  SHOP_OWNER: "Shop Owner",
-  CUSTOMER: "Customer",
+  customer: "Customer",
+  shopOwner: "Shop Owner",
+  winemaker: "Winemaker",
 } as const;
 
 export type Role = (typeof Role)[keyof typeof Role];

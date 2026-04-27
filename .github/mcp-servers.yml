@@ -1,0 +1,76 @@
+# MCP server definitions for local/agent use
+# Playwright-focused setup for web E2E testing
+
+servers:
+  - id: playwright-web-e2e
+    name: Playwright (web E2E)
+    description: |
+      Start backend + frontend and run Playwright tests. Assumes Bun is installed and
+      repo has been bootstrapped with `bun install`.
+
+    # Commands to start services (run in background where shell supports '&')
+    start_commands:
+      - bun --cwd apps/server run dev &
+      - bun --cwd apps/web run dev &
+
+    # Health checks the agent should wait for before running tests
+    wait_for:
+      - url: http://localhost:3000/swagger/json
+        timeout: 60
+      - url: http://localhost:5173
+        timeout: 30
+
+    # Command to run the E2E suite
+    test_command: bun --cwd apps/web run test:e2e
+
+    # Env vars commonly required (override for CI/secrets)
+    env:
+      DATABASE_URL: postgresql://postgres:postgres@localhost:5432/winemarket
+      CLERK_JWT_KEY: "$CLERK_JWT_KEY"
+      FRONTEND_URL: http://localhost:5173
+
+    # Ports expected to be open by the stack
+    ports:
+      - 3000
+      - 5173
+
+    notes: |
+      - CI starts the backend and waits for /swagger/json then generates the client;
+        this config mimics that flow for local/agent runs.
+      - On Windows shells adjust backgrounding (use PowerShell Start-Process or run in separate terminals).
+      - If you use docker-compose to run Postgres, set DATABASE_URL accordingly before running tests.
+
+  - id: docker-compose-postgres
+    name: Docker Compose (Postgres + app stack)
+    description: |
+      Use docker compose to bring up a local Postgres instance for agent/CI runs, then start the app stack and run Playwright E2E.
+
+    # Commands to start services
+    start_commands:
+      - docker compose up -d postgres
+      - # Optional: start whole stack if docker-compose.yml defines services
+      - docker compose up -d
+      - bun --cwd apps/server run dev &
+      - bun --cwd apps/web run dev &
+
+    wait_for:
+      - url: http://localhost:3000/swagger/json
+        timeout: 90
+      - url: tcp://localhost:5432
+        timeout: 60
+
+    test_command: bun --cwd apps/web run test:e2e
+
+    env:
+      DATABASE_URL: postgresql://postgres:postgres@localhost:5432/winemarket
+      CLERK_JWT_KEY: "$CLERK_JWT_KEY"
+
+    ports:
+      - 5432
+      - 3000
+      - 5173
+
+    notes: |
+      - Ensure docker daemon is available to the agent.
+      - Adjust docker compose service names if different.
+      - This entry is optional; local dev can also use the upstream Postgres container from docker-compose.yml if present.

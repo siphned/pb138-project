@@ -1,62 +1,73 @@
-import { useAuth } from "@clerk/react";
-import { useQueryClient } from "@tanstack/react-query";
-import { createContext, type ReactNode, useContext } from "react";
-import { getUsersMeQueryKey, useGetUsersMe } from "@/generated/hooks/useGetUsersMe";
-import { usePutUsersMe } from "@/generated/hooks/usePutUsersMe";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { createContext, type ReactNode, useContext, useEffect, useState } from "react";
+import {
+  getGetUsersMeQueryKey,
+  getGetUsersMeQueryOptions,
+  usePutUsersMe,
+} from "@/generated/users/users";
 
 export interface UserProfile {
   id: string;
   fname: string;
   lname: string;
   email: string;
-  role: "user" | "admin";
+  clerkId: string;
+  roles: string[];
 }
 
 interface UserContextType {
   user: UserProfile | null;
-  updateUser: (newData: Partial<UserProfile>) => Promise<void>;
+  updateUser: (newData: Partial<Pick<UserProfile, "fname" | "lname">>) => Promise<UserProfile>;
   isLoading: boolean;
 }
+
+const defaultUser: UserProfile | null = null;
 
 const UserContext = createContext<UserContextType | undefined>(undefined);
 
 export function UserProvider({ children }: { children: ReactNode }) {
-  const { isSignedIn, isLoaded } = useAuth();
+  const { data: profile, isLoading } = useQuery(getGetUsersMeQueryOptions());
   const queryClient = useQueryClient();
-
-  // Only fetch the profile if the user is signed in and Clerk is loaded
-  const { data: profile, isLoading: isProfileLoading } = useGetUsersMe({
-    query: {
-      enabled: !!isSignedIn && isLoaded,
-    },
-  });
-
   const updateMutation = usePutUsersMe({
     mutation: {
-      onSuccess: (): void => {
-        void queryClient.invalidateQueries({ queryKey: getUsersMeQueryKey() });
+      onSuccess: () => {
+        queryClient.invalidateQueries({ queryKey: getGetUsersMeQueryKey() });
       },
     },
   });
 
-  const updateUser = async (newData: Partial<UserProfile>): Promise<void> => {
-    if (!profile) return;
+  const [user, setUser] = useState<UserProfile | null>(defaultUser);
+  useEffect(() => {
+    if (profile) {
+      setUser({
+        clerkId: profile.clerkId,
+        email: profile.email,
+        fname: profile.fname,
+        id: profile.id,
+        lname: profile.lname,
+        roles: profile.roles ?? [],
+      });
+    }
+  }, [profile]);
 
-    await updateMutation.mutateAsync({
-      data: {
-        fname: newData.fname,
-        lname: newData.lname,
-      },
-    });
+  const updateUser = async (
+    newData: Partial<Pick<UserProfile, "fname" | "lname">>
+  ): Promise<UserProfile> => {
+    if (!user) throw new Error("No user to update");
+    const updated = await updateMutation.mutateAsync({ data: newData });
+    return {
+      clerkId: updated.clerkId,
+      email: updated.email,
+      fname: updated.fname,
+      id: updated.id,
+      lname: updated.lname,
+      roles: updated.roles ?? [],
+    };
   };
 
-  const value = {
-    user: profile ?? null,
-    updateUser,
-    isLoading: !isLoaded || isProfileLoading,
-  };
-
-  return <UserContext.Provider value={value}>{children}</UserContext.Provider>;
+  return (
+    <UserContext.Provider value={{ isLoading, updateUser, user }}>{children}</UserContext.Provider>
+  );
 }
 
 export function useUser() {

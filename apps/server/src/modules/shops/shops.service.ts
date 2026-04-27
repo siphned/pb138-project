@@ -22,8 +22,14 @@ type UpdateShopData = {
 };
 
 export const shopsService = {
-  listShops(): Promise<ShopWithAddress[]> {
-    return shopsRepository.findAll();
+  async createShop(ownerUserId: string, data: CreateShopData): Promise<ShopWithAddress> {
+    const shop = await shopsRepository.createShopWithAddress(
+      { description: data.description, name: data.name, ownerUserId },
+      data.address
+    );
+    const created = await shopsRepository.findById(shop.id);
+    if (!created) throw new Error("NOT_FOUND");
+    return created;
   },
 
   async getShop(id: string): Promise<ShopWithAddress> {
@@ -32,17 +38,11 @@ export const shopsService = {
     return shop;
   },
 
-  async createShop(ownerUserId: string, data: CreateShopData): Promise<ShopWithAddress> {
-    const existing = await shopsRepository.findByOwnerUserId(ownerUserId);
-    if (existing) throw new Error("ALREADY_HAS_SHOP");
-
-    const shop = await shopsRepository.createShopWithAddress(
-      { ownerUserId, name: data.name, description: data.description },
-      data.address
-    );
-    const created = await shopsRepository.findById(shop.id);
-    if (!created) throw new Error("NOT_FOUND");
-    return created;
+  listMyShops(ownerUserId: string): Promise<ShopWithAddress[]> {
+    return shopsRepository.findAllByOwnerUserId(ownerUserId) as Promise<ShopWithAddress[]>;
+  },
+  listShops(): Promise<ShopWithAddress[]> {
+    return shopsRepository.findAll();
   },
 
   async updateShop(
@@ -62,11 +62,11 @@ export const shopsService = {
     if (data.address && Object.keys(data.address).length > 0) {
       const currentAddress = shop.address;
       const mergedAddress: AddressData = {
-        country: data.address.country ?? currentAddress.country,
         city: data.address.city ?? currentAddress.city,
+        country: data.address.country ?? currentAddress.country,
+        houseNumber: data.address.houseNumber ?? currentAddress.houseNumber,
         postalCode: data.address.postalCode ?? currentAddress.postalCode,
         street: data.address.street ?? currentAddress.street,
-        houseNumber: data.address.houseNumber ?? currentAddress.houseNumber,
       };
       const newAddress = await shopsRepository.insertAddress(mergedAddress);
       updates.addressId = newAddress.id;

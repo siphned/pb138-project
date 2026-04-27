@@ -2,54 +2,45 @@
 
 ## Route Hierarchy
 
+Routes are file-based (TanStack Router). The actual route files in `apps/web/src/routes/`:
+
 ```
-/                    (home, public)
-├── /wines           (catalog, public)
-├── /wines/:id       (detail, public)
-├── /winemakers      (browse, public)
-├── /winemakers/:id  (profile, public)
-├── /shops           (browse, public)
-├── /shops/:id       (detail, public)
-├── /events          (listing, public)
-└── /events/:id      (detail, public)
+/                         index.tsx (public — home/landing)
+├── /explore              explore.tsx (public — wine catalog)
+├── /search               search.tsx (public)
+├── /events               events.tsx (public)
+├── /cart                 cart.tsx (public — guest + user)
 
 /auth
-├── /auth/login      (form)
-└── /auth/register   (form)
+├── /auth/login           auth/login.tsx (Clerk SignIn)
+└── /auth/register        auth/register.tsx (Clerk SignUp)
 
-/cart                (guest + user)
+_authenticated            (pathless layout guard — requires Clerk session)
+├── /dashboard            _authenticated.dashboard.tsx
+├── /orders               _authenticated.orders.tsx
+├── /settings             _authenticated.settings.tsx
 
-/checkout            (customer+ only)
+  _authenticated._winemaker   (pathless — winemaker role)
+  ├── /winemaker/supply       _authenticated._winemaker.supply.tsx
+  └── /winemaker/wines        _authenticated._winemaker.wines.tsx
 
-/orders              (customer+ only)
-├── /orders/:id      (detail)
+  _authenticated._shop_owner  (pathless — shop_owner role)
+  ├── /shops                  _authenticated._shop_owner.shops.index.tsx
+  └── /shops/$id
+      ├── /shops/$id/         _authenticated._shop_owner.shops.$id.tsx
+      ├── /shops/$id/inventory        shops.$id.inventory.tsx
+      ├── /shops/$id/bundles          shops.$id.bundles.tsx
+      ├── /shops/$id/shop-orders      shops.$id.shop-orders.tsx
+      └── /shops/$id/supply-browse    shops.$id.supply-browse.tsx
 
-/dashboard           (customer+ only)
-├── /dashboard/profile
-├── /dashboard/addresses
-└── /dashboard/role-request
-
-/winemaker           (winemaker role)
-├── /winemaker/wines
-├── /winemaker/wines/:id
-├── /winemaker/events
-└── /winemaker/events/:id
-
-/shop                (shop owner role)
-├── /shop/products
-├── /shop/products/:id
-├── /shop/bundles
-├── /shop/bundles/:id
-├── /shop/hours
-└── /shop/orders
-
-/admin               (admin role)
-├── /admin/users
-├── /admin/role-requests
-├── /admin/events
-├── /admin/reviews
-└── /admin/statistics
+  _authenticated._admin       (pathless — admin role)
+  ├── /admin                  _authenticated._admin.admin.tsx
+  ├── /admin/moderation       _authenticated._admin.moderation.tsx
+  ├── /admin/role-requests    _authenticated._admin.role-requests.tsx
+  └── /admin/users            _authenticated._admin.users.tsx
 ```
+
+**Note:** `/admin/statistics` was deferred and is not implemented. `/winemaker/events` is not yet a separate route (events live at `/events`). `/checkout` is not yet a separate route file.
 
 ---
 
@@ -96,10 +87,10 @@ Global, imported from anywhere:
 |-------|-------|----------|-----------|------------|-------|
 | / | ✅ | ✅ | ✅ | ✅ | ✅ |
 | /wines | ✅ | ✅ | ✅ | ✅ | ✅ |
-| /checkout | ❌ | ✅ | ✅ | ✅ | ✅ |
+| /checkout | ✅ | ✅ | ✅ | ✅ | ✅ |
 | /dashboard/* | ❌ | ✅ | ✅ | ✅ | ✅ |
 | /winemaker/* | ❌ | ❌ | ✅ | ❌ | ✅ |
-| /shop/* | ❌ | ❌ | ❌ | ✅ | ✅ |
+| /shops/:id/* | ❌ | ❌ | ❌ | 🔒 | ✅ |
 | /admin/* | ❌ | ❌ | ❌ | ❌ | ✅ |
 
 ---
@@ -131,10 +122,10 @@ Use Tailwind responsive classes: `sm:`, `md:`, `lg:`, `xl:`
 
 ## API Integration
 
-Every route uses Kubb-generated hooks:
+Every route uses Orval-generated hooks:
 
 ```typescript
-import { useGetWines, useCreateWine } from '@repo/api/hooks';
+import { useGetWines, useCreateWine } from '@/generated/wines/wines';
 
 export default function WineCatalog() {
   const { data: wines } = useGetWines({ region: 'Burgundy' });
@@ -142,7 +133,7 @@ export default function WineCatalog() {
 }
 ```
 
-Types auto-generated from OpenAPI spec (see API specification in docs/).
+Generated files live in `apps/web/src/generated/` (excluded from Biome linting and TypeScript strict checks). Regenerate after backend changes with `bun run generate`. Config: `apps/web/orval.config.ts`.
 
 ---
 
@@ -160,3 +151,5 @@ data → Render content
 
 ## Revision History
 - **v1.0** (Week 6) — Frontend route structure from PRD
+- **v1.1** (Week 8) — Updated for multiple shops and guest checkout
+- **v1.2** (Week 11) — Route tree updated to match actual implemented files; admin/statistics deferred noted; pathless layout guards documented

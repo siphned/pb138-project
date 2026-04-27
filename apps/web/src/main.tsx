@@ -1,9 +1,9 @@
+import { ClerkProvider } from "@clerk/react";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { createRouter, RouterProvider } from "@tanstack/react-router";
 import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
 import "./index.css";
-import { ClerkProvider } from "@clerk/react";
 import { AxiosInterceptor } from "./components/AxiosInterceptor.tsx";
 import { UserProvider } from "./context/UserContext.tsx";
 import { routeTree } from "./routeTree.gen.ts";
@@ -20,13 +20,13 @@ declare module "@tanstack/react-router" {
 const PUBLISHABLE_KEY = import.meta.env.VITE_CLERK_PUBLISHABLE_KEY;
 
 if (!PUBLISHABLE_KEY) {
-  throw new Error("Missing Publishable Key");
+  throw new Error("Missing VITE_CLERK_PUBLISHABLE_KEY in .env.local");
 }
 
 // biome-ignore lint/style/noNonNullAssertion: root element is guaranteed to exist in index.html
 createRoot(document.getElementById("root")!).render(
   <StrictMode>
-    <ClerkProvider publishableKey={PUBLISHABLE_KEY} afterSignOutUrl="/">
+    <ClerkProvider afterSignOutUrl="/" publishableKey={PUBLISHABLE_KEY}>
       <AxiosInterceptor>
         <QueryClientProvider client={queryClient}>
           <UserProvider>

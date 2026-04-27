@@ -14,31 +14,11 @@ type AddressData = {
 };
 
 export const shopsRepository = {
-  findAll(): Promise<ShopWithAddress[]> {
-    return db.query.shops.findMany({
-      where: isNull(shops.deletedAt),
-      with: { address: true },
-    }) as Promise<ShopWithAddress[]>;
-  },
-
-  findById(id: string): Promise<ShopWithAddress | undefined> {
-    return db.query.shops.findFirst({
-      where: and(eq(shops.id, id), isNull(shops.deletedAt)),
-      with: { address: true },
-    }) as Promise<ShopWithAddress | undefined>;
-  },
-
-  findByOwnerUserId(ownerUserId: string): Promise<Shop | undefined> {
-    return db.query.shops.findFirst({
-      where: and(eq(shops.ownerUserId, ownerUserId), isNull(shops.deletedAt)),
-    });
-  },
-
   async createShopWithAddress(
     shopData: { ownerUserId: string; name: string; description: string },
     addressData: AddressData
   ): Promise<Shop> {
-    return db.transaction(async (tx) => {
+    return await db.transaction(async (tx) => {
       const [address] = await tx.insert(addresses).values(addressData).returning();
       if (!address) throw new Error("Address insert returned no rows");
 
@@ -49,6 +29,43 @@ export const shopsRepository = {
       if (!shop) throw new Error("Shop insert returned no rows");
 
       return shop;
+    });
+  },
+
+  async findAll(): Promise<ShopWithAddress[]> {
+    const results = await db.query.shops.findMany({
+      where: isNull(shops.deletedAt),
+      with: {
+        address: true,
+      },
+    });
+
+    return results.filter((s) => s.address && !s.address.deletedAt) as ShopWithAddress[];
+  },
+
+  findAllByOwnerUserId(ownerUserId: string): Promise<Shop[]> {
+    return db.query.shops.findMany({
+      where: and(eq(shops.ownerUserId, ownerUserId), isNull(shops.deletedAt)),
+    });
+  },
+
+  async findById(id: string): Promise<ShopWithAddress | undefined> {
+    const result = await db.query.shops.findFirst({
+      where: and(eq(shops.id, id), isNull(shops.deletedAt)),
+      with: {
+        address: true,
+      },
+    });
+
+    if (result?.address && !result.address.deletedAt) {
+      return result as ShopWithAddress;
+    }
+    return undefined;
+  },
+
+  findByOwnerUserId(ownerUserId: string): Promise<Shop | undefined> {
+    return db.query.shops.findFirst({
+      where: and(eq(shops.ownerUserId, ownerUserId), isNull(shops.deletedAt)),
     });
   },
 

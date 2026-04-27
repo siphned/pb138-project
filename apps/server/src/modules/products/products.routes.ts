@@ -10,17 +10,17 @@ import { productsService } from "./products.service";
 
 const shopParams = t.Object({ id: t.String() });
 const shopProductParams = t.Object({ id: t.String(), productId: t.String() });
-const shopBundleParams = t.Object({ id: t.String(), bundleId: t.String() });
+const shopBundleParams = t.Object({ bundleId: t.String(), id: t.String() });
 
 const bundleResponse = t.Object({
-  id: t.String(),
-  shopId: t.String(),
-  name: t.String(),
+  createdAt: t.Date(),
   description: t.Union([t.String(), t.Null()]),
+  id: t.String(),
+  isBundle: t.Boolean(),
+  name: t.String(),
   price: t.String(),
   quantity: t.Integer(),
-  isBundle: t.Boolean(),
-  createdAt: t.Date(),
+  shopId: t.String(),
   updatedAt: t.Union([t.Date(), t.Null()]),
 });
 
@@ -30,6 +30,8 @@ function handleError(e: unknown) {
     if (e.message === "FORBIDDEN") return status(403, "Forbidden");
     if (e.message === "INVALID_WINE") return status(422, "One or more wine IDs are invalid");
     if (e.message === "BUNDLE_MIN_WINES") return status(422, "Bundle requires at least 2 wines");
+    if (e.message === "NOT_ENOUGH_STOCK")
+      return status(422, "Not enough winemaker stock available");
   }
   throw e;
 }
@@ -42,8 +44,12 @@ export const productsRoutes = new Elysia()
   .get(
     "/shops/:id/products",
     async ({ params, query }) => {
-      const isBundle =
-        query.isBundle === "true" ? true : query.isBundle === "false" ? false : undefined;
+      let isBundle: boolean | undefined;
+      if (query.isBundle === "true") {
+        isBundle = true;
+      } else if (query.isBundle === "false") {
+        isBundle = false;
+      }
       try {
         return await productsService.listProducts(params.id, isBundle);
       } catch (e) {
@@ -51,14 +57,14 @@ export const productsRoutes = new Elysia()
       }
     },
     {
-      params: shopParams,
-      query: t.Object({ isBundle: t.Optional(t.String()) }),
       detail: {
-        tags: ["products"],
-        summary: "List products for a shop",
         description:
           "Returns products and bundles for the shop. Filter with `?isBundle=true` or `?isBundle=false`.",
+        summary: "List products for a shop",
+        tags: ["products"],
       },
+      params: shopParams,
+      query: t.Object({ isBundle: t.Optional(t.String()) }),
     }
   )
 
@@ -72,11 +78,11 @@ export const productsRoutes = new Elysia()
       }
     },
     {
-      params: t.Object({ id: t.String() }),
       detail: {
-        tags: ["products"],
         summary: "Get product or bundle by ID",
+        tags: ["products"],
       },
+      params: t.Object({ id: t.String() }),
     }
   )
 
@@ -90,15 +96,15 @@ export const productsRoutes = new Elysia()
       }
     },
     {
-      requireCapability: "shop_owner",
-      params: shopParams,
       body: createProductBody,
-      response: { 201: t.Any(), 403: t.String(), 404: t.String(), 422: t.String() },
       detail: {
-        tags: ["products"],
-        summary: "Create a product",
         security: [{ bearerAuth: [] }],
+        summary: "Create a product",
+        tags: ["products"],
       },
+      params: shopParams,
+      requireRoles: ["shop_owner"],
+      response: { 201: bundleResponse, 403: t.String(), 404: t.String(), 422: t.String() },
     }
   )
 
@@ -112,15 +118,15 @@ export const productsRoutes = new Elysia()
       }
     },
     {
-      requireAuth: true,
-      params: shopProductParams,
       body: updateProductBody,
-      response: { 200: t.Any(), 403: t.String(), 404: t.String(), 422: t.String() },
       detail: {
-        tags: ["products"],
-        summary: "Update a product",
         security: [{ bearerAuth: [] }],
+        summary: "Update a product",
+        tags: ["products"],
       },
+      params: shopProductParams,
+      requireAuth: true,
+      response: { 200: bundleResponse, 403: t.String(), 404: t.String(), 422: t.String() },
     }
   )
 
@@ -135,14 +141,14 @@ export const productsRoutes = new Elysia()
       }
     },
     {
-      requireAuth: true,
-      params: shopProductParams,
-      response: { 204: t.Null(), 403: t.String(), 404: t.String() },
       detail: {
-        tags: ["products"],
-        summary: "Delete a product",
         security: [{ bearerAuth: [] }],
+        summary: "Delete a product",
+        tags: ["products"],
       },
+      params: shopProductParams,
+      requireAuth: true,
+      response: { 204: t.Null(), 403: t.String(), 404: t.String() },
     }
   )
 
@@ -158,15 +164,15 @@ export const productsRoutes = new Elysia()
       }
     },
     {
-      requireCapability: "shop_owner",
-      params: shopParams,
       body: createBundleBody,
-      response: { 201: t.Any(), 403: t.String(), 404: t.String(), 422: t.String() },
       detail: {
-        tags: ["products"],
-        summary: "Create a bundle",
         security: [{ bearerAuth: [] }],
+        summary: "Create a bundle",
+        tags: ["products"],
       },
+      params: shopParams,
+      requireRoles: ["shop_owner"],
+      response: { 201: bundleResponse, 403: t.String(), 404: t.String(), 422: t.String() },
     }
   )
 
@@ -180,15 +186,15 @@ export const productsRoutes = new Elysia()
       }
     },
     {
-      requireAuth: true,
-      params: shopBundleParams,
       body: updateBundleBody,
-      response: { 200: bundleResponse, 403: t.String(), 404: t.String(), 422: t.String() },
       detail: {
-        tags: ["products"],
-        summary: "Update a bundle",
         security: [{ bearerAuth: [] }],
+        summary: "Update a bundle",
+        tags: ["products"],
       },
+      params: shopBundleParams,
+      requireAuth: true,
+      response: { 200: bundleResponse, 403: t.String(), 404: t.String(), 422: t.String() },
     }
   )
 
@@ -203,13 +209,13 @@ export const productsRoutes = new Elysia()
       }
     },
     {
-      requireAuth: true,
-      params: shopBundleParams,
-      response: { 204: t.Null(), 403: t.String(), 404: t.String() },
       detail: {
-        tags: ["products"],
-        summary: "Delete a bundle",
         security: [{ bearerAuth: [] }],
+        summary: "Delete a bundle",
+        tags: ["products"],
       },
+      params: shopBundleParams,
+      requireAuth: true,
+      response: { 204: t.Null(), 403: t.String(), 404: t.String() },
     }
   );

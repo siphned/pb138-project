@@ -45,11 +45,11 @@ export function MyWines({ role = "Winemaker" }: MyWinesProps) {
 
   return (
     <div className="flex flex-col gap-6 space-y-6 mt-6">
-      <Tabs defaultValue="main" className="w-full">
+      <Tabs className="w-full" defaultValue="main">
         <TabsList className="w-full justify-start h-14 bg-secondary/40 rounded-2xl p-1 gap-2">
           <TabsTrigger
-            value="main"
             className="flex-1 rounded-xl data-[state=active]:bg-background data-[state=active]:shadow-sm"
+            value="main"
           >
             {role === "Customer" ? (
               <ShoppingBag className="h-4 w-4 mr-2" />
@@ -60,27 +60,27 @@ export function MyWines({ role = "Winemaker" }: MyWinesProps) {
           </TabsTrigger>
           {role !== "Customer" && (
             <TabsTrigger
-              value="bundles"
               className="flex-1 rounded-xl data-[state=active]:bg-background data-[state=active]:shadow-sm"
+              value="bundles"
             >
               Bundles
             </TabsTrigger>
           )}
           <TabsTrigger
-            value="events"
             className="flex-1 rounded-xl data-[state=active]:bg-background data-[state=active]:shadow-sm"
+            value="events"
           >
             Events
           </TabsTrigger>
         </TabsList>
 
-        <TabsContent value="main" className="mt-6">
+        <TabsContent className="mt-6" value="main">
           <Card className="bg-secondary/40 border-none shadow-none rounded-3xl">
             <CardContent className="p-6 md:p-8">{renderTableContent()}</CardContent>
           </Card>
         </TabsContent>
 
-        <TabsContent value="bundles" className="mt-6">
+        <TabsContent className="mt-6" value="bundles">
           <Card className="bg-secondary/40 border-none shadow-none rounded-3xl">
             <CardContent className="p-6 md:p-8">
               {/* Plug in the Bundles component here! */}
@@ -89,7 +89,7 @@ export function MyWines({ role = "Winemaker" }: MyWinesProps) {
           </Card>
         </TabsContent>
 
-        <TabsContent value="events" className="mt-6">
+        <TabsContent className="mt-6" value="events">
           <Card className="bg-secondary/40 border-none shadow-none rounded-3xl">
             <CardContent className="p-6 md:p-8">
               {/* Plug in the Events component here! */}
@@ -108,36 +108,36 @@ function WinemakerInventory() {
   // Store data in an array so we can render it differently on Mobile vs Desktop
   const inventoryData = [
     {
+      badgeClasses: "bg-[#E8F5E9] text-[#2E7D32] hover:bg-[#E8F5E9]",
       id: 1,
       name: "Chateau Montrose 2018",
-      vintage: "2018",
       qty: 245,
       status: "In Stock",
-      badgeClasses: "bg-[#E8F5E9] text-[#2E7D32] hover:bg-[#E8F5E9]",
+      vintage: "2018",
     },
     {
+      badgeClasses: "bg-[#FFF3E0] text-[#EF6C00] hover:bg-[#FFF3E0]",
       id: 2,
       name: "La Dame de Montrose 2019",
-      vintage: "2019",
       qty: 8,
       status: "Low Stock",
-      badgeClasses: "bg-[#FFF3E0] text-[#EF6C00] hover:bg-[#FFF3E0]",
+      vintage: "2019",
     },
     {
+      badgeClasses: "bg-[#FFEBEE] text-[#C62828] hover:bg-[#FFEBEE]",
       id: 3,
       name: "Tertio de Montrose 2020",
-      vintage: "2020",
       qty: 0,
       status: "Out of Stock",
-      badgeClasses: "bg-[#FFEBEE] text-[#C62828] hover:bg-[#FFEBEE]",
+      vintage: "2020",
     },
     {
+      badgeClasses: "bg-[#E8F5E9] text-[#2E7D32] hover:bg-[#E8F5E9]",
       id: 4,
       name: "Montrose Rose 2021",
-      vintage: "2021",
       qty: 156,
       status: "In Stock",
-      badgeClasses: "bg-[#E8F5E9] text-[#2E7D32] hover:bg-[#E8F5E9]",
+      vintage: "2021",
     },
   ];
 
@@ -186,7 +186,7 @@ function WinemakerInventory() {
           </TableHeader>
           <TableBody>
             {inventoryData.map((wine) => (
-              <TableRow key={wine.id} className="border-border/50 border-b">
+              <TableRow className="border-border/50 border-b" key={wine.id}>
                 <TableCell className="font-medium text-sm">{wine.name}</TableCell>
                 <TableCell className="text-center text-muted-foreground text-sm">
                   {wine.vintage}
@@ -196,7 +196,7 @@ function WinemakerInventory() {
                   <Badge className={`${wine.badgeClasses} border-none`}>{wine.status}</Badge>
                 </TableCell>
                 <TableCell className="text-right">
-                  <Button variant="ghost" size="icon" className="h-8 w-8 text-muted-foreground">
+                  <Button className="h-8 w-8 text-muted-foreground" size="icon" variant="ghost">
                     <MoreHorizontal className="h-4 w-4" />
                   </Button>
                 </TableCell>
@@ -210,8 +210,8 @@ function WinemakerInventory() {
       <div className="block md:hidden flex flex-col">
         {inventoryData.map((wine) => (
           <div
-            key={wine.id}
             className="flex justify-between py-5 border-b border-border/50 last:border-0"
+            key={wine.id}
           >
             <div className="flex flex-col gap-1.5">
               <span className="font-heading font-semibold text-[15px]">{wine.name}</span>
@@ -224,7 +224,7 @@ function WinemakerInventory() {
                 </Badge>
               </div>
             </div>
-            <Button variant="ghost" size="icon" className="h-8 w-8 -mr-2 text-muted-foreground">
+            <Button className="h-8 w-8 -mr-2 text-muted-foreground" size="icon" variant="ghost">
               <MoreHorizontal className="h-5 w-5" />
             </Button>
           </div>
@@ -242,14 +242,14 @@ function ShopOwnerInventory() {
     {
       id: 1,
       name: "Chateau Montrose 2018",
-      winemaker: "Chateau Montrose",
       qty: 24,
+      winemaker: "Chateau Montrose",
     },
     {
       id: 2,
       name: "La Dame de Montrose 2019",
-      winemaker: "Chateau Montrose",
       qty: 8,
+      winemaker: "Chateau Montrose",
     },
   ];
 
@@ -293,12 +293,12 @@ function ShopOwnerInventory() {
           </TableHeader>
           <TableBody>
             {shopData.map((wine) => (
-              <TableRow key={wine.id} className="border-border/50 border-b">
+              <TableRow className="border-border/50 border-b" key={wine.id}>
                 <TableCell className="font-medium text-sm">{wine.name}</TableCell>
                 <TableCell className="text-muted-foreground text-sm">{wine.winemaker}</TableCell>
                 <TableCell className="text-center font-medium text-sm">{wine.qty}</TableCell>
                 <TableCell className="text-right">
-                  <Button variant="ghost" size="icon" className="h-8 w-8 text-muted-foreground">
+                  <Button className="h-8 w-8 text-muted-foreground" size="icon" variant="ghost">
                     <MoreHorizontal className="h-4 w-4" />
                   </Button>
                 </TableCell>
@@ -312,8 +312,8 @@ function ShopOwnerInventory() {
       <div className="block md:hidden flex flex-col">
         {shopData.map((wine) => (
           <div
-            key={wine.id}
             className="flex justify-between py-5 border-b border-border/50 last:border-0"
+            key={wine.id}
           >
             <div className="flex flex-col gap-1.5">
               <span className="font-heading font-semibold text-[15px]">{wine.name}</span>
@@ -321,7 +321,7 @@ function ShopOwnerInventory() {
                 {wine.winemaker} <span className="mx-1">|</span> Qty: {wine.qty}
               </span>
             </div>
-            <Button variant="ghost" size="icon" className="h-8 w-8 -mr-2 text-muted-foreground">
+            <Button className="h-8 w-8 -mr-2 text-muted-foreground" size="icon" variant="ghost">
               <MoreHorizontal className="h-5 w-5" />
             </Button>
           </div>
@@ -337,22 +337,22 @@ function ShopOwnerInventory() {
 function CustomerOrderHistory() {
   const orderData = [
     {
-      id: 1,
-      orderId: "#ORD-7392",
-      date: "April 12, 2026",
-      items: "3 Bottles",
-      total: "€425.00",
-      status: "Delivered",
       badgeClasses: "bg-[#E8F5E9] text-[#2E7D32] hover:bg-[#E8F5E9]",
+      date: "April 12, 2026",
+      id: 1,
+      items: "3 Bottles",
+      orderId: "#ORD-7392",
+      status: "Delivered",
+      total: "€425.00",
     },
     {
-      id: 2,
-      orderId: "#ORD-7391",
-      date: "March 28, 2026",
-      items: "1 Bottle",
-      total: "€150.00",
-      status: "Processing",
       badgeClasses: "bg-[#FFF3E0] text-[#EF6C00] hover:bg-[#FFF3E0]",
+      date: "March 28, 2026",
+      id: 2,
+      items: "1 Bottle",
+      orderId: "#ORD-7391",
+      status: "Processing",
+      total: "€150.00",
     },
   ];
 
@@ -392,7 +392,7 @@ function CustomerOrderHistory() {
           </TableHeader>
           <TableBody>
             {orderData.map((order) => (
-              <TableRow key={order.id} className="border-border/50 border-b">
+              <TableRow className="border-border/50 border-b" key={order.id}>
                 <TableCell className="font-medium text-primary flex items-center gap-1 hover:underline cursor-pointer text-sm">
                   {order.orderId} <ArrowUpRight className="h-3 w-3" />
                 </TableCell>
@@ -412,8 +412,8 @@ function CustomerOrderHistory() {
       <div className="block md:hidden flex flex-col">
         {orderData.map((order) => (
           <div
-            key={order.id}
             className="flex justify-between items-center py-5 border-b border-border/50 last:border-0"
+            key={order.id}
           >
             <div className="flex flex-col gap-1.5">
               <span className="font-heading font-semibold text-[15px] text-primary flex items-center gap-1">
@@ -442,20 +442,20 @@ function CustomerOrderHistory() {
 function BundlesList() {
   const bundlesData = [
     {
+      badgeClasses: "bg-[#E8F5E9] text-[#2E7D32] hover:bg-[#E8F5E9]",
       id: 1,
-      name: "Holiday Red Trio",
       items: "3 Bottles",
+      name: "Holiday Red Trio",
       price: "€120.00",
       status: "Active",
-      badgeClasses: "bg-[#E8F5E9] text-[#2E7D32] hover:bg-[#E8F5E9]",
     },
     {
+      badgeClasses: "bg-secondary text-secondary-foreground hover:bg-secondary",
       id: 2,
-      name: "Summer White Duo",
       items: "2 Bottles",
+      name: "Summer White Duo",
       price: "€45.00",
       status: "Draft",
-      badgeClasses: "bg-secondary text-secondary-foreground hover:bg-secondary",
     },
   ];
 
@@ -490,7 +490,7 @@ function BundlesList() {
           </TableHeader>
           <TableBody>
             {bundlesData.map((bundle) => (
-              <TableRow key={bundle.id} className="border-border/50 border-b">
+              <TableRow className="border-border/50 border-b" key={bundle.id}>
                 <TableCell className="font-medium text-sm">{bundle.name}</TableCell>
                 <TableCell className="text-center text-muted-foreground text-sm">
                   {bundle.items}
@@ -500,7 +500,7 @@ function BundlesList() {
                   <Badge className={`${bundle.badgeClasses} border-none`}>{bundle.status}</Badge>
                 </TableCell>
                 <TableCell className="text-right">
-                  <Button variant="ghost" size="icon" className="h-8 w-8 text-muted-foreground">
+                  <Button className="h-8 w-8 text-muted-foreground" size="icon" variant="ghost">
                     <MoreHorizontal className="h-4 w-4" />
                   </Button>
                 </TableCell>
@@ -514,8 +514,8 @@ function BundlesList() {
       <div className="block md:hidden flex flex-col">
         {bundlesData.map((bundle) => (
           <div
-            key={bundle.id}
             className="flex justify-between items-center py-5 border-b border-border/50 last:border-0"
+            key={bundle.id}
           >
             <div className="flex flex-col gap-1.5">
               <span className="font-heading font-semibold text-[15px]">{bundle.name}</span>
@@ -528,7 +528,7 @@ function BundlesList() {
                 </Badge>
               </div>
             </div>
-            <Button variant="ghost" size="icon" className="h-8 w-8 -mr-2 text-muted-foreground">
+            <Button className="h-8 w-8 -mr-2 text-muted-foreground" size="icon" variant="ghost">
               <MoreHorizontal className="h-5 w-5" />
             </Button>
           </div>
@@ -544,22 +544,22 @@ function BundlesList() {
 function EventsList() {
   const eventsData = [
     {
-      id: 1,
-      name: "Spring Tasting 2026",
-      date: "May 15, 2026",
-      location: "Paris, FR",
       attendees: "45 / 50",
-      status: "Upcoming",
       badgeClasses: "bg-[#E3F2FD] text-[#1976D2] hover:bg-[#E3F2FD]",
+      date: "May 15, 2026",
+      id: 1,
+      location: "Paris, FR",
+      name: "Spring Tasting 2026",
+      status: "Upcoming",
     },
     {
-      id: 2,
-      name: "Winemaker Dinner",
-      date: "June 02, 2026",
-      location: "Lyon, FR",
       attendees: "12 / 20",
-      status: "Upcoming",
       badgeClasses: "bg-[#E3F2FD] text-[#1976D2] hover:bg-[#E3F2FD]",
+      date: "June 02, 2026",
+      id: 2,
+      location: "Lyon, FR",
+      name: "Winemaker Dinner",
+      status: "Upcoming",
     },
   ];
 
@@ -596,7 +596,7 @@ function EventsList() {
           </TableHeader>
           <TableBody>
             {eventsData.map((event) => (
-              <TableRow key={event.id} className="border-border/50 border-b">
+              <TableRow className="border-border/50 border-b" key={event.id}>
                 <TableCell className="font-medium text-sm">{event.name}</TableCell>
                 <TableCell className="text-center text-muted-foreground text-sm">
                   {event.date} • {event.location}
@@ -606,7 +606,7 @@ function EventsList() {
                   <Badge className={`${event.badgeClasses} border-none`}>{event.status}</Badge>
                 </TableCell>
                 <TableCell className="text-right">
-                  <Button variant="ghost" size="icon" className="h-8 w-8 text-muted-foreground">
+                  <Button className="h-8 w-8 text-muted-foreground" size="icon" variant="ghost">
                     <MoreHorizontal className="h-4 w-4" />
                   </Button>
                 </TableCell>
@@ -620,8 +620,8 @@ function EventsList() {
       <div className="block md:hidden flex flex-col">
         {eventsData.map((event) => (
           <div
-            key={event.id}
             className="flex justify-between items-center py-5 border-b border-border/50 last:border-0"
+            key={event.id}
           >
             <div className="flex flex-col gap-1.5">
               <span className="font-heading font-semibold text-[15px]">{event.name}</span>
@@ -637,7 +637,7 @@ function EventsList() {
                 </span>
               </div>
             </div>
-            <Button variant="ghost" size="icon" className="h-8 w-8 -mr-2 text-muted-foreground">
+            <Button className="h-8 w-8 -mr-2 text-muted-foreground" size="icon" variant="ghost">
               <MoreHorizontal className="h-5 w-5" />
             </Button>
           </div>

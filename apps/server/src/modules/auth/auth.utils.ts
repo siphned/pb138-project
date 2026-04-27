@@ -1,9 +1,9 @@
 import { verifyToken } from "@clerk/backend";
 
+export type AppRole = "customer" | "winemaker" | "shop_owner" | "admin";
+
 export type ClerkPayload = Awaited<ReturnType<typeof verifyToken>> & {
-  role?: "user" | "admin";
-  is_winemaker?: boolean;
-  is_shop_owner?: boolean;
+  roles?: AppRole[];
 };
 
 export async function verifyClerkToken(
@@ -21,8 +21,8 @@ export async function verifyClerkToken(
 
   try {
     const payload = await verifyToken(token, {
-      jwtKey: CLERK_JWT_KEY,
       authorizedParties: [FRONTEND_URL],
+      jwtKey: CLERK_JWT_KEY,
     });
     return payload as ClerkPayload;
   } catch {

@@ -1,6 +1,5 @@
 {
   "$schema": "https://turborepo.dev/schema.json",
-  "ui": "tui",
   "tasks": {
     "build": {
       "dependsOn": ["^build"],
@@ -10,12 +9,17 @@
     "check-types": {
       "dependsOn": ["^check-types"]
     },
+    "db:seed": {
+      "cache": false
+    },
     "dev": {
       "cache": false,
       "persistent": true
     },
     "generate": {
-      "cache": false
+      "cache": false,
+      "dependsOn": ["^generate"],
+      "outputs": ["openapi.json", "src/generated/**"]
     },
     "test": {
       "cache": false,
@@ -25,5 +29,6 @@
       "cache": false,
       "outputs": ["test-results/**"]
     }
-  }
+  },
+  "ui": "tui"
 }

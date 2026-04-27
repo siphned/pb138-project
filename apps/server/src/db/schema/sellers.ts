@@ -1,38 +1,38 @@
-import { pgTable, text, timestamp, uuid, varchar } from "drizzle-orm/pg-core";
+import { pgTable, text, uuid, varchar } from "drizzle-orm/pg-core";
 import { addresses } from "./addresses";
+import { timestamptz } from "./helpers";
 import { users } from "./users";
 
 export const winemakers = pgTable("winemakers", {
+  addressId: uuid("address_id")
+    .notNull()
+    .references(() => addresses.id),
+  createdAt: timestamptz("created_at").notNull().defaultNow(),
+  deletedAt: timestamptz("deleted_at"),
+  description: text("description").notNull(),
+  email: text("email"),
   id: uuid("id").primaryKey().defaultRandom(),
+  name: varchar("name", { length: 255 }).notNull(),
+  phone: varchar("phone", { length: 20 }),
+  updatedAt: timestamptz("updated_at"),
   userId: uuid("user_id")
     .notNull()
     .unique()
     .references(() => users.id),
-  name: text("name").notNull().unique(),
-  description: text("description").notNull(),
-  websiteUrl: text("websiteurl"),
-  email: varchar("email", { length: 255 }).notNull(),
-  phone: varchar("phone", { length: 30 }).notNull(),
-  addressId: uuid("address_id")
-    .notNull()
-    .references(() => addresses.id),
-  createdAt: timestamp("created_at").notNull().defaultNow(),
-  updatedAt: timestamp("updated_at"),
-  deletedAt: timestamp("deleted_at"),
+  websiteUrl: text("website_url"),
 });
 
 export const shops = pgTable("shops", {
-  id: uuid("id").primaryKey().defaultRandom(),
-  ownerUserId: uuid("owner_user_id")
-    .notNull()
-    .unique()
-    .references(() => users.id),
-  name: varchar("name", { length: 255 }).notNull(),
-  description: text("description").notNull(),
   addressId: uuid("address_id")
     .notNull()
     .references(() => addresses.id),
-  createdAt: timestamp("created_at").notNull().defaultNow(),
-  updatedAt: timestamp("updated_at"),
-  deletedAt: timestamp("deleted_at"),
+  createdAt: timestamptz("created_at").notNull().defaultNow(),
+  deletedAt: timestamptz("deleted_at"),
+  description: text("description").notNull(),
+  id: uuid("id").primaryKey().defaultRandom(),
+  name: varchar("name", { length: 255 }).notNull(),
+  ownerUserId: uuid("owner_user_id")
+    .notNull()
+    .references(() => users.id),
+  updatedAt: timestamptz("updated_at"),
 });

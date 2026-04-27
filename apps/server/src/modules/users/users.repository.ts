@@ -4,6 +4,23 @@ import type { Address, NewAddress, NewUser, User } from "../../db/schema";
 import { addresses, users } from "../../db/schema";
 
 export const usersRepository = {
+  async create(data: NewUser): Promise<User> {
+    const [user] = await db.insert(users).values(data).returning();
+    if (!user) throw new Error("Insert returned no rows");
+    return user;
+  },
+
+  async createAddress(data: NewAddress): Promise<Address> {
+    const [address] = await db.insert(addresses).values(data).returning();
+    if (!address) throw new Error("Insert returned no rows");
+    return address;
+  },
+
+  async findAddressById(id: string): Promise<Address | undefined> {
+    return await db.query.addresses.findFirst({
+      where: eq(addresses.id, id),
+    });
+  },
   findByClerkId(clerkId: string): Promise<User | undefined> {
     return db.query.users.findFirst({
       where: eq(users.clerkId, clerkId),
@@ -16,10 +33,17 @@ export const usersRepository = {
     });
   },
 
-  async create(data: NewUser): Promise<User> {
-    const [user] = await db.insert(users).values(data).returning();
-    if (!user) throw new Error("Insert returned no rows");
-    return user;
+  async updateById(
+    id: string,
+    data: Partial<Pick<User, "fname" | "lname" | "shippingAddressId" | "billingAddressId">>
+  ): Promise<User> {
+    const [updated] = await db
+      .update(users)
+      .set({ ...data, updatedAt: new Date() })
+      .where(eq(users.id, id))
+      .returning();
+    if (!updated) throw new Error("User not found");
+    return updated;
   },
 
   // Idempotent insert: if clerk_id already exists (concurrent first-login race),
@@ -39,30 +63,5 @@ export const usersRepository = {
     });
     if (!existing) throw new Error("User not found after upsert");
     return existing;
-  },
-
-  async updateById(
-    id: string,
-    data: Partial<Pick<User, "fname" | "lname" | "shippingAddressId" | "billingAddressId" | "role">>
-  ): Promise<User> {
-    const [updated] = await db
-      .update(users)
-      .set({ ...data, updatedAt: new Date() })
-      .where(eq(users.id, id))
-      .returning();
-    if (!updated) throw new Error("User not found");
-    return updated;
-  },
-
-  async createAddress(data: NewAddress): Promise<Address> {
-    const [address] = await db.insert(addresses).values(data).returning();
-    if (!address) throw new Error("Insert returned no rows");
-    return address;
-  },
-
-  async findAddressById(id: string): Promise<Address | undefined> {
-    return db.query.addresses.findFirst({
-      where: eq(addresses.id, id),
-    });
   },
 };

@@ -1,12 +1,12 @@
-import { integer, pgTable, text, timestamp, uuid, varchar } from "drizzle-orm/pg-core";
+import { pgTable, text, uuid } from "drizzle-orm/pg-core";
+import { timestamptz } from "./helpers";
 
 export const images = pgTable("images", {
-  id: uuid("id").primaryKey().defaultRandom(),
-  url: text("url").notNull(),
-  altText: text("alt_text"),
-  entityType: varchar("entity_type", { length: 50 }).notNull(),
+  createdAt: timestamptz("created_at").notNull().defaultNow(),
+  deletedAt: timestamptz("deleted_at"),
   entityId: uuid("entity_id").notNull(),
-  sortOrder: integer("sort_order").default(0),
-  createdAt: timestamp("created_at").notNull().defaultNow(),
-  updatedAt: timestamp("updated_at"),
+  entityType: text("entity_type").notNull(), // "wine", "event", "review"
+  id: uuid("id").primaryKey().defaultRandom(),
+  updatedAt: timestamptz("updated_at"),
+  url: text("url").notNull(),
 });

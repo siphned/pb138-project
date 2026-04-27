@@ -1,17 +1,31 @@
-import { pgTable, text, timestamp, uuid, varchar } from "drizzle-orm/pg-core";
+import { pgTable, text, uuid, varchar } from "drizzle-orm/pg-core";
 import { addresses } from "./addresses";
-import { userRoleEnum } from "./enums";
+import { userStatusEnum } from "./enums";
+import { timestamptz } from "./helpers";
 
 export const users = pgTable("users", {
-  id: uuid("id").primaryKey().defaultRandom(),
-  clerkId: text("clerk_id").notNull().unique(),
-  fname: varchar("fname", { length: 30 }).notNull(),
-  lname: varchar("lname", { length: 30 }).notNull(),
-  email: text("email").notNull().unique(),
-  role: userRoleEnum("role").notNull().default("user"),
-  shippingAddressId: uuid("shipping_address_id").references(() => addresses.id),
   billingAddressId: uuid("billing_address_id").references(() => addresses.id),
-  createdAt: timestamp("created_at").notNull().defaultNow(),
-  updatedAt: timestamp("updated_at"),
-  deletedAt: timestamp("deleted_at"),
+  clerkId: text("clerk_id").notNull().unique(),
+  createdAt: timestamptz("created_at").notNull().defaultNow(),
+  deletedAt: timestamptz("deleted_at"),
+  email: text("email").notNull().unique(),
+  fname: varchar("fname", { length: 30 }).notNull(),
+  id: uuid("id").primaryKey().defaultRandom(),
+  lname: varchar("lname", { length: 30 }).notNull(),
+  shippingAddressId: uuid("shipping_address_id").references(() => addresses.id),
+  status: userStatusEnum("status").notNull().default("active"),
+  updatedAt: timestamptz("updated_at"),
 });
+
+export const userRoles = pgTable("user_roles", {
+  createdAt: timestamptz("created_at").notNull().defaultNow(),
+  deletedAt: timestamptz("deleted_at"),
+  id: uuid("id").primaryKey().defaultRandom(),
+  role: varchar("role", { length: 50 }).notNull(),
+  updatedAt: timestamptz("updated_at"),
+  userId: uuid("user_id")
+    .notNull()
+    .references(() => users.id, { onDelete: "cascade" }),
+});
+
+export type UserRole = typeof userRoles.$inferSelect;

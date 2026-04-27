@@ -7,25 +7,25 @@ import { defineConfig } from "vite";
 // https://vite.dev/config/
 export default defineConfig({
   plugins: [
-    TanStackRouterVite({ target: "react", autoCodeSplitting: true }),
+    TanStackRouterVite({ autoCodeSplitting: true, target: "react" }),
     react(),
     tailwindcss(),
   ],
-  server: {
-    proxy: {
-      "/profile": "http://localhost:3000",
-      "/api": {
-        target: "http://localhost:3000",
-        changeOrigin: true,
-        rewrite: (path) => path.replace(/^\/api/, ""),
-      },
-    },
-  },
   resolve: {
     alias: {
       "@": fileURLToPath(new URL("./src", import.meta.url)),
       "@repo/shared": fileURLToPath(new URL("../../packages/shared/src/index.ts", import.meta.url)),
     },
     dedupe: ["react", "react-dom"],
+  },
+  server: {
+    proxy: {
+      "/api": {
+        changeOrigin: true,
+        rewrite: (path) => path.replace(/^\/api/, ""),
+        target: "http://localhost:3000",
+      },
+      "/profile": "http://localhost:3000",
+    },
   },
 });

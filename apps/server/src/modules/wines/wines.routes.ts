@@ -7,14 +7,14 @@ export const winesRoutes = new Elysia()
   .use(authPlugin)
 
   .get("/wines", ({ query }) => winesService.listWines(query), {
-    query: wineFiltersQuery,
-    response: { 200: t.Array(wineResponse) },
     detail: {
-      tags: ["wines"],
-      summary: "List wines",
       description:
         "Returns all non-deleted wines. Filterable by region, type, color, vintageYear, winemakerId.",
+      summary: "List wines",
+      tags: ["wines"],
     },
+    query: wineFiltersQuery,
+    response: { 200: t.Array(wineResponse) },
   })
 
   .get(
@@ -28,13 +28,13 @@ export const winesRoutes = new Elysia()
       }
     },
     {
+      detail: {
+        description: "Returns a single wine with winemaker info. 404 if not found or deleted.",
+        summary: "Get wine by ID",
+        tags: ["wines"],
+      },
       params: t.Object({ id: t.String() }),
       response: { 200: wineResponse, 404: t.String() },
-      detail: {
-        tags: ["wines"],
-        summary: "Get wine by ID",
-        description: "Returns a single wine with winemaker info. 404 if not found or deleted.",
-      },
     }
   )
 
@@ -50,23 +50,23 @@ export const winesRoutes = new Elysia()
       }
     },
     {
-      requireCapability: "winemaker",
       body: createWineBody,
-      response: { 201: wineResponse, 404: t.String() },
       detail: {
-        tags: ["wines"],
-        summary: "Create wine",
         description: "Creates a wine under the authenticated winemaker profile.",
         security: [{ bearerAuth: [] }],
+        summary: "Create wine",
+        tags: ["wines"],
       },
+      requireRoles: ["winemaker"],
+      response: { 201: wineResponse, 404: t.String() },
     }
   )
 
   .put(
     "/wines/:id",
-    async ({ params, dbUser, body }) => {
+    async ({ params, dbUser, clerkPayload, body }) => {
       try {
-        return await winesService.replaceWine(params.id, dbUser.id, dbUser.role, body);
+        return await winesService.replaceWine(params.id, dbUser.id, clerkPayload.roles ?? [], body);
       } catch (e: unknown) {
         if (e instanceof Error) {
           if (e.message === "NOT_FOUND") return status(404, "Wine not found");
@@ -76,24 +76,24 @@ export const winesRoutes = new Elysia()
       }
     },
     {
-      requireAuth: true,
-      params: t.Object({ id: t.String() }),
       body: updateWineBody,
-      response: { 200: wineResponse, 403: t.String(), 404: t.String() },
       detail: {
-        tags: ["wines"],
-        summary: "Replace wine",
         description: "Full replacement of a wine. Must be own wine or admin.",
         security: [{ bearerAuth: [] }],
+        summary: "Replace wine",
+        tags: ["wines"],
       },
+      params: t.Object({ id: t.String() }),
+      requireRoles: ["winemaker", "admin"],
+      response: { 200: wineResponse, 403: t.String(), 404: t.String() },
     }
   )
 
   .delete(
     "/wines/:id",
-    async ({ params, dbUser }) => {
+    async ({ params, dbUser, clerkPayload }) => {
       try {
-        await winesService.deleteWine(params.id, dbUser.id, dbUser.role);
+        await winesService.deleteWine(params.id, dbUser.id, clerkPayload.roles ?? []);
         return status(204, null);
       } catch (e: unknown) {
         if (e instanceof Error) {
@@ -104,14 +104,14 @@ export const winesRoutes = new Elysia()
       }
     },
     {
-      requireAuth: true,
-      params: t.Object({ id: t.String() }),
-      response: { 204: t.Null(), 403: t.String(), 404: t.String() },
       detail: {
-        tags: ["wines"],
-        summary: "Delete wine",
         description: "Soft-deletes a wine. Must be own wine or admin.",
         security: [{ bearerAuth: [] }],
+        summary: "Delete wine",
+        tags: ["wines"],
       },
+      params: t.Object({ id: t.String() }),
+      requireRoles: ["winemaker", "admin"],
+      response: { 204: t.Null(), 403: t.String(), 404: t.String() },
     }
   );

@@ -1,0 +1,125 @@
+import { Elysia, status, t } from "elysia";
+import { authPlugin } from "../auth";
+import { supplyAgreementsService } from "./supply-agreements.service";
+
+function handleError(e: unknown) {
+  if (e instanceof Error) {
+    if (e.message === "NOT_FOUND") return status(404, "Not found");
+    if (e.message === "FORBIDDEN") return status(403, "Forbidden");
+    if (e.message === "ALREADY_RESPONDED") return status(422, "Already responded to this request");
+    if (e.message === "NOT_A_WINEMAKER") return status(403, "User is not a winemaker");
+  }
+  throw e;
+}
+
+const agreementResponse = t.Object({
+  createdAt: t.Date(),
+  id: t.String(),
+  respondedAt: t.Union([t.Date(), t.Null()]),
+  shopId: t.String(),
+  status: t.String(),
+  winemakerId: t.String(),
+});
+
+const errorResponse = {
+  403: t.String(),
+  404: t.String(),
+  422: t.String(),
+};
+
+export const supplyAgreementsRoutes = new Elysia({
+  prefix: "/supply-agreements",
+  tags: ["supply-agreements"],
+})
+  .use(authPlugin)
+
+  .post(
+    "/",
+    async ({ dbUser, body }) => {
+      try {
+        return await supplyAgreementsService.createRequest(
+          dbUser.id,
+          body.winemakerId,
+          body.shopId
+        );
+      } catch (e) {
+        return handleError(e);
+      }
+    },
+    {
+      body: t.Object({
+        shopId: t.String(),
+        winemakerId: t.String(),
+      }),
+      detail: {
+        description: "A shop owner requests a supply agreement from a winemaker.",
+        security: [{ bearerAuth: [] }],
+        summary: "Create a supply agreement request",
+      },
+      requireRoles: ["shop_owner"],
+      response: { 200: agreementResponse, ...errorResponse },
+    }
+  )
+
+  .patch(
+    "/:id",
+    async ({ dbUser, params, body }) => {
+      try {
+        return await supplyAgreementsService.respondToRequest(dbUser.id, params.id, body.status);
+      } catch (e) {
+        return handleError(e);
+      }
+    },
+    {
+      body: t.Object({
+        status: t.Union([t.Literal("approved"), t.Literal("rejected")]),
+      }),
+      detail: {
+        description: "A winemaker approves or rejects a supply agreement request.",
+        security: [{ bearerAuth: [] }],
+        summary: "Respond to a supply agreement request",
+      },
+      params: t.Object({ id: t.String() }),
+      requireRoles: ["winemaker"],
+      response: { 200: agreementResponse, ...errorResponse },
+    }
+  )
+
+  .get(
+    "/shop/:shopId",
+    async ({ dbUser, params }) => {
+      try {
+        return await supplyAgreementsService.listForShop(dbUser.id, params.shopId);
+      } catch (e) {
+        return handleError(e);
+      }
+    },
+    {
+      detail: {
+        security: [{ bearerAuth: [] }],
+        summary: "List supply agreements for a shop",
+      },
+      params: t.Object({ shopId: t.String() }),
+      requireRoles: ["shop_owner"],
+      response: { 200: t.Array(agreementResponse), ...errorResponse },
+    }
+  )
+
+  .get(
+    "/winemaker",
+    async ({ dbUser }) => {
+      try {
+        return await supplyAgreementsService.listForWinemaker(dbUser.id);
+      } catch (e) {
+        return handleError(e);
+      }
+    },
+    {
+      detail: {
+        security: [{ bearerAuth: [] }],
+        summary: "List supply agreements for the authenticated winemaker",
+      },
+      requireRoles: ["winemaker"],
+      response: { 200: t.Array(agreementResponse), ...errorResponse },
+    }
+  );

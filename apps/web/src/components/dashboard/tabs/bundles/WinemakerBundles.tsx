@@ -24,31 +24,31 @@ export function WinemakerBundles() {
   // Mock data reflecting your database relationships
   const bundlesData = [
     {
+      badgeClasses: "bg-[#E8F5E9] text-[#2E7D32] hover:bg-[#E8F5E9]",
+      creatableQty: 14,
       id: 1,
-      name: "Holiday Red Trio",
       items: "3 Bottles (Montrose 2018, 2019, 2020)",
+      name: "Holiday Red Trio", // How many can be made from current inventory
       price: "€320.00",
-      creatableQty: 14, // How many can be made from current inventory
       status: "Active",
-      badgeClasses: "bg-[#E8F5E9] text-[#2E7D32] hover:bg-[#E8F5E9]",
     },
     {
-      id: 2,
-      name: "Summer Rosé Special",
-      items: "6 Bottles (Montrose Rose 2021)",
-      price: "€150.00",
+      badgeClasses: "bg-[#E8F5E9] text-[#2E7D32] hover:bg-[#E8F5E9]",
       creatableQty: 26,
+      id: 2,
+      items: "6 Bottles (Montrose Rose 2021)",
+      name: "Summer Rosé Special",
+      price: "€150.00",
       status: "Active",
-      badgeClasses: "bg-[#E8F5E9] text-[#2E7D32] hover:bg-[#E8F5E9]",
     },
     {
-      id: 3,
-      name: "Collector's Vertical",
-      items: "5 Bottles (Rare Vintages)",
-      price: "€850.00",
-      creatableQty: 0, // Missing inventory for this bundle
-      status: "Out of Stock",
       badgeClasses: "bg-[#FFEBEE] text-[#C62828] hover:bg-[#FFEBEE]",
+      creatableQty: 0,
+      id: 3,
+      items: "5 Bottles (Rare Vintages)",
+      name: "Collector's Vertical", // Missing inventory for this bundle
+      price: "€850.00",
+      status: "Out of Stock",
     },
   ];
 
@@ -66,7 +66,7 @@ export function WinemakerBundles() {
           <Package className="h-5 w-5" /> My Bundles
         </div>
         <div className="flex items-center gap-3 w-full md:w-auto">
-          <Select value={statusFilter} onValueChange={(val) => setStatusFilter(val || "all")}>
+          <Select onValueChange={(val) => setStatusFilter(val || "all")} value={statusFilter}>
             <SelectTrigger className="w-full sm:w-[140px] bg-background border-none rounded-lg h-10">
               <SelectValue placeholder="Status" />
             </SelectTrigger>
@@ -103,7 +103,7 @@ export function WinemakerBundles() {
           </TableHeader>
           <TableBody>
             {filteredData.map((bundle) => (
-              <TableRow key={bundle.id} className="border-border/50 border-b">
+              <TableRow className="border-border/50 border-b" key={bundle.id}>
                 <TableCell className="font-medium text-sm">{bundle.name}</TableCell>
                 <TableCell className="text-muted-foreground text-xs">{bundle.items}</TableCell>
                 <TableCell className="text-center font-medium text-sm">
@@ -118,7 +118,7 @@ export function WinemakerBundles() {
                   <Badge className={`${bundle.badgeClasses} border-none`}>{bundle.status}</Badge>
                 </TableCell>
                 <TableCell className="text-right">
-                  <Button variant="ghost" size="icon" className="h-8 w-8 text-muted-foreground">
+                  <Button className="h-8 w-8 text-muted-foreground" size="icon" variant="ghost">
                     <MoreHorizontal className="h-4 w-4" />
                   </Button>
                 </TableCell>
@@ -132,8 +132,8 @@ export function WinemakerBundles() {
       <div className="md:hidden flex flex-col">
         {filteredData.map((bundle) => (
           <div
-            key={bundle.id}
             className="flex justify-between py-5 border-b border-border/50 last:border-0"
+            key={bundle.id}
           >
             <div className="flex flex-col gap-1.5 w-full pr-4">
               <span className="font-heading font-semibold text-[15px] truncate">{bundle.name}</span>
@@ -151,9 +151,9 @@ export function WinemakerBundles() {
               </div>
             </div>
             <Button
-              variant="ghost"
-              size="icon"
               className="h-8 w-8 shrink-0 -mr-2 text-muted-foreground"
+              size="icon"
+              variant="ghost"
             >
               <MoreHorizontal className="h-5 w-5" />
             </Button>

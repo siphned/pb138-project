@@ -1,51 +1,65 @@
-import { pgTable, text, timestamp, uuid, varchar } from "drizzle-orm/pg-core";
+import { pgTable, smallint, text, uuid, varchar } from "drizzle-orm/pg-core";
 import { addresses } from "./addresses";
-import { eventInviteStatusEnum, eventVisibilityEnum } from "./enums";
+import { eventStatusEnum, eventVisibilityEnum } from "./enums";
 import { timestamptz } from "./helpers";
 import { winemakers } from "./sellers";
 import { users } from "./users";
 
 export const events = pgTable("events", {
-  id: uuid("id").primaryKey().defaultRandom(),
-  winemakerId: uuid("winemaker_id")
-    .notNull()
-    .references(() => winemakers.id),
-  name: varchar("name", { length: 255 }).notNull(),
-  description: text("description"),
   addressId: uuid("address_id")
     .notNull()
     .references(() => addresses.id),
-  startTime: timestamptz("start_time").notNull(),
+  capacity: smallint("capacity").notNull(),
+  createdAt: timestamptz("created_at").notNull().defaultNow(),
+  deletedAt: timestamptz("deleted_at"),
+  description: text("description"),
   endTime: timestamptz("end_time").notNull(),
-  createdAt: timestamp("created_at").notNull().defaultNow(),
-  deletedAt: timestamp("deleted_at"),
-  inviteType: varchar("invite_type", { length: 255 }).notNull(),
-  visibility: eventVisibilityEnum("visibility").notNull(),
-});
-
-export const eventInvites = pgTable("event_invites", {
   id: uuid("id").primaryKey().defaultRandom(),
-  eventId: uuid("event_id")
-    .notNull()
-    .references(() => events.id),
-  winemakerIdInvited: uuid("winemaker_id_invited")
+  inviteType: varchar("invite_type", { length: 255 }).notNull(),
+  name: varchar("name", { length: 255 }).notNull(),
+  startTime: timestamptz("start_time").notNull(),
+  status: eventStatusEnum("status").notNull().default("pending"),
+  updatedAt: timestamptz("updated_at"),
+  visibility: eventVisibilityEnum("visibility").notNull(),
+  winemakerId: uuid("winemaker_id")
     .notNull()
     .references(() => winemakers.id),
-  token: uuid("token").notNull().unique(),
-  createdAt: timestamp("created_at").notNull().defaultNow(),
-  expiresAt: timestamp("expires_at").notNull(),
-  status: eventInviteStatusEnum("status").notNull(),
 });
 
-export const comments = pgTable("comments", {
-  id: uuid("id").primaryKey().defaultRandom(),
+export const eventInvitations = pgTable("event_invitations", {
+  createdAt: timestamptz("created_at").notNull().defaultNow(),
+  deletedAt: timestamptz("deleted_at"),
+  email: text("email").notNull(),
   eventId: uuid("event_id")
     .notNull()
     .references(() => events.id),
+  expiresAt: timestamptz("expires_at").notNull(),
+  id: uuid("id").primaryKey().defaultRandom(),
+  token: text("token").notNull().unique(),
+  updatedAt: timestamptz("updated_at"),
+});
+
+export const eventRegistrations = pgTable("event_registrations", {
+  createdAt: timestamptz("created_at").notNull().defaultNow(),
+  deletedAt: timestamptz("deleted_at"),
+  eventId: uuid("event_id")
+    .notNull()
+    .references(() => events.id),
+  id: uuid("id").primaryKey().defaultRandom(),
   userId: uuid("user_id")
     .notNull()
     .references(() => users.id),
+});
+
+export const eventComments = pgTable("event_comments", {
   body: text("body").notNull(),
-  createdAt: timestamp("created_at").notNull().defaultNow(),
-  deletedAt: timestamp("deleted_at"),
+  createdAt: timestamptz("created_at").notNull().defaultNow(),
+  deletedAt: timestamptz("deleted_at"),
+  eventId: uuid("event_id")
+    .notNull()
+    .references(() => events.id),
+  id: uuid("id").primaryKey().defaultRandom(),
+  userId: uuid("user_id")
+    .notNull()
+    .references(() => users.id),
 });
