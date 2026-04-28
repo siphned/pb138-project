@@ -1,8 +1,8 @@
 import { Link } from "@tanstack/react-router";
+import { ArrowRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useGetShopsByIdProducts } from "@/generated/hooks/productsController/useGetShopsByIdProducts";
 import { WineCard } from "./WineCard";
-import { ArrowRight } from "lucide-react";
 
 // Shape returned by GET /shops/:id/products (no response schema in OpenAPI)
 type ShopProductRaw = {
@@ -81,11 +81,9 @@ export function ShopProductsSection({ shopId }: ShopProductsSectionProps) {
           </div>
         ))}
       </div>
-        <div className="flex justify-center">
-        <Button 
-           variant="outline">
-           
-          <Link className="flex items-center gap-2 text-sm " to="/explore">
+      <div className="flex justify-center">
+        <Button variant="outline">
+          <Link className="flex items-center gap-2 text-sm " to="/wines">
             Show Inventory
             <ArrowRight className="h-4 w-4" />
           </Link>

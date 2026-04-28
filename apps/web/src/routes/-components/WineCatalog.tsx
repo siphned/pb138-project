@@ -12,10 +12,8 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
-// TEMP: GET /products not yet implemented — using GET /wines as standin.
-// Swap back to useGetProducts once backend implements the endpoint.
+import { useGetProducts } from "@/generated/hooks/productsController/useGetProducts";
 import { useGetShopsByIdProducts } from "@/generated/hooks/productsController/useGetShopsByIdProducts";
-import { useGetWines } from "@/generated/hooks/useGetWines";
 import { WineCard } from "./WineCard";
 import { WineFiltersSidebar } from "./WineFiltersSidebar";
 
@@ -39,21 +37,19 @@ export function WineCatalog({ search, shopId, shopName }: WineCatalogProps) {
   const navigate = useNavigate();
   const [searchInput, setSearchInput] = useState(search.search ?? "");
 
-  const winesResult = useGetWines({
-    color:
-      typeof search.color === "string"
-        ? (search.color as "red" | "white" | "rosé" | "orange" | undefined)
-        : (search.color?.[0] as "red" | "white" | "rosé" | "orange" | undefined),
+  const productsResult = useGetProducts({
+    maxPrice: search.maxPrice,
+    minPrice: search.minPrice,
+    page: search.page,
     region: typeof search.region === "string" ? search.region : search.region?.[0],
-    type:
-      typeof search.type === "string"
-        ? (search.type as "still" | "sparkling" | "fortified" | "dessert" | undefined)
-        : (search.type?.[0] as "still" | "sparkling" | "fortified" | "dessert" | undefined),
+    search: search.search,
+    sort: search.sort,
+    type: typeof search.type === "string" ? search.type : search.type?.[0],
   });
 
   const shopProductsResult = useGetShopsByIdProducts(shopId ?? "", { isBundle: "false" });
 
-  const { data: rawData, isLoading, error } = shopId ? shopProductsResult : winesResult;
+  const { data: rawData, isLoading, error } = shopId ? shopProductsResult : productsResult;
 
   type RawProductItem = {
     color?: string;

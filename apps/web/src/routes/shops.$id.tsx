@@ -70,7 +70,6 @@ function ShopDetailPage() {
             <Card className="lg:sticky lg:top-8 rounded-2xl p-6 border-none bg-secondary/10 shadow-none">
               <h3 className="font-heading text-xl font-bold mb-4">Contact & Hours</h3>
               <div className="space-y-4 text-sm">
-                
                 <div>
                   <p className="font-semibold text-muted-foreground mb-1 uppercase tracking-wider text-[10px]">
                     Phone
@@ -90,7 +89,8 @@ function ShopDetailPage() {
               <div className="space-y-0 text-sm">
                 <div>
                   <p className="font-semibold text-muted-foreground mb-0 uppercase tracking-wider text-[10px]">
-                   {shop.description || "No description available."}</p>
+                    {shop.description || "No description available."}
+                  </p>
                 </div>
               </div>
             </Card>
@@ -99,10 +99,7 @@ function ShopDetailPage() {
 
         {/* Rest of page content */}
         <div className="space-y-8">
-          <ShopInfoPanel
-            address={shop.address}
-            name={shop.name}
-          />
+          <ShopInfoPanel address={shop.address} name={shop.name} />
           <Separator />
           <ShopMapEmbed address={shop.address} />
           <Separator />

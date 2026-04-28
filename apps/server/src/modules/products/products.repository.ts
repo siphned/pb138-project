@@ -1,5 +1,5 @@
-import { and, asc, desc, eq, ilike, inArray, isNull, or, sql } from "drizzle-orm";
 import type { SQL } from "drizzle-orm";
+import { and, asc, desc, eq, ilike, inArray, isNull, or, sql } from "drizzle-orm";
 import { db } from "../../db";
 import type { NewProduct, NewProductWine, Product, ProductWine, Wine } from "../../db/schema";
 import { products, productWines, reviews, shops, wines } from "../../db/schema";
@@ -178,94 +178,6 @@ export const productsRepository = {
         .where(eq(wines.id, pw.wineId));
     }
   },
-  async findById(id: string): Promise<ProductWithWines | undefined> {
-    const product = await db.query.products.findFirst({
-      where: and(eq(products.id, id), isNull(products.deletedAt)),
-      with: {
-        productWines: {
-          with: {
-            wine: {
-              columns: {
-                alcoholContent: true,
-                color: true,
-                deletedAt: true,
-                id: true,
-                name: true,
-                type: true,
-                vintageYear: true,
-                volumeMl: true,
-              },
-            },
-          },
-        },
-      },
-    });
-
-    if (product) {
-      const typedProduct = product as unknown as ProductWithWines;
-      if (typedProduct.productWines) {
-        typedProduct.productWines = typedProduct.productWines.filter(
-          (pw) => pw.wine && !pw.wine.deletedAt
-        );
-      }
-      return typedProduct;
-    }
-    return undefined;
-  },
-
-  findByShopId(shopId: string, isBundle?: boolean): Promise<ProductWithWines[]> {
-    return db.query.products.findMany({
-      where: and(
-        eq(products.shopId, shopId),
-        isNull(products.deletedAt),
-        isBundle !== undefined ? eq(products.isBundle, isBundle) : undefined
-      ),
-      with: {
-        productWines: {
-          with: {
-            wine: {
-              columns: {
-                alcoholContent: true,
-                color: true,
-                deletedAt: true,
-                id: true,
-                name: true,
-                type: true,
-                vintageYear: true,
-                volumeMl: true,
-              },
-            },
-          },
-        },
-      },
-    }) as Promise<ProductWithWines[]>;
-  },
-
-  findByIds(ids: string[]): Promise<ProductWithWinesAndWinemaker[]> {
-    if (ids.length === 0) return Promise.resolve([]);
-    return db.query.products.findMany({
-      where: and(inArray(products.id, ids), isNull(products.deletedAt)),
-      with: {
-        productWines: {
-          with: {
-            wine: {
-              columns: {
-                color: true,
-                id: true,
-                name: true,
-                region: true,
-                type: true,
-                vintageYear: true,
-              },
-              with: {
-                winemaker: { columns: { name: true } },
-              },
-            },
-          },
-        },
-      },
-    }) as Promise<ProductWithWinesAndWinemaker[]>;
-  },
 
   async findAll(
     filters: ProductCatalogFilters,
@@ -385,6 +297,94 @@ export const productsRepository = {
     ]);
 
     return { rows, total: countResult?.total ?? 0 };
+  },
+  async findById(id: string): Promise<ProductWithWines | undefined> {
+    const product = await db.query.products.findFirst({
+      where: and(eq(products.id, id), isNull(products.deletedAt)),
+      with: {
+        productWines: {
+          with: {
+            wine: {
+              columns: {
+                alcoholContent: true,
+                color: true,
+                deletedAt: true,
+                id: true,
+                name: true,
+                type: true,
+                vintageYear: true,
+                volumeMl: true,
+              },
+            },
+          },
+        },
+      },
+    });
+
+    if (product) {
+      const typedProduct = product as unknown as ProductWithWines;
+      if (typedProduct.productWines) {
+        typedProduct.productWines = typedProduct.productWines.filter(
+          (pw) => pw.wine && !pw.wine.deletedAt
+        );
+      }
+      return typedProduct;
+    }
+    return undefined;
+  },
+
+  findByIds(ids: string[]): Promise<ProductWithWinesAndWinemaker[]> {
+    if (ids.length === 0) return Promise.resolve([]);
+    return db.query.products.findMany({
+      where: and(inArray(products.id, ids), isNull(products.deletedAt)),
+      with: {
+        productWines: {
+          with: {
+            wine: {
+              columns: {
+                color: true,
+                id: true,
+                name: true,
+                region: true,
+                type: true,
+                vintageYear: true,
+              },
+              with: {
+                winemaker: { columns: { name: true } },
+              },
+            },
+          },
+        },
+      },
+    }) as Promise<ProductWithWinesAndWinemaker[]>;
+  },
+
+  findByShopId(shopId: string, isBundle?: boolean): Promise<ProductWithWines[]> {
+    return db.query.products.findMany({
+      where: and(
+        eq(products.shopId, shopId),
+        isNull(products.deletedAt),
+        isBundle !== undefined ? eq(products.isBundle, isBundle) : undefined
+      ),
+      with: {
+        productWines: {
+          with: {
+            wine: {
+              columns: {
+                alcoholContent: true,
+                color: true,
+                deletedAt: true,
+                id: true,
+                name: true,
+                type: true,
+                vintageYear: true,
+                volumeMl: true,
+              },
+            },
+          },
+        },
+      },
+    }) as Promise<ProductWithWines[]>;
   },
 
   async handleSameWineQuantityChange(

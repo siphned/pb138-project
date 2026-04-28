@@ -1,6 +1,6 @@
 import type { Product } from "../../db/schema";
-import { parsePagination } from "../../utils/pagination";
 import type { PaginatedResult } from "../../utils/pagination";
+import { parsePagination } from "../../utils/pagination";
 import { shopsRepository } from "../shops/shops.repository";
 import type { ProductCatalogFilters, ProductWithWines } from "./products.repository";
 import { productsRepository } from "./products.repository";
@@ -87,6 +87,44 @@ export const productsService = {
     await productsRepository.softDelete(productId);
   },
 
+  async getAllProducts(
+    query: ProductCatalogFilters & { page?: number }
+  ): Promise<PaginatedResult<CatalogProductItem>> {
+    const { page = 1, ...filters } = query;
+    const { limit, offset } = parsePagination({ page });
+
+    const { rows, total } = await productsRepository.findAll(filters, { limit, offset });
+
+    if (rows.length === 0) {
+      return { data: [], limit, page, total };
+    }
+
+    const enriched = await productsRepository.findByIds(rows.map((r) => r.id));
+    const winesMap = new Map(enriched.map((p) => [p.id, p.productWines]));
+
+    const data: CatalogProductItem[] = rows.map((row) => ({
+      id: row.id,
+      isBundle: row.isBundle,
+      name: row.name,
+      price: row.price,
+      quantity: row.quantity,
+      rating: row.avgRating !== null ? Number.parseFloat(row.avgRating) : null,
+      reviewCount: row.reviewCount,
+      shop: { id: row.shopId, name: row.shopName },
+      wines: (winesMap.get(row.id) ?? []).map((pw) => ({
+        color: pw.wine.color,
+        id: pw.wine.id,
+        name: pw.wine.name,
+        region: pw.wine.region,
+        type: pw.wine.type,
+        vintageYear: pw.wine.vintageYear,
+        winemaker: { name: pw.wine.winemaker.name },
+      })),
+    }));
+
+    return { data, limit, page, total };
+  },
+
   async getProduct(id: string): Promise<ProductWithWines> {
     const product = await productsRepository.findById(id);
     if (!product) throw new Error("NOT_FOUND");
@@ -151,43 +189,5 @@ export const productsService = {
 
     const { wineId, ...fields } = data;
     return productsRepository.updateProduct(productId, fields, wineId);
-  },
-
-  async getAllProducts(
-    query: ProductCatalogFilters & { page?: number }
-  ): Promise<PaginatedResult<CatalogProductItem>> {
-    const { page = 1, ...filters } = query;
-    const { limit, offset } = parsePagination({ page });
-
-    const { rows, total } = await productsRepository.findAll(filters, { limit, offset });
-
-    if (rows.length === 0) {
-      return { data: [], limit, page, total };
-    }
-
-    const enriched = await productsRepository.findByIds(rows.map((r) => r.id));
-    const winesMap = new Map(enriched.map((p) => [p.id, p.productWines]));
-
-    const data: CatalogProductItem[] = rows.map((row) => ({
-      id: row.id,
-      isBundle: row.isBundle,
-      name: row.name,
-      price: row.price,
-      quantity: row.quantity,
-      rating: row.avgRating !== null ? Number.parseFloat(row.avgRating) : null,
-      reviewCount: row.reviewCount,
-      shop: { id: row.shopId, name: row.shopName },
-      wines: (winesMap.get(row.id) ?? []).map((pw) => ({
-        color: pw.wine.color,
-        id: pw.wine.id,
-        name: pw.wine.name,
-        region: pw.wine.region,
-        type: pw.wine.type,
-        vintageYear: pw.wine.vintageYear,
-        winemaker: { name: pw.wine.winemaker.name },
-      })),
-    }));
-
-    return { data, limit, page, total };
   },
 };
