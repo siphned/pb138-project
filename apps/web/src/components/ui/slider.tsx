@@ -21,7 +21,10 @@ function Slider({
 
   return (
     <SliderPrimitive.Root
-      className={cn("data-[orientation=horizontal]:w-full data-[orientation=vertical]:h-full", className)}
+      className={cn(
+        "data-[orientation=horizontal]:w-full data-[orientation=vertical]:h-full",
+        className
+      )}
       data-slot="slider"
       defaultValue={value !== undefined ? undefined : defaultValue}
       max={max}
@@ -35,10 +38,7 @@ function Slider({
           className="relative grow overflow-hidden rounded-4xl bg-primary/30 select-none data-[orientation=horizontal]:h-3 data-[orientation=horizontal]:w-full data-[orientation=vertical]:h-full data-[orientation=vertical]:w-3"
           data-slot="slider-track"
         >
-          <SliderPrimitive.Indicator
-            className="bg-primary select-none"
-            data-slot="slider-range"
-          />
+          <SliderPrimitive.Indicator className="bg-primary select-none" data-slot="slider-range" />
         </SliderPrimitive.Track>
         {Array.from({ length: _values.length }, (_, index) => (
           <SliderPrimitive.Thumb

@@ -1,7 +1,7 @@
-import { Star } from "lucide-react";
 import type React from "react";
 import { Card, CardContent, CardFooter, CardHeader } from "@/components/ui/card";
 import { cn } from "@/lib/utils";
+import { StarRating } from "./StarRating";
 
 interface CatalogCardProps {
   imageSlot: React.ReactNode;
@@ -71,25 +71,7 @@ export function CatalogCard({
       </CardHeader>
 
       <CardContent className="p-4 space-y-2">
-        {rating !== undefined && (
-          <div className="flex items-center gap-1.5 text-sm">
-            <div className="flex items-center gap-0.5">
-              {[1, 2, 3, 4, 5].map((star) => (
-                <Star
-                  className={cn(
-                    "h-3.5 w-3.5",
-                    star <= Math.floor(rating) ? "fill-star text-star" : "text-muted-foreground"
-                  )}
-                  key={star}
-                />
-              ))}
-            </div>
-            <span className="font-medium text-foreground">{rating.toFixed(1)}</span>
-            {reviewCount !== undefined && (
-              <span className="text-muted-foreground">({reviewCount} reviews)</span>
-            )}
-          </div>
-        )}
+        {rating !== undefined && <StarRating rating={rating} reviewCount={reviewCount} />}
 
         <div className="space-y-1">
           <h3 className="font-heading text-lg font-bold leading-tight">

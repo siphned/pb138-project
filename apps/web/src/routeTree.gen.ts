@@ -10,12 +10,15 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as WinesRouteImport } from './routes/wines'
+import { Route as ShopsRouteImport } from './routes/shops'
 import { Route as SearchRouteImport } from './routes/search'
 import { Route as ExploreRouteImport } from './routes/explore'
 import { Route as EventsRouteImport } from './routes/events'
 import { Route as CartRouteImport } from './routes/cart'
 import { Route as AuthenticatedRouteImport } from './routes/_authenticated'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as ShopsIndexRouteImport } from './routes/shops.index'
+import { Route as ShopsIdRouteImport } from './routes/shops.$id'
 import { Route as ProductsProductIdRouteImport } from './routes/products.$productId'
 import { Route as AuthRegisterRouteImport } from './routes/auth/register'
 import { Route as AuthLoginRouteImport } from './routes/auth/login'
@@ -31,16 +34,21 @@ import { Route as AuthenticatedAdminUsersRouteImport } from './routes/_authentic
 import { Route as AuthenticatedAdminRoleRequestsRouteImport } from './routes/_authenticated._admin.role-requests'
 import { Route as AuthenticatedAdminModerationRouteImport } from './routes/_authenticated._admin.moderation'
 import { Route as AuthenticatedAdminAdminRouteImport } from './routes/_authenticated._admin.admin'
-import { Route as AuthenticatedShop_ownerShopsIndexRouteImport } from './routes/_authenticated._shop_owner.shops.index'
-import { Route as AuthenticatedShop_ownerShopsIdRouteImport } from './routes/_authenticated._shop_owner.shops.$id'
-import { Route as AuthenticatedShop_ownerShopsIdSupplyBrowseRouteImport } from './routes/_authenticated._shop_owner.shops.$id.supply-browse'
-import { Route as AuthenticatedShop_ownerShopsIdShopOrdersRouteImport } from './routes/_authenticated._shop_owner.shops.$id.shop-orders'
-import { Route as AuthenticatedShop_ownerShopsIdInventoryRouteImport } from './routes/_authenticated._shop_owner.shops.$id.inventory'
-import { Route as AuthenticatedShop_ownerShopsIdBundlesRouteImport } from './routes/_authenticated._shop_owner.shops.$id.bundles'
+import { Route as AuthenticatedShop_ownerManageShopsIndexRouteImport } from './routes/_authenticated._shop_owner.manage.shops.index'
+import { Route as AuthenticatedShop_ownerManageShopsIdRouteImport } from './routes/_authenticated._shop_owner.manage.shops.$id'
+import { Route as AuthenticatedShop_ownerManageShopsIdSupplyBrowseRouteImport } from './routes/_authenticated._shop_owner.manage.shops.$id.supply-browse'
+import { Route as AuthenticatedShop_ownerManageShopsIdShopOrdersRouteImport } from './routes/_authenticated._shop_owner.manage.shops.$id.shop-orders'
+import { Route as AuthenticatedShop_ownerManageShopsIdInventoryRouteImport } from './routes/_authenticated._shop_owner.manage.shops.$id.inventory'
+import { Route as AuthenticatedShop_ownerManageShopsIdBundlesRouteImport } from './routes/_authenticated._shop_owner.manage.shops.$id.bundles'
 
 const WinesRoute = WinesRouteImport.update({
   id: '/wines',
   path: '/wines',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ShopsRoute = ShopsRouteImport.update({
+  id: '/shops',
+  path: '/shops',
   getParentRoute: () => rootRouteImport,
 } as any)
 const SearchRoute = SearchRouteImport.update({
@@ -71,6 +79,16 @@ const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => rootRouteImport,
+} as any)
+const ShopsIndexRoute = ShopsIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => ShopsRoute,
+} as any)
+const ShopsIdRoute = ShopsIdRouteImport.update({
+  id: '/$id',
+  path: '/$id',
+  getParentRoute: () => ShopsRoute,
 } as any)
 const ProductsProductIdRoute = ProductsProductIdRouteImport.update({
   id: '/products/$productId',
@@ -148,41 +166,41 @@ const AuthenticatedAdminAdminRoute = AuthenticatedAdminAdminRouteImport.update({
   path: '/admin',
   getParentRoute: () => AuthenticatedAdminRoute,
 } as any)
-const AuthenticatedShop_ownerShopsIndexRoute =
-  AuthenticatedShop_ownerShopsIndexRouteImport.update({
-    id: '/shops/',
-    path: '/shops/',
+const AuthenticatedShop_ownerManageShopsIndexRoute =
+  AuthenticatedShop_ownerManageShopsIndexRouteImport.update({
+    id: '/manage/shops/',
+    path: '/manage/shops/',
     getParentRoute: () => AuthenticatedShop_ownerRoute,
   } as any)
-const AuthenticatedShop_ownerShopsIdRoute =
-  AuthenticatedShop_ownerShopsIdRouteImport.update({
-    id: '/shops/$id',
-    path: '/shops/$id',
+const AuthenticatedShop_ownerManageShopsIdRoute =
+  AuthenticatedShop_ownerManageShopsIdRouteImport.update({
+    id: '/manage/shops/$id',
+    path: '/manage/shops/$id',
     getParentRoute: () => AuthenticatedShop_ownerRoute,
   } as any)
-const AuthenticatedShop_ownerShopsIdSupplyBrowseRoute =
-  AuthenticatedShop_ownerShopsIdSupplyBrowseRouteImport.update({
+const AuthenticatedShop_ownerManageShopsIdSupplyBrowseRoute =
+  AuthenticatedShop_ownerManageShopsIdSupplyBrowseRouteImport.update({
     id: '/supply-browse',
     path: '/supply-browse',
-    getParentRoute: () => AuthenticatedShop_ownerShopsIdRoute,
+    getParentRoute: () => AuthenticatedShop_ownerManageShopsIdRoute,
   } as any)
-const AuthenticatedShop_ownerShopsIdShopOrdersRoute =
-  AuthenticatedShop_ownerShopsIdShopOrdersRouteImport.update({
+const AuthenticatedShop_ownerManageShopsIdShopOrdersRoute =
+  AuthenticatedShop_ownerManageShopsIdShopOrdersRouteImport.update({
     id: '/shop-orders',
     path: '/shop-orders',
-    getParentRoute: () => AuthenticatedShop_ownerShopsIdRoute,
+    getParentRoute: () => AuthenticatedShop_ownerManageShopsIdRoute,
   } as any)
-const AuthenticatedShop_ownerShopsIdInventoryRoute =
-  AuthenticatedShop_ownerShopsIdInventoryRouteImport.update({
+const AuthenticatedShop_ownerManageShopsIdInventoryRoute =
+  AuthenticatedShop_ownerManageShopsIdInventoryRouteImport.update({
     id: '/inventory',
     path: '/inventory',
-    getParentRoute: () => AuthenticatedShop_ownerShopsIdRoute,
+    getParentRoute: () => AuthenticatedShop_ownerManageShopsIdRoute,
   } as any)
-const AuthenticatedShop_ownerShopsIdBundlesRoute =
-  AuthenticatedShop_ownerShopsIdBundlesRouteImport.update({
+const AuthenticatedShop_ownerManageShopsIdBundlesRoute =
+  AuthenticatedShop_ownerManageShopsIdBundlesRouteImport.update({
     id: '/bundles',
     path: '/bundles',
-    getParentRoute: () => AuthenticatedShop_ownerShopsIdRoute,
+    getParentRoute: () => AuthenticatedShop_ownerManageShopsIdRoute,
   } as any)
 
 export interface FileRoutesByFullPath {
@@ -191,6 +209,7 @@ export interface FileRoutesByFullPath {
   '/events': typeof EventsRoute
   '/explore': typeof ExploreRoute
   '/search': typeof SearchRoute
+  '/shops': typeof ShopsRouteWithChildren
   '/wines': typeof WinesRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
   '/orders': typeof AuthenticatedOrdersRoute
@@ -198,18 +217,20 @@ export interface FileRoutesByFullPath {
   '/auth/login': typeof AuthLoginRoute
   '/auth/register': typeof AuthRegisterRoute
   '/products/$productId': typeof ProductsProductIdRoute
+  '/shops/$id': typeof ShopsIdRoute
+  '/shops/': typeof ShopsIndexRoute
   '/admin': typeof AuthenticatedAdminAdminRoute
   '/moderation': typeof AuthenticatedAdminModerationRoute
   '/role-requests': typeof AuthenticatedAdminRoleRequestsRoute
   '/users': typeof AuthenticatedAdminUsersRoute
   '/manage-wines': typeof AuthenticatedWinemakerManageWinesRoute
   '/supply': typeof AuthenticatedWinemakerSupplyRoute
-  '/shops/$id': typeof AuthenticatedShop_ownerShopsIdRouteWithChildren
-  '/shops/': typeof AuthenticatedShop_ownerShopsIndexRoute
-  '/shops/$id/bundles': typeof AuthenticatedShop_ownerShopsIdBundlesRoute
-  '/shops/$id/inventory': typeof AuthenticatedShop_ownerShopsIdInventoryRoute
-  '/shops/$id/shop-orders': typeof AuthenticatedShop_ownerShopsIdShopOrdersRoute
-  '/shops/$id/supply-browse': typeof AuthenticatedShop_ownerShopsIdSupplyBrowseRoute
+  '/manage/shops/$id': typeof AuthenticatedShop_ownerManageShopsIdRouteWithChildren
+  '/manage/shops/': typeof AuthenticatedShop_ownerManageShopsIndexRoute
+  '/manage/shops/$id/bundles': typeof AuthenticatedShop_ownerManageShopsIdBundlesRoute
+  '/manage/shops/$id/inventory': typeof AuthenticatedShop_ownerManageShopsIdInventoryRoute
+  '/manage/shops/$id/shop-orders': typeof AuthenticatedShop_ownerManageShopsIdShopOrdersRoute
+  '/manage/shops/$id/supply-browse': typeof AuthenticatedShop_ownerManageShopsIdSupplyBrowseRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -224,18 +245,20 @@ export interface FileRoutesByTo {
   '/auth/login': typeof AuthLoginRoute
   '/auth/register': typeof AuthRegisterRoute
   '/products/$productId': typeof ProductsProductIdRoute
+  '/shops/$id': typeof ShopsIdRoute
+  '/shops': typeof ShopsIndexRoute
   '/admin': typeof AuthenticatedAdminAdminRoute
   '/moderation': typeof AuthenticatedAdminModerationRoute
   '/role-requests': typeof AuthenticatedAdminRoleRequestsRoute
   '/users': typeof AuthenticatedAdminUsersRoute
   '/manage-wines': typeof AuthenticatedWinemakerManageWinesRoute
   '/supply': typeof AuthenticatedWinemakerSupplyRoute
-  '/shops/$id': typeof AuthenticatedShop_ownerShopsIdRouteWithChildren
-  '/shops': typeof AuthenticatedShop_ownerShopsIndexRoute
-  '/shops/$id/bundles': typeof AuthenticatedShop_ownerShopsIdBundlesRoute
-  '/shops/$id/inventory': typeof AuthenticatedShop_ownerShopsIdInventoryRoute
-  '/shops/$id/shop-orders': typeof AuthenticatedShop_ownerShopsIdShopOrdersRoute
-  '/shops/$id/supply-browse': typeof AuthenticatedShop_ownerShopsIdSupplyBrowseRoute
+  '/manage/shops/$id': typeof AuthenticatedShop_ownerManageShopsIdRouteWithChildren
+  '/manage/shops': typeof AuthenticatedShop_ownerManageShopsIndexRoute
+  '/manage/shops/$id/bundles': typeof AuthenticatedShop_ownerManageShopsIdBundlesRoute
+  '/manage/shops/$id/inventory': typeof AuthenticatedShop_ownerManageShopsIdInventoryRoute
+  '/manage/shops/$id/shop-orders': typeof AuthenticatedShop_ownerManageShopsIdShopOrdersRoute
+  '/manage/shops/$id/supply-browse': typeof AuthenticatedShop_ownerManageShopsIdSupplyBrowseRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -245,6 +268,7 @@ export interface FileRoutesById {
   '/events': typeof EventsRoute
   '/explore': typeof ExploreRoute
   '/search': typeof SearchRoute
+  '/shops': typeof ShopsRouteWithChildren
   '/wines': typeof WinesRoute
   '/_authenticated/_admin': typeof AuthenticatedAdminRouteWithChildren
   '/_authenticated/_shop_owner': typeof AuthenticatedShop_ownerRouteWithChildren
@@ -255,18 +279,20 @@ export interface FileRoutesById {
   '/auth/login': typeof AuthLoginRoute
   '/auth/register': typeof AuthRegisterRoute
   '/products/$productId': typeof ProductsProductIdRoute
+  '/shops/$id': typeof ShopsIdRoute
+  '/shops/': typeof ShopsIndexRoute
   '/_authenticated/_admin/admin': typeof AuthenticatedAdminAdminRoute
   '/_authenticated/_admin/moderation': typeof AuthenticatedAdminModerationRoute
   '/_authenticated/_admin/role-requests': typeof AuthenticatedAdminRoleRequestsRoute
   '/_authenticated/_admin/users': typeof AuthenticatedAdminUsersRoute
   '/_authenticated/_winemaker/manage-wines': typeof AuthenticatedWinemakerManageWinesRoute
   '/_authenticated/_winemaker/supply': typeof AuthenticatedWinemakerSupplyRoute
-  '/_authenticated/_shop_owner/shops/$id': typeof AuthenticatedShop_ownerShopsIdRouteWithChildren
-  '/_authenticated/_shop_owner/shops/': typeof AuthenticatedShop_ownerShopsIndexRoute
-  '/_authenticated/_shop_owner/shops/$id/bundles': typeof AuthenticatedShop_ownerShopsIdBundlesRoute
-  '/_authenticated/_shop_owner/shops/$id/inventory': typeof AuthenticatedShop_ownerShopsIdInventoryRoute
-  '/_authenticated/_shop_owner/shops/$id/shop-orders': typeof AuthenticatedShop_ownerShopsIdShopOrdersRoute
-  '/_authenticated/_shop_owner/shops/$id/supply-browse': typeof AuthenticatedShop_ownerShopsIdSupplyBrowseRoute
+  '/_authenticated/_shop_owner/manage/shops/$id': typeof AuthenticatedShop_ownerManageShopsIdRouteWithChildren
+  '/_authenticated/_shop_owner/manage/shops/': typeof AuthenticatedShop_ownerManageShopsIndexRoute
+  '/_authenticated/_shop_owner/manage/shops/$id/bundles': typeof AuthenticatedShop_ownerManageShopsIdBundlesRoute
+  '/_authenticated/_shop_owner/manage/shops/$id/inventory': typeof AuthenticatedShop_ownerManageShopsIdInventoryRoute
+  '/_authenticated/_shop_owner/manage/shops/$id/shop-orders': typeof AuthenticatedShop_ownerManageShopsIdShopOrdersRoute
+  '/_authenticated/_shop_owner/manage/shops/$id/supply-browse': typeof AuthenticatedShop_ownerManageShopsIdSupplyBrowseRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -276,6 +302,7 @@ export interface FileRouteTypes {
     | '/events'
     | '/explore'
     | '/search'
+    | '/shops'
     | '/wines'
     | '/dashboard'
     | '/orders'
@@ -283,18 +310,20 @@ export interface FileRouteTypes {
     | '/auth/login'
     | '/auth/register'
     | '/products/$productId'
+    | '/shops/$id'
+    | '/shops/'
     | '/admin'
     | '/moderation'
     | '/role-requests'
     | '/users'
     | '/manage-wines'
     | '/supply'
-    | '/shops/$id'
-    | '/shops/'
-    | '/shops/$id/bundles'
-    | '/shops/$id/inventory'
-    | '/shops/$id/shop-orders'
-    | '/shops/$id/supply-browse'
+    | '/manage/shops/$id'
+    | '/manage/shops/'
+    | '/manage/shops/$id/bundles'
+    | '/manage/shops/$id/inventory'
+    | '/manage/shops/$id/shop-orders'
+    | '/manage/shops/$id/supply-browse'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -309,18 +338,20 @@ export interface FileRouteTypes {
     | '/auth/login'
     | '/auth/register'
     | '/products/$productId'
+    | '/shops/$id'
+    | '/shops'
     | '/admin'
     | '/moderation'
     | '/role-requests'
     | '/users'
     | '/manage-wines'
     | '/supply'
-    | '/shops/$id'
-    | '/shops'
-    | '/shops/$id/bundles'
-    | '/shops/$id/inventory'
-    | '/shops/$id/shop-orders'
-    | '/shops/$id/supply-browse'
+    | '/manage/shops/$id'
+    | '/manage/shops'
+    | '/manage/shops/$id/bundles'
+    | '/manage/shops/$id/inventory'
+    | '/manage/shops/$id/shop-orders'
+    | '/manage/shops/$id/supply-browse'
   id:
     | '__root__'
     | '/'
@@ -329,6 +360,7 @@ export interface FileRouteTypes {
     | '/events'
     | '/explore'
     | '/search'
+    | '/shops'
     | '/wines'
     | '/_authenticated/_admin'
     | '/_authenticated/_shop_owner'
@@ -339,18 +371,20 @@ export interface FileRouteTypes {
     | '/auth/login'
     | '/auth/register'
     | '/products/$productId'
+    | '/shops/$id'
+    | '/shops/'
     | '/_authenticated/_admin/admin'
     | '/_authenticated/_admin/moderation'
     | '/_authenticated/_admin/role-requests'
     | '/_authenticated/_admin/users'
     | '/_authenticated/_winemaker/manage-wines'
     | '/_authenticated/_winemaker/supply'
-    | '/_authenticated/_shop_owner/shops/$id'
-    | '/_authenticated/_shop_owner/shops/'
-    | '/_authenticated/_shop_owner/shops/$id/bundles'
-    | '/_authenticated/_shop_owner/shops/$id/inventory'
-    | '/_authenticated/_shop_owner/shops/$id/shop-orders'
-    | '/_authenticated/_shop_owner/shops/$id/supply-browse'
+    | '/_authenticated/_shop_owner/manage/shops/$id'
+    | '/_authenticated/_shop_owner/manage/shops/'
+    | '/_authenticated/_shop_owner/manage/shops/$id/bundles'
+    | '/_authenticated/_shop_owner/manage/shops/$id/inventory'
+    | '/_authenticated/_shop_owner/manage/shops/$id/shop-orders'
+    | '/_authenticated/_shop_owner/manage/shops/$id/supply-browse'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -360,6 +394,7 @@ export interface RootRouteChildren {
   EventsRoute: typeof EventsRoute
   ExploreRoute: typeof ExploreRoute
   SearchRoute: typeof SearchRoute
+  ShopsRoute: typeof ShopsRouteWithChildren
   WinesRoute: typeof WinesRoute
   AuthLoginRoute: typeof AuthLoginRoute
   AuthRegisterRoute: typeof AuthRegisterRoute
@@ -373,6 +408,13 @@ declare module '@tanstack/react-router' {
       path: '/wines'
       fullPath: '/wines'
       preLoaderRoute: typeof WinesRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/shops': {
+      id: '/shops'
+      path: '/shops'
+      fullPath: '/shops'
+      preLoaderRoute: typeof ShopsRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/search': {
@@ -416,6 +458,20 @@ declare module '@tanstack/react-router' {
       fullPath: '/'
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
+    }
+    '/shops/': {
+      id: '/shops/'
+      path: '/'
+      fullPath: '/shops/'
+      preLoaderRoute: typeof ShopsIndexRouteImport
+      parentRoute: typeof ShopsRoute
+    }
+    '/shops/$id': {
+      id: '/shops/$id'
+      path: '/$id'
+      fullPath: '/shops/$id'
+      preLoaderRoute: typeof ShopsIdRouteImport
+      parentRoute: typeof ShopsRoute
     }
     '/products/$productId': {
       id: '/products/$productId'
@@ -522,47 +578,47 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAdminAdminRouteImport
       parentRoute: typeof AuthenticatedAdminRoute
     }
-    '/_authenticated/_shop_owner/shops/': {
-      id: '/_authenticated/_shop_owner/shops/'
-      path: '/shops'
-      fullPath: '/shops/'
-      preLoaderRoute: typeof AuthenticatedShop_ownerShopsIndexRouteImport
+    '/_authenticated/_shop_owner/manage/shops/': {
+      id: '/_authenticated/_shop_owner/manage/shops/'
+      path: '/manage/shops'
+      fullPath: '/manage/shops/'
+      preLoaderRoute: typeof AuthenticatedShop_ownerManageShopsIndexRouteImport
       parentRoute: typeof AuthenticatedShop_ownerRoute
     }
-    '/_authenticated/_shop_owner/shops/$id': {
-      id: '/_authenticated/_shop_owner/shops/$id'
-      path: '/shops/$id'
-      fullPath: '/shops/$id'
-      preLoaderRoute: typeof AuthenticatedShop_ownerShopsIdRouteImport
+    '/_authenticated/_shop_owner/manage/shops/$id': {
+      id: '/_authenticated/_shop_owner/manage/shops/$id'
+      path: '/manage/shops/$id'
+      fullPath: '/manage/shops/$id'
+      preLoaderRoute: typeof AuthenticatedShop_ownerManageShopsIdRouteImport
       parentRoute: typeof AuthenticatedShop_ownerRoute
     }
-    '/_authenticated/_shop_owner/shops/$id/supply-browse': {
-      id: '/_authenticated/_shop_owner/shops/$id/supply-browse'
+    '/_authenticated/_shop_owner/manage/shops/$id/supply-browse': {
+      id: '/_authenticated/_shop_owner/manage/shops/$id/supply-browse'
       path: '/supply-browse'
-      fullPath: '/shops/$id/supply-browse'
-      preLoaderRoute: typeof AuthenticatedShop_ownerShopsIdSupplyBrowseRouteImport
-      parentRoute: typeof AuthenticatedShop_ownerShopsIdRoute
+      fullPath: '/manage/shops/$id/supply-browse'
+      preLoaderRoute: typeof AuthenticatedShop_ownerManageShopsIdSupplyBrowseRouteImport
+      parentRoute: typeof AuthenticatedShop_ownerManageShopsIdRoute
     }
-    '/_authenticated/_shop_owner/shops/$id/shop-orders': {
-      id: '/_authenticated/_shop_owner/shops/$id/shop-orders'
+    '/_authenticated/_shop_owner/manage/shops/$id/shop-orders': {
+      id: '/_authenticated/_shop_owner/manage/shops/$id/shop-orders'
       path: '/shop-orders'
-      fullPath: '/shops/$id/shop-orders'
-      preLoaderRoute: typeof AuthenticatedShop_ownerShopsIdShopOrdersRouteImport
-      parentRoute: typeof AuthenticatedShop_ownerShopsIdRoute
+      fullPath: '/manage/shops/$id/shop-orders'
+      preLoaderRoute: typeof AuthenticatedShop_ownerManageShopsIdShopOrdersRouteImport
+      parentRoute: typeof AuthenticatedShop_ownerManageShopsIdRoute
     }
-    '/_authenticated/_shop_owner/shops/$id/inventory': {
-      id: '/_authenticated/_shop_owner/shops/$id/inventory'
+    '/_authenticated/_shop_owner/manage/shops/$id/inventory': {
+      id: '/_authenticated/_shop_owner/manage/shops/$id/inventory'
       path: '/inventory'
-      fullPath: '/shops/$id/inventory'
-      preLoaderRoute: typeof AuthenticatedShop_ownerShopsIdInventoryRouteImport
-      parentRoute: typeof AuthenticatedShop_ownerShopsIdRoute
+      fullPath: '/manage/shops/$id/inventory'
+      preLoaderRoute: typeof AuthenticatedShop_ownerManageShopsIdInventoryRouteImport
+      parentRoute: typeof AuthenticatedShop_ownerManageShopsIdRoute
     }
-    '/_authenticated/_shop_owner/shops/$id/bundles': {
-      id: '/_authenticated/_shop_owner/shops/$id/bundles'
+    '/_authenticated/_shop_owner/manage/shops/$id/bundles': {
+      id: '/_authenticated/_shop_owner/manage/shops/$id/bundles'
       path: '/bundles'
-      fullPath: '/shops/$id/bundles'
-      preLoaderRoute: typeof AuthenticatedShop_ownerShopsIdBundlesRouteImport
-      parentRoute: typeof AuthenticatedShop_ownerShopsIdRoute
+      fullPath: '/manage/shops/$id/bundles'
+      preLoaderRoute: typeof AuthenticatedShop_ownerManageShopsIdBundlesRouteImport
+      parentRoute: typeof AuthenticatedShop_ownerManageShopsIdRoute
     }
   }
 }
@@ -584,41 +640,41 @@ const AuthenticatedAdminRouteChildren: AuthenticatedAdminRouteChildren = {
 const AuthenticatedAdminRouteWithChildren =
   AuthenticatedAdminRoute._addFileChildren(AuthenticatedAdminRouteChildren)
 
-interface AuthenticatedShop_ownerShopsIdRouteChildren {
-  AuthenticatedShop_ownerShopsIdBundlesRoute: typeof AuthenticatedShop_ownerShopsIdBundlesRoute
-  AuthenticatedShop_ownerShopsIdInventoryRoute: typeof AuthenticatedShop_ownerShopsIdInventoryRoute
-  AuthenticatedShop_ownerShopsIdShopOrdersRoute: typeof AuthenticatedShop_ownerShopsIdShopOrdersRoute
-  AuthenticatedShop_ownerShopsIdSupplyBrowseRoute: typeof AuthenticatedShop_ownerShopsIdSupplyBrowseRoute
+interface AuthenticatedShop_ownerManageShopsIdRouteChildren {
+  AuthenticatedShop_ownerManageShopsIdBundlesRoute: typeof AuthenticatedShop_ownerManageShopsIdBundlesRoute
+  AuthenticatedShop_ownerManageShopsIdInventoryRoute: typeof AuthenticatedShop_ownerManageShopsIdInventoryRoute
+  AuthenticatedShop_ownerManageShopsIdShopOrdersRoute: typeof AuthenticatedShop_ownerManageShopsIdShopOrdersRoute
+  AuthenticatedShop_ownerManageShopsIdSupplyBrowseRoute: typeof AuthenticatedShop_ownerManageShopsIdSupplyBrowseRoute
 }
 
-const AuthenticatedShop_ownerShopsIdRouteChildren: AuthenticatedShop_ownerShopsIdRouteChildren =
+const AuthenticatedShop_ownerManageShopsIdRouteChildren: AuthenticatedShop_ownerManageShopsIdRouteChildren =
   {
-    AuthenticatedShop_ownerShopsIdBundlesRoute:
-      AuthenticatedShop_ownerShopsIdBundlesRoute,
-    AuthenticatedShop_ownerShopsIdInventoryRoute:
-      AuthenticatedShop_ownerShopsIdInventoryRoute,
-    AuthenticatedShop_ownerShopsIdShopOrdersRoute:
-      AuthenticatedShop_ownerShopsIdShopOrdersRoute,
-    AuthenticatedShop_ownerShopsIdSupplyBrowseRoute:
-      AuthenticatedShop_ownerShopsIdSupplyBrowseRoute,
+    AuthenticatedShop_ownerManageShopsIdBundlesRoute:
+      AuthenticatedShop_ownerManageShopsIdBundlesRoute,
+    AuthenticatedShop_ownerManageShopsIdInventoryRoute:
+      AuthenticatedShop_ownerManageShopsIdInventoryRoute,
+    AuthenticatedShop_ownerManageShopsIdShopOrdersRoute:
+      AuthenticatedShop_ownerManageShopsIdShopOrdersRoute,
+    AuthenticatedShop_ownerManageShopsIdSupplyBrowseRoute:
+      AuthenticatedShop_ownerManageShopsIdSupplyBrowseRoute,
   }
 
-const AuthenticatedShop_ownerShopsIdRouteWithChildren =
-  AuthenticatedShop_ownerShopsIdRoute._addFileChildren(
-    AuthenticatedShop_ownerShopsIdRouteChildren,
+const AuthenticatedShop_ownerManageShopsIdRouteWithChildren =
+  AuthenticatedShop_ownerManageShopsIdRoute._addFileChildren(
+    AuthenticatedShop_ownerManageShopsIdRouteChildren,
   )
 
 interface AuthenticatedShop_ownerRouteChildren {
-  AuthenticatedShop_ownerShopsIdRoute: typeof AuthenticatedShop_ownerShopsIdRouteWithChildren
-  AuthenticatedShop_ownerShopsIndexRoute: typeof AuthenticatedShop_ownerShopsIndexRoute
+  AuthenticatedShop_ownerManageShopsIdRoute: typeof AuthenticatedShop_ownerManageShopsIdRouteWithChildren
+  AuthenticatedShop_ownerManageShopsIndexRoute: typeof AuthenticatedShop_ownerManageShopsIndexRoute
 }
 
 const AuthenticatedShop_ownerRouteChildren: AuthenticatedShop_ownerRouteChildren =
   {
-    AuthenticatedShop_ownerShopsIdRoute:
-      AuthenticatedShop_ownerShopsIdRouteWithChildren,
-    AuthenticatedShop_ownerShopsIndexRoute:
-      AuthenticatedShop_ownerShopsIndexRoute,
+    AuthenticatedShop_ownerManageShopsIdRoute:
+      AuthenticatedShop_ownerManageShopsIdRouteWithChildren,
+    AuthenticatedShop_ownerManageShopsIndexRoute:
+      AuthenticatedShop_ownerManageShopsIndexRoute,
   }
 
 const AuthenticatedShop_ownerRouteWithChildren =
@@ -665,6 +721,18 @@ const AuthenticatedRouteWithChildren = AuthenticatedRoute._addFileChildren(
   AuthenticatedRouteChildren,
 )
 
+interface ShopsRouteChildren {
+  ShopsIdRoute: typeof ShopsIdRoute
+  ShopsIndexRoute: typeof ShopsIndexRoute
+}
+
+const ShopsRouteChildren: ShopsRouteChildren = {
+  ShopsIdRoute: ShopsIdRoute,
+  ShopsIndexRoute: ShopsIndexRoute,
+}
+
+const ShopsRouteWithChildren = ShopsRoute._addFileChildren(ShopsRouteChildren)
+
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AuthenticatedRoute: AuthenticatedRouteWithChildren,
@@ -672,6 +740,7 @@ const rootRouteChildren: RootRouteChildren = {
   EventsRoute: EventsRoute,
   ExploreRoute: ExploreRoute,
   SearchRoute: SearchRoute,
+  ShopsRoute: ShopsRouteWithChildren,
   WinesRoute: WinesRoute,
   AuthLoginRoute: AuthLoginRoute,
   AuthRegisterRoute: AuthRegisterRoute,

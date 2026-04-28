@@ -1,5 +1,5 @@
-import { axiosInstance as kubbAxiosInstance } from "@kubb/plugin-client/clients/axios";
 import { useAuth } from "@clerk/react";
+import { axiosInstance as kubbAxiosInstance } from "@kubb/plugin-client/clients/axios";
 import { useEffect } from "react";
 import axiosInstance from "../api/client";
 
