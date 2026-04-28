@@ -46,7 +46,7 @@ function Carousel({
   className,
   children,
   ...props
-}: React.ComponentProps<"div"> & CarouselProps) {
+}: React.ComponentProps<"section"> & CarouselProps) {
   const [carouselRef, api] = useEmblaCarousel(
     {
       ...opts,
@@ -113,16 +113,16 @@ function Carousel({
         scrollPrev,
       }}
     >
-      <div
+      <section
+        aria-label="Carousel"
         aria-roledescription="carousel"
         className={cn("relative", className)}
         data-slot="carousel"
         onKeyDownCapture={handleKeyDown}
-        role="region"
         {...props}
       >
         {children}
-      </div>
+      </section>
     </CarouselContext.Provider>
   );
 }
