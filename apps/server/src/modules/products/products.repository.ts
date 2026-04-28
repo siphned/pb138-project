@@ -1,7 +1,8 @@
-import { and, eq, inArray, isNull, sql } from "drizzle-orm";
+import { and, asc, desc, eq, ilike, inArray, isNull, or, sql } from "drizzle-orm";
+import type { SQL } from "drizzle-orm";
 import { db } from "../../db";
 import type { NewProduct, NewProductWine, Product, ProductWine, Wine } from "../../db/schema";
-import { products, productWines, wines } from "../../db/schema";
+import { products, productWines, reviews, shops, wines } from "../../db/schema";
 
 export type WineInfo = Pick<
   Wine,
@@ -264,6 +265,125 @@ export const productsRepository = {
         },
       },
     }) as Promise<ProductWithWinesAndWinemaker[]>;
+  },
+
+  async findAll(
+    filters: ProductCatalogFilters,
+    pagination: { limit: number; offset: number }
+  ): Promise<{ rows: CatalogRow[]; total: number }> {
+    const conditions: SQL[] = [isNull(products.deletedAt)];
+
+    if (filters.minPrice !== undefined) {
+      conditions.push(sql`${products.price} >= ${filters.minPrice}`);
+    }
+    if (filters.maxPrice !== undefined) {
+      conditions.push(sql`${products.price} <= ${filters.maxPrice}`);
+    }
+    if (filters.search) {
+      const pattern = `%${filters.search}%`;
+      const searchCond = or(
+        ilike(products.name, pattern),
+        sql`EXISTS (
+          SELECT 1 FROM product_wines pw
+          JOIN wines w ON pw.wine_id = w.id
+          WHERE pw.product_id = ${products.id}
+            AND w.name ILIKE ${pattern}
+            AND w.deleted_at IS NULL
+        )`
+      );
+      if (searchCond) {
+        conditions.push(searchCond);
+      }
+    }
+    if (filters.type) {
+      conditions.push(sql`EXISTS (
+        SELECT 1 FROM product_wines pw
+        JOIN wines w ON pw.wine_id = w.id
+        WHERE pw.product_id = ${products.id}
+          AND w.type = ${filters.type}
+          AND w.deleted_at IS NULL
+      )`);
+    }
+    if (filters.color) {
+      conditions.push(sql`EXISTS (
+        SELECT 1 FROM product_wines pw
+        JOIN wines w ON pw.wine_id = w.id
+        WHERE pw.product_id = ${products.id}
+          AND w.color = ${filters.color}
+          AND w.deleted_at IS NULL
+      )`);
+    }
+    if (filters.region) {
+      const regionPattern = `%${filters.region}%`;
+      conditions.push(sql`EXISTS (
+        SELECT 1 FROM product_wines pw
+        JOIN wines w ON pw.wine_id = w.id
+        WHERE pw.product_id = ${products.id}
+          AND w.region ILIKE ${regionPattern}
+          AND w.deleted_at IS NULL
+      )`);
+    }
+
+    const reviewsJoinCond = and(
+      eq(reviews.entityId, products.id),
+      eq(reviews.entityType, "product"),
+      isNull(reviews.deletedAt)
+    );
+
+    const orderByExpr = (() => {
+      switch (filters.sort) {
+        case "price-asc":
+          return asc(products.price);
+        case "price-desc":
+          return desc(products.price);
+        case "rating":
+          return sql`AVG(${reviews.rating}) DESC NULLS LAST`;
+        default:
+          return desc(products.createdAt);
+      }
+    })();
+
+    const having =
+      filters.rating !== undefined ? sql`AVG(${reviews.rating}) >= ${filters.rating}` : undefined;
+
+    const baseSelect = db
+      .select({
+        avgRating: sql<string | null>`AVG(${reviews.rating})`,
+        id: products.id,
+        isBundle: products.isBundle,
+        name: products.name,
+        price: products.price,
+        quantity: products.quantity,
+        reviewCount: sql<number>`COUNT(DISTINCT ${reviews.id})::int`,
+        shopId: products.shopId,
+        shopName: shops.name,
+      })
+      .from(products)
+      .innerJoin(shops, eq(products.shopId, shops.id))
+      .leftJoin(reviews, reviewsJoinCond)
+      .where(and(...conditions))
+      .groupBy(products.id, shops.id);
+
+    // biome-ignore lint/suspicious/noExplicitAny: Drizzle's .having() returns a narrower type; cast to keep chaining uniform
+    const rowsQuery: any = having ? baseSelect.having(having) : baseSelect;
+
+    const countBase = db
+      .select({ id: products.id })
+      .from(products)
+      .innerJoin(shops, eq(products.shopId, shops.id))
+      .leftJoin(reviews, reviewsJoinCond)
+      .where(and(...conditions))
+      .groupBy(products.id, shops.id);
+
+    // biome-ignore lint/suspicious/noExplicitAny: same reason as rowsQuery
+    const countSubq = ((having ? countBase.having(having) : countBase) as any).as("subq");
+
+    const [rows, [countResult]] = await Promise.all([
+      rowsQuery.orderBy(orderByExpr).limit(pagination.limit).offset(pagination.offset),
+      db.select({ total: sql<number>`COUNT(*)::int` }).from(countSubq),
+    ]);
+
+    return { rows, total: countResult?.total ?? 0 };
   },
 
   async handleSameWineQuantityChange(

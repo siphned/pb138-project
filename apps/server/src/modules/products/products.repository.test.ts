@@ -28,10 +28,18 @@ const mockDb = db as unknown as MockDatabase;
 
 vi.mock("../../db", () => {
   const m = {
+    as: vi.fn().mockReturnThis(),
     delete: vi.fn().mockReturnThis(),
     for: vi.fn().mockReturnThis(),
     from: vi.fn().mockReturnThis(),
+    groupBy: vi.fn().mockReturnThis(),
+    having: vi.fn().mockReturnThis(),
+    innerJoin: vi.fn().mockReturnThis(),
     insert: vi.fn().mockReturnThis(),
+    leftJoin: vi.fn().mockReturnThis(),
+    limit: vi.fn().mockReturnThis(),
+    offset: vi.fn().mockReturnThis(),
+    orderBy: vi.fn().mockReturnThis(),
     query: {
       products: {
         findFirst: vi.fn(),
@@ -223,6 +231,99 @@ describe("productsRepository", () => {
         })
       );
       expect(result).toEqual(mockData);
+    });
+  });
+
+  describe("findAll", () => {
+    it("returns rows and total with correct shape", async () => {
+      const mockRows = [
+        {
+          avgRating: "4.5",
+          id: "p1",
+          isBundle: false,
+          name: "Château Noir",
+          price: "12.99",
+          quantity: 5,
+          reviewCount: 3,
+          shopId: "s1",
+          shopName: "The Wine Shop",
+        },
+      ];
+
+      // First db.select call: main paginated query (chain ends with .offset)
+      const mainChain = {
+        as: vi.fn().mockReturnThis(),
+        from: vi.fn().mockReturnThis(),
+        groupBy: vi.fn().mockReturnThis(),
+        having: vi.fn().mockReturnThis(),
+        innerJoin: vi.fn().mockReturnThis(),
+        leftJoin: vi.fn().mockReturnThis(),
+        limit: vi.fn().mockReturnThis(),
+        offset: vi.fn().mockResolvedValue(mockRows),
+        orderBy: vi.fn().mockReturnThis(),
+        where: vi.fn().mockReturnThis(),
+      };
+
+      // Second db.select call: count subquery base (chain ends with .as())
+      const countSubqChain = {
+        as: vi.fn().mockReturnValue({ _subq: true }),
+        from: vi.fn().mockReturnThis(),
+        groupBy: vi.fn().mockReturnThis(),
+        having: vi.fn().mockReturnThis(),
+        innerJoin: vi.fn().mockReturnThis(),
+        leftJoin: vi.fn().mockReturnThis(),
+        where: vi.fn().mockReturnThis(),
+      };
+
+      // Third db.select call: count outer query (chain ends with .from(subq))
+      const countOuterChain = {
+        from: vi.fn().mockResolvedValue([{ total: 1 }]),
+      };
+
+      vi.mocked(mockDb.select)
+        .mockReturnValueOnce(mainChain as never)
+        .mockReturnValueOnce(countSubqChain as never)
+        .mockReturnValueOnce(countOuterChain as never);
+
+      const result = await productsRepository.findAll({}, { limit: 20, offset: 0 });
+
+      expect(result.rows).toEqual(mockRows);
+      expect(result.total).toBe(1);
+    });
+
+    it("returns empty rows and zero total when nothing matches", async () => {
+      const emptyMain = {
+        as: vi.fn().mockReturnThis(),
+        from: vi.fn().mockReturnThis(),
+        groupBy: vi.fn().mockReturnThis(),
+        having: vi.fn().mockReturnThis(),
+        innerJoin: vi.fn().mockReturnThis(),
+        leftJoin: vi.fn().mockReturnThis(),
+        limit: vi.fn().mockReturnThis(),
+        offset: vi.fn().mockResolvedValue([]),
+        orderBy: vi.fn().mockReturnThis(),
+        where: vi.fn().mockReturnThis(),
+      };
+      const emptySubq = {
+        as: vi.fn().mockReturnValue({ _subq: true }),
+        from: vi.fn().mockReturnThis(),
+        groupBy: vi.fn().mockReturnThis(),
+        having: vi.fn().mockReturnThis(),
+        innerJoin: vi.fn().mockReturnThis(),
+        leftJoin: vi.fn().mockReturnThis(),
+        where: vi.fn().mockReturnThis(),
+      };
+      const emptyCount = { from: vi.fn().mockResolvedValue([{ total: 0 }]) };
+
+      vi.mocked(mockDb.select)
+        .mockReturnValueOnce(emptyMain as never)
+        .mockReturnValueOnce(emptySubq as never)
+        .mockReturnValueOnce(emptyCount as never);
+
+      const result = await productsRepository.findAll({}, { limit: 20, offset: 0 });
+
+      expect(result.rows).toEqual([]);
+      expect(result.total).toBe(0);
     });
   });
 });
