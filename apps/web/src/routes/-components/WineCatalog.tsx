@@ -90,7 +90,15 @@ export function WineCatalog({ search, shopId, shopName }: WineCatalogProps) {
         shopName: item.shop?.name ?? undefined,
         updatedAt: item.updatedAt ?? null,
         wines: Array.isArray(item.wines)
-          ? (item.wines as { id: string; name: string; region: string; vintageYear: string | number; type: string; color: string; winemaker: { id: string; name: string } }[])
+          ? (item.wines as {
+              id: string;
+              name: string;
+              region: string;
+              vintageYear: string | number;
+              type: string;
+              color: string;
+              winemaker: { id: string; name: string };
+            }[])
           : [
               {
                 color: item.color ?? "",
@@ -109,7 +117,12 @@ export function WineCatalog({ search, shopId, shopName }: WineCatalogProps) {
     const timer = setTimeout(() => {
       if (searchInput !== (search.search ?? "")) {
         navigate({
-          search: { ...search, page: 1, search: searchInput || undefined, sort: search.sort ?? "newest" },
+          search: {
+            ...search,
+            page: 1,
+            search: searchInput || undefined,
+            sort: search.sort ?? "newest",
+          },
           to: "/wines",
         });
       }
@@ -120,7 +133,7 @@ export function WineCatalog({ search, shopId, shopName }: WineCatalogProps) {
   const renderContent = () => {
     if (isLoading) {
       return (
-        <div className="grid grid-cols-1 gap-6 md:grid-cols-2 xl:grid-cols-3">
+        <div className="grid grid-cols-1 gap-6 md:grid-cols-3 xl:grid-cols-4">
           {["s1", "s2", "s3", "s4", "s5", "s6"].map((s) => (
             <div className="h-[400px] w-full animate-pulse rounded-2xl bg-secondary/20" key={s} />
           ))}
@@ -155,7 +168,7 @@ export function WineCatalog({ search, shopId, shopName }: WineCatalogProps) {
     }
 
     return (
-      <div className="grid grid-cols-1 gap-6 md:grid-cols-2 xl:grid-cols-3">
+      <div className="grid grid-cols-1 gap-6 md:grid-cols-3 xl:grid-cols-4">
         {products.map((product) => (
           <WineCard
             key={product.id}
@@ -211,7 +224,10 @@ export function WineCatalog({ search, shopId, shopName }: WineCatalogProps) {
 
                 <Select
                   onValueChange={(value) =>
-                    navigate({ search: { ...search, page: 1, sort: value ?? "newest" }, to: "/wines" })
+                    navigate({
+                      search: { ...search, page: 1, sort: value ?? "newest" },
+                      to: "/wines",
+                    })
                   }
                   value={String(search.sort ?? "newest")}
                 >
@@ -243,7 +259,11 @@ export function WineCatalog({ search, shopId, shopName }: WineCatalogProps) {
                   className="rounded-full px-8"
                   onClick={() =>
                     navigate({
-                      search: { ...search, page: (Number(search.page) || 1) + 1, sort: search.sort ?? "newest" },
+                      search: {
+                        ...search,
+                        page: (Number(search.page) || 1) + 1,
+                        sort: search.sort ?? "newest",
+                      },
                       to: "/wines",
                     })
                   }

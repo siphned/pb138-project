@@ -1,0 +1,125 @@
+import { createFileRoute, Link } from "@tanstack/react-router";
+import { ArrowLeft } from "lucide-react";
+import { PublicLayout } from "@/components/layout/PublicLayout";
+import { Button } from "@/components/ui/button";
+import { Card } from "@/components/ui/card";
+import { Separator } from "@/components/ui/separator";
+import { useGetShopsById } from "@/generated/hooks/shopsController/useGetShopsById";
+import { ShopBundlesSection } from "./-components/ShopBundlesSection";
+import { ShopHeroGallery } from "./-components/ShopHeroGallery";
+import { ShopInfoPanel } from "./-components/ShopInfoPanel";
+import { ShopMapEmbed } from "./-components/ShopMapEmbed";
+import { ShopProductsSection } from "./-components/ShopProductsSection";
+
+export const Route = createFileRoute("/shops/$id")({
+  component: ShopDetailPage,
+});
+
+function ShopDetailPage() {
+  const { id } = Route.useParams();
+  const { data: shop, isLoading, isError, refetch } = useGetShopsById(id);
+
+  if (isLoading) {
+    return (
+      <PublicLayout>
+        <div className="h-72 w-full animate-pulse bg-secondary/20 lg:h-96" />
+        <div className="container mx-auto px-6 py-8 lg:px-12 space-y-8">
+          <div className="h-10 w-48 animate-pulse rounded-md bg-secondary/20" />
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+            <div className="lg:col-span-2 space-y-8">
+              <div className="h-32 w-full animate-pulse rounded-2xl bg-secondary/20" />
+              <div className="h-64 w-full animate-pulse rounded-2xl bg-secondary/20" />
+            </div>
+            <div className="h-64 w-full animate-pulse rounded-2xl bg-secondary/20" />
+          </div>
+        </div>
+      </PublicLayout>
+    );
+  }
+
+  if (isError || !shop) {
+    return (
+      <PublicLayout>
+        <div className="container mx-auto flex flex-col items-center py-24 text-center">
+          <p className="font-bold text-destructive">Failed to load shop details.</p>
+          <Button onClick={() => refetch()} variant="link">
+            Retry
+          </Button>
+        </div>
+      </PublicLayout>
+    );
+  }
+
+  return (
+    <PublicLayout>
+      <ShopHeroGallery shopName={shop.name} />
+
+      <div className="container mx-auto px-6 py-8 lg:px-12">
+        <Link
+          className="mb-6 flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground"
+          to="/shops"
+        >
+          <ArrowLeft className="h-4 w-4" />
+          Back to all shops
+        </Link>
+
+        <div className="grid grid-cols-1 gap-8 lg:grid-cols-3">
+          {/* LEFT COLUMN */}
+          <div className="lg:col-span-2 space-y-8">
+            <ShopInfoPanel
+              address={shop.address}
+              name={shop.name}
+              // rating and reviewCount are gaps in API
+            />
+            <Separator />
+            <ShopMapEmbed address={shop.address} />
+            <Separator />
+            <ShopProductsSection shopId={shop.id} />
+            <ShopBundlesSection shopId={shop.id} />
+            <Separator />
+            <div className="space-y-4">
+              <h2 className="font-heading text-2xl font-bold">Reviews</h2>
+              <p className="text-muted-foreground text-sm italic">
+                Coming soon — we're working on bringing customer reviews to shop profiles!
+                {/* TODO: wire up when backend ships GET /shops/:id/reviews */}
+              </p>
+            </div>
+          </div>
+
+          {/* RIGHT COLUMN */}
+          <div className="space-y-6">
+            <Card className="sticky top-8 rounded-2xl p-6 border-none bg-secondary/10 shadow-none">
+              <h3 className="font-heading text-xl font-bold mb-4">Contact & Hours</h3>
+              <div className="space-y-4 text-sm">
+                <div>
+                  <p className="font-semibold text-muted-foreground mb-1 uppercase tracking-wider text-[10px]">
+                    Address
+                  </p>
+                  <p>
+                    {shop.address.street} {shop.address.houseNumber}
+                  </p>
+                  <p>
+                    {shop.address.city}, {shop.address.postalCode}
+                  </p>
+                  <p>{shop.address.country}</p>
+                </div>
+                <div>
+                  <p className="font-semibold text-muted-foreground mb-1 uppercase tracking-wider text-[10px]">
+                    Phone
+                  </p>
+                  <p>__</p> {/* gap #4 */}
+                </div>
+                <div>
+                  <p className="font-semibold text-muted-foreground mb-1 uppercase tracking-wider text-[10px]">
+                    Opening Hours
+                  </p>
+                  <p>__</p> {/* gap #4 */}
+                </div>
+              </div>
+            </Card>
+          </div>
+        </div>
+      </div>
+    </PublicLayout>
+  );
+}
