@@ -37,15 +37,7 @@ export function WineCatalog({ search, shopId, shopName }: WineCatalogProps) {
   const navigate = useNavigate();
   const [searchInput, setSearchInput] = useState(search.search ?? "");
 
-  const productsResult = useGetProducts({
-    maxPrice: search.maxPrice,
-    minPrice: search.minPrice,
-    page: search.page,
-    region: typeof search.region === "string" ? search.region : search.region?.[0],
-    search: search.search,
-    sort: search.sort,
-    type: typeof search.type === "string" ? search.type : search.type?.[0],
-  });
+  const productsResult = useGetProducts();
 
   const shopProductsResult = useGetShopsByIdProducts(shopId ?? "", { isBundle: "false" });
 

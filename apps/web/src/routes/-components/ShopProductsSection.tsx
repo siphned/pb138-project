@@ -83,7 +83,11 @@ export function ShopProductsSection({ shopId }: ShopProductsSectionProps) {
       </div>
       <div className="flex justify-center">
         <Button variant="outline">
-          <Link className="flex items-center gap-2 text-sm " to="/wines">
+          <Link 
+            className="flex items-center gap-2 text-sm " 
+            search={{ page: 1, sort: "newest" }}
+            to="/wines"
+          >
             Show Inventory
             <ArrowRight className="h-4 w-4" />
           </Link>
