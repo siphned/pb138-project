@@ -107,7 +107,7 @@ export function CatalogCard({
           {price !== undefined && (
             <span className="text-xl font-bold text-foreground">{price}</span>
           )}
-          {actionSlot && <div className="relative z-[2]">{actionSlot}</div>}
+          {actionSlot && <div className="relative z-2">{actionSlot}</div>}
         </CardFooter>
       )}
     </Card>

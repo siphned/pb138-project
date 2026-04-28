@@ -2,7 +2,6 @@ import { Link } from "@tanstack/react-router";
 import { Heart } from "lucide-react";
 import { useState } from "react";
 import { CatalogCard } from "@/components/catalog/CatalogCard";
-import { Button } from "@/components/ui/button";
 import type { GetProducts200 } from "@/generated/types/GetProducts";
 import { cn } from "@/lib/utils";
 
