@@ -33,6 +33,72 @@ interface WineCatalogProps {
   shopName?: string;
 }
 
+type CatalogProduct = {
+  createdAt: string;
+  description: string | null;
+  id: string;
+  isBundle: boolean;
+  name: string;
+  price: string;
+  quantity: number;
+  rating: number;
+  reviewCount: number;
+  shopId: string;
+  shopName?: string;
+  updatedAt: string | null;
+  wines: {
+    id: string;
+    name: string;
+    region: string;
+    vintageYear: string | number;
+    type: string;
+    color: string;
+    winemaker: { id: string; name: string };
+  }[];
+};
+
+const matchesText = (product: CatalogProduct, query?: string) => {
+  if (!query) return true;
+  const q = query.toLowerCase();
+  return (
+    product.name.toLowerCase().includes(q) ||
+    (product.wines?.[0]?.winemaker?.name.toLowerCase().includes(q) ?? false)
+  );
+};
+
+const matchesAttributes = (product: CatalogProduct, search: WineCatalogProps["search"]) => {
+  const wine = product.wines?.[0];
+  const { color, type, region } = search;
+
+  if (color?.length && !color.some((c) => wine?.color?.toLowerCase().includes(c.toLowerCase())))
+    return false;
+  if (type?.length && !type.some((t) => wine?.type?.toLowerCase().includes(t.toLowerCase())))
+    return false;
+  if (region?.length && !region.some((r) => wine?.region === r)) return false;
+
+  return true;
+};
+
+const matchesStats = (product: CatalogProduct, search: WineCatalogProps["search"]) => {
+  const { minPrice, maxPrice, rating } = search;
+  const price = Number(product.price);
+
+  if (minPrice && price < minPrice) return false;
+  if (maxPrice && price > maxPrice) return false;
+  if (rating && product.rating < rating) return false;
+
+  return true;
+};
+
+const filterProduct = (product: CatalogProduct, search: WineCatalogProps["search"]) => {
+  if (product.isBundle) return false;
+  return (
+    matchesText(product, search.search) &&
+    matchesAttributes(product, search) &&
+    matchesStats(product, search)
+  );
+};
+
 export function WineCatalog({ search, shopId, shopName }: WineCatalogProps) {
   const navigate = useNavigate();
   const [searchInput, setSearchInput] = useState(search.search ?? "");
@@ -48,6 +114,7 @@ export function WineCatalog({ search, shopId, shopName }: WineCatalogProps) {
     createdAt?: string;
     description?: string | null;
     id: string;
+    isBundle?: boolean;
     name: string;
     price?: string;
     quantity?: number | string;
@@ -68,7 +135,7 @@ export function WineCatalog({ search, shopId, shopName }: WineCatalogProps) {
         createdAt: item.createdAt ?? "",
         description: item.description ?? null,
         id: item.id,
-        isBundle: false as const,
+        isBundle: !!item.isBundle,
         name: item.name,
         price: item.price ?? "0",
         quantity: Number(item.quantity),
@@ -99,6 +166,23 @@ export function WineCatalog({ search, shopId, shopName }: WineCatalogProps) {
               },
             ],
       }))
+    : undefined;
+
+  const filteredProducts = products
+    ? products
+        .filter((product) => filterProduct(product, search))
+        .sort((a, b) => {
+          switch (search.sort) {
+            case "price-asc":
+              return Number(a.price) - Number(b.price);
+            case "price-desc":
+              return Number(b.price) - Number(a.price);
+            case "rating":
+              return b.rating - a.rating;
+            default:
+              return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
+          }
+        })
     : undefined;
 
   useEffect(() => {
@@ -140,7 +224,7 @@ export function WineCatalog({ search, shopId, shopName }: WineCatalogProps) {
       );
     }
 
-    if (!Array.isArray(products) || products.length === 0) {
+    if (!Array.isArray(filteredProducts) || filteredProducts.length === 0) {
       return (
         <div className="flex flex-col items-center justify-center space-y-4 py-20 text-center">
           <div className="flex h-20 w-20 items-center justify-center rounded-full bg-secondary/20">
@@ -157,7 +241,7 @@ export function WineCatalog({ search, shopId, shopName }: WineCatalogProps) {
 
     return (
       <div className="grid grid-cols-1 gap-6 md:grid-cols-3 xl:grid-cols-4">
-        {products.map((product) => (
+        {filteredProducts.map((product) => (
           <WineCard
             key={product.id}
             product={product}
@@ -234,14 +318,15 @@ export function WineCatalog({ search, shopId, shopName }: WineCatalogProps) {
 
             {/* Result count */}
             <p className="text-sm text-muted-foreground">
-              Showing <span className="font-bold text-foreground">{products?.length ?? 0}</span>{" "}
+              Showing{" "}
+              <span className="font-bold text-foreground">{filteredProducts?.length ?? 0}</span>{" "}
               products
             </p>
 
             {renderContent()}
 
             {/* Load more */}
-            {products && products.length >= 12 && (
+            {filteredProducts && filteredProducts.length >= 12 && (
               <div className="flex justify-center pt-8">
                 <Button
                   className="rounded-full px-8"
