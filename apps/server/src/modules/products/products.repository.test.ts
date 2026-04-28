@@ -35,6 +35,7 @@ vi.mock("../../db", () => {
     query: {
       products: {
         findFirst: vi.fn(),
+        findMany: vi.fn(),
       },
     },
     returning: vi.fn().mockReturnThis(),
@@ -179,6 +180,48 @@ describe("productsRepository", () => {
 
       expect(db.update).toHaveBeenCalledWith(wines);
       expect(db.update).toHaveBeenCalledWith(products);
+    });
+  });
+
+  describe("findByIds", () => {
+    it("returns empty array immediately when ids list is empty", async () => {
+      const result = await productsRepository.findByIds([]);
+      expect(result).toEqual([]);
+      expect(db.query.products.findMany).not.toHaveBeenCalled();
+    });
+
+    it("calls findMany with inArray and nested with clause", async () => {
+      const mockData = [
+        {
+          id: "p1",
+          name: "Pinot Noir",
+          productWines: [
+            {
+              wine: {
+                color: "red",
+                id: "w1",
+                name: "Red Wine",
+                region: "Bordeaux",
+                type: "still",
+                vintageYear: 2020,
+                winemaker: { name: "Jean Dupont" },
+              },
+            },
+          ],
+        },
+      ];
+      vi.mocked(db.query.products.findMany).mockResolvedValue(mockData as never);
+
+      const result = await productsRepository.findByIds(["p1"]);
+
+      expect(db.query.products.findMany).toHaveBeenCalledWith(
+        expect.objectContaining({
+          with: expect.objectContaining({
+            productWines: expect.anything(),
+          }),
+        })
+      );
+      expect(result).toEqual(mockData);
     });
   });
 });

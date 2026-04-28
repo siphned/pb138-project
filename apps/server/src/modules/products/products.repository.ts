@@ -12,6 +12,43 @@ export type ProductWineWithInfo = ProductWine & { wine: WineInfo };
 
 export type ProductWithWines = Product & { productWines: ProductWineWithInfo[] };
 
+export type CatalogWineInfo = {
+  id: string;
+  name: string;
+  type: string;
+  color: string;
+  region: string;
+  vintageYear: number;
+  winemaker: { name: string };
+};
+
+export type ProductWithWinesAndWinemaker = Product & {
+  productWines: Array<ProductWine & { wine: CatalogWineInfo }>;
+};
+
+export type ProductCatalogFilters = {
+  minPrice?: number;
+  maxPrice?: number;
+  type?: string;
+  color?: string;
+  region?: string;
+  rating?: number;
+  sort?: "newest" | "price-asc" | "price-desc" | "rating";
+  search?: string;
+};
+
+export type CatalogRow = {
+  id: string;
+  name: string;
+  price: string;
+  quantity: number;
+  isBundle: boolean;
+  shopId: string;
+  shopName: string;
+  avgRating: string | null;
+  reviewCount: number;
+};
+
 type Transaction = Parameters<Parameters<typeof db.transaction>[0]>[0];
 
 export const productsRepository = {
@@ -204,6 +241,32 @@ export const productsRepository = {
         },
       },
     }) as Promise<ProductWithWines[]>;
+  },
+
+  findByIds(ids: string[]): Promise<ProductWithWinesAndWinemaker[]> {
+    if (ids.length === 0) return Promise.resolve([]);
+    return db.query.products.findMany({
+      where: inArray(products.id, ids),
+      with: {
+        productWines: {
+          with: {
+            wine: {
+              columns: {
+                color: true,
+                id: true,
+                name: true,
+                region: true,
+                type: true,
+                vintageYear: true,
+              },
+              with: {
+                winemaker: { columns: { name: true } },
+              },
+            },
+          },
+        },
+      },
+    }) as Promise<ProductWithWinesAndWinemaker[]>;
   },
 
   async handleSameWineQuantityChange(
