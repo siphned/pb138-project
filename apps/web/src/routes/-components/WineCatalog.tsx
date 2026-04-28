@@ -77,7 +77,7 @@ export function WineCatalog({ search, shopId, shopName }: WineCatalogProps) {
 
   const products = Array.isArray(rawData)
     ? (rawData as RawProductItem[]).map((item) => ({
-        createdAt: item.createdAt,
+        createdAt: item.createdAt ?? "",
         description: item.description ?? null,
         id: item.id,
         isBundle: false as const,
@@ -90,16 +90,16 @@ export function WineCatalog({ search, shopId, shopName }: WineCatalogProps) {
         shopName: item.shop?.name ?? undefined,
         updatedAt: item.updatedAt ?? null,
         wines: Array.isArray(item.wines)
-          ? item.wines
+          ? (item.wines as { id: string; name: string; region: string; vintageYear: string | number; type: string; color: string; winemaker: { id: string; name: string } }[])
           : [
               {
-                color: item.color,
+                color: item.color ?? "",
                 id: item.id,
                 name: item.name,
-                region: item.region,
-                type: item.type,
+                region: item.region ?? "",
+                type: item.type ?? "",
                 vintageYear: Number(item.vintageYear),
-                winemaker: item.winemaker,
+                winemaker: (item.winemaker ?? { id: "", name: "" }) as { id: string; name: string },
               },
             ],
       }))
@@ -109,7 +109,7 @@ export function WineCatalog({ search, shopId, shopName }: WineCatalogProps) {
     const timer = setTimeout(() => {
       if (searchInput !== (search.search ?? "")) {
         navigate({
-          search: { ...search, page: 1, search: searchInput || undefined },
+          search: { ...search, page: 1, search: searchInput || undefined, sort: search.sort ?? "newest" },
           to: "/wines",
         });
       }
@@ -211,7 +211,7 @@ export function WineCatalog({ search, shopId, shopName }: WineCatalogProps) {
 
                 <Select
                   onValueChange={(value) =>
-                    navigate({ search: { ...search, page: 1, sort: value }, to: "/wines" })
+                    navigate({ search: { ...search, page: 1, sort: value ?? "newest" }, to: "/wines" })
                   }
                   value={String(search.sort ?? "newest")}
                 >
@@ -243,7 +243,7 @@ export function WineCatalog({ search, shopId, shopName }: WineCatalogProps) {
                   className="rounded-full px-8"
                   onClick={() =>
                     navigate({
-                      search: { ...search, page: (Number(search.page) || 1) + 1 },
+                      search: { ...search, page: (Number(search.page) || 1) + 1, sort: search.sort ?? "newest" },
                       to: "/wines",
                     })
                   }

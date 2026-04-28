@@ -164,7 +164,8 @@ export function Sidebar({ userRoles = [Role.customer], activeRole, onRoleChange 
 
             <Link
               className="flex-none flex items-center gap-3 px-3 py-3 rounded-md bg-secondary hover:bg-secondary/80 transition-colors text-sm font-medium text-primary"
-              to="/bundles"
+              search={{ page: 1, sort: "newest" }}
+              to="/wines"
             >
               <Package className="h-4 w-4" /> Bundles
             </Link>

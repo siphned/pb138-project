@@ -19,7 +19,7 @@ import { winesRoutes } from "./modules/wines";
 export const app = new Elysia()
   .onError(({ code, error, request }) => {
     console.error(`Error ${code} during ${request.method} ${request.url}:`, error);
-    return error.message;
+    return (error as Error).message;
   })
   .use(cors({ origin: "http://localhost:5173" }))
   .use(

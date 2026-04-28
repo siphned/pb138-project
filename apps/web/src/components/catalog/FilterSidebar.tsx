@@ -126,7 +126,7 @@ function PriceRangeSection({
   return (
     <div className="space-y-4">
       <SectionHeading>{section.label}</SectionHeading>
-      <Slider max={MAX_PRICE} onValueChange={setLocalValue} step={10} value={localValue} />
+      <Slider max={MAX_PRICE} onValueChange={(v) => setLocalValue(v as number[])} step={10} value={localValue} />
       <div className="text-sm text-muted-foreground">
         Price: €{localValue[0]} -{" "}
         {localValue[1] === MAX_PRICE ? `${MAX_PRICE}+` : `€${localValue[1]}`}
