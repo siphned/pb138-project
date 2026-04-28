@@ -9,7 +9,8 @@ type ShopProductRaw = {
   id: string;
   name: string;
   price: string;
-  productWines: unknown[];
+  productWines?: unknown[];
+  wines?: unknown[];
 };
 
 interface ShopBundlesSectionProps {
@@ -51,15 +52,17 @@ export function ShopBundlesSection({ shopId }: ShopBundlesSectionProps) {
               id: product.id,
               name: product.name,
               price: product.price,
-              wineCount: product.productWines.length,
+              wineCount: Array.isArray(product.wines)
+                ? product.wines.length
+                : (product.productWines?.length ?? 0),
             }}
           />
         ))}
       </div>
       <div className="flex justify-center">
         <Button variant="outline">
-          <Link 
-            className="flex items-center gap-2 text-sm " 
+          <Link
+            className="flex items-center gap-2 text-sm "
             search={{ page: 1, sort: "newest" }}
             to="/wines"
           >

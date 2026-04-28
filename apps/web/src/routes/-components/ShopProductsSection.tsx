@@ -7,15 +7,16 @@ import { WineCard } from "./WineCard";
 // Shape returned by GET /shops/:id/products (no response schema in OpenAPI)
 type ShopProductRaw = {
   id: string;
-  shopId: string;
+  shopId?: string;
   name: string;
-  description: string | null;
+  description?: string | null;
   price: string;
-  quantity: number;
-  isBundle: boolean;
-  createdAt: string;
-  updatedAt: string | null;
-  productWines: {
+  quantity?: number;
+  isBundle?: boolean;
+  createdAt?: string;
+  updatedAt?: string | null;
+  // API may return either shape:
+  productWines?: {
     wine: {
       id: string;
       name: string;
@@ -23,6 +24,15 @@ type ShopProductRaw = {
       color: string;
       vintageYear: number;
     };
+  }[];
+  wines?: {
+    id: string;
+    name: string;
+    type: string;
+    color: string;
+    vintageYear: number;
+    region?: string;
+    winemaker?: { id: string; name: string };
   }[];
 };
 
@@ -65,17 +75,34 @@ export function ShopProductsSection({ shopId }: ShopProductsSectionProps) {
             <WineCard
               product={{
                 ...product,
+                createdAt: product.createdAt ?? "",
+                description: product.description ?? null,
+                isBundle: !!product.isBundle,
+                quantity: product.quantity ?? 0,
                 rating: 0,
                 reviewCount: 0,
-                wines: product.productWines.map((pw) => ({
-                  color: pw.wine.color,
-                  id: pw.wine.id,
-                  name: pw.wine.name,
-                  region: "",
-                  type: pw.wine.type,
-                  vintageYear: pw.wine.vintageYear,
-                  winemaker: { id: "", name: "" },
-                })),
+                shopId: product.shopId ?? shopId,
+                updatedAt: product.updatedAt ?? null,
+                wines:
+                  Array.isArray(product.wines) && product.wines.length > 0
+                    ? product.wines.map((w) => ({
+                        color: w.color,
+                        id: w.id,
+                        name: w.name,
+                        region: w.region ?? "",
+                        type: w.type,
+                        vintageYear: w.vintageYear,
+                        winemaker: w.winemaker ?? { id: "", name: "" },
+                      }))
+                    : (product.productWines ?? []).map((pw) => ({
+                        color: pw.wine.color,
+                        id: pw.wine.id,
+                        name: pw.wine.name,
+                        region: "",
+                        type: pw.wine.type,
+                        vintageYear: pw.wine.vintageYear,
+                        winemaker: { id: "", name: "" },
+                      })),
               }}
             />
           </div>
@@ -83,8 +110,8 @@ export function ShopProductsSection({ shopId }: ShopProductsSectionProps) {
       </div>
       <div className="flex justify-center">
         <Button variant="outline">
-          <Link 
-            className="flex items-center gap-2 text-sm " 
+          <Link
+            className="flex items-center gap-2 text-sm "
             search={{ page: 1, sort: "newest" }}
             to="/wines"
           >
