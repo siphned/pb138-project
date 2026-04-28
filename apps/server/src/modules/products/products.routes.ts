@@ -70,16 +70,26 @@ export const productsRoutes = new Elysia()
     }
   )
 
-  .get("/products", async ({ query }) => productsService.getAllProducts(query), {
-    detail: {
-      description:
-        "Returns paginated retail products across all shops. Supports filtering by price, type, color, region, rating, and full-text search.",
-      summary: "Browse product catalog",
-      tags: ["products"],
+  .get(
+    "/products",
+    async ({ query }) => {
+      try {
+        return await productsService.getAllProducts(query);
+      } catch (e) {
+        return handleError(e);
+      }
     },
-    query: getAllProductsQuery,
-    response: { 200: getAllProductsResponse },
-  })
+    {
+      detail: {
+        description:
+          "Returns paginated retail products across all shops. Supports filtering by price, type, color, region, rating, and full-text search.",
+        summary: "Browse product catalog",
+        tags: ["products"],
+      },
+      query: getAllProductsQuery,
+      response: { 200: getAllProductsResponse },
+    }
+  )
 
   .get(
     "/products/:id",
