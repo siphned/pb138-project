@@ -325,5 +325,42 @@ describe("productsRepository", () => {
       expect(result.rows).toEqual([]);
       expect(result.total).toBe(0);
     });
+
+    it("applies having clause when rating filter is provided", async () => {
+      const ratedMain = {
+        as: vi.fn().mockReturnThis(),
+        from: vi.fn().mockReturnThis(),
+        groupBy: vi.fn().mockReturnThis(),
+        having: vi.fn().mockReturnThis(),
+        innerJoin: vi.fn().mockReturnThis(),
+        leftJoin: vi.fn().mockReturnThis(),
+        limit: vi.fn().mockReturnThis(),
+        offset: vi.fn().mockResolvedValue([]),
+        orderBy: vi.fn().mockReturnThis(),
+        where: vi.fn().mockReturnThis(),
+      };
+      const ratedSubq = {
+        as: vi.fn().mockReturnValue({ _subq: true }),
+        from: vi.fn().mockReturnThis(),
+        groupBy: vi.fn().mockReturnThis(),
+        having: vi.fn().mockReturnThis(),
+        innerJoin: vi.fn().mockReturnThis(),
+        leftJoin: vi.fn().mockReturnThis(),
+        where: vi.fn().mockReturnThis(),
+      };
+      const ratedCount = { from: vi.fn().mockResolvedValue([{ total: 0 }]) };
+
+      vi.mocked(mockDb.select)
+        .mockReturnValueOnce(ratedMain as never)
+        .mockReturnValueOnce(ratedSubq as never)
+        .mockReturnValueOnce(ratedCount as never);
+
+      const result = await productsRepository.findAll({ rating: 4 }, { limit: 20, offset: 0 });
+
+      expect(ratedMain.having).toHaveBeenCalled();
+      expect(ratedSubq.having).toHaveBeenCalled();
+      expect(result.rows).toEqual([]);
+      expect(result.total).toBe(0);
+    });
   });
 });

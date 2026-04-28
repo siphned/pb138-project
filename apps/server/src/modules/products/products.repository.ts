@@ -343,6 +343,7 @@ export const productsRepository = {
       }
     })();
 
+    // Products with no reviews yield AVG = NULL; NULL >= N is false in PostgreSQL — unrated products are intentionally excluded when this filter is active
     const having =
       filters.rating !== undefined ? sql`AVG(${reviews.rating}) >= ${filters.rating}` : undefined;
 
