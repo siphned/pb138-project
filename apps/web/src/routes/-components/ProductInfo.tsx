@@ -5,7 +5,7 @@ import { Badge } from "@/components/ui/badge";
 interface ProductInfoProps {
   name: string;
   isBundle: boolean;
-  wines: {
+  wines?: {
     id: string;
     name: string;
     region: string;
@@ -59,8 +59,8 @@ export function ProductInfo({ name, isBundle, wines, rating, reviewCount }: Prod
         <p className="text-xs text-muted-foreground italic">No reviews yet</p>
       )}
 
-      {!isBundle && wines.length > 1 && (
-        <p className="text-sm text-muted-foreground">This bundle contains {wines.length} wines</p>
+      {!isBundle && (wines?.length ?? 0) > 1 && (
+        <p className="text-sm text-muted-foreground">This bundle contains {wines?.length} wines</p>
       )}
     </div>
   );

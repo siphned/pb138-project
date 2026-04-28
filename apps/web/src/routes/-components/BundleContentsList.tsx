@@ -18,7 +18,7 @@ export function BundleContentsList({ wines }: BundleContentsListProps) {
       <h2 className="font-heading text-2xl font-bold">Contains</h2>
       <div className="rounded-2xl border-none bg-secondary/10 p-6">
         <div className="space-y-4">
-          {wines.map((wine, index) => (
+          {wines?.map((wine, index) => (
             <div key={wine.id}>
               <div className="flex items-center justify-between">
                 <div>
@@ -30,7 +30,7 @@ export function BundleContentsList({ wines }: BundleContentsListProps) {
                   <p className="text-xs text-muted-foreground">{wine.region}</p>
                 </div>
               </div>
-              {index < wines.length - 1 && <Separator className="mt-4 bg-background/50" />}
+              {index < (wines?.length ?? 0) - 1 && <Separator className="mt-4 bg-background/50" />}
             </div>
           ))}
         </div>

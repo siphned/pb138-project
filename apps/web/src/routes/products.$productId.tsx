@@ -102,7 +102,7 @@ function ProductDetailPage() {
                   name={product.name}
                   rating={reviewData?.averageRating ?? undefined}
                   reviewCount={reviewData?.reviews?.length}
-                  wines={product.wines}
+                  wines={product.wines ?? []}
                 />
                 <ProductPriceRow
                   price={product.price}
@@ -115,7 +115,7 @@ function ProductDetailPage() {
         </ProductHero>
 
         {product.isBundle ? (
-          <BundleContentsList wines={product.wines} />
+          <BundleContentsList wines={product.wines ?? []} />
         ) : (
           product.wines?.[0] && <ProductWineAssociation wine={product.wines[0]} />
         )}
