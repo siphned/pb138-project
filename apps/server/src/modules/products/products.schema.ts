@@ -60,7 +60,7 @@ export const getAllProductsQuery = t.Object({
   color: t.Optional(catalogWineColor),
   maxPrice: t.Optional(t.Numeric()),
   minPrice: t.Optional(t.Numeric()),
-  page: t.Optional(t.Numeric({ minimum: 1 })),
+  page: t.Optional(t.Integer({ minimum: 1 })),
   rating: t.Optional(t.Numeric({ maximum: 5, minimum: 1 })),
   region: t.Optional(t.String()),
   search: t.Optional(t.String()),
