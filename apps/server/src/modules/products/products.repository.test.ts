@@ -190,7 +190,7 @@ describe("productsRepository", () => {
       expect(db.query.products.findMany).not.toHaveBeenCalled();
     });
 
-    it("calls findMany with inArray and nested with clause", async () => {
+    it("calls findMany with inArray and soft-delete filter", async () => {
       const mockData = [
         {
           id: "p1",
@@ -216,6 +216,7 @@ describe("productsRepository", () => {
 
       expect(db.query.products.findMany).toHaveBeenCalledWith(
         expect.objectContaining({
+          where: expect.anything(), // includes and(inArray(...), isNull(deletedAt))
           with: expect.objectContaining({
             productWines: expect.anything(),
           }),

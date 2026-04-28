@@ -12,13 +12,10 @@ export type ProductWineWithInfo = ProductWine & { wine: WineInfo };
 
 export type ProductWithWines = Product & { productWines: ProductWineWithInfo[] };
 
-export type CatalogWineInfo = {
-  id: string;
-  name: string;
-  type: string;
-  color: string;
-  region: string;
-  vintageYear: number;
+export type CatalogWineInfo = Pick<
+  Wine,
+  "color" | "id" | "name" | "region" | "type" | "vintageYear"
+> & {
   winemaker: { name: string };
 };
 
@@ -246,7 +243,7 @@ export const productsRepository = {
   findByIds(ids: string[]): Promise<ProductWithWinesAndWinemaker[]> {
     if (ids.length === 0) return Promise.resolve([]);
     return db.query.products.findMany({
-      where: inArray(products.id, ids),
+      where: and(inArray(products.id, ids), isNull(products.deletedAt)),
       with: {
         productWines: {
           with: {
