@@ -19,7 +19,7 @@ export function ShopInfoPanel({ name, address, rating, reviewCount }: ShopInfoPa
         {rating !== undefined && <StarRating rating={rating} reviewCount={reviewCount} size="md" />}
       </div>
 
-      <div className="flex items-start gap-2 text-muted-foreground">
+      <div className="flex place-items-baseline gap-2 text-muted-foreground">
         <MapPin className="mt-1 h-4 w-4 shrink-0" />
         <p className="text-sm lg:text-base">{fullAddress}</p>
       </div>

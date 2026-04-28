@@ -38,15 +38,9 @@ export function ProductPriceRow({ price, quantity, productId }: ProductPriceRowP
         <span className="font-heading text-3xl font-bold">{formattedPrice}</span>
         {quantity === 0 && <Badge variant="destructive">Out of stock</Badge>}
         {quantity > 0 && quantity <= 5 && (
-          <Badge className="bg-warning-bg text-warning">
-            Only {quantity} left
-          </Badge>
+          <Badge className="bg-warning-bg text-warning">Only {quantity} left</Badge>
         )}
-        {quantity > 5 && (
-          <Badge className="bg-success-bg text-success">
-            In stock
-          </Badge>
-        )}
+        {quantity > 5 && <Badge className="bg-success-bg text-success">In stock</Badge>}
       </div>
 
       <div className="space-y-4">

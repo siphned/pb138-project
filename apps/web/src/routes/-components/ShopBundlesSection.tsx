@@ -1,12 +1,24 @@
+import { ArrowRight } from "lucide-react";
 import { BundleCard } from "@/components/catalog/BundleCard";
+import { Button } from "@/components/ui/button";
+import { Link } from "@tanstack/react-router";
 import { useGetShopsByIdProducts } from "@/generated/hooks/productsController/useGetShopsByIdProducts";
+
+// Shape returned by GET /shops/:id/products (no response schema in OpenAPI)
+type ShopProductRaw = {
+  id: string;
+  name: string;
+  price: string;
+  productWines: unknown[];
+};
 
 interface ShopBundlesSectionProps {
   shopId: string;
 }
 
 export function ShopBundlesSection({ shopId }: ShopBundlesSectionProps) {
-  const { data: products, isLoading } = useGetShopsByIdProducts(shopId, { isBundle: "true" });
+  const { data, isLoading } = useGetShopsByIdProducts(shopId, { isBundle: "true" });
+  const products = data as ShopProductRaw[] | undefined;
 
   if (isLoading) {
     return (
@@ -25,24 +37,34 @@ export function ShopBundlesSection({ shopId }: ShopBundlesSectionProps) {
   }
 
   if (!products || products.length === 0) {
-    return null; // Hide if no bundles
+    return null;
   }
 
   return (
     <div className="space-y-4">
       <h2 className="font-heading text-2xl font-bold">Exclusive Bundles</h2>
       <div className="flex gap-4 overflow-x-auto pb-4 [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
-        {(products as { id: string; name: string; price: string; wines?: unknown[] }[]).map((product) => (
+        {products.map((product) => (
           <BundleCard
             key={product.id}
             product={{
               id: product.id,
               name: product.name,
               price: product.price,
-              wineCount: product.wines?.length,
+              wineCount: product.productWines.length,
             }}
           />
         ))}
+    </div>
+        <div className="flex justify-center">
+        <Button 
+           variant="outline">
+           
+          <Link className="flex items-center gap-2 text-sm " to="/explore">
+            Show Inventory
+            <ArrowRight className="h-4 w-4" />
+          </Link>
+        </Button>
       </div>
     </div>
   );
