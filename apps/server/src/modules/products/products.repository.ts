@@ -271,7 +271,7 @@ export const productsRepository = {
     filters: ProductCatalogFilters,
     pagination: { limit: number; offset: number }
   ): Promise<{ rows: CatalogRow[]; total: number }> {
-    const conditions: SQL[] = [isNull(products.deletedAt)];
+    const conditions: SQL[] = [isNull(products.deletedAt), isNull(shops.deletedAt)];
 
     if (filters.minPrice !== undefined) {
       conditions.push(sql`${products.price} >= ${filters.minPrice}`);
