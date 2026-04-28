@@ -15,7 +15,9 @@ vi.mock("./products.repository", () => ({
   productsRepository: {
     createBundleWithWines: vi.fn(),
     createProductWithWine: vi.fn(),
+    findAll: vi.fn(),
     findById: vi.fn(),
+    findByIds: vi.fn(),
     findByShopId: vi.fn(),
     softDelete: vi.fn(),
     updateBundle: vi.fn(),
@@ -222,5 +224,109 @@ describe("listProducts", () => {
     const result = await productsService.listProducts(shopId);
     expect(result).toHaveLength(1);
     expect(productsRepository.findByShopId).toHaveBeenCalledWith(shopId, undefined);
+  });
+});
+
+describe("getAllProducts", () => {
+  const mockRows = [
+    {
+      avgRating: "4.2",
+      id: productId,
+      isBundle: false,
+      name: "Château Noir",
+      price: "12.99",
+      quantity: 5,
+      reviewCount: 3,
+      shopId,
+      shopName: "The Wine Shop",
+    },
+  ];
+
+  const mockEnriched = [
+    {
+      id: productId,
+      productWines: [
+        {
+          wine: {
+            color: "red",
+            id: wineId1,
+            name: "Pinot Noir",
+            region: "Burgundy",
+            type: "still",
+            vintageYear: 2020,
+            winemaker: { name: "Jean Dupont" },
+          },
+        },
+      ],
+    },
+  ];
+
+  it("returns paginated envelope with correct shape", async () => {
+    vi.mocked(productsRepository.findAll).mockResolvedValue({ rows: mockRows, total: 1 });
+    vi.mocked(productsRepository.findByIds).mockResolvedValue(mockEnriched as never);
+
+    const result = await productsService.getAllProducts({});
+
+    expect(result.page).toBe(1);
+    expect(result.limit).toBe(20);
+    expect(result.total).toBe(1);
+    expect(result.data).toHaveLength(1);
+  });
+
+  it("coerces avgRating string to number and maps null correctly", async () => {
+    const noRatingRows = [
+      {
+        avgRating: null,
+        id: productId,
+        isBundle: false,
+        name: "Château Noir",
+        price: "12.99",
+        quantity: 5,
+        reviewCount: 0,
+        shopId,
+        shopName: "The Wine Shop",
+      },
+    ];
+    vi.mocked(productsRepository.findAll).mockResolvedValue({ rows: noRatingRows, total: 1 });
+    vi.mocked(productsRepository.findByIds).mockResolvedValue(mockEnriched as never);
+
+    const result = await productsService.getAllProducts({});
+    expect(result.data[0]?.rating).toBeNull();
+
+    vi.mocked(productsRepository.findAll).mockResolvedValue({ rows: mockRows, total: 1 });
+    vi.mocked(productsRepository.findByIds).mockResolvedValue(mockEnriched as never);
+
+    const result2 = await productsService.getAllProducts({});
+    expect(result2.data[0]?.rating).toBe(4.2);
+  });
+
+  it("maps wine details and winemaker name correctly", async () => {
+    vi.mocked(productsRepository.findAll).mockResolvedValue({ rows: mockRows, total: 1 });
+    vi.mocked(productsRepository.findByIds).mockResolvedValue(mockEnriched as never);
+
+    const result = await productsService.getAllProducts({});
+    const wine = result.data[0]?.wines[0];
+
+    expect(wine).toEqual({
+      color: "red",
+      id: wineId1,
+      name: "Pinot Noir",
+      region: "Burgundy",
+      type: "still",
+      vintageYear: 2020,
+      winemaker: { name: "Jean Dupont" },
+    });
+  });
+
+  it("passes filters through to repository", async () => {
+    vi.mocked(productsRepository.findAll).mockResolvedValue({ rows: [], total: 0 });
+
+    await productsService.getAllProducts({ color: "red", minPrice: 10, page: 2 });
+
+    expect(productsRepository.findAll).toHaveBeenCalledWith(
+      { color: "red", minPrice: 10 },
+      { limit: 20, offset: 20 }
+    );
+    expect(productsRepository.findByIds).not.toHaveBeenCalled();
   });
 });
