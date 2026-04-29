@@ -13,7 +13,9 @@ interface ExploreSectionProps {
 export function ExploreSection({ mode }: ExploreSectionProps) {
   const { data: rawData, isLoading } = useGetProducts();
   const allProducts = (
-    Array.isArray(rawData) ? rawData : ((rawData as unknown as { data?: GetProducts200 })?.data ?? [])
+    Array.isArray(rawData)
+      ? rawData
+      : ((rawData as unknown as { data?: GetProducts200 })?.data ?? [])
   ) as GetProducts200;
   const products = allProducts
     .filter((p) => (mode === "bundles" ? p.isBundle : !p.isBundle))
