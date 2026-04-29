@@ -1,40 +1,65 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { ArrowLeft } from "lucide-react";
 import { PublicLayout } from "@/components/layout/PublicLayout";
-import { ReviewList } from "@/components/reviews/ReviewList";
-import { ReviewsSummary } from "@/components/reviews/ReviewsSummary";
 import { Button } from "@/components/ui/button";
+import { Separator } from "@/components/ui/separator";
 import { useGetProductsById } from "@/generated/hooks/productsController/useGetProductsById";
 import { useGetReviewsProductById } from "@/generated/reviews/reviews";
-import { BundleContentsList } from "./-components/BundleContentsList";
-import { BundlesContainingWine } from "./-components/BundlesContainingWine";
-import { ProductHero } from "./-components/ProductHero";
-import { ProductImagePlaceholder } from "./-components/ProductImagePlaceholder";
+import { ProductDescriptionCard } from "./-components/ProductDescriptionCard";
+import { ProductGallery } from "./-components/ProductGallery";
 import { ProductInfo } from "./-components/ProductInfo";
+import { ProductPageSkeleton } from "./-components/ProductPageSkeleton";
 import { ProductPriceRow } from "./-components/ProductPriceRow";
-import { ProductWineAssociation } from "./-components/ProductWineAssociation";
+import { ProductRelatedSection } from "./-components/ProductRelatedSection";
+import { ProductReviewsSection } from "./-components/ProductReviewsSection";
+import { ProductSoldAtCard } from "./-components/ProductSoldAtCard";
+import { ProductWinemakerCard } from "./-components/ProductWinemakerCard";
 
-// cast: remove once backend fixes OpenAPI spec for GET /products/:id
-type ProductDetail = {
+type RawProductDetail = {
   id: string;
   name: string;
-  description: string | null;
-  price: string;
-  quantity: number;
-  isBundle: boolean;
-  shopId: string;
-  rating: number;
-  reviewCount: number;
-  wines: {
-    id: string;
-    name: string;
-    region: string;
-    vintageYear: number;
-    type: string;
-    color: string;
-    winemaker: { id: string; name: string };
+  description?: string | null;
+  price?: string;
+  quantity?: number;
+  isBundle?: boolean;
+  shopId?: string;
+  shop?: { id: string; name: string };
+  // GET /products/:id returns productWines, not wines
+  productWines?: {
+    wine: {
+      id: string;
+      name: string;
+      type: string;
+      color: string;
+      vintageYear: number;
+      // region and winemaker not returned by findById — backend gap
+      region?: string;
+      winemaker?: { id: string; name: string };
+    };
   }[];
 };
+
+function toProductDetail(raw: RawProductDetail) {
+  return {
+    description: raw.description ?? null,
+    id: raw.id,
+    isBundle: !!raw.isBundle,
+    name: raw.name,
+    price: raw.price ?? "0",
+    quantity: Number(raw.quantity ?? 0),
+    shop: raw.shop,
+    shopId: raw.shopId ?? "",
+    wines: (raw.productWines ?? []).map((pw) => ({
+      color: pw.wine.color,
+      id: pw.wine.id,
+      name: pw.wine.name,
+      region: pw.wine.region ?? "",
+      type: pw.wine.type,
+      vintageYear: Number(pw.wine.vintageYear),
+      winemaker: pw.wine.winemaker ?? { id: "", name: "" },
+    })),
+  };
+}
 
 export const Route = createFileRoute("/products/$productId")({
   component: ProductDetailPage,
@@ -45,27 +70,9 @@ function ProductDetailPage() {
   const { data, isLoading, isError, refetch } = useGetProductsById(productId);
   const { data: reviewData, isLoading: reviewsLoading } = useGetReviewsProductById(productId);
 
-  const product = data as ProductDetail | undefined;
+  if (isLoading) return <ProductPageSkeleton />;
 
-  if (isLoading) {
-    return (
-      <PublicLayout>
-        <div className="container mx-auto px-6 py-8 lg:px-12 space-y-8">
-          <div className="h-6 w-32 animate-pulse rounded-md bg-secondary/20" />
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12">
-            <div className="aspect-square w-full animate-pulse rounded-2xl bg-secondary/20" />
-            <div className="space-y-6">
-              <div className="h-10 w-3/4 animate-pulse rounded-md bg-secondary/20" />
-              <div className="h-24 w-full animate-pulse rounded-2xl bg-secondary/20" />
-              <div className="h-48 w-full animate-pulse rounded-2xl bg-secondary/20" />
-            </div>
-          </div>
-        </div>
-      </PublicLayout>
-    );
-  }
-
-  if (isError || !product) {
+  if (isError || !data) {
     return (
       <PublicLayout>
         <div className="container mx-auto flex flex-col items-center py-24 text-center">
@@ -77,6 +84,8 @@ function ProductDetailPage() {
       </PublicLayout>
     );
   }
+
+  const product = toProductDetail(data);
 
   return (
     <PublicLayout>
@@ -90,62 +99,61 @@ function ProductDetailPage() {
           Back to catalog
         </Link>
 
-        <ProductHero>
-          {{
-            image: (
-              <ProductImagePlaceholder isBundle={product.isBundle} wine={product.wines?.[0]} />
-            ),
-            info: (
-              <div className="space-y-8">
-                <ProductInfo
+        <div className="grid grid-cols-1 gap-8 lg:grid-cols-2">
+          <ProductGallery productName={product.name} />
+
+          <div className="space-y-6">
+            <div className="space-y-6">
+              <ProductInfo
+                isBundle={product.isBundle}
+                name={product.name}
+                rating={reviewData?.averageRating ?? undefined}
+                reviewCount={reviewData?.reviews?.length}
+                wines={product.wines}
+              />
+
+              {product.description && (
+                <ProductDescriptionCard
+                  description={product.description}
                   isBundle={product.isBundle}
-                  name={product.name}
-                  rating={reviewData?.averageRating ?? undefined}
-                  reviewCount={reviewData?.reviews?.length}
-                  wines={product.wines ?? []}
                 />
+              )}
+            </div>
+
+            <div className="space-y-4">
+              <div className="lg:sticky lg:top-8 space-y-4">
                 <ProductPriceRow
                   price={product.price}
                   productId={product.id}
                   quantity={product.quantity}
                 />
+
+                {product.shopId && (
+                  <ProductSoldAtCard shopId={product.shopId} shopName={product.shop?.name} />
+                )}
+
+                {!product.isBundle && product.wines[0]?.winemaker?.id && (
+                  <ProductWinemakerCard
+                    winemakerId={product.wines[0].winemaker.id}
+                    winemakerName={product.wines[0].winemaker.name}
+                  />
+                )}
               </div>
-            ),
-          }}
-        </ProductHero>
-
-        {product.isBundle ? (
-          <BundleContentsList wines={product.wines ?? []} />
-        ) : (
-          product.wines?.[0] && <ProductWineAssociation wine={product.wines[0]} />
-        )}
-
-        <BundlesContainingWine />
-
-        <div className="space-y-6 pt-8 border-t">
-          <h2 className="font-heading text-2xl font-bold">Customer Reviews</h2>
-
-          {reviewData && reviewData.averageRating !== null && (
-            <ReviewsSummary
-              averageRating={reviewData.averageRating}
-              reviewCount={reviewData.reviews.length}
-            />
-          )}
-
-          <ReviewList
-            emptyMessage="Be the first to review this product."
-            isLoading={reviewsLoading}
-            reviews={
-              reviewData?.reviews.map((r) => ({
-                authorName: `${r.user.fname} ${r.user.lname}`,
-                body: r.body ?? "",
-                createdAt: r.createdAt as unknown as string,
-                id: r.id,
-                rating: r.rating as unknown as number,
-              })) ?? []
-            }
-          />
+            </div>
+          </div>
         </div>
+
+        <Separator />
+
+        <ProductRelatedSection
+          isBundle={product.isBundle}
+          shopId={product.shopId}
+          wines={product.wines}
+        />
+
+        <Separator />
+
+        <ProductReviewsSection isLoading={reviewsLoading} reviewData={reviewData} />
       </div>
     </PublicLayout>
   );

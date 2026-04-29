@@ -6,6 +6,7 @@ import { Card } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
 import { useGetShopsById } from "@/generated/hooks/shopsController/useGetShopsById";
 import { ShopBundlesSection } from "./-components/ShopBundlesSection";
+import { ShopContactCard } from "./-components/ShopContactCard";
 import { ShopHeroGallery } from "./-components/ShopHeroGallery";
 import { ShopInfoPanel } from "./-components/ShopInfoPanel";
 import { ShopMapEmbed } from "./-components/ShopMapEmbed";
@@ -18,7 +19,6 @@ export const Route = createFileRoute("/shops/$id")({
 function ShopDetailPage() {
   const { id } = Route.useParams();
   const { data: shop, isLoading, isError, refetch } = useGetShopsById(id);
-  
 
   if (isLoading) {
     return (
@@ -64,35 +64,11 @@ function ShopDetailPage() {
 
         {/* Photos left, contact card right. On mobile: photos then card stacked. */}
         <div className="grid grid-cols-1 gap-8 lg:grid-cols-2">
-          <div >
+          <div>
             <ShopHeroGallery shopName={shop.name} />
           </div>
           <div>
-            <Card className="lg:sticky lg:top-8 rounded-2xl p-6 border-none bg-secondary/10 shadow-none">
-              <h3 className="font-heading text-xl font-bold mb-0">Contact & Hours</h3>
-              <div className="space-y-4 text-sm">
-                <div className=" sm: flex-col  md:grid grid-cols-2">
-                  <div>
-                    <p className="font-semibold text-muted-foreground mb-0 leading-none font-heading tracking-wider">
-                      Phone
-                    </p>
-                    <p>+420 123 456 789</p> {/* gap #4 */}
-                  </div>
-                  <div>
-                    <p className="font-semibold text-muted-foreground mb-0 leading-none font-heading tracking-wider">
-                      Email
-                    </p>
-                    <p>example.email@example.com</p> {/* gap #4 */}
-                  </div>
-                </div>
-                <div>
-                  <p className="font-semibold text-muted-foreground mb-0 leading-none font-heading tracking-wider">
-                    Opening Hours
-                  </p>
-                  <p>__</p> {/* gap #4 */}
-                </div>
-              </div>
-            </Card>
+            <ShopContactCard shopId={shop.id} />
             <Card className="mt-6 rounded-2xl p-6 border-none bg-secondary/10 shadow-none">
               <h3 className="font-heading text-xl font-bold mb-0">About our shop</h3>
               <div className="space-y-0 text-sm">
