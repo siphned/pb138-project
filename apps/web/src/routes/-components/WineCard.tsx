@@ -2,11 +2,29 @@ import { Link } from "@tanstack/react-router";
 import { Heart } from "lucide-react";
 import { useState } from "react";
 import { CatalogCard } from "@/components/catalog/CatalogCard";
-import type { GetProducts200 } from "@/generated/types/GetProducts";
 import { cn } from "@/lib/utils";
 
+interface WineCardProduct {
+  id: string;
+  name: string;
+  price: string | number;
+  rating?: string | number | null;
+  reviewCount?: string | number | null;
+  shopName?: string;
+  wines?: {
+    color?: string;
+    id?: string;
+    name?: string;
+    region?: string;
+    type?: string;
+    vintageYear?: string | number;
+    winemaker?: { id?: string; name?: string };
+  }[];
+  [key: string]: unknown;
+}
+
 interface WineCardProps {
-  product: GetProducts200[number] & { shopName?: string };
+  product: WineCardProduct;
   shopName?: string;
 }
 

@@ -3,7 +3,6 @@ import { ArrowRight } from "lucide-react";
 import { BundleCard } from "@/components/catalog/BundleCard";
 import { buttonVariants } from "@/components/ui/button";
 import { useGetProducts } from "@/generated/hooks/useGetProducts";
-import type { GetProducts200 } from "@/generated/types/GetProducts";
 import { WineCard } from "./WineCard";
 
 interface ExploreSectionProps {
@@ -12,12 +11,7 @@ interface ExploreSectionProps {
 
 export function ExploreSection({ mode }: ExploreSectionProps) {
   const { data: rawData, isLoading } = useGetProducts();
-  const allProducts = (
-    Array.isArray(rawData)
-      ? rawData
-      : ((rawData as unknown as { data?: GetProducts200 })?.data ?? [])
-  ) as GetProducts200;
-  const products = allProducts
+  const products = (rawData?.data ?? [])
     .filter((p) => (mode === "bundles" ? p.isBundle : !p.isBundle))
     .slice(0, 8);
 

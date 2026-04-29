@@ -56,4 +56,6 @@ const client = async <TData, TError = unknown, TVariables = unknown>(
     });
 };
 
+export type Client = typeof client;
+
 export default client;
