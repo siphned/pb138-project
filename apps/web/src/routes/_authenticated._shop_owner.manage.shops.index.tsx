@@ -1,12 +1,12 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { useGetShops } from "@/generated/shops/shops";
+import { useGetShopsMe } from "@/generated/hooks/shopsController/useGetShopsMe";
 
-export const Route = createFileRoute("/_authenticated/_shop_owner/shops/")({
+export const Route = createFileRoute("/_authenticated/_shop_owner/manage/shops/")({
   component: MyShops,
 });
 
 function MyShops() {
-  const { data: shops, isLoading } = useGetShops();
+  const { data: shops, isLoading } = useGetShopsMe();
 
   if (isLoading) return <div>Loading shops...</div>;
 
@@ -22,21 +22,21 @@ function MyShops() {
               <Link
                 className="rounded bg-primary px-3 py-1 text-white hover:bg-primary/90"
                 params={{ id: shop.id }}
-                to="/shops/$id/inventory"
+                to="/manage/shops/$id/inventory"
               >
                 Inventory
               </Link>
               <Link
                 className="rounded bg-secondary px-3 py-1 hover:bg-secondary/80"
                 params={{ id: shop.id }}
-                to="/shops/$id/shop-orders"
+                to="/manage/shops/$id/shop-orders"
               >
                 Orders
               </Link>
               <Link
                 className="rounded bg-accent px-3 py-1 hover:bg-accent/80"
                 params={{ id: shop.id }}
-                to="/shops/$id/bundles"
+                to="/manage/shops/$id/bundles"
               >
                 Bundles
               </Link>

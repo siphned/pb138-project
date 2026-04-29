@@ -12,7 +12,7 @@ interface WineCardProps {
 
 export function WineCard({ product, shopName }: WineCardProps) {
   const [wishlisted, setWishlisted] = useState(false);
-  const wine = product.wines[0];
+  const wine = product.wines?.[0];
   const rating = Number(product.rating) || 0;
   const reviewCount = Number(product.reviewCount) || 0;
   const price = Number(product.price).toLocaleString("cs-CZ", {
@@ -23,7 +23,6 @@ export function WineCard({ product, shopName }: WineCardProps) {
 
   return (
     <CatalogCard
-      
       imageSlot={
         <div className="flex h-full w-full  items-center justify-center bg-linear-to-b from-secondary/10 to-secondary/30">
           <span className="-rotate-90 text-4xl font-bold uppercase tracking-widest text-secondary-foreground/20">
@@ -47,12 +46,14 @@ export function WineCard({ product, shopName }: WineCardProps) {
       title={product.name}
       topRightSlot={
         <button
-          className="rounded-full bg-background/80 p-2 transition-colors hover:bg-background"
+          className="rounded-full bg-background/80 p-2 transition-colors opacity-50 cursor-not-allowed"
+          disabled
           onClick={(e) => {
             e.preventDefault();
             e.stopPropagation();
             setWishlisted((w) => !w);
           }}
+          title="Wishlist coming soon"
           type="button"
         >
           <Heart

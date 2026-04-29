@@ -1,7 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { RouteStub } from "./-components/RouteStub";
 
-export const Route = createFileRoute("/_authenticated/_shop_owner/shops/$id/shop-orders")({
+export const Route = createFileRoute("/_authenticated/_shop_owner/manage/shops/$id/shop-orders")({
   component: ShopOrdersPage,
 });
 

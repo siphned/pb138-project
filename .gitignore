@@ -53,3 +53,7 @@ raw/
 .claude/
 CLAUDE.md
 GEMINI.md
+.claude/settings.local.json
+apps/server/src/db/seed.ts
+
+docs/figma/
