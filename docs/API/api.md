@@ -19,35 +19,18 @@ This document specifies all REST API endpoints for the WineMarket platform. Each
 
 ---
 
-## Module: AUTH
-**Responsibility**: User registration, login, token refresh, logout
-
-| Method | Path | Description | Auth |
-|--------|------|---|---|
-| POST | `/auth/register` | Register new account | ❌ |
-| POST | `/auth/login` | Login & receive JWT | ❌ |
-| POST | `/auth/refresh` | Refresh token | ✅ |
-| POST | `/auth/logout` | Invalidate session | ✅ |
-| GET | `/auth/me` | Current user info | ✅ |
-
----
-
 ## Module: USERS
 **Responsibility**: User profiles, addresses, role requests
 
 | Method | Path | Description | Auth |
 |--------|------|---|---|
-| GET | `/users/:id` | Get profile | ❌ |
-| PATCH | `/users/:id` | Update profile | ✅ (own) |
-| GET | `/users/:id/addresses` | Get addresses | ✅ (own) |
-| POST | `/users/:id/addresses` | Add address | ✅ (own) |
-| PATCH | `/users/:id/addresses/:addr_id` | Update address | ✅ (own) |
-| DELETE | `/users/:id/addresses/:addr_id` | Delete address | ✅ (own) |
-| POST | `/users/:id/request-winemaker` | Request Winemaker role | ✅ |
-| POST | `/users/:id/request-shop-owner` | Request Shop Owner role | ✅ |
-| GET | `/role-requests` | Pending requests (Admin) | ✅ (Admin) |
-| POST | `/role-requests/:req_id/approve` | Approve request | ✅ (Admin) |
-| POST | `/role-requests/:req_id/reject` | Reject request | ✅ (Admin) |
+| GET | `/users/me` | Get current user record (lazy created from Clerk) | ✅ |
+| PUT | `/users/me` | Update profile (first/last name) | ✅ |
+| GET | `/users/me/addresses` | Get current user addresses | ✅ |
+| POST | `/users/me/addresses` | Set a shipping or billing address | ✅ |
+| GET | `/role-requests` | List all role requests | ✅ (Admin) |
+| POST | `/role-requests/:id/approve` | Approve a role request | ✅ (Admin) |
+| POST | `/role-requests/:id/reject` | Reject a role request | ✅ (Admin) |
 
 ---
 
@@ -70,6 +53,7 @@ This document specifies all REST API endpoints for the WineMarket platform. Each
 | Method | Path | Description | Auth |
 |--------|------|---|---|
 | GET | `/winemakers` | Browse winemakers | ❌ |
+| GET | `/winemakers/me` | Get current winemaker profile | ✅ (WINEMAKER) |
 | GET | `/winemakers/:id` | Winemaker profile | ❌ |
 | PATCH | `/winemakers/:id` | Edit profile | ✅ (own) |
 | GET | `/winemakers/:id/wines` | Winemaker's wines | ❌ |
@@ -110,19 +94,16 @@ This document specifies all REST API endpoints for the WineMarket platform. Each
 ## Module: CARTS & ORDERS
 **Responsibility**: Shopping cart, checkout, orders
 
-**Cart Notes:** The server only stores carts for authenticated users (JWT required for all cart endpoints). There is no server-side guest cart. Guest cart functionality must be implemented on the **frontend** using `localStorage` — items added while unauthenticated are stored locally, then synced to the server via `POST /carts/merge` immediately after login. **This frontend localStorage cart is not yet implemented.**
+**Cart Notes:** The server supports both authenticated user carts and guest session carts. Guest sessions are identified via `guest_session_id` cookie. When a user logs in, their guest cart is automatically merged into their user cart.
 
 | Method | Path | Description | Auth |
 |--------|------|---|---|
-| GET | `/carts/me` | Get current user's cart (creates if none) | ✅ |
-| POST | `/carts/items` | Add item to cart (accumulates if already present) | ✅ |
-| PUT | `/carts/items/:id` | Update cart item quantity | ✅ |
-| DELETE | `/carts/items/:id` | Remove item from cart | ✅ |
-| POST | `/carts/merge` | Merge guest localStorage items into user cart on login | ✅ |
-| POST | `/orders` | Checkout — convert cart to order, clears cart | ✅ |
-| GET | `/orders` | List current user's orders | ✅ |
-| GET | `/orders/:id` | Get order by ID (own orders only) | ✅ |
-| PUT | `/orders/:id/items/:itemId/status` | Update individual order item status | ✅ (SHOP_OWNER) |
+| GET | `/carts` | Get current cart (user or session) | ❌/✅ |
+| POST | `/carts/items` | Add item to cart | ❌/✅ |
+| PUT | `/carts/items/:productId` | Update item quantity | ❌/✅ |
+| DELETE | `/carts/items/:productId` | Remove item from cart | ❌/✅ |
+| POST | `/orders/checkout` | Checkout — convert cart to order | ✅ |
+| GET | `/orders/:id` | Get order details | ✅ (own) |
 
 **Checkout body:** `paymentMethod`, `deliveryType`, plus either `shippingAddressId` (existing) or `newShippingAddress` (inline object), same for billing. Stock is validated at checkout time.
 
@@ -206,3 +187,4 @@ This document specifies all REST API endpoints for the WineMarket platform. Each
 - **v1.0** (Week 6) — Initial API design from PRD requirements
 - **v1.1** (Week 9, WINE-79) — Admin module: event moderation moved from /events to /admin/events; user deactivate replaced with full status lifecycle (active/suspended/banned); review admin endpoints added under /admin/reviews; role-request admin routes removed (live at /role-requests without prefix); GET /admin/statistics deferred
 - **v1.2** (Week 10, WINE-65) — Carts & Orders implemented: paths changed from /cart to /carts/me; PUT replaces PATCH for item updates; guest cart is localStorage-only (no server sessions) with POST /carts/merge for login sync; order status update is per-item (PUT /orders/:id/items/:itemId/status) not per-order; /shops/:id/orders and DELETE /cart (clear) not implemented
+- **v1.3** (Week 10, WINE-148) — Synchronized with actual implementation: removed outdated AUTH module (using Clerk); moved /auth/me to /users/me; updated /carts to support server-side guest sessions; added /winemakers/me; added /role-requests root routes.
