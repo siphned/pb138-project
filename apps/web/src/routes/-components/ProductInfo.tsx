@@ -1,3 +1,4 @@
+import { Link } from "@tanstack/react-router";
 import { MapPin } from "lucide-react";
 import { StarRating } from "@/components/catalog/StarRating";
 import { Badge } from "@/components/ui/badge";
@@ -41,7 +42,14 @@ export function ProductInfo({ name, isBundle, wines, rating, reviewCount }: Prod
       <div className="space-y-1">
         {firstWine?.winemaker?.name && (
           <p className="text-sm font-medium text-muted-foreground">
-            Winemaker: <span className="text-foreground">{firstWine.winemaker.name}</span>
+            Winemaker:{" "}
+            <Link
+              className="text-foreground hover:text-primary hover:underline"
+              params={{ id: firstWine.winemaker.id }}
+              to="/winemakers/$id"
+            >
+              {firstWine.winemaker.name}
+            </Link>
           </p>
         )}
         {firstWine?.region && (

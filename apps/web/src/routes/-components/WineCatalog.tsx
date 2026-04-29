@@ -18,6 +18,7 @@ import { WineCard } from "./WineCard";
 import { WineFiltersSidebar } from "./WineFiltersSidebar";
 
 interface WineCatalogProps {
+  mode?: "wines" | "bundles";
   search: {
     color?: string[];
     maxPrice?: number;
@@ -90,8 +91,13 @@ const matchesStats = (product: CatalogProduct, search: WineCatalogProps["search"
   return true;
 };
 
-const filterProduct = (product: CatalogProduct, search: WineCatalogProps["search"]) => {
-  if (product.isBundle) return false;
+const filterProduct = (
+  product: CatalogProduct,
+  search: WineCatalogProps["search"],
+  mode: "wines" | "bundles" = "wines"
+) => {
+  if (mode === "wines" && product.isBundle) return false;
+  if (mode === "bundles" && !product.isBundle) return false;
   return (
     matchesText(product, search.search) &&
     matchesAttributes(product, search) &&
@@ -99,7 +105,17 @@ const filterProduct = (product: CatalogProduct, search: WineCatalogProps["search
   );
 };
 
-export function WineCatalog({ search, shopId, shopName }: WineCatalogProps) {
+function getCatalogHeading(
+  shopId?: string,
+  shopName?: string,
+  mode: "wines" | "bundles" = "wines"
+) {
+  if (shopId) return `${shopName ?? "Shop"}'s Wines`;
+  if (mode === "bundles") return "Explore Bundles";
+  return "Explore Wines";
+}
+
+export function WineCatalog({ search, shopId, shopName, mode = "wines" }: WineCatalogProps) {
   const navigate = useNavigate();
   const [searchInput, setSearchInput] = useState(search.search ?? "");
 
@@ -130,47 +146,49 @@ export function WineCatalog({ search, shopId, shopName }: WineCatalogProps) {
     wines?: unknown[];
   };
 
-  const products = Array.isArray(rawData)
-    ? (rawData as RawProductItem[]).map((item) => ({
-        createdAt: item.createdAt ?? "",
-        description: item.description ?? null,
-        id: item.id,
-        isBundle: !!item.isBundle,
-        name: item.name,
-        price: item.price ?? "0",
-        quantity: Number(item.quantity),
-        rating: Number(item.rating ?? 0),
-        reviewCount: Number(item.reviewCount ?? 0),
-        shopId: item.shopId ?? shopId ?? "",
-        shopName: item.shop?.name ?? undefined,
-        updatedAt: item.updatedAt ?? null,
-        wines: Array.isArray(item.wines)
-          ? (item.wines as {
-              id: string;
-              name: string;
-              region: string;
-              vintageYear: string | number;
-              type: string;
-              color: string;
-              winemaker: { id: string; name: string };
-            }[])
-          : [
-              {
-                color: item.color ?? "",
-                id: item.id,
-                name: item.name,
-                region: item.region ?? "",
-                type: item.type ?? "",
-                vintageYear: Number(item.vintageYear),
-                winemaker: (item.winemaker ?? { id: "", name: "" }) as { id: string; name: string },
-              },
-            ],
-      }))
-    : undefined;
+  const rawArray = Array.isArray(rawData)
+    ? rawData
+    : ((rawData as { data?: unknown[] })?.data ?? []);
+
+  const products = (rawArray as RawProductItem[]).map((item) => ({
+    createdAt: item.createdAt ?? "",
+    description: item.description ?? null,
+    id: item.id,
+    isBundle: !!item.isBundle,
+    name: item.name,
+    price: item.price ?? "0",
+    quantity: Number(item.quantity),
+    rating: Number(item.rating ?? 0),
+    reviewCount: Number(item.reviewCount ?? 0),
+    shopId: item.shopId ?? shopId ?? "",
+    shopName: item.shop?.name ?? undefined,
+    updatedAt: item.updatedAt ?? null,
+    wines: Array.isArray(item.wines)
+      ? (item.wines as {
+          id: string;
+          name: string;
+          region: string;
+          vintageYear: string | number;
+          type: string;
+          color: string;
+          winemaker: { id: string; name: string };
+        }[])
+      : [
+          {
+            color: item.color ?? "",
+            id: item.id,
+            name: item.name,
+            region: item.region ?? "",
+            type: item.type ?? "",
+            vintageYear: Number(item.vintageYear),
+            winemaker: (item.winemaker ?? { id: "", name: "" }) as { id: string; name: string },
+          },
+        ],
+  }));
 
   const filteredProducts = products
     ? products
-        .filter((product) => filterProduct(product, search))
+        .filter((product) => filterProduct(product, search, mode))
         .sort((a, b) => {
           switch (search.sort) {
             case "price-asc":
@@ -195,19 +213,19 @@ export function WineCatalog({ search, shopId, shopName }: WineCatalogProps) {
             search: searchInput || undefined,
             sort: search.sort ?? "newest",
           },
-          to: "/wines",
+          to: mode === "bundles" ? "/bundles" : "/wines",
         });
       }
     }, 500);
     return () => clearTimeout(timer);
-  }, [searchInput, search, navigate]);
+  }, [searchInput, search, navigate, mode]);
 
   const renderContent = () => {
     if (isLoading) {
       return (
         <div className="grid grid-cols-1 gap-6 md:grid-cols-3 xl:grid-cols-4">
           {["s1", "s2", "s3", "s4", "s5", "s6"].map((s) => (
-            <div className="h-[400px] w-full animate-pulse rounded-2xl bg-secondary/20" key={s} />
+            <div className="h-100 w-full animate-pulse rounded-2xl bg-secondary/20" key={s} />
           ))}
         </div>
       );
@@ -232,7 +250,14 @@ export function WineCatalog({ search, shopId, shopName }: WineCatalogProps) {
           </div>
           <h3 className="text-xl font-bold">No products found</h3>
           <p className="max-w-xs text-muted-foreground">Try adjusting or clearing your filters.</p>
-          <Button onClick={() => navigate({ search: { page: 1, sort: "newest" }, to: "/wines" })}>
+          <Button
+            onClick={() =>
+              navigate({
+                search: { page: 1, sort: "newest" },
+                to: mode === "bundles" ? "/bundles" : "/wines",
+              })
+            }
+          >
             Clear all filters
           </Button>
         </div>
@@ -264,7 +289,7 @@ export function WineCatalog({ search, shopId, shopName }: WineCatalogProps) {
           {/* Main content */}
           <div className="flex-1 space-y-6">
             <h1 className="font-heading text-3xl font-bold">
-              {shopId ? `${shopName ?? "Shop"}'s Wines` : "Explore Wines"}
+              {getCatalogHeading(shopId, shopName, mode)}
             </h1>
             {/* Top bar */}
             <div className="flex flex-col items-center justify-between gap-4 rounded-2xl bg-secondary/10 p-4 md:flex-row">
@@ -298,7 +323,7 @@ export function WineCatalog({ search, shopId, shopName }: WineCatalogProps) {
                   onValueChange={(value) =>
                     navigate({
                       search: { ...search, page: 1, sort: value ?? "newest" },
-                      to: "/wines",
+                      to: mode === "bundles" ? "/bundles" : "/wines",
                     })
                   }
                   value={String(search.sort ?? "newest")}
@@ -337,7 +362,7 @@ export function WineCatalog({ search, shopId, shopName }: WineCatalogProps) {
                         page: (Number(search.page) || 1) + 1,
                         sort: search.sort ?? "newest",
                       },
-                      to: "/wines",
+                      to: mode === "bundles" ? "/bundles" : "/wines",
                     })
                   }
                   variant="outline"
