@@ -1,5 +1,5 @@
-import { setConfig } from "@kubb/plugin-client/clients/axios";
 import { ClerkProvider } from "@clerk/react";
+import { setConfig } from "@kubb/plugin-client/clients/axios";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { createRouter, RouterProvider } from "@tanstack/react-router";
 import { StrictMode } from "react";

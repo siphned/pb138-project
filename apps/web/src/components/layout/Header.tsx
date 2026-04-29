@@ -30,7 +30,9 @@ export function Header({ activeRole, onRoleChange }: HeaderProps) {
           <Search className="h-5 w-5" />
         </Button>
         <Button className="hidden sm:flex" size="icon" variant="ghost">
-          <ShoppingCart className="h-5 w-5" />
+          <Link to="/cart">
+            <ShoppingCart className="h-5 w-5" />
+          </Link>
         </Button>
 
         <Show when="signed-out">
