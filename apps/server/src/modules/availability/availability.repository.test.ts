@@ -1,6 +1,6 @@
+import { availabilityExceptions, availabilityRegular } from "@repo/shared/schemas";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { db } from "../../db";
-import { availabilityExceptions, availabilityRegular } from "../../db/schema";
 import { availabilityRepository } from "./availability.repository";
 
 interface MockChained {

@@ -46,6 +46,8 @@ const req = new Request("http://localhost/swagger/json");
 const res = await app.handle(req);
 
 if (!res.ok) {
+  // biome-ignore lint/suspicious/noConsole: script error reporting requires console output
+  console.error(`Failed to fetch OpenAPI spec: ${res.status} ${res.statusText}`);
   process.exit(1);
 }
 

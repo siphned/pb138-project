@@ -1,4 +1,4 @@
-import type { Product } from "../../db/schema";
+import type { Product } from "@repo/shared/schemas";
 import type { PaginatedResult } from "../../utils/pagination";
 import { parsePagination } from "../../utils/pagination";
 import { shopsRepository } from "../shops/shops.repository";

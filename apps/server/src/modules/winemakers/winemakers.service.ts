@@ -1,4 +1,4 @@
-import type { Wine } from "../../db/schema";
+import type { Wine } from "@repo/shared/schemas";
 import type {
   EventRow,
   UpdateWinemakerData,

@@ -1,6 +1,6 @@
+import { roleRequests } from "@repo/shared/schemas";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { db } from "../../db";
-import { roleRequests } from "../../db/schema";
 import { roleRequestsRepository } from "./role-requests.repository";
 
 interface MockChained {

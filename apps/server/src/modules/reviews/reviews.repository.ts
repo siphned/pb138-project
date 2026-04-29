@@ -1,7 +1,7 @@
+import type { Review } from "@repo/shared/schemas";
+import { orderItems, orders, reviews } from "@repo/shared/schemas";
 import { and, avg, eq, isNull } from "drizzle-orm";
 import { db } from "../../db";
-import type { Review } from "../../db/schema";
-import { orderItems, orders, reviews } from "../../db/schema";
 
 export type ReviewWithUser = Review & {
   user: { id: string; fname: string; lname: string };

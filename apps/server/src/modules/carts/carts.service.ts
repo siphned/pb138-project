@@ -1,4 +1,4 @@
-import type { Cart } from "../../db/schema";
+import type { Cart } from "@repo/shared/schemas";
 import { productsRepository } from "../products/products.repository";
 import type { CartWithItems } from "./carts.repository";
 import { cartsRepository } from "./carts.repository";

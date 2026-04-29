@@ -1,7 +1,7 @@
+import type { Address, NewAddress, NewUser, User } from "@repo/shared/schemas";
+import { addresses, users } from "@repo/shared/schemas";
 import { eq } from "drizzle-orm";
 import { db } from "../../db";
-import type { Address, NewAddress, NewUser, User } from "../../db/schema";
-import { addresses, users } from "../../db/schema";
 
 export const usersRepository = {
   async create(data: NewUser): Promise<User> {

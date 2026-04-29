@@ -1,4 +1,4 @@
-import type { Order, orders } from "../../db/schema";
+import type { Order, orders } from "@repo/shared/schemas";
 import type { CartWithItems } from "../carts/carts.repository";
 import { cartsService } from "../carts/carts.service";
 import { emailService } from "../email";

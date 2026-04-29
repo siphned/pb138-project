@@ -1,40 +1,74 @@
 import { render, screen } from "@testing-library/react";
 import { describe, expect, it, vi } from "vitest";
-import { UserInfoCard } from "../components/dashboard/UserInfoCard";
-import { useUser } from "../context/UserContext";
 
-// Mock the context
-vi.mock("../context/UserContext", async () => {
-  const actual = await vi.importActual("../context/UserContext");
-  return {
-    ...actual,
-    useUser: vi.fn(),
-  };
-});
+vi.mock("@clerk/react", () => ({
+  useClerk: vi.fn(),
+}));
+
+vi.mock("@/components/ui/avatar", () => ({
+  Avatar: ({ children }: { children: React.ReactNode }) => <div>{children}</div>,
+  AvatarFallback: ({ children }: { children: React.ReactNode }) => <span>{children}</span>,
+  AvatarImage: () => null,
+}));
+
+vi.mock("@/components/ui/card", () => ({
+  Card: ({ children }: { children: React.ReactNode }) => <div>{children}</div>,
+  CardContent: ({ children }: { children: React.ReactNode }) => <div>{children}</div>,
+}));
+
+vi.mock("@/components/ui/button", () => ({
+  Button: ({ children }: { children: React.ReactNode }) => (
+    <button type="button">{children}</button>
+  ),
+}));
+
+vi.mock("@/components/ui/dialog", () => ({
+  Dialog: ({ children }: { children: React.ReactNode }) => <div>{children}</div>,
+  DialogContent: ({ children }: { children: React.ReactNode }) => <div>{children}</div>,
+  DialogTrigger: ({ render: r }: { render: React.ReactNode }) => <>{r}</>,
+}));
+
+vi.mock("./ProfileEditForm", () => ({
+  ProfileEditForm: () => null,
+}));
+
+vi.mock("@/components/dashboard/ProfileEditForm", () => ({
+  ProfileEditForm: () => null,
+}));
+
+import { useClerk } from "@clerk/react";
+import { UserInfoCard } from "../components/dashboard/UserInfoCard";
 
 describe("UserInfoCard", () => {
-  it("renders nothing when user is null", () => {
-    vi.mocked(useUser).mockReturnValue({ loading: false, refetch: vi.fn(), user: null } as never);
-    const { container } = render(<UserInfoCard />);
-    expect(container.firstChild).toBeNull();
-  });
-
-  it("renders user information correctly", () => {
-    const mockUser = {
-      email: "john@example.com",
-      fname: "John",
-      lname: "Doe",
-    };
-    vi.mocked(useUser).mockReturnValue({
-      loading: false,
-      refetch: vi.fn(),
-      user: mockUser,
+  it("renders user full name and initials from Clerk", () => {
+    vi.mocked(useClerk).mockReturnValue({
+      user: {
+        emailAddresses: [{ emailAddress: "john@example.com" }],
+        firstName: "John",
+        fullName: "John Doe",
+        imageUrl: undefined,
+        lastName: "Doe",
+      },
     } as never);
 
     render(<UserInfoCard />);
 
-    expect(screen.getByText("John Doe")).toBeDefined();
-    expect(screen.getByText("john@example.com")).toBeDefined();
-    expect(screen.getByText("JD")).toBeDefined(); // initials
+    expect(screen.getByText("John Doe")).toBeInTheDocument();
+    expect(screen.getByText("JO")).toBeInTheDocument(); // initials
+  });
+
+  it("renders Edit Profile button", () => {
+    vi.mocked(useClerk).mockReturnValue({
+      user: {
+        emailAddresses: [{ emailAddress: "john@example.com" }],
+        firstName: "John",
+        fullName: "John Doe",
+        imageUrl: undefined,
+        lastName: "Doe",
+      },
+    } as never);
+
+    render(<UserInfoCard />);
+    expect(screen.getByText("Edit Profile")).toBeInTheDocument();
   });
 });

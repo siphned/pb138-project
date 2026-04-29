@@ -1,4 +1,5 @@
 import { pgTable, text, uuid, varchar } from "drizzle-orm/pg-core";
+import { createInsertSchema, createSelectSchema } from "drizzle-zod";
 import { addresses } from "./addresses";
 import { userStatusEnum } from "./enums";
 import { timestamptz } from "./helpers";
@@ -17,6 +18,9 @@ export const users = pgTable("users", {
   updatedAt: timestamptz("updated_at"),
 });
 
+export const insertUserSchema = createInsertSchema(users);
+export const selectUserSchema = createSelectSchema(users);
+
 export const userRoles = pgTable("user_roles", {
   createdAt: timestamptz("created_at").notNull().defaultNow(),
   deletedAt: timestamptz("deleted_at"),
@@ -27,5 +31,8 @@ export const userRoles = pgTable("user_roles", {
     .notNull()
     .references(() => users.id, { onDelete: "cascade" }),
 });
+
+export const insertUserRoleSchema = createInsertSchema(userRoles);
+export const selectUserRoleSchema = createSelectSchema(userRoles);
 
 export type UserRole = typeof userRoles.$inferSelect;

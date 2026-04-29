@@ -1,6 +1,6 @@
+import { cartItems, carts } from "@repo/shared/schemas";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { db } from "../../db";
-import { cartItems, carts } from "../../db/schema";
 import { cartsRepository } from "./carts.repository";
 
 interface MockChained {

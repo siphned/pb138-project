@@ -1,4 +1,4 @@
-import type { Event, EventComment, EventRegistration } from "../../db/schema";
+import type { Event, EventComment, EventRegistration } from "@repo/shared/schemas";
 import type { PaginatedResult } from "../../utils/pagination";
 import { parsePagination } from "../../utils/pagination";
 import type { CommentWithUser, EventWithDetails } from "./events.repository";

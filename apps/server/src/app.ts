@@ -53,6 +53,8 @@ export const app = new Elysia()
           { description: "Winemaker profiles and portfolios", name: "winemakers" },
           { description: "Shopping cart management for guests and users", name: "carts" },
           { description: "Order placement and history", name: "orders" },
+          { description: "Product and winemaker reviews and ratings", name: "reviews" },
+          { description: "Platform administration and moderation", name: "admin" },
           { description: "Anonymous session management", name: "guest-sessions" },
           { description: "B2B supply relationship management", name: "supply-agreements" },
         ],

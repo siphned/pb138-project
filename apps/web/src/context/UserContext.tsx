@@ -1,11 +1,8 @@
 import { useAuth } from "@clerk/react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { createContext, type ReactNode, useContext, useEffect, useState } from "react";
-import {
-  getGetUsersMeQueryKey,
-  getGetUsersMeQueryOptions,
-  usePutUsersMe,
-} from "@/generated/users/users";
+import { getUsersMeQueryKey, getUsersMeQueryOptions } from "@/generated/hooks/useGetUsersMe";
+import { usePutUsersMe } from "@/generated/hooks/usePutUsersMe";
 
 export interface UserProfile {
   id: string;
@@ -29,14 +26,14 @@ const UserContext = createContext<UserContextType | undefined>(undefined);
 export function UserProvider({ children }: { children: ReactNode }) {
   const { isSignedIn, isLoaded } = useAuth();
   const { data: profile, isLoading: isQueryLoading } = useQuery({
-    ...getGetUsersMeQueryOptions(),
+    ...getUsersMeQueryOptions(),
     enabled: isLoaded && isSignedIn,
   });
   const queryClient = useQueryClient();
   const updateMutation = usePutUsersMe({
     mutation: {
       onSuccess: () => {
-        queryClient.invalidateQueries({ queryKey: getGetUsersMeQueryKey() });
+        queryClient.invalidateQueries({ queryKey: getUsersMeQueryKey() });
       },
     },
   });

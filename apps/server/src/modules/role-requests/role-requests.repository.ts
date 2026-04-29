@@ -1,7 +1,7 @@
+import type { RoleRequest } from "@repo/shared/schemas";
+import { roleRequests } from "@repo/shared/schemas";
 import { and, eq, isNull } from "drizzle-orm";
 import { db } from "../../db";
-import type { RoleRequest } from "../../db/schema";
-import { roleRequests } from "../../db/schema";
 
 export const roleRequestsRepository = {
   async create(data: {

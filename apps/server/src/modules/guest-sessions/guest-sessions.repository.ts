@@ -1,7 +1,7 @@
+import type { GuestSession } from "@repo/shared/schemas";
+import { guestSessions } from "@repo/shared/schemas";
 import { eq, lt } from "drizzle-orm";
 import { db } from "../../db";
-import type { GuestSession } from "../../db/schema";
-import { guestSessions } from "../../db/schema";
 
 export const guestSessionsRepository = {
   async cleanupExpired(): Promise<void> {

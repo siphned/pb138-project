@@ -1,6 +1,6 @@
+import { addresses, shops } from "@repo/shared/schemas";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { db } from "../../db";
-import { addresses, shops } from "../../db/schema";
 import { shopsRepository } from "./shops.repository";
 
 interface MockChained {

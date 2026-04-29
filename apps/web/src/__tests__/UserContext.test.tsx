@@ -9,9 +9,16 @@ vi.mock("@tanstack/react-query", () => ({
   useQueryClient: () => ({ invalidateQueries: vi.fn() }),
 }));
 
-vi.mock("@/generated/users/users", () => ({
-  getGetUsersMeQueryKey: () => ["users", "me"],
-  getGetUsersMeQueryOptions: () => ({ queryKey: ["users", "me"] }),
+vi.mock("@clerk/react", () => ({
+  useAuth: () => ({ isLoaded: true, isSignedIn: true }),
+}));
+
+vi.mock("@/generated/hooks/useGetUsersMe", () => ({
+  getUsersMeQueryKey: () => ["users", "me"],
+  getUsersMeQueryOptions: () => ({ queryKey: ["users", "me"] }),
+}));
+
+vi.mock("@/generated/hooks/usePutUsersMe", () => ({
   usePutUsersMe: () => ({ mutateAsync: mockMutateAsync }),
 }));
 

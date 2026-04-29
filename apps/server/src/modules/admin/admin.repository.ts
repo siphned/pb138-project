@@ -1,7 +1,7 @@
+import type { Event, Review, User } from "@repo/shared/schemas";
+import { events, reviews, userRoles, users } from "@repo/shared/schemas";
 import { and, count, eq, isNull } from "drizzle-orm";
 import { db } from "../../db";
-import type { Event, Review, User } from "../../db/schema";
-import { events, reviews, userRoles, users } from "../../db/schema";
 
 export type AdminUserRow = User & {
   roles: { id: string; role: string }[];

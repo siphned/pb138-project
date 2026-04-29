@@ -1,5 +1,5 @@
 import { createClerkClient } from "@clerk/backend";
-import type { Address, User } from "../../db/schema";
+import type { Address, User } from "@repo/shared/schemas";
 import type { ClerkPayload } from "../auth/auth.utils";
 import { userRolesRepository } from "./user-roles.repository";
 import { usersRepository } from "./users.repository";

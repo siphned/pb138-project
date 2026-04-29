@@ -1,7 +1,7 @@
+import type { UserRole } from "@repo/shared/schemas";
+import { userRoles } from "@repo/shared/schemas";
 import { and, eq, isNull } from "drizzle-orm";
 import { db } from "../../db";
-import type { UserRole } from "../../db/schema";
-import { userRoles } from "../../db/schema";
 
 export const userRolesRepository = {
   /**

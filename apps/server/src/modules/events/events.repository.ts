@@ -1,7 +1,13 @@
+import type { Event, EventComment, EventRegistration } from "@repo/shared/schemas";
+import {
+  addresses,
+  eventComments,
+  eventRegistrations,
+  events,
+  winemakers,
+} from "@repo/shared/schemas";
 import { and, count, eq, gte, ilike, inArray, isNull, lte } from "drizzle-orm";
 import { db } from "../../db";
-import type { Event, EventComment, EventRegistration } from "../../db/schema";
-import { addresses, eventComments, eventRegistrations, events, winemakers } from "../../db/schema";
 
 export type EventWithDetails = Event & {
   winemaker: { id: string; name: string } | null;

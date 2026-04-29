@@ -1,4 +1,4 @@
-import type { AvailabilityException, AvailabilityRegular } from "../../db/schema";
+import type { AvailabilityException, AvailabilityRegular } from "@repo/shared/schemas";
 import { availabilityRepository } from "./availability.repository";
 
 function parseTime(hhmm: string): Date {
