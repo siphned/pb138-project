@@ -16,7 +16,7 @@ export function ShopGalleryThumbnailStrip({
       {images.map((src, i) => (
         <button
           className={cn(
-            "h-20 w-24 shrink-0 overflow-hidden rounded-lg border-2 transition-all",
+            "h-20 shrink-0 overflow-hidden rounded-lg border-2 transition-all",
             "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring",
             i === selectedIndex
               ? "border-primary"

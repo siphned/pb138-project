@@ -11,10 +11,10 @@ export function ShopGalleryMobile({ images, shopName }: ShopGalleryMobileProps) 
       <CarouselContent>
         {images.map((src, i) => (
           <CarouselItem key={src}>
-            <div className="aspect-shop-hero-mobile w-full overflow-hidden rounded-2xl">
+            <div className="flex flex-col items-center aspect-shop-hero-mobile w-full overflow-hidden">
               <img
                 alt={`${shopName} — ${i + 1}`}
-                className="h-full w-full object-cover"
+                className=" object-cover h-full rounded-2xl"
                 src={src}
               />
             </div>

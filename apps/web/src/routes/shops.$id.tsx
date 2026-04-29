@@ -62,8 +62,8 @@ function ShopDetailPage() {
         </Link>
 
         {/* Photos left, contact card right. On mobile: photos then card stacked. */}
-        <div className="grid grid-cols-1 gap-8 lg:grid-cols-3">
-          <div className="lg:col-span-2">
+        <div className="grid grid-cols-1 gap-8 lg:grid-cols-2">
+          <div >
             <ShopHeroGallery shopName={shop.name} />
           </div>
           <div>
