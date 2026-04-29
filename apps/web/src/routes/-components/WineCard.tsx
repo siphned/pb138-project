@@ -46,12 +46,14 @@ export function WineCard({ product, shopName }: WineCardProps) {
       title={product.name}
       topRightSlot={
         <button
-          className="rounded-full bg-background/80 p-2 transition-colors hover:bg-background"
+          className="rounded-full bg-background/80 p-2 transition-colors opacity-50 cursor-not-allowed"
+          disabled
           onClick={(e) => {
             e.preventDefault();
             e.stopPropagation();
             setWishlisted((w) => !w);
           }}
+          title="Wishlist coming soon"
           type="button"
         >
           <Heart

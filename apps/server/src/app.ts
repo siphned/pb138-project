@@ -18,6 +18,7 @@ import { winesRoutes } from "./modules/wines";
 
 export const app = new Elysia()
   .onError(({ code, error, request }) => {
+    // biome-ignore lint/suspicious/noConsole: global error handler
     console.error(`Error ${code} during ${request.method} ${request.url}:`, error);
     return (error as Error).message;
   })
