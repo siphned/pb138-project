@@ -1,5 +1,5 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { useGetShopsMe } from "@/generated/hooks/shopsController/useGetShopsMe";
+import { useGetShopsMe } from "@/generated/hooks/useGetShopsMe";
 
 export const Route = createFileRoute("/_authenticated/_shop_owner/manage/shops/")({
   component: MyShops,

@@ -12,8 +12,8 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
-import { useGetProducts } from "@/generated/hooks/productsController/useGetProducts";
-import { useGetShopsByIdProducts } from "@/generated/hooks/productsController/useGetShopsByIdProducts";
+import { useGetProducts } from "@/generated/hooks/useGetProducts";
+import { useGetShopsByIdProducts } from "@/generated/hooks/useGetShopsByIdProducts";
 import { WineCard } from "./WineCard";
 import { WineFiltersSidebar } from "./WineFiltersSidebar";
 

@@ -2,7 +2,7 @@ import { Check, Minus, Plus, ShoppingCart } from "lucide-react";
 import { useState } from "react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { usePostCartsItems } from "@/generated/hooks/cartsController/usePostCartsItems";
+import { usePostCartsItems } from "@/generated/hooks/usePostCartsItems";
 
 interface ProductPriceRowProps {
   price: string;

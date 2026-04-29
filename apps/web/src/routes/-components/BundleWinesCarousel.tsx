@@ -1,4 +1,4 @@
-import { useGetShopsByIdProducts } from "@/generated/hooks/productsController/useGetShopsByIdProducts";
+import { useGetShopsByIdProducts } from "@/generated/hooks/useGetShopsByIdProducts";
 import { WineCard } from "./WineCard";
 
 type ShopProductRaw = {

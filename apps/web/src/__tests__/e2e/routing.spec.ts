@@ -7,10 +7,10 @@ test.describe("Routing", () => {
     await expect(page.getByRole("heading", { name: /welcome to wine enjoyers/i })).toBeVisible();
   });
 
-  test("/explore renders Explore Wines route stub", async ({ page }) => {
+  test("/explore renders Explore page heading", async ({ page }) => {
     await page.goto("/explore");
     await page.waitForLoadState("networkidle");
-    await expect(page.getByText(/explore wines/i)).toBeVisible();
+    await expect(page.getByRole("heading", { name: /^explore$/i })).toBeVisible();
   });
 
   test("navigating to an unknown route shows 404 or redirects", async ({ page }) => {

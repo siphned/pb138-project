@@ -79,9 +79,15 @@ describe("Sidebar", () => {
     expect(screen.getByText("Explore Wines")).toBeInTheDocument();
   });
 
-  it("shows Bundles link", () => {
+  it("shows Bundles link pointing to /bundles", () => {
     render(<Sidebar />);
-    expect(screen.getByText("Bundles")).toBeInTheDocument();
+    const bundlesLink = screen.getByText("Bundles").closest("a");
+    expect(bundlesLink).toHaveAttribute("href", "/bundles");
+  });
+
+  it("shows Events link", () => {
+    render(<Sidebar />);
+    expect(screen.getByText("Events")).toBeInTheDocument();
   });
 
   it("shows active role for single-role user", () => {

@@ -34,7 +34,7 @@ export function WinemakerWinesList({ wines, winemakerName }: WinemakerWinesListP
               wines: [
                 {
                   ...wine,
-                  winemaker: { id: "", name: winemakerName },
+                  winemaker: { name: winemakerName },
                 },
               ],
             }}
