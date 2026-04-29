@@ -11,6 +11,7 @@ import { writeFile } from "node:fs/promises";
 import { app } from "../src/app";
 
 const OUTPUT_PATH = "./openapi.json";
+const ROOT_OUTPUT_PATH = "../../openapi.json";
 
 // biome-ignore lint/suspicious/noExplicitAny: OpenAPI spec traversal uses unknown shape
 type AnyNode = any;
@@ -73,4 +74,9 @@ for (const pathItem of Object.values(normalized.paths ?? {})) {
 const spec = normalized;
 
 await writeFile(OUTPUT_PATH, JSON.stringify(spec, null, 2));
+try {
+  await writeFile(ROOT_OUTPUT_PATH, JSON.stringify(spec, null, 2));
+} catch (_e) {
+  // Ignore if root path doesn't exist
+}
 process.exit(0);
