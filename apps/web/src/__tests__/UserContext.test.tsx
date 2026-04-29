@@ -4,14 +4,21 @@ import { describe, expect, it, vi } from "vitest";
 
 const mockMutateAsync = vi.fn();
 
+vi.mock("@clerk/react", () => ({
+  useAuth: () => ({ isLoaded: true, isSignedIn: true }),
+}));
+
 vi.mock("@tanstack/react-query", () => ({
   useQuery: vi.fn(),
   useQueryClient: () => ({ invalidateQueries: vi.fn() }),
 }));
 
-vi.mock("@/generated/users/users", () => ({
-  getGetUsersMeQueryKey: () => ["users", "me"],
-  getGetUsersMeQueryOptions: () => ({ queryKey: ["users", "me"] }),
+vi.mock("@/generated/hooks/useGetUsersMe", () => ({
+  getUsersMeQueryKey: () => ["users", "me"],
+  getUsersMeQueryOptions: () => ({ queryKey: ["users", "me"] }),
+}));
+
+vi.mock("@/generated/hooks/usePutUsersMe", () => ({
   usePutUsersMe: () => ({ mutateAsync: mockMutateAsync }),
 }));
 

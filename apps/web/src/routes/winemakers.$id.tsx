@@ -2,7 +2,7 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { ArrowLeft } from "lucide-react";
 import { PublicLayout } from "@/components/layout/PublicLayout";
 import { Separator } from "@/components/ui/separator";
-import { useGetWinemakersById } from "@/generated/hooks/winemakersController/useGetWinemakersById";
+import { useGetWinemakersById } from "@/generated/hooks/useGetWinemakersById";
 import { WinemakerHero } from "./-components/WinemakerHero";
 import { WinemakerWinesList } from "./-components/WinemakerWinesList";
 

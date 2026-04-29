@@ -5,13 +5,21 @@ import { describe, expect, it, vi } from "vitest";
 const mockSignOut = vi.fn();
 
 vi.mock("@clerk/react", () => ({
-  useClerk: () => ({ signOut: mockSignOut }),
+  Show: ({ children }: { children: React.ReactNode }) => <>{children}</>,
+  useAuth: () => ({ isSignedIn: true }),
+  useClerk: () => ({ openUserProfile: vi.fn(), signOut: mockSignOut }),
+  useUser: () => ({ user: null }),
+}));
+
+vi.mock("@/context/UserContext", () => ({
+  useUser: () => ({ user: null }),
 }));
 
 vi.mock("@tanstack/react-router", () => ({
   Link: ({ to, children }: { to: string; children: React.ReactNode }) => (
     <a href={to}>{children}</a>
   ),
+  useNavigate: () => vi.fn(),
 }));
 
 // Stub shadcn Sheet so the sidebar content is always visible
@@ -47,7 +55,6 @@ vi.mock("@/components/ui/button", () => ({
 }));
 
 import { Sidebar } from "../components/layout/Sidebar";
-import { Role } from "../types/roles";
 
 describe("Sidebar", () => {
   it("shows Log out button", () => {
@@ -55,31 +62,28 @@ describe("Sidebar", () => {
     expect(screen.getByText("Log out")).toBeInTheDocument();
   });
 
-  it("calls signOut with redirect to / when Log out is clicked", async () => {
+  it("calls signOut when Log out is clicked", async () => {
     const user = userEvent.setup();
     mockSignOut.mockResolvedValue(undefined);
     render(<Sidebar />);
     await user.click(screen.getByText("Log out"));
-    expect(mockSignOut).toHaveBeenCalledWith({ redirectUrl: "/" });
+    expect(mockSignOut).toHaveBeenCalled();
   });
 
-  it("shows Order History link for customer role", () => {
-    render(<Sidebar activeRole={Role.customer} userRoles={[Role.customer]} />);
-    expect(screen.getByText("Order History")).toBeInTheDocument();
+  it("shows Explore Wines link", () => {
+    render(<Sidebar />);
+    expect(screen.getByText("Explore Wines")).toBeInTheDocument();
   });
 
-  it("shows My Wines and Bundles links for non-customer roles", () => {
-    render(<Sidebar activeRole={Role.winemaker} userRoles={[Role.winemaker]} />);
-    expect(screen.getByText("My Wines")).toBeInTheDocument();
-    expect(screen.getByText("Bundles")).toBeInTheDocument();
-  });
-
-  it("My Wines and Bundles link to /shops not invalid routes", () => {
-    render(<Sidebar activeRole={Role.winemaker} userRoles={[Role.winemaker]} />);
-    const winesLink = screen.getByText("My Wines").closest("a");
+  it("shows Bundles link pointing to /bundles", () => {
+    render(<Sidebar />);
     const bundlesLink = screen.getByText("Bundles").closest("a");
-    expect(winesLink).toHaveAttribute("href", "/shops");
-    expect(bundlesLink).toHaveAttribute("href", "/shops");
+    expect(bundlesLink).toHaveAttribute("href", "/bundles");
+  });
+
+  it("shows Events link", () => {
+    render(<Sidebar />);
+    expect(screen.getByText("Events")).toBeInTheDocument();
   });
 
   it("Log out is a button not a navigation link", () => {

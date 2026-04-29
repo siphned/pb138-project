@@ -2,7 +2,7 @@ import { Link } from "@tanstack/react-router";
 import { ArrowRight } from "lucide-react";
 import { BundleCard } from "@/components/catalog/BundleCard";
 import { buttonVariants } from "@/components/ui/button";
-import { useGetProducts } from "@/generated/hooks/productsController/useGetProducts";
+import { useGetProducts } from "@/generated/hooks/useGetProducts";
 import type { GetProducts200 } from "@/generated/types/GetProducts";
 import { WineCard } from "./WineCard";
 

@@ -1,4 +1,4 @@
-import { useGetShopsByIdAvailability } from "@/generated/hooks/availabilityController/useGetShopsByIdAvailability";
+import { useGetShopsByIdAvailability } from "@/generated/hooks/useGetShopsByIdAvailability";
 
 interface ShopHoursDisplayProps {
   shopId: string;

@@ -6,7 +6,7 @@ import { ShopCard } from "@/components/catalog/ShopCard";
 import { PublicLayout } from "@/components/layout/PublicLayout";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { useGetShops } from "@/generated/hooks/shopsController/useGetShops";
+import { useGetShops } from "@/generated/hooks/useGetShops";
 import { useDebounce } from "@/hooks/use-debounce";
 
 const searchSchema = z.object({ search: z.string().optional() });

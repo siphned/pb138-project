@@ -4,7 +4,7 @@ import { PublicLayout } from "@/components/layout/PublicLayout";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
-import { useGetShopsById } from "@/generated/hooks/shopsController/useGetShopsById";
+import { useGetShopsById } from "@/generated/hooks/useGetShopsById";
 import { ShopBundlesSection } from "./-components/ShopBundlesSection";
 import { ShopContactCard } from "./-components/ShopContactCard";
 import { ShopHeroGallery } from "./-components/ShopHeroGallery";

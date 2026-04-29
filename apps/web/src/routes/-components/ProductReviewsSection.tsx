@@ -1,6 +1,6 @@
 import { ReviewList } from "@/components/reviews/ReviewList";
 import { ReviewsSummary } from "@/components/reviews/ReviewsSummary";
-import type { GetReviewsProductById200 } from "@/generated/model";
+import type { GetReviewsProductById200 } from "@/generated/types/GetReviewsProductById";
 
 interface ProductReviewsSectionProps {
   reviewData?: GetReviewsProductById200;

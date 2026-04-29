@@ -1,5 +1,5 @@
 import { BundleCard } from "@/components/catalog/BundleCard";
-import { useGetShopsByIdProducts } from "@/generated/hooks/productsController/useGetShopsByIdProducts";
+import { useGetShopsByIdProducts } from "@/generated/hooks/useGetShopsByIdProducts";
 
 type RawBundle = {
   id: string;
