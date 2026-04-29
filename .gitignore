@@ -34,6 +34,7 @@ apps/server/openapi.json
 # Test results
 test-results/
 apps/*/test-results.xml
+apps/*/playwright-report/
 
 # Scripts (temporary/local)
 test-all.sh
