@@ -1,6 +1,6 @@
 import { createFileRoute, Outlet } from "@tanstack/react-router";
 
-export const Route = createFileRoute("/_authenticated/_shop_owner/shops/$id")({
+export const Route = createFileRoute("/_authenticated/_shop_owner/manage/shops/$id")({
   component: ShopLayout,
 });
 

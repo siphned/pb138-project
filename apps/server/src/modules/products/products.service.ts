@@ -1,6 +1,8 @@
 import type { Product } from "@repo/shared/schemas";
+import type { PaginatedResult } from "../../utils/pagination";
+import { parsePagination } from "../../utils/pagination";
 import { shopsRepository } from "../shops/shops.repository";
-import type { ProductWithWines } from "./products.repository";
+import type { ProductCatalogFilters, ProductWithWines } from "./products.repository";
 import { productsRepository } from "./products.repository";
 
 async function assertShopOwnership(shopId: string, requesterId: string): Promise<void> {
@@ -8,6 +10,26 @@ async function assertShopOwnership(shopId: string, requesterId: string): Promise
   if (!shop) throw new Error("NOT_FOUND");
   if (shop.ownerUserId !== requesterId) throw new Error("FORBIDDEN");
 }
+
+type CatalogProductItem = {
+  id: string;
+  name: string;
+  price: string;
+  quantity: number;
+  isBundle: boolean;
+  shop: { id: string; name: string };
+  rating: number | null;
+  reviewCount: number;
+  wines: Array<{
+    id: string;
+    name: string;
+    color: string;
+    type: string;
+    region: string;
+    vintageYear: number;
+    winemaker: { name: string };
+  }>;
+};
 
 export const productsService = {
   async createBundle(
@@ -63,6 +85,44 @@ export const productsService = {
     if (!product || product.shopId !== shopId || product.isBundle) throw new Error("NOT_FOUND");
 
     await productsRepository.softDelete(productId);
+  },
+
+  async getAllProducts(
+    query: ProductCatalogFilters & { page?: number }
+  ): Promise<PaginatedResult<CatalogProductItem>> {
+    const { page = 1, ...filters } = query;
+    const { limit, offset } = parsePagination({ page });
+
+    const { rows, total } = await productsRepository.findAll(filters, { limit, offset });
+
+    if (rows.length === 0) {
+      return { data: [], limit, page, total };
+    }
+
+    const enriched = await productsRepository.findByIds(rows.map((r) => r.id));
+    const winesMap = new Map(enriched.map((p) => [p.id, p.productWines]));
+
+    const data: CatalogProductItem[] = rows.map((row) => ({
+      id: row.id,
+      isBundle: row.isBundle,
+      name: row.name,
+      price: row.price,
+      quantity: row.quantity,
+      rating: row.avgRating !== null ? Number.parseFloat(row.avgRating) : null,
+      reviewCount: row.reviewCount,
+      shop: { id: row.shopId, name: row.shopName },
+      wines: (winesMap.get(row.id) ?? []).map((pw) => ({
+        color: pw.wine.color,
+        id: pw.wine.id,
+        name: pw.wine.name,
+        region: pw.wine.region,
+        type: pw.wine.type,
+        vintageYear: pw.wine.vintageYear,
+        winemaker: { name: pw.wine.winemaker.name },
+      })),
+    }));
+
+    return { data, limit, page, total };
   },
 
   async getProduct(id: string): Promise<ProductWithWines> {

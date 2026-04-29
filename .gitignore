@@ -55,3 +55,9 @@ yarn-error.log*
 # LLM resources (not tracked - may contain embedded repos/files)
 raw/
 .claude/
+CLAUDE.md
+GEMINI.md
+.claude/settings.local.json
+apps/server/src/db/seed.ts
+
+docs/figma/

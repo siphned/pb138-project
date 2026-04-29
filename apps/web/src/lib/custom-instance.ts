@@ -1,19 +1,5 @@
-import Axios, { type AxiosError, type AxiosRequestConfig, type AxiosResponse } from "axios";
-
-export const axiosInstance = Axios.create({
-  baseURL: import.meta.env.VITE_API_URL ?? "http://localhost:3000",
-  headers: {
-    "Content-Type": "application/json",
-  },
-});
-
-axiosInstance.interceptors.request.use(async (config) => {
-  const token = await window.Clerk?.session?.getToken();
-  if (token) {
-    config.headers.Authorization = `Bearer ${token}`;
-  }
-  return config;
-});
+import type { AxiosError, AxiosRequestConfig, AxiosResponse } from "axios";
+import { axiosInstance } from "../api/client";
 
 // Orval uses named export and expects the response data directly.
 export const customInstance = <T, R = unknown>(
@@ -49,13 +35,3 @@ export type ResponseErrorConfig<E> = AxiosError<E>;
 
 // Default export for Kubb client import
 export default kubbInstance;
-
-declare global {
-  interface Window {
-    Clerk?: {
-      session?: {
-        getToken: () => Promise<string | null>;
-      };
-    };
-  }
-}

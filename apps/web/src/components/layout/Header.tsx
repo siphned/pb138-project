@@ -1,37 +1,28 @@
-import { Search, ShoppingCart } from "lucide-react";
+﻿import { Show, useClerk } from "@clerk/react";
+import { Link } from "@tanstack/react-router";
+import { Search, ShoppingCart, User } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { Role } from "@/types/roles";
-import { Sidebar } from "./Sidebar"; // Import your new component here!
+import { Sidebar } from "./Sidebar";
 
 interface HeaderProps {
-  user?: {
-    name?: string;
-    fname?: string;
-    lname?: string;
-    email: string;
-    avatarUrl?: string;
-  };
   activeRole?: Role;
   onRoleChange?: (role: Role) => void;
 }
 
-export function Header({ user: propUser, activeRole, onRoleChange }: HeaderProps) {
-  const currentUser = propUser;
-  const displayName =
-    currentUser?.name ||
-    (currentUser?.fname && currentUser?.lname ? `${currentUser.fname} ${currentUser.lname}` : "");
-  const initials = displayName?.substring(0, 2).toUpperCase() || "WE";
-
+export function Header({ activeRole, onRoleChange }: HeaderProps) {
+  const { user: clerkUser } = useClerk();
+  const initials = clerkUser ? (clerkUser.fullName || "User").substring(0, 2).toUpperCase() : "GU";
   return (
     <header className="h-16 border-b bg-background flex items-center justify-between px-6 lg:px-12">
       {/* Left: Logo Area */}
-      <div className="flex items-center gap-2 font-heading font-bold text-xl">
-        <div className="h-8 w-8 bg-primary rounded-full flex items-center justify-center text-primary-foreground text-xs">
-          WE
+      <Link to="/">
+        <div className="flex items-center gap-2 font-heading font-bold text-xl">
+          <img alt="Wine Enjoyers Logo" className="h-8 w-8 rounded-full" src="/logo.png" />
+          Wine Enjoyers
         </div>
-        Wine Enjoyers
-      </div>
+      </Link>
 
       {/* Right: Icons & Menus */}
       <div className="flex items-center gap-4">
@@ -42,21 +33,25 @@ export function Header({ user: propUser, activeRole, onRoleChange }: HeaderProps
           <ShoppingCart className="h-5 w-5" />
         </Button>
 
-        {currentUser && (
-          <a
-            className="rounded-full focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2"
-            href="/profile"
-          >
-            <Avatar className="h-9 w-9 hover:opacity-80 transition-opacity">
-              <AvatarImage alt={displayName} src={currentUser.avatarUrl} />
-              <AvatarFallback className="bg-secondary text-secondary-foreground">
+        <Show when="signed-out">
+          <Link to="/auth/login">
+            <Button className="rounded-full" size="icon" variant="ghost">
+              <User className="h-5 w-5" />
+            </Button>
+          </Link>
+        </Show>
+
+        <Show when="signed-in">
+          <Link to="/dashboard">
+            <Avatar className="h-8 w-8">
+              <AvatarImage alt={clerkUser?.fullName || "User"} src={clerkUser?.imageUrl} />
+              <AvatarFallback className="bg-primary text-primary-foreground font-heading text-xs">
                 {initials}
               </AvatarFallback>
             </Avatar>
-          </a>
-        )}
+          </Link>
+        </Show>
 
-        {/* Drop the Sidebar right here! */}
         <Sidebar
           activeRole={activeRole}
           onRoleChange={onRoleChange}

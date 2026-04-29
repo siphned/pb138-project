@@ -28,13 +28,22 @@ const mockDb = db as unknown as MockDatabase;
 
 vi.mock("../../db", () => {
   const m = {
+    as: vi.fn().mockReturnThis(),
     delete: vi.fn().mockReturnThis(),
     for: vi.fn().mockReturnThis(),
     from: vi.fn().mockReturnThis(),
+    groupBy: vi.fn().mockReturnThis(),
+    having: vi.fn().mockReturnThis(),
+    innerJoin: vi.fn().mockReturnThis(),
     insert: vi.fn().mockReturnThis(),
+    leftJoin: vi.fn().mockReturnThis(),
+    limit: vi.fn().mockReturnThis(),
+    offset: vi.fn().mockReturnThis(),
+    orderBy: vi.fn().mockReturnThis(),
     query: {
       products: {
         findFirst: vi.fn(),
+        findMany: vi.fn(),
       },
     },
     returning: vi.fn().mockReturnThis(),
@@ -179,6 +188,179 @@ describe("productsRepository", () => {
 
       expect(db.update).toHaveBeenCalledWith(wines);
       expect(db.update).toHaveBeenCalledWith(products);
+    });
+  });
+
+  describe("findByIds", () => {
+    it("returns empty array immediately when ids list is empty", async () => {
+      const result = await productsRepository.findByIds([]);
+      expect(result).toEqual([]);
+      expect(db.query.products.findMany).not.toHaveBeenCalled();
+    });
+
+    it("calls findMany with inArray and soft-delete filter", async () => {
+      const mockData = [
+        {
+          id: "p1",
+          name: "Pinot Noir",
+          productWines: [
+            {
+              wine: {
+                color: "red",
+                id: "w1",
+                name: "Red Wine",
+                region: "Bordeaux",
+                type: "still",
+                vintageYear: 2020,
+                winemaker: { name: "Jean Dupont" },
+              },
+            },
+          ],
+        },
+      ];
+      vi.mocked(db.query.products.findMany).mockResolvedValue(mockData as never);
+
+      const result = await productsRepository.findByIds(["p1"]);
+
+      expect(db.query.products.findMany).toHaveBeenCalledWith(
+        expect.objectContaining({
+          where: expect.anything(), // includes and(inArray(...), isNull(deletedAt))
+          with: expect.objectContaining({
+            productWines: expect.anything(),
+          }),
+        })
+      );
+      expect(result).toEqual(mockData);
+    });
+  });
+
+  describe("findAll", () => {
+    it("returns rows and total with correct shape", async () => {
+      const mockRows = [
+        {
+          avgRating: "4.5",
+          id: "p1",
+          isBundle: false,
+          name: "Château Noir",
+          price: "12.99",
+          quantity: 5,
+          reviewCount: 3,
+          shopId: "s1",
+          shopName: "The Wine Shop",
+        },
+      ];
+
+      // First db.select call: main paginated query (chain ends with .offset)
+      const mainChain = {
+        as: vi.fn().mockReturnThis(),
+        from: vi.fn().mockReturnThis(),
+        groupBy: vi.fn().mockReturnThis(),
+        having: vi.fn().mockReturnThis(),
+        innerJoin: vi.fn().mockReturnThis(),
+        leftJoin: vi.fn().mockReturnThis(),
+        limit: vi.fn().mockReturnThis(),
+        offset: vi.fn().mockResolvedValue(mockRows),
+        orderBy: vi.fn().mockReturnThis(),
+        where: vi.fn().mockReturnThis(),
+      };
+
+      // Second db.select call: count subquery base (chain ends with .as())
+      const countSubqChain = {
+        as: vi.fn().mockReturnValue({ _subq: true }),
+        from: vi.fn().mockReturnThis(),
+        groupBy: vi.fn().mockReturnThis(),
+        having: vi.fn().mockReturnThis(),
+        innerJoin: vi.fn().mockReturnThis(),
+        leftJoin: vi.fn().mockReturnThis(),
+        where: vi.fn().mockReturnThis(),
+      };
+
+      // Third db.select call: count outer query (chain ends with .from(subq))
+      const countOuterChain = {
+        from: vi.fn().mockResolvedValue([{ total: 1 }]),
+      };
+
+      vi.mocked(mockDb.select)
+        .mockReturnValueOnce(mainChain as never)
+        .mockReturnValueOnce(countSubqChain as never)
+        .mockReturnValueOnce(countOuterChain as never);
+
+      const result = await productsRepository.findAll({}, { limit: 20, offset: 0 });
+
+      expect(result.rows).toEqual(mockRows);
+      expect(result.total).toBe(1);
+    });
+
+    it("returns empty rows and zero total when nothing matches", async () => {
+      const emptyMain = {
+        as: vi.fn().mockReturnThis(),
+        from: vi.fn().mockReturnThis(),
+        groupBy: vi.fn().mockReturnThis(),
+        having: vi.fn().mockReturnThis(),
+        innerJoin: vi.fn().mockReturnThis(),
+        leftJoin: vi.fn().mockReturnThis(),
+        limit: vi.fn().mockReturnThis(),
+        offset: vi.fn().mockResolvedValue([]),
+        orderBy: vi.fn().mockReturnThis(),
+        where: vi.fn().mockReturnThis(),
+      };
+      const emptySubq = {
+        as: vi.fn().mockReturnValue({ _subq: true }),
+        from: vi.fn().mockReturnThis(),
+        groupBy: vi.fn().mockReturnThis(),
+        having: vi.fn().mockReturnThis(),
+        innerJoin: vi.fn().mockReturnThis(),
+        leftJoin: vi.fn().mockReturnThis(),
+        where: vi.fn().mockReturnThis(),
+      };
+      const emptyCount = { from: vi.fn().mockResolvedValue([{ total: 0 }]) };
+
+      vi.mocked(mockDb.select)
+        .mockReturnValueOnce(emptyMain as never)
+        .mockReturnValueOnce(emptySubq as never)
+        .mockReturnValueOnce(emptyCount as never);
+
+      const result = await productsRepository.findAll({}, { limit: 20, offset: 0 });
+
+      expect(result.rows).toEqual([]);
+      expect(result.total).toBe(0);
+    });
+
+    it("applies having clause when rating filter is provided", async () => {
+      const ratedMain = {
+        as: vi.fn().mockReturnThis(),
+        from: vi.fn().mockReturnThis(),
+        groupBy: vi.fn().mockReturnThis(),
+        having: vi.fn().mockReturnThis(),
+        innerJoin: vi.fn().mockReturnThis(),
+        leftJoin: vi.fn().mockReturnThis(),
+        limit: vi.fn().mockReturnThis(),
+        offset: vi.fn().mockResolvedValue([]),
+        orderBy: vi.fn().mockReturnThis(),
+        where: vi.fn().mockReturnThis(),
+      };
+      const ratedSubq = {
+        as: vi.fn().mockReturnValue({ _subq: true }),
+        from: vi.fn().mockReturnThis(),
+        groupBy: vi.fn().mockReturnThis(),
+        having: vi.fn().mockReturnThis(),
+        innerJoin: vi.fn().mockReturnThis(),
+        leftJoin: vi.fn().mockReturnThis(),
+        where: vi.fn().mockReturnThis(),
+      };
+      const ratedCount = { from: vi.fn().mockResolvedValue([{ total: 0 }]) };
+
+      vi.mocked(mockDb.select)
+        .mockReturnValueOnce(ratedMain as never)
+        .mockReturnValueOnce(ratedSubq as never)
+        .mockReturnValueOnce(ratedCount as never);
+
+      const result = await productsRepository.findAll({ rating: 4 }, { limit: 20, offset: 0 });
+
+      expect(ratedMain.having).toHaveBeenCalled();
+      expect(ratedSubq.having).toHaveBeenCalled();
+      expect(result.rows).toEqual([]);
+      expect(result.total).toBe(0);
     });
   });
 });
