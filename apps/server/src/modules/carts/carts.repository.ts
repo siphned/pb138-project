@@ -1,7 +1,7 @@
+import type { Cart, Product } from "@repo/shared/schemas";
+import { cartItems, carts } from "@repo/shared/schemas";
 import { and, eq, isNull, sql } from "drizzle-orm";
 import { db } from "../../db";
-import type { Cart, Product } from "../../db/schema";
-import { cartItems, carts } from "../../db/schema";
 
 export interface CartItemWithProduct {
   id: string;

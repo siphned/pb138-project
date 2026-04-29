@@ -1,7 +1,7 @@
+import type { NewProduct, NewProductWine, Product, ProductWine, Wine } from "@repo/shared/schemas";
+import { products, productWines, wines } from "@repo/shared/schemas";
 import { and, eq, inArray, isNull, sql } from "drizzle-orm";
 import { db } from "../../db";
-import type { NewProduct, NewProductWine, Product, ProductWine, Wine } from "../../db/schema";
-import { products, productWines, wines } from "../../db/schema";
 
 export type WineInfo = Pick<
   Wine,

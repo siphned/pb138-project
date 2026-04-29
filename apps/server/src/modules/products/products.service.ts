@@ -1,4 +1,4 @@
-import type { Product } from "../../db/schema";
+import type { Product } from "@repo/shared/schemas";
 import { shopsRepository } from "../shops/shops.repository";
 import type { ProductWithWines } from "./products.repository";
 import { productsRepository } from "./products.repository";

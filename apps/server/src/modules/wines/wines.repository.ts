@@ -1,7 +1,7 @@
+import type { Wine, Winemaker } from "@repo/shared/schemas";
+import { winemakers, wines } from "@repo/shared/schemas";
 import { and, eq, isNull } from "drizzle-orm";
 import { db } from "../../db";
-import type { Wine, Winemaker } from "../../db/schema";
-import { winemakers, wines } from "../../db/schema";
 
 export type WineWithWinemaker = Wine & {
   winemaker: { id: string; name: string };

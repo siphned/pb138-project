@@ -1,6 +1,6 @@
+import { supplyAgreements } from "@repo/shared/schemas";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { db } from "../../db";
-import { supplyAgreements } from "../../db/schema";
 import { supplyAgreementsRepository } from "./supply-agreements.repository";
 
 interface MockChained {

@@ -3,7 +3,6 @@
  */
 
 import { faker } from "@faker-js/faker";
-import { db } from "./index";
 import {
   addresses,
   availabilityRegular,
@@ -21,7 +20,8 @@ import {
   users,
   winemakers,
   wines,
-} from "./schema";
+} from "@repo/shared/schemas";
+import { db } from "./index";
 
 const seed = process.env.SEED_FAKER_SEED ? Number(process.env.SEED_FAKER_SEED) : undefined;
 if (seed !== undefined) {

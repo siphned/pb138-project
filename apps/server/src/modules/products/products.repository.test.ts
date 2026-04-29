@@ -1,6 +1,6 @@
+import { products, wines } from "@repo/shared/schemas";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { db } from "../../db";
-import { products, wines } from "../../db/schema";
 import { productsRepository } from "./products.repository";
 
 interface MockChained {

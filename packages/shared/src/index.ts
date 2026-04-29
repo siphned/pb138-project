@@ -9,6 +9,35 @@ export const ProfileUpdateSchema = z.object({
   website: z.string().url("Invalid website URL").or(z.literal("")),
 });
 
+// Inferred row types re-exported for frontend consumers.
+// Do NOT export Drizzle table objects here — use @repo/shared/schemas for server-side access.
+export type {
+  Address,
+  AvailabilityException,
+  AvailabilityRegular,
+  Cart,
+  Comment,
+  Event,
+  EventComment,
+  EventRegistration,
+  GuestSession,
+  NewAddress,
+  NewEvent,
+  NewProduct,
+  NewProductWine,
+  NewUser,
+  Order,
+  Product,
+  ProductWine,
+  Review,
+  RoleRequest,
+  Shop,
+  SupplyAgreement,
+  User,
+  Wine,
+  Winemaker,
+} from "./schemas";
+
 export type ProfileUpdate = z.infer<typeof ProfileUpdateSchema>;
 
 export const DashboardStatsSchema = z.object({

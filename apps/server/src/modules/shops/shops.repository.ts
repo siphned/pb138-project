@@ -1,7 +1,7 @@
+import type { Address, Shop } from "@repo/shared/schemas";
+import { addresses, shops } from "@repo/shared/schemas";
 import { and, eq, isNull } from "drizzle-orm";
 import { db } from "../../db";
-import type { Address, Shop } from "../../db/schema";
-import { addresses, shops } from "../../db/schema";
 
 export type ShopWithAddress = Shop & { address: Address };
 

@@ -1,7 +1,7 @@
+import type { Address, Wine, Winemaker } from "@repo/shared/schemas";
+import { events, winemakers, wines } from "@repo/shared/schemas";
 import { and, eq, isNull } from "drizzle-orm";
 import { db } from "../../db";
-import type { Address, Wine, Winemaker } from "../../db/schema";
-import { events, winemakers, wines } from "../../db/schema";
 
 export type EventRow = {
   id: string;

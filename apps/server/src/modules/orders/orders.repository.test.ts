@@ -1,6 +1,6 @@
+import { addresses, orderItems, orders } from "@repo/shared/schemas";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { db } from "../../db";
-import { addresses, orderItems, orders } from "../../db/schema";
 
 vi.mock("../products/products.repository", () => ({
   productsRepository: {

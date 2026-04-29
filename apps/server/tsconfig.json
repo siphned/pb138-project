@@ -21,6 +21,12 @@
     "noUncheckedIndexedAccess": true,
     "noImplicitOverride": true,
 
+    // Path aliases
+    "baseUrl": ".",
+    "paths": {
+      "@repo/shared/*": ["../../../packages/shared/src/*"]
+    },
+
     // Some stricter flags (disabled by default)
     "noUnusedLocals": true,
     "noUnusedParameters": true,

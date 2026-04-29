@@ -1,7 +1,7 @@
+import type { AvailabilityException, AvailabilityRegular } from "@repo/shared/schemas";
+import { availabilityExceptions, availabilityRegular, shops } from "@repo/shared/schemas";
 import { and, eq, isNull } from "drizzle-orm";
 import { db } from "../../db";
-import type { AvailabilityException, AvailabilityRegular } from "../../db/schema";
-import { availabilityExceptions, availabilityRegular, shops } from "../../db/schema";
 
 export const availabilityRepository = {
   async deleteException(id: string): Promise<void> {

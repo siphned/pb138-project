@@ -1,7 +1,7 @@
+import type { Address, Order, Product } from "@repo/shared/schemas";
+import { addresses, orderItems, orders } from "@repo/shared/schemas";
 import { and, eq, isNull } from "drizzle-orm";
 import { db } from "../../db";
-import type { Address, Order, Product } from "../../db/schema";
-import { addresses, orderItems, orders } from "../../db/schema";
 import { productsRepository } from "../products/products.repository";
 
 export type OrderItemWithProduct = typeof orderItems.$inferSelect & {

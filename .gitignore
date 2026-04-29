@@ -34,6 +34,10 @@ apps/server/openapi.json
 # Test results
 test-results/
 apps/*/test-results.xml
+apps/web/playwright-report/
+
+# Superpowers docs (generated)
+docs/superpowers/
 
 # Scripts (temporary/local)
 test-all.sh

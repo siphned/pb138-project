@@ -1,4 +1,4 @@
-import type { SupplyAgreement } from "../../db/schema";
+import type { SupplyAgreement } from "@repo/shared/schemas";
 import { shopsRepository } from "../shops/shops.repository";
 import { winemakersRepository } from "../winemakers/winemakers.repository";
 import { supplyAgreementsRepository } from "./supply-agreements.repository";

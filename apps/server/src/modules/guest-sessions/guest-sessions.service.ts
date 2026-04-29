@@ -1,4 +1,4 @@
-import type { GuestSession } from "../../db/schema";
+import type { GuestSession } from "@repo/shared/schemas";
 import { guestSessionsRepository } from "./guest-sessions.repository";
 
 const DEFAULT_EXPIRATION_DAYS = 30;

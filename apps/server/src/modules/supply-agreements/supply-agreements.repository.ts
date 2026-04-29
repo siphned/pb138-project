@@ -1,7 +1,7 @@
+import type { SupplyAgreement } from "@repo/shared/schemas";
+import { supplyAgreements } from "@repo/shared/schemas";
 import { and, eq, isNull } from "drizzle-orm";
 import { db } from "../../db";
-import type { SupplyAgreement } from "../../db/schema";
-import { supplyAgreements } from "../../db/schema";
 
 export const supplyAgreementsRepository = {
   async create(data: { shopId: string; winemakerId: string }): Promise<SupplyAgreement> {

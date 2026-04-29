@@ -1,6 +1,6 @@
+import { guestSessions } from "@repo/shared/schemas";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { db } from "../../db";
-import { guestSessions } from "../../db/schema";
 import { guestSessionsRepository } from "./guest-sessions.repository";
 
 interface MockChained {
