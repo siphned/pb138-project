@@ -3,13 +3,13 @@
 ## Module Ownership
 
 ### Ondra's Modules (8 modules, 40+ endpoints)
-- **Auth**: register, login, refresh, logout, me
+- **Auth**: Clerk integration, token verification plugin, lazy user creation
 - **Users**: profiles, addresses, role requests, approvals
 - **Wines**: catalog CRUD, filtering
 - **Winemakers**: profile management
 - **Events**: creation, approval, registration, management
 - **Comments**: event comments CRUD
-- **Email**: transactional email service
+- **Email**: transactional email service (Resend)
 - **Admin**: user management, statistics (shared)
 
 ### Johnny's Modules (6 modules, 35+ endpoints)

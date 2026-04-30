@@ -83,6 +83,12 @@ jobs:
         run: until curl -sf http://localhost:3000/swagger/json > /dev/null; do sleep 1; done
       - name: Generate Kubb client
         run: bun run generate
+      - name: Check for schema drift
+        run: |
+          if ! git diff --exit-code openapi.json; then
+            echo "❌ OpenAPI schema drift detected! Please run 'bun run generate' locally and commit the changes."
+            exit 1
+          fi
       - name: Stop backend server
         if: always()
         run: kill $(lsof -t -i:3000) 2>/dev/null || true
