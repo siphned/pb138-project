@@ -59,7 +59,7 @@ apps/server/src/
 ## Database Design
 
 21+ entities covering:
-- Users (5 roles)
+- Users (5 roles, integrated with Clerk)
 - Catalog (wines, products, bundles)
 - Commerce (carts, orders, items)
 - Features (events, reviews, comments)
@@ -74,7 +74,7 @@ OpenAPI Spec (auto-generated)
     ↓
 Kubb Code Generation
     ↓
-React Hooks (@repo/api)
+React Hooks (@repo/web/src/generated)
     ↓
 Frontend Components
 ```

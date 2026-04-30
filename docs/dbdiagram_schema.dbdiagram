@@ -23,12 +23,6 @@
       "y": 73
     },
     {
-      "name": "Sessions",
-      "schemaName": "public",
-      "x": 2060.42333984375,
-      "y": 95
-    },
-    {
       "name": "Products",
       "schemaName": "public",
       "x": 2612.3125,
@@ -69,6 +63,12 @@
       "schemaName": "public",
       "x": 1674.0908930352393,
       "y": 1175.6691489361701
+    },
+    {
+      "name": "Event_registrations",
+      "schemaName": "public",
+      "x": 495.8027088138104,
+      "y": 2206.3328931846563
     },
     {
       "name": "Orders",
@@ -214,21 +214,6 @@
         "user_id"
       ],
       "firstTableName": "Comments",
-      "firstSchemaName": "public",
-      "firstRelation": "*",
-      "secondFieldNames": [
-        "id"
-      ],
-      "secondTableName": "Users",
-      "secondSchemaName": "public",
-      "secondRelation": "1",
-      "checkPoints": []
-    },
-    {
-      "firstFieldNames": [
-        "user_id"
-      ],
-      "firstTableName": "Sessions",
       "firstSchemaName": "public",
       "firstRelation": "*",
       "secondFieldNames": [

@@ -1,8 +1,8 @@
 {
   "permissions": {
     "allow": [
-      "Bash(gh pr:*)",
-      "Bash(gh api:*)"
+      "Bash(git merge *)",
+      "Bash(git fetch *)"
     ]
   }
 }

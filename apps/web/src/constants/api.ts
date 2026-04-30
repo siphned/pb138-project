@@ -3,19 +3,19 @@ export const API_BASE_URL = import.meta.env.VITE_API_URL || "http://localhost:30
 
 export const API_ENDPOINTS = {
   // Auth
-  AUTH: {
-    LOGIN: "/auth/login",
-    LOGOUT: "/auth/logout",
-    REGISTER: "/auth/register",
-    REFRESH: "/auth/refresh",
+  auth: {
+    login: "/auth/login",
+    logout: "/auth/logout",
+    refresh: "/auth/refresh",
+    register: "/auth/register",
   },
   // Users
-  USERS: {
-    GET_ALL: "/users",
-    GET_ONE: (id: string) => `/users/${id}`,
-    CREATE: "/users",
-    UPDATE: (id: string) => `/users/${id}`,
-    DELETE: (id: string) => `/users/${id}`,
+  users: {
+    create: "/users",
+    delete: (id: string) => `/users/${id}`,
+    getAll: "/users",
+    getOne: (id: string) => `/users/${id}`,
+    update: (id: string) => `/users/${id}`,
   },
   // Add more as needed
 };

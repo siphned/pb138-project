@@ -1,24 +1,41 @@
 import { defineConfig } from "@kubb/core";
-import { pluginOas } from "@kubb/plugin-oas";
-import { pluginTs } from "@kubb/plugin-ts";
 import { pluginClient } from "@kubb/plugin-client";
+import { pluginOas } from "@kubb/plugin-oas";
 import { pluginReactQuery } from "@kubb/plugin-react-query";
+import { pluginTs } from "@kubb/plugin-ts";
+
+// Run `bun run generate` in apps/server first to produce openapi.json,
+// then run `bun run generate` here (or `turbo generate` from the root).
 
 export default defineConfig({
   input: {
-    path: "http://localhost:3000/swagger/json",
+    path: "../server/openapi.json",
   },
   output: {
-    path: "src/generated",
+    clean: true,
+    path: "./src/generated",
   },
   plugins: [
-    pluginOas(),
-    pluginTs(),
+    pluginOas({ generators: [] }),
+
+    // 1. TypeScript types for all schemas
+    pluginTs({
+      output: { path: "types" },
+    }),
+
+    // 2. Axios-based fetch functions
     pluginClient({
+      importPath: "../../lib/axios",
       output: { path: "clients" },
     }),
+
+    // 3. TanStack Query hooks (useQuery / useMutation)
     pluginReactQuery({
+      client: {
+        importPath: "../../lib/axios",
+      },
       output: { path: "hooks" },
     }),
   ],
+  root: ".",
 });

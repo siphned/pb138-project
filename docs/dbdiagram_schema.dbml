@@ -4,6 +4,12 @@ Enum user_role {
   admin
 }
 
+Enum user_status {
+  active
+  suspended
+  banned
+}
+
 Enum role_request_type {
   winemaker
   shop_owner
@@ -75,12 +81,12 @@ Enum payment_method {
 
 Table Users {
   id uuid [pk]
+  clerk_id text [not null, unique]
   fname varchar(30) [not null]
   lname varchar(30) [not null]
   email text [not null, unique]
-  email_verified boolean [not null]
-  hashed_password varchar(256) [not null]
   role user_role [not null, default: 'user']
+  status user_status [not null, default: 'active']
   shipping_address_id uuid
   billing_address_id uuid
   created_at timestamp [not null]
@@ -109,6 +115,7 @@ Table Wines {
   description text [not null]
   composition text [not null]
   attribution text [not null]
+  region varchar(255) [not null]
   vintage_year smallint [not null]
   type wine_type [not null]
   color wine_color [not null]
@@ -120,15 +127,6 @@ Table Wines {
   deleted_at timestamptz
 }
 
-Table Sessions {
-  id uuid [pk]
-  user_id uuid [not null]
-  token text [not null, unique]
-  role user_role [not null, default: 'user']
-  created_at timestamp [not null]
-  expires_at timestamp [not null]
-}
-
 Table Products {
   id uuid [pk]
   shop_id uuid [not null]
@@ -136,9 +134,10 @@ Table Products {
   description text
   price numeric(10,2) [not null]
   quantity smallint [not null]
-  created_at timestamp [not null]
-  updated_at timestamp
-  deleted_at timestamp
+  is_bundle boolean [not null, default: false]
+  created_at timestamptz [not null]
+  updated_at timestamptz
+  deleted_at timestamptz
 }
 
 Table Availability_regular {
@@ -334,7 +333,6 @@ Ref: Product_reviews.product_id > Products.id
 Ref: Comments.event_id > Events.id
 Ref: Comments.user_id > Users.id
 
-Ref: Sessions.user_id > Users.id
 Ref: Winemakers.user_id - Users.id
 Ref: Shops.owner_user_id > Users.id
 

@@ -11,7 +11,7 @@ This folder contains the **complete REST API specification** for WineMarket. Eve
 ## Files
 
 - `api.md` — Complete API reference
-  - 8 modules (Auth, Users, Wines, Shops, Orders, Events, Reviews, Admin)
+  - 14 modules (Users, Wines, Shops, Orders, Events, Reviews, Admin, etc.)
   - 50+ endpoints
   - All authorization requirements mapped to role matrix
 
@@ -20,15 +20,14 @@ This folder contains the **complete REST API specification** for WineMarket. Eve
 The API design:
 1. **Drives backend implementation** — Ondra & Johnny code from this spec
 2. **Drives frontend integration** — Adam consumes via Kubb-generated hooks
-3. **Defines contracts** — OpenAPI spec auto-generated from Elysia routes
+3. **Defines contracts** — OpenAPI spec auto-generated from Elysia routes and exported to `openapi.json`
 4. **Ensures consistency** — Standard patterns across all modules
 
 ## Module Ownership
 
 | Module | Owner |
 |--------|-------|
-| Auth | Ondra |
-| Users | Ondra |
+| Users (incl. Auth) | Ondra |
 | Wines | Ondra |
 | Winemakers | Ondra |
 | Shops | Johnny |
@@ -39,6 +38,9 @@ The API design:
 | Comments | Ondra |
 | Reviews | Johnny |
 | Admin | Both |
+| Supply Agreements | Johnny |
+| Guest Sessions | Johnny |
+| Email | Ondra |
 
 ## Related Documentation
 
@@ -46,8 +48,9 @@ See `/docs/` for:
 - **project_requirements_document.md** — Functional requirements & user stories
 - **notes.md** — Implementation notes (address freezing, role flows, etc.)
 - **dbdiagram_schema.dbml** — Database schema definition
-- **MODULES/** — Backend module structure & implementation plan
-- **ARCHITECTURE/** — System design & layering patterns
+- **MODULES/modules.md** — Module structure (who implements what)
+- **ARCHITECTURE/architecture.md** — Layered architecture (how routes → services → repos)
+- **ROLES/roles.md** — Authorization rules (every endpoint references this)
 
 ## Revision History
 

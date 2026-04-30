@@ -1,0 +1,164 @@
+openapi: 3.1.0
+info:
+  title: E-Shop API
+  version: 1.0.0
+  description: A simple e-shop product catalogue API.
+
+servers:
+  - url: http://localhost:3000
+    description: Local development server
+
+paths:
+  # List products
+  /products:
+    get:
+      operationId: listProducts
+      summary: List all products
+      tags: [Products]
+      responses:
+        "200":
+          description: A JSON array of products
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Product"
+
+    # Create product
+    post:
+      operationId: createProduct
+      summary: Create a new product
+      tags: [Products]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateProductBody"
+      responses:
+        "201":
+          description: The created product
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Product"
+        "400":
+          description: Validation error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+  # Get single product
+  /products/{id}:
+    get:
+      operationId: getProduct
+      summary: Get a single product by ID
+      tags: [Products]
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: The product
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Product"
+        "404":
+          description: Product not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+    # Delete product
+    delete:
+      operationId: deleteProduct
+      summary: Delete a product by ID
+      tags: [Products]
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "204":
+          description: Product deleted (no content)
+        "404":
+          description: Product not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+# Schemas
+components:
+  schemas:
+    Product:
+      type: object
+      required: [id, name, price, stock, category]
+      properties:
+        id:
+          type: integer
+          example: 1
+        name:
+          type: string
+          example: "Wireless Mouse"
+        price:
+          type: number
+          format: float
+          example: 29.99
+        stock:
+          type: integer
+          example: 150
+        category:
+          type: string
+          example: "peripherals"
+
+    CreateProductBody:
+      type: object
+      required: [name, price]
+      properties:
+        name:
+          type: string
+          example: "Wireless Mouse"
+        price:
+          type: number
+          format: float
+          example: 29.99
+        stock:
+          type: integer
+          example: 150
+          default: 0
+        category:
+          type: string
+          example: "peripherals"
+          default: "uncategorised"
+
+    ErrorResponse:
+      type: object
+      required: [status, message]
+      properties:
+        status:
+          type: integer
+          example: 400
+        message:
+          type: string
+          example: "Validation failed"
+        errors:
+          type: array
+          items:
+            type: object
+            properties:
+              field:
+                type: string
+                example: "name"
+              message:
+                type: string
+                example: "Name is required"
