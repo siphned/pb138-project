@@ -17,29 +17,20 @@ Every code change is tied to a **Jira ticket**. The Jira issue key (`WINE-XX`) m
 ## Branch Naming
 
 ```
-<type>/WINE-<id>-<short-description>
+WINE-<id>-<short-description>
 ```
-
-| Type | When |
-|------|------|
-| `feature/` | New functionality |
-| `fix/` | Bug fix |
-| `docs/` | Documentation only |
-| `chore/` | Config, tooling, CI |
-| `refactor/` | Code restructure, no behavior change |
-| `test/` | Adding or fixing tests |
 
 **Examples:**
 ```
-feature/WINE-42-auth-login-endpoint
-feature/WINE-15-wine-crud-backend
-fix/WINE-88-cart-merge-on-login
-docs/WINE-5-api-endpoint-spec
-chore/WINE-3-setup-ci-pipeline
+WINE-42-auth-login-endpoint
+WINE-15-wine-crud-backend
+WINE-88-cart-merge-on-login
+WINE-5-api-endpoint-spec
+WINE-3-setup-ci-pipeline
 ```
 
 **Rules:**
-- Always include `WINE-XX` — Jira reads this to link the branch
+- Always start with `WINE-XX` — Jira reads this to link the branch
 - Use lowercase kebab-case after the ticket key
 - Keep descriptions short (3–5 words)
 
@@ -148,7 +139,7 @@ git checkout dev
 git pull origin dev
 
 # 3. Create branch with Jira key
-git checkout -b feature/WINE-42-auth-login-endpoint
+git checkout -b WINE-42-auth-login-endpoint
 
 # 4. Work and commit (Jira key in every commit scope)
 git add .
@@ -156,7 +147,7 @@ git commit -m "feat(WINE-42): add POST /auth/login endpoint"
 git commit -m "feat(WINE-42): add JWT token generation"
 
 # 5. Push branch
-git push -u origin feature/WINE-42-auth-login-endpoint
+git push -u origin WINE-42-auth-login-endpoint
 
 # 6. Open MR on GitLab:
 #    Title:  [WINE-42] Add POST /auth/login endpoint
@@ -214,16 +205,16 @@ Every MR and push to `dev`/`main` runs the pipeline:
 
 | Branch | Who can push | Who can merge |
 |--------|-------------|---------------|
-| `main` | Nobody directly | Maintainers via MR from `dev` (milestones only) |
+| main | Nobody directly | Maintainers via MR from `dev` (milestones only) |
 | `dev` | Nobody directly | Developers via MR from feature branches |
-| `feature/*` | Author | — |
+| `WINE-*` | Author | — |
 
 ---
 
 ## Quick Reference
 
 ```
-Branch:  feature/WINE-42-short-name
+Branch:  WINE-42-short-name
 Commit:  feat(WINE-42): description
 MR:      [WINE-42] Description
 ```
