@@ -22,6 +22,7 @@ import { Route as ShopsIndexRouteImport } from './routes/shops.index'
 import { Route as WinemakersIdRouteImport } from './routes/winemakers.$id'
 import { Route as ShopsIdRouteImport } from './routes/shops.$id'
 import { Route as ProductsProductIdRouteImport } from './routes/products.$productId'
+import { Route as CheckoutConfirmedRouteImport } from './routes/checkout.confirmed'
 import { Route as AuthRegisterRouteImport } from './routes/auth/register'
 import { Route as AuthLoginRouteImport } from './routes/auth/login'
 import { Route as AuthenticatedSettingsRouteImport } from './routes/_authenticated.settings'
@@ -105,6 +106,11 @@ const ShopsIdRoute = ShopsIdRouteImport.update({
 const ProductsProductIdRoute = ProductsProductIdRouteImport.update({
   id: '/products/$productId',
   path: '/products/$productId',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const CheckoutConfirmedRoute = CheckoutConfirmedRouteImport.update({
+  id: '/checkout/confirmed',
+  path: '/checkout/confirmed',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AuthRegisterRoute = AuthRegisterRouteImport.update({
@@ -229,6 +235,7 @@ export interface FileRoutesByFullPath {
   '/settings': typeof AuthenticatedSettingsRoute
   '/auth/login': typeof AuthLoginRoute
   '/auth/register': typeof AuthRegisterRoute
+  '/checkout/confirmed': typeof CheckoutConfirmedRoute
   '/products/$productId': typeof ProductsProductIdRoute
   '/shops/$id': typeof ShopsIdRoute
   '/winemakers/$id': typeof WinemakersIdRoute
@@ -259,6 +266,7 @@ export interface FileRoutesByTo {
   '/settings': typeof AuthenticatedSettingsRoute
   '/auth/login': typeof AuthLoginRoute
   '/auth/register': typeof AuthRegisterRoute
+  '/checkout/confirmed': typeof CheckoutConfirmedRoute
   '/products/$productId': typeof ProductsProductIdRoute
   '/shops/$id': typeof ShopsIdRoute
   '/winemakers/$id': typeof WinemakersIdRoute
@@ -295,6 +303,7 @@ export interface FileRoutesById {
   '/_authenticated/settings': typeof AuthenticatedSettingsRoute
   '/auth/login': typeof AuthLoginRoute
   '/auth/register': typeof AuthRegisterRoute
+  '/checkout/confirmed': typeof CheckoutConfirmedRoute
   '/products/$productId': typeof ProductsProductIdRoute
   '/shops/$id': typeof ShopsIdRoute
   '/winemakers/$id': typeof WinemakersIdRoute
@@ -328,6 +337,7 @@ export interface FileRouteTypes {
     | '/settings'
     | '/auth/login'
     | '/auth/register'
+    | '/checkout/confirmed'
     | '/products/$productId'
     | '/shops/$id'
     | '/winemakers/$id'
@@ -358,6 +368,7 @@ export interface FileRouteTypes {
     | '/settings'
     | '/auth/login'
     | '/auth/register'
+    | '/checkout/confirmed'
     | '/products/$productId'
     | '/shops/$id'
     | '/winemakers/$id'
@@ -393,6 +404,7 @@ export interface FileRouteTypes {
     | '/_authenticated/settings'
     | '/auth/login'
     | '/auth/register'
+    | '/checkout/confirmed'
     | '/products/$productId'
     | '/shops/$id'
     | '/winemakers/$id'
@@ -423,6 +435,7 @@ export interface RootRouteChildren {
   WinesRoute: typeof WinesRoute
   AuthLoginRoute: typeof AuthLoginRoute
   AuthRegisterRoute: typeof AuthRegisterRoute
+  CheckoutConfirmedRoute: typeof CheckoutConfirmedRoute
   ProductsProductIdRoute: typeof ProductsProductIdRoute
   WinemakersIdRoute: typeof WinemakersIdRoute
 }
@@ -518,6 +531,13 @@ declare module '@tanstack/react-router' {
       path: '/products/$productId'
       fullPath: '/products/$productId'
       preLoaderRoute: typeof ProductsProductIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/checkout/confirmed': {
+      id: '/checkout/confirmed'
+      path: '/checkout/confirmed'
+      fullPath: '/checkout/confirmed'
+      preLoaderRoute: typeof CheckoutConfirmedRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/auth/register': {
@@ -785,6 +805,7 @@ const rootRouteChildren: RootRouteChildren = {
   WinesRoute: WinesRoute,
   AuthLoginRoute: AuthLoginRoute,
   AuthRegisterRoute: AuthRegisterRoute,
+  CheckoutConfirmedRoute: CheckoutConfirmedRoute,
   ProductsProductIdRoute: ProductsProductIdRoute,
   WinemakersIdRoute: WinemakersIdRoute,
 }
