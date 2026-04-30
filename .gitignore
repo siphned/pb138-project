@@ -65,8 +65,4 @@ docs/figma/
 
 # Git Worktrees
 .worktrees/
-
-
 .claude/worktrees/
-
-.worktrees

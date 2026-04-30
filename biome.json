@@ -51,6 +51,7 @@
       "!**/.env",
       "!**/.env.*",
       "!**/bun.lock",
+      "!**/.worktrees",
       "!**/raw",
       "!**/tsconfig*.json",
       "!**/src/generated/**",
