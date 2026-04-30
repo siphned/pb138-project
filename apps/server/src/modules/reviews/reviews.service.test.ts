@@ -35,8 +35,8 @@ describe("reviewsService", () => {
       vi.mocked(reviewsRepository.countReviews).mockResolvedValue(42);
 
       const result = await reviewsService.listProductReviews(productId, {
-        page: 1,
         limit: 12,
+        page: 1,
         sort: "newest",
       });
 
@@ -60,8 +60,8 @@ describe("reviewsService", () => {
       vi.mocked(reviewsRepository.countReviews).mockResolvedValue(7);
 
       const result = await reviewsService.listWinemakerReviews(winemakerId, {
-        page: 2,
         limit: 5,
+        page: 2,
         sort: "highest",
       });
 
