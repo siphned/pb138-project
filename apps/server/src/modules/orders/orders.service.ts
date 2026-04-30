@@ -1,4 +1,5 @@
 import type { Order, orders } from "@repo/shared/schemas";
+import { Logger } from "../../utils/logger";
 import type { CartWithItems } from "../carts/carts.repository";
 import { type CartsService, cartsService } from "../carts/carts.service";
 import { emailService, type IEmailService } from "../email/email.service";
@@ -63,13 +64,22 @@ export class OrdersService {
         const user = await this.usersRepo.findById(userId);
         if (user) {
           emailData.customerName = user.fname;
-          await this.emailService.sendOrderConfirmation(user.email, emailData).catch(() => {
-            /* ignore */
+          await this.emailService.sendOrderConfirmation(user.email, emailData).catch((error) => {
+            Logger.error("Failed to send order confirmation email", error, {
+              email: user.email,
+              operation: "sendOrderConfirmation",
+              orderId: order.id,
+              userId,
+            });
           });
         }
       } else if (data?.guestEmail) {
-        await this.emailService.sendOrderConfirmation(data.guestEmail, emailData).catch(() => {
-          /* ignore */
+        await this.emailService.sendOrderConfirmation(data.guestEmail, emailData).catch((error) => {
+          Logger.error("Failed to send order confirmation email to guest", error, {
+            email: data.guestEmail,
+            operation: "sendOrderConfirmation",
+            orderId: order.id,
+          });
         });
       }
     }
