@@ -83,7 +83,7 @@ describe("Sidebar", () => {
       loading: false,
       refetch: vi.fn(),
       updateUser: vi.fn(),
-      user: { fname: "Test", id: "user1" , lname: "User"},
+      user: { fname: "Test", id: "user1", lname: "User" },
     } as never);
   });
 
@@ -126,7 +126,7 @@ describe("Sidebar", () => {
         loading: false,
         refetch: vi.fn(),
         updateUser: vi.fn(),
-        user: { fname: "", id: "user1" , lname: "User"},
+        user: { fname: "", id: "user1", lname: "User" },
       } as never);
       render(<Sidebar />);
       // Should still render and show initials
@@ -138,7 +138,7 @@ describe("Sidebar", () => {
         loading: false,
         refetch: vi.fn(),
         updateUser: vi.fn(),
-        user: { fname: "Test", id: "user1" , lname: ""},
+        user: { fname: "Test", id: "user1", lname: "" },
       } as never);
       render(<Sidebar />);
       expect(screen.getByText("TE")).toBeInTheDocument();
@@ -161,7 +161,7 @@ describe("Sidebar", () => {
         loading: false,
         refetch: vi.fn(),
         updateUser: vi.fn(),
-        user: { fname: "John", id: "user1" , lname: "Doe"},
+        user: { fname: "John", id: "user1", lname: "Doe" },
       } as never);
       render(<Sidebar />);
       expect(screen.getByText("JO")).toBeInTheDocument();
@@ -172,7 +172,7 @@ describe("Sidebar", () => {
         loading: false,
         refetch: vi.fn(),
         updateUser: vi.fn(),
-        user: { fname: "José", id: "user1" , lname: "García"},
+        user: { fname: "José", id: "user1", lname: "García" },
       } as never);
       render(<Sidebar />);
       expect(screen.getByText("JO")).toBeInTheDocument();
@@ -276,12 +276,7 @@ describe("Sidebar", () => {
     });
 
     it("renders with multiple roles when provided", () => {
-      render(
-        <Sidebar
-          activeRole={Role.customer}
-          userRoles={[Role.customer, Role.winemaker]}
-        />
-      );
+      render(<Sidebar activeRole={Role.customer} userRoles={[Role.customer, Role.winemaker]} />);
       expect(screen.getByText("Log out")).toBeInTheDocument();
     });
 
@@ -304,12 +299,7 @@ describe("Sidebar", () => {
     });
 
     it("respects provided activeRole prop", () => {
-      render(
-        <Sidebar
-          activeRole={Role.winemaker}
-          userRoles={[Role.customer, Role.winemaker]}
-        />
-      );
+      render(<Sidebar activeRole={Role.winemaker} userRoles={[Role.customer, Role.winemaker]} />);
       expect(screen.getByText("Log out")).toBeInTheDocument();
     });
   });
@@ -331,6 +321,22 @@ describe("Sidebar", () => {
       render(<Sidebar activeRole={Role.winemaker} userRoles={[Role.winemaker]} />);
       expect(screen.getByText("Log out")).toBeInTheDocument();
     });
+
+    it("shows Bundles link pointing to /bundles", () => {
+      render(<Sidebar />);
+      const bundlesLink = screen.getByText("Bundles").closest("a");
+      expect(bundlesLink).toHaveAttribute("href", "/bundles");
+    });
+
+    it("shows Events link", () => {
+      render(<Sidebar />);
+      expect(screen.getByText("Events")).toBeInTheDocument();
+    });
+
+    it("shows active role for single-role user", () => {
+      render(<Sidebar activeRole={Role.customer} userRoles={[Role.customer]} />);
+      expect(screen.getByText(Role.customer)).toBeInTheDocument();
+    });
   });
 
   describe("Accessibility", () => {
@@ -350,6 +356,12 @@ describe("Sidebar", () => {
       render(<Sidebar />);
       // Navigation should be semantic
       expect(screen.getByText("Explore Wines")).toBeInTheDocument();
+    });
+
+    it("Log out is a button not a navigation link", () => {
+      render(<Sidebar />);
+      const logoutEl = screen.getByText("Log out");
+      expect(logoutEl.tagName).toBe("BUTTON");
     });
   });
 
@@ -384,34 +396,11 @@ describe("Sidebar", () => {
         loading: false,
         refetch: vi.fn(),
         updateUser: vi.fn(),
-        user: { fname: "Jane", id: "user2" , lname: "Smith"},
+        user: { fname: "Jane", id: "user2", lname: "Smith" },
       } as never);
 
       rerender(<Sidebar />);
       expect(screen.getByText("JA")).toBeInTheDocument();
     });
-  });
-});
-
-  it("shows Bundles link pointing to /bundles", () => {
-    render(<Sidebar />);
-    const bundlesLink = screen.getByText("Bundles").closest("a");
-    expect(bundlesLink).toHaveAttribute("href", "/bundles");
-  });
-
-  it("shows Events link", () => {
-    render(<Sidebar />);
-    expect(screen.getByText("Events")).toBeInTheDocument();
-  });
-
-  it("shows active role for single-role user", () => {
-    render(<Sidebar activeRole={Role.customer} userRoles={[Role.customer]} />);
-    expect(screen.getByText(Role.customer)).toBeInTheDocument();
-  });
-
-  it("Log out is a button not a navigation link", () => {
-    render(<Sidebar />);
-    const logoutEl = screen.getByText("Log out");
-    expect(logoutEl.tagName).toBe("BUTTON");
   });
 });
