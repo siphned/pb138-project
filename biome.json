@@ -86,11 +86,11 @@
       "jest"
     ]
   },
-    "css": {
-      "linter": { "enabled": true },
-      "formatter": { "enabled": true, "indentStyle": "space", "lineWidth": 100 },
-      "parser": { "allowWrongLineComments": true, "cssModules": true }
-    },
+  "css": {
+    "linter": { "enabled": true },
+    "formatter": { "enabled": true, "indentStyle": "space", "lineWidth": 100 },
+    "parser": { "allowWrongLineComments": true, "cssModules": true }
+  },
   "html": {
     "formatter": { "enabled": true, "selfCloseVoidElements": "always" }
   },
