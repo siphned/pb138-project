@@ -29,7 +29,7 @@
     "check-types": "tsc --noEmit",
     "db:check": "drizzle-kit check",
     "db:generate": "drizzle-kit generate",
-    "db:migrate": "drizzle-kit migrate",
+    "db:migrate": "echo 'Migrate hangs on Neon (Windows bug). Use: bunx drizzle-kit push'",
     "db:seed": "bun run src/db/seed.ts",
     "db:studio": "drizzle-kit studio",
     "dev": "bun run src/index.ts",

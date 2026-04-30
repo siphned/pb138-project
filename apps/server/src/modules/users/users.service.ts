@@ -144,8 +144,8 @@ export class UsersService {
   async syncRolesToDatabase(userId: string, clerkRoles: string[]): Promise<void> {
     const existingRoles = await this.userRolesRepo.findByUserId(userId);
 
-    const rolesToAdd = clerkRoles.filter((r) => !existingRoles.includes(r));
-    const rolesToRemove = existingRoles.filter((r) => !clerkRoles.includes(r));
+    const rolesToAdd = clerkRoles.filter((r: string) => !existingRoles.includes(r));
+    const rolesToRemove = existingRoles.filter((r: string) => !clerkRoles.includes(r));
 
     if (rolesToAdd.length === 0 && rolesToRemove.length === 0) return;
 

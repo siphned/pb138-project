@@ -5,6 +5,10 @@ dotenv.config({ path: ".env.local" });
 
 export default defineConfig({
   dbCredentials: {
+    // Fix Neon SSL mode warning
+    ssl: process.env.DATABASE_URL?.includes("neon.tech")
+      ? { rejectUnauthorized: false }
+      : undefined,
     url: process.env.DATABASE_URL ?? "",
   },
   dialect: "postgresql",
