@@ -13,11 +13,6 @@ interface MockChained {
 vi.mock("../../db", () => {
   const m = {
     insert: vi.fn().mockReturnThis(),
-    select: vi.fn().mockReturnValue({
-      from: vi.fn().mockReturnValue({
-        where: vi.fn().mockResolvedValue([{ value: 3 }]),
-      }),
-    }),
     query: {
       events: { findFirst: vi.fn() },
       images: { findFirst: vi.fn(), findMany: vi.fn() },
@@ -27,6 +22,11 @@ vi.mock("../../db", () => {
       wines: { findFirst: vi.fn() },
     },
     returning: vi.fn().mockReturnThis(),
+    select: vi.fn().mockReturnValue({
+      from: vi.fn().mockReturnValue({
+        where: vi.fn().mockResolvedValue([{ value: 3 }]),
+      }),
+    }),
     set: vi.fn().mockReturnThis(),
     update: vi.fn().mockReturnThis(),
     values: vi.fn().mockReturnThis(),
@@ -35,7 +35,11 @@ vi.mock("../../db", () => {
   return { db: m };
 });
 
-const mockDb = db as unknown as { insert: () => MockChained; update: () => MockChained; returning: () => Promise<unknown[]> };
+const mockDb = db as unknown as {
+  insert: () => MockChained;
+  update: () => MockChained;
+  returning: () => Promise<unknown[]>;
+};
 
 const imageId = "11111111-1111-1111-1111-111111111111";
 const entityId = "22222222-2222-2222-2222-222222222222";
@@ -48,7 +52,11 @@ describe("insert", () => {
     const mockImage = { id: imageId, url: "/uploads/wine/uuid.jpg" };
     vi.mocked(mockDb.returning).mockResolvedValueOnce([mockImage]);
 
-    const result = await imagesRepository.insert({ entityId, entityType: "wine", url: "/uploads/wine/uuid.jpg" });
+    const result = await imagesRepository.insert({
+      entityId,
+      entityType: "wine",
+      url: "/uploads/wine/uuid.jpg",
+    });
 
     expect(result.id).toBe(imageId);
     expect(db.insert).toHaveBeenCalledWith(images);

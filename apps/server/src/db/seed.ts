@@ -73,15 +73,17 @@ async function insertAddress() {
 
 async function insertUser(override: { fname: string; lname: string }) {
   const addr = await insertAddress();
+  const fname = override.fname.slice(0, 30);
+  const lname = override.lname.slice(0, 30);
   const [row] = await db
     .insert(users)
     .values({
       clerkId: clerkId(),
       email: faker.internet
-        .email({ firstName: override.fname, lastName: override.lname })
+        .email({ firstName: fname, lastName: lname })
         .toLowerCase(),
-      fname: override.fname,
-      lname: override.lname,
+      fname,
+      lname,
       shippingAddressId: addr.id,
     })
     .returning();

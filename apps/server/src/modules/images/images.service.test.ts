@@ -85,7 +85,12 @@ describe("uploadImage", () => {
     vi.mocked(imagesRepository.countByEntity).mockResolvedValue(0);
     vi.mocked(imagesRepository.insert).mockResolvedValue(mockImage as never);
 
-    await imagesService.uploadImage({ roles: ["admin"], userId: otherUserId }, "wine", entityId, makeFile());
+    await imagesService.uploadImage(
+      { roles: ["admin"], userId: otherUserId },
+      "wine",
+      entityId,
+      makeFile()
+    );
 
     expect(imagesRepository.findOwnerUserId).not.toHaveBeenCalled();
     expect(imagesRepository.insert).toHaveBeenCalled();
@@ -145,7 +150,12 @@ describe("uploadImage", () => {
 
   it("throws UNSUPPORTED_MEDIA_TYPE for non-image files", async () => {
     await expect(
-      imagesService.uploadImage({ roles: ["winemaker"], userId }, "wine", entityId, makeFile("application/pdf"))
+      imagesService.uploadImage(
+        { roles: ["winemaker"], userId },
+        "wine",
+        entityId,
+        makeFile("application/pdf")
+      )
     ).rejects.toThrow("UNSUPPORTED_MEDIA_TYPE");
     expect(imagesRepository.entityExists).not.toHaveBeenCalled();
   });
@@ -173,7 +183,12 @@ describe("deleteImage", () => {
   it("allows admin to delete any image", async () => {
     vi.mocked(imagesRepository.findById).mockResolvedValue(mockImage as never);
 
-    await imagesService.deleteImage({ roles: ["admin"], userId: otherUserId }, "wine", entityId, imageId);
+    await imagesService.deleteImage(
+      { roles: ["admin"], userId: otherUserId },
+      "wine",
+      entityId,
+      imageId
+    );
 
     expect(imagesRepository.findOwnerUserId).not.toHaveBeenCalled();
     expect(imagesRepository.softDelete).toHaveBeenCalledWith(imageId);

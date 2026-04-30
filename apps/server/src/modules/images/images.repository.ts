@@ -2,7 +2,7 @@ import type { Image } from "@repo/shared/schemas";
 import { events, images, products, shops, winemakers, wines } from "@repo/shared/schemas";
 import { and, count, eq, isNull } from "drizzle-orm";
 import { db } from "../../db";
-import { VALID_ENTITY_TYPES } from "./images.schema";
+import type { VALID_ENTITY_TYPES } from "./images.schema";
 
 export type EntityType = (typeof VALID_ENTITY_TYPES)[number];
 
@@ -18,6 +18,19 @@ export interface IImagesRepository {
 }
 
 export const imagesRepository: IImagesRepository = {
+  async countByEntity(entityType, entityId) {
+    const [result] = await db
+      .select({ value: count() })
+      .from(images)
+      .where(
+        and(
+          eq(images.entityType, entityType),
+          eq(images.entityId, entityId),
+          isNull(images.deletedAt)
+        )
+      );
+    return result?.value ?? 0;
+  },
   async entityExists(entityType, entityId) {
     switch (entityType) {
       case "event": {
@@ -56,16 +69,6 @@ export const imagesRepository: IImagesRepository = {
         return !!r;
       }
     }
-  },
-
-  async countByEntity(entityType, entityId) {
-    const [result] = await db
-      .select({ value: count() })
-      .from(images)
-      .where(
-        and(eq(images.entityType, entityType), eq(images.entityId, entityId), isNull(images.deletedAt))
-      );
-    return result?.value ?? 0;
   },
 
   findByEntity(entityType, entityId) {

@@ -1,12 +1,12 @@
 import { basename } from "node:path";
 import { fileURLToPath } from "node:url";
 import { Elysia, status, t } from "elysia";
+import { handleError } from "../../utils/errors";
 import type { AppRole } from "../auth";
 import { authPlugin } from "../auth";
-import { handleError } from "../../utils/errors";
 import type { EntityType } from "./images.repository";
 import { imagesRepository } from "./images.repository";
-import { VALID_ENTITY_TYPES, imageResponse, uploadImageBody } from "./images.schema";
+import { imageResponse, uploadImageBody, VALID_ENTITY_TYPES } from "./images.schema";
 import { imagesService } from "./images.service";
 
 const UPLOADS_DIR = fileURLToPath(new URL("../../../uploads", import.meta.url));

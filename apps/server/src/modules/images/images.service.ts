@@ -28,7 +28,12 @@ export class ImagesService {
     return this.repo.findByEntity(entityType, entityId);
   }
 
-  async uploadImage(caller: Caller, entityType: EntityType, entityId: string, file: File): Promise<Image> {
+  async uploadImage(
+    caller: Caller,
+    entityType: EntityType,
+    entityId: string,
+    file: File
+  ): Promise<Image> {
     if (!ALLOWED_MIME_TYPES.includes(file.type as (typeof ALLOWED_MIME_TYPES)[number])) {
       throw new Error("UNSUPPORTED_MEDIA_TYPE");
     }
@@ -60,14 +65,23 @@ export class ImagesService {
     await Bun.write(filePath, file);
 
     try {
-      return await this.repo.insert({ entityId, entityType, url: `/uploads/${entityType}/${filename}` });
+      return await this.repo.insert({
+        entityId,
+        entityType,
+        url: `/uploads/${entityType}/${filename}`,
+      });
     } catch (e) {
       await unlink(filePath).catch(() => {});
       throw e;
     }
   }
 
-  async deleteImage(caller: Caller, entityType: EntityType, entityId: string, imageId: string): Promise<void> {
+  async deleteImage(
+    caller: Caller,
+    entityType: EntityType,
+    entityId: string,
+    imageId: string
+  ): Promise<void> {
     const image = await this.repo.findById(imageId);
     if (!image || image.entityType !== entityType || image.entityId !== entityId) {
       throw new Error("NOT_FOUND");
@@ -80,7 +94,11 @@ export class ImagesService {
     await this.repo.softDelete(imageId);
   }
 
-  private async verifyOwnership(userId: string, entityType: EntityType, entityId: string): Promise<void> {
+  private async verifyOwnership(
+    userId: string,
+    entityType: EntityType,
+    entityId: string
+  ): Promise<void> {
     const ownerUserId = await this.repo.findOwnerUserId(entityType, entityId);
     if (ownerUserId === undefined) throw new Error("NOT_FOUND");
     if (ownerUserId !== userId) throw new Error("FORBIDDEN");
