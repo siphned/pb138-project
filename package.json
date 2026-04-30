@@ -30,7 +30,8 @@
     "generate": "turbo run generate",
     "lint": "biome lint .",
     "test": "turbo run test",
-    "test:e2e": "turbo run test:e2e"
+    "test:e2e": "turbo run test:e2e",
+    "validate": "bun run lint && turbo run db:check && bun run generate && git diff --exit-code openapi.json && bun run check-types && bun run test && bun run build"
   },
   "workspaces": [
     "apps/*",
