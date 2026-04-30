@@ -27,6 +27,7 @@
   "scripts": {
     "build": "tsc",
     "check-types": "tsc --noEmit",
+    "db:check": "drizzle-kit generate --check",
     "db:generate": "drizzle-kit generate",
     "db:migrate": "drizzle-kit migrate",
     "db:seed": "bun run src/db/seed.ts",
