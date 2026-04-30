@@ -24,6 +24,7 @@ describe("reviewsService", () => {
 
   const userId = "u1";
   const productId = "p1";
+  const winemakerId = "w1";
   const reviewId = "r1";
 
   describe("listProductReviews", () => {
@@ -48,6 +49,31 @@ describe("reviewsService", () => {
         sort: "newest",
       });
       expect(reviewsRepository.countReviews).toHaveBeenCalledWith(productId, "product");
+    });
+  });
+
+  describe("listWinemakerReviews", () => {
+    it("returns reviews, totalCount, and averageRating", async () => {
+      const mockReviews = [{ id: "r2" }];
+      vi.mocked(reviewsRepository.findReviews).mockResolvedValue(mockReviews as never);
+      vi.mocked(reviewsRepository.averageRating).mockResolvedValue(3.8);
+      vi.mocked(reviewsRepository.countReviews).mockResolvedValue(7);
+
+      const result = await reviewsService.listWinemakerReviews(winemakerId, {
+        page: 2,
+        limit: 5,
+        sort: "highest",
+      });
+
+      expect(result.reviews).toBe(mockReviews);
+      expect(result.averageRating).toBe(3.8);
+      expect(result.totalCount).toBe(7);
+      expect(reviewsRepository.findReviews).toHaveBeenCalledWith(winemakerId, "winemaker", {
+        limit: 5,
+        offset: 5,
+        sort: "highest",
+      });
+      expect(reviewsRepository.countReviews).toHaveBeenCalledWith(winemakerId, "winemaker");
     });
   });
 
