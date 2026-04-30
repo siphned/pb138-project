@@ -321,6 +321,22 @@ describe("Sidebar", () => {
       render(<Sidebar activeRole={Role.winemaker} userRoles={[Role.winemaker]} />);
       expect(screen.getByText("Log out")).toBeInTheDocument();
     });
+
+    it("shows Bundles link pointing to /bundles", () => {
+      render(<Sidebar />);
+      const bundlesLink = screen.getByText("Bundles").closest("a");
+      expect(bundlesLink).toHaveAttribute("href", "/bundles");
+    });
+
+    it("shows Events link", () => {
+      render(<Sidebar />);
+      expect(screen.getByText("Events")).toBeInTheDocument();
+    });
+
+    it("shows active role for single-role user", () => {
+      render(<Sidebar activeRole={Role.customer} userRoles={[Role.customer]} />);
+      expect(screen.getByText(Role.customer)).toBeInTheDocument();
+    });
   });
 
   describe("Accessibility", () => {
@@ -340,6 +356,12 @@ describe("Sidebar", () => {
       render(<Sidebar />);
       // Navigation should be semantic
       expect(screen.getByText("Explore Wines")).toBeInTheDocument();
+    });
+
+    it("Log out is a button not a navigation link", () => {
+      render(<Sidebar />);
+      const logoutEl = screen.getByText("Log out");
+      expect(logoutEl.tagName).toBe("BUTTON");
     });
   });
 
