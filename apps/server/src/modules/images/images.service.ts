@@ -33,7 +33,13 @@ export class ImagesService {
       await this.verifyOwnership(caller.userId, entityType, entityId);
     }
 
-    const ext = file.type.split("/")[1] ?? "jpg";
+    const mimeToExt: Record<string, string> = {
+      "image/gif": "gif",
+      "image/jpeg": "jpg",
+      "image/png": "png",
+      "image/webp": "webp",
+    };
+    const ext = mimeToExt[file.type] ?? "jpg";
     const filename = `${crypto.randomUUID()}.${ext}`;
     const dir = join(UPLOADS_DIR, entityType);
 
@@ -58,6 +64,7 @@ export class ImagesService {
 
   private async verifyOwnership(userId: string, entityType: EntityType, entityId: string): Promise<void> {
     const ownerUserId = await this.repo.findOwnerUserId(entityType, entityId);
+    if (ownerUserId === undefined) throw new Error("NOT_FOUND");
     if (ownerUserId !== userId) throw new Error("FORBIDDEN");
   }
 }

@@ -104,6 +104,16 @@ describe("uploadImage", () => {
     expect(globalThis.Bun.write).not.toHaveBeenCalled();
   });
 
+  it("throws NOT_FOUND when entity owner record is soft-deleted", async () => {
+    vi.mocked(imagesRepository.entityExists).mockResolvedValue(true);
+    vi.mocked(imagesRepository.findOwnerUserId).mockResolvedValue(undefined);
+
+    await expect(
+      imagesService.uploadImage({ roles: ["winemaker"], userId }, "wine", entityId, makeFile())
+    ).rejects.toThrow("NOT_FOUND");
+    expect(globalThis.Bun.write).not.toHaveBeenCalled();
+  });
+
   it("throws UNSUPPORTED_MEDIA_TYPE for non-image files", async () => {
     await expect(
       imagesService.uploadImage({ roles: ["winemaker"], userId }, "wine", entityId, makeFile("application/pdf"))

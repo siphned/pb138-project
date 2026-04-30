@@ -3,6 +3,7 @@ import { fileURLToPath } from "node:url";
 import { Elysia, status, t } from "elysia";
 import type { AppRole } from "../auth";
 import { authPlugin } from "../auth";
+import { handleError } from "../../utils/errors";
 import type { EntityType } from "./images.repository";
 import { VALID_ENTITY_TYPES, imageResponse, uploadImageBody } from "./images.schema";
 import { imagesService } from "./images.service";
@@ -24,8 +25,7 @@ function buildImageRoutes(entityPlural: string, entityType: EntityType) {
         try {
           return await imagesService.listImages(entityType, params.id);
         } catch (e) {
-          if (e instanceof Error && e.message === "NOT_FOUND") return status(404, "Not found");
-          throw e;
+          return handleError(e);
         }
       },
       {
@@ -54,12 +54,10 @@ function buildImageRoutes(entityPlural: string, entityType: EntityType) {
           );
         } catch (e) {
           if (e instanceof Error) {
-            if (e.message === "NOT_FOUND") return status(404, "Not found");
-            if (e.message === "FORBIDDEN") return status(403, "Forbidden");
             if (e.message === "UNSUPPORTED_MEDIA_TYPE") return status(415, "Unsupported file type");
             if (e.message === "PAYLOAD_TOO_LARGE") return status(413, "File too large");
           }
-          throw e;
+          return handleError(e);
         }
       },
       {
@@ -94,11 +92,7 @@ function buildImageRoutes(entityPlural: string, entityType: EntityType) {
           );
           return status(204, null);
         } catch (e) {
-          if (e instanceof Error) {
-            if (e.message === "NOT_FOUND") return status(404, "Not found");
-            if (e.message === "FORBIDDEN") return status(403, "Forbidden");
-          }
-          throw e;
+          return handleError(e);
         }
       },
       {
