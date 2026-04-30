@@ -61,3 +61,7 @@ GEMINI.md
 apps/server/src/db/seed.ts
 
 docs/figma/
+
+# local image uploads
+apps/server/uploads/*
+!apps/server/uploads/.gitkeep
