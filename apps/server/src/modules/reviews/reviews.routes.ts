@@ -1,7 +1,12 @@
 import { Elysia, t } from "elysia";
 import { handleError } from "../../utils/errors";
 import { authPlugin } from "../auth";
-import { createReviewBody, reviewListResponse, reviewResponse } from "./reviews.schema";
+import {
+  createReviewBody,
+  listReviewsQuery,
+  reviewListResponse,
+  reviewResponse,
+} from "./reviews.schema";
 import { reviewsService } from "./reviews.service";
 
 export const createReviewsRoutes = (auth = authPlugin) => {
@@ -10,32 +15,42 @@ export const createReviewsRoutes = (auth = authPlugin) => {
 
     .get(
       "/product/:id",
-      async ({ params }) => {
-        return await reviewsService.listProductReviews(params.id);
+      async ({ params, query }) => {
+        return await reviewsService.listProductReviews(params.id, {
+          limit: query.limit ?? 12,
+          page: query.page ?? 1,
+          sort: query.sort ?? "newest",
+        });
       },
       {
         detail: {
-          description: "Returns all reviews and average rating for a product.",
+          description: "Returns paginated reviews and average rating for a product.",
           summary: "List product reviews",
           tags: ["reviews"],
         },
         params: t.Object({ id: t.String() }),
+        query: listReviewsQuery,
         response: { 200: reviewListResponse },
       }
     )
 
     .get(
       "/winemaker/:id",
-      async ({ params }) => {
-        return await reviewsService.listWinemakerReviews(params.id);
+      async ({ params, query }) => {
+        return await reviewsService.listWinemakerReviews(params.id, {
+          limit: query.limit ?? 12,
+          page: query.page ?? 1,
+          sort: query.sort ?? "newest",
+        });
       },
       {
         detail: {
-          description: "Returns all reviews and average rating for a winemaker.",
+          description: "Returns paginated reviews and average rating for a winemaker.",
           summary: "List winemaker reviews",
           tags: ["reviews"],
         },
         params: t.Object({ id: t.String() }),
+        query: listReviewsQuery,
         response: { 200: reviewListResponse },
       }
     )
