@@ -1,4 +1,5 @@
 import { mkdirSync } from "node:fs";
+import { unlink } from "node:fs/promises";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 vi.mock("./images.repository", () => ({
@@ -7,6 +8,7 @@ vi.mock("./images.repository", () => ({
     entityExists: vi.fn(),
     findByEntity: vi.fn(),
     findById: vi.fn(),
+    findByUrl: vi.fn(),
     findOwnerUserId: vi.fn(),
     insert: vi.fn(),
     softDelete: vi.fn(),
@@ -14,6 +16,7 @@ vi.mock("./images.repository", () => ({
 }));
 
 vi.mock("node:fs", () => ({ mkdirSync: vi.fn() }));
+vi.mock("node:fs/promises", () => ({ unlink: vi.fn().mockResolvedValue(undefined) }));
 
 import { imagesRepository } from "./images.repository";
 import { imagesService } from "./images.service";
@@ -115,6 +118,18 @@ describe("uploadImage", () => {
       imagesService.uploadImage({ roles: ["winemaker"], userId }, "wine", entityId, makeFile())
     ).rejects.toThrow("NOT_FOUND");
     expect(globalThis.Bun.write).not.toHaveBeenCalled();
+  });
+
+  it("cleans up file from disk when DB insert fails", async () => {
+    vi.mocked(imagesRepository.entityExists).mockResolvedValue(true);
+    vi.mocked(imagesRepository.findOwnerUserId).mockResolvedValue(userId);
+    vi.mocked(imagesRepository.countByEntity).mockResolvedValue(0);
+    vi.mocked(imagesRepository.insert).mockRejectedValue(new Error("DB error"));
+
+    await expect(
+      imagesService.uploadImage({ roles: ["winemaker"], userId }, "wine", entityId, makeFile())
+    ).rejects.toThrow("DB error");
+    expect(unlink).toHaveBeenCalled();
   });
 
   it("throws IMAGE_LIMIT_EXCEEDED when entity already has 10 images", async () => {

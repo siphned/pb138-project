@@ -1,4 +1,5 @@
 import { mkdirSync } from "node:fs";
+import { unlink } from "node:fs/promises";
 import { join } from "node:path";
 import { fileURLToPath } from "node:url";
 import type { Image } from "@repo/shared/schemas";
@@ -54,10 +55,16 @@ export class ImagesService {
     const filename = `${crypto.randomUUID()}.${ext}`;
     const dir = join(UPLOADS_DIR, entityType);
 
+    const filePath = join(dir, filename);
     mkdirSync(dir, { recursive: true });
-    await Bun.write(join(dir, filename), file);
+    await Bun.write(filePath, file);
 
-    return this.repo.insert({ entityId, entityType, url: `/uploads/${entityType}/${filename}` });
+    try {
+      return await this.repo.insert({ entityId, entityType, url: `/uploads/${entityType}/${filename}` });
+    } catch (e) {
+      await unlink(filePath).catch(() => {});
+      throw e;
+    }
   }
 
   async deleteImage(caller: Caller, entityType: EntityType, entityId: string, imageId: string): Promise<void> {

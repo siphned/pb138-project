@@ -93,6 +93,18 @@ describe("findById", () => {
   });
 });
 
+describe("findByUrl", () => {
+  it("returns image when found by url", async () => {
+    vi.mocked(db.query.images.findFirst).mockResolvedValue({ id: imageId } as never);
+    expect((await imagesRepository.findByUrl("/uploads/wine/uuid.jpg"))?.id).toBe(imageId);
+  });
+
+  it("returns undefined when not found", async () => {
+    vi.mocked(db.query.images.findFirst).mockResolvedValue(undefined);
+    expect(await imagesRepository.findByUrl("/uploads/wine/missing.jpg")).toBeUndefined();
+  });
+});
+
 describe("softDelete", () => {
   it("sets deletedAt on the image", async () => {
     await imagesRepository.softDelete(imageId);

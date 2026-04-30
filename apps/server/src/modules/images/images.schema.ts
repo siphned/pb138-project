@@ -2,10 +2,12 @@ import { t } from "elysia";
 
 export const VALID_ENTITY_TYPES = ["event", "product", "shop", "wine", "winemaker"] as const;
 
+export const entityTypeSchema = t.Union(VALID_ENTITY_TYPES.map((v) => t.Literal(v)));
+
 export const imageResponse = t.Object({
   createdAt: t.Date(),
   entityId: t.String(),
-  entityType: t.String(),
+  entityType: entityTypeSchema,
   id: t.String(),
   url: t.String(),
 });

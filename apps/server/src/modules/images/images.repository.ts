@@ -2,14 +2,16 @@ import type { Image } from "@repo/shared/schemas";
 import { events, images, products, shops, winemakers, wines } from "@repo/shared/schemas";
 import { and, count, eq, isNull } from "drizzle-orm";
 import { db } from "../../db";
+import { VALID_ENTITY_TYPES } from "./images.schema";
 
-export type EntityType = "event" | "product" | "shop" | "wine" | "winemaker";
+export type EntityType = (typeof VALID_ENTITY_TYPES)[number];
 
 export interface IImagesRepository {
   countByEntity(entityType: EntityType, entityId: string): Promise<number>;
   entityExists(entityType: EntityType, entityId: string): Promise<boolean>;
   findByEntity(entityType: EntityType, entityId: string): Promise<Image[]>;
   findById(id: string): Promise<Image | undefined>;
+  findByUrl(url: string): Promise<Image | undefined>;
   findOwnerUserId(entityType: EntityType, entityId: string): Promise<string | undefined>;
   insert(data: { entityId: string; entityType: EntityType; url: string }): Promise<Image>;
   softDelete(id: string): Promise<void>;
@@ -79,6 +81,12 @@ export const imagesRepository: IImagesRepository = {
   findById(id) {
     return db.query.images.findFirst({
       where: and(eq(images.id, id), isNull(images.deletedAt)),
+    }) as Promise<Image | undefined>;
+  },
+
+  findByUrl(url) {
+    return db.query.images.findFirst({
+      where: and(eq(images.url, url), isNull(images.deletedAt)),
     }) as Promise<Image | undefined>;
   },
 

@@ -5,6 +5,7 @@ import type { AppRole } from "../auth";
 import { authPlugin } from "../auth";
 import { handleError } from "../../utils/errors";
 import type { EntityType } from "./images.repository";
+import { imagesRepository } from "./images.repository";
 import { VALID_ENTITY_TYPES, imageResponse, uploadImageBody } from "./images.schema";
 import { imagesService } from "./images.service";
 
@@ -118,7 +119,11 @@ export const imagesRoutes = new Elysia()
       if (!(VALID_ENTITY_TYPES as readonly string[]).includes(params.entityType)) {
         return status(404, "Not found");
       }
-      const file = Bun.file(`${UPLOADS_DIR}/${params.entityType}/${basename(params.filename)}`);
+      const safeName = basename(params.filename);
+      const url = `/uploads/${params.entityType}/${safeName}`;
+      const record = await imagesRepository.findByUrl(url);
+      if (!record) return status(404, "Not found");
+      const file = Bun.file(`${UPLOADS_DIR}/${params.entityType}/${safeName}`);
       if (!(await file.exists())) return status(404, "Not found");
       return file;
     },
