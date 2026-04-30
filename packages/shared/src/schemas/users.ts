@@ -36,6 +36,7 @@ export const userRoles = pgTable("user_roles", {
 export const insertUserRoleSchema = createInsertSchema(userRoles);
 export const selectUserRoleSchema = createSelectSchema(userRoles);
 
+export type UserModel = typeof users.$inferSelect;
 export type UserRole = typeof userRoles.$inferSelect;
 
 /**

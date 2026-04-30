@@ -103,6 +103,7 @@ export {
   supplyAgreementInsertSchema,
   supplyAgreementSelectSchema,
   supplyAgreements,
+  type UserModel,
   type UserRole,
   userRoles,
   users,
