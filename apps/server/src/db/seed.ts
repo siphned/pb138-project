@@ -73,15 +73,17 @@ async function insertAddress() {
 
 async function insertUser(override: { fname: string; lname: string }) {
   const addr = await insertAddress();
+  const fname = override.fname.slice(0, 30);
+  const lname = override.lname.slice(0, 30);
   const [row] = await db
     .insert(users)
     .values({
       clerkId: clerkId(),
       email: faker.internet
-        .email({ firstName: override.fname, lastName: override.lname })
+        .email({ firstName: fname, lastName: lname })
         .toLowerCase(),
-      fname: override.fname,
-      lname: override.lname,
+      fname,
+      lname,
       shippingAddressId: addr.id,
     })
     .returning();
@@ -189,40 +191,59 @@ async function insertEvents(winemakerId: string, count: number) {
 async function main() {
   await teardown();
 
-  const customers = await Promise.all(
-    Array.from({ length: 2 }, () =>
-      insertUser({ fname: faker.person.firstName(), lname: faker.person.lastName() })
-    )
-  );
-  const victor = await insertUser({ fname: "Victor", lname: "W" });
-  const wm = await insertWinemaker(victor.id);
-  const shop = await insertShop(victor.id);
-  const wineRows = await insertWines(wm.id, 2);
-  const prodRows = await insertProductsForShop(shop.id, wineRows);
-  await insertEvents(wm.id, 1);
+  const NUM_USERS = Number(process.env.SEED_NUM_USERS) || 1000;
+  const NUM_WINEMAKERS = Number(process.env.SEED_NUM_WINEMAKERS) || Math.max(1, Math.floor(NUM_USERS * 0.05));
+  const TOTAL_WINES = Number(process.env.SEED_TOTAL_WINES) || 5000;
+  const WINES_PER_WINEMAKER = Number(process.env.SEED_WINES_PER_WINEMAKER) || Math.ceil(TOTAL_WINES / NUM_WINEMAKERS);
+  const SHOPS_PER_WINEMAKER = Number(process.env.SEED_SHOPS_PER_WINEMAKER) || 1;
+  const EVENTS_PER_WINEMAKER = Number(process.env.SEED_EVENTS_PER_WINEMAKER) || 1;
 
-  const firstProd = prodRows[0];
-  if (firstProd) {
-    for (const customer of customers) {
-      const [review] = await db
-        .insert(reviews)
-        .values({
-          body: "Nice",
-          entityId: firstProd.id,
-          entityType: "product",
-          rating: 5,
-          userId: customer.id,
-        })
-        .returning();
-      if (review) {
-        await db.insert(comments).values({
-          body: "Thanks!",
-          reviewId: review.id,
-          userId: victor.id,
-        });
-      }
-    }
+  console.log("Seeding counts:", { NUM_USERS, NUM_WINEMAKERS, WINES_PER_WINEMAKER, SHOPS_PER_WINEMAKER, EVENTS_PER_WINEMAKER });
+
+  // insert users
+  const customers: (typeof users.$inferSelect)[] = [];
+  for (let i = 0; i < NUM_USERS; i++) {
+    const u = await insertUser({ fname: faker.person.firstName(), lname: faker.person.lastName() });
+    customers.push(u);
+    if ((i + 1) % 100 === 0) console.log(`Inserted users: ${i + 1}`);
   }
+
+  // choose winemaker owners from users (allow duplicates)
+  const wmOwners = Array.from({ length: NUM_WINEMAKERS }, () => pick(customers));
+  const winemakerRows: (typeof winemakers.$inferSelect)[] = [];
+  const shopRows: (typeof shops.$inferSelect)[] = [];
+  for (let i = 0; i < wmOwners.length; i++) {
+    const owner = wmOwners[i];
+    if (!owner) continue;
+    const wm = await insertWinemaker(owner.id);
+    if (wm) winemakerRows.push(wm);
+    for (let s = 0; s < SHOPS_PER_WINEMAKER; s++) {
+      const shop = await insertShop(owner.id);
+      if (shop) shopRows.push(shop);
+    }
+    if ((i + 1) % 10 === 0) console.log(`Inserted winemakers+shops: ${i + 1}`);
+  }
+
+  // insert wines and products per winemaker/shop
+  for (let i = 0; i < winemakerRows.length; i++) {
+    const wm = winemakerRows[i];
+    if (!wm) continue;
+    const wineRows = await insertWines(wm.id, WINES_PER_WINEMAKER);
+    const shop = shopRows[i * SHOPS_PER_WINEMAKER];
+    if (shop) {
+      await insertProductsForShop(shop.id, wineRows);
+    }
+    if ((i + 1) % 10 === 0) console.log(`Inserted wines/products for winemaker: ${i + 1}`);
+  }
+
+  // insert events
+  for (let i = 0; i < winemakerRows.length; i++) {
+    const wm = winemakerRows[i];
+    if (!wm) continue;
+    await insertEvents(wm.id, EVENTS_PER_WINEMAKER);
+  }
+
+  console.log("Seeding complete");
 }
 
 // biome-ignore lint/suspicious/noConsole: entry point needs to log errors

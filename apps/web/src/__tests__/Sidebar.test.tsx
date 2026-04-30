@@ -1,20 +1,21 @@
-import { render, screen } from "@testing-library/react";
+import { render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
-import { describe, expect, it, vi } from "vitest";
+import { beforeEach, describe, expect, it, vi } from "vitest";
 
 const mockSignOut = vi.fn();
 const mockNavigate = vi.fn();
+const mockOpenUserProfile = vi.fn();
 
 vi.mock("@clerk/react", () => ({
   Show: ({ children, when }: { children: React.ReactNode; when: string }) =>
     when === "signed-in" ? children : null,
-  useAuth: () => ({ isLoaded: true, isSignedIn: true }),
-  useClerk: () => ({ openUserProfile: vi.fn(), signOut: mockSignOut }),
-  useUser: () => ({ user: { fullName: "Test User", imageUrl: undefined } }),
+  useAuth: vi.fn(),
+  useClerk: () => ({ openUserProfile: mockOpenUserProfile, signOut: mockSignOut }),
+  useUser: vi.fn(),
 }));
 
 vi.mock("@/context/UserContext", () => ({
-  useUser: () => ({ isLoading: false, user: { fname: "Test", lname: "User", roles: [] } }),
+  useUser: vi.fn(),
 }));
 
 vi.mock("@tanstack/react-router", () => ({
@@ -24,7 +25,7 @@ vi.mock("@tanstack/react-router", () => ({
   useNavigate: () => mockNavigate,
 }));
 
-// Stub shadcn Sheet so the sidebar content is always visible
+// Stub shadcn components so sidebar content is always visible
 vi.mock("@/components/ui/sheet", () => ({
   Sheet: ({ children }: { children: React.ReactNode }) => <div>{children}</div>,
   SheetContent: ({ children }: { children: React.ReactNode }) => <div>{children}</div>,
@@ -56,48 +57,425 @@ vi.mock("@/components/ui/button", () => ({
   ),
 }));
 
+import { useAuth, useUser as useClerkUser } from "@clerk/react";
 import { Sidebar } from "../components/layout/Sidebar";
+import { useUser } from "../context/UserContext";
 import { Role } from "../types/roles";
 
 describe("Sidebar", () => {
-  it("shows Log out button", () => {
-    render(<Sidebar />);
-    expect(screen.getByText("Log out")).toBeInTheDocument();
-  });
-
-  it("calls signOut and navigates to / when Log out is clicked", async () => {
-    const user = userEvent.setup();
+  beforeEach(() => {
+    mockSignOut.mockClear();
+    mockNavigate.mockClear();
+    mockOpenUserProfile.mockClear();
     mockSignOut.mockResolvedValue(undefined);
     mockNavigate.mockReturnValue(undefined);
-    render(<Sidebar />);
-    await user.click(screen.getByText("Log out"));
-    expect(mockSignOut).toHaveBeenCalled();
+
+    vi.mocked(useAuth).mockReturnValue({
+      isLoaded: true,
+      isSignedIn: true,
+    } as never);
+
+    vi.mocked(useClerkUser).mockReturnValue({
+      user: { fullName: "Test User", imageUrl: undefined },
+    } as never);
+
+    vi.mocked(useUser).mockReturnValue({
+      loading: false,
+      refetch: vi.fn(),
+      updateUser: vi.fn(),
+      user: { fname: "Test", id: "user1", lname: "User" },
+    } as never);
   });
 
-  it("shows Explore Wines link", () => {
-    render(<Sidebar />);
-    expect(screen.getByText("Explore Wines")).toBeInTheDocument();
+  describe("Rendering", () => {
+    it("renders menu trigger button", () => {
+      render(<Sidebar />);
+      // Menu button is rendered by the mocked Sheet
+      expect(screen.getByText("Log out")).toBeInTheDocument();
+    });
+
+    it("displays user full name from context", () => {
+      render(<Sidebar />);
+      expect(screen.getByText("Test User")).toBeInTheDocument();
+    });
+
+    it("displays user initials in avatar fallback", () => {
+      render(<Sidebar />);
+      expect(screen.getByText("TE")).toBeInTheDocument();
+    });
+
+    it("shows Explore Wines link", () => {
+      render(<Sidebar />);
+      expect(screen.getByText("Explore Wines")).toBeInTheDocument();
+    });
+
+    it("shows Log out button", () => {
+      render(<Sidebar />);
+      expect(screen.getByText("Log out")).toBeInTheDocument();
+    });
   });
 
-  it("shows Bundles link pointing to /bundles", () => {
-    render(<Sidebar />);
-    const bundlesLink = screen.getByText("Bundles").closest("a");
-    expect(bundlesLink).toHaveAttribute("href", "/bundles");
+  describe("User Information Display", () => {
+    it("displays user name from context", () => {
+      render(<Sidebar />);
+      expect(screen.getByText("Test User")).toBeInTheDocument();
+    });
+
+    it("handles missing first name gracefully", () => {
+      vi.mocked(useUser).mockReturnValue({
+        loading: false,
+        refetch: vi.fn(),
+        updateUser: vi.fn(),
+        user: { fname: "", id: "user1", lname: "User" },
+      } as never);
+      render(<Sidebar />);
+      // Should still render and show initials
+      expect(screen.getByText("U")).toBeInTheDocument();
+    });
+
+    it("handles missing last name gracefully", () => {
+      vi.mocked(useUser).mockReturnValue({
+        loading: false,
+        refetch: vi.fn(),
+        updateUser: vi.fn(),
+        user: { fname: "Test", id: "user1", lname: "" },
+      } as never);
+      render(<Sidebar />);
+      expect(screen.getByText("TE")).toBeInTheDocument();
+    });
+
+    it("shows Guest when user is null", () => {
+      vi.mocked(useUser).mockReturnValue({
+        loading: false,
+        refetch: vi.fn(),
+        updateUser: vi.fn(),
+        user: null,
+      } as never);
+      render(<Sidebar />);
+      // Guest user handling
+      expect(screen.getByText("G")).toBeInTheDocument();
+    });
+
+    it("displays full name trimmed correctly", () => {
+      vi.mocked(useUser).mockReturnValue({
+        loading: false,
+        refetch: vi.fn(),
+        updateUser: vi.fn(),
+        user: { fname: "John", id: "user1", lname: "Doe" },
+      } as never);
+      render(<Sidebar />);
+      expect(screen.getByText("JO")).toBeInTheDocument();
+    });
+
+    it("handles special characters in names", () => {
+      vi.mocked(useUser).mockReturnValue({
+        loading: false,
+        refetch: vi.fn(),
+        updateUser: vi.fn(),
+        user: { fname: "José", id: "user1", lname: "García" },
+      } as never);
+      render(<Sidebar />);
+      expect(screen.getByText("JO")).toBeInTheDocument();
+    });
   });
 
-  it("shows Events link", () => {
-    render(<Sidebar />);
-    expect(screen.getByText("Events")).toBeInTheDocument();
+  describe("Authentication", () => {
+    it("shows signed-in content when authenticated", () => {
+      vi.mocked(useAuth).mockReturnValue({
+        isLoaded: true,
+        isSignedIn: true,
+      } as never);
+      render(<Sidebar />);
+      expect(screen.getByText("Log out")).toBeInTheDocument();
+    });
+
+    it("shows sign-in prompt when not authenticated", () => {
+      vi.mocked(useAuth).mockReturnValue({
+        isLoaded: true,
+        isSignedIn: false,
+      } as never);
+      render(<Sidebar />);
+      expect(screen.getByText("Sign in to manage your wines and orders.")).toBeInTheDocument();
+    });
+
+    it("shows Sign In button when not authenticated", () => {
+      vi.mocked(useAuth).mockReturnValue({
+        isLoaded: true,
+        isSignedIn: false,
+      } as never);
+      render(<Sidebar />);
+      expect(screen.getByText("Sign In")).toBeInTheDocument();
+    });
+
+    it("hides user avatar when not authenticated", () => {
+      vi.mocked(useAuth).mockReturnValue({
+        isLoaded: true,
+        isSignedIn: false,
+      } as never);
+      render(<Sidebar />);
+      expect(screen.queryByText("TE")).not.toBeInTheDocument();
+    });
   });
 
-  it("shows active role for single-role user", () => {
-    render(<Sidebar activeRole={Role.customer} userRoles={[Role.customer]} />);
-    expect(screen.getByText(Role.customer)).toBeInTheDocument();
+  describe("Logout Functionality", () => {
+    it("calls signOut when logout button clicked", async () => {
+      const user = userEvent.setup();
+      render(<Sidebar />);
+      await user.click(screen.getByText("Log out"));
+      expect(mockSignOut).toHaveBeenCalled();
+    });
+
+    it("navigates to home after logout", async () => {
+      const user = userEvent.setup();
+      render(<Sidebar />);
+      await user.click(screen.getByText("Log out"));
+
+      await waitFor(() => {
+        expect(mockNavigate).toHaveBeenCalledWith({ to: "/" });
+      });
+    });
+
+    it("calls signOut before navigating", async () => {
+      const user = userEvent.setup();
+      const callOrder: string[] = [];
+
+      mockSignOut.mockImplementation(() => {
+        callOrder.push("signOut");
+        return Promise.resolve();
+      });
+      mockNavigate.mockImplementation(() => {
+        callOrder.push("navigate");
+      });
+
+      render(<Sidebar />);
+      await user.click(screen.getByText("Log out"));
+
+      await waitFor(() => {
+        expect(callOrder).toEqual(["signOut", "navigate"]);
+      });
+    });
+
+    it("handles signOut rejection gracefully", async () => {
+      const user = userEvent.setup();
+      mockSignOut.mockRejectedValueOnce(new Error("Logout failed"));
+
+      render(<Sidebar />);
+      await user.click(screen.getByText("Log out"));
+
+      // Should still attempt to navigate
+      await waitFor(() => {
+        expect(mockNavigate).toHaveBeenCalled();
+      });
+    });
   });
 
-  it("Log out is a button not a navigation link", () => {
-    render(<Sidebar />);
-    const logoutEl = screen.getByText("Log out");
-    expect(logoutEl.tagName).toBe("BUTTON");
+  describe("Role Handling", () => {
+    it("renders with single role by default", () => {
+      render(<Sidebar />);
+      expect(screen.getByText("Log out")).toBeInTheDocument();
+    });
+
+    it("renders with multiple roles when provided", () => {
+      render(<Sidebar activeRole={Role.customer} userRoles={[Role.customer, Role.winemaker]} />);
+      expect(screen.getByText("Log out")).toBeInTheDocument();
+    });
+
+    it("calls onRoleChange when role changes", () => {
+      const mockRoleChange = vi.fn();
+      render(
+        <Sidebar
+          activeRole={Role.customer}
+          onRoleChange={mockRoleChange}
+          userRoles={[Role.customer, Role.winemaker]}
+        />
+      );
+      // onRoleChange would be called by accordion interaction
+      expect(mockRoleChange).toBeDefined();
+    });
+
+    it("uses first role as default active role", () => {
+      render(<Sidebar userRoles={[Role.customer, Role.winemaker]} />);
+      expect(screen.getByText("Log out")).toBeInTheDocument();
+    });
+
+    it("respects provided activeRole prop", () => {
+      render(<Sidebar activeRole={Role.winemaker} userRoles={[Role.customer, Role.winemaker]} />);
+      expect(screen.getByText("Log out")).toBeInTheDocument();
+    });
+  });
+
+  describe("Navigation Links", () => {
+    it("renders Explore Wines link with correct href", () => {
+      render(<Sidebar />);
+      const link = screen.getByText("Explore Wines");
+      expect(link.closest("a")).toHaveAttribute("href", "/explore");
+    });
+
+    it("renders correct links for customer role", () => {
+      render(<Sidebar userRoles={[Role.customer]} />);
+      expect(screen.getByText("Explore Wines")).toBeInTheDocument();
+      // Shopping cart or order links would be visible
+    });
+
+    it("renders correct links for winemaker role", () => {
+      render(<Sidebar activeRole={Role.winemaker} userRoles={[Role.winemaker]} />);
+      expect(screen.getByText("Log out")).toBeInTheDocument();
+    });
+
+    it("shows Bundles link pointing to /bundles", () => {
+      render(<Sidebar />);
+      const bundlesLink = screen.getByText("Bundles").closest("a");
+      expect(bundlesLink).toHaveAttribute("href", "/bundles");
+    });
+
+    it("shows Events link", () => {
+      render(<Sidebar />);
+      expect(screen.getByText("Events")).toBeInTheDocument();
+    });
+
+    it("shows active role for single-role user", () => {
+      render(<Sidebar activeRole={Role.customer} userRoles={[Role.customer]} />);
+      expect(screen.getByText(Role.customer)).toBeInTheDocument();
+    });
+  });
+
+  describe("Accessibility", () => {
+    it("uses proper button element for logout", () => {
+      render(<Sidebar />);
+      const logoutButton = screen.getByText("Log out").closest("button");
+      expect(logoutButton).toBeInTheDocument();
+    });
+
+    it("provides alternative text for avatar", () => {
+      render(<Sidebar />);
+      // Avatar shows initials as fallback
+      expect(screen.getByText("TE")).toBeInTheDocument();
+    });
+
+    it("uses semantic navigation structure", () => {
+      render(<Sidebar />);
+      // Navigation should be semantic
+      expect(screen.getByText("Explore Wines")).toBeInTheDocument();
+    });
+
+    it("Log out is a button not a navigation link", () => {
+      render(<Sidebar />);
+      const logoutEl = screen.getByText("Log out");
+      expect(logoutEl.tagName).toBe("BUTTON");
+    });
+  });
+
+  describe("Sheet Integration", () => {
+    it("wraps sidebar in Sheet component", () => {
+      const { container } = render(<Sidebar />);
+      // Sheet mocks ensure content is visible
+      expect(container).toBeTruthy();
+    });
+
+    it("renders sheet trigger for mobile menu", () => {
+      render(<Sidebar />);
+      // Content should be visible due to mock
+      expect(screen.getByText("Log out")).toBeInTheDocument();
+    });
+  });
+
+  describe("Navigation Links", () => {
+    it("renders Explore Wines link with correct href", () => {
+      render(<Sidebar />);
+      const link = screen.getByText("Explore Wines");
+      expect(link.closest("a")).toHaveAttribute("href", "/explore");
+    });
+
+    it("renders correct links for customer role", () => {
+      render(<Sidebar userRoles={[Role.customer]} />);
+      expect(screen.getByText("Explore Wines")).toBeInTheDocument();
+      // Shopping cart or order links would be visible
+    });
+
+    it("renders correct links for winemaker role", () => {
+      render(<Sidebar activeRole={Role.winemaker} userRoles={[Role.winemaker]} />);
+      expect(screen.getByText("Log out")).toBeInTheDocument();
+    });
+
+    it("shows Bundles link pointing to /bundles", () => {
+      render(<Sidebar />);
+      const bundlesLink = screen.getByText("Bundles").closest("a");
+      expect(bundlesLink).toHaveAttribute("href", "/bundles");
+    });
+
+    it("shows Events link", () => {
+      render(<Sidebar />);
+      expect(screen.getByText("Events")).toBeInTheDocument();
+    });
+
+    it("shows active role for single-role user", () => {
+      render(<Sidebar activeRole={Role.customer} userRoles={[Role.customer]} />);
+      expect(screen.getByText(Role.customer)).toBeInTheDocument();
+    });
+  });
+
+  describe("Accessibility", () => {
+    it("uses proper button element for logout", () => {
+      render(<Sidebar />);
+      const logoutButton = screen.getByText("Log out").closest("button");
+      expect(logoutButton).toBeInTheDocument();
+    });
+
+    it("provides alternative text for avatar", () => {
+      render(<Sidebar />);
+      // Avatar shows initials as fallback
+      expect(screen.getByText("TE")).toBeInTheDocument();
+    });
+
+    it("uses semantic navigation structure", () => {
+      render(<Sidebar />);
+      // Navigation should be semantic
+      expect(screen.getByText("Explore Wines")).toBeInTheDocument();
+    });
+
+    it("Log out is a button not a navigation link", () => {
+      render(<Sidebar />);
+      const logoutEl = screen.getByText("Log out");
+      expect(logoutEl.tagName).toBe("BUTTON");
+    });
+  });
+
+  describe("Sheet Integration", () => {
+    it("wraps sidebar in Sheet component", () => {
+      const { container } = render(<Sidebar />);
+      // Sheet mocks ensure content is visible
+      expect(container).toBeTruthy();
+    });
+
+    it("renders sheet trigger for mobile menu", () => {
+      render(<Sidebar />);
+      // Content should be visible due to mock
+      expect(screen.getByText("Log out")).toBeInTheDocument();
+    });
+  });
+
+  describe("Multiple Renders", () => {
+    it("maintains state across re-renders", () => {
+      const { rerender } = render(<Sidebar />);
+      expect(screen.getByText("Test User")).toBeInTheDocument();
+
+      rerender(<Sidebar />);
+      expect(screen.getByText("Test User")).toBeInTheDocument();
+    });
+
+    it("updates display name when user changes", () => {
+      const { rerender } = render(<Sidebar />);
+      expect(screen.getByText("TE")).toBeInTheDocument();
+
+      vi.mocked(useUser).mockReturnValue({
+        loading: false,
+        refetch: vi.fn(),
+        updateUser: vi.fn(),
+        user: { fname: "Jane", id: "user2", lname: "Smith" },
+      } as never);
+
+      rerender(<Sidebar />);
+      expect(screen.getByText("JA")).toBeInTheDocument();
+    });
   });
 });

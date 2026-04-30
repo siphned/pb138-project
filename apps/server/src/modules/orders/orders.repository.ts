@@ -122,7 +122,7 @@ export class OrdersRepository implements IOrdersRepository {
     });
 
     if (order) {
-      const typedOrder = order as unknown as OrderWithItems;
+      const typedOrder = order as OrderWithItems;
       if (typedOrder.items) {
         typedOrder.items = typedOrder.items.filter(
           (item) => item.product && !item.product.deletedAt

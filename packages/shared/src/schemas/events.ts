@@ -1,4 +1,5 @@
 import { pgTable, smallint, text, uuid, varchar } from "drizzle-orm/pg-core";
+import { createInsertSchema, createSelectSchema } from "drizzle-zod";
 import { addresses } from "./addresses";
 import { eventStatusEnum, eventVisibilityEnum } from "./enums";
 import { timestamptz } from "./helpers";
@@ -63,3 +64,19 @@ export const eventComments = pgTable("event_comments", {
     .notNull()
     .references(() => users.id),
 });
+
+export const eventSelectSchema = createSelectSchema(events);
+export const eventInsertSchema = createInsertSchema(events);
+export type EventModel = typeof events.$inferSelect;
+
+export const eventInvitationSelectSchema = createSelectSchema(eventInvitations);
+export const eventInvitationInsertSchema = createInsertSchema(eventInvitations);
+export type EventInvitationModel = typeof eventInvitations.$inferSelect;
+
+export const eventRegistrationSelectSchema = createSelectSchema(eventRegistrations);
+export const eventRegistrationInsertSchema = createInsertSchema(eventRegistrations);
+export type EventRegistrationModel = typeof eventRegistrations.$inferSelect;
+
+export const eventCommentSelectSchema = createSelectSchema(eventComments);
+export const eventCommentInsertSchema = createInsertSchema(eventComments);
+export type EventCommentModel = typeof eventComments.$inferSelect;

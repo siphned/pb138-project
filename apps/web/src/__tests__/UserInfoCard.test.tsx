@@ -25,7 +25,7 @@ vi.mock("@/components/ui/button", () => ({
 vi.mock("@/components/ui/dialog", () => ({
   Dialog: ({ children }: { children: React.ReactNode }) => <div>{children}</div>,
   DialogContent: ({ children }: { children: React.ReactNode }) => <div>{children}</div>,
-  DialogTrigger: ({ render: r }: { render: React.ReactNode }) => <>{r}</>,
+  DialogTrigger: ({ render }: { render: React.ReactNode }) => <>{render}</>,
 }));
 
 vi.mock("./ProfileEditForm", () => ({

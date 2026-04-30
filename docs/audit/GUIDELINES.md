@@ -91,6 +91,8 @@ Ordered list of everything that still needs to happen to fully close this audit.
 ## Working from an Audit Document
 
 - **Outstanding Work** is the canonical backlog for fixing findings.
+- **Do not overwrite original findings.** The `audit.md` (or the initial audit file) should remain a permanent record of the state of the codebase at the time of the audit.
+- **Use Replies for Resolution:** Detailed responses, architectural justifications, and implementation details for fixes must be written in a `replies.md` file (or a file named `YYYY-MM-DD-<topic>-reply.md` if not using folders).
+- **Status Updates:** You may update the **Status** field of a finding in the original document to ✅ resolved or 🔄 in progress, but do not delete or significantly modify the original "Current state" or "Divergence" descriptions.
 - When you create a Jira ticket from a finding, note the ticket key next to the action item.
-- When a finding is fully resolved, update its **Status** to ✅ resolved and add a brief note of what changed.
-- **Never close an audit** (set `Status: CLOSED`) until all critical and major findings are ✅ resolved.
+- **Never close an audit** (set **Status: CLOSED** in the meta section) until all critical and major findings are ✅ resolved and documented in a reply.

@@ -1,4 +1,6 @@
-export type AppRole = "customer" | "winemaker" | "shop_owner" | "admin";
+import type { AppRole } from "@repo/shared";
+
+export type { AppRole };
 
 export const Role = {
   customer: "Customer",

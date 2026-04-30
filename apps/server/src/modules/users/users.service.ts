@@ -1,11 +1,26 @@
 import { createClerkClient } from "@clerk/backend";
 import type { Address, User } from "@repo/shared/schemas";
-import type { ClerkPayload } from "../auth/auth.utils";
+import { z } from "zod";
 import { type IUserRolesRepository, userRolesRepository } from "./user-roles.repository";
 import { type IUsersRepository, usersRepository } from "./users.repository";
 
-const clerkClient = createClerkClient({
-  secretKey: process.env.CLERK_SECRET_KEY,
+// Lazy-load Clerk client to prevent import-time errors if env vars are missing
+let _clerkClient: ReturnType<typeof createClerkClient> | null = null;
+function getClerkClient() {
+  if (!_clerkClient) {
+    const secretKey = process.env.CLERK_SECRET_KEY;
+    if (!secretKey) throw new Error("CLERK_SECRET_KEY is not set");
+    _clerkClient = createClerkClient({ secretKey });
+  }
+  return _clerkClient;
+}
+
+const AddressSchema = z.object({
+  city: z.string().min(1, "City is required"),
+  country: z.string().min(1, "Country is required"),
+  houseNumber: z.string().min(1, "House number is required"),
+  postalCode: z.string().min(1, "Postal code is required"),
+  street: z.string().min(1, "Street is required"),
 });
 
 export class UsersService {
@@ -14,11 +29,14 @@ export class UsersService {
     private userRolesRepo: IUserRolesRepository
   ) {}
 
+  /**
+   * Get shipping and billing addresses for a user.
+   */
   async getAddresses(
-    clerkId: string,
-    payload: ClerkPayload
+    userId: string
   ): Promise<{ shipping: Address | null; billing: Address | null }> {
-    const user = await this.lazyGetOrCreate(clerkId, payload);
+    const user = await this.usersRepo.findById(userId);
+    if (!user) throw new Error("User not found");
 
     const [shipping, billing] = await Promise.all([
       user.shippingAddressId ? this.usersRepo.findAddressById(user.shippingAddressId) : null,
@@ -31,87 +49,110 @@ export class UsersService {
     };
   }
 
-  async getAddressesForUser(
-    user: User
-  ): Promise<{ shipping: Address | null; billing: Address | null }> {
-    const [shipping, billing] = await Promise.all([
-      user.shippingAddressId ? this.usersRepo.findAddressById(user.shippingAddressId) : null,
-      user.billingAddressId ? this.usersRepo.findAddressById(user.billingAddressId) : null,
-    ]);
-    return { billing: billing ?? null, shipping: shipping ?? null };
-  }
-
   getById(id: string): Promise<User | undefined> {
     return this.usersRepo.findById(id);
   }
 
-  async getProfileWithRoles(
-    clerkId: string,
-    payload: ClerkPayload
-  ): Promise<User & { roles: string[] }> {
-    const user = await this.lazyGetOrCreate(clerkId, payload);
+  /**
+   * Returns user with their current roles from DB.
+   * Lazily syncs with Clerk if user doesn't exist locally.
+   */
+  async getProfileWithRoles(clerkId: string): Promise<User & { roles: string[] }> {
+    const user = await this.lazyGetOrCreate(clerkId);
     const roles = await this.userRolesRepo.findByUserId(user.id);
     return { ...user, roles };
   }
 
-  async lazyGetOrCreate(clerkId: string, _payload: ClerkPayload): Promise<User> {
+  /**
+   * Ensures a local user exists and is synced with Clerk profile/roles.
+   * Orchestrates the sync flow with proper separation of concerns.
+   */
+  async lazyGetOrCreate(clerkId: string): Promise<User> {
     const existing = await this.usersRepo.findByClerkId(clerkId);
     if (existing) return existing;
 
-    const clerkUser = await clerkClient.users.getUser(clerkId);
+    // 1. Fetch external profile
+    const profile = await this.fetchExternalProfile(clerkId);
 
-    const email = clerkUser.emailAddresses[0]?.emailAddress;
-    if (!email) throw new Error("Clerk user has no email address");
-
-    // First login: seed the customer role in Clerk public metadata if not already set
-    if (!clerkUser.publicMetadata?.roles) {
-      await clerkClient.users.updateUser(clerkId, {
-        publicMetadata: { ...clerkUser.publicMetadata, roles: ["customer"] },
-      });
-    }
-
+    // 2. Persist local user record
     const user = await this.usersRepo.upsert({
       clerkId,
-      email,
-      fname: clerkUser.firstName ?? "",
-      lname: clerkUser.lastName ?? "",
+      email: profile.email,
+      fname: profile.fname,
+      lname: profile.lname,
     });
 
-    // Sync Clerk roles to database
-    await this.syncRolesToDatabase(
-      user.id,
-      (clerkUser.publicMetadata?.roles as string[]) || ["customer"]
-    );
+    // 3. Sync roles to DB
+    await this.syncRolesToDatabase(user.id, profile.roles);
 
     return user;
   }
 
-  async syncRolesToDatabase(userId: string, clerkRoles: string[]): Promise<void> {
-    // Get existing roles in DB
-    const existingRoles = await this.userRolesRepo.findByUserId(userId);
+  /**
+   * Fetches user from Clerk and ensures basic metadata (roles) is seeded.
+   */
+  private async fetchExternalProfile(clerkId: string): Promise<{
+    email: string;
+    fname: string;
+    lname: string;
+    roles: string[];
+  }> {
+    try {
+      const clerk = getClerkClient();
+      const clerkUser = await clerk.users.getUser(clerkId);
 
-    // Add missing roles
-    for (const role of clerkRoles) {
-      if (!existingRoles.includes(role)) {
-        await this.userRolesRepo.addRole(userId, role);
-      }
-    }
+      const email = clerkUser.emailAddresses[0]?.emailAddress;
+      if (!email) throw new Error("Clerk user has no email address");
 
-    // Remove roles that are no longer in Clerk
-    for (const role of existingRoles) {
-      if (!clerkRoles.includes(role)) {
-        await this.userRolesRepo.removeRole(userId, role);
+      const roles = (clerkUser.publicMetadata?.roles as string[]) || [];
+
+      // Proactively seed 'customer' role if metadata is empty
+      if (roles.length === 0) {
+        const defaultRoles = ["customer"];
+        // Fire-and-forget update to Clerk to avoid blocking login
+        clerk.users
+          .updateUser(clerkId, {
+            publicMetadata: { ...clerkUser.publicMetadata, roles: defaultRoles },
+          })
+          .catch((e) =>
+            // biome-ignore lint/suspicious/noConsole: background sync
+            console.error(`Failed to seed Clerk roles for ${clerkId}:`, e)
+          );
+        return {
+          email,
+          fname: clerkUser.firstName ?? "",
+          lname: clerkUser.lastName ?? "",
+          roles: defaultRoles,
+        };
       }
+
+      return {
+        email,
+        fname: clerkUser.firstName ?? "",
+        lname: clerkUser.lastName ?? "",
+        roles,
+      };
+    } catch (error) {
+      if (error instanceof Error) throw error;
+      throw new Error(`External profile sync failed for ${clerkId}`);
     }
   }
 
-  async updateProfile(
-    clerkId: string,
-    payload: ClerkPayload,
-    data: { fname?: string; lname?: string }
-  ): Promise<User> {
-    const user = await this.lazyGetOrCreate(clerkId, payload);
-    return this.usersRepo.updateById(user.id, data);
+  /**
+   * Batched role synchronization to prevent N+1 queries.
+   */
+  async syncRolesToDatabase(userId: string, clerkRoles: string[]): Promise<void> {
+    const existingRoles = await this.userRolesRepo.findByUserId(userId);
+
+    const rolesToAdd = clerkRoles.filter((r: string) => !existingRoles.includes(r));
+    const rolesToRemove = existingRoles.filter((r: string) => !clerkRoles.includes(r));
+
+    if (rolesToAdd.length === 0 && rolesToRemove.length === 0) return;
+
+    await Promise.all([
+      this.userRolesRepo.addRoles(userId, rolesToAdd),
+      this.userRolesRepo.removeRoles(userId, rolesToRemove),
+    ]);
   }
 
   updateProfileById(userId: string, data: { fname?: string; lname?: string }): Promise<User> {
@@ -119,41 +160,16 @@ export class UsersService {
   }
 
   async upsertAddress(
-    clerkId: string,
-    payload: ClerkPayload,
-    type: "shipping" | "billing",
-    addressData: {
-      country: string;
-      city: string;
-      postalCode: string;
-      street: string;
-      houseNumber: string;
-    }
-  ): Promise<Address> {
-    const user = await this.lazyGetOrCreate(clerkId, payload);
-
-    const address = await this.usersRepo.createAddress(addressData);
-
-    const field = type === "shipping" ? "shippingAddressId" : "billingAddressId";
-    await this.usersRepo.updateById(user.id, { [field]: address.id });
-
-    return address;
-  }
-
-  async upsertAddressForUser(
     userId: string,
     type: "shipping" | "billing",
-    addressData: {
-      country: string;
-      city: string;
-      postalCode: string;
-      street: string;
-      houseNumber: string;
-    }
+    addressData: unknown
   ): Promise<Address> {
-    const address = await this.usersRepo.createAddress(addressData);
+    const validated = AddressSchema.parse(addressData);
+    const address = await this.usersRepo.createAddress(validated);
+
     const field = type === "shipping" ? "shippingAddressId" : "billingAddressId";
     await this.usersRepo.updateById(userId, { [field]: address.id });
+
     return address;
   }
 }

@@ -52,7 +52,7 @@ export const ordersRoutes = new Elysia({ prefix: "/orders", tags: ["orders"] })
   .derive(async ({ headers, cookie: { guest_session_id } }) => {
     const payload = await verifyClerkToken(headers.authorization);
     if (payload) {
-      const dbUser = await usersService.lazyGetOrCreate(payload.sub, payload);
+      const dbUser = await usersService.lazyGetOrCreate(payload.sub);
       const guestSessionId = guest_session_id?.value;
       if (typeof guestSessionId === "string") {
         await cartsService.mergeOnLogin(dbUser.id, guestSessionId);

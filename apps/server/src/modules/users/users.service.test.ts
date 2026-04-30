@@ -1,9 +1,8 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
-import type { ClerkPayload } from "../auth/auth.utils";
 
 const { mockGetUser, mockUpdateUser, mockUpdateUserMetadata } = vi.hoisted(() => ({
   mockGetUser: vi.fn(),
-  mockUpdateUser: vi.fn(),
+  mockUpdateUser: vi.fn().mockResolvedValue({}),
   mockUpdateUserMetadata: vi.fn(),
 }));
 
@@ -32,32 +31,31 @@ vi.mock("./users.repository", () => ({
 vi.mock("./user-roles.repository", () => ({
   userRolesRepository: {
     addRole: vi.fn().mockResolvedValue(undefined),
+    addRoles: vi.fn().mockResolvedValue(undefined),
     findByUserId: vi.fn().mockResolvedValue([]),
     removeRole: vi.fn().mockResolvedValue(undefined),
+    removeRoles: vi.fn().mockResolvedValue(undefined),
   },
 }));
 
+import { userRolesRepository } from "./user-roles.repository";
 import { usersRepository } from "./users.repository";
 import { usersService } from "./users.service";
 
 describe("usersService", () => {
   beforeEach(() => {
     vi.clearAllMocks();
+    process.env.CLERK_SECRET_KEY = "test_key";
   });
 
   const clerkId = "user_123";
-  const payload = (roles: string[]) =>
-    ({
-      roles,
-      sub: clerkId,
-    }) as unknown as ClerkPayload;
 
   describe("lazyGetOrCreate", () => {
     it("returns the existing user and never calls Clerk when the user is already in the DB", async () => {
       const existingUser = { clerkId, id: "uuid" };
       vi.mocked(usersRepository.findByClerkId).mockResolvedValue(existingUser as never);
 
-      const result = await usersService.lazyGetOrCreate(clerkId, payload(["customer"]));
+      const result = await usersService.lazyGetOrCreate(clerkId);
 
       expect(result).toBe(existingUser);
       expect(mockGetUser).not.toHaveBeenCalled();
@@ -73,7 +71,7 @@ describe("usersService", () => {
       });
       vi.mocked(usersRepository.upsert).mockResolvedValue({ id: "new-uuid" } as never);
 
-      await usersService.lazyGetOrCreate(clerkId, payload(["customer"]));
+      await usersService.lazyGetOrCreate(clerkId);
 
       expect(mockGetUser).toHaveBeenCalledWith(clerkId);
       expect(usersRepository.upsert).toHaveBeenCalled();
@@ -89,7 +87,7 @@ describe("usersService", () => {
       });
       vi.mocked(usersRepository.upsert).mockResolvedValue({ id: "new-uuid" } as never);
 
-      await usersService.lazyGetOrCreate(clerkId, payload([]));
+      await usersService.lazyGetOrCreate(clerkId);
 
       expect(mockUpdateUser).toHaveBeenCalledWith(clerkId, {
         publicMetadata: { roles: ["customer"] },
@@ -102,28 +100,27 @@ describe("usersService", () => {
         emailAddresses: [],
       });
 
-      await expect(usersService.lazyGetOrCreate(clerkId, payload([]))).rejects.toThrow(
+      await expect(usersService.lazyGetOrCreate(clerkId)).rejects.toThrow(
         "Clerk user has no email address"
       );
     });
   });
 
-  describe("updateProfile", () => {
-    it("updates basic profile fields", async () => {
-      const existingUser = { clerkId, id: "uuid" };
-      const updated = { ...existingUser, lname: "Smith" };
-      vi.mocked(usersRepository.findByClerkId).mockResolvedValue(existingUser as never);
-      vi.mocked(usersRepository.updateById).mockResolvedValue(updated as never);
+  describe("syncRolesToDatabase", () => {
+    it("batches additions and removals", async () => {
+      const userId = "u1";
+      vi.mocked(userRolesRepository.findByUserId).mockResolvedValue(["customer", "old-role"]);
+      const targetRoles = ["customer", "admin"];
 
-      await usersService.updateProfile(clerkId, payload(["customer"]), { lname: "Smith" });
+      await usersService.syncRolesToDatabase(userId, targetRoles);
 
-      expect(usersRepository.updateById).toHaveBeenCalledWith("uuid", { lname: "Smith" });
+      expect(userRolesRepository.addRoles).toHaveBeenCalledWith(userId, ["admin"]);
+      expect(userRolesRepository.removeRoles).toHaveBeenCalledWith(userId, ["old-role"]);
     });
   });
 
   describe("upsertAddress", () => {
     it("creates a new address and links it to user", async () => {
-      const existingUser = { clerkId, id: "uuid" };
       const createdAddr = { id: "new-addr" };
       const addrData = {
         city: "B",
@@ -133,19 +130,25 @@ describe("usersService", () => {
         street: "S",
       };
 
-      vi.mocked(usersRepository.findByClerkId).mockResolvedValue(existingUser as never);
       vi.mocked(usersRepository.createAddress).mockResolvedValue(createdAddr as never);
-      vi.mocked(usersRepository.updateById).mockResolvedValue(existingUser as never);
+      vi.mocked(usersRepository.updateById).mockResolvedValue({ id: "u1" } as never);
 
-      const result = await usersService.upsertAddress(
-        clerkId,
-        payload(["customer"]),
-        "shipping",
-        addrData
-      );
+      const result = await usersService.upsertAddress("u1", "shipping", addrData);
 
       expect(result).toBe(createdAddr);
       expect(usersRepository.createAddress).toHaveBeenCalledWith(addrData);
+    });
+
+    it("fails validation for empty fields", async () => {
+      const addrData = {
+        city: "",
+        country: "CZ",
+        houseNumber: "1",
+        postalCode: "1",
+        street: "S",
+      };
+
+      await expect(usersService.upsertAddress("u1", "shipping", addrData)).rejects.toThrow();
     });
   });
 
