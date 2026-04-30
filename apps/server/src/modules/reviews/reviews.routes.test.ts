@@ -57,7 +57,7 @@ describe("reviews.routes integration", () => {
     const res = await app.handle(new Request("http://localhost/reviews/product/p1"));
 
     expect(res.status).toBe(200);
-    const body = await res.json();
+    const body = (await res.json()) as { totalCount: number };
     expect(body.totalCount).toBe(0);
     expect(reviewsService.listProductReviews).toHaveBeenCalledWith("p1", {
       limit: 12,
@@ -78,7 +78,7 @@ describe("reviews.routes integration", () => {
     );
 
     expect(res.status).toBe(200);
-    const body = await res.json();
+    const body = (await res.json()) as { totalCount: number };
     expect(body.totalCount).toBe(5);
     expect(reviewsService.listWinemakerReviews).toHaveBeenCalledWith("w1", {
       limit: 5,
