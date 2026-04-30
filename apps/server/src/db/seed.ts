@@ -199,14 +199,14 @@ async function main() {
   const customers = await insertUsers(NUM_USERS);
   console.log(`Inserted ${customers.length} users`);
 
-  // Batch insert winemakers
+  // Batch insert winemakers (deduplicate to avoid unique constraint violation)
   console.log("Inserting winemakers...");
   const wmOwners = Array.from({ length: NUM_WINEMAKERS }, () => pick(customers));
-  const wmOwnerIds = wmOwners.map((w) => w?.id).filter(Boolean) as string[];
-  const winemakerRows = await insertWinemakers(wmOwnerIds);
+  const uniqueWmOwnerIds = Array.from(new Set(wmOwners.map((w) => w?.id).filter(Boolean))) as string[];
+  const winemakerRows = await insertWinemakers(uniqueWmOwnerIds);
   console.log(`Inserted ${winemakerRows.length} winemakers`);
 
-  // Batch insert shops
+  // Batch insert shops (can have duplicates - one user can own multiple shops)
   console.log("Inserting shops...");
   const shopOwnerIds = wmOwners.flatMap((w) => Array(SHOPS_PER_WINEMAKER).fill(w?.id)).filter(Boolean) as string[];
   const shopRows = await insertShops(shopOwnerIds);
