@@ -1,7 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useState } from "react";
 import { PublicLayout } from "@/components/layout/PublicLayout";
-import { useGetCarts } from "@/generated/carts/carts";
+import { useGetCarts } from "@/generated/hooks/useGetCarts";
 import { CartSection } from "./-components/cart/CartSection";
 import { CheckoutSection } from "./-components/cart/CheckoutSection";
 
