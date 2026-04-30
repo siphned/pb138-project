@@ -50,6 +50,9 @@ vi.mock("../auth/auth.utils", () => ({
 }));
 
 vi.mock("../users/users.service", () => ({
+  UsersService: class {
+    lazyGetOrCreate = vi.fn().mockResolvedValue({ id: "db_user_1" });
+  },
   usersService: {
     lazyGetOrCreate: vi.fn().mockResolvedValue({ id: "db_user_1" }),
   },
