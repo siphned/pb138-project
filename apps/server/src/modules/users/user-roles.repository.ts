@@ -1,14 +1,16 @@
 import type { UserRole } from "@repo/shared/schemas";
 import { userRoles } from "@repo/shared/schemas";
-import { and, eq, isNull } from "drizzle-orm";
+import { and, eq, inArray, isNull } from "drizzle-orm";
 import { db } from "../../db";
 
 export interface IUserRolesRepository {
   addRole(userId: string, role: string): Promise<UserRole>;
+  addRoles(userId: string, roles: string[]): Promise<void>;
   deleteAllRoles(userId: string): Promise<void>;
   findByUserId(userId: string): Promise<string[]>;
   hasRole(userId: string, role: string): Promise<boolean>;
   removeRole(userId: string, role: string): Promise<void>;
+  removeRoles(userId: string, roles: string[]): Promise<void>;
 }
 
 export const userRolesRepository: IUserRolesRepository = {
@@ -30,6 +32,18 @@ export const userRolesRepository: IUserRolesRepository = {
     const [newRole] = await db.insert(userRoles).values({ role, userId }).returning();
     if (!newRole) throw new Error("Failed to add role");
     return newRole;
+  },
+
+  async addRoles(userId: string, roles: string[]): Promise<void> {
+    if (roles.length === 0) return;
+
+    await db
+      .insert(userRoles)
+      .values(roles.map((role) => ({ role, userId })))
+      .onConflictDoUpdate({
+        set: { deletedAt: null },
+        target: [userRoles.userId, userRoles.role],
+      });
   },
 
   async deleteAllRoles(userId: string): Promise<void> {
@@ -63,5 +77,13 @@ export const userRolesRepository: IUserRolesRepository = {
       .update(userRoles)
       .set({ deletedAt: new Date() })
       .where(and(eq(userRoles.userId, userId), eq(userRoles.role, role)));
+  },
+
+  async removeRoles(userId: string, roles: string[]): Promise<void> {
+    if (roles.length === 0) return;
+    await db
+      .update(userRoles)
+      .set({ deletedAt: new Date() })
+      .where(and(eq(userRoles.userId, userId), inArray(userRoles.role, roles)));
   },
 };

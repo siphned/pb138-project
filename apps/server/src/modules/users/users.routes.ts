@@ -56,7 +56,7 @@ export const usersRoutes = new Elysia({ prefix: "/users" })
   .get(
     "/me/addresses",
     async ({ dbUser }) => {
-      return await usersService.getAddressesForUser(dbUser);
+      return await usersService.getAddresses(dbUser.id);
     },
     {
       detail: {
@@ -74,7 +74,7 @@ export const usersRoutes = new Elysia({ prefix: "/users" })
     "/me/addresses",
     async ({ dbUser, body }) => {
       const { type, ...addressData } = body;
-      return await usersService.upsertAddressForUser(dbUser.id, type, addressData);
+      return await usersService.upsertAddress(dbUser.id, type, addressData);
     },
     {
       body: addressBody,
