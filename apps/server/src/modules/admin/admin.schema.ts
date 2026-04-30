@@ -1,8 +1,78 @@
 import { t } from "elysia";
+import { z } from "zod";
 
+/**
+ * Admin API response schemas.
+ * Zod schemas are exported for shared types and OpenAPI generation.
+ * TypeBox schemas (t.*) are provided for Elysia route validation.
+ */
+
+export const adminUserResponseSchema = z.object({
+  createdAt: z.date(),
+  deletedAt: z.date().nullable(),
+  email: z.string(),
+  fname: z.string(),
+  id: z.string(),
+  lname: z.string(),
+  role: z.string(),
+  status: z.string(),
+});
+
+export const adminEventResponseSchema = z.object({
+  address: z.nullable(
+    z.object({
+      city: z.string(),
+      country: z.string(),
+      houseNumber: z.string(),
+      postalCode: z.string(),
+      street: z.string(),
+    })
+  ),
+  addressId: z.string(),
+  endTime: z.date(),
+  id: z.string(),
+  name: z.string(),
+  startTime: z.date(),
+  status: z.string(),
+  winemaker: z.nullable(
+    z.object({
+      id: z.string(),
+      name: z.string(),
+    })
+  ),
+  winemakerId: z.string(),
+});
+
+export const adminReviewResponseSchema = z.object({
+  body: z.string().nullable(),
+  createdAt: z.date(),
+  entityId: z.string(),
+  entityType: z.string(),
+  id: z.string(),
+  rating: z.number(),
+  user: z.nullable(
+    z.object({
+      fname: z.string(),
+      id: z.string(),
+      lname: z.string(),
+    })
+  ),
+  userId: z.string(),
+});
+
+export const adminStatsResponseSchema = z.object({
+  events: z.number(),
+  reviews: z.number(),
+  users: z.number(),
+});
+
+/**
+ * TypeBox schemas for Elysia route validation.
+ * Mirrors Zod schemas above for route compatibility.
+ */
 export const adminUserResponse = t.Object({
   createdAt: t.Date(),
-  deletedAt: t.Union([t.Date(), t.Null()]),
+  deletedAt: t.Nullable(t.Date()),
   email: t.String(),
   fname: t.String(),
   id: t.String(),

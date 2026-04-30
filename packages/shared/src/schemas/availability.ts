@@ -1,4 +1,5 @@
 import { integer, pgTable, uuid, varchar } from "drizzle-orm/pg-core";
+import { createInsertSchema, createSelectSchema } from "drizzle-zod";
 import { timestamptz } from "./helpers";
 import { shops, winemakers } from "./sellers";
 
@@ -32,3 +33,11 @@ export const availabilityExceptions = pgTable("availability_exceptions", {
   updatedAt: timestamptz("updated_at"),
   winemakerId: uuid("winemaker_id").references(() => winemakers.id),
 });
+
+export const availabilityRegularSelectSchema = createSelectSchema(availabilityRegular);
+export const availabilityRegularInsertSchema = createInsertSchema(availabilityRegular);
+export type AvailabilityRegularModel = typeof availabilityRegular.$inferSelect;
+
+export const availabilityExceptionSelectSchema = createSelectSchema(availabilityExceptions);
+export const availabilityExceptionInsertSchema = createInsertSchema(availabilityExceptions);
+export type AvailabilityExceptionModel = typeof availabilityExceptions.$inferSelect;

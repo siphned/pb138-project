@@ -1,4 +1,5 @@
 import { pgTable, text, uuid, varchar } from "drizzle-orm/pg-core";
+import { createInsertSchema, createSelectSchema } from "drizzle-zod";
 import { addresses } from "./addresses";
 import { timestamptz } from "./helpers";
 import { users } from "./users";
@@ -36,3 +37,11 @@ export const shops = pgTable("shops", {
     .references(() => users.id),
   updatedAt: timestamptz("updated_at"),
 });
+
+export const winemakerSelectSchema = createSelectSchema(winemakers);
+export const winemakerInsertSchema = createInsertSchema(winemakers);
+export type WinemakerModel = typeof winemakers.$inferSelect;
+
+export const shopSelectSchema = createSelectSchema(shops);
+export const shopInsertSchema = createInsertSchema(shops);
+export type ShopModel = typeof shops.$inferSelect;

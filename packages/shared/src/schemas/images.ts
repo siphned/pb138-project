@@ -1,4 +1,5 @@
 import { pgTable, text, uuid } from "drizzle-orm/pg-core";
+import { createInsertSchema, createSelectSchema } from "drizzle-zod";
 import { timestamptz } from "./helpers";
 
 export const images = pgTable("images", {
@@ -10,3 +11,7 @@ export const images = pgTable("images", {
   updatedAt: timestamptz("updated_at"),
   url: text("url").notNull(),
 });
+
+export const imageSelectSchema = createSelectSchema(images);
+export const imageInsertSchema = createInsertSchema(images);
+export type ImageModel = typeof images.$inferSelect;
