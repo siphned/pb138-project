@@ -61,3 +61,10 @@ GEMINI.md
 apps/server/src/db/seed.ts
 
 docs/figma/
+
+# Git Worktrees
+.worktrees/
+
+
+.claude/worktrees/
+
