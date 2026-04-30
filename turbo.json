@@ -9,6 +9,9 @@
     "check-types": {
       "dependsOn": ["^check-types"]
     },
+    "db:check": {
+      "cache": false
+    },
     "db:seed": {
       "cache": false
     },
