@@ -3,7 +3,20 @@ import { addresses, users } from "@repo/shared/schemas";
 import { eq } from "drizzle-orm";
 import { db } from "../../db";
 
-export const usersRepository = {
+export interface IUsersRepository {
+  create(data: NewUser): Promise<User>;
+  createAddress(data: NewAddress): Promise<Address>;
+  findAddressById(id: string): Promise<Address | undefined>;
+  findByClerkId(clerkId: string): Promise<User | undefined>;
+  findById(id: string): Promise<User | undefined>;
+  updateById(
+    id: string,
+    data: Partial<Pick<User, "fname" | "lname" | "shippingAddressId" | "billingAddressId">>
+  ): Promise<User>;
+  upsert(data: NewUser): Promise<User>;
+}
+
+export const usersRepository: IUsersRepository = {
   async create(data: NewUser): Promise<User> {
     const [user] = await db.insert(users).values(data).returning();
     if (!user) throw new Error("Insert returned no rows");
@@ -21,14 +34,15 @@ export const usersRepository = {
       where: eq(addresses.id, id),
     });
   },
-  findByClerkId(clerkId: string): Promise<User | undefined> {
-    return db.query.users.findFirst({
+
+  async findByClerkId(clerkId: string): Promise<User | undefined> {
+    return await db.query.users.findFirst({
       where: eq(users.clerkId, clerkId),
     });
   },
 
-  findById(id: string): Promise<User | undefined> {
-    return db.query.users.findFirst({
+  async findById(id: string): Promise<User | undefined> {
+    return await db.query.users.findFirst({
       where: eq(users.id, id),
     });
   },
@@ -46,18 +60,22 @@ export const usersRepository = {
     return updated;
   },
 
-  // Idempotent insert: if clerk_id already exists (concurrent first-login race),
-  // silently skip and return the existing row instead of throwing a unique violation.
   async upsert(data: NewUser): Promise<User> {
-    const [inserted] = await db
+    await db
       .insert(users)
       .values(data)
-      .onConflictDoNothing({ target: users.clerkId })
-      .returning();
+      .onConflictDoUpdate({
+        set: {
+          email: data.email,
+          fname: data.fname,
+          lname: data.lname,
+          updatedAt: new Date(),
+        },
+        target: [users.clerkId],
+      });
 
-    if (inserted) return inserted;
-
-    // Another concurrent request won the race — fetch what it inserted
+    // Workaround for Drizzle ORM not returning on conflict? Or just safer to re-fetch
+    // since we want to avoid the race — fetch what it inserted
     const existing = await db.query.users.findFirst({
       where: eq(users.clerkId, data.clerkId),
     });

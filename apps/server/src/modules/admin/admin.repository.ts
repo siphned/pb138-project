@@ -22,14 +22,36 @@ export type AdminReviewRow = Review & {
   user: { id: string; fname: string; lname: string } | null;
 };
 
-export const adminRepository = {
-  findEventById(id: string): Promise<Event | undefined> {
+export interface IAdminRepository {
+  findEventById(id: string): Promise<Event | undefined>;
+  findEventWithDetailsById(id: string): Promise<AdminEventRow | undefined>;
+  findReviewById(id: string): Promise<Review | undefined>;
+  findUserById(id: string): Promise<AdminUserRow | undefined>;
+  listAllReviews(pagination: {
+    limit: number;
+    offset: number;
+  }): Promise<{ data: AdminReviewRow[]; total: number }>;
+  listEvents(
+    filters: { status: "pending" | "approved" | "rejected" },
+    pagination: { limit: number; offset: number }
+  ): Promise<{ data: AdminEventRow[]; total: number }>;
+  listUsers(
+    filters: { status?: "active" | "suspended" | "banned"; role?: string },
+    pagination: { limit: number; offset: number }
+  ): Promise<{ data: AdminUserRow[]; total: number }>;
+  setEventStatus(id: string, newStatus: "approved" | "rejected"): Promise<void>;
+  setUserStatus(id: string, newStatus: "active" | "suspended" | "banned"): Promise<AdminUserRow>;
+  softDeleteReview(id: string): Promise<void>;
+}
+
+export const adminRepository: IAdminRepository = {
+  async findEventById(id: string): Promise<Event | undefined> {
     return db.query.events.findFirst({
       where: and(eq(events.id, id), isNull(events.deletedAt)),
     });
   },
 
-  findEventWithDetailsById(id: string): Promise<AdminEventRow | undefined> {
+  async findEventWithDetailsById(id: string): Promise<AdminEventRow | undefined> {
     return db.query.events.findFirst({
       where: and(eq(events.id, id), isNull(events.deletedAt)),
       with: {
@@ -41,13 +63,13 @@ export const adminRepository = {
     }) as Promise<AdminEventRow | undefined>;
   },
 
-  findReviewById(id: string) {
+  async findReviewById(id: string) {
     return db.query.reviews.findFirst({
       where: and(eq(reviews.id, id), isNull(reviews.deletedAt)),
     });
   },
 
-  findUserById(id: string): Promise<AdminUserRow | undefined> {
+  async findUserById(id: string): Promise<AdminUserRow | undefined> {
     return db.query.users.findFirst({
       where: and(eq(users.id, id), isNull(users.deletedAt)),
       with: {
@@ -111,6 +133,7 @@ export const adminRepository = {
 
     return { data: data as AdminEventRow[], total: Number(countResult[0]?.value ?? 0) };
   },
+
   async listUsers(
     filters: { status?: "active" | "suspended" | "banned"; role?: string },
     pagination: { limit: number; offset: number }

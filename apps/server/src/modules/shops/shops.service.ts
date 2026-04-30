@@ -1,4 +1,4 @@
-import type { ShopWithAddress } from "./shops.repository";
+import type { IShopsRepository, ShopWithAddress } from "./shops.repository";
 import { shopsRepository } from "./shops.repository";
 
 type AddressData = {
@@ -21,36 +21,39 @@ type UpdateShopData = {
   address?: Partial<AddressData>;
 };
 
-export const shopsService = {
+export class ShopsService {
+  constructor(private shopsRepo: IShopsRepository) {}
+
   async createShop(ownerUserId: string, data: CreateShopData): Promise<ShopWithAddress> {
-    const shop = await shopsRepository.createShopWithAddress(
+    const shop = await this.shopsRepo.createShopWithAddress(
       { description: data.description, name: data.name, ownerUserId },
       data.address
     );
-    const created = await shopsRepository.findById(shop.id);
+    const created = await this.shopsRepo.findById(shop.id);
     if (!created) throw new Error("NOT_FOUND");
     return created;
-  },
+  }
 
   async getShop(id: string): Promise<ShopWithAddress> {
-    const shop = await shopsRepository.findById(id);
+    const shop = await this.shopsRepo.findById(id);
     if (!shop) throw new Error("NOT_FOUND");
     return shop;
-  },
+  }
 
   listMyShops(ownerUserId: string): Promise<ShopWithAddress[]> {
-    return shopsRepository.findAllByOwnerUserId(ownerUserId) as Promise<ShopWithAddress[]>;
-  },
+    return this.shopsRepo.findAllByOwnerUserId(ownerUserId) as Promise<ShopWithAddress[]>;
+  }
+
   listShops(): Promise<ShopWithAddress[]> {
-    return shopsRepository.findAll();
-  },
+    return this.shopsRepo.findAll();
+  }
 
   async updateShop(
     shopId: string,
     requesterId: string,
     data: UpdateShopData
   ): Promise<ShopWithAddress> {
-    const shop = await shopsRepository.findById(shopId);
+    const shop = await this.shopsRepo.findById(shopId);
     if (!shop) throw new Error("NOT_FOUND");
     if (shop.ownerUserId !== requesterId) throw new Error("FORBIDDEN");
 
@@ -68,13 +71,15 @@ export const shopsService = {
         postalCode: data.address.postalCode ?? currentAddress.postalCode,
         street: data.address.street ?? currentAddress.street,
       };
-      const newAddress = await shopsRepository.insertAddress(mergedAddress);
+      const newAddress = await this.shopsRepo.insertAddress(mergedAddress);
       updates.addressId = newAddress.id;
     }
 
-    await shopsRepository.updateById(shopId, updates);
-    const updated = await shopsRepository.findById(shopId);
+    await this.shopsRepo.updateById(shopId, updates);
+    const updated = await this.shopsRepo.findById(shopId);
     if (!updated) throw new Error("NOT_FOUND");
     return updated;
-  },
-};
+  }
+}
+
+export const shopsService = new ShopsService(shopsRepository);

@@ -47,9 +47,66 @@ export type CatalogRow = {
   reviewCount: number;
 };
 
-type Transaction = Parameters<Parameters<typeof db.transaction>[0]>[0];
+export type Transaction = Parameters<Parameters<typeof db.transaction>[0]>[0];
 
-export const productsRepository = {
+export interface IProductsRepository {
+  applyBundleAllocations(
+    tx: Transaction,
+    targetWines: { wineId: string; quantity: number }[],
+    newQty: number
+  ): Promise<void>;
+  createBundleWithWines(
+    shopId: string,
+    productData: { name: string; description?: string; price: string; quantity: number },
+    wineList: { wineId: string; quantity: number }[]
+  ): Promise<Product>;
+  createProductWithWine(
+    shopId: string,
+    productData: { name: string; description?: string; price: string; quantity: number },
+    wineId: string
+  ): Promise<Product>;
+  decrementStock(tx: Transaction, productId: string, quantity: number): Promise<void>;
+  findAll(
+    filters: ProductCatalogFilters,
+    pagination: { limit: number; offset: number }
+  ): Promise<{ rows: CatalogRow[]; total: number }>;
+  findById(id: string): Promise<ProductWithWines | undefined>;
+  findByIds(ids: string[]): Promise<ProductWithWinesAndWinemaker[]>;
+  findByShopId(shopId: string, isBundle?: boolean): Promise<ProductWithWines[]>;
+  handleSameWineQuantityChange(
+    tx: Transaction,
+    wineId: string,
+    oldQty: number,
+    newQty: number
+  ): Promise<void>;
+  handleWineIdChange(
+    tx: Transaction,
+    oldId: string,
+    oldQty: number,
+    newId: string,
+    newQty: number
+  ): Promise<void>;
+  isDeleted(id: string): Promise<boolean>;
+  productIdsExist(ids: string[]): Promise<boolean>;
+  revertBundleAllocations(
+    tx: Transaction,
+    product: Product & { productWines: ProductWine[] }
+  ): Promise<void>;
+  softDelete(id: string): Promise<void>;
+  updateBundle(
+    id: string,
+    fields: { name?: string; description?: string | null; price?: string; quantity?: number },
+    newWines?: { wineId: string; quantity: number }[]
+  ): Promise<Product>;
+  updateProduct(
+    id: string,
+    fields: { name?: string; description?: string | null; price?: string; quantity?: number },
+    newWineId?: string
+  ): Promise<Product>;
+  winesExist(wineIds: string[]): Promise<boolean>;
+}
+
+export const productsRepository: IProductsRepository = {
   async applyBundleAllocations(
     tx: Transaction,
     targetWines: { wineId: string; quantity: number }[],
@@ -255,7 +312,6 @@ export const productsRepository = {
       }
     })();
 
-    // Products with no reviews yield AVG = NULL; NULL >= N is false in PostgreSQL — unrated products are intentionally excluded when this filter is active
     const having =
       filters.rating !== undefined ? sql`AVG(${reviews.rating}) >= ${filters.rating}` : undefined;
 
@@ -298,6 +354,7 @@ export const productsRepository = {
 
     return { rows, total: countResult?.total ?? 0 };
   },
+
   async findById(id: string): Promise<ProductWithWines | undefined> {
     const product = await db.query.products.findFirst({
       where: and(eq(products.id, id), isNull(products.deletedAt)),

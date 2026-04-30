@@ -1,8 +1,12 @@
 import type { Event, EventComment, EventRegistration } from "@repo/shared/schemas";
 import type { PaginatedResult } from "../../utils/pagination";
 import { parsePagination } from "../../utils/pagination";
-import type { CommentWithUser, EventWithDetails } from "./events.repository";
-import { eventsRepository } from "./events.repository";
+import {
+  type CommentWithUser,
+  type EventWithDetails,
+  eventsRepository,
+  type IEventsRepository,
+} from "./events.repository";
 
 function validateEventDates(
   data: { startTime?: string; endTime?: string },
@@ -33,12 +37,14 @@ function buildEventUpdates(
   return updates;
 }
 
-export const eventsService = {
+export class EventsService {
+  constructor(private eventsRepo: IEventsRepository) {}
+
   async addComment(eventId: string, userId: string, body: string): Promise<EventComment> {
-    const event = await eventsRepository.findById(eventId);
+    const event = await this.eventsRepo.findById(eventId);
     if (!event || event.status !== "approved") throw new Error("EVENT_NOT_AVAILABLE");
-    return eventsRepository.createComment(eventId, userId, body);
-  },
+    return this.eventsRepo.createComment(eventId, userId, body);
+  }
 
   async createEvent(
     userId: string,
@@ -59,7 +65,7 @@ export const eventsService = {
       };
     }
   ): Promise<Event> {
-    const winemaker = await eventsRepository.findWinemakerByUserId(userId);
+    const winemaker = await this.eventsRepo.findWinemakerByUserId(userId);
     if (!winemaker) throw new Error("FORBIDDEN");
 
     const startTime = new Date(data.startTime);
@@ -67,7 +73,7 @@ export const eventsService = {
     if (startTime <= new Date()) throw new Error("INVALID_DATES");
     if (endTime <= startTime) throw new Error("INVALID_DATES");
 
-    return eventsRepository.createEventWithAddress(
+    return this.eventsRepo.createEventWithAddress(
       winemaker.id,
       {
         capacity: data.capacity,
@@ -80,41 +86,42 @@ export const eventsService = {
       },
       data.address
     );
-  },
+  }
 
   async deleteEvent(id: string, userId: string): Promise<void> {
-    const event = await eventsRepository.findById(id);
+    const event = await this.eventsRepo.findById(id);
     if (!event) throw new Error("NOT_FOUND");
 
-    const winemaker = await eventsRepository.findWinemakerByUserId(userId);
+    const winemaker = await this.eventsRepo.findWinemakerByUserId(userId);
     if (!winemaker || winemaker.id !== event.winemakerId) throw new Error("FORBIDDEN");
 
-    await eventsRepository.softDelete(id);
-  },
+    await this.eventsRepo.softDelete(id);
+  }
 
   async getEvent(id: string): Promise<EventWithDetails> {
-    const event = await eventsRepository.findById(id);
+    const event = await this.eventsRepo.findById(id);
     if (!event || event.status !== "approved") throw new Error("NOT_FOUND");
     return event;
-  },
+  }
 
   async listComments(
     eventId: string,
     paginationQuery: { page?: number; limit?: number }
   ): Promise<PaginatedResult<CommentWithUser>> {
-    const event = await eventsRepository.findById(eventId);
+    const event = await this.eventsRepo.findById(eventId);
     if (!event || event.status !== "approved") throw new Error("NOT_FOUND");
 
     const { limit, offset } = parsePagination(paginationQuery);
     const page = Math.max(1, paginationQuery.page ?? 1);
 
     const [data, total] = await Promise.all([
-      eventsRepository.findComments(eventId, { limit, offset }),
-      eventsRepository.countComments(eventId),
+      this.eventsRepo.findComments(eventId, { limit, offset }),
+      this.eventsRepo.countComments(eventId),
     ]);
 
     return { data, limit, page, total };
-  },
+  }
+
   async listEvents(
     filters: { winemakerName?: string; from?: string; to?: string },
     paginationQuery: { page?: number; limit?: number }
@@ -124,7 +131,7 @@ export const eventsService = {
 
     let winemakerIds: string[] | undefined;
     if (filters.winemakerName) {
-      winemakerIds = await eventsRepository.resolveWinemakerIdsByName(filters.winemakerName);
+      winemakerIds = await this.eventsRepo.resolveWinemakerIdsByName(filters.winemakerName);
       if (winemakerIds.length === 0) return { data: [], limit, page, total: 0 };
     }
 
@@ -136,26 +143,26 @@ export const eventsService = {
     };
 
     const [data, total] = await Promise.all([
-      eventsRepository.findMany(repoFilters, { limit, offset }),
-      eventsRepository.countMany(repoFilters),
+      this.eventsRepo.findMany(repoFilters, { limit, offset }),
+      this.eventsRepo.countMany(repoFilters),
     ]);
 
     return { data, limit, page, total };
-  },
+  }
 
   async registerForEvent(eventId: string, userId: string): Promise<EventRegistration> {
-    const event = await eventsRepository.findById(eventId);
+    const event = await this.eventsRepo.findById(eventId);
     if (!event || event.status !== "approved" || event.startTime <= new Date()) {
       throw new Error("EVENT_NOT_AVAILABLE");
     }
-    return eventsRepository.createRegistration(eventId, userId, event.capacity);
-  },
+    return this.eventsRepo.createRegistration(eventId, userId, event.capacity);
+  }
 
   async unregisterFromEvent(eventId: string, userId: string): Promise<void> {
-    const reg = await eventsRepository.findActiveRegistration(eventId, userId);
+    const reg = await this.eventsRepo.findActiveRegistration(eventId, userId);
     if (!reg) throw new Error("NOT_FOUND");
-    await eventsRepository.softDeleteRegistration(reg.id);
-  },
+    await this.eventsRepo.softDeleteRegistration(reg.id);
+  }
 
   async updateEvent(
     id: string,
@@ -168,10 +175,10 @@ export const eventsService = {
       endTime?: string;
     }
   ): Promise<Event> {
-    const event = await eventsRepository.findById(id);
+    const event = await this.eventsRepo.findById(id);
     if (!event) throw new Error("NOT_FOUND");
 
-    const winemaker = await eventsRepository.findWinemakerByUserId(userId);
+    const winemaker = await this.eventsRepo.findWinemakerByUserId(userId);
     if (!winemaker || winemaker.id !== event.winemakerId) throw new Error("FORBIDDEN");
     if (event.status !== "pending") throw new Error("CONFLICT");
 
@@ -181,11 +188,13 @@ export const eventsService = {
     validateEventDates(data, startTime, endTime);
 
     if (data.capacity !== undefined) {
-      const registrationCount = await eventsRepository.countActiveRegistrations(id);
+      const registrationCount = await this.eventsRepo.countActiveRegistrations(id);
       if (data.capacity < registrationCount) throw new Error("CAPACITY_TOO_LOW");
     }
 
     const updates = buildEventUpdates(data, startTime, endTime);
-    return eventsRepository.update(id, updates as Parameters<typeof eventsRepository.update>[1]);
-  },
-};
+    return this.eventsRepo.update(id, updates);
+  }
+}
+
+export const eventsService = new EventsService(eventsRepository);

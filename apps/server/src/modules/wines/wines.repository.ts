@@ -29,7 +29,16 @@ export type WineFilters = {
   winemakerId?: string;
 };
 
-export const winesRepository = {
+export interface IWinesRepository {
+  findAll(filters: WineFilters): Promise<WineWithWinemaker[]>;
+  findById(id: string): Promise<WineWithWinemaker | undefined>;
+  findWinemakerByUserId(userId: string): Promise<Winemaker | undefined>;
+  insert(winemakerId: string, data: WineData): Promise<Wine>;
+  softDelete(id: string): Promise<void>;
+  updateById(id: string, data: WineData): Promise<Wine>;
+}
+
+export const winesRepository: IWinesRepository = {
   async findAll(filters: WineFilters): Promise<WineWithWinemaker[]> {
     const conditions = [isNull(wines.deletedAt)];
     if (filters.region) conditions.push(eq(wines.region, filters.region));

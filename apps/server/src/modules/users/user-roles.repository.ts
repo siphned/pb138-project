@@ -3,7 +3,15 @@ import { userRoles } from "@repo/shared/schemas";
 import { and, eq, isNull } from "drizzle-orm";
 import { db } from "../../db";
 
-export const userRolesRepository = {
+export interface IUserRolesRepository {
+  addRole(userId: string, role: string): Promise<UserRole>;
+  deleteAllRoles(userId: string): Promise<void>;
+  findByUserId(userId: string): Promise<string[]>;
+  hasRole(userId: string, role: string): Promise<boolean>;
+  removeRole(userId: string, role: string): Promise<void>;
+}
+
+export const userRolesRepository: IUserRolesRepository = {
   /**
    * Add a role to a user (idempotent - doesn't error if already exists and not deleted)
    */
@@ -19,61 +27,36 @@ export const userRolesRepository = {
 
     if (existing) return existing;
 
-    // Check if it was soft-deleted, if so, reactivate it
-    const deleted = await db.query.userRoles.findFirst({
-      where: and(eq(userRoles.userId, userId), eq(userRoles.role, role)),
-    });
-
-    if (deleted) {
-      const [updated] = await db
-        .update(userRoles)
-        .set({ deletedAt: null, updatedAt: new Date() })
-        .where(eq(userRoles.id, deleted.id))
-        .returning();
-      if (!updated) throw new Error("Failed to reactivate role");
-      return updated;
-    }
-
-    // Add new role
     const [newRole] = await db.insert(userRoles).values({ role, userId }).returning();
-
     if (!newRole) throw new Error("Failed to add role");
     return newRole;
   },
 
-  /**
-   * Soft-delete all roles for a user
-   */
   async deleteAllRoles(userId: string): Promise<void> {
     await db.update(userRoles).set({ deletedAt: new Date() }).where(eq(userRoles.userId, userId));
   },
-  /**
-   * Get all active roles for a user
-   */
+
   async findByUserId(userId: string): Promise<string[]> {
-    const rows = await db
-      .select({ role: userRoles.role })
-      .from(userRoles)
-      .where(and(eq(userRoles.userId, userId), isNull(userRoles.deletedAt)));
-    return rows.map((r) => r.role);
+    const roles = await db.query.userRoles.findMany({
+      columns: { role: true },
+      where: and(eq(userRoles.userId, userId), isNull(userRoles.deletedAt)),
+    });
+    return roles.map((r) => r.role);
   },
 
-  /**
-   * Check if user has a specific active role
-   */
   async hasRole(userId: string, role: string): Promise<boolean> {
-    const result = await db.query.userRoles.findFirst({
+    const found = await db.query.userRoles.findFirst({
       where: and(
         eq(userRoles.userId, userId),
         eq(userRoles.role, role),
         isNull(userRoles.deletedAt)
       ),
     });
-    return !!result;
+    return !!found;
   },
 
   /**
-   * Remove (soft-delete) a role from a user
+   * Soft delete a role from a user
    */
   async removeRole(userId: string, role: string): Promise<void> {
     await db
