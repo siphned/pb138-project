@@ -1,8 +1,8 @@
 import { Separator } from "@/components/ui/separator";
-import type { GetCarts200ItemsItem } from "@/generated/model/getCarts200ItemsItem";
+import type { GetCarts200Item } from "@/generated/types/GetCarts";
 
 type CartSummaryProps = {
-  items: GetCarts200ItemsItem[];
+  items: GetCarts200Item[];
   deliveryType?: "pickup" | "shipping";
 };
 

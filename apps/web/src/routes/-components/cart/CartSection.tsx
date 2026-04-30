@@ -1,10 +1,10 @@
 import { useQueryClient } from "@tanstack/react-query";
 import {
-  invalidateGetCarts,
+  getCartsQueryKey,
   useDeleteCartsItemsByProductId,
   usePutCartsItemsByProductId,
-} from "@/generated/carts/carts";
-import type { GetCarts200 } from "@/generated/model/getCarts200";
+} from "@/generated";
+import type { GetCarts200 } from "@/generated/types/GetCarts";
 import { CartEmpty } from "./CartEmpty";
 import { CartItemRow } from "./CartItemRow";
 import { CartSummary } from "./CartSummary";
@@ -18,11 +18,19 @@ export function CartSection({ cart, deliveryType }: CartSectionProps) {
   const queryClient = useQueryClient();
 
   const updateQuantity = usePutCartsItemsByProductId({
-    mutation: { onSuccess: () => invalidateGetCarts(queryClient) },
+    mutation: {
+      onSuccess: () => {
+        queryClient.invalidateQueries({ queryKey: getCartsQueryKey() });
+      },
+    },
   });
 
   const removeItem = useDeleteCartsItemsByProductId({
-    mutation: { onSuccess: () => invalidateGetCarts(queryClient) },
+    mutation: {
+      onSuccess: () => {
+        queryClient.invalidateQueries({ queryKey: getCartsQueryKey() });
+      },
+    },
   });
 
   const handleQuantityChange = (productId: string, quantity: number) => {

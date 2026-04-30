@@ -3,9 +3,9 @@ import { useMemo, useRef } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useUser } from "@/context/UserContext";
-import type { GetCarts200 } from "@/generated/model/getCarts200";
-import { usePostOrdersCheckout } from "@/generated/orders/orders";
-import { useGetUsersMeAddresses } from "@/generated/users/users";
+import { useGetUsersMeAddresses, usePostOrdersCheckout } from "@/generated";
+import type { GetCarts200 } from "@/generated/types/GetCarts";
+import type { PostOrdersCheckout200 } from "@/generated/types/PostOrdersCheckout";
 import { AddressForm, type AddressFormValues } from "./AddressForm";
 
 type CheckoutSectionProps = {
@@ -70,7 +70,7 @@ export function CheckoutSection({ cart, onDeliveryTypeChange }: CheckoutSectionP
         },
       },
       {
-        onSuccess: (result) => {
+        onSuccess: (result: PostOrdersCheckout200) => {
           navigate({
             search: { orderId: result.id },
             to: "/checkout/confirmed",

@@ -65,7 +65,7 @@ function EventsPage() {
           </div>
         ) : (
           <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
-            {eventsList.map((event) => (
+            {eventsList.map((event: (typeof eventsList)[0]) => (
               <EventCard event={event} key={event.id} />
             ))}
           </div>

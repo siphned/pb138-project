@@ -88,26 +88,14 @@ describe("DashboardTabs", () => {
   });
 
   describe("Shop Owner Role", () => {
-    it("handles shop_owner role correctly", () => {
-      render(<DashboardTabs role={Role.shop_owner} />);
+    it("handles shopOwner role correctly", () => {
+      render(<DashboardTabs role={Role.shopOwner} />);
       expect(screen.getByText("Events")).toBeInTheDocument();
     });
 
     it("shows correct tabs for shop owner", () => {
-      render(<DashboardTabs role={Role.shop_owner} />);
+      render(<DashboardTabs role={Role.shopOwner} />);
       // Shop owner should have similar tabs to customer or winemaker
-      expect(screen.getByText("Events")).toBeInTheDocument();
-    });
-  });
-
-  describe("Admin Role", () => {
-    it("handles admin role correctly", () => {
-      render(<DashboardTabs role={Role.admin} />);
-      expect(screen.getByText("Events")).toBeInTheDocument();
-    });
-
-    it("shows Events tab for admin", () => {
-      render(<DashboardTabs role={Role.admin} />);
       expect(screen.getByText("Events")).toBeInTheDocument();
     });
   });
@@ -190,7 +178,7 @@ describe("DashboardTabs", () => {
 
   describe("Tab Rendering", () => {
     it("always renders Events tab regardless of role", () => {
-      const roles = [Role.customer, Role.winemaker, Role.admin, Role.shop_owner];
+      const roles = [Role.customer, Role.winemaker, Role.shopOwner];
 
       roles.forEach((role) => {
         const { unmount } = render(<DashboardTabs role={role} />);
