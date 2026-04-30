@@ -66,3 +66,7 @@ docs/figma/
 # Git Worktrees
 .worktrees/
 .claude/worktrees/
+
+# local image uploads
+apps/server/uploads/*
+!apps/server/uploads/.gitkeep
