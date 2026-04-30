@@ -2,6 +2,7 @@ import { cors } from "@elysiajs/cors";
 import { openapi } from "@elysiajs/openapi";
 import { Elysia } from "elysia";
 import { adminRoutes } from "./modules/admin";
+import { imagesRoutes } from "./modules/images";
 import { availabilityRoutes } from "./modules/availability";
 import { cartsRoutes } from "./modules/carts";
 import { eventsRoutes } from "./modules/events";
@@ -57,6 +58,7 @@ export const app = new Elysia()
           { description: "Platform administration and moderation", name: "admin" },
           { description: "Anonymous session management", name: "guest-sessions" },
           { description: "B2B supply relationship management", name: "supply-agreements" },
+          { description: "Image upload and management", name: "images" },
         ],
       },
       provider: "scalar",
@@ -76,4 +78,5 @@ export const app = new Elysia()
   .use(guestSessionsRoutes)
   .use(supplyAgreementsRoutes)
   .use(reviewsRoutes)
-  .use(adminRoutes);
+  .use(adminRoutes)
+  .use(imagesRoutes);
