@@ -50,10 +50,7 @@ export const reviewsRepository: IReviewsRepository = {
     return row?.avg !== null && row?.avg !== undefined ? Number.parseFloat(row.avg) : null;
   },
 
-  async countReviews(
-    entityId: string,
-    entityType: "product" | "winemaker"
-  ): Promise<number> {
+  async countReviews(entityId: string, entityType: "product" | "winemaker"): Promise<number> {
     const [row] = await db
       .select({ count: count() })
       .from(reviews)
@@ -78,13 +75,11 @@ export const reviewsRepository: IReviewsRepository = {
     entityType: "product" | "winemaker",
     opts: { limit: number; offset: number; sort: "newest" | "highest" | "lowest" }
   ): Promise<ReviewWithUser[]> {
-    let orderBy: (typeof reviews.$inferSelect)[];
+    let orderBy = [desc(reviews.createdAt)];
     if (opts.sort === "highest") {
       orderBy = [desc(reviews.rating), desc(reviews.createdAt)];
     } else if (opts.sort === "lowest") {
       orderBy = [asc(reviews.rating), desc(reviews.createdAt)];
-    } else {
-      orderBy = [desc(reviews.createdAt)];
     }
 
     return db.query.reviews.findMany({
