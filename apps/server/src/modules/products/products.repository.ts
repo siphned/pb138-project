@@ -379,7 +379,7 @@ export const productsRepository: IProductsRepository = {
     });
 
     if (product) {
-      const typedProduct = product as unknown as ProductWithWines;
+      const typedProduct = product as ProductWithWines;
       if (typedProduct.productWines) {
         typedProduct.productWines = typedProduct.productWines.filter(
           (pw) => pw.wine && !pw.wine.deletedAt
