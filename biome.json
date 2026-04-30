@@ -54,7 +54,7 @@
       "!**/.worktrees",
       "!**/raw",
       "!**/tsconfig*.json",
-      "!**/src/generated/**",
+      "!**/src/generated",
       "!**/routeTree.gen.ts"
     ]
   },
@@ -72,6 +72,7 @@
       "trailingCommas": "es5"
     },
     "globals": [
+      "Bun",
       "Cypress",
       "assert",
       "before",
@@ -290,6 +291,10 @@
       "linter": { "enabled": false },
       "formatter": { "enabled": false },
       "assist": { "enabled": false }
+    },
+    {
+      "includes": ["**/index.css"],
+      "css": { "linter": { "enabled": false }, "formatter": { "enabled": false } }
     }
   ],
   "vcs": {

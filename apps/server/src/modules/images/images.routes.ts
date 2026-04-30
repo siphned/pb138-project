@@ -11,6 +11,15 @@ import { imagesService } from "./images.service";
 
 const UPLOADS_DIR = fileURLToPath(new URL("../../../uploads", import.meta.url));
 
+function handleUploadError(e: unknown) {
+  if (e instanceof Error) {
+    if (e.message === "UNSUPPORTED_MEDIA_TYPE") return status(415, "Unsupported file type");
+    if (e.message === "PAYLOAD_TOO_LARGE") return status(413, "File too large");
+    if (e.message === "IMAGE_LIMIT_EXCEEDED") return status(409, "Image limit reached");
+  }
+  return handleError(e);
+}
+
 function buildImageRoutes(entityPlural: string, entityType: EntityType) {
   const requireRoles: AppRole[] =
     entityType === "shop" || entityType === "product"
@@ -22,6 +31,7 @@ function buildImageRoutes(entityPlural: string, entityType: EntityType) {
 
     .get(
       `/${entityPlural}/:id/images`,
+      // @ts-ignore - Elysia type inference issue with handleError returns
       async ({ params }) => {
         try {
           return await imagesService.listImages(entityType, params.id);
@@ -36,7 +46,12 @@ function buildImageRoutes(entityPlural: string, entityType: EntityType) {
           tags: ["images"],
         },
         params: t.Object({ id: t.String() }),
-        response: { 200: t.Array(imageResponse), 404: t.String() },
+        response: {
+          200: t.Array(imageResponse),
+          400: t.String(),
+          403: t.String(),
+          404: t.String(),
+        },
       }
     )
 
@@ -44,22 +59,15 @@ function buildImageRoutes(entityPlural: string, entityType: EntityType) {
       `/${entityPlural}/:id/images`,
       async ({ params, body, dbUser, clerkPayload }) => {
         try {
-          return status(
-            201,
-            await imagesService.uploadImage(
-              { roles: clerkPayload.roles ?? [], userId: dbUser.id },
-              entityType,
-              params.id,
-              body.file
-            )
+          const image = await imagesService.uploadImage(
+            { roles: clerkPayload.roles ?? [], userId: dbUser.id },
+            entityType,
+            params.id,
+            body.file
           );
+          return status(201, image);
         } catch (e) {
-          if (e instanceof Error) {
-            if (e.message === "UNSUPPORTED_MEDIA_TYPE") return status(415, "Unsupported file type");
-            if (e.message === "PAYLOAD_TOO_LARGE") return status(413, "File too large");
-            if (e.message === "IMAGE_LIMIT_EXCEEDED") return status(409, "Image limit reached");
-          }
-          return handleError(e);
+          return handleUploadError(e);
         }
       },
       {

@@ -214,11 +214,12 @@ async function main() {
   const shopRows: (typeof shops.$inferSelect)[] = [];
   for (let i = 0; i < wmOwners.length; i++) {
     const owner = wmOwners[i];
+    if (!owner) continue;
     const wm = await insertWinemaker(owner.id);
-    winemakerRows.push(wm);
+    if (wm) winemakerRows.push(wm);
     for (let s = 0; s < SHOPS_PER_WINEMAKER; s++) {
       const shop = await insertShop(owner.id);
-      shopRows.push(shop);
+      if (shop) shopRows.push(shop);
     }
     if ((i + 1) % 10 === 0) console.log(`Inserted winemakers+shops: ${i + 1}`);
   }
@@ -226,6 +227,7 @@ async function main() {
   // insert wines and products per winemaker/shop
   for (let i = 0; i < winemakerRows.length; i++) {
     const wm = winemakerRows[i];
+    if (!wm) continue;
     const wineRows = await insertWines(wm.id, WINES_PER_WINEMAKER);
     const shop = shopRows[i * SHOPS_PER_WINEMAKER];
     if (shop) {
@@ -237,6 +239,7 @@ async function main() {
   // insert events
   for (let i = 0; i < winemakerRows.length; i++) {
     const wm = winemakerRows[i];
+    if (!wm) continue;
     await insertEvents(wm.id, EVENTS_PER_WINEMAKER);
   }
 

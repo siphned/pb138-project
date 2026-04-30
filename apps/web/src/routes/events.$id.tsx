@@ -43,9 +43,9 @@ function EventDetailPage() {
     );
   }
 
-  const title = (event as any).title || (event as any).name || "Untitled Event";
-  const startDate = (event as any).startDate ? new Date((event as any).startDate) : null;
-  const endDate = (event as any).endDate ? new Date((event as any).endDate) : null;
+  const title = event?.title || event?.name || "Untitled Event";
+  const startDate = event?.startDate ? new Date(event.startDate) : null;
+  const endDate = event?.endDate ? new Date(event.endDate) : null;
 
   return (
     <PublicLayout>
@@ -92,12 +92,10 @@ function EventDetailPage() {
           {/* Main content */}
           <div className="lg:col-span-2 space-y-6">
             {/* Description */}
-            {(event as any).description && (
+            {event?.description && (
               <div className="space-y-3">
                 <h2 className="font-heading text-2xl font-bold">About This Event</h2>
-                <p className="leading-relaxed text-muted-foreground">
-                  {(event as any).description}
-                </p>
+                <p className="leading-relaxed text-muted-foreground">{event.description}</p>
               </div>
             )}
 
@@ -105,25 +103,23 @@ function EventDetailPage() {
 
             {/* Details grid */}
             <div className="grid grid-cols-2 gap-6">
-              {(event as any).location && (
+              {event?.location && (
                 <div className="space-y-2">
                   <div className="flex items-center gap-2">
                     <MapPin className="h-5 w-5 text-primary" />
                     <h3 className="font-semibold">Location</h3>
                   </div>
-                  <p className="text-muted-foreground">{(event as any).location}</p>
+                  <p className="text-muted-foreground">{event.location}</p>
                 </div>
               )}
 
-              {(event as any).attendees !== undefined && (
+              {event?.attendees !== undefined && (
                 <div className="space-y-2">
                   <div className="flex items-center gap-2">
                     <Users className="h-5 w-5 text-primary" />
                     <h3 className="font-semibold">Attendees</h3>
                   </div>
-                  <p className="text-muted-foreground">
-                    {(event as any).attendees} people attending
-                  </p>
+                  <p className="text-muted-foreground">{event.attendees} people attending</p>
                 </div>
               )}
             </div>
@@ -142,14 +138,14 @@ function EventDetailPage() {
             </div>
 
             {/* Winemaker info */}
-            {(event as any).winemakerName && (
+            {event?.winemakerName && (
               <div className="rounded-2xl border bg-card p-6">
                 <h3 className="font-heading text-lg font-bold mb-4">Hosted By</h3>
                 <div className="space-y-3">
-                  <p className="font-semibold text-primary">{(event as any).winemakerName}</p>
-                  {(event as any).winemakerId && (
+                  <p className="font-semibold text-primary">{event.winemakerName}</p>
+                  {event?.winemakerId && (
                     <Button asChild className="w-full" variant="outline">
-                      <Link params={{ id: (event as any).winemakerId }} to="/winemakers/$id">
+                      <Link params={{ id: event.winemakerId }} to="/winemakers/$id">
                         Visit Winemaker Profile
                       </Link>
                     </Button>

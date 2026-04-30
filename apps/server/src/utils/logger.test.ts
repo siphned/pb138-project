@@ -15,7 +15,7 @@ describe("Logger", () => {
       Logger.error("Test error", new Error("test"), { operation: "test", userId: "123" });
 
       expect(consoleErrorSpy).toHaveBeenCalled();
-      const call = consoleErrorSpy.mock.calls[0][0];
+      const call = consoleErrorSpy.mock.calls[0]?.[0];
       expect(call).toContain("[ERROR]");
       expect(call).toContain("Test error");
       expect(call).toContain("userId");
@@ -58,7 +58,7 @@ describe("Logger", () => {
       Logger.warn("Test warning");
 
       expect(consoleWarnSpy).toHaveBeenCalled();
-      const call = consoleWarnSpy.mock.calls[0][0];
+      const call = consoleWarnSpy.mock.calls[0]?.[0];
       expect(call).toContain("[WARN]");
       expect(call).toContain("Test warning");
 
@@ -75,7 +75,7 @@ describe("Logger", () => {
       Logger.info("Test info", { key: "value" });
 
       expect(consoleLogSpy).toHaveBeenCalled();
-      const call = consoleLogSpy.mock.calls[0][0];
+      const call = consoleLogSpy.mock.calls[0]?.[0];
       expect(call).toContain("[INFO]");
       expect(call).toContain("Test info");
 
@@ -92,7 +92,7 @@ describe("Logger", () => {
       Logger.debug("Test debug");
 
       expect(consoleLogSpy).toHaveBeenCalled();
-      const call = consoleLogSpy.mock.calls[0][0];
+      const call = consoleLogSpy.mock.calls[0]?.[0];
       expect(call).toContain("[DEBUG]");
 
       consoleLogSpy.mockRestore();
@@ -111,7 +111,7 @@ describe("Logger", () => {
         userId: "user123",
       });
 
-      const call = consoleErrorSpy.mock.calls[0][0];
+      const call = consoleErrorSpy.mock.calls[0]?.[0];
       expect(call).toContain("userId");
       expect(call).toContain("operation");
       expect(call).toContain("orderId");

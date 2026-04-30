@@ -1,6 +1,6 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
+import { ArrowRight, Calendar, Package } from "lucide-react";
 import { z } from "zod";
-import { Package, ArrowRight, Calendar } from "lucide-react";
 import { AuthLayout } from "@/components/layout/AuthLayout";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -53,8 +53,6 @@ function OrderDetailView({ orderId }: { orderId: string }) {
     );
   }
 
-  const orderData = order as any;
-
   return (
     <AuthLayout>
       <div className="container mx-auto max-w-2xl p-8 space-y-6">
@@ -77,14 +75,14 @@ function OrderDetailView({ orderId }: { orderId: string }) {
             <div className="flex items-center justify-between">
               <span className="text-muted-foreground">Status</span>
               <span className="inline-block rounded-full bg-blue-100 px-3 py-1 text-sm font-medium text-blue-900 capitalize">
-                {orderData.status || "Pending"}
+                {String(order?.status || "Pending")}
               </span>
             </div>
             <Separator />
             <div className="flex items-center justify-between">
               <span className="text-muted-foreground">Payment Status</span>
               <span className="inline-block rounded-full bg-yellow-100 px-3 py-1 text-sm font-medium text-yellow-900 capitalize">
-                {orderData.paymentStatus || "Pending"}
+                {String(order?.paymentStatus || "Pending")}
               </span>
             </div>
           </CardContent>
@@ -96,41 +94,50 @@ function OrderDetailView({ orderId }: { orderId: string }) {
             <CardTitle>Order Summary</CardTitle>
           </CardHeader>
           <CardContent className="space-y-3">
-            {orderData.items && Array.isArray(orderData.items) && (
+            {Array.isArray(order?.items) && (
               <div className="space-y-2">
-                {orderData.items.map((item: any, i: number) => (
-                  <div key={i} className="flex justify-between text-sm">
-                    <span>
-                      {item.product?.name || "Product"} x {item.quantity}
-                    </span>
-                    <span className="font-medium">
-                      €{(Number(item.unitPriceAtPurchase) * item.quantity).toFixed(2)}
-                    </span>
-                  </div>
-                ))}
+                {order.items.map(
+                  (
+                    item: {
+                      product?: { name?: string };
+                      unitPriceAtPurchase?: string;
+                      quantity?: number;
+                    },
+                    i: number
+                  ) => (
+                    <div className="flex justify-between text-sm" key={i}>
+                      <span>
+                        {item.product?.name || "Product"} x {item.quantity}
+                      </span>
+                      <span className="font-medium">
+                        €{(Number(item.unitPriceAtPurchase) * item.quantity).toFixed(2)}
+                      </span>
+                    </div>
+                  )
+                )}
               </div>
             )}
             <Separator />
             <div className="flex justify-between font-bold">
               <span>Total</span>
-              <span>€{Number(orderData.totalPrice || 0).toFixed(2)}</span>
+              <span>€{Number(order?.totalPrice || 0).toFixed(2)}</span>
             </div>
           </CardContent>
         </Card>
 
         {/* Shipping Address */}
-        {orderData.shippingAddress && (
+        {order?.shippingAddress && (
           <Card>
             <CardHeader>
               <CardTitle>Shipping Address</CardTitle>
             </CardHeader>
             <CardContent className="text-sm space-y-1">
-              <p>{orderData.shippingAddress.street}</p>
-              <p>{orderData.shippingAddress.houseNumber}</p>
+              <p>{order.shippingAddress.street}</p>
+              <p>{order.shippingAddress.houseNumber}</p>
               <p>
-                {orderData.shippingAddress.city}, {orderData.shippingAddress.postalCode}
+                {order.shippingAddress.city}, {order.shippingAddress.postalCode}
               </p>
-              <p>{orderData.shippingAddress.country}</p>
+              <p>{order.shippingAddress.country}</p>
             </CardContent>
           </Card>
         )}
@@ -145,9 +152,7 @@ function OrderHistoryView() {
       <div className="container mx-auto max-w-4xl p-8 space-y-6">
         <div>
           <h1 className="font-heading text-3xl font-bold">Order History</h1>
-          <p className="text-muted-foreground mt-2">
-            View and manage your orders and shipments
-          </p>
+          <p className="text-muted-foreground mt-2">View and manage your orders and shipments</p>
         </div>
 
         <Card>

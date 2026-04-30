@@ -71,7 +71,9 @@ export class ImagesService {
         url: `/uploads/${entityType}/${filename}`,
       });
     } catch (e) {
-      await unlink(filePath).catch(() => {});
+      await unlink(filePath).catch(() => {
+        /* Ignore cleanup errors */
+      });
       throw e;
     }
   }

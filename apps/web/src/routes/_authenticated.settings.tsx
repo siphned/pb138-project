@@ -1,7 +1,7 @@
-import { createFileRoute } from "@tanstack/react-router";
-import { useEffect, useState } from "react";
 import { useUser } from "@clerk/react";
-import { Mail, MapPin, Phone, User, LogOut } from "lucide-react";
+import { createFileRoute } from "@tanstack/react-router";
+import { LogOut, Mail, User } from "lucide-react";
+import { useEffect, useState } from "react";
 import { AuthLayout } from "@/components/layout/AuthLayout";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -17,17 +17,17 @@ function SettingsPage() {
   const { user, isLoaded } = useUser();
   const [editMode, setEditMode] = useState(false);
   const [formData, setFormData] = useState({
+    email: "",
     firstName: "",
     lastName: "",
-    email: "",
   });
 
   useEffect(() => {
     if (isLoaded && user) {
       setFormData({
+        email: user.primaryEmailAddress?.emailAddress || "",
         firstName: user.firstName || "",
         lastName: user.lastName || "",
-        email: user.primaryEmailAddress?.emailAddress || "",
       });
     }
   }, [isLoaded, user]);
@@ -53,8 +53,8 @@ function SettingsPage() {
         lastName: formData.lastName,
       });
       setEditMode(false);
-    } catch (error) {
-      console.error("Failed to update profile:", error);
+    } catch {
+      // Silently fail - user stays in edit mode to retry
     }
   };
 
@@ -79,7 +79,7 @@ function SettingsPage() {
                 </CardTitle>
               </div>
               {!editMode && (
-                <Button onClick={() => setEditMode(true)} variant="outline" size="sm">
+                <Button onClick={() => setEditMode(true)} size="sm" variant="outline">
                   Edit
                 </Button>
               )}
@@ -148,7 +148,7 @@ function SettingsPage() {
                       Receive updates about your orders and account
                     </p>
                   </div>
-                  <input type="checkbox" defaultChecked className="h-5 w-5" />
+                  <input className="h-5 w-5" defaultChecked type="checkbox" />
                 </div>
 
                 <Separator />
@@ -160,7 +160,7 @@ function SettingsPage() {
                       Get notified about new wine events and tastings
                     </p>
                   </div>
-                  <input type="checkbox" defaultChecked className="h-5 w-5" />
+                  <input className="h-5 w-5" defaultChecked type="checkbox" />
                 </div>
               </div>
             </CardContent>
