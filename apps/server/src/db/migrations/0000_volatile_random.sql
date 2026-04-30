@@ -162,8 +162,10 @@ CREATE TABLE "events" (
 --> statement-breakpoint
 CREATE TABLE "guest_sessions" (
 	"created_at" timestamp with time zone DEFAULT now() NOT NULL,
+	"deleted_at" timestamp with time zone,
 	"expires_at" timestamp with time zone NOT NULL,
-	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL
+	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
+	"updated_at" timestamp with time zone
 );
 --> statement-breakpoint
 CREATE TABLE "images" (
@@ -240,6 +242,7 @@ CREATE TABLE "role_requests" (
 	"status" "role_request_status" DEFAULT 'pending' NOT NULL,
 	"submitted_at" timestamp with time zone DEFAULT now() NOT NULL,
 	"type" "role_request_type" NOT NULL,
+	"updated_at" timestamp with time zone,
 	"user_id" uuid NOT NULL
 );
 --> statement-breakpoint
@@ -276,6 +279,7 @@ CREATE TABLE "supply_agreements" (
 	"responded_at" timestamp with time zone,
 	"shop_id" uuid NOT NULL,
 	"status" "supply_agreement_status" DEFAULT 'pending' NOT NULL,
+	"updated_at" timestamp with time zone,
 	"winemaker_id" uuid NOT NULL
 );
 --> statement-breakpoint

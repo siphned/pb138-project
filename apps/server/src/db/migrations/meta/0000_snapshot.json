@@ -85,7 +85,7 @@
       "values": ["still", "sparkling", "fortified", "dessert"]
     }
   },
-  "id": "00f11374-1558-43a0-b7a7-94b6a5a01bf5",
+  "id": "503eb6e0-c246-44f7-b472-9941f900d908",
   "policies": {},
   "prevId": "00000000-0000-0000-0000-000000000000",
   "roles": {},
@@ -956,6 +956,12 @@
           "primaryKey": false,
           "type": "timestamp with time zone"
         },
+        "deleted_at": {
+          "name": "deleted_at",
+          "notNull": false,
+          "primaryKey": false,
+          "type": "timestamp with time zone"
+        },
         "expires_at": {
           "name": "expires_at",
           "notNull": true,
@@ -968,6 +974,12 @@
           "notNull": true,
           "primaryKey": true,
           "type": "uuid"
+        },
+        "updated_at": {
+          "name": "updated_at",
+          "notNull": false,
+          "primaryKey": false,
+          "type": "timestamp with time zone"
         }
       },
       "compositePrimaryKeys": {},
@@ -1594,6 +1606,12 @@
           "type": "role_request_type",
           "typeSchema": "public"
         },
+        "updated_at": {
+          "name": "updated_at",
+          "notNull": false,
+          "primaryKey": false,
+          "type": "timestamp with time zone"
+        },
         "user_id": {
           "name": "user_id",
           "notNull": true,
@@ -1753,6 +1771,12 @@
           "primaryKey": false,
           "type": "supply_agreement_status",
           "typeSchema": "public"
+        },
+        "updated_at": {
+          "name": "updated_at",
+          "notNull": false,
+          "primaryKey": false,
+          "type": "timestamp with time zone"
         },
         "winemaker_id": {
           "name": "winemaker_id",

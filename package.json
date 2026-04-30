@@ -29,6 +29,10 @@
     "format": "biome format --write .",
     "generate": "turbo run generate",
     "lint": "biome lint .",
+    "db:generate": "turbo run db:generate --filter=server",
+    "db:migrate": "turbo run db:migrate --filter=server",
+    "db:seed": "turbo run db:seed --filter=server",
+    "db:studio": "turbo run db:studio --filter=server",
     "test": "turbo run test",
     "test:e2e": "turbo run test:e2e",
     "validate": "bun run lint && turbo run db:check && bun run generate && (git diff --exit-code openapi.json > /dev/null || (echo '❌ OpenAPI schema drift! Run generate and commit changes.' && exit 1)) && bun run check-types && bun run test && bun run build"

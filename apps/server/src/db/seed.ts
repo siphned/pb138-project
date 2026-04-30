@@ -5,18 +5,26 @@
 import { faker } from "@faker-js/faker";
 import {
   addresses,
+  availabilityExceptions,
   availabilityRegular,
   cartItems,
   carts,
   comments,
+  eventComments,
+  eventInvitations,
+  eventRegistrations,
   events,
+  guestSessions,
+  images,
   orderItems,
   orders,
-  products,
   productWines,
+  products,
   reviews,
   roleRequests,
   shops,
+  supplyAgreements,
+  userRoles,
   users,
   winemakers,
   wines,
@@ -47,6 +55,10 @@ function pick<T>(arr: T[]): T {
 }
 
 async function teardown() {
+  // Delete in correct FK dependency order (children first)
+  await db.delete(eventComments);
+  await db.delete(eventInvitations);
+  await db.delete(eventRegistrations);
   await db.delete(comments);
   await db.delete(reviews);
   await db.delete(orderItems);
@@ -54,13 +66,18 @@ async function teardown() {
   await db.delete(cartItems);
   await db.delete(carts);
   await db.delete(availabilityRegular);
+  await db.delete(availabilityExceptions);
   await db.delete(productWines);
   await db.delete(products);
+  await db.delete(supplyAgreements);
   await db.delete(events);
   await db.delete(wines);
   await db.delete(roleRequests);
+  await db.delete(userRoles);
   await db.delete(shops);
   await db.delete(winemakers);
+  await db.delete(guestSessions);
+  await db.delete(images);
   await db.delete(users);
   await db.delete(addresses);
 }
@@ -77,9 +94,7 @@ async function insertUser(override: { fname: string; lname: string }) {
     .insert(users)
     .values({
       clerkId: clerkId(),
-      email: faker.internet
-        .email({ firstName: override.fname, lastName: override.lname })
-        .toLowerCase(),
+      email: faker.internet.email({ firstName: override.fname, lastName: override.lname }).toLowerCase(),
       fname: override.fname,
       lname: override.lname,
       shippingAddressId: addr.id,
@@ -144,24 +159,24 @@ async function insertWines(winemakerId: string, count: number) {
 }
 
 async function insertProductsForShop(shopId: string, wineRows: (typeof wines.$inferSelect)[]) {
-  const productsList = [];
-  for (const wine of wineRows) {
-    const [product] = await db
-      .insert(products)
-      .values({
-        isBundle: false,
-        name: wine.name,
-        price: "15.00",
-        quantity: 50,
-        shopId,
-      })
-      .returning();
-    if (product) {
-      await db.insert(productWines).values({ productId: product.id, quantity: 1, wineId: wine.id });
-      productsList.push(product);
-    }
-  }
-  return productsList;
+  const productsToInsert = wineRows.map((wine) => ({
+    isBundle: false,
+    name: wine.name,
+    price: "15.00",
+    quantity: 50,
+    shopId,
+  }));
+
+  const insertedProducts = await db.insert(products).values(productsToInsert).returning();
+
+  const productWinesToInsert = insertedProducts.map((product, idx) => ({
+    productId: product.id,
+    quantity: 1,
+    wineId: wineRows[idx]!.id,
+  }));
+
+  await db.insert(productWines).values(productWinesToInsert);
+  return insertedProducts;
 }
 
 async function insertEvents(winemakerId: string, count: number) {

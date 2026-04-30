@@ -1,9 +1,8 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
-import type { ClerkPayload } from "../auth/auth.utils";
 
 const { mockGetUser, mockUpdateUser, mockUpdateUserMetadata } = vi.hoisted(() => ({
   mockGetUser: vi.fn(),
-  mockUpdateUser: vi.fn(),
+  mockUpdateUser: vi.fn().mockResolvedValue({}),
   mockUpdateUserMetadata: vi.fn(),
 }));
 
@@ -50,18 +49,13 @@ describe("usersService", () => {
   });
 
   const clerkId = "user_123";
-  const payload = (roles: string[]) =>
-    ({
-      roles,
-      sub: clerkId,
-    }) as unknown as ClerkPayload;
 
   describe("lazyGetOrCreate", () => {
     it("returns the existing user and never calls Clerk when the user is already in the DB", async () => {
       const existingUser = { clerkId, id: "uuid" };
       vi.mocked(usersRepository.findByClerkId).mockResolvedValue(existingUser as never);
 
-      const result = await usersService.lazyGetOrCreate(clerkId, payload(["customer"]));
+      const result = await usersService.lazyGetOrCreate(clerkId);
 
       expect(result).toBe(existingUser);
       expect(mockGetUser).not.toHaveBeenCalled();
@@ -77,7 +71,7 @@ describe("usersService", () => {
       });
       vi.mocked(usersRepository.upsert).mockResolvedValue({ id: "new-uuid" } as never);
 
-      await usersService.lazyGetOrCreate(clerkId, payload(["customer"]));
+      await usersService.lazyGetOrCreate(clerkId);
 
       expect(mockGetUser).toHaveBeenCalledWith(clerkId);
       expect(usersRepository.upsert).toHaveBeenCalled();
@@ -93,7 +87,7 @@ describe("usersService", () => {
       });
       vi.mocked(usersRepository.upsert).mockResolvedValue({ id: "new-uuid" } as never);
 
-      await usersService.lazyGetOrCreate(clerkId, payload([]));
+      await usersService.lazyGetOrCreate(clerkId);
 
       expect(mockUpdateUser).toHaveBeenCalledWith(clerkId, {
         publicMetadata: { roles: ["customer"] },
@@ -106,7 +100,7 @@ describe("usersService", () => {
         emailAddresses: [],
       });
 
-      await expect(usersService.lazyGetOrCreate(clerkId, payload([]))).rejects.toThrow(
+      await expect(usersService.lazyGetOrCreate(clerkId)).rejects.toThrow(
         "Clerk user has no email address"
       );
     });
