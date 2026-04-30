@@ -48,7 +48,7 @@ export function Sidebar({ userRoles = [Role.customer], activeRole, onRoleChange 
   const hasMultipleRoles = userRoles.length > 1;
 
   const handleLogout = async () => {
-    await signOut();
+    await signOut({ redirectUrl: "/" });
     navigate({ to: "/" });
   };
 
@@ -176,6 +176,34 @@ export function Sidebar({ userRoles = [Role.customer], activeRole, onRoleChange 
             >
               <Calendar className="h-4 w-4" /> Events
             </Link>
+
+            <Show when="signed-in">
+              {currentActiveRole === Role.customer && (
+                <Link
+                  className="flex-none flex items-center gap-3 px-3 py-3 rounded-md bg-secondary hover:bg-secondary/80 transition-colors text-sm font-medium text-primary"
+                  to="/orders"
+                >
+                  <Package className="h-4 w-4" /> Order History
+                </Link>
+              )}
+
+              {currentActiveRole !== Role.customer && (
+                <>
+                  <Link
+                    className="flex-none flex items-center gap-3 px-3 py-3 rounded-md bg-secondary hover:bg-secondary/80 transition-colors text-sm font-medium text-primary"
+                    to="/shops"
+                  >
+                    <Wine className="h-4 w-4" /> My Wines
+                  </Link>
+                  <Link
+                    className="flex-none flex items-center gap-3 px-3 py-3 rounded-md bg-secondary hover:bg-secondary/80 transition-colors text-sm font-medium text-primary"
+                    to="/shops"
+                  >
+                    <Package className="h-4 w-4" /> Bundles
+                  </Link>
+                </>
+              )}
+            </Show>
 
             <Show when="signed-in">
               <button

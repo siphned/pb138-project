@@ -11,9 +11,10 @@ import { CartSummary } from "./CartSummary";
 
 type CartSectionProps = {
   cart: GetCarts200 | null;
+  deliveryType?: "pickup" | "shipping";
 };
 
-export function CartSection({ cart }: CartSectionProps) {
+export function CartSection({ cart, deliveryType }: CartSectionProps) {
   const queryClient = useQueryClient();
 
   const updateQuantity = usePutCartsItemsByProductId({
@@ -58,7 +59,7 @@ export function CartSection({ cart }: CartSectionProps) {
               />
             ))}
           </div>
-          <CartSummary items={cart.items} />
+          <CartSummary deliveryType={deliveryType} items={cart.items} />
         </>
       )}
     </div>

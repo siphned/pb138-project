@@ -3,10 +3,11 @@ import type { GetCarts200ItemsItem } from "@/generated/model/getCarts200ItemsIte
 
 type CartSummaryProps = {
   items: GetCarts200ItemsItem[];
+  deliveryType?: "pickup" | "shipping";
 };
 
-export function CartSummary({ items }: CartSummaryProps) {
-  const deliveryCost = 42.0;
+export function CartSummary({ items, deliveryType = "shipping" }: CartSummaryProps) {
+  const deliveryCost = deliveryType === "pickup" ? 0.0 : 15.0; // Changed from hardcoded 42.0
   const subtotal = items.reduce((acc, item) => {
     const price = Number.parseFloat(item.product.price);
     const quantity = Number(item.quantity);

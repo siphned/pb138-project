@@ -26,6 +26,8 @@ export const addressFormSchema = z.object({
   city: z.string().min(1, "Required"),
   country: z.string().min(1, "Required"),
   deliveryType: z.enum(["pickup", "shipping"]),
+  guestEmail: z.string().email("Invalid email").optional().or(z.literal("")),
+  guestName: z.string().optional(),
   houseNumber: z.string().min(1, "Required"),
   paymentMethod: z.enum(["card", "bank_transfer", "cash_on_delivery"]),
   postalCode: z.string().min(1, "Required"),
@@ -38,16 +40,20 @@ type AddressFormProps = {
   defaultValues?: Partial<AddressFormValues>;
   onSubmit: (values: AddressFormValues) => void;
   isSubmitting: boolean;
+  showGuestFields?: boolean;
+  onDeliveryTypeChange?: (type: "pickup" | "shipping") => void;
 };
 
 export const AddressForm = forwardRef<HTMLFormElement, AddressFormProps>(
-  ({ defaultValues, onSubmit, isSubmitting }, ref) => {
+  ({ defaultValues, onSubmit, isSubmitting, showGuestFields, onDeliveryTypeChange }, ref) => {
     const form = useForm<AddressFormValues>({
       defaultValues: {
         billingAddressSameAsShipping: true,
         city: "",
         country: "",
         deliveryType: "shipping",
+        guestEmail: "",
+        guestName: "",
         houseNumber: "",
         paymentMethod: "card",
         postalCode: "",
@@ -60,6 +66,44 @@ export const AddressForm = forwardRef<HTMLFormElement, AddressFormProps>(
     return (
       <Form {...form}>
         <form className="space-y-6" onSubmit={form.handleSubmit(onSubmit)} ref={ref}>
+          {/* Guest Fields */}
+          {showGuestFields && (
+            <div className="space-y-4">
+              <h4 className="text-sm font-medium">Guest Information</h4>
+              <div className="grid grid-cols-2 gap-4">
+                <FormField
+                  control={form.control}
+                  name="guestName"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormControl>
+                        <Input placeholder="Full Name" {...field} disabled={isSubmitting} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={form.control}
+                  name="guestEmail"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormControl>
+                        <Input
+                          placeholder="Email Address"
+                          type="email"
+                          {...field}
+                          disabled={isSubmitting}
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              </div>
+            </div>
+          )}
+
           {/* Delivery Method */}
           <FormField
             control={form.control}
@@ -68,7 +112,13 @@ export const AddressForm = forwardRef<HTMLFormElement, AddressFormProps>(
               <FormItem>
                 <FormLabel>Delivery Method</FormLabel>
                 <FormControl>
-                  <DeliveryMethodToggle onChange={field.onChange} value={field.value} />
+                  <DeliveryMethodToggle
+                    onChange={(val) => {
+                      field.onChange(val);
+                      onDeliveryTypeChange?.(val);
+                    }}
+                    value={field.value}
+                  />
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -164,7 +214,7 @@ export const AddressForm = forwardRef<HTMLFormElement, AddressFormProps>(
                     </SelectTrigger>
                   </FormControl>
                   <SelectContent>
-                    <SelectItem value="card_payment">Card payment</SelectItem>
+                    <SelectItem value="card">Card payment</SelectItem>
                     <SelectItem value="bank_transfer">Bank Transfer</SelectItem>
                     <SelectItem value="cash_on_delivery">Cash on Delivery</SelectItem>
                   </SelectContent>

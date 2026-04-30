@@ -2,6 +2,7 @@ import { useNavigate } from "@tanstack/react-router";
 import { useMemo, useRef } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { useUser } from "@/context/UserContext";
 import type { GetCarts200 } from "@/generated/model/getCarts200";
 import { usePostOrdersCheckout } from "@/generated/orders/orders";
 import { useGetUsersMeAddresses } from "@/generated/users/users";
@@ -9,11 +10,13 @@ import { AddressForm, type AddressFormValues } from "./AddressForm";
 
 type CheckoutSectionProps = {
   cart: GetCarts200 | null;
+  onDeliveryTypeChange?: (type: "pickup" | "shipping") => void;
 };
 
-export function CheckoutSection({ cart }: CheckoutSectionProps) {
+export function CheckoutSection({ cart, onDeliveryTypeChange }: CheckoutSectionProps) {
   const navigate = useNavigate();
   const formRef = useRef<HTMLFormElement>(null);
+  const { user } = useUser();
 
   const { data: userAddresses } = useGetUsersMeAddresses();
   const checkout = usePostOrdersCheckout();
@@ -54,6 +57,8 @@ export function CheckoutSection({ cart }: CheckoutSectionProps) {
                 street: values.street,
               },
           deliveryType: values.deliveryType,
+          guestEmail: values.guestEmail || undefined,
+          guestName: values.guestName || undefined,
           paymentMethod: values.paymentMethod,
           shippingAddress: {
             city: values.city,
@@ -79,29 +84,30 @@ export function CheckoutSection({ cart }: CheckoutSectionProps) {
 
   return (
     <div className="flex flex-col gap-3">
-    <CardTitle className="font-heading text-2xl ">Checkout</CardTitle>
-     <Card className="h-fit">
-      <CardHeader>
-      </CardHeader>
-      <CardContent className="flex flex-col gap-6">
-        <AddressForm
-          defaultValues={defaultAddressValues}
-          isSubmitting={checkout.isPending}
-          onSubmit={handleSubmit}
-          ref={formRef}
-        />
-        <Button
-          className="w-full"
-          disabled={isCartEmpty || checkout.isPending}
-          onClick={() => formRef.current?.requestSubmit()}
-        >
-          {checkout.isPending ? "Processing..." : `Confirm Order — €${total.toFixed(2)}`}
-        </Button>
-        <p className="text-center text-xs text-muted-foreground">
-          By purchasing you agree to our Terms of Service and Privacy Policy.
-        </p>
-      </CardContent>
-    </Card>
+      <CardTitle className="font-heading text-2xl ">Checkout</CardTitle>
+      <Card className="h-fit">
+        <CardHeader />
+        <CardContent className="flex flex-col gap-6">
+          <AddressForm
+            defaultValues={defaultAddressValues}
+            isSubmitting={checkout.isPending}
+            onDeliveryTypeChange={onDeliveryTypeChange}
+            onSubmit={handleSubmit}
+            ref={formRef}
+            showGuestFields={!user}
+          />
+          <Button
+            className="w-full"
+            disabled={isCartEmpty || checkout.isPending}
+            onClick={() => formRef.current?.requestSubmit()}
+          >
+            {checkout.isPending ? "Processing..." : `Confirm Order — €${total.toFixed(2)}`}
+          </Button>
+          <p className="text-center text-xs text-muted-foreground">
+            By purchasing you agree to our Terms of Service and Privacy Policy.
+          </p>
+        </CardContent>
+      </Card>
     </div>
   );
 }

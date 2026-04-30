@@ -1,40 +1,53 @@
+import { useClerk } from "@clerk/react";
 import { render, screen } from "@testing-library/react";
 import { describe, expect, it, vi } from "vitest";
 import { UserInfoCard } from "../components/dashboard/UserInfoCard";
-import { useUser } from "../context/UserContext";
 
-// Mock the context
-vi.mock("../context/UserContext", async () => {
-  const actual = await vi.importActual("../context/UserContext");
-  return {
-    ...actual,
-    useUser: vi.fn(),
-  };
-});
+vi.mock("@clerk/react", () => ({
+  useClerk: vi.fn(),
+}));
+
+vi.mock("../context/UserContext", () => ({
+  useUser: vi.fn(),
+}));
+
+// Mock Dialog to avoid potential issues with Radix UI
+vi.mock("@/components/ui/dialog", () => ({
+  Dialog: ({ children }: { children: React.ReactNode }) => <div>{children}</div>,
+  DialogContent: ({ children }: { children: React.ReactNode }) => <div>{children}</div>,
+  DialogTrigger: ({ render }: { render: React.ReactNode }) => <div>{render}</div>,
+}));
+
+// Mock ProfileEditForm
+vi.mock("../components/dashboard/ProfileEditForm", () => ({
+  ProfileEditForm: () => <div>ProfileEditForm</div>,
+}));
 
 describe("UserInfoCard", () => {
-  it("renders nothing when user is null", () => {
-    vi.mocked(useUser).mockReturnValue({ loading: false, refetch: vi.fn(), user: null } as never);
-    const { container } = render(<UserInfoCard />);
-    expect(container.firstChild).toBeNull();
+  it("renders default 'User' when clerk user is null", () => {
+    vi.mocked(useClerk).mockReturnValue({
+      user: null,
+    } as any);
+
+    render(<UserInfoCard />);
+    expect(screen.getByText("User")).toBeInTheDocument();
   });
 
   it("renders user information correctly", () => {
-    const mockUser = {
-      email: "john@example.com",
-      fname: "John",
-      lname: "Doe",
-    };
-    vi.mocked(useUser).mockReturnValue({
-      loading: false,
-      refetch: vi.fn(),
-      user: mockUser,
-    } as never);
+    vi.mocked(useClerk).mockReturnValue({
+      user: {
+        emailAddresses: [{ emailAddress: "john@example.com" }],
+        firstName: "John",
+        fullName: "John Doe",
+        imageUrl: "http://example.com/image.jpg",
+        lastName: "Doe",
+      },
+    } as any);
 
     render(<UserInfoCard />);
 
-    expect(screen.getByText("John Doe")).toBeDefined();
-    expect(screen.getByText("john@example.com")).toBeDefined();
-    expect(screen.getByText("JD")).toBeDefined(); // initials
+    expect(screen.getByText("John Doe")).toBeInTheDocument();
+    expect(screen.getByText("john@example.com")).toBeInTheDocument();
+    expect(screen.getByText("JO")).toBeInTheDocument(); // initials
   });
 });
