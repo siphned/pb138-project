@@ -8,6 +8,13 @@ import { imagesRepository } from "./images.repository";
 const UPLOADS_DIR = fileURLToPath(new URL("../../../uploads", import.meta.url));
 const ALLOWED_MIME_TYPES = ["image/jpeg", "image/png", "image/webp", "image/gif"] as const;
 const MAX_FILE_SIZE = 10 * 1024 * 1024;
+const IMAGE_LIMITS: Record<string, number> = {
+  event: 10,
+  product: 10,
+  shop: 10,
+  wine: 10,
+  winemaker: 10,
+};
 
 type Caller = { roles: string[]; userId: string };
 
@@ -32,6 +39,10 @@ export class ImagesService {
     if (!caller.roles.includes("admin")) {
       await this.verifyOwnership(caller.userId, entityType, entityId);
     }
+
+    const limit = IMAGE_LIMITS[entityType] ?? 10;
+    const currentCount = await this.repo.countByEntity(entityType, entityId);
+    if (currentCount >= limit) throw new Error("IMAGE_LIMIT_EXCEEDED");
 
     const mimeToExt: Record<string, string> = {
       "image/gif": "gif",

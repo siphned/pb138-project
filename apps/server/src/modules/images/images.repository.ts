@@ -1,11 +1,12 @@
 import type { Image } from "@repo/shared/schemas";
 import { events, images, products, shops, winemakers, wines } from "@repo/shared/schemas";
-import { and, eq, isNull } from "drizzle-orm";
+import { and, count, eq, isNull } from "drizzle-orm";
 import { db } from "../../db";
 
 export type EntityType = "event" | "product" | "shop" | "wine" | "winemaker";
 
 export interface IImagesRepository {
+  countByEntity(entityType: EntityType, entityId: string): Promise<number>;
   entityExists(entityType: EntityType, entityId: string): Promise<boolean>;
   findByEntity(entityType: EntityType, entityId: string): Promise<Image[]>;
   findById(id: string): Promise<Image | undefined>;
@@ -53,6 +54,16 @@ export const imagesRepository: IImagesRepository = {
         return !!r;
       }
     }
+  },
+
+  async countByEntity(entityType, entityId) {
+    const [result] = await db
+      .select({ value: count() })
+      .from(images)
+      .where(
+        and(eq(images.entityType, entityType), eq(images.entityId, entityId), isNull(images.deletedAt))
+      );
+    return result?.value ?? 0;
   },
 
   findByEntity(entityType, entityId) {

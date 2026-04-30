@@ -13,6 +13,11 @@ interface MockChained {
 vi.mock("../../db", () => {
   const m = {
     insert: vi.fn().mockReturnThis(),
+    select: vi.fn().mockReturnValue({
+      from: vi.fn().mockReturnValue({
+        where: vi.fn().mockResolvedValue([{ value: 3 }]),
+      }),
+    }),
     query: {
       events: { findFirst: vi.fn() },
       images: { findFirst: vi.fn(), findMany: vi.fn() },
@@ -55,6 +60,14 @@ describe("insert", () => {
     await expect(
       imagesRepository.insert({ entityId, entityType: "wine", url: "/uploads/wine/uuid.jpg" })
     ).rejects.toThrow("Image insert returned no rows");
+  });
+});
+
+describe("countByEntity", () => {
+  it("returns count of non-deleted images for entity", async () => {
+    const result = await imagesRepository.countByEntity("wine", entityId);
+    expect(result).toBe(3);
+    expect(db.select).toHaveBeenCalled();
   });
 });
 

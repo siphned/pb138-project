@@ -56,6 +56,7 @@ function buildImageRoutes(entityPlural: string, entityType: EntityType) {
           if (e instanceof Error) {
             if (e.message === "UNSUPPORTED_MEDIA_TYPE") return status(415, "Unsupported file type");
             if (e.message === "PAYLOAD_TOO_LARGE") return status(413, "File too large");
+            if (e.message === "IMAGE_LIMIT_EXCEEDED") return status(409, "Image limit reached");
           }
           return handleError(e);
         }
@@ -74,6 +75,7 @@ function buildImageRoutes(entityPlural: string, entityType: EntityType) {
           201: imageResponse,
           403: t.String(),
           404: t.String(),
+          409: t.String(),
           413: t.String(),
           415: t.String(),
         },

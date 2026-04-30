@@ -3,6 +3,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 vi.mock("./images.repository", () => ({
   imagesRepository: {
+    countByEntity: vi.fn(),
     entityExists: vi.fn(),
     findByEntity: vi.fn(),
     findById: vi.fn(),
@@ -66,6 +67,7 @@ describe("uploadImage", () => {
   it("uploads image for entity owner", async () => {
     vi.mocked(imagesRepository.entityExists).mockResolvedValue(true);
     vi.mocked(imagesRepository.findOwnerUserId).mockResolvedValue(userId);
+    vi.mocked(imagesRepository.countByEntity).mockResolvedValue(0);
     vi.mocked(imagesRepository.insert).mockResolvedValue(mockImage as never);
 
     await imagesService.uploadImage({ roles: ["winemaker"], userId }, "wine", entityId, makeFile());
@@ -77,6 +79,7 @@ describe("uploadImage", () => {
 
   it("allows admin to upload regardless of ownership", async () => {
     vi.mocked(imagesRepository.entityExists).mockResolvedValue(true);
+    vi.mocked(imagesRepository.countByEntity).mockResolvedValue(0);
     vi.mocked(imagesRepository.insert).mockResolvedValue(mockImage as never);
 
     await imagesService.uploadImage({ roles: ["admin"], userId: otherUserId }, "wine", entityId, makeFile());
@@ -111,6 +114,17 @@ describe("uploadImage", () => {
     await expect(
       imagesService.uploadImage({ roles: ["winemaker"], userId }, "wine", entityId, makeFile())
     ).rejects.toThrow("NOT_FOUND");
+    expect(globalThis.Bun.write).not.toHaveBeenCalled();
+  });
+
+  it("throws IMAGE_LIMIT_EXCEEDED when entity already has 10 images", async () => {
+    vi.mocked(imagesRepository.entityExists).mockResolvedValue(true);
+    vi.mocked(imagesRepository.findOwnerUserId).mockResolvedValue(userId);
+    vi.mocked(imagesRepository.countByEntity).mockResolvedValue(10);
+
+    await expect(
+      imagesService.uploadImage({ roles: ["winemaker"], userId }, "wine", entityId, makeFile())
+    ).rejects.toThrow("IMAGE_LIMIT_EXCEEDED");
     expect(globalThis.Bun.write).not.toHaveBeenCalled();
   });
 
