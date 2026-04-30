@@ -17,13 +17,21 @@ import { usersRoutes } from "./modules/users";
 import { winemakersRoutes } from "./modules/winemakers";
 import { winesRoutes } from "./modules/wines";
 
+const isProd = process.env.NODE_ENV === "production";
+const frontendUrl = process.env.FRONTEND_URL || "http://localhost:5173";
+const apiUrl = process.env.API_URL || "http://localhost:3000";
+
 export const app = new Elysia()
   .onError(({ code, error, request }) => {
     // biome-ignore lint/suspicious/noConsole: global error handler
     console.error(`Error ${code} during ${request.method} ${request.url}:`, error);
-    return (error as Error).message;
+
+    if (code === "NOT_FOUND") return "Not Found";
+    if (code === "VALIDATION") return error.all;
+
+    return isProd ? "Internal Server Error" : (error as Error).message;
   })
-  .use(cors({ origin: "http://localhost:5173" }))
+  .use(cors({ origin: frontendUrl }))
   .use(
     openapi({
       documentation: {
@@ -42,7 +50,7 @@ export const app = new Elysia()
           title: "WineMarket API",
           version: "0.1.0",
         },
-        servers: [{ description: "Development", url: "http://localhost:3000" }],
+        servers: [{ description: isProd ? "Production" : "Development", url: apiUrl }],
         tags: [
           { description: "Authenticated user profile endpoints", name: "users" },
           { description: "Winemaker/shop-owner role application flow", name: "role-requests" },

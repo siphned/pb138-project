@@ -1,4 +1,5 @@
 import { pgTable, text, uuid, varchar } from "drizzle-orm/pg-core";
+import { createInsertSchema, createSelectSchema } from "drizzle-zod";
 import { roleRequestStatusEnum, roleRequestTypeEnum } from "./enums";
 import { timestamptz } from "./helpers";
 import { users } from "./users";
@@ -18,3 +19,7 @@ export const roleRequests = pgTable("role_requests", {
     .notNull()
     .references(() => users.id),
 });
+
+export const roleRequestSelectSchema = createSelectSchema(roleRequests);
+export const roleRequestInsertSchema = createInsertSchema(roleRequests);
+export type RoleRequestModel = typeof roleRequests.$inferSelect;

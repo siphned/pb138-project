@@ -1,7 +1,6 @@
-import { type User as ClerkUser, createClerkClient } from "@clerk/backend";
+import { createClerkClient } from "@clerk/backend";
 import type { Address, User } from "@repo/shared/schemas";
 import { z } from "zod";
-import type { ClerkPayload } from "../auth/auth.utils";
 import { type IUserRolesRepository, userRolesRepository } from "./user-roles.repository";
 import { type IUsersRepository, usersRepository } from "./users.repository";
 
@@ -54,52 +53,88 @@ export class UsersService {
     return this.usersRepo.findById(id);
   }
 
-  async getProfileWithRoles(
-    clerkId: string,
-    payload: ClerkPayload
-  ): Promise<User & { roles: string[] }> {
-    const user = await this.lazyGetOrCreate(clerkId, payload);
+  /**
+   * Returns user with their current roles from DB.
+   * Lazily syncs with Clerk if user doesn't exist locally.
+   */
+  async getProfileWithRoles(clerkId: string): Promise<User & { roles: string[] }> {
+    const user = await this.lazyGetOrCreate(clerkId);
     const roles = await this.userRolesRepo.findByUserId(user.id);
     return { ...user, roles };
   }
 
   /**
-   * Ensures a local user exists and is synced with Clerk metadata.
+   * Ensures a local user exists and is synced with Clerk profile/roles.
+   * Orchestrates the sync flow with proper separation of concerns.
    */
-  async lazyGetOrCreate(clerkId: string, _payload: ClerkPayload): Promise<User> {
+  async lazyGetOrCreate(clerkId: string): Promise<User> {
     const existing = await this.usersRepo.findByClerkId(clerkId);
     if (existing) return existing;
 
-    const clerk = getClerkClient();
-    const clerkUser = await clerk.users.getUser(clerkId);
+    // 1. Fetch external profile
+    const profile = await this.fetchExternalProfile(clerkId);
 
-    const email = clerkUser.emailAddresses[0]?.emailAddress;
-    if (!email) throw new Error("Clerk user has no email address");
-
-    // 1. Sync Clerk Metadata if needed
-    await this.ensureClerkMetadata(clerkId, clerkUser);
-
-    // 2. Create Local User
+    // 2. Persist local user record
     const user = await this.usersRepo.upsert({
       clerkId,
-      email,
-      fname: clerkUser.firstName ?? "",
-      lname: clerkUser.lastName ?? "",
+      email: profile.email,
+      fname: profile.fname,
+      lname: profile.lname,
     });
 
-    // 3. Sync Roles
-    const roles = (clerkUser.publicMetadata?.roles as string[]) || ["customer"];
-    await this.syncRolesToDatabase(user.id, roles);
+    // 3. Sync roles to DB
+    await this.syncRolesToDatabase(user.id, profile.roles);
 
     return user;
   }
 
-  private async ensureClerkMetadata(clerkId: string, clerkUser: ClerkUser): Promise<void> {
-    if (!clerkUser.publicMetadata?.roles) {
+  /**
+   * Fetches user from Clerk and ensures basic metadata (roles) is seeded.
+   */
+  private async fetchExternalProfile(clerkId: string): Promise<{
+    email: string;
+    fname: string;
+    lname: string;
+    roles: string[];
+  }> {
+    try {
       const clerk = getClerkClient();
-      await clerk.users.updateUser(clerkId, {
-        publicMetadata: { ...clerkUser.publicMetadata, roles: ["customer"] },
-      });
+      const clerkUser = await clerk.users.getUser(clerkId);
+
+      const email = clerkUser.emailAddresses[0]?.emailAddress;
+      if (!email) throw new Error("Clerk user has no email address");
+
+      const roles = (clerkUser.publicMetadata?.roles as string[]) || [];
+
+      // Proactively seed 'customer' role if metadata is empty
+      if (roles.length === 0) {
+        const defaultRoles = ["customer"];
+        // Fire-and-forget update to Clerk to avoid blocking login
+        clerk.users
+          .updateUser(clerkId, {
+            publicMetadata: { ...clerkUser.publicMetadata, roles: defaultRoles },
+          })
+          .catch((e) =>
+            // biome-ignore lint/suspicious/noConsole: background sync
+            console.error(`Failed to seed Clerk roles for ${clerkId}:`, e)
+          );
+        return {
+          email,
+          fname: clerkUser.firstName ?? "",
+          lname: clerkUser.lastName ?? "",
+          roles: defaultRoles,
+        };
+      }
+
+      return {
+        email,
+        fname: clerkUser.firstName ?? "",
+        lname: clerkUser.lastName ?? "",
+        roles,
+      };
+    } catch (error) {
+      if (error instanceof Error) throw error;
+      throw new Error(`External profile sync failed for ${clerkId}`);
     }
   }
 
@@ -111,6 +146,8 @@ export class UsersService {
 
     const rolesToAdd = clerkRoles.filter((r) => !existingRoles.includes(r));
     const rolesToRemove = existingRoles.filter((r) => !clerkRoles.includes(r));
+
+    if (rolesToAdd.length === 0 && rolesToRemove.length === 0) return;
 
     await Promise.all([
       this.userRolesRepo.addRoles(userId, rolesToAdd),

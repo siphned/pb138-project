@@ -1,5 +1,6 @@
 import { pgTable, text, uuid, varchar } from "drizzle-orm/pg-core";
 import { createInsertSchema, createSelectSchema } from "drizzle-zod";
+import { z } from "zod";
 import { addresses } from "./addresses";
 import { userStatusEnum } from "./enums";
 import { timestamptz } from "./helpers";
@@ -35,4 +36,21 @@ export const userRoles = pgTable("user_roles", {
 export const insertUserRoleSchema = createInsertSchema(userRoles);
 export const selectUserRoleSchema = createSelectSchema(userRoles);
 
+export type UserModel = typeof users.$inferSelect;
 export type UserRole = typeof userRoles.$inferSelect;
+
+/**
+ * Request schema for profile update.
+ * Subset of user fields that customers can edit.
+ * Different from insertUserSchema (which includes clerk fields).
+ */
+export const profileUpdateSchema = z.object({
+  avatarUrl: z.string().url().optional().or(z.literal("")),
+  bio: z.string().optional().or(z.literal("")),
+  email: z.string().email("Invalid email address"),
+  location: z.string().min(1, "Address is required"),
+  name: z.string().min(1, "Name is required"),
+  website: z.string().url("Invalid website URL").or(z.literal("")),
+});
+
+export type ProfileUpdate = z.infer<typeof profileUpdateSchema>;
