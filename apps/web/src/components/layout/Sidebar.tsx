@@ -48,7 +48,11 @@ export function Sidebar({ userRoles = [Role.customer], activeRole, onRoleChange 
   const hasMultipleRoles = userRoles.length > 1;
 
   const handleLogout = async () => {
-    await signOut({ redirectUrl: "/" });
+    try {
+      await signOut({ redirectUrl: "/" });
+    } catch (error) {
+      console.error("Sign out error:", error);
+    }
     navigate({ to: "/" });
   };
 
