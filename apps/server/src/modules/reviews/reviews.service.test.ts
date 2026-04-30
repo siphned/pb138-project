@@ -3,6 +3,7 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 vi.mock("./reviews.repository", () => ({
   reviewsRepository: {
     averageRating: vi.fn(),
+    countReviews: vi.fn(),
     findById: vi.fn(),
     findReviews: vi.fn(),
     findReviewWithUser: vi.fn(),
@@ -26,16 +27,27 @@ describe("reviewsService", () => {
   const reviewId = "r1";
 
   describe("listProductReviews", () => {
-    it("returns reviews and averageRating together", async () => {
+    it("returns reviews, totalCount, and averageRating", async () => {
       const mockReviews = [{ id: "r1" }];
       vi.mocked(reviewsRepository.findReviews).mockResolvedValue(mockReviews as never);
       vi.mocked(reviewsRepository.averageRating).mockResolvedValue(4.5);
+      vi.mocked(reviewsRepository.countReviews).mockResolvedValue(42);
 
-      const result = await reviewsService.listProductReviews(productId);
+      const result = await reviewsService.listProductReviews(productId, {
+        page: 1,
+        limit: 12,
+        sort: "newest",
+      });
 
       expect(result.reviews).toBe(mockReviews);
       expect(result.averageRating).toBe(4.5);
-      expect(reviewsRepository.findReviews).toHaveBeenCalledWith(productId, "product");
+      expect(result.totalCount).toBe(42);
+      expect(reviewsRepository.findReviews).toHaveBeenCalledWith(productId, "product", {
+        limit: 12,
+        offset: 0,
+        sort: "newest",
+      });
+      expect(reviewsRepository.countReviews).toHaveBeenCalledWith(productId, "product");
     });
   });
 
