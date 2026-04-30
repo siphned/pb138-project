@@ -3118,7 +3118,7 @@
     },
     "/reviews/product/{id}": {
       "get": {
-        "description": "Returns all reviews and average rating for a product.",
+        "description": "Returns paginated reviews and average rating for a product.",
         "operationId": "getReviewsProductById",
         "parameters": [
           {
@@ -3126,6 +3126,55 @@
             "name": "id",
             "required": true,
             "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "limit",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "default": 0,
+                  "format": "integer",
+                  "type": "string"
+                },
+                {
+                  "maximum": 100,
+                  "minimum": 1,
+                  "type": "integer"
+                }
+              ],
+              "maximum": 100,
+              "minimum": 1
+            }
+          },
+          {
+            "in": "query",
+            "name": "page",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "default": 0,
+                  "format": "integer",
+                  "type": "string"
+                },
+                {
+                  "minimum": 1,
+                  "type": "integer"
+                }
+              ],
+              "minimum": 1
+            }
+          },
+          {
+            "in": "query",
+            "name": "sort",
+            "required": false,
+            "schema": {
+              "enum": ["newest", "highest", "lowest"],
               "type": "string"
             }
           }
@@ -3200,9 +3249,21 @@
                         "type": "object"
                       },
                       "type": "array"
+                    },
+                    "totalCount": {
+                      "anyOf": [
+                        {
+                          "default": 0,
+                          "format": "integer",
+                          "type": "string"
+                        },
+                        {
+                          "type": "integer"
+                        }
+                      ]
                     }
                   },
-                  "required": ["averageRating", "reviews"],
+                  "required": ["averageRating", "reviews", "totalCount"],
                   "type": "object"
                 }
               }
@@ -3495,7 +3556,7 @@
     },
     "/reviews/winemaker/{id}": {
       "get": {
-        "description": "Returns all reviews and average rating for a winemaker.",
+        "description": "Returns paginated reviews and average rating for a winemaker.",
         "operationId": "getReviewsWinemakerById",
         "parameters": [
           {
@@ -3503,6 +3564,55 @@
             "name": "id",
             "required": true,
             "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "limit",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "default": 0,
+                  "format": "integer",
+                  "type": "string"
+                },
+                {
+                  "maximum": 100,
+                  "minimum": 1,
+                  "type": "integer"
+                }
+              ],
+              "maximum": 100,
+              "minimum": 1
+            }
+          },
+          {
+            "in": "query",
+            "name": "page",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "default": 0,
+                  "format": "integer",
+                  "type": "string"
+                },
+                {
+                  "minimum": 1,
+                  "type": "integer"
+                }
+              ],
+              "minimum": 1
+            }
+          },
+          {
+            "in": "query",
+            "name": "sort",
+            "required": false,
+            "schema": {
+              "enum": ["newest", "highest", "lowest"],
               "type": "string"
             }
           }
@@ -3577,9 +3687,21 @@
                         "type": "object"
                       },
                       "type": "array"
+                    },
+                    "totalCount": {
+                      "anyOf": [
+                        {
+                          "default": 0,
+                          "format": "integer",
+                          "type": "string"
+                        },
+                        {
+                          "type": "integer"
+                        }
+                      ]
                     }
                   },
-                  "required": ["averageRating", "reviews"],
+                  "required": ["averageRating", "reviews", "totalCount"],
                   "type": "object"
                 }
               }

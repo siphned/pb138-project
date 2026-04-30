@@ -1,7 +1,8 @@
+import { parsePagination } from "../../utils/pagination";
 import type { IReviewsRepository, ReviewWithUser } from "./reviews.repository";
 import { reviewsRepository } from "./reviews.repository";
 
-type ReviewListResult<T> = { reviews: T[]; averageRating: number | null };
+type ReviewListResult<T> = { reviews: T[]; averageRating: number | null; totalCount: number };
 
 export class ReviewsService {
   constructor(private reviewsRepo: IReviewsRepository) {}
@@ -60,20 +61,30 @@ export class ReviewsService {
     await this.reviewsRepo.softDelete(reviewId);
   }
 
-  async listProductReviews(productId: string): Promise<ReviewListResult<ReviewWithUser>> {
-    const [reviews, averageRating] = await Promise.all([
-      this.reviewsRepo.findReviews(productId, "product"),
+  async listProductReviews(
+    productId: string,
+    opts: { page: number; limit: number; sort: "newest" | "highest" | "lowest" }
+  ): Promise<ReviewListResult<ReviewWithUser>> {
+    const { limit, offset } = parsePagination(opts);
+    const [reviews, totalCount, averageRating] = await Promise.all([
+      this.reviewsRepo.findReviews(productId, "product", { limit, offset, sort: opts.sort }),
+      this.reviewsRepo.countReviews(productId, "product"),
       this.reviewsRepo.averageRating(productId, "product"),
     ]);
-    return { averageRating, reviews };
+    return { averageRating, reviews, totalCount };
   }
 
-  async listWinemakerReviews(winemakerId: string): Promise<ReviewListResult<ReviewWithUser>> {
-    const [reviews, averageRating] = await Promise.all([
-      this.reviewsRepo.findReviews(winemakerId, "winemaker"),
+  async listWinemakerReviews(
+    winemakerId: string,
+    opts: { page: number; limit: number; sort: "newest" | "highest" | "lowest" }
+  ): Promise<ReviewListResult<ReviewWithUser>> {
+    const { limit, offset } = parsePagination(opts);
+    const [reviews, totalCount, averageRating] = await Promise.all([
+      this.reviewsRepo.findReviews(winemakerId, "winemaker", { limit, offset, sort: opts.sort }),
+      this.reviewsRepo.countReviews(winemakerId, "winemaker"),
       this.reviewsRepo.averageRating(winemakerId, "winemaker"),
     ]);
-    return { averageRating, reviews };
+    return { averageRating, reviews, totalCount };
   }
 }
 

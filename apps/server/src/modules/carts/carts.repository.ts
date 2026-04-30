@@ -70,7 +70,7 @@ export const cartsRepository: ICartsRepository = {
     });
 
     if (cart) {
-      const typedCart = cart as unknown as CartWithItems;
+      const typedCart = cart as CartWithItems;
       if (typedCart.items) {
         typedCart.items = typedCart.items.filter((item) => item.product && !item.product.deletedAt);
       }
