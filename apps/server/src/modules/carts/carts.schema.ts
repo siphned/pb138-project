@@ -44,13 +44,14 @@ export const updateItemBodySchema = z.object({
 });
 
 export const mergeBodySchema = z.object({
-  items: z.array(
-    z.object({
-      productId: z.string().uuid(),
-      quantity: z.number().int().min(1),
-    }),
-    { min: 1 }
-  ),
+  items: z
+    .array(
+      z.object({
+        productId: z.string().uuid(),
+        quantity: z.number().int().min(1),
+      })
+    )
+    .min(1),
 });
 
 // ─── TypeBox Schemas ──────────────────────────────────────────────────────

@@ -14,7 +14,10 @@ export const addRegularBodySchema = z.object({
   startTime: z.string().regex(/^([01]\d|2[0-3]):[0-5]\d$/),
   type: z.enum(["open", "closed"]),
   validFrom: z.string().regex(/^\d{4}-\d{2}-\d{2}$/),
-  validTo: z.string().regex(/^\d{4}-\d{2}-\d{2}$/).optional(),
+  validTo: z
+    .string()
+    .regex(/^\d{4}-\d{2}-\d{2}$/)
+    .optional(),
 });
 
 export const addExceptionBodySchema = z.object({
