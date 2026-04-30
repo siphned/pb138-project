@@ -31,7 +31,49 @@ type RepoFilters = {
   winemakerIds?: string[];
 };
 
-export const eventsRepository = {
+export interface IEventsRepository {
+  countActiveRegistrations(eventId: string): Promise<number>;
+  countComments(eventId: string): Promise<number>;
+  countMany(filters: RepoFilters): Promise<number>;
+  createComment(eventId: string, userId: string, body: string): Promise<EventComment>;
+  createEventWithAddress(
+    winemakerId: string,
+    data: {
+      name: string;
+      description?: string;
+      capacity: number;
+      startTime: Date;
+      endTime: Date;
+      inviteType: string;
+      visibility: "public" | "private";
+    },
+    addressData: {
+      country: string;
+      city: string;
+      postalCode: string;
+      street: string;
+      houseNumber: string;
+    }
+  ): Promise<Event>;
+  createRegistration(eventId: string, userId: string, capacity: number): Promise<EventRegistration>;
+  findActiveRegistration(eventId: string, userId: string): Promise<EventRegistration | undefined>;
+  findById(id: string): Promise<EventWithDetails | undefined>;
+  findComments(
+    eventId: string,
+    pagination: { limit: number; offset: number }
+  ): Promise<CommentWithUser[]>;
+  findMany(
+    filters: RepoFilters,
+    pagination: { limit: number; offset: number }
+  ): Promise<EventWithDetails[]>;
+  findWinemakerByUserId(userId: string): Promise<{ id: string; name: string } | undefined>;
+  resolveWinemakerIdsByName(name: string): Promise<string[]>;
+  softDelete(id: string): Promise<void>;
+  softDeleteRegistration(id: string): Promise<void>;
+  update(id: string, fields: Record<string, unknown>): Promise<Event>;
+}
+
+export const eventsRepository: IEventsRepository = {
   async countActiveRegistrations(eventId: string): Promise<number> {
     const [result] = await db
       .select({ value: count() })
@@ -223,7 +265,7 @@ export const eventsRepository = {
 
     return rows.filter((r) => r.winemaker && !r.winemaker.deletedAt) as EventWithDetails[];
   },
-  findWinemakerByUserId(userId: string) {
+  async findWinemakerByUserId(userId: string) {
     return db.query.winemakers.findFirst({
       columns: { id: true, name: true },
       where: and(eq(winemakers.userId, userId), isNull(winemakers.deletedAt)),

@@ -1,10 +1,15 @@
 import type { Order, orders } from "@repo/shared/schemas";
 import type { CartWithItems } from "../carts/carts.repository";
-import { cartsService } from "../carts/carts.service";
-import { emailService } from "../email";
-import { usersRepository } from "../users/users.repository";
-import type { CreateOrderData, CreateOrderItem, OrderWithItems } from "./orders.repository";
-import { ordersRepository } from "./orders.repository";
+import { type CartsService, cartsService } from "../carts/carts.service";
+import { emailService, type IEmailService } from "../email/email.service";
+import { type IUsersRepository, usersRepository } from "../users/users.repository";
+import {
+  type CreateOrderData,
+  type CreateOrderItem,
+  type IOrdersRepository,
+  type OrderWithItems,
+  ordersRepository,
+} from "./orders.repository";
 
 export interface CheckoutData {
   guestEmail?: string;
@@ -27,14 +32,21 @@ export interface CheckoutData {
   };
 }
 
-export const ordersService = {
+export class OrdersService {
+  constructor(
+    private ordersRepo: IOrdersRepository,
+    private cartsService: CartsService,
+    private emailService: IEmailService,
+    private usersRepo: IUsersRepository
+  ) {}
+
   async afterCheckout(
     order: Order,
     _items: CreateOrderItem[],
     userId?: string,
     data?: CheckoutData
   ) {
-    const orderWithItems = await ordersRepository.findById(order.id);
+    const orderWithItems = await this.ordersRepo.findById(order.id);
     if (orderWithItems) {
       const emailData = {
         customerName: userId ? "" : data?.guestName || "Guest",
@@ -48,26 +60,27 @@ export const ordersService = {
       };
 
       if (userId) {
-        const user = await usersRepository.findById(userId);
+        const user = await this.usersRepo.findById(userId);
         if (user) {
           emailData.customerName = user.fname;
-          await emailService.sendOrderConfirmation(user.email, emailData).catch(() => {
+          await this.emailService.sendOrderConfirmation(user.email, emailData).catch(() => {
             /* ignore */
           });
         }
       } else if (data?.guestEmail) {
-        await emailService.sendOrderConfirmation(data.guestEmail, emailData).catch(() => {
+        await this.emailService.sendOrderConfirmation(data.guestEmail, emailData).catch(() => {
           /* ignore */
         });
       }
     }
 
     if (userId) {
-      await cartsService.clearCart(userId);
+      await this.cartsService.clearCart(userId);
     } else if (order.guestSessionId) {
-      await cartsService.clearCartBySession(order.guestSessionId);
+      await this.cartsService.clearCartBySession(order.guestSessionId);
     }
-  },
+  }
+
   async createOrder(
     { userId, sessionId }: { userId?: string; sessionId?: string },
     data: CheckoutData
@@ -93,7 +106,7 @@ export const ordersService = {
       userId,
     };
 
-    const order = await ordersRepository.create(orderData, items);
+    const order = await this.ordersRepo.create(orderData, items);
 
     // Non-blocking operations
     this.afterCheckout(order, items, userId, data).catch(() => {
@@ -101,20 +114,20 @@ export const ordersService = {
     });
 
     return order;
-  },
+  }
 
   async getCart(userId?: string, sessionId?: string) {
-    if (userId) return await cartsService.getCartForUser(userId);
-    if (sessionId) return await cartsService.getCartForSession(sessionId);
+    if (userId) return await this.cartsService.getCartForUser(userId);
+    if (sessionId) return await this.cartsService.getCartForSession(sessionId);
     return null;
-  },
+  }
 
   async getOrder(id: string, userId: string): Promise<OrderWithItems> {
-    const order = await ordersRepository.findById(id);
+    const order = await this.ordersRepo.findById(id);
     if (!order) throw new Error("NOT_FOUND");
     if (order.userId !== userId) throw new Error("FORBIDDEN");
     return order;
-  },
+  }
 
   processCartItems(cart: CartWithItems) {
     const items: CreateOrderItem[] = [];
@@ -142,22 +155,22 @@ export const ordersService = {
     const totalPrice = (subtotal + shippingFee).toFixed(2);
 
     return { items, totalPrice };
-  },
+  }
 
   async updateStatus(
     orderId: string,
     _userId: string,
     status: typeof orders.$inferSelect.status
   ): Promise<Order> {
-    const order = await ordersRepository.findById(orderId);
+    const order = await this.ordersRepo.findById(orderId);
     if (!order) throw new Error("NOT_FOUND");
 
-    const updated = await ordersRepository.updateStatus(orderId, status);
+    const updated = await this.ordersRepo.updateStatus(orderId, status);
 
     if (order.userId) {
-      const user = await usersRepository.findById(order.userId);
+      const user = await this.usersRepo.findById(order.userId);
       if (user) {
-        await emailService
+        await this.emailService
           .sendOrderStatusUpdate(user.email, {
             orderId: order.id,
             status: updated.status,
@@ -167,7 +180,7 @@ export const ordersService = {
           });
       }
     } else if (order.guestEmail) {
-      await emailService
+      await this.emailService
         .sendOrderStatusUpdate(order.guestEmail, {
           orderId: order.id,
           status: updated.status,
@@ -178,5 +191,12 @@ export const ordersService = {
     }
 
     return updated;
-  },
-};
+  }
+}
+
+export const ordersService = new OrdersService(
+  ordersRepository,
+  cartsService,
+  emailService,
+  usersRepository
+);

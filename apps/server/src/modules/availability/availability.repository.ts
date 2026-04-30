@@ -3,7 +3,33 @@ import { availabilityExceptions, availabilityRegular, shops } from "@repo/shared
 import { and, eq, isNull } from "drizzle-orm";
 import { db } from "../../db";
 
-export const availabilityRepository = {
+export interface IAvailabilityRepository {
+  deleteException(id: string): Promise<void>;
+  deleteRegular(id: string): Promise<void>;
+  findExceptionById(id: string): Promise<AvailabilityException | undefined>;
+  findExceptionsByShopId(shopId: string): Promise<AvailabilityException[]>;
+  findRegularById(id: string): Promise<AvailabilityRegular | undefined>;
+  findRegularByShopId(shopId: string): Promise<AvailabilityRegular[]>;
+  findShopById(id: string): Promise<{ id: string; ownerUserId: string } | undefined>;
+  insertException(data: {
+    shopId: string;
+    startsAt: Date;
+    endsAt: Date;
+    action: string;
+    reason?: string;
+  }): Promise<AvailabilityException>;
+  insertRegular(data: {
+    shopId: string;
+    dow: number;
+    startTime: Date;
+    endTime: Date;
+    validFrom: string;
+    validTo?: string;
+    type: string;
+  }): Promise<AvailabilityRegular>;
+}
+
+export const availabilityRepository: IAvailabilityRepository = {
   async deleteException(id: string): Promise<void> {
     await db.delete(availabilityExceptions).where(eq(availabilityExceptions.id, id));
   },
@@ -29,6 +55,7 @@ export const availabilityRepository = {
       where: and(eq(availabilityRegular.id, id), isNull(availabilityRegular.deletedAt)),
     });
   },
+
   findRegularByShopId(shopId: string): Promise<AvailabilityRegular[]> {
     return db.query.availabilityRegular.findMany({
       where: eq(availabilityRegular.shopId, shopId),
@@ -37,6 +64,7 @@ export const availabilityRepository = {
 
   findShopById(id: string) {
     return db.query.shops.findFirst({
+      columns: { id: true, ownerUserId: true },
       where: and(eq(shops.id, id), isNull(shops.deletedAt)),
     });
   },

@@ -2,7 +2,11 @@ import type { Address, Order, Product } from "@repo/shared/schemas";
 import { addresses, orderItems, orders } from "@repo/shared/schemas";
 import { and, eq, isNull } from "drizzle-orm";
 import { db } from "../../db";
-import { productsRepository } from "../products/products.repository";
+import {
+  type IProductsRepository,
+  productsRepository,
+  type Transaction,
+} from "../products/products.repository";
 
 export type OrderItemWithProduct = typeof orderItems.$inferSelect & {
   product: Product;
@@ -45,7 +49,17 @@ export interface CreateOrderData {
   billingAddress: CreateOrderAddress;
 }
 
-export const ordersRepository = {
+export interface IOrdersRepository {
+  create(data: CreateOrderData, items: CreateOrderItem[]): Promise<Order>;
+  findById(id: string): Promise<OrderWithItems | undefined>;
+  listForShop(shopId: string): Promise<{ order: Order }[]>;
+  listForUser(userId: string): Promise<Order[]>;
+  updateStatus(id: string, status: typeof orders.$inferSelect.status): Promise<Order>;
+}
+
+export class OrdersRepository implements IOrdersRepository {
+  constructor(private productsRepo: IProductsRepository) {}
+
   async create(data: CreateOrderData, items: CreateOrderItem[]): Promise<Order> {
     return db.transaction(async (tx) => {
       const [shippingAddr] = await tx.insert(addresses).values(data.shippingAddress).returning();
@@ -84,12 +98,13 @@ export const ordersRepository = {
 
       // Decrement stock for each item
       for (const item of items) {
-        await productsRepository.decrementStock(tx as never, item.productId, item.quantity);
+        await this.productsRepo.decrementStock(tx as Transaction, item.productId, item.quantity);
       }
 
       return order;
     });
-  },
+  }
+
   async findById(id: string): Promise<OrderWithItems | undefined> {
     const order = await db.query.orders.findFirst({
       where: and(eq(orders.id, id), isNull(orders.deletedAt)),
@@ -116,9 +131,9 @@ export const ordersRepository = {
       return typedOrder;
     }
     return undefined;
-  },
+  }
 
-  listForShop(shopId: string): Promise<{ order: Order }[]> {
+  async listForShop(shopId: string): Promise<{ order: Order }[]> {
     return db
       .selectDistinct({ order: orders })
       .from(orders)
@@ -126,14 +141,14 @@ export const ordersRepository = {
       .where(
         and(eq(orderItems.shopId, shopId), isNull(orders.deletedAt), isNull(orderItems.deletedAt))
       );
-  },
+  }
 
-  listForUser(userId: string): Promise<Order[]> {
+  async listForUser(userId: string): Promise<Order[]> {
     return db.query.orders.findMany({
       orderBy: (orders, { desc }) => [desc(orders.createdAt)],
       where: and(eq(orders.userId, userId), isNull(orders.deletedAt)),
     });
-  },
+  }
 
   async updateStatus(id: string, status: typeof orders.$inferSelect.status): Promise<Order> {
     const [updated] = await db
@@ -143,5 +158,7 @@ export const ordersRepository = {
       .returning();
     if (!updated) throw new Error("Order not found");
     return updated;
-  },
-};
+  }
+}
+
+export const ordersRepository = new OrdersRepository(productsRepository);

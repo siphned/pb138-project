@@ -7,7 +7,27 @@ export type ReviewWithUser = Review & {
   user: { id: string; fname: string; lname: string };
 };
 
-export const reviewsRepository = {
+export interface IReviewsRepository {
+  averageRating(entityId: string, entityType: "product" | "winemaker"): Promise<number | null>;
+  findById(id: string): Promise<Review | undefined>;
+  findReviews(entityId: string, entityType: "product" | "winemaker"): Promise<ReviewWithUser[]>;
+  findReviewWithUser(reviewId: string): Promise<ReviewWithUser | undefined>;
+  findUserReview(
+    userId: string,
+    entityId: string,
+    entityType: "product" | "winemaker"
+  ): Promise<Review | undefined>;
+  hasPurchasedProduct(userId: string, productId: string): Promise<boolean>;
+  insertReview(
+    userId: string,
+    entityId: string,
+    entityType: "product" | "winemaker",
+    data: { rating: number; body?: string }
+  ): Promise<Review>;
+  softDelete(reviewId: string): Promise<void>;
+}
+
+export const reviewsRepository: IReviewsRepository = {
   async averageRating(
     entityId: string,
     entityType: "product" | "winemaker"
@@ -30,6 +50,7 @@ export const reviewsRepository = {
       where: and(eq(reviews.id, id), isNull(reviews.deletedAt)),
     });
   },
+
   findReviews(entityId: string, entityType: "product" | "winemaker"): Promise<ReviewWithUser[]> {
     return db.query.reviews.findMany({
       where: and(

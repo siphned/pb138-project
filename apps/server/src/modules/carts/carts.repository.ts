@@ -18,7 +18,20 @@ export interface CartWithItems extends Cart {
   items: CartItemWithProduct[];
 }
 
-export const cartsRepository = {
+export interface ICartsRepository {
+  addItem(cartId: string, productId: string, quantity: number): Promise<void>;
+  clear(cartId: string): Promise<void>;
+  clearCart(cartId: string): Promise<void>;
+  create(data: { userId?: string; sessionId?: string }): Promise<Cart>;
+  findByIdWithItems(id: string): Promise<CartWithItems | undefined>;
+  findBySessionId(sessionId: string): Promise<Cart | undefined>;
+  findByUserId(userId: string): Promise<Cart | undefined>;
+  mergeCarts(fromCartId: string, toCartId: string): Promise<void>;
+  removeItem(cartId: string, productId: string): Promise<void>;
+  updateItemQuantity(cartId: string, productId: string, quantity: number): Promise<void>;
+}
+
+export const cartsRepository: ICartsRepository = {
   async addItem(cartId: string, productId: string, quantity: number): Promise<void> {
     await db
       .insert(cartItems)

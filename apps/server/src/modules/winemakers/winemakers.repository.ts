@@ -30,7 +30,17 @@ export type UpdateWinemakerData = {
   phone?: string;
 };
 
-export const winemakersRepository = {
+export interface IWinemakersRepository {
+  findAll(): Promise<WinemakerListItem[]>;
+  findById(id: string): Promise<WinemakerWithRelations | undefined>;
+  findByIdWithAddress(id: string): Promise<WinemakerListItem | undefined>;
+  findByUserId(userId: string): Promise<Winemaker | undefined>;
+  findEventsByWinemakerId(winemakerId: string): Promise<EventRow[]>;
+  findWinesByWinemakerId(winemakerId: string): Promise<Wine[]>;
+  updateById(id: string, data: UpdateWinemakerData): Promise<Winemaker>;
+}
+
+export const winemakersRepository: IWinemakersRepository = {
   async findAll(): Promise<WinemakerListItem[]> {
     const results = await db.query.winemakers.findMany({
       where: isNull(winemakers.deletedAt),

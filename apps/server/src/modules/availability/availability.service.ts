@@ -1,5 +1,5 @@
 import type { AvailabilityException, AvailabilityRegular } from "@repo/shared/schemas";
-import { availabilityRepository } from "./availability.repository";
+import { availabilityRepository, type IAvailabilityRepository } from "./availability.repository";
 
 function parseTime(hhmm: string): Date {
   const [h = 0, m = 0] = hhmm.split(":").map(Number);
@@ -8,13 +8,15 @@ function parseTime(hhmm: string): Date {
   return d;
 }
 
-async function assertShopOwnership(shopId: string, requesterId: string): Promise<void> {
-  const shop = await availabilityRepository.findShopById(shopId);
-  if (!shop) throw new Error("NOT_FOUND");
-  if (shop.ownerUserId !== requesterId) throw new Error("FORBIDDEN");
-}
+export class AvailabilityService {
+  constructor(private availabilityRepo: IAvailabilityRepository) {}
 
-export const availabilityService = {
+  private async assertShopOwnership(shopId: string, requesterId: string): Promise<void> {
+    const shop = await this.availabilityRepo.findShopById(shopId);
+    if (!shop) throw new Error("NOT_FOUND");
+    if (shop.ownerUserId !== requesterId) throw new Error("FORBIDDEN");
+  }
+
   async addException(
     shopId: string,
     requesterId: string,
@@ -25,20 +27,20 @@ export const availabilityService = {
       reason?: string;
     }
   ): Promise<AvailabilityException> {
-    await assertShopOwnership(shopId, requesterId);
+    await this.assertShopOwnership(shopId, requesterId);
 
     const starts = new Date(data.startsAt);
     const ends = new Date(data.endsAt);
     if (ends <= starts) throw new Error("INVALID_TIME_RANGE");
 
-    return availabilityRepository.insertException({
+    return this.availabilityRepo.insertException({
       action: data.action,
       endsAt: ends,
       reason: data.reason,
       shopId,
       startsAt: starts,
     });
-  },
+  }
 
   async addRegular(
     shopId: string,
@@ -52,7 +54,7 @@ export const availabilityService = {
       type: "open" | "closed";
     }
   ): Promise<AvailabilityRegular> {
-    await assertShopOwnership(shopId, requesterId);
+    await this.assertShopOwnership(shopId, requesterId);
 
     const start = parseTime(data.startTime);
     const end = parseTime(data.endTime);
@@ -61,7 +63,7 @@ export const availabilityService = {
     if (data.validTo !== undefined && data.validTo <= data.validFrom)
       throw new Error("INVALID_TIME_RANGE");
 
-    return availabilityRepository.insertRegular({
+    return this.availabilityRepo.insertRegular({
       dow: data.dow,
       endTime: end,
       shopId,
@@ -70,37 +72,40 @@ export const availabilityService = {
       validFrom: data.validFrom,
       validTo: data.validTo,
     });
-  },
+  }
 
   async deleteException(shopId: string, entryId: string, requesterId: string): Promise<void> {
-    await assertShopOwnership(shopId, requesterId);
+    await this.assertShopOwnership(shopId, requesterId);
 
-    const entry = await availabilityRepository.findExceptionById(entryId);
+    const entry = await this.availabilityRepo.findExceptionById(entryId);
     if (!entry || entry.shopId !== shopId) throw new Error("NOT_FOUND");
 
-    await availabilityRepository.deleteException(entryId);
-  },
+    await this.availabilityRepo.deleteException(entryId);
+  }
 
   async deleteRegular(shopId: string, entryId: string, requesterId: string): Promise<void> {
-    await assertShopOwnership(shopId, requesterId);
+    await this.assertShopOwnership(shopId, requesterId);
 
-    const entry = await availabilityRepository.findRegularById(entryId);
+    const entry = await this.availabilityRepo.findRegularById(entryId);
     if (!entry || entry.shopId !== shopId) throw new Error("NOT_FOUND");
 
-    await availabilityRepository.deleteRegular(entryId);
-  },
+    await this.availabilityRepo.deleteRegular(entryId);
+  }
+
   async getAvailability(shopId: string): Promise<{
     regular: AvailabilityRegular[];
     exceptions: AvailabilityException[];
   }> {
-    const shop = await availabilityRepository.findShopById(shopId);
+    const shop = await this.availabilityRepo.findShopById(shopId);
     if (!shop) throw new Error("NOT_FOUND");
 
     const [regular, exceptions] = await Promise.all([
-      availabilityRepository.findRegularByShopId(shopId),
-      availabilityRepository.findExceptionsByShopId(shopId),
+      this.availabilityRepo.findRegularByShopId(shopId),
+      this.availabilityRepo.findExceptionsByShopId(shopId),
     ]);
 
     return { exceptions, regular };
-  },
-};
+  }
+}
+
+export const availabilityService = new AvailabilityService(availabilityRepository);

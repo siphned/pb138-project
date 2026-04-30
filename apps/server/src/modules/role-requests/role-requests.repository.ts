@@ -3,7 +3,24 @@ import { roleRequests } from "@repo/shared/schemas";
 import { and, eq, isNull } from "drizzle-orm";
 import { db } from "../../db";
 
-export const roleRequestsRepository = {
+export interface IRoleRequestsRepository {
+  create(data: {
+    userId: string;
+    type: "winemaker" | "shop_owner";
+    businessName: string;
+    details?: string;
+  }): Promise<RoleRequest>;
+  findById(id: string): Promise<RoleRequest | undefined>;
+  findByUserId(userId: string): Promise<RoleRequest[]>;
+  findPending(): Promise<RoleRequest[]>;
+  updateStatus(
+    id: string,
+    status: "approved" | "rejected",
+    adminUserId: string
+  ): Promise<RoleRequest>;
+}
+
+export const roleRequestsRepository: IRoleRequestsRepository = {
   async create(data: {
     userId: string;
     type: "winemaker" | "shop_owner";
@@ -14,6 +31,7 @@ export const roleRequestsRepository = {
     if (!request) throw new Error("Failed to create role request");
     return request;
   },
+
   findById(id: string): Promise<RoleRequest | undefined> {
     return db.query.roleRequests.findFirst({
       where: and(eq(roleRequests.id, id), isNull(roleRequests.deletedAt)),

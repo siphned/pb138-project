@@ -13,7 +13,23 @@ type AddressData = {
   houseNumber: string;
 };
 
-export const shopsRepository = {
+export interface IShopsRepository {
+  createShopWithAddress(
+    shopData: { ownerUserId: string; name: string; description: string },
+    addressData: AddressData
+  ): Promise<Shop>;
+  findAll(): Promise<ShopWithAddress[]>;
+  findAllByOwnerUserId(ownerUserId: string): Promise<Shop[]>;
+  findById(id: string): Promise<ShopWithAddress | undefined>;
+  findByOwnerUserId(ownerUserId: string): Promise<Shop | undefined>;
+  insertAddress(data: AddressData): Promise<Address>;
+  updateById(
+    id: string,
+    data: { name?: string; description?: string; addressId?: string }
+  ): Promise<Shop>;
+}
+
+export const shopsRepository: IShopsRepository = {
   async createShopWithAddress(
     shopData: { ownerUserId: string; name: string; description: string },
     addressData: AddressData

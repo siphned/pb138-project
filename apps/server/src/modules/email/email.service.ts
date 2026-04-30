@@ -16,7 +16,15 @@ import {
 const getResend = () => new Resend(process.env.RESEND_API_KEY ?? "");
 const FROM = process.env.FROM_EMAIL ?? "noreply@winemarket.com";
 
-export const emailService = {
+export interface IEmailService {
+  sendEventApproval(to: string, data: EventApprovalData): Promise<void>;
+  sendOrderConfirmation(to: string, data: OrderConfirmationData): Promise<void>;
+  sendOrderStatusUpdate(to: string, data: OrderStatusData): Promise<void>;
+  sendRoleRequestApproved(to: string, data: RoleRequestData): Promise<void>;
+  sendRoleRequestRejected(to: string, data: RoleRequestData): Promise<void>;
+}
+
+export const emailService: IEmailService = {
   async sendEventApproval(to: string, data: EventApprovalData): Promise<void> {
     await getResend().emails.send({
       from: FROM,
@@ -25,6 +33,7 @@ export const emailService = {
       to,
     });
   },
+
   async sendOrderConfirmation(to: string, data: OrderConfirmationData): Promise<void> {
     await getResend().emails.send({
       from: FROM,
