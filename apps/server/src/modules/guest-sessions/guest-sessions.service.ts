@@ -1,17 +1,13 @@
 import type { GuestSession } from "@repo/shared/schemas";
-import {
-  guestSessionsRepository,
-  type IGuestSessionsRepository,
-} from "./guest-sessions.repository";
+import { db } from "../../db";
+import * as guestSessionsRepo from "./guest-sessions.repository";
 
 const DEFAULT_EXPIRATION_DAYS = 30;
 
 export class GuestSessionsService {
-  constructor(private guestSessionsRepo: IGuestSessionsRepository) {}
-
   async getOrCreateSession(sessionId?: string): Promise<GuestSession> {
     if (sessionId) {
-      const session = await this.guestSessionsRepo.findById(sessionId);
+      const session = await guestSessionsRepo.findById(db, sessionId);
       if (session && session.expiresAt > new Date()) {
         return session;
       }
@@ -20,11 +16,11 @@ export class GuestSessionsService {
     const expiresAt = new Date();
     expiresAt.setDate(expiresAt.getDate() + DEFAULT_EXPIRATION_DAYS);
 
-    return this.guestSessionsRepo.create({ expiresAt });
+    return guestSessionsRepo.create(db, { expiresAt });
   }
 
   async validateSession(sessionId: string): Promise<GuestSession | null> {
-    const session = await this.guestSessionsRepo.findById(sessionId);
+    const session = await guestSessionsRepo.findById(db, sessionId);
     if (session && session.expiresAt > new Date()) {
       return session;
     }
@@ -32,4 +28,4 @@ export class GuestSessionsService {
   }
 }
 
-export const guestSessionsService = new GuestSessionsService(guestSessionsRepository);
+export const guestSessionsService = new GuestSessionsService();

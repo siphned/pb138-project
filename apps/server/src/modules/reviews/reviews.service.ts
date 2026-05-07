@@ -1,27 +1,26 @@
+import { db } from "../../db";
 import { parsePagination } from "../../utils/pagination";
-import type { IReviewsRepository, ReviewWithUser } from "./reviews.repository";
-import { reviewsRepository } from "./reviews.repository";
+import type { ReviewWithUser } from "./reviews.repository";
+import * as reviewsRepo from "./reviews.repository";
 
 type ReviewListResult<T> = { reviews: T[]; averageRating: number | null; totalCount: number };
 
 export class ReviewsService {
-  constructor(private reviewsRepo: IReviewsRepository) {}
-
   async createProductReview(
     userId: string,
     productId: string,
     data: { rating: number; body?: string }
   ): Promise<ReviewWithUser> {
     const [hasPurchased, existing] = await Promise.all([
-      this.reviewsRepo.hasPurchasedProduct(userId, productId),
-      this.reviewsRepo.findUserReview(userId, productId, "product"),
+      reviewsRepo.hasPurchasedProduct(db, userId, productId),
+      reviewsRepo.findUserReview(db, userId, productId, "product"),
     ]);
 
     if (!hasPurchased) throw new Error("NOT_PURCHASED");
     if (existing) throw new Error("ALREADY_REVIEWED");
 
-    const review = await this.reviewsRepo.insertReview(userId, productId, "product", data);
-    const withUser = await this.reviewsRepo.findReviewWithUser(review.id);
+    const review = await reviewsRepo.insertReview(db, userId, productId, "product", data);
+    const withUser = await reviewsRepo.findReviewWithUser(db, review.id);
     if (!withUser) throw new Error("NOT_FOUND");
     return withUser;
   }
@@ -31,11 +30,11 @@ export class ReviewsService {
     winemakerId: string,
     data: { rating: number; body?: string }
   ): Promise<ReviewWithUser> {
-    const existing = await this.reviewsRepo.findUserReview(userId, winemakerId, "winemaker");
+    const existing = await reviewsRepo.findUserReview(db, userId, winemakerId, "winemaker");
     if (existing) throw new Error("ALREADY_REVIEWED");
 
-    const review = await this.reviewsRepo.insertReview(userId, winemakerId, "winemaker", data);
-    const withUser = await this.reviewsRepo.findReviewWithUser(review.id);
+    const review = await reviewsRepo.insertReview(db, userId, winemakerId, "winemaker", data);
+    const withUser = await reviewsRepo.findReviewWithUser(db, review.id);
     if (!withUser) throw new Error("NOT_FOUND");
     return withUser;
   }
@@ -47,18 +46,18 @@ export class ReviewsService {
     entityId: string,
     entityType: "product" | "winemaker"
   ): Promise<void> {
-    const review = await this.reviewsRepo.findUserReview(userId, entityId, entityType);
+    const review = await reviewsRepo.findUserReview(db, userId, entityId, entityType);
     if (!review || review.id !== reviewId) {
       // Also check by ID if it's admin
       if (userRole === "admin") {
-        const byId = await this.reviewsRepo.findById(reviewId);
+        const byId = await reviewsRepo.findById(db, reviewId);
         if (!byId) throw new Error("NOT_FOUND");
       } else {
         throw new Error("NOT_FOUND");
       }
     }
 
-    await this.reviewsRepo.softDelete(reviewId);
+    await reviewsRepo.softDelete(db, reviewId);
   }
 
   async listProductReviews(
@@ -67,9 +66,9 @@ export class ReviewsService {
   ): Promise<ReviewListResult<ReviewWithUser>> {
     const { limit, offset } = parsePagination(opts);
     const [reviews, totalCount, averageRating] = await Promise.all([
-      this.reviewsRepo.findReviews(productId, "product", { limit, offset, sort: opts.sort }),
-      this.reviewsRepo.countReviews(productId, "product"),
-      this.reviewsRepo.averageRating(productId, "product"),
+      reviewsRepo.findReviews(db, productId, "product", { limit, offset, sort: opts.sort }),
+      reviewsRepo.countReviews(db, productId, "product"),
+      reviewsRepo.averageRating(db, productId, "product"),
     ]);
     return { averageRating, reviews, totalCount };
   }
@@ -80,12 +79,12 @@ export class ReviewsService {
   ): Promise<ReviewListResult<ReviewWithUser>> {
     const { limit, offset } = parsePagination(opts);
     const [reviews, totalCount, averageRating] = await Promise.all([
-      this.reviewsRepo.findReviews(winemakerId, "winemaker", { limit, offset, sort: opts.sort }),
-      this.reviewsRepo.countReviews(winemakerId, "winemaker"),
-      this.reviewsRepo.averageRating(winemakerId, "winemaker"),
+      reviewsRepo.findReviews(db, winemakerId, "winemaker", { limit, offset, sort: opts.sort }),
+      reviewsRepo.countReviews(db, winemakerId, "winemaker"),
+      reviewsRepo.averageRating(db, winemakerId, "winemaker"),
     ]);
     return { averageRating, reviews, totalCount };
   }
 }
 
-export const reviewsService = new ReviewsService(reviewsRepository);
+export const reviewsService = new ReviewsService();

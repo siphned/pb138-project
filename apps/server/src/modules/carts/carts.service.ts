@@ -1,76 +1,84 @@
 import type { Cart } from "@repo/shared/schemas";
-import { type IProductsRepository, productsRepository } from "../products/products.repository";
-import { type CartWithItems, cartsRepository, type ICartsRepository } from "./carts.repository";
+import { db } from "../../db";
+import * as productsRepo from "../products/products.repository";
+import type { CartWithItems } from "./carts.repository";
+import * as cartsRepo from "./carts.repository";
 
 export class CartsService {
-  constructor(
-    private cartsRepo: ICartsRepository,
-    private productsRepo: IProductsRepository
-  ) {}
-
   async addItem(
     { userId, sessionId }: { userId?: string; sessionId?: string },
     productId: string,
     quantity: number
   ): Promise<void> {
-    // Check if product is deleted
-    const isDeleted = await this.productsRepo.isDeleted(productId);
-    if (isDeleted) throw new Error("PRODUCT_DELETED");
+    const product = await productsRepo.findById(db, productId);
+    if (!product) throw new Error("PRODUCT_NOT_FOUND");
 
     let cart: Cart | undefined;
     if (userId) {
-      cart = await this.cartsRepo.findByUserId(userId);
-      if (!cart) cart = await this.cartsRepo.create({ userId });
+      cart = await cartsRepo.findByUserId(db, userId);
+      if (!cart) cart = await cartsRepo.create(db, { userId });
     } else if (sessionId) {
-      cart = await this.cartsRepo.findBySessionId(sessionId);
-      if (!cart) cart = await this.cartsRepo.create({ sessionId });
+      cart = await cartsRepo.findBySessionId(db, sessionId);
+      if (!cart) cart = await cartsRepo.create(db, { sessionId });
     }
 
     if (!cart) throw new Error("Could not find or create cart");
 
-    await this.cartsRepo.addItem(cart.id, productId, quantity);
+    await cartsRepo.addItem(db, cart.id, productId, quantity);
   }
 
   async clearCart(userId: string): Promise<void> {
-    const cart = await this.cartsRepo.findByUserId(userId);
+    const cart = await cartsRepo.findByUserId(db, userId);
     if (cart) {
-      await this.cartsRepo.clearCart(cart.id);
+      await cartsRepo.clearCart(db, cart.id);
     }
   }
 
   async clearCartBySession(sessionId: string): Promise<void> {
-    const cart = await this.cartsRepo.findBySessionId(sessionId);
+    const cart = await cartsRepo.findBySessionId(db, sessionId);
     if (cart) {
-      await this.cartsRepo.clearCart(cart.id);
+      await cartsRepo.clearCart(db, cart.id);
     }
   }
 
   async getCartForSession(sessionId: string): Promise<CartWithItems | undefined> {
-    let cart = await this.cartsRepo.findBySessionId(sessionId);
+    let cart = await cartsRepo.findBySessionId(db, sessionId);
     if (!cart) {
-      cart = await this.cartsRepo.create({ sessionId });
+      cart = await cartsRepo.create(db, { sessionId });
     }
-    return this.cartsRepo.findByIdWithItems(cart.id);
+    return cartsRepo.findByIdWithItems(db, cart.id);
   }
 
   async getCartForUser(userId: string): Promise<CartWithItems | undefined> {
-    let cart = await this.cartsRepo.findByUserId(userId);
+    let cart = await cartsRepo.findByUserId(db, userId);
     if (!cart) {
-      cart = await this.cartsRepo.create({ userId });
+      cart = await cartsRepo.create(db, { userId });
     }
-    return this.cartsRepo.findByIdWithItems(cart.id);
+    return cartsRepo.findByIdWithItems(db, cart.id);
   }
 
   async mergeOnLogin(userId: string, sessionId: string): Promise<void> {
-    const guestCart = await this.cartsRepo.findBySessionId(sessionId);
+    const guestCart = await cartsRepo.findBySessionId(db, sessionId);
     if (!guestCart) return;
 
-    let userCart = await this.cartsRepo.findByUserId(userId);
+    let userCart = await cartsRepo.findByUserId(db, userId);
     if (!userCart) {
-      userCart = await this.cartsRepo.create({ userId });
+      userCart = await cartsRepo.create(db, { userId });
     }
 
-    await this.cartsRepo.mergeCarts(guestCart.id, userCart.id);
+    const fromCartId = guestCart.id;
+    const toCartId = userCart.id;
+
+    await db.transaction(async (tx) => {
+      const fromItems = await cartsRepo.getCartItems(tx, fromCartId);
+
+      for (const item of fromItems) {
+        await cartsRepo.addItem(tx, toCartId, item.productId, item.quantity);
+      }
+
+      await cartsRepo.clearCart(tx, fromCartId);
+      await cartsRepo.deleteCart(tx, fromCartId);
+    });
   }
 
   async removeItem(
@@ -79,14 +87,14 @@ export class CartsService {
   ): Promise<void> {
     let cart: Cart | undefined;
     if (userId) {
-      cart = await this.cartsRepo.findByUserId(userId);
+      cart = await cartsRepo.findByUserId(db, userId);
     } else if (sessionId) {
-      cart = await this.cartsRepo.findBySessionId(sessionId);
+      cart = await cartsRepo.findBySessionId(db, sessionId);
     }
 
     if (!cart) throw new Error("Cart not found");
 
-    await this.cartsRepo.removeItem(cart.id, productId);
+    await cartsRepo.removeItem(db, cart.id, productId);
   }
 
   async updateItemQuantity(
@@ -96,15 +104,15 @@ export class CartsService {
   ): Promise<void> {
     let cart: Cart | undefined;
     if (userId) {
-      cart = await this.cartsRepo.findByUserId(userId);
+      cart = await cartsRepo.findByUserId(db, userId);
     } else if (sessionId) {
-      cart = await this.cartsRepo.findBySessionId(sessionId);
+      cart = await cartsRepo.findBySessionId(db, sessionId);
     }
 
     if (!cart) throw new Error("Cart not found");
 
-    await this.cartsRepo.updateItemQuantity(cart.id, productId, quantity);
+    await cartsRepo.updateItemQuantity(db, cart.id, productId, quantity);
   }
 }
 
-export const cartsService = new CartsService(cartsRepository, productsRepository);
+export const cartsService = new CartsService();

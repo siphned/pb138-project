@@ -1,55 +1,45 @@
 import type { SupplyAgreement } from "@repo/shared/schemas";
-import { type IShopsRepository, shopsRepository } from "../shops/shops.repository";
-import {
-  type IWinemakersRepository,
-  winemakersRepository,
-} from "../winemakers/winemakers.repository";
-import {
-  type ISupplyAgreementsRepository,
-  supplyAgreementsRepository,
-} from "./supply-agreements.repository";
+import { db } from "../../db";
+import { ForbiddenShopActionError } from "../shops/shops.errors";
+import * as shopsRepo from "../shops/shops.repository";
+import * as winemakersRepo from "../winemakers/winemakers.repository";
+import * as supplyAgreementsRepo from "./supply-agreements.repository";
 
 export class SupplyAgreementsService {
-  constructor(
-    private supplyAgreementsRepo: ISupplyAgreementsRepository,
-    private shopsRepo: IShopsRepository,
-    private winemakersRepo: IWinemakersRepository
-  ) {}
-
   async createRequest(
     userId: string,
     winemakerId: string,
     shopId: string
   ): Promise<SupplyAgreement> {
-    const shop = await this.shopsRepo.findById(shopId);
+    const shop = await shopsRepo.findById(db, shopId);
     if (!shop || shop.ownerUserId !== userId) {
-      throw new Error("FORBIDDEN");
+      throw new ForbiddenShopActionError();
     }
 
-    const existing = await this.supplyAgreementsRepo.findByShopAndWinemaker(shopId, winemakerId);
+    const existing = await supplyAgreementsRepo.findByShopAndWinemaker(db, shopId, winemakerId);
     if (existing) {
       return existing;
     }
 
-    return this.supplyAgreementsRepo.create({ shopId, winemakerId });
+    return supplyAgreementsRepo.create(db, { shopId, winemakerId });
   }
 
   async listForShop(userId: string, shopId: string): Promise<SupplyAgreement[]> {
-    const shop = await this.shopsRepo.findById(shopId);
+    const shop = await shopsRepo.findById(db, shopId);
     if (!shop || shop.ownerUserId !== userId) {
-      throw new Error("FORBIDDEN");
+      throw new ForbiddenShopActionError();
     }
 
-    return this.supplyAgreementsRepo.listForShop(shopId);
+    return supplyAgreementsRepo.listForShop(db, shopId);
   }
 
   async listForWinemaker(userId: string): Promise<SupplyAgreement[]> {
-    const winemaker = await this.winemakersRepo.findByUserId(userId);
+    const winemaker = await winemakersRepo.findByUserId(db, userId);
     if (!winemaker) {
       throw new Error("NOT_A_WINEMAKER");
     }
 
-    return this.supplyAgreementsRepo.listForWinemaker(winemaker.id);
+    return supplyAgreementsRepo.listForWinemaker(db, winemaker.id);
   }
 
   async respondToRequest(
@@ -57,10 +47,10 @@ export class SupplyAgreementsService {
     agreementId: string,
     status: "approved" | "rejected"
   ): Promise<SupplyAgreement> {
-    const agreement = await this.supplyAgreementsRepo.findById(agreementId);
+    const agreement = await supplyAgreementsRepo.findById(db, agreementId);
     if (!agreement) throw new Error("NOT_FOUND");
 
-    const winemaker = await this.winemakersRepo.findById(agreement.winemakerId);
+    const winemaker = await winemakersRepo.findById(db, agreement.winemakerId);
     if (!winemaker || winemaker.userId !== userId) {
       throw new Error("FORBIDDEN");
     }
@@ -69,15 +59,11 @@ export class SupplyAgreementsService {
       throw new Error("ALREADY_RESPONDED");
     }
 
-    const updated = await this.supplyAgreementsRepo.updateStatus(agreementId, status);
+    const updated = await supplyAgreementsRepo.updateStatus(db, agreementId, status);
     if (!updated) throw new Error("NOT_FOUND");
 
     return updated;
   }
 }
 
-export const supplyAgreementsService = new SupplyAgreementsService(
-  supplyAgreementsRepository,
-  shopsRepository,
-  winemakersRepository
-);
+export const supplyAgreementsService = new SupplyAgreementsService();

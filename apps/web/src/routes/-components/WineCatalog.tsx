@@ -12,6 +12,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
+import { Skeleton } from "@/components/ui/skeleton";
 import { useGetProducts } from "@/generated/hooks/useGetProducts";
 import { useGetShopsByIdProducts } from "@/generated/hooks/useGetShopsByIdProducts";
 import { WineCard } from "./WineCard";
@@ -123,7 +124,7 @@ export function WineCatalog({ search, shopId, shopName, mode = "wines" }: WineCa
 
   const shopProductsResult = useGetShopsByIdProducts(shopId ?? "", { isBundle: "false" });
 
-  const { data: rawData, isLoading, error } = shopId ? shopProductsResult : productsResult;
+  const { data: rawData, isLoading, error, refetch } = shopId ? shopProductsResult : productsResult;
 
   type RawProductItem = {
     color?: string;
@@ -224,8 +225,14 @@ export function WineCatalog({ search, shopId, shopName, mode = "wines" }: WineCa
     if (isLoading) {
       return (
         <div className="grid grid-cols-1 gap-6 md:grid-cols-3 xl:grid-cols-4">
-          {["s1", "s2", "s3", "s4", "s5", "s6"].map((s) => (
-            <div className="h-100 w-full animate-pulse rounded-2xl bg-secondary/20" key={s} />
+          {[1, 2, 3, 4, 5, 6, 7, 8].map((i) => (
+            <div className="flex flex-col space-y-3" key={i}>
+              <Skeleton className="h-[200px] w-full rounded-2xl" />
+              <div className="space-y-2">
+                <Skeleton className="h-4 w-[250px]" />
+                <Skeleton className="h-4 w-[200px]" />
+              </div>
+            </div>
           ))}
         </div>
       );
@@ -235,7 +242,7 @@ export function WineCatalog({ search, shopId, shopName, mode = "wines" }: WineCa
       return (
         <div className="flex flex-col items-center justify-center py-20 text-center">
           <p className="font-bold text-destructive">Error loading products.</p>
-          <Button onClick={() => window.location.reload()} variant="link">
+          <Button onClick={() => refetch()} variant="link">
             Try again
           </Button>
         </div>

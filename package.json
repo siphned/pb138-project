@@ -39,6 +39,7 @@
   },
   "workspaces": [
     "apps/*",
-    "packages/*"
+    "packages/shared",
+    "packages/typescript-config"
   ]
 }

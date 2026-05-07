@@ -5,6 +5,7 @@ import { useEffect, useState } from "react";
 import { AuthLayout } from "@/components/layout/AuthLayout";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Checkbox } from "@/components/ui/checkbox";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Separator } from "@/components/ui/separator";
@@ -148,7 +149,7 @@ function SettingsPage() {
                       Receive updates about your orders and account
                     </p>
                   </div>
-                  <input className="h-5 w-5" defaultChecked type="checkbox" />
+                  <Checkbox defaultChecked />
                 </div>
 
                 <Separator />
@@ -160,7 +161,7 @@ function SettingsPage() {
                       Get notified about new wine events and tastings
                     </p>
                   </div>
-                  <input className="h-5 w-5" defaultChecked type="checkbox" />
+                  <Checkbox defaultChecked />
                 </div>
               </div>
             </CardContent>

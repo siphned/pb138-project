@@ -1,44 +1,43 @@
-import type {
-  IWinesRepository,
-  WineData,
-  WineFilters,
-  WineWithWinemaker,
-} from "./wines.repository";
-import { winesRepository } from "./wines.repository";
+import { db } from "../../db";
+import {
+  ForbiddenWineActionError,
+  WinemakerNotFoundError,
+  WineNotFoundError,
+} from "./wines.errors";
+import type { WineData, WineFilters, WineWithWinemaker } from "./wines.repository";
+import * as winesRepo from "./wines.repository";
 
 export class WinesService {
-  constructor(private winesRepo: IWinesRepository) {}
-
   async createWine(userId: string, data: WineData): Promise<WineWithWinemaker> {
-    const winemaker = await this.winesRepo.findWinemakerByUserId(userId);
-    if (!winemaker) throw new Error("NOT_FOUND");
+    const winemaker = await winesRepo.findWinemakerByUserId(db, userId);
+    if (!winemaker) throw new WinemakerNotFoundError();
 
-    const inserted = await this.winesRepo.insert(winemaker.id, data);
-    const created = await this.winesRepo.findById(inserted.id);
-    if (!created) throw new Error("NOT_FOUND");
+    const inserted = await winesRepo.insert(db, winemaker.id, data);
+    const created = await winesRepo.findById(db, inserted.id);
+    if (!created) throw new WineNotFoundError(inserted.id);
     return created;
   }
 
   async deleteWine(id: string, userId: string, roles: string[]): Promise<void> {
-    const wine = await this.winesRepo.findById(id);
-    if (!wine) throw new Error("NOT_FOUND");
+    const wine = await winesRepo.findById(db, id);
+    if (!wine) throw new WineNotFoundError(id);
 
     if (!roles.includes("admin")) {
-      const winemaker = await this.winesRepo.findWinemakerByUserId(userId);
-      if (!winemaker || wine.winemakerId !== winemaker.id) throw new Error("FORBIDDEN");
+      const winemaker = await winesRepo.findWinemakerByUserId(db, userId);
+      if (!winemaker || wine.winemakerId !== winemaker.id) throw new ForbiddenWineActionError();
     }
 
-    await this.winesRepo.softDelete(id);
+    await winesRepo.softDelete(db, id);
   }
 
   async getWine(id: string): Promise<WineWithWinemaker> {
-    const wine = await this.winesRepo.findById(id);
-    if (!wine) throw new Error("NOT_FOUND");
+    const wine = await winesRepo.findById(db, id);
+    if (!wine) throw new WineNotFoundError(id);
     return wine;
   }
 
   listWines(filters: WineFilters): Promise<WineWithWinemaker[]> {
-    return this.winesRepo.findAll(filters);
+    return winesRepo.findAll(db, filters);
   }
 
   async replaceWine(
@@ -47,19 +46,19 @@ export class WinesService {
     roles: string[],
     data: WineData
   ): Promise<WineWithWinemaker> {
-    const wine = await this.winesRepo.findById(id);
-    if (!wine) throw new Error("NOT_FOUND");
+    const wine = await winesRepo.findById(db, id);
+    if (!wine) throw new WineNotFoundError(id);
 
     if (!roles.includes("admin")) {
-      const winemaker = await this.winesRepo.findWinemakerByUserId(userId);
-      if (!winemaker || wine.winemakerId !== winemaker.id) throw new Error("FORBIDDEN");
+      const winemaker = await winesRepo.findWinemakerByUserId(db, userId);
+      if (!winemaker || wine.winemakerId !== winemaker.id) throw new ForbiddenWineActionError();
     }
 
-    await this.winesRepo.updateById(id, data);
-    const updated = await this.winesRepo.findById(id);
-    if (!updated) throw new Error("NOT_FOUND");
+    await winesRepo.updateById(db, id, data);
+    const updated = await winesRepo.findById(db, id);
+    if (!updated) throw new WineNotFoundError(id);
     return updated;
   }
 }
 
-export const winesService = new WinesService(winesRepository);
+export const winesService = new WinesService();

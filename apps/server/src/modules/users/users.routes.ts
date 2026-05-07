@@ -1,6 +1,7 @@
 import { Elysia } from "elysia";
+import { db } from "../../db";
 import { authPlugin } from "../auth";
-import { userRolesRepository } from "./user-roles.repository";
+import * as userRolesRepo from "./user-roles.repository";
 import {
   addressBody,
   addressesResponseSchema,
@@ -16,7 +17,7 @@ export const usersRoutes = new Elysia({ prefix: "/users" })
   .get(
     "/me",
     async ({ dbUser }) => {
-      const roles = await userRolesRepository.findByUserId(dbUser.id);
+      const roles = await userRolesRepo.findByUserId(db, dbUser.id);
       return { ...dbUser, roles };
     },
     {
@@ -36,7 +37,7 @@ export const usersRoutes = new Elysia({ prefix: "/users" })
     "/me",
     async ({ dbUser, body }) => {
       const updated = await usersService.updateProfileById(dbUser.id, body);
-      const roles = await userRolesRepository.findByUserId(dbUser.id);
+      const roles = await userRolesRepo.findByUserId(db, dbUser.id);
       return { ...updated, roles };
     },
 
@@ -53,22 +54,16 @@ export const usersRoutes = new Elysia({ prefix: "/users" })
     }
   )
 
-  .get(
-    "/me/addresses",
-    async ({ dbUser }) => {
-      return await usersService.getAddresses(dbUser.id);
+  .get("/me/addresses", ({ dbUser }) => usersService.getAddresses(dbUser.id), {
+    detail: {
+      description: "Returns the shipping and billing addresses linked to the authenticated user.",
+      security: [{ bearerAuth: [] }],
+      summary: "Get current user addresses",
+      tags: ["users"],
     },
-    {
-      detail: {
-        description: "Returns the shipping and billing addresses linked to the authenticated user.",
-        security: [{ bearerAuth: [] }],
-        summary: "Get current user addresses",
-        tags: ["users"],
-      },
-      requireAuth: true,
-      response: addressesResponseSchema,
-    }
-  )
+    requireAuth: true,
+    response: addressesResponseSchema,
+  })
 
   .post(
     "/me/addresses",

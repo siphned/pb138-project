@@ -51,8 +51,14 @@ export function Sidebar({ userRoles = [Role.customer], activeRole, onRoleChange 
   const handleLogout = async () => {
     try {
       await signOut({ redirectUrl: "/" });
+<<<<<<< HEAD
     } catch (_error) {
       //console.error("Sign out error:", error);
+=======
+    } catch (error) {
+      // biome-ignore lint/suspicious/noConsole: error reporting
+      console.error("Sign out error:", error);
+>>>>>>> 23a400f (feat: complete Milestone 2 remediation - structural refactor, UI polish, and technical debt cleanup)
     }
     navigate({ to: "/" });
   };
@@ -189,19 +195,9 @@ export function Sidebar({ userRoles = [Role.customer], activeRole, onRoleChange 
             </Show>
 
             <Show when="signed-in">
-<<<<<<< HEAD
               <NavItem variant="muted" className="mt-2" onClick={() => openUserProfile()}>
                 <Settings className="h-4 w-4" /> Settings
               </NavItem>
-=======
-              <Button
-                className="flex-none flex items-center gap-3 px-3 py-3 rounded-md text-sm font-medium text-muted-foreground mt-2"
-                onClick={() => openUserProfile()}
-                variant="ghost"
-              >
-                <Settings className="h-4 w-4" /> Settings
-              </Button>
->>>>>>> 3a48d19 (fix(WINE-155): replace raw button elements with Button component)
             </Show>
           </nav>
         </div>
@@ -219,6 +215,17 @@ export function Sidebar({ userRoles = [Role.customer], activeRole, onRoleChange 
             <NavItem
               variant="destructive"
               className="mt-2 w-full text-left"
+              onClick={handleLogout}
+            >
+              <LogOut className="h-4 w-4" /> Log out
+            </NavItem>
+          </Show>
+        </div>
+      </SheetContent>
+    </Sheet>
+  );
+}
+mt-2 w-full text-left"
               onClick={handleLogout}
             >
               <LogOut className="h-4 w-4" /> Log out

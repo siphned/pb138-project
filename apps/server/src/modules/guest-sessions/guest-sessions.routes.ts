@@ -1,6 +1,7 @@
-import { Elysia, status, t } from "elysia";
+import { Elysia, t } from "elysia";
+import { db } from "../../db";
 import { authPlugin } from "../auth";
-import { guestSessionsRepository } from "./guest-sessions.repository";
+import * as guestSessionsRepo from "./guest-sessions.repository";
 import { guestSessionsService } from "./guest-sessions.service";
 
 export const guestSessionsRoutes = new Elysia({
@@ -8,27 +9,19 @@ export const guestSessionsRoutes = new Elysia({
   tags: ["guest-sessions"],
 })
   .use(authPlugin)
+
   .post(
     "/",
-    async ({ cookie: { guest_session_id } }) => {
-      const session = await guestSessionsService.getOrCreateSession(
-        guest_session_id?.value as string | undefined
-      );
-
-      if (guest_session_id) {
-        guest_session_id.value = session.id;
-        guest_session_id.httpOnly = true;
-        guest_session_id.path = "/";
-        guest_session_id.expires = session.expiresAt;
-      }
-
+    async ({ set }) => {
+      const session = await guestSessionsService.getOrCreateSession();
+      set.status = 201;
       return session;
     },
     {
       detail: {
         description:
-          "Returns an existing valid guest session or creates a new one. Sets a guest_session_id cookie.",
-        summary: "Get or create a guest session",
+          "Creates a new anonymous session record and returns the session ID in the response body. Used for guest carts and temporary state.",
+        summary: "Initialize guest session",
       },
       response: t.Object({
         createdAt: t.Date(),
@@ -37,49 +30,26 @@ export const guestSessionsRoutes = new Elysia({
       }),
     }
   )
+
   .get(
-    "/me",
-    async ({ cookie: { guest_session_id } }) => {
-      const sessionId = guest_session_id?.value;
-      if (!sessionId || typeof sessionId !== "string") {
-        return status(404, "No guest session found");
+    "/:id",
+    async ({ params }) => {
+      const session = await guestSessionsRepo.findById(db, params.id);
+      if (!session || session.expiresAt < new Date()) {
+        throw new Error("NOT_FOUND");
       }
-
-      const session = await guestSessionsService.validateSession(sessionId);
-      if (!session) {
-        return status(404, "Invalid or expired guest session");
-      }
-
       return session;
     },
     {
       detail: {
-        description: "Returns the guest session associated with the guest_session_id cookie.",
-        summary: "Get current guest session",
+        description: "Returns metadata for an existing guest session if it has not expired.",
+        summary: "Validate guest session",
       },
-      response: {
-        200: t.Object({
-          createdAt: t.Date(),
-          expiresAt: t.Date(),
-          id: t.String(),
-        }),
-        404: t.String(),
-      },
-    }
-  )
-  .delete(
-    "/cleanup",
-    async () => {
-      await guestSessionsRepository.cleanupExpired();
-      return status(204, null);
-    },
-    {
-      detail: {
-        description:
-          "Removes all guest sessions that have passed their expiresAt date. Admin only.",
-        security: [{ bearerAuth: [] }],
-        summary: "Cleanup expired guest sessions",
-      },
-      requireRoles: ["admin"],
+      params: t.Object({ id: t.String() }),
+      response: t.Object({
+        createdAt: t.Date(),
+        expiresAt: t.Date(),
+        id: t.String(),
+      }),
     }
   );
