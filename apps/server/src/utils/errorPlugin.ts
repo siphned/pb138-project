@@ -1,13 +1,21 @@
 import { AppError } from "@repo/shared";
-import { Elysia } from "elysia";
+import { Elysia, t } from "elysia";
 import { logger } from "./logger";
+
+export const errorResponse = t.Object({
+  error: t.Object({
+    code: t.String(),
+    message: t.String(),
+  }),
+  success: t.Literal(false),
+});
 
 export const errorPlugin = new Elysia().onError(({ error, set }) => {
   if (error instanceof AppError) {
     set.status = error.statusCode;
     return {
       error: {
-        code: error.code,
+        code: error.code ?? "UNKNOWN_ERROR",
         message: error.message,
       },
       success: false,
