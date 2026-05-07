@@ -101,44 +101,39 @@ export function MyWines({ role = "Winemaker" }: MyWinesProps) {
     </div>
   );
 }
+function statusVariant(
+  status: string
+): "success" | "warning" | "danger" | "info" | "secondary" | "outline" {
+  switch (status) {
+    case "In Stock":
+    case "Delivered":
+    case "Active":
+      return "success";
+    case "Low Stock":
+    case "Processing":
+      return "warning";
+    case "Out of Stock":
+    case "Cancelled":
+      return "danger";
+    case "Upcoming":
+      return "info";
+    case "Draft":
+      return "secondary";
+    default:
+      return "outline";
+  }
+}
+
 // ==========================================
 // 1. WINEMAKER VIEW
 // ==========================================
 function WinemakerInventory() {
   // Store data in an array so we can render it differently on Mobile vs Desktop
   const inventoryData = [
-    {
-      badgeClasses: "bg-[#E8F5E9] text-[#2E7D32] hover:bg-[#E8F5E9]",
-      id: 1,
-      name: "Chateau Montrose 2018",
-      qty: 245,
-      status: "In Stock",
-      vintage: "2018",
-    },
-    {
-      badgeClasses: "bg-[#FFF3E0] text-[#EF6C00] hover:bg-[#FFF3E0]",
-      id: 2,
-      name: "La Dame de Montrose 2019",
-      qty: 8,
-      status: "Low Stock",
-      vintage: "2019",
-    },
-    {
-      badgeClasses: "bg-[#FFEBEE] text-[#C62828] hover:bg-[#FFEBEE]",
-      id: 3,
-      name: "Tertio de Montrose 2020",
-      qty: 0,
-      status: "Out of Stock",
-      vintage: "2020",
-    },
-    {
-      badgeClasses: "bg-[#E8F5E9] text-[#2E7D32] hover:bg-[#E8F5E9]",
-      id: 4,
-      name: "Montrose Rose 2021",
-      qty: 156,
-      status: "In Stock",
-      vintage: "2021",
-    },
+    { id: 1, name: "Chateau Montrose 2018", qty: 245, status: "In Stock", vintage: "2018" },
+    { id: 2, name: "La Dame de Montrose 2019", qty: 8, status: "Low Stock", vintage: "2019" },
+    { id: 3, name: "Tertio de Montrose 2020", qty: 0, status: "Out of Stock", vintage: "2020" },
+    { id: 4, name: "Montrose Rose 2021", qty: 156, status: "In Stock", vintage: "2021" },
   ];
 
   return (
@@ -193,7 +188,9 @@ function WinemakerInventory() {
                 </TableCell>
                 <TableCell className="text-center font-medium text-sm">{wine.qty}</TableCell>
                 <TableCell className="text-center">
-                  <Badge className={`${wine.badgeClasses} border-none`}>{wine.status}</Badge>
+                  <Badge className="border-none" variant={statusVariant(wine.status)}>
+                    {wine.status}
+                  </Badge>
                 </TableCell>
                 <TableCell className="text-right">
                   <Button className="h-8 w-8 text-muted-foreground" size="icon" variant="ghost">
@@ -214,12 +211,12 @@ function WinemakerInventory() {
             key={wine.id}
           >
             <div className="flex flex-col gap-1.5">
-              <span className="font-heading font-semibold text-[15px]">{wine.name}</span>
+              <span className="font-heading font-semibold text-sm">{wine.name}</span>
               <span className="text-xs text-muted-foreground font-medium">
                 {wine.vintage} <span className="mx-1">|</span> Qty: {wine.qty}
               </span>
               <div className="pt-1.5">
-                <Badge className={`${wine.badgeClasses} border-none px-2 py-0.5 text-[10px]`}>
+                <Badge className="border-none px-2 py-0.5" variant={statusVariant(wine.status)}>
                   {wine.status}
                 </Badge>
               </div>
@@ -316,7 +313,7 @@ function ShopOwnerInventory() {
             key={wine.id}
           >
             <div className="flex flex-col gap-1.5">
-              <span className="font-heading font-semibold text-[15px]">{wine.name}</span>
+              <span className="font-heading font-semibold text-sm">{wine.name}</span>
               <span className="text-xs text-muted-foreground font-medium">
                 {wine.winemaker} <span className="mx-1">|</span> Qty: {wine.qty}
               </span>
@@ -337,7 +334,6 @@ function ShopOwnerInventory() {
 function CustomerOrderHistory() {
   const orderData = [
     {
-      badgeClasses: "bg-[#E8F5E9] text-[#2E7D32] hover:bg-[#E8F5E9]",
       date: "April 12, 2026",
       id: 1,
       items: "3 Bottles",
@@ -346,7 +342,6 @@ function CustomerOrderHistory() {
       total: "€425.00",
     },
     {
-      badgeClasses: "bg-[#FFF3E0] text-[#EF6C00] hover:bg-[#FFF3E0]",
       date: "March 28, 2026",
       id: 2,
       items: "1 Bottle",
@@ -399,7 +394,9 @@ function CustomerOrderHistory() {
                 <TableCell className="text-muted-foreground text-sm">{order.date}</TableCell>
                 <TableCell className="text-center font-medium text-sm">{order.items}</TableCell>
                 <TableCell className="text-center">
-                  <Badge className={`${order.badgeClasses} border-none`}>{order.status}</Badge>
+                  <Badge className="border-none" variant={statusVariant(order.status)}>
+                    {order.status}
+                  </Badge>
                 </TableCell>
                 <TableCell className="text-right font-medium text-sm">{order.total}</TableCell>
               </TableRow>
@@ -416,19 +413,19 @@ function CustomerOrderHistory() {
             key={order.id}
           >
             <div className="flex flex-col gap-1.5">
-              <span className="font-heading font-semibold text-[15px] text-primary flex items-center gap-1">
+              <span className="font-heading font-semibold text-sm text-primary flex items-center gap-1">
                 {order.orderId} <ArrowUpRight className="h-3 w-3" />
               </span>
               <span className="text-xs text-muted-foreground font-medium">
                 {order.date} <span className="mx-1">|</span> {order.items}
               </span>
               <div className="pt-1.5">
-                <Badge className={`${order.badgeClasses} border-none px-2 py-0.5 text-[10px]`}>
+                <Badge className="border-none px-2 py-0.5" variant={statusVariant(order.status)}>
                   {order.status}
                 </Badge>
               </div>
             </div>
-            <div className="font-medium text-[15px]">{order.total}</div>
+            <div className="font-medium text-sm">{order.total}</div>
           </div>
         ))}
       </div>
@@ -441,22 +438,8 @@ function CustomerOrderHistory() {
 // ==========================================
 function BundlesList() {
   const bundlesData = [
-    {
-      badgeClasses: "bg-[#E8F5E9] text-[#2E7D32] hover:bg-[#E8F5E9]",
-      id: 1,
-      items: "3 Bottles",
-      name: "Holiday Red Trio",
-      price: "€120.00",
-      status: "Active",
-    },
-    {
-      badgeClasses: "bg-secondary text-secondary-foreground hover:bg-secondary",
-      id: 2,
-      items: "2 Bottles",
-      name: "Summer White Duo",
-      price: "€45.00",
-      status: "Draft",
-    },
+    { id: 1, items: "3 Bottles", name: "Holiday Red Trio", price: "€120.00", status: "Active" },
+    { id: 2, items: "2 Bottles", name: "Summer White Duo", price: "€45.00", status: "Draft" },
   ];
 
   return (
@@ -497,7 +480,9 @@ function BundlesList() {
                 </TableCell>
                 <TableCell className="text-center font-medium text-sm">{bundle.price}</TableCell>
                 <TableCell className="text-center">
-                  <Badge className={`${bundle.badgeClasses} border-none`}>{bundle.status}</Badge>
+                  <Badge className="border-none" variant={statusVariant(bundle.status)}>
+                    {bundle.status}
+                  </Badge>
                 </TableCell>
                 <TableCell className="text-right">
                   <Button className="h-8 w-8 text-muted-foreground" size="icon" variant="ghost">
@@ -518,12 +503,12 @@ function BundlesList() {
             key={bundle.id}
           >
             <div className="flex flex-col gap-1.5">
-              <span className="font-heading font-semibold text-[15px]">{bundle.name}</span>
+              <span className="font-heading font-semibold text-sm">{bundle.name}</span>
               <span className="text-xs text-muted-foreground font-medium">
                 {bundle.items} <span className="mx-1">|</span> {bundle.price}
               </span>
               <div className="pt-1.5">
-                <Badge className={`${bundle.badgeClasses} border-none px-2 py-0.5 text-[10px]`}>
+                <Badge className="border-none px-2 py-0.5" variant={statusVariant(bundle.status)}>
                   {bundle.status}
                 </Badge>
               </div>
@@ -545,7 +530,6 @@ function EventsList() {
   const eventsData = [
     {
       attendees: "45 / 50",
-      badgeClasses: "bg-[#E3F2FD] text-[#1976D2] hover:bg-[#E3F2FD]",
       date: "May 15, 2026",
       id: 1,
       location: "Paris, FR",
@@ -554,7 +538,6 @@ function EventsList() {
     },
     {
       attendees: "12 / 20",
-      badgeClasses: "bg-[#E3F2FD] text-[#1976D2] hover:bg-[#E3F2FD]",
       date: "June 02, 2026",
       id: 2,
       location: "Lyon, FR",
@@ -603,7 +586,9 @@ function EventsList() {
                 </TableCell>
                 <TableCell className="text-center font-medium text-sm">{event.attendees}</TableCell>
                 <TableCell className="text-center">
-                  <Badge className={`${event.badgeClasses} border-none`}>{event.status}</Badge>
+                  <Badge className="border-none" variant={statusVariant(event.status)}>
+                    {event.status}
+                  </Badge>
                 </TableCell>
                 <TableCell className="text-right">
                   <Button className="h-8 w-8 text-muted-foreground" size="icon" variant="ghost">
@@ -624,12 +609,12 @@ function EventsList() {
             key={event.id}
           >
             <div className="flex flex-col gap-1.5">
-              <span className="font-heading font-semibold text-[15px]">{event.name}</span>
+              <span className="font-heading font-semibold text-sm">{event.name}</span>
               <span className="text-xs text-muted-foreground font-medium">
                 {event.date} <span className="mx-1">|</span> {event.location}
               </span>
               <div className="pt-1.5 flex items-center gap-2">
-                <Badge className={`${event.badgeClasses} border-none px-2 py-0.5 text-[10px]`}>
+                <Badge className="border-none px-2 py-0.5" variant={statusVariant(event.status)}>
                   {event.status}
                 </Badge>
                 <span className="text-xs text-muted-foreground font-medium pl-2 border-l border-border/50">
