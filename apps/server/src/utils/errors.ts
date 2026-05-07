@@ -17,6 +17,10 @@ export function handleError(e: unknown) {
         return status(400, "Insufficient stock for one or more items");
       case "INVALID_TRANSITION":
         return status(409, "Order item status cannot be changed from its current state");
+      case "ALREADY_HAS_PENDING_REQUEST":
+        return status(409, "You already have a pending request for this role");
+      case "ALREADY_RESPONDED":
+        return status(400, "Request already processed");
     }
   }
   throw e;
