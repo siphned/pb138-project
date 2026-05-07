@@ -1,6 +1,7 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { ArrowLeft } from "lucide-react";
 import { PublicLayout } from "@/components/layout/PublicLayout";
+import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import { useGetWinemakersById } from "@/generated/hooks/useGetWinemakersById";
 import { WinemakerHero } from "./-components/WinemakerHero";
@@ -36,13 +37,9 @@ function WinemakerProfilePage() {
       <PublicLayout>
         <div className="container mx-auto flex flex-col items-center py-24 text-center">
           <p className="font-bold text-destructive">Failed to load winemaker details.</p>
-          <button
-            className="text-primary hover:underline mt-2"
-            onClick={() => refetch()}
-            type="button"
-          >
+          <Button className="mt-2" onClick={() => refetch()} variant="link">
             Retry
-          </button>
+          </Button>
         </div>
       </PublicLayout>
     );

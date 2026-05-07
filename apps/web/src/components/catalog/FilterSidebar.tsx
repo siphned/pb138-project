@@ -149,14 +149,14 @@ function RatingSection({
         {[4, 3, 2, 1].map((n) => {
           const isSelected = values[section.key] === n;
           return (
-            <button
+            <Button
               className={cn(
-                "flex w-full items-center gap-2 rounded-lg px-2 py-1.5 text-sm transition-colors hover:bg-secondary",
+                "flex w-full items-center gap-2 rounded-lg px-2 py-1.5 text-sm justify-start",
                 isSelected && "bg-secondary font-medium"
               )}
               key={n}
               onClick={() => onChange(section.key, isSelected ? undefined : n)}
-              type="button"
+              variant="ghost"
             >
               {[1, 2, 3, 4, 5].map((star) => (
                 <Star
@@ -168,7 +168,7 @@ function RatingSection({
                 />
               ))}
               <span className="text-muted-foreground">& up</span>
-            </button>
+            </Button>
           );
         })}
       </div>

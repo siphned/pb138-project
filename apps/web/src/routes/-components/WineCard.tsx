@@ -2,6 +2,7 @@ import { Link } from "@tanstack/react-router";
 import { Heart } from "lucide-react";
 import { useState } from "react";
 import { CatalogCard } from "@/components/catalog/CatalogCard";
+import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 
 interface WineCardProduct {
@@ -63,8 +64,8 @@ export function WineCard({ product, shopName }: WineCardProps) {
       subtitle={subtitle || undefined}
       title={product.name}
       topRightSlot={
-        <button
-          className="rounded-full bg-background/80 p-2 transition-colors opacity-50 cursor-not-allowed"
+        <Button
+          className="rounded-full bg-background/80 p-2 opacity-50 cursor-not-allowed h-auto w-auto"
           disabled
           onClick={(e) => {
             e.preventDefault();
@@ -72,7 +73,7 @@ export function WineCard({ product, shopName }: WineCardProps) {
             setWishlisted((w) => !w);
           }}
           title="Wishlist coming soon"
-          type="button"
+          variant="ghost"
         >
           <Heart
             className={cn(
@@ -80,7 +81,7 @@ export function WineCard({ product, shopName }: WineCardProps) {
               wishlisted ? "fill-primary text-primary" : "text-muted-foreground"
             )}
           />
-        </button>
+        </Button>
       }
     />
   );

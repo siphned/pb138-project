@@ -119,8 +119,8 @@ export function Sidebar({ userRoles = [Role.customer], activeRole, onRoleChange 
                         {userRoles
                           .filter((role) => role !== currentActiveRole)
                           .map((role) => (
-                            <button
-                              className="w-full text-left px-3 py-2 text-sm font-medium rounded-md hover:bg-secondary/50 text-muted-foreground transition-colors"
+                            <Button
+                              className="w-full justify-start px-3 py-2 text-sm font-medium rounded-md text-muted-foreground"
                               key={role}
                               onClick={() => {
                                 setAccordionState([]);
@@ -128,10 +128,10 @@ export function Sidebar({ userRoles = [Role.customer], activeRole, onRoleChange 
                                   onRoleChange(role);
                                 }
                               }}
-                              type="button"
+                              variant="ghost"
                             >
                               {role}
-                            </button>
+                            </Button>
                           ))}
                       </div>
                     </AccordionContent>
@@ -189,21 +189,31 @@ export function Sidebar({ userRoles = [Role.customer], activeRole, onRoleChange 
             </Show>
 
             <Show when="signed-in">
+<<<<<<< HEAD
               <NavItem variant="muted" className="mt-2" onClick={() => openUserProfile()}>
                 <Settings className="h-4 w-4" /> Settings
               </NavItem>
+=======
+              <Button
+                className="flex-none flex items-center gap-3 px-3 py-3 rounded-md text-sm font-medium text-muted-foreground mt-2"
+                onClick={() => openUserProfile()}
+                variant="ghost"
+              >
+                <Settings className="h-4 w-4" /> Settings
+              </Button>
+>>>>>>> 3a48d19 (fix(WINE-155): replace raw button elements with Button component)
             </Show>
           </nav>
         </div>
 
         <div className="flex-none border-t pt-4 pb-6 px-6 flex flex-col gap-1 bg-background z-10">
-          <button
-            className="flex items-center justify-between px-3 py-2 rounded-md hover:bg-secondary/50 transition-colors text-sm font-medium text-muted-foreground w-full text-left"
-            type="button"
+          <Button
+            className="flex items-center justify-between px-3 py-2 rounded-md text-sm font-medium text-muted-foreground w-full"
+            variant="ghost"
           >
             Theme
             <Moon className="h-4 w-4" />
-          </button>
+          </Button>
 
           <Show when="signed-in">
             <NavItem
