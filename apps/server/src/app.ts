@@ -16,21 +16,14 @@ import { supplyAgreementsRoutes } from "./modules/supply-agreements";
 import { usersRoutes } from "./modules/users";
 import { winemakersRoutes } from "./modules/winemakers";
 import { winesRoutes } from "./modules/wines";
+import { errorPlugin } from "./utils/errorPlugin";
 
 const isProd = process.env.NODE_ENV === "production";
 const frontendUrl = process.env.FRONTEND_URL || "http://localhost:5173";
 const apiUrl = process.env.API_URL || "http://localhost:3000";
 
 export const app = new Elysia()
-  .onError(({ code, error, request }) => {
-    // biome-ignore lint/suspicious/noConsole: global error handler
-    console.error(`Error ${code} during ${request.method} ${request.url}:`, error);
-
-    if (code === "NOT_FOUND") return "Not Found";
-    if (code === "VALIDATION") return error.all;
-
-    return isProd ? "Internal Server Error" : (error as Error).message;
-  })
+  .use(errorPlugin)
   .use(cors({ origin: frontendUrl }))
   .use(
     openapi({
