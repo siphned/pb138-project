@@ -14,6 +14,7 @@ import { roleRequestsRoutes } from "./modules/role-requests";
 import { shopsRoutes } from "./modules/shops";
 import { supplyAgreementsRoutes } from "./modules/supply-agreements";
 import { usersRoutes } from "./modules/users";
+import { webhooksRoutes } from "./modules/webhooks";
 import { winemakersRoutes } from "./modules/winemakers";
 import { winesRoutes } from "./modules/wines";
 import { errorPlugin } from "./utils/error-plugin";
@@ -67,6 +68,7 @@ export const app = new Elysia()
     })
   )
   .use(usersRoutes)
+  .use(webhooksRoutes)
   .use(roleRequestsRoutes)
   .use(shopsRoutes)
   .use(productsRoutes)
