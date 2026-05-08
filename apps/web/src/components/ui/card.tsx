@@ -1,18 +1,35 @@
+import { cva, type VariantProps } from "class-variance-authority";
 import type * as React from "react";
 
 import { cn } from "@/lib/utils";
 
-function Card({
-  className,
-  size = "default",
-  ...props
-}: React.ComponentProps<"div"> & { size?: "default" | "sm" }) {
+const cardVariants = cva(
+  "group/card flex flex-col overflow-hidden rounded-2xl text-sm text-card-foreground has-[>img:first-child]:pt-0 *:[img:first-child]:rounded-t-xl *:[img:last-child]:rounded-b-xl",
+  {
+    defaultVariants: {
+      variant: "default",
+    },
+    variants: {
+      variant: {
+        default:
+          "gap-6 bg-card py-6 ring-1 ring-foreground/10 data-[size=sm]:gap-4 data-[size=sm]:py-4",
+        catalog:
+          "relative bg-secondary/20 p-0 shadow-sm transition-all hover:shadow-md",
+        section: "bg-secondary/10",
+      },
+    },
+  }
+);
+
+type CardProps = React.ComponentProps<"div"> &
+  VariantProps<typeof cardVariants> & {
+    size?: "default" | "sm";
+  };
+
+function Card({ className, size = "default", variant, ...props }: CardProps) {
   return (
     <div
-      className={cn(
-        "group/card flex flex-col gap-6 overflow-hidden rounded-2xl bg-card py-6 text-sm text-card-foreground ring-1 ring-foreground/10 has-[>img:first-child]:pt-0 data-[size=sm]:gap-4 data-[size=sm]:py-4 *:[img:first-child]:rounded-t-xl *:[img:last-child]:rounded-b-xl",
-        className
-      )}
+      className={cn(cardVariants({ variant }), className)}
       data-size={size}
       data-slot="card"
       {...props}
@@ -86,4 +103,13 @@ function CardFooter({ className, ...props }: React.ComponentProps<"div">) {
   );
 }
 
-export { Card, CardAction, CardContent, CardDescription, CardFooter, CardHeader, CardTitle };
+export {
+  Card,
+  CardAction,
+  CardContent,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  cardVariants,
+  CardTitle,
+};
