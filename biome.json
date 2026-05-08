@@ -55,7 +55,8 @@
       "!**/raw",
       "!**/tsconfig*.json",
       "!**/src/generated",
-      "!**/routeTree.gen.ts"
+      "!**/routeTree.gen.ts",
+      "!openapi.json"
     ]
   },
   "formatter": {
