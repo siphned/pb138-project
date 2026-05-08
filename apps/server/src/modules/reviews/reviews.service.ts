@@ -39,12 +39,31 @@ export class ReviewsService {
     return withUser;
   }
 
+  async createWineReview(
+    userId: string,
+    wineId: string,
+    data: { rating: number; body?: string }
+  ): Promise<ReviewWithUser> {
+    const [hasPurchased, existing] = await Promise.all([
+      reviewsRepo.hasPurchasedWine(db, userId, wineId),
+      reviewsRepo.findUserReview(db, userId, wineId, "wine"),
+    ]);
+
+    if (!hasPurchased) throw new Error("NOT_PURCHASED");
+    if (existing) throw new Error("ALREADY_REVIEWED");
+
+    const review = await reviewsRepo.insertReview(db, userId, wineId, "wine", data);
+    const withUser = await reviewsRepo.findReviewWithUser(db, review.id);
+    if (!withUser) throw new Error("NOT_FOUND");
+    return withUser;
+  }
+
   async deleteReview(
     reviewId: string,
     userId: string,
     userRole: string,
     entityId: string,
-    entityType: "product" | "winemaker"
+    entityType: "product" | "winemaker" | "wine"
   ): Promise<void> {
     const review = await reviewsRepo.findUserReview(db, userId, entityId, entityType);
     if (!review || review.id !== reviewId) {
@@ -82,6 +101,19 @@ export class ReviewsService {
       reviewsRepo.findReviews(db, winemakerId, "winemaker", { limit, offset, sort: opts.sort }),
       reviewsRepo.countReviews(db, winemakerId, "winemaker"),
       reviewsRepo.averageRating(db, winemakerId, "winemaker"),
+    ]);
+    return { averageRating, reviews, totalCount };
+  }
+
+  async listWineReviews(
+    wineId: string,
+    opts: { page: number; limit: number; sort: "newest" | "highest" | "lowest" }
+  ): Promise<ReviewListResult<ReviewWithUser>> {
+    const { limit, offset } = parsePagination(opts);
+    const [reviews, totalCount, averageRating] = await Promise.all([
+      reviewsRepo.findReviews(db, wineId, "wine", { limit, offset, sort: opts.sort }),
+      reviewsRepo.countReviews(db, wineId, "wine"),
+      reviewsRepo.averageRating(db, wineId, "wine"),
     ]);
     return { averageRating, reviews, totalCount };
   }

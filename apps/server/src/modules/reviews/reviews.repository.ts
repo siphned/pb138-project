@@ -1,5 +1,5 @@
 import type { Review } from "@repo/shared/schemas";
-import { orderItems, orders, reviews } from "@repo/shared/schemas";
+import { orderItems, orders, productWines, reviews } from "@repo/shared/schemas";
 import { and, asc, avg, count, desc, eq, isNull } from "drizzle-orm";
 import type { Database } from "../../db";
 
@@ -10,7 +10,7 @@ export type ReviewWithUser = Review & {
 export async function averageRating(
   db: Database,
   entityId: string,
-  entityType: "product" | "winemaker"
+  entityType: "product" | "winemaker" | "wine"
 ): Promise<number | null> {
   const [row] = await db
     .select({ avg: avg(reviews.rating) })
@@ -28,7 +28,7 @@ export async function averageRating(
 export async function countReviews(
   db: Database,
   entityId: string,
-  entityType: "product" | "winemaker"
+  entityType: "product" | "winemaker" | "wine"
 ): Promise<number> {
   const [row] = await db
     .select({ count: count() })
@@ -52,7 +52,7 @@ export async function findById(db: Database, id: string): Promise<Review | undef
 export async function findReviews(
   db: Database,
   entityId: string,
-  entityType: "product" | "winemaker",
+  entityType: "product" | "winemaker" | "wine",
   opts: { limit: number; offset: number; sort: "newest" | "highest" | "lowest" }
 ): Promise<ReviewWithUser[]> {
   let orderBy = [desc(reviews.createdAt)];
@@ -89,7 +89,7 @@ export async function findUserReview(
   db: Database,
   userId: string,
   entityId: string,
-  entityType: "product" | "winemaker"
+  entityType: "product" | "winemaker" | "wine"
 ): Promise<Review | undefined> {
   return db.query.reviews.findFirst({
     where: and(
@@ -115,11 +115,26 @@ export async function hasPurchasedProduct(
   return rows.length > 0;
 }
 
+export async function hasPurchasedWine(
+  db: Database,
+  userId: string,
+  wineId: string
+): Promise<boolean> {
+  const rows = await db
+    .select({ id: orderItems.id })
+    .from(orderItems)
+    .innerJoin(orders, eq(orderItems.orderId, orders.id))
+    .innerJoin(productWines, eq(orderItems.productId, productWines.productId))
+    .where(and(eq(orders.userId, userId), eq(productWines.wineId, wineId)))
+    .limit(1);
+  return rows.length > 0;
+}
+
 export async function insertReview(
   db: Database,
   userId: string,
   entityId: string,
-  entityType: "product" | "winemaker",
+  entityType: "product" | "winemaker" | "wine",
   data: { rating: number; body?: string }
 ): Promise<Review> {
   const [review] = await db
@@ -139,3 +154,16 @@ export async function insertReview(
 export async function softDelete(db: Database, reviewId: string): Promise<void> {
   await db.update(reviews).set({ deletedAt: new Date() }).where(eq(reviews.id, reviewId));
 }
+
+export const reviewsRepository = {
+  averageRating,
+  countReviews,
+  findById,
+  findReviews,
+  findReviewWithUser,
+  findUserReview,
+  hasPurchasedProduct,
+  hasPurchasedWine,
+  insertReview,
+  softDelete,
+};
