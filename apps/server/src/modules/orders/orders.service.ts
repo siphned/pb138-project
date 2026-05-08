@@ -154,54 +154,6 @@ export class OrdersService {
     return order;
   }
 
-  // biome-ignore lint/suspicious/noExplicitAny: complex cart type
-  private validateAndProcessCart(cart: any) {
-    const items: CreateOrderItem[] = [];
-    let subtotal = 0;
-
-    for (const cartItem of cart.items) {
-      if (cartItem.product.deletedAt !== null) {
-        throw new Error(`PRODUCT_DELETED:${cartItem.product.name}`);
-      }
-      if (cartItem.product.quantity < cartItem.quantity) {
-        throw new Error(`INSUFFICIENT_STOCK:${cartItem.product.name}`);
-      }
-
-      items.push({
-        productId: cartItem.productId,
-        quantity: cartItem.quantity,
-        shopId: cartItem.product.shopId,
-        unitPrice: cartItem.product.price,
-      });
-
-      subtotal += Number.parseFloat(cartItem.product.price) * cartItem.quantity;
-    }
-
-    const shippingFee = 10;
-    const totalPrice = (subtotal + shippingFee).toFixed(2);
-    return { items, totalPrice };
-  }
-
-  private async updateStockAfterOrder(tx: Database, items: CreateOrderItem[]) {
-    for (const item of items) {
-      const product = await productsRepo.findById(tx, item.productId);
-      if (!product) throw new Error("PRODUCT_NOT_FOUND");
-
-      await productsRepo.update(tx, item.productId, {
-        quantity: product.quantity - item.quantity,
-      });
-
-      for (const pw of product.productWines) {
-        const totalWineNeeded = pw.quantity * item.quantity;
-        const currentWineQty = await productsRepo.getWineQuantityForUpdate(tx, pw.wineId);
-        if (currentWineQty === undefined || currentWineQty < totalWineNeeded) {
-          throw new Error("INSUFFICIENT_STOCK");
-        }
-        await productsRepo.updateWineQuantity(tx, pw.wineId, sql`quantity - ${totalWineNeeded}`);
-      }
-    }
-  }
-
   async getOrder(id: string, userId: string): Promise<OrderWithItems> {
     const order = await ordersRepo.findById(db, id);
     if (!order) throw new Error("NOT_FOUND");
@@ -239,6 +191,55 @@ export class OrdersService {
     }
 
     return updated;
+  }
+
+  // biome-ignore lint/suspicious/noExplicitAny: complex cart type
+  private validateAndProcessCart(cart: any) {
+    const items: CreateOrderItem[] = [];
+    let subtotal = 0;
+
+    for (const cartItem of cart.items) {
+      if (cartItem.product.deletedAt !== null) {
+        throw new Error(`PRODUCT_DELETED:${cartItem.product.name}`);
+      }
+      if (cartItem.product.quantity < cartItem.quantity) {
+        throw new Error(`INSUFFICIENT_STOCK:${cartItem.product.name}`);
+      }
+
+      items.push({
+        productId: cartItem.productId,
+        quantity: cartItem.quantity,
+        shopId: cartItem.product.shopId,
+        unitPrice: cartItem.product.price,
+      });
+
+      subtotal += Number.parseFloat(cartItem.product.price) * cartItem.quantity;
+    }
+
+    const shippingFee = 10;
+    const totalPrice = (subtotal + shippingFee).toFixed(2);
+    return { items, totalPrice };
+  }
+
+  private async updateStockAfterOrder(tx: Database, items: CreateOrderItem[]) {
+    for (const item of items) {
+      const product = await productsRepo.findById(tx, item.productId);
+      if (!product) throw new Error("PRODUCT_NOT_FOUND");
+
+      // Use atomic decrement to prevent race conditions
+      await productsRepo.update(tx, item.productId, {
+        quantity: sql`${sql.raw('quantity')} - ${item.quantity}`,
+      });
+
+      for (const pw of product.productWines) {
+        const totalWineNeeded = pw.quantity * item.quantity;
+        const currentWineQty = await productsRepo.getWineQuantityForUpdate(tx, pw.wineId);
+        if (currentWineQty === undefined || currentWineQty < totalWineNeeded) {
+          throw new Error("INSUFFICIENT_STOCK");
+        }
+        await productsRepo.updateWineQuantity(tx, pw.wineId, sql`${sql.raw('quantity')} - ${totalWineNeeded}`);
+      }
+    }
   }
 }
 

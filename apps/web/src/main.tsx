@@ -9,20 +9,11 @@ import { Button } from "./components/ui/button";
 import { UserProvider } from "./context/UserContext.tsx";
 import { routeTree } from "./routeTree.gen.ts";
 
-// Add artificial delay to query functions for smoother skeleton transitions
 const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
-      queryFn: async ({ queryKey, signal }) => {
-        // Global 200ms delay
-        await new Promise((resolve) => setTimeout(resolve, 200));
-        const url = queryKey.join("/");
-        const response = await fetch(url, { signal });
-        if (!response.ok) throw new Error("Network response was not ok");
-        return response.json();
-      },
-      retry: 1, // 5 minutes
-      staleTime: 1000 * 60 * 5,
+      retry: 1,
+      staleTime: 1000 * 60 * 5, // 5 minutes
     },
   },
 });
@@ -54,7 +45,7 @@ createRoot(document.getElementById("root")!).render(
                 <p className="text-muted-foreground mb-8">
                   An unexpected error occurred. Please try reloading the application.
                 </p>
-                <Button className="px-6 py-2" onClick={() => window.location.reload()}>
+                <Button onClick={() => window.location.reload()} className="px-6 py-2">
                   Reload App
                 </Button>
               </div>

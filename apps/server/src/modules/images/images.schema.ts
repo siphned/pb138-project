@@ -7,7 +7,7 @@ export const entityTypeSchema = t.Union(VALID_ENTITY_TYPES.map((v) => t.Literal(
 export const imageResponse = t.Object({
   createdAt: t.Date(),
   entityId: t.String(),
-  entityType: entityTypeSchema,
+  entityType: t.String(),
   id: t.String(),
   url: t.String(),
 });

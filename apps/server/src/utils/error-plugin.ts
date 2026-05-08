@@ -22,7 +22,7 @@ export const errorPlugin = new Elysia().onError(({ error, set }) => {
     };
   }
 
-  logger.error(error);
+  logger.error({ err: error });
 
   set.status = 500;
   return {

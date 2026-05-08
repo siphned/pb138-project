@@ -24,8 +24,7 @@ function buildImageRoutes(entityPlural: string, entityType: EntityType) {
     .get(
       `/${entityPlural}/:id/images`,
       async ({ params }) => {
-        // biome-ignore lint/suspicious/noExplicitAny: Elysia type inference mismatch with entityType literal
-        return (await imagesService.listImages(entityType, params.id)) as any;
+        return await imagesService.listImages(entityType, params.id);
       },
       {
         detail: {
@@ -50,8 +49,7 @@ function buildImageRoutes(entityPlural: string, entityType: EntityType) {
           params.id,
           body.file
         );
-        // biome-ignore lint/suspicious/noExplicitAny: Elysia type inference mismatch
-        return status(201, image as any);
+        return status(201, image);
       },
       {
         body: uploadImageBody,
