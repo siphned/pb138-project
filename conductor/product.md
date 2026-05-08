@@ -10,7 +10,11 @@ The application is live at [winery-prod.vercel.app](https://vercel.com/sinoglmat
 
 ## Core Features
 - Wine Catalog (Search, Filter, Detail)
+- Wine Discovery: Detail pages with shop availability and aggregated wine reviews.
+- Producer Showcase: Comprehensive Winemaker profiles with catalog, events, and reputation tabs.
 - User Authentication & Profiles (Role-based: Customer, Producer, Admin)
-- Subscription Engine (Monthly boxes)
 - Event Registration (Tastings, vineyard tours)
 - Checkout & Order Management
+
+## Future Expansions
+- Subscription Engine (Monthly boxes)
