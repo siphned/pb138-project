@@ -16,7 +16,7 @@ import { supplyAgreementsRoutes } from "./modules/supply-agreements";
 import { usersRoutes } from "./modules/users";
 import { winemakersRoutes } from "./modules/winemakers";
 import { winesRoutes } from "./modules/wines";
-import { errorPlugin } from "./utils/errorPlugin";
+import { errorPlugin } from "./utils/error-plugin";
 
 const isProd = process.env.NODE_ENV === "production";
 const frontendUrl = process.env.FRONTEND_URL || "http://localhost:5173";

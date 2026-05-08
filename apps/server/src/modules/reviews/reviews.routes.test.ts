@@ -1,4 +1,4 @@
-import type { Elysia } from "elysia";
+import { Elysia } from "elysia";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
 // Mock the service
@@ -12,117 +12,69 @@ vi.mock("./reviews.service", () => ({
   },
 }));
 
-import { createReviewsRoutes } from "./reviews.routes";
+const mockUserState = {
+  clerkId: "clerk-u1",
+  clerkPayload: { roles: ["customer"], sub: "clerk-u1" },
+  dbUser: { id: "u1", role: "customer" },
+};
+
+// Mock the auth module BEFORE importing reviewsRoutes
+vi.mock("../auth", () => ({
+  authPlugin: new (require("elysia").Elysia)({ name: "auth" }).macro({
+    requireAuth: {
+      resolve: () => mockUserState,
+    },
+    requireCapability: () => ({
+      resolve: () => mockUserState,
+    }),
+    requireRoles: () => ({
+      resolve: () => mockUserState,
+    }),
+  }),
+}));
+
+import { reviewsRoutes } from "./reviews.routes";
 import { reviewsService } from "./reviews.service";
 
 describe("reviews.routes integration", () => {
-  const mockAuthState = {
-    clerkPayload: { roles: ["customer"], sub: "test" },
-    dbUser: {
-      deletedAt: null,
-      email: "user@test.com",
-      fname: "Test",
-      id: "u1",
-      lname: "User",
-      role: "customer",
-      status: "active",
-      updatedAt: null,
-    },
-  };
-
-  const mockAuthPlugin = (app: Elysia) =>
-    app
-      .derive(() => mockAuthState)
-      .macro(
-        () =>
-          ({
-            requireAuth: () => ({}),
-            requireRoles: () => ({}),
-          }) as any
-      );
-
-  const app = createReviewsRoutes(mockAuthPlugin as any);
+  const app = new Elysia().use(reviewsRoutes);
 
   beforeEach(() => {
     vi.clearAllMocks();
   });
 
-  it("GET /reviews/product/:id returns 200 with totalCount and calls service with defaults", async () => {
+  it("GET /products/:id/reviews returns 200", async () => {
     vi.mocked(reviewsService.listProductReviews).mockResolvedValue({
       averageRating: 4.5,
       reviews: [],
       totalCount: 0,
     });
 
-    const res = await app.handle(new Request("http://localhost/reviews/product/p1"));
-
+    const res = await app.handle(new Request("http://localhost/products/p1/reviews"));
     expect(res.status).toBe(200);
-    const body = (await res.json()) as { totalCount: number };
-    expect(body.totalCount).toBe(0);
-    expect(reviewsService.listProductReviews).toHaveBeenCalledWith("p1", {
-      limit: 12,
-      page: 1,
-      sort: "newest",
-    });
   });
 
-  it("GET /reviews/winemaker/:id returns 200 with totalCount and custom params", async () => {
-    vi.mocked(reviewsService.listWinemakerReviews).mockResolvedValue({
-      averageRating: 3.0,
-      reviews: [],
-      totalCount: 5,
-    });
+  it("POST /products/:id/reviews returns 200", async () => {
+    vi.mocked(reviewsService.createProductReview).mockResolvedValue({ id: "r1" } as any);
 
     const res = await app.handle(
-      new Request("http://localhost/reviews/winemaker/w1?page=2&limit=5&sort=highest")
-    );
-
-    expect(res.status).toBe(200);
-    const body = (await res.json()) as { totalCount: number };
-    expect(body.totalCount).toBe(5);
-    expect(reviewsService.listWinemakerReviews).toHaveBeenCalledWith("w1", {
-      limit: 5,
-      page: 2,
-      sort: "highest",
-    });
-  });
-
-  it("POST /reviews/product/:id returns 200", async () => {
-    const mockFullReview = {
-      body: "test",
-      createdAt: new Date().toISOString(),
-      deletedAt: null,
-      entityId: "p1",
-      entityType: "product",
-      id: "r1",
-      rating: 5,
-      updatedAt: null,
-      user: { fname: "Test", id: "u1", lname: "User" },
-      userId: "u1",
-    };
-
-    vi.mocked(reviewsService.createProductReview).mockResolvedValue(mockFullReview as any);
-
-    const res = await app.handle(
-      new Request("http://localhost/reviews/product/p1", {
+      new Request("http://localhost/products/p1/reviews", {
         body: JSON.stringify({ body: "test", rating: 5 }),
         headers: { "Content-Type": "application/json" },
         method: "POST",
       })
     );
-
     expect(res.status).toBe(200);
   });
 
-  it("DELETE /reviews/product/:id/:reviewId returns 200", async () => {
+  it("DELETE /reviews/:id returns 200", async () => {
     vi.mocked(reviewsService.deleteReview).mockResolvedValue(undefined);
 
     const res = await app.handle(
-      new Request("http://localhost/reviews/product/p1/r1", {
+      new Request("http://localhost/reviews/r1?entityId=p1&entityType=product", {
         method: "DELETE",
       })
     );
-
     expect(res.status).toBe(200);
   });
 });

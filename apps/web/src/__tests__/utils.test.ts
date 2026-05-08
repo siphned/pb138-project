@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
-import { formatDate, formatDatetime } from "../utils/dateFormatter";
+import { formatDate, formatDatetime } from "../utils/date-formatter";
 import { getStockStatus } from "../utils/stock";
-import { capitalize, capitalizeFirst, slugify, truncateString } from "../utils/stringUtils";
+import { capitalize, capitalizeFirst, slugify, truncateString } from "../utils/string-utils";
 import { validateEmail, validatePassword, validatePhoneNumber } from "../utils/validators";
 
 describe("Utility functions", () => {

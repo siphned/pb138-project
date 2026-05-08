@@ -2,6 +2,7 @@ import { createClerkClient } from "@clerk/backend";
 import type { Address, User } from "@repo/shared/schemas";
 import { z } from "zod";
 import { db } from "../../db";
+import { logger } from "../../utils/logger";
 import * as userRolesRepo from "./user-roles.repository";
 import { UserNotFoundError } from "./users.errors";
 import * as usersRepo from "./users.repository";
@@ -146,10 +147,7 @@ export class UsersService {
           .updateUser(clerkId, {
             publicMetadata: { ...clerkUser.publicMetadata, roles: defaultRoles },
           })
-          .catch((e) =>
-            // biome-ignore lint/suspicious/noConsole: background sync
-            console.error(`Failed to seed Clerk roles for ${clerkId}:`, e)
-          );
+          .catch((e) => logger.error({ clerkId }, `Failed to seed Clerk roles: ${e.message}`));
         return {
           email,
           fname: clerkUser.firstName ?? "",

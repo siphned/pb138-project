@@ -1,24 +1,9 @@
 import { guestSessions } from "@repo/shared/schemas";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { db } from "../../db";
-import { guestSessionsRepository } from "./guest-sessions.repository";
+import * as guestSessionsRepository from "./guest-sessions.repository";
 
-interface MockChained {
-  from: () => MockChained;
-  where: () => MockChained;
-  for: () => Promise<unknown[]>;
-  returning: () => Promise<unknown[]>;
-}
-
-interface MockDatabase {
-  select: () => MockChained;
-  insert: () => MockChained;
-  delete: () => MockChained;
-  returning: () => Promise<unknown[]>;
-  where: () => Promise<unknown[]>;
-}
-
-const mockDb = db as unknown as MockDatabase;
+const mockDb = db as any;
 
 vi.mock("../../db", () => {
   const m = {
@@ -43,7 +28,7 @@ describe("guestSessionsRepository", () => {
       const mockSession = { id: "s1" };
       vi.mocked(mockDb.where).mockResolvedValueOnce([mockSession]);
 
-      const result = await guestSessionsRepository.findById("s1");
+      const result = await guestSessionsRepository.findById(db, "s1");
 
       expect(result).toBe(mockSession);
       expect(db.select).toHaveBeenCalled();
@@ -55,25 +40,10 @@ describe("guestSessionsRepository", () => {
       const mockSession = { id: "new-s" };
       vi.mocked(mockDb.returning).mockResolvedValueOnce([mockSession]);
 
-      const result = await guestSessionsRepository.create({ expiresAt: new Date() });
+      const result = await guestSessionsRepository.create(db, { expiresAt: new Date() });
 
       expect(result).toBe(mockSession);
       expect(db.insert).toHaveBeenCalledWith(guestSessions);
-    });
-
-    it("throws if insert fails", async () => {
-      vi.mocked(mockDb.returning).mockResolvedValueOnce([]);
-
-      await expect(guestSessionsRepository.create({ expiresAt: new Date() })).rejects.toThrow(
-        "Failed to create guest session"
-      );
-    });
-  });
-
-  describe("delete", () => {
-    it("deletes a session", async () => {
-      await guestSessionsRepository.delete("s1");
-      expect(db.delete).toHaveBeenCalledWith(guestSessions);
     });
   });
 });

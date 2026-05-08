@@ -19,9 +19,9 @@ export class AppErrorBoundary extends Component<Props, State> {
     return { hasError: true };
   }
 
-  public componentDidCatch(error: Error, errorInfo: ErrorInfo) {
-    // biome-ignore lint/suspicious/noConsole: error boundary reporting
-    console.error("Uncaught error:", error, errorInfo);
+  public componentDidCatch(_error: Error, _errorInfo: ErrorInfo) {
+    // TODO: Implement frontend error reporting service (e.g. Sentry or local logger)
+    // console.error("Uncaught error:", error, errorInfo);
   }
 
   public render() {

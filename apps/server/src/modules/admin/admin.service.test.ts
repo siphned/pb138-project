@@ -1,23 +1,26 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
+import { db } from "../../db";
+import { emailService } from "../email/email.service";
+import * as winemakersRepo from "../winemakers/winemakers.repository";
+import * as adminRepo from "./admin.repository";
+import { adminService } from "./admin.service";
 
-vi.mock("./admin.repository", () => ({
-  adminRepository: {
+vi.mock("./admin.repository", async (importOriginal) => {
+  const actual = await importOriginal<typeof import("./admin.repository")>();
+  return {
+    ...actual,
     findEventById: vi.fn(),
     findEventWithDetailsById: vi.fn(),
-    findProductReviewById: vi.fn(),
     findReviewById: vi.fn(),
     findUserById: vi.fn(),
-    findWinemakerReviewById: vi.fn(),
     listAllReviews: vi.fn(),
     listEvents: vi.fn(),
     listUsers: vi.fn(),
     setEventStatus: vi.fn(),
     setUserStatus: vi.fn(),
-    softDeleteProductReview: vi.fn(),
     softDeleteReview: vi.fn(),
-    softDeleteWinemakerReview: vi.fn(),
-  },
-}));
+  };
+});
 
 vi.mock("../email/email.service", () => ({
   emailService: {
@@ -25,16 +28,13 @@ vi.mock("../email/email.service", () => ({
   },
 }));
 
-vi.mock("../winemakers/winemakers.repository", () => ({
-  winemakersRepository: {
+vi.mock("../winemakers/winemakers.repository", async (importOriginal) => {
+  const actual = await importOriginal<typeof import("../winemakers/winemakers.repository")>();
+  return {
+    ...actual,
     findById: vi.fn(),
-  },
-}));
-
-import { emailService } from "../email";
-import { winemakersRepository } from "../winemakers/winemakers.repository";
-import { adminRepository } from "./admin.repository";
-import { adminService } from "./admin.service";
+  };
+});
 
 describe("adminService", () => {
   beforeEach(() => {
@@ -48,7 +48,7 @@ describe("adminService", () => {
   describe("listUsers", () => {
     it("delegates to repository with filters and pagination", async () => {
       const mockData = [{ id: userId }];
-      vi.mocked(adminRepository.listUsers).mockResolvedValue({ data: mockData as never, total: 1 });
+      vi.mocked(adminRepo.listUsers).mockResolvedValue({ data: mockData as never, total: 1 });
 
       const result = await adminService.listUsers({ status: "active" }, { limit: 10, offset: 0 });
 
@@ -60,16 +60,16 @@ describe("adminService", () => {
   describe("setUserStatus", () => {
     it("updates status if user found", async () => {
       const mockUser = { id: userId };
-      vi.mocked(adminRepository.findUserById).mockResolvedValue(mockUser as never);
-      vi.mocked(adminRepository.setUserStatus).mockResolvedValue(mockUser as never);
+      vi.mocked(adminRepo.findUserById).mockResolvedValue(mockUser as never);
+      vi.mocked(adminRepo.setUserStatus).mockResolvedValue(mockUser as never);
 
       await adminService.setUserStatus(userId, "suspended");
 
-      expect(adminRepository.setUserStatus).toHaveBeenCalledWith(userId, "suspended");
+      expect(adminRepo.setUserStatus).toHaveBeenCalledWith(db, userId, "suspended");
     });
 
     it("throws NOT_FOUND if user not found", async () => {
-      vi.mocked(adminRepository.findUserById).mockResolvedValue(undefined);
+      vi.mocked(adminRepo.findUserById).mockResolvedValue(undefined);
       await expect(adminService.setUserStatus(userId, "active")).rejects.toThrow("NOT_FOUND");
     });
   });
@@ -86,30 +86,30 @@ describe("adminService", () => {
       };
       const mockWinemaker = { email: "wine@test.com", id: "wm1", name: "Winery" };
 
-      vi.mocked(adminRepository.findEventById).mockResolvedValue(mockEvent as never);
-      vi.mocked(adminRepository.findEventWithDetailsById).mockResolvedValue(mockEvent as never);
-      vi.mocked(winemakersRepository.findById).mockResolvedValue(mockWinemaker as never);
+      vi.mocked(adminRepo.findEventById).mockResolvedValue(mockEvent as never);
+      vi.mocked(adminRepo.findEventWithDetailsById).mockResolvedValue(mockEvent as never);
+      vi.mocked(winemakersRepo.findById).mockResolvedValue(mockWinemaker as never);
 
       await adminService.approveEvent(eventId);
 
-      expect(adminRepository.setEventStatus).toHaveBeenCalledWith(eventId, "approved");
+      expect(adminRepo.setEventStatus).toHaveBeenCalledWith(db, eventId, "approved");
       expect(emailService.sendEventApproval).toHaveBeenCalled();
     });
   });
 
   describe("listAllReviews", () => {
     it("delegates to repository", async () => {
-      vi.mocked(adminRepository.listAllReviews).mockResolvedValue({ data: [], total: 0 });
+      vi.mocked(adminRepo.listAllReviews).mockResolvedValue({ data: [], total: 0 });
       await adminService.listAllReviews();
-      expect(adminRepository.listAllReviews).toHaveBeenCalled();
+      expect(adminRepo.listAllReviews).toHaveBeenCalled();
     });
   });
 
   describe("deleteReview", () => {
     it("soft deletes review if found", async () => {
-      vi.mocked(adminRepository.findReviewById).mockResolvedValue({ id: reviewId } as never);
+      vi.mocked(adminRepo.findReviewById).mockResolvedValue({ id: reviewId } as never);
       await adminService.deleteReview(reviewId);
-      expect(adminRepository.softDeleteReview).toHaveBeenCalledWith(reviewId);
+      expect(adminRepo.softDeleteReview).toHaveBeenCalledWith(db, reviewId);
     });
   });
 });

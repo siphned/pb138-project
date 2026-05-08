@@ -87,3 +87,14 @@ winery/
 ---
 Last updated: April 2026
 Maintained by: Matej Šinogl
+
+## Agent skills
+
+### Issue tracker
+Jira integrated with GitHub. Jira for tracking, GitHub for PRs. See `docs/agents/issue-tracker.md`. 
+
+### Triage labels
+Standard canonical labels used as Jira labels. See `docs/agents/triage-labels.md`. 
+
+### Domain docs
+Multi-context layout for monorepo. See `docs/agents/domain.md`. 

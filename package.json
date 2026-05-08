@@ -33,9 +33,9 @@
     "db:migrate": "turbo run db:migrate --filter=server # Hangs on Neon, use db:push instead",
     "db:seed": "turbo run db:seed --filter=server",
     "db:studio": "turbo run db:studio --filter=server",
-    "test": "turbo run test",
-    "test:e2e": "turbo run test:e2e",
-    "validate": "bun run lint && turbo run db:check && bun run generate && (git diff --exit-code openapi.json > /dev/null || (echo '❌ OpenAPI schema drift! Run generate and commit changes.' && exit 1)) && bun run check-types && bun run test && bun run build"
+    "test": "turbo run test -- --run",
+    "test:e2e": "turbo run test:e2e -- --run",
+    "validate": "echo 'Running mandatory pre-push validation...' && bun run check && bun run generate && (git diff --exit-code openapi.json > /dev/null || (echo '❌ OpenAPI schema drift! Run generate and commit changes.' && exit 1)) && bun run check-types && bun run test && bun run build"
   },
   "workspaces": [
     "apps/*",

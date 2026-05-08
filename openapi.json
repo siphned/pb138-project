@@ -1988,319 +1988,10 @@
         "operationId": "patchShopsById"
       }
     },
-    "/shops/{id}/products": {
+    "/products/": {
       "get": {
-        "description": "Returns products and bundles for the shop. Filter with `?isBundle=true` or `?isBundle=false`.",
-        "summary": "List products for a shop",
-        "tags": [
-          "products"
-        ],
-        "parameters": [
-          {
-            "name": "id",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          },
-          {
-            "name": "isBundle",
-            "in": "query",
-            "required": false,
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
-        "operationId": "getShopsByIdProducts",
-        "responses": {
-          "200": {
-            "description": "Success"
-          }
-        }
-      },
-      "post": {
-        "security": [
-          {
-            "bearerAuth": []
-          }
-        ],
-        "summary": "Create a product",
-        "tags": [
-          "products"
-        ],
-        "parameters": [
-          {
-            "name": "id",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": {
-                "type": "object",
-                "required": [
-                  "name",
-                  "price",
-                  "quantity",
-                  "wineId"
-                ],
-                "properties": {
-                  "description": {
-                    "minLength": 1,
-                    "type": "string"
-                  },
-                  "name": {
-                    "maxLength": 255,
-                    "minLength": 1,
-                    "type": "string"
-                  },
-                  "price": {
-                    "pattern": "^\\d+(\\.\\d{1,2})?$",
-                    "type": "string"
-                  },
-                  "quantity": {
-                    "minimum": 0,
-                    "anyOf": [
-                      {
-                        "format": "integer",
-                        "default": 0,
-                        "type": "string"
-                      },
-                      {
-                        "minimum": 0,
-                        "type": "integer"
-                      }
-                    ]
-                  },
-                  "wineId": {
-                    "format": "uuid",
-                    "type": "string"
-                  }
-                }
-              }
-            },
-            "application/x-www-form-urlencoded": {
-              "schema": {
-                "type": "object",
-                "required": [
-                  "name",
-                  "price",
-                  "quantity",
-                  "wineId"
-                ],
-                "properties": {
-                  "description": {
-                    "minLength": 1,
-                    "type": "string"
-                  },
-                  "name": {
-                    "maxLength": 255,
-                    "minLength": 1,
-                    "type": "string"
-                  },
-                  "price": {
-                    "pattern": "^\\d+(\\.\\d{1,2})?$",
-                    "type": "string"
-                  },
-                  "quantity": {
-                    "minimum": 0,
-                    "anyOf": [
-                      {
-                        "format": "integer",
-                        "default": 0,
-                        "type": "string"
-                      },
-                      {
-                        "minimum": 0,
-                        "type": "integer"
-                      }
-                    ]
-                  },
-                  "wineId": {
-                    "format": "uuid",
-                    "type": "string"
-                  }
-                }
-              }
-            },
-            "multipart/form-data": {
-              "schema": {
-                "type": "object",
-                "required": [
-                  "name",
-                  "price",
-                  "quantity",
-                  "wineId"
-                ],
-                "properties": {
-                  "description": {
-                    "minLength": 1,
-                    "type": "string"
-                  },
-                  "name": {
-                    "maxLength": 255,
-                    "minLength": 1,
-                    "type": "string"
-                  },
-                  "price": {
-                    "pattern": "^\\d+(\\.\\d{1,2})?$",
-                    "type": "string"
-                  },
-                  "quantity": {
-                    "minimum": 0,
-                    "anyOf": [
-                      {
-                        "format": "integer",
-                        "default": 0,
-                        "type": "string"
-                      },
-                      {
-                        "minimum": 0,
-                        "type": "integer"
-                      }
-                    ]
-                  },
-                  "wineId": {
-                    "format": "uuid",
-                    "type": "string"
-                  }
-                }
-              }
-            }
-          }
-        },
-        "responses": {
-          "201": {
-            "description": "Response for status 201",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "required": [
-                    "createdAt",
-                    "description",
-                    "id",
-                    "isBundle",
-                    "name",
-                    "price",
-                    "quantity",
-                    "shopId",
-                    "updatedAt"
-                  ],
-                  "properties": {
-                    "createdAt": {
-                      "anyOf": [
-                        {
-                          "format": "date-time",
-                          "type": "string"
-                        },
-                        {
-                          "format": "date",
-                          "type": "string"
-                        },
-                        {
-                          "type": "number"
-                        }
-                      ]
-                    },
-                    "description": {
-                      "type": "string",
-                      "nullable": true
-                    },
-                    "id": {
-                      "type": "string"
-                    },
-                    "isBundle": {
-                      "type": "boolean"
-                    },
-                    "name": {
-                      "type": "string"
-                    },
-                    "price": {
-                      "type": "string"
-                    },
-                    "quantity": {
-                      "anyOf": [
-                        {
-                          "format": "integer",
-                          "default": 0,
-                          "type": "string"
-                        },
-                        {
-                          "type": "integer"
-                        }
-                      ]
-                    },
-                    "shopId": {
-                      "type": "string"
-                    },
-                    "updatedAt": {
-                      "anyOf": [
-                        {
-                          "format": "date-time",
-                          "type": "string"
-                        },
-                        {
-                          "format": "date",
-                          "type": "string"
-                        },
-                        {
-                          "type": "number"
-                        }
-                      ],
-                      "nullable": true
-                    }
-                  }
-                }
-              }
-            }
-          },
-          "403": {
-            "description": "Response for status 403",
-            "content": {
-              "text/plain": {
-                "schema": {
-                  "type": "string"
-                }
-              }
-            }
-          },
-          "404": {
-            "description": "Response for status 404",
-            "content": {
-              "text/plain": {
-                "schema": {
-                  "type": "string"
-                }
-              }
-            }
-          },
-          "422": {
-            "description": "Response for status 422",
-            "content": {
-              "text/plain": {
-                "schema": {
-                  "type": "string"
-                }
-              }
-            }
-          }
-        },
-        "operationId": "postShopsByIdProducts"
-      }
-    },
-    "/products": {
-      "get": {
-        "description": "Returns paginated retail products across all shops. Supports filtering by price, type, color, region, rating, and full-text search.",
-        "summary": "Browse product catalog",
+        "description": "Returns all non-deleted products. Filterable by price, rating, type, etc.",
+        "summary": "List all products (catalog)",
         "tags": [
           "products"
         ],
@@ -2631,7 +2322,8 @@
     },
     "/products/{id}": {
       "get": {
-        "summary": "Get product or bundle by ID",
+        "description": "Returns a single product with its underlying wines.",
+        "summary": "Get product by ID",
         "tags": [
           "products"
         ],
@@ -2645,572 +2337,44 @@
             }
           }
         ],
-        "operationId": "getProductsById",
-        "responses": {
-          "200": {
-            "description": "Success"
-          }
-        }
-      }
-    },
-    "/shops/{id}/products/{productId}": {
-      "patch": {
-        "security": [
-          {
-            "bearerAuth": []
-          }
-        ],
-        "summary": "Update a product",
-        "tags": [
-          "products"
-        ],
-        "parameters": [
-          {
-            "name": "id",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          },
-          {
-            "name": "productId",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": {
-                "type": "object",
-                "properties": {
-                  "description": {
-                    "nullable": true,
-                    "minLength": 1,
-                    "type": "string"
-                  },
-                  "name": {
-                    "maxLength": 255,
-                    "minLength": 1,
-                    "type": "string"
-                  },
-                  "price": {
-                    "pattern": "^\\d+(\\.\\d{1,2})?$",
-                    "type": "string"
-                  },
-                  "quantity": {
-                    "minimum": 0,
-                    "anyOf": [
-                      {
-                        "format": "integer",
-                        "default": 0,
-                        "type": "string"
-                      },
-                      {
-                        "minimum": 0,
-                        "type": "integer"
-                      }
-                    ]
-                  },
-                  "wineId": {
-                    "format": "uuid",
-                    "type": "string"
-                  }
-                }
-              }
-            },
-            "application/x-www-form-urlencoded": {
-              "schema": {
-                "type": "object",
-                "properties": {
-                  "description": {
-                    "nullable": true,
-                    "minLength": 1,
-                    "type": "string"
-                  },
-                  "name": {
-                    "maxLength": 255,
-                    "minLength": 1,
-                    "type": "string"
-                  },
-                  "price": {
-                    "pattern": "^\\d+(\\.\\d{1,2})?$",
-                    "type": "string"
-                  },
-                  "quantity": {
-                    "minimum": 0,
-                    "anyOf": [
-                      {
-                        "format": "integer",
-                        "default": 0,
-                        "type": "string"
-                      },
-                      {
-                        "minimum": 0,
-                        "type": "integer"
-                      }
-                    ]
-                  },
-                  "wineId": {
-                    "format": "uuid",
-                    "type": "string"
-                  }
-                }
-              }
-            },
-            "multipart/form-data": {
-              "schema": {
-                "type": "object",
-                "properties": {
-                  "description": {
-                    "nullable": true,
-                    "minLength": 1,
-                    "type": "string"
-                  },
-                  "name": {
-                    "maxLength": 255,
-                    "minLength": 1,
-                    "type": "string"
-                  },
-                  "price": {
-                    "pattern": "^\\d+(\\.\\d{1,2})?$",
-                    "type": "string"
-                  },
-                  "quantity": {
-                    "minimum": 0,
-                    "anyOf": [
-                      {
-                        "format": "integer",
-                        "default": 0,
-                        "type": "string"
-                      },
-                      {
-                        "minimum": 0,
-                        "type": "integer"
-                      }
-                    ]
-                  },
-                  "wineId": {
-                    "format": "uuid",
-                    "type": "string"
-                  }
-                }
-              }
-            }
-          }
-        },
         "responses": {
           "200": {
             "description": "Response for status 200",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "404": {
+            "description": "Response for status 404",
             "content": {
               "application/json": {
                 "schema": {
                   "type": "object",
                   "required": [
-                    "createdAt",
-                    "description",
-                    "id",
-                    "isBundle",
-                    "name",
-                    "price",
-                    "quantity",
-                    "shopId",
-                    "updatedAt"
+                    "error",
+                    "success"
                   ],
                   "properties": {
-                    "createdAt": {
-                      "anyOf": [
-                        {
-                          "format": "date-time",
+                    "error": {
+                      "type": "object",
+                      "required": [
+                        "code",
+                        "message"
+                      ],
+                      "properties": {
+                        "code": {
                           "type": "string"
                         },
-                        {
-                          "format": "date",
+                        "message": {
                           "type": "string"
-                        },
-                        {
-                          "type": "number"
                         }
-                      ]
+                      }
                     },
-                    "description": {
-                      "type": "string",
-                      "nullable": true
-                    },
-                    "id": {
-                      "type": "string"
-                    },
-                    "isBundle": {
+                    "success": {
+                      "const": false,
                       "type": "boolean"
-                    },
-                    "name": {
-                      "type": "string"
-                    },
-                    "price": {
-                      "type": "string"
-                    },
-                    "quantity": {
-                      "anyOf": [
-                        {
-                          "format": "integer",
-                          "default": 0,
-                          "type": "string"
-                        },
-                        {
-                          "type": "integer"
-                        }
-                      ]
-                    },
-                    "shopId": {
-                      "type": "string"
-                    },
-                    "updatedAt": {
-                      "anyOf": [
-                        {
-                          "format": "date-time",
-                          "type": "string"
-                        },
-                        {
-                          "format": "date",
-                          "type": "string"
-                        },
-                        {
-                          "type": "number"
-                        }
-                      ],
-                      "nullable": true
-                    }
-                  }
-                }
-              }
-            }
-          },
-          "403": {
-            "description": "Response for status 403",
-            "content": {
-              "text/plain": {
-                "schema": {
-                  "type": "string"
-                }
-              }
-            }
-          },
-          "404": {
-            "description": "Response for status 404",
-            "content": {
-              "text/plain": {
-                "schema": {
-                  "type": "string"
-                }
-              }
-            }
-          },
-          "422": {
-            "description": "Response for status 422",
-            "content": {
-              "text/plain": {
-                "schema": {
-                  "type": "string"
-                }
-              }
-            }
-          }
-        },
-        "operationId": "patchShopsByIdProductsByProductId"
-      },
-      "delete": {
-        "security": [
-          {
-            "bearerAuth": []
-          }
-        ],
-        "summary": "Delete a product",
-        "tags": [
-          "products"
-        ],
-        "parameters": [
-          {
-            "name": "id",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          },
-          {
-            "name": "productId",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
-        "responses": {
-          "204": {
-            "description": "No Content"
-          },
-          "403": {
-            "description": "Response for status 403",
-            "content": {
-              "text/plain": {
-                "schema": {
-                  "type": "string"
-                }
-              }
-            }
-          },
-          "404": {
-            "description": "Response for status 404",
-            "content": {
-              "text/plain": {
-                "schema": {
-                  "type": "string"
-                }
-              }
-            }
-          }
-        },
-        "operationId": "deleteShopsByIdProductsByProductId"
-      }
-    },
-    "/shops/{id}/bundles": {
-      "post": {
-        "security": [
-          {
-            "bearerAuth": []
-          }
-        ],
-        "summary": "Create a bundle",
-        "tags": [
-          "products"
-        ],
-        "parameters": [
-          {
-            "name": "id",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": {
-                "type": "object",
-                "required": [
-                  "name",
-                  "price",
-                  "quantity",
-                  "wines"
-                ],
-                "properties": {
-                  "description": {
-                    "minLength": 1,
-                    "type": "string"
-                  },
-                  "name": {
-                    "maxLength": 255,
-                    "minLength": 1,
-                    "type": "string"
-                  },
-                  "price": {
-                    "pattern": "^\\d+(\\.\\d{1,2})?$",
-                    "type": "string"
-                  },
-                  "quantity": {
-                    "minimum": 0,
-                    "anyOf": [
-                      {
-                        "format": "integer",
-                        "default": 0,
-                        "type": "string"
-                      },
-                      {
-                        "minimum": 0,
-                        "type": "integer"
-                      }
-                    ]
-                  },
-                  "wines": {
-                    "minItems": 2,
-                    "type": "array",
-                    "items": {
-                      "type": "object",
-                      "required": [
-                        "quantity",
-                        "wineId"
-                      ],
-                      "properties": {
-                        "quantity": {
-                          "minimum": 1,
-                          "anyOf": [
-                            {
-                              "format": "integer",
-                              "default": 0,
-                              "type": "string"
-                            },
-                            {
-                              "minimum": 1,
-                              "type": "integer"
-                            }
-                          ]
-                        },
-                        "wineId": {
-                          "format": "uuid",
-                          "type": "string"
-                        }
-                      }
-                    }
-                  }
-                }
-              }
-            },
-            "application/x-www-form-urlencoded": {
-              "schema": {
-                "type": "object",
-                "required": [
-                  "name",
-                  "price",
-                  "quantity",
-                  "wines"
-                ],
-                "properties": {
-                  "description": {
-                    "minLength": 1,
-                    "type": "string"
-                  },
-                  "name": {
-                    "maxLength": 255,
-                    "minLength": 1,
-                    "type": "string"
-                  },
-                  "price": {
-                    "pattern": "^\\d+(\\.\\d{1,2})?$",
-                    "type": "string"
-                  },
-                  "quantity": {
-                    "minimum": 0,
-                    "anyOf": [
-                      {
-                        "format": "integer",
-                        "default": 0,
-                        "type": "string"
-                      },
-                      {
-                        "minimum": 0,
-                        "type": "integer"
-                      }
-                    ]
-                  },
-                  "wines": {
-                    "minItems": 2,
-                    "type": "array",
-                    "items": {
-                      "type": "object",
-                      "required": [
-                        "quantity",
-                        "wineId"
-                      ],
-                      "properties": {
-                        "quantity": {
-                          "minimum": 1,
-                          "anyOf": [
-                            {
-                              "format": "integer",
-                              "default": 0,
-                              "type": "string"
-                            },
-                            {
-                              "minimum": 1,
-                              "type": "integer"
-                            }
-                          ]
-                        },
-                        "wineId": {
-                          "format": "uuid",
-                          "type": "string"
-                        }
-                      }
-                    }
-                  }
-                }
-              }
-            },
-            "multipart/form-data": {
-              "schema": {
-                "type": "object",
-                "required": [
-                  "name",
-                  "price",
-                  "quantity",
-                  "wines"
-                ],
-                "properties": {
-                  "description": {
-                    "minLength": 1,
-                    "type": "string"
-                  },
-                  "name": {
-                    "maxLength": 255,
-                    "minLength": 1,
-                    "type": "string"
-                  },
-                  "price": {
-                    "pattern": "^\\d+(\\.\\d{1,2})?$",
-                    "type": "string"
-                  },
-                  "quantity": {
-                    "minimum": 0,
-                    "anyOf": [
-                      {
-                        "format": "integer",
-                        "default": 0,
-                        "type": "string"
-                      },
-                      {
-                        "minimum": 0,
-                        "type": "integer"
-                      }
-                    ]
-                  },
-                  "wines": {
-                    "minItems": 2,
-                    "type": "array",
-                    "items": {
-                      "type": "object",
-                      "required": [
-                        "quantity",
-                        "wineId"
-                      ],
-                      "properties": {
-                        "quantity": {
-                          "minimum": 1,
-                          "anyOf": [
-                            {
-                              "format": "integer",
-                              "default": 0,
-                              "type": "string"
-                            },
-                            {
-                              "minimum": 1,
-                              "type": "integer"
-                            }
-                          ]
-                        },
-                        "wineId": {
-                          "format": "uuid",
-                          "type": "string"
-                        }
-                      }
                     }
                   }
                 }
@@ -3218,531 +2382,7 @@
             }
           }
         },
-        "responses": {
-          "201": {
-            "description": "Response for status 201",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "required": [
-                    "createdAt",
-                    "description",
-                    "id",
-                    "isBundle",
-                    "name",
-                    "price",
-                    "quantity",
-                    "shopId",
-                    "updatedAt"
-                  ],
-                  "properties": {
-                    "createdAt": {
-                      "anyOf": [
-                        {
-                          "format": "date-time",
-                          "type": "string"
-                        },
-                        {
-                          "format": "date",
-                          "type": "string"
-                        },
-                        {
-                          "type": "number"
-                        }
-                      ]
-                    },
-                    "description": {
-                      "type": "string",
-                      "nullable": true
-                    },
-                    "id": {
-                      "type": "string"
-                    },
-                    "isBundle": {
-                      "type": "boolean"
-                    },
-                    "name": {
-                      "type": "string"
-                    },
-                    "price": {
-                      "type": "string"
-                    },
-                    "quantity": {
-                      "anyOf": [
-                        {
-                          "format": "integer",
-                          "default": 0,
-                          "type": "string"
-                        },
-                        {
-                          "type": "integer"
-                        }
-                      ]
-                    },
-                    "shopId": {
-                      "type": "string"
-                    },
-                    "updatedAt": {
-                      "anyOf": [
-                        {
-                          "format": "date-time",
-                          "type": "string"
-                        },
-                        {
-                          "format": "date",
-                          "type": "string"
-                        },
-                        {
-                          "type": "number"
-                        }
-                      ],
-                      "nullable": true
-                    }
-                  }
-                }
-              }
-            }
-          },
-          "403": {
-            "description": "Response for status 403",
-            "content": {
-              "text/plain": {
-                "schema": {
-                  "type": "string"
-                }
-              }
-            }
-          },
-          "404": {
-            "description": "Response for status 404",
-            "content": {
-              "text/plain": {
-                "schema": {
-                  "type": "string"
-                }
-              }
-            }
-          },
-          "422": {
-            "description": "Response for status 422",
-            "content": {
-              "text/plain": {
-                "schema": {
-                  "type": "string"
-                }
-              }
-            }
-          }
-        },
-        "operationId": "postShopsByIdBundles"
-      }
-    },
-    "/shops/{id}/bundles/{bundleId}": {
-      "patch": {
-        "security": [
-          {
-            "bearerAuth": []
-          }
-        ],
-        "summary": "Update a bundle",
-        "tags": [
-          "products"
-        ],
-        "parameters": [
-          {
-            "name": "bundleId",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          },
-          {
-            "name": "id",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": {
-                "type": "object",
-                "properties": {
-                  "description": {
-                    "nullable": true,
-                    "minLength": 1,
-                    "type": "string"
-                  },
-                  "name": {
-                    "maxLength": 255,
-                    "minLength": 1,
-                    "type": "string"
-                  },
-                  "price": {
-                    "pattern": "^\\d+(\\.\\d{1,2})?$",
-                    "type": "string"
-                  },
-                  "quantity": {
-                    "minimum": 0,
-                    "anyOf": [
-                      {
-                        "format": "integer",
-                        "default": 0,
-                        "type": "string"
-                      },
-                      {
-                        "minimum": 0,
-                        "type": "integer"
-                      }
-                    ]
-                  },
-                  "wines": {
-                    "minItems": 2,
-                    "type": "array",
-                    "items": {
-                      "type": "object",
-                      "required": [
-                        "quantity",
-                        "wineId"
-                      ],
-                      "properties": {
-                        "quantity": {
-                          "minimum": 1,
-                          "anyOf": [
-                            {
-                              "format": "integer",
-                              "default": 0,
-                              "type": "string"
-                            },
-                            {
-                              "minimum": 1,
-                              "type": "integer"
-                            }
-                          ]
-                        },
-                        "wineId": {
-                          "format": "uuid",
-                          "type": "string"
-                        }
-                      }
-                    }
-                  }
-                }
-              }
-            },
-            "application/x-www-form-urlencoded": {
-              "schema": {
-                "type": "object",
-                "properties": {
-                  "description": {
-                    "nullable": true,
-                    "minLength": 1,
-                    "type": "string"
-                  },
-                  "name": {
-                    "maxLength": 255,
-                    "minLength": 1,
-                    "type": "string"
-                  },
-                  "price": {
-                    "pattern": "^\\d+(\\.\\d{1,2})?$",
-                    "type": "string"
-                  },
-                  "quantity": {
-                    "minimum": 0,
-                    "anyOf": [
-                      {
-                        "format": "integer",
-                        "default": 0,
-                        "type": "string"
-                      },
-                      {
-                        "minimum": 0,
-                        "type": "integer"
-                      }
-                    ]
-                  },
-                  "wines": {
-                    "minItems": 2,
-                    "type": "array",
-                    "items": {
-                      "type": "object",
-                      "required": [
-                        "quantity",
-                        "wineId"
-                      ],
-                      "properties": {
-                        "quantity": {
-                          "minimum": 1,
-                          "anyOf": [
-                            {
-                              "format": "integer",
-                              "default": 0,
-                              "type": "string"
-                            },
-                            {
-                              "minimum": 1,
-                              "type": "integer"
-                            }
-                          ]
-                        },
-                        "wineId": {
-                          "format": "uuid",
-                          "type": "string"
-                        }
-                      }
-                    }
-                  }
-                }
-              }
-            },
-            "multipart/form-data": {
-              "schema": {
-                "type": "object",
-                "properties": {
-                  "description": {
-                    "nullable": true,
-                    "minLength": 1,
-                    "type": "string"
-                  },
-                  "name": {
-                    "maxLength": 255,
-                    "minLength": 1,
-                    "type": "string"
-                  },
-                  "price": {
-                    "pattern": "^\\d+(\\.\\d{1,2})?$",
-                    "type": "string"
-                  },
-                  "quantity": {
-                    "minimum": 0,
-                    "anyOf": [
-                      {
-                        "format": "integer",
-                        "default": 0,
-                        "type": "string"
-                      },
-                      {
-                        "minimum": 0,
-                        "type": "integer"
-                      }
-                    ]
-                  },
-                  "wines": {
-                    "minItems": 2,
-                    "type": "array",
-                    "items": {
-                      "type": "object",
-                      "required": [
-                        "quantity",
-                        "wineId"
-                      ],
-                      "properties": {
-                        "quantity": {
-                          "minimum": 1,
-                          "anyOf": [
-                            {
-                              "format": "integer",
-                              "default": 0,
-                              "type": "string"
-                            },
-                            {
-                              "minimum": 1,
-                              "type": "integer"
-                            }
-                          ]
-                        },
-                        "wineId": {
-                          "format": "uuid",
-                          "type": "string"
-                        }
-                      }
-                    }
-                  }
-                }
-              }
-            }
-          }
-        },
-        "responses": {
-          "200": {
-            "description": "Response for status 200",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "required": [
-                    "createdAt",
-                    "description",
-                    "id",
-                    "isBundle",
-                    "name",
-                    "price",
-                    "quantity",
-                    "shopId",
-                    "updatedAt"
-                  ],
-                  "properties": {
-                    "createdAt": {
-                      "anyOf": [
-                        {
-                          "format": "date-time",
-                          "type": "string"
-                        },
-                        {
-                          "format": "date",
-                          "type": "string"
-                        },
-                        {
-                          "type": "number"
-                        }
-                      ]
-                    },
-                    "description": {
-                      "type": "string",
-                      "nullable": true
-                    },
-                    "id": {
-                      "type": "string"
-                    },
-                    "isBundle": {
-                      "type": "boolean"
-                    },
-                    "name": {
-                      "type": "string"
-                    },
-                    "price": {
-                      "type": "string"
-                    },
-                    "quantity": {
-                      "anyOf": [
-                        {
-                          "format": "integer",
-                          "default": 0,
-                          "type": "string"
-                        },
-                        {
-                          "type": "integer"
-                        }
-                      ]
-                    },
-                    "shopId": {
-                      "type": "string"
-                    },
-                    "updatedAt": {
-                      "anyOf": [
-                        {
-                          "format": "date-time",
-                          "type": "string"
-                        },
-                        {
-                          "format": "date",
-                          "type": "string"
-                        },
-                        {
-                          "type": "number"
-                        }
-                      ],
-                      "nullable": true
-                    }
-                  }
-                }
-              }
-            }
-          },
-          "403": {
-            "description": "Response for status 403",
-            "content": {
-              "text/plain": {
-                "schema": {
-                  "type": "string"
-                }
-              }
-            }
-          },
-          "404": {
-            "description": "Response for status 404",
-            "content": {
-              "text/plain": {
-                "schema": {
-                  "type": "string"
-                }
-              }
-            }
-          },
-          "422": {
-            "description": "Response for status 422",
-            "content": {
-              "text/plain": {
-                "schema": {
-                  "type": "string"
-                }
-              }
-            }
-          }
-        },
-        "operationId": "patchShopsByIdBundlesByBundleId"
-      },
-      "delete": {
-        "security": [
-          {
-            "bearerAuth": []
-          }
-        ],
-        "summary": "Delete a bundle",
-        "tags": [
-          "products"
-        ],
-        "parameters": [
-          {
-            "name": "bundleId",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          },
-          {
-            "name": "id",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
-        "responses": {
-          "204": {
-            "description": "No Content"
-          },
-          "403": {
-            "description": "Response for status 403",
-            "content": {
-              "text/plain": {
-                "schema": {
-                  "type": "string"
-                }
-              }
-            }
-          },
-          "404": {
-            "description": "Response for status 404",
-            "content": {
-              "text/plain": {
-                "schema": {
-                  "type": "string"
-                }
-              }
-            }
-          }
-        },
-        "operationId": "deleteShopsByIdBundlesByBundleId"
+        "operationId": "getProductsById"
       }
     },
     "/shops/{id}/availability": {
@@ -6792,8 +5432,8 @@
           }
         },
         "responses": {
-          "201": {
-            "description": "Response for status 201",
+          "200": {
+            "description": "Response for status 200",
             "content": {
               "application/json": {
                 "schema": {
@@ -6936,9 +5576,34 @@
           "404": {
             "description": "Response for status 404",
             "content": {
-              "text/plain": {
+              "application/json": {
                 "schema": {
-                  "type": "string"
+                  "type": "object",
+                  "required": [
+                    "error",
+                    "success"
+                  ],
+                  "properties": {
+                    "error": {
+                      "type": "object",
+                      "required": [
+                        "code",
+                        "message"
+                      ],
+                      "properties": {
+                        "code": {
+                          "type": "string"
+                        },
+                        "message": {
+                          "type": "string"
+                        }
+                      }
+                    },
+                    "success": {
+                      "const": false,
+                      "type": "boolean"
+                    }
+                  }
                 }
               }
             }
@@ -7109,9 +5774,34 @@
           "404": {
             "description": "Response for status 404",
             "content": {
-              "text/plain": {
+              "application/json": {
                 "schema": {
-                  "type": "string"
+                  "type": "object",
+                  "required": [
+                    "error",
+                    "success"
+                  ],
+                  "properties": {
+                    "error": {
+                      "type": "object",
+                      "required": [
+                        "code",
+                        "message"
+                      ],
+                      "properties": {
+                        "code": {
+                          "type": "string"
+                        },
+                        "message": {
+                          "type": "string"
+                        }
+                      }
+                    },
+                    "success": {
+                      "const": false,
+                      "type": "boolean"
+                    }
+                  }
                 }
               }
             }
@@ -7623,9 +6313,34 @@
           "403": {
             "description": "Response for status 403",
             "content": {
-              "text/plain": {
+              "application/json": {
                 "schema": {
-                  "type": "string"
+                  "type": "object",
+                  "required": [
+                    "error",
+                    "success"
+                  ],
+                  "properties": {
+                    "error": {
+                      "type": "object",
+                      "required": [
+                        "code",
+                        "message"
+                      ],
+                      "properties": {
+                        "code": {
+                          "type": "string"
+                        },
+                        "message": {
+                          "type": "string"
+                        }
+                      }
+                    },
+                    "success": {
+                      "const": false,
+                      "type": "boolean"
+                    }
+                  }
                 }
               }
             }
@@ -7633,9 +6348,34 @@
           "404": {
             "description": "Response for status 404",
             "content": {
-              "text/plain": {
+              "application/json": {
                 "schema": {
-                  "type": "string"
+                  "type": "object",
+                  "required": [
+                    "error",
+                    "success"
+                  ],
+                  "properties": {
+                    "error": {
+                      "type": "object",
+                      "required": [
+                        "code",
+                        "message"
+                      ],
+                      "properties": {
+                        "code": {
+                          "type": "string"
+                        },
+                        "message": {
+                          "type": "string"
+                        }
+                      }
+                    },
+                    "success": {
+                      "const": false,
+                      "type": "boolean"
+                    }
+                  }
                 }
               }
             }
@@ -7671,9 +6411,34 @@
           "403": {
             "description": "Response for status 403",
             "content": {
-              "text/plain": {
+              "application/json": {
                 "schema": {
-                  "type": "string"
+                  "type": "object",
+                  "required": [
+                    "error",
+                    "success"
+                  ],
+                  "properties": {
+                    "error": {
+                      "type": "object",
+                      "required": [
+                        "code",
+                        "message"
+                      ],
+                      "properties": {
+                        "code": {
+                          "type": "string"
+                        },
+                        "message": {
+                          "type": "string"
+                        }
+                      }
+                    },
+                    "success": {
+                      "const": false,
+                      "type": "boolean"
+                    }
+                  }
                 }
               }
             }
@@ -7681,9 +6446,34 @@
           "404": {
             "description": "Response for status 404",
             "content": {
-              "text/plain": {
+              "application/json": {
                 "schema": {
-                  "type": "string"
+                  "type": "object",
+                  "required": [
+                    "error",
+                    "success"
+                  ],
+                  "properties": {
+                    "error": {
+                      "type": "object",
+                      "required": [
+                        "code",
+                        "message"
+                      ],
+                      "properties": {
+                        "code": {
+                          "type": "string"
+                        },
+                        "message": {
+                          "type": "string"
+                        }
+                      }
+                    },
+                    "success": {
+                      "const": false,
+                      "type": "boolean"
+                    }
+                  }
                 }
               }
             }
@@ -8201,8 +6991,8 @@
         "tags": [
           "guest-sessions"
         ],
-        "description": "Returns an existing valid guest session or creates a new one. Sets a guest_session_id cookie.",
-        "summary": "Get or create a guest session",
+        "description": "Creates a new anonymous session record and returns the session ID in the response body. Used for guest carts and temporary state.",
+        "summary": "Initialize guest session",
         "responses": {
           "200": {
             "description": "Response for status 200",
@@ -8258,13 +7048,23 @@
         "operationId": "postGuest-sessions"
       }
     },
-    "/guest-sessions/me": {
+    "/guest-sessions/{id}": {
       "get": {
         "tags": [
           "guest-sessions"
         ],
-        "description": "Returns the guest session associated with the guest_session_id cookie.",
-        "summary": "Get current guest session",
+        "description": "Returns metadata for an existing guest session if it has not expired.",
+        "summary": "Validate guest session",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
         "responses": {
           "200": {
             "description": "Response for status 200",
@@ -8315,39 +7115,9 @@
                 }
               }
             }
-          },
-          "404": {
-            "description": "Response for status 404",
-            "content": {
-              "text/plain": {
-                "schema": {
-                  "type": "string"
-                }
-              }
-            }
           }
         },
-        "operationId": "getGuest-sessionsMe"
-      }
-    },
-    "/guest-sessions/cleanup": {
-      "delete": {
-        "tags": [
-          "guest-sessions"
-        ],
-        "description": "Removes all guest sessions that have passed their expiresAt date. Admin only.",
-        "security": [
-          {
-            "bearerAuth": []
-          }
-        ],
-        "summary": "Cleanup expired guest sessions",
-        "operationId": "deleteGuest-sessionsCleanup",
-        "responses": {
-          "200": {
-            "description": "Success"
-          }
-        }
+        "operationId": "getGuest-sessionsById"
       }
     },
     "/supply-agreements/": {
@@ -8926,13 +7696,13 @@
         "operationId": "getSupply-agreementsWinemaker"
       }
     },
-    "/reviews/product/{id}": {
+    "/products/{id}/reviews": {
       "get": {
+        "description": "Returns all reviews for a product with rating breakdown.",
+        "summary": "List product reviews",
         "tags": [
           "reviews"
         ],
-        "description": "Returns paginated reviews and average rating for a product.",
-        "summary": "List product reviews",
         "parameters": [
           {
             "name": "id",
@@ -8947,18 +7717,14 @@
             "in": "query",
             "required": false,
             "schema": {
-              "maximum": 100,
-              "minimum": 1,
               "anyOf": [
                 {
-                  "format": "integer",
+                  "format": "numeric",
                   "default": 0,
                   "type": "string"
                 },
                 {
-                  "maximum": 100,
-                  "minimum": 1,
-                  "type": "integer"
+                  "type": "number"
                 }
               ]
             }
@@ -8968,16 +7734,14 @@
             "in": "query",
             "required": false,
             "schema": {
-              "minimum": 1,
               "anyOf": [
                 {
-                  "format": "integer",
+                  "format": "numeric",
                   "default": 0,
                   "type": "string"
                 },
                 {
-                  "minimum": 1,
-                  "type": "integer"
+                  "type": "number"
                 }
               ]
             }
@@ -9001,121 +7765,24 @@
             "description": "Response for status 200",
             "content": {
               "application/json": {
-                "schema": {
-                  "type": "object",
-                  "required": [
-                    "averageRating",
-                    "reviews",
-                    "totalCount"
-                  ],
-                  "properties": {
-                    "averageRating": {
-                      "nullable": true,
-                      "type": "number"
-                    },
-                    "reviews": {
-                      "type": "array",
-                      "items": {
-                        "type": "object",
-                        "required": [
-                          "body",
-                          "createdAt",
-                          "id",
-                          "rating",
-                          "user",
-                          "userId"
-                        ],
-                        "properties": {
-                          "body": {
-                            "nullable": true,
-                            "type": "string"
-                          },
-                          "createdAt": {
-                            "anyOf": [
-                              {
-                                "format": "date-time",
-                                "type": "string"
-                              },
-                              {
-                                "format": "date",
-                                "type": "string"
-                              },
-                              {
-                                "type": "number"
-                              }
-                            ]
-                          },
-                          "id": {
-                            "type": "string"
-                          },
-                          "rating": {
-                            "anyOf": [
-                              {
-                                "format": "integer",
-                                "default": 0,
-                                "type": "string"
-                              },
-                              {
-                                "type": "integer"
-                              }
-                            ]
-                          },
-                          "user": {
-                            "type": "object",
-                            "required": [
-                              "fname",
-                              "id",
-                              "lname"
-                            ],
-                            "properties": {
-                              "fname": {
-                                "type": "string"
-                              },
-                              "id": {
-                                "type": "string"
-                              },
-                              "lname": {
-                                "type": "string"
-                              }
-                            }
-                          },
-                          "userId": {
-                            "type": "string"
-                          }
-                        }
-                      }
-                    },
-                    "totalCount": {
-                      "anyOf": [
-                        {
-                          "format": "integer",
-                          "default": 0,
-                          "type": "string"
-                        },
-                        {
-                          "type": "integer"
-                        }
-                      ]
-                    }
-                  }
-                }
+                "schema": {}
               }
             }
           }
         },
-        "operationId": "getReviewsProductById"
+        "operationId": "getProductsByIdReviews"
       },
       "post": {
-        "tags": [
-          "reviews"
-        ],
-        "description": "Creates a review for a product. Requires verified purchase.",
+        "description": "Creates a review for a product. Must have purchased it.",
         "security": [
           {
             "bearerAuth": []
           }
         ],
-        "summary": "Create product review",
+        "summary": "Review product",
+        "tags": [
+          "reviews"
+        ],
         "parameters": [
           {
             "name": "id",
@@ -9137,8 +7804,6 @@
                 ],
                 "properties": {
                   "body": {
-                    "maxLength": 2000,
-                    "minLength": 1,
                     "type": "string"
                   },
                   "rating": {
@@ -9146,14 +7811,14 @@
                     "minimum": 1,
                     "anyOf": [
                       {
-                        "format": "integer",
+                        "format": "numeric",
                         "default": 0,
                         "type": "string"
                       },
                       {
                         "maximum": 5,
                         "minimum": 1,
-                        "type": "integer"
+                        "type": "number"
                       }
                     ]
                   }
@@ -9168,8 +7833,6 @@
                 ],
                 "properties": {
                   "body": {
-                    "maxLength": 2000,
-                    "minLength": 1,
                     "type": "string"
                   },
                   "rating": {
@@ -9177,14 +7840,14 @@
                     "minimum": 1,
                     "anyOf": [
                       {
-                        "format": "integer",
+                        "format": "numeric",
                         "default": 0,
                         "type": "string"
                       },
                       {
                         "maximum": 5,
                         "minimum": 1,
-                        "type": "integer"
+                        "type": "number"
                       }
                     ]
                   }
@@ -9199,8 +7862,6 @@
                 ],
                 "properties": {
                   "body": {
-                    "maxLength": 2000,
-                    "minLength": 1,
                     "type": "string"
                   },
                   "rating": {
@@ -9208,14 +7869,14 @@
                     "minimum": 1,
                     "anyOf": [
                       {
-                        "format": "integer",
+                        "format": "numeric",
                         "default": 0,
                         "type": "string"
                       },
                       {
                         "maximum": 5,
                         "minimum": 1,
-                        "type": "integer"
+                        "type": "number"
                       }
                     ]
                   }
@@ -9229,178 +7890,517 @@
             "description": "Response for status 200",
             "content": {
               "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "400": {
+            "description": "Response for status 400",
+            "content": {
+              "application/json": {
                 "schema": {
                   "type": "object",
                   "required": [
-                    "body",
-                    "createdAt",
-                    "id",
-                    "rating",
-                    "user",
-                    "userId"
+                    "error",
+                    "success"
                   ],
                   "properties": {
-                    "body": {
-                      "nullable": true,
-                      "type": "string"
-                    },
-                    "createdAt": {
-                      "anyOf": [
-                        {
-                          "format": "date-time",
-                          "type": "string"
-                        },
-                        {
-                          "format": "date",
-                          "type": "string"
-                        },
-                        {
-                          "type": "number"
-                        }
-                      ]
-                    },
-                    "id": {
-                      "type": "string"
-                    },
-                    "rating": {
-                      "anyOf": [
-                        {
-                          "format": "integer",
-                          "default": 0,
-                          "type": "string"
-                        },
-                        {
-                          "type": "integer"
-                        }
-                      ]
-                    },
-                    "user": {
+                    "error": {
                       "type": "object",
                       "required": [
-                        "fname",
-                        "id",
-                        "lname"
+                        "code",
+                        "message"
                       ],
                       "properties": {
-                        "fname": {
+                        "code": {
                           "type": "string"
                         },
-                        "id": {
-                          "type": "string"
-                        },
-                        "lname": {
+                        "message": {
                           "type": "string"
                         }
                       }
                     },
-                    "userId": {
-                      "type": "string"
+                    "success": {
+                      "const": false,
+                      "type": "boolean"
                     }
                   }
                 }
               }
             }
           },
-          "401": {
-            "description": "Response for status 401",
+          "404": {
+            "description": "Response for status 404",
             "content": {
-              "text/plain": {
+              "application/json": {
                 "schema": {
-                  "type": "string"
+                  "type": "object",
+                  "required": [
+                    "error",
+                    "success"
+                  ],
+                  "properties": {
+                    "error": {
+                      "type": "object",
+                      "required": [
+                        "code",
+                        "message"
+                      ],
+                      "properties": {
+                        "code": {
+                          "type": "string"
+                        },
+                        "message": {
+                          "type": "string"
+                        }
+                      }
+                    },
+                    "success": {
+                      "const": false,
+                      "type": "boolean"
+                    }
+                  }
                 }
+              }
+            }
+          }
+        },
+        "operationId": "postProductsByIdReviews"
+      }
+    },
+    "/winemakers/{id}/reviews": {
+      "get": {
+        "description": "Returns all reviews for a winemaker.",
+        "summary": "List winemaker reviews",
+        "tags": [
+          "reviews"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "format": "numeric",
+                  "default": 0,
+                  "type": "string"
+                },
+                {
+                  "type": "number"
+                }
+              ]
+            }
+          },
+          {
+            "name": "page",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "format": "numeric",
+                  "default": 0,
+                  "type": "string"
+                },
+                {
+                  "type": "number"
+                }
+              ]
+            }
+          },
+          {
+            "name": "sort",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "enum": [
+                "newest",
+                "highest",
+                "lowest"
+              ]
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Response for status 200",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          }
+        },
+        "operationId": "getWinemakersByIdReviews"
+      },
+      "post": {
+        "description": "Creates a review for a winemaker profile.",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "Review winemaker",
+        "tags": [
+          "reviews"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "rating"
+                ],
+                "properties": {
+                  "body": {
+                    "type": "string"
+                  },
+                  "rating": {
+                    "maximum": 5,
+                    "minimum": 1,
+                    "anyOf": [
+                      {
+                        "format": "numeric",
+                        "default": 0,
+                        "type": "string"
+                      },
+                      {
+                        "maximum": 5,
+                        "minimum": 1,
+                        "type": "number"
+                      }
+                    ]
+                  }
+                }
+              }
+            },
+            "application/x-www-form-urlencoded": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "rating"
+                ],
+                "properties": {
+                  "body": {
+                    "type": "string"
+                  },
+                  "rating": {
+                    "maximum": 5,
+                    "minimum": 1,
+                    "anyOf": [
+                      {
+                        "format": "numeric",
+                        "default": 0,
+                        "type": "string"
+                      },
+                      {
+                        "maximum": 5,
+                        "minimum": 1,
+                        "type": "number"
+                      }
+                    ]
+                  }
+                }
+              }
+            },
+            "multipart/form-data": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "rating"
+                ],
+                "properties": {
+                  "body": {
+                    "type": "string"
+                  },
+                  "rating": {
+                    "maximum": 5,
+                    "minimum": 1,
+                    "anyOf": [
+                      {
+                        "format": "numeric",
+                        "default": 0,
+                        "type": "string"
+                      },
+                      {
+                        "maximum": 5,
+                        "minimum": 1,
+                        "type": "number"
+                      }
+                    ]
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Response for status 200",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "400": {
+            "description": "Response for status 400",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "error",
+                    "success"
+                  ],
+                  "properties": {
+                    "error": {
+                      "type": "object",
+                      "required": [
+                        "code",
+                        "message"
+                      ],
+                      "properties": {
+                        "code": {
+                          "type": "string"
+                        },
+                        "message": {
+                          "type": "string"
+                        }
+                      }
+                    },
+                    "success": {
+                      "const": false,
+                      "type": "boolean"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Response for status 404",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "error",
+                    "success"
+                  ],
+                  "properties": {
+                    "error": {
+                      "type": "object",
+                      "required": [
+                        "code",
+                        "message"
+                      ],
+                      "properties": {
+                        "code": {
+                          "type": "string"
+                        },
+                        "message": {
+                          "type": "string"
+                        }
+                      }
+                    },
+                    "success": {
+                      "const": false,
+                      "type": "boolean"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "operationId": "postWinemakersByIdReviews"
+      }
+    },
+    "/reviews/{id}": {
+      "delete": {
+        "description": "Deletes a review. Must be owner or admin.",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "Delete review",
+        "tags": [
+          "reviews"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "entityId",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "entityType",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Response for status 200",
+            "content": {
+              "application/json": {
+                "schema": {}
               }
             }
           },
           "403": {
             "description": "Response for status 403",
             "content": {
-              "text/plain": {
+              "application/json": {
                 "schema": {
-                  "type": "string"
+                  "type": "object",
+                  "required": [
+                    "error",
+                    "success"
+                  ],
+                  "properties": {
+                    "error": {
+                      "type": "object",
+                      "required": [
+                        "code",
+                        "message"
+                      ],
+                      "properties": {
+                        "code": {
+                          "type": "string"
+                        },
+                        "message": {
+                          "type": "string"
+                        }
+                      }
+                    },
+                    "success": {
+                      "const": false,
+                      "type": "boolean"
+                    }
+                  }
                 }
               }
             }
           },
-          "409": {
-            "description": "Response for status 409",
+          "404": {
+            "description": "Response for status 404",
             "content": {
-              "text/plain": {
+              "application/json": {
                 "schema": {
-                  "type": "string"
+                  "type": "object",
+                  "required": [
+                    "error",
+                    "success"
+                  ],
+                  "properties": {
+                    "error": {
+                      "type": "object",
+                      "required": [
+                        "code",
+                        "message"
+                      ],
+                      "properties": {
+                        "code": {
+                          "type": "string"
+                        },
+                        "message": {
+                          "type": "string"
+                        }
+                      }
+                    },
+                    "success": {
+                      "const": false,
+                      "type": "boolean"
+                    }
+                  }
                 }
               }
             }
           }
         },
-        "operationId": "postReviewsProductById"
+        "operationId": "deleteReviewsById"
       }
     },
-    "/reviews/winemaker/{id}": {
+    "/admin/events": {
       "get": {
-        "tags": [
-          "reviews"
+        "description": "List events by status for moderation.",
+        "security": [
+          {
+            "bearerAuth": []
+          }
         ],
-        "description": "Returns paginated reviews and average rating for a winemaker.",
-        "summary": "List winemaker reviews",
+        "summary": "List events (admin)",
+        "tags": [
+          "admin"
+        ],
         "parameters": [
-          {
-            "name": "id",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          },
-          {
-            "name": "limit",
-            "in": "query",
-            "required": false,
-            "schema": {
-              "maximum": 100,
-              "minimum": 1,
-              "anyOf": [
-                {
-                  "format": "integer",
-                  "default": 0,
-                  "type": "string"
-                },
-                {
-                  "maximum": 100,
-                  "minimum": 1,
-                  "type": "integer"
-                }
-              ]
-            }
-          },
           {
             "name": "page",
             "in": "query",
             "required": false,
             "schema": {
-              "minimum": 1,
               "anyOf": [
                 {
-                  "format": "integer",
+                  "format": "numeric",
                   "default": 0,
                   "type": "string"
                 },
                 {
-                  "minimum": 1,
-                  "type": "integer"
+                  "type": "number"
                 }
               ]
             }
           },
           {
-            "name": "sort",
+            "name": "status",
             "in": "query",
             "required": false,
             "schema": {
               "type": "string",
               "enum": [
-                "newest",
-                "highest",
-                "lowest"
+                "pending",
+                "approved",
+                "rejected"
               ]
             }
           }
@@ -9410,121 +8410,26 @@
             "description": "Response for status 200",
             "content": {
               "application/json": {
-                "schema": {
-                  "type": "object",
-                  "required": [
-                    "averageRating",
-                    "reviews",
-                    "totalCount"
-                  ],
-                  "properties": {
-                    "averageRating": {
-                      "nullable": true,
-                      "type": "number"
-                    },
-                    "reviews": {
-                      "type": "array",
-                      "items": {
-                        "type": "object",
-                        "required": [
-                          "body",
-                          "createdAt",
-                          "id",
-                          "rating",
-                          "user",
-                          "userId"
-                        ],
-                        "properties": {
-                          "body": {
-                            "nullable": true,
-                            "type": "string"
-                          },
-                          "createdAt": {
-                            "anyOf": [
-                              {
-                                "format": "date-time",
-                                "type": "string"
-                              },
-                              {
-                                "format": "date",
-                                "type": "string"
-                              },
-                              {
-                                "type": "number"
-                              }
-                            ]
-                          },
-                          "id": {
-                            "type": "string"
-                          },
-                          "rating": {
-                            "anyOf": [
-                              {
-                                "format": "integer",
-                                "default": 0,
-                                "type": "string"
-                              },
-                              {
-                                "type": "integer"
-                              }
-                            ]
-                          },
-                          "user": {
-                            "type": "object",
-                            "required": [
-                              "fname",
-                              "id",
-                              "lname"
-                            ],
-                            "properties": {
-                              "fname": {
-                                "type": "string"
-                              },
-                              "id": {
-                                "type": "string"
-                              },
-                              "lname": {
-                                "type": "string"
-                              }
-                            }
-                          },
-                          "userId": {
-                            "type": "string"
-                          }
-                        }
-                      }
-                    },
-                    "totalCount": {
-                      "anyOf": [
-                        {
-                          "format": "integer",
-                          "default": 0,
-                          "type": "string"
-                        },
-                        {
-                          "type": "integer"
-                        }
-                      ]
-                    }
-                  }
-                }
+                "schema": {}
               }
             }
           }
         },
-        "operationId": "getReviewsWinemakerById"
-      },
+        "operationId": "getAdminEvents"
+      }
+    },
+    "/admin/events/{id}/approve": {
       "post": {
-        "tags": [
-          "reviews"
-        ],
-        "description": "Creates a review for a winemaker.",
+        "description": "Approve a pending event.",
         "security": [
           {
             "bearerAuth": []
           }
         ],
-        "summary": "Create winemaker review",
+        "summary": "Approve event",
+        "tags": [
+          "admin"
+        ],
         "parameters": [
           {
             "name": "id",
@@ -9535,228 +8440,69 @@
             }
           }
         ],
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": {
-                "type": "object",
-                "required": [
-                  "rating"
-                ],
-                "properties": {
-                  "body": {
-                    "maxLength": 2000,
-                    "minLength": 1,
-                    "type": "string"
-                  },
-                  "rating": {
-                    "maximum": 5,
-                    "minimum": 1,
-                    "anyOf": [
-                      {
-                        "format": "integer",
-                        "default": 0,
-                        "type": "string"
-                      },
-                      {
-                        "maximum": 5,
-                        "minimum": 1,
-                        "type": "integer"
-                      }
-                    ]
-                  }
-                }
-              }
-            },
-            "application/x-www-form-urlencoded": {
-              "schema": {
-                "type": "object",
-                "required": [
-                  "rating"
-                ],
-                "properties": {
-                  "body": {
-                    "maxLength": 2000,
-                    "minLength": 1,
-                    "type": "string"
-                  },
-                  "rating": {
-                    "maximum": 5,
-                    "minimum": 1,
-                    "anyOf": [
-                      {
-                        "format": "integer",
-                        "default": 0,
-                        "type": "string"
-                      },
-                      {
-                        "maximum": 5,
-                        "minimum": 1,
-                        "type": "integer"
-                      }
-                    ]
-                  }
-                }
-              }
-            },
-            "multipart/form-data": {
-              "schema": {
-                "type": "object",
-                "required": [
-                  "rating"
-                ],
-                "properties": {
-                  "body": {
-                    "maxLength": 2000,
-                    "minLength": 1,
-                    "type": "string"
-                  },
-                  "rating": {
-                    "maximum": 5,
-                    "minimum": 1,
-                    "anyOf": [
-                      {
-                        "format": "integer",
-                        "default": 0,
-                        "type": "string"
-                      },
-                      {
-                        "maximum": 5,
-                        "minimum": 1,
-                        "type": "integer"
-                      }
-                    ]
-                  }
-                }
-              }
-            }
-          }
-        },
         "responses": {
           "200": {
             "description": "Response for status 200",
             "content": {
               "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "404": {
+            "description": "Response for status 404",
+            "content": {
+              "application/json": {
                 "schema": {
                   "type": "object",
                   "required": [
-                    "body",
-                    "createdAt",
-                    "id",
-                    "rating",
-                    "user",
-                    "userId"
+                    "error",
+                    "success"
                   ],
                   "properties": {
-                    "body": {
-                      "nullable": true,
-                      "type": "string"
-                    },
-                    "createdAt": {
-                      "anyOf": [
-                        {
-                          "format": "date-time",
-                          "type": "string"
-                        },
-                        {
-                          "format": "date",
-                          "type": "string"
-                        },
-                        {
-                          "type": "number"
-                        }
-                      ]
-                    },
-                    "id": {
-                      "type": "string"
-                    },
-                    "rating": {
-                      "anyOf": [
-                        {
-                          "format": "integer",
-                          "default": 0,
-                          "type": "string"
-                        },
-                        {
-                          "type": "integer"
-                        }
-                      ]
-                    },
-                    "user": {
+                    "error": {
                       "type": "object",
                       "required": [
-                        "fname",
-                        "id",
-                        "lname"
+                        "code",
+                        "message"
                       ],
                       "properties": {
-                        "fname": {
+                        "code": {
                           "type": "string"
                         },
-                        "id": {
-                          "type": "string"
-                        },
-                        "lname": {
+                        "message": {
                           "type": "string"
                         }
                       }
                     },
-                    "userId": {
-                      "type": "string"
+                    "success": {
+                      "const": false,
+                      "type": "boolean"
                     }
                   }
                 }
               }
             }
-          },
-          "401": {
-            "description": "Response for status 401",
-            "content": {
-              "text/plain": {
-                "schema": {
-                  "type": "string"
-                }
-              }
-            }
-          },
-          "409": {
-            "description": "Response for status 409",
-            "content": {
-              "text/plain": {
-                "schema": {
-                  "type": "string"
-                }
-              }
-            }
           }
         },
-        "operationId": "postReviewsWinemakerById"
+        "operationId": "postAdminEventsByIdApprove"
       }
     },
-    "/reviews/product/{id}/{reviewId}": {
-      "delete": {
-        "tags": [
-          "reviews"
-        ],
-        "description": "Soft-deletes a product review. Must be own review or admin.",
+    "/admin/events/{id}/reject": {
+      "post": {
+        "description": "Reject a pending event.",
         "security": [
           {
             "bearerAuth": []
           }
         ],
-        "summary": "Delete product review",
+        "summary": "Reject event",
+        "tags": [
+          "admin"
+        ],
         "parameters": [
           {
             "name": "id",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          },
-          {
-            "name": "reviewId",
             "in": "path",
             "required": true,
             "schema": {
@@ -9769,143 +8515,77 @@
             "description": "Response for status 200",
             "content": {
               "application/json": {
-                "schema": {
-                  "type": "object",
-                  "required": [
-                    "success"
-                  ],
-                  "properties": {
-                    "success": {
-                      "type": "boolean"
-                    }
-                  }
-                }
-              }
-            }
-          },
-          "401": {
-            "description": "Response for status 401",
-            "content": {
-              "text/plain": {
-                "schema": {
-                  "type": "string"
-                }
+                "schema": {}
               }
             }
           },
           "404": {
             "description": "Response for status 404",
-            "content": {
-              "text/plain": {
-                "schema": {
-                  "type": "string"
-                }
-              }
-            }
-          }
-        },
-        "operationId": "deleteReviewsProductByIdByReviewId"
-      }
-    },
-    "/reviews/winemaker/{id}/{reviewId}": {
-      "delete": {
-        "tags": [
-          "reviews"
-        ],
-        "description": "Soft-deletes a winemaker review. Must be own review or admin.",
-        "security": [
-          {
-            "bearerAuth": []
-          }
-        ],
-        "summary": "Delete winemaker review",
-        "parameters": [
-          {
-            "name": "id",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          },
-          {
-            "name": "reviewId",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "Response for status 200",
             "content": {
               "application/json": {
                 "schema": {
                   "type": "object",
                   "required": [
+                    "error",
                     "success"
                   ],
                   "properties": {
+                    "error": {
+                      "type": "object",
+                      "required": [
+                        "code",
+                        "message"
+                      ],
+                      "properties": {
+                        "code": {
+                          "type": "string"
+                        },
+                        "message": {
+                          "type": "string"
+                        }
+                      }
+                    },
                     "success": {
+                      "const": false,
                       "type": "boolean"
                     }
                   }
                 }
               }
             }
-          },
-          "401": {
-            "description": "Response for status 401",
-            "content": {
-              "text/plain": {
-                "schema": {
-                  "type": "string"
-                }
-              }
-            }
-          },
-          "404": {
-            "description": "Response for status 404",
-            "content": {
-              "text/plain": {
-                "schema": {
-                  "type": "string"
-                }
-              }
-            }
           }
         },
-        "operationId": "deleteReviewsWinemakerByIdByReviewId"
+        "operationId": "postAdminEventsByIdReject"
       }
     },
     "/admin/users": {
       "get": {
-        "tags": [
-          "admin"
-        ],
+        "description": "List users with optional status and role filters.",
         "security": [
           {
             "bearerAuth": []
           }
         ],
-        "summary": "List and filter users",
+        "summary": "List users (admin)",
+        "tags": [
+          "admin"
+        ],
         "parameters": [
           {
-            "name": "limit",
+            "name": "page",
             "in": "query",
             "required": false,
             "schema": {
-              "type": "string"
-            }
-          },
-          {
-            "name": "offset",
-            "in": "query",
-            "required": false,
-            "schema": {
-              "type": "string"
+              "anyOf": [
+                {
+                  "format": "numeric",
+                  "default": 0,
+                  "type": "string"
+                },
+                {
+                  "type": "number"
+                }
+              ]
             }
           },
           {
@@ -9921,7 +8601,12 @@
             "in": "query",
             "required": false,
             "schema": {
-              "type": "string"
+              "type": "string",
+              "enum": [
+                "active",
+                "suspended",
+                "banned"
+              ]
             }
           }
         ],
@@ -9930,85 +8615,7 @@
             "description": "Response for status 200",
             "content": {
               "application/json": {
-                "schema": {
-                  "type": "object",
-                  "required": [
-                    "data",
-                    "total"
-                  ],
-                  "properties": {
-                    "data": {
-                      "type": "array",
-                      "items": {
-                        "type": "object",
-                        "required": [
-                          "createdAt",
-                          "deletedAt",
-                          "email",
-                          "fname",
-                          "id",
-                          "lname",
-                          "role",
-                          "status"
-                        ],
-                        "properties": {
-                          "createdAt": {
-                            "anyOf": [
-                              {
-                                "format": "date-time",
-                                "type": "string"
-                              },
-                              {
-                                "format": "date",
-                                "type": "string"
-                              },
-                              {
-                                "type": "number"
-                              }
-                            ]
-                          },
-                          "deletedAt": {
-                            "nullable": true,
-                            "anyOf": [
-                              {
-                                "format": "date-time",
-                                "type": "string"
-                              },
-                              {
-                                "format": "date",
-                                "type": "string"
-                              },
-                              {
-                                "type": "number"
-                              }
-                            ]
-                          },
-                          "email": {
-                            "type": "string"
-                          },
-                          "fname": {
-                            "type": "string"
-                          },
-                          "id": {
-                            "type": "string"
-                          },
-                          "lname": {
-                            "type": "string"
-                          },
-                          "role": {
-                            "type": "string"
-                          },
-                          "status": {
-                            "type": "string"
-                          }
-                        }
-                      }
-                    },
-                    "total": {
-                      "type": "number"
-                    }
-                  }
-                }
+                "schema": {}
               }
             }
           }
@@ -10018,15 +8625,16 @@
     },
     "/admin/users/{id}/status": {
       "patch": {
-        "tags": [
-          "admin"
-        ],
+        "description": "Update a user's account status.",
         "security": [
           {
             "bearerAuth": []
           }
         ],
-        "summary": "Update user status",
+        "summary": "Set user status",
+        "tags": [
+          "admin"
+        ],
         "parameters": [
           {
             "name": "id",
@@ -10101,79 +8709,41 @@
             "description": "Response for status 200",
             "content": {
               "application/json": {
-                "schema": {
-                  "type": "object",
-                  "required": [
-                    "createdAt",
-                    "deletedAt",
-                    "email",
-                    "fname",
-                    "id",
-                    "lname",
-                    "role",
-                    "status"
-                  ],
-                  "properties": {
-                    "createdAt": {
-                      "anyOf": [
-                        {
-                          "format": "date-time",
-                          "type": "string"
-                        },
-                        {
-                          "format": "date",
-                          "type": "string"
-                        },
-                        {
-                          "type": "number"
-                        }
-                      ]
-                    },
-                    "deletedAt": {
-                      "nullable": true,
-                      "anyOf": [
-                        {
-                          "format": "date-time",
-                          "type": "string"
-                        },
-                        {
-                          "format": "date",
-                          "type": "string"
-                        },
-                        {
-                          "type": "number"
-                        }
-                      ]
-                    },
-                    "email": {
-                      "type": "string"
-                    },
-                    "fname": {
-                      "type": "string"
-                    },
-                    "id": {
-                      "type": "string"
-                    },
-                    "lname": {
-                      "type": "string"
-                    },
-                    "role": {
-                      "type": "string"
-                    },
-                    "status": {
-                      "type": "string"
-                    }
-                  }
-                }
+                "schema": {}
               }
             }
           },
           "404": {
             "description": "Response for status 404",
             "content": {
-              "text/plain": {
+              "application/json": {
                 "schema": {
-                  "type": "string"
+                  "type": "object",
+                  "required": [
+                    "error",
+                    "success"
+                  ],
+                  "properties": {
+                    "error": {
+                      "type": "object",
+                      "required": [
+                        "code",
+                        "message"
+                      ],
+                      "properties": {
+                        "code": {
+                          "type": "string"
+                        },
+                        "message": {
+                          "type": "string"
+                        }
+                      }
+                    },
+                    "success": {
+                      "const": false,
+                      "type": "boolean"
+                    }
+                  }
                 }
               }
             }
@@ -10182,517 +8752,34 @@
         "operationId": "patchAdminUsersByIdStatus"
       }
     },
-    "/admin/events": {
-      "get": {
-        "tags": [
-          "admin"
-        ],
-        "security": [
-          {
-            "bearerAuth": []
-          }
-        ],
-        "summary": "List events for moderation",
-        "parameters": [
-          {
-            "name": "limit",
-            "in": "query",
-            "required": false,
-            "schema": {
-              "type": "string"
-            }
-          },
-          {
-            "name": "offset",
-            "in": "query",
-            "required": false,
-            "schema": {
-              "type": "string"
-            }
-          },
-          {
-            "name": "status",
-            "in": "query",
-            "required": false,
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "Response for status 200",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "required": [
-                    "data",
-                    "total"
-                  ],
-                  "properties": {
-                    "data": {
-                      "type": "array",
-                      "items": {
-                        "type": "object",
-                        "required": [
-                          "address",
-                          "addressId",
-                          "endTime",
-                          "id",
-                          "name",
-                          "startTime",
-                          "status",
-                          "winemaker",
-                          "winemakerId"
-                        ],
-                        "properties": {
-                          "address": {
-                            "nullable": true,
-                            "type": "object",
-                            "required": [
-                              "city",
-                              "country",
-                              "houseNumber",
-                              "postalCode",
-                              "street"
-                            ],
-                            "properties": {
-                              "city": {
-                                "type": "string"
-                              },
-                              "country": {
-                                "type": "string"
-                              },
-                              "houseNumber": {
-                                "type": "string"
-                              },
-                              "postalCode": {
-                                "type": "string"
-                              },
-                              "street": {
-                                "type": "string"
-                              }
-                            }
-                          },
-                          "addressId": {
-                            "type": "string"
-                          },
-                          "endTime": {
-                            "anyOf": [
-                              {
-                                "format": "date-time",
-                                "type": "string"
-                              },
-                              {
-                                "format": "date",
-                                "type": "string"
-                              },
-                              {
-                                "type": "number"
-                              }
-                            ]
-                          },
-                          "id": {
-                            "type": "string"
-                          },
-                          "name": {
-                            "type": "string"
-                          },
-                          "startTime": {
-                            "anyOf": [
-                              {
-                                "format": "date-time",
-                                "type": "string"
-                              },
-                              {
-                                "format": "date",
-                                "type": "string"
-                              },
-                              {
-                                "type": "number"
-                              }
-                            ]
-                          },
-                          "status": {
-                            "type": "string"
-                          },
-                          "winemaker": {
-                            "nullable": true,
-                            "type": "object",
-                            "required": [
-                              "id",
-                              "name"
-                            ],
-                            "properties": {
-                              "id": {
-                                "type": "string"
-                              },
-                              "name": {
-                                "type": "string"
-                              }
-                            }
-                          },
-                          "winemakerId": {
-                            "type": "string"
-                          }
-                        }
-                      }
-                    },
-                    "total": {
-                      "type": "number"
-                    }
-                  }
-                }
-              }
-            }
-          }
-        },
-        "operationId": "getAdminEvents"
-      }
-    },
-    "/admin/events/{id}/approve": {
-      "patch": {
-        "tags": [
-          "admin"
-        ],
-        "security": [
-          {
-            "bearerAuth": []
-          }
-        ],
-        "summary": "Approve a pending event",
-        "parameters": [
-          {
-            "name": "id",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "Response for status 200",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "required": [
-                    "address",
-                    "addressId",
-                    "endTime",
-                    "id",
-                    "name",
-                    "startTime",
-                    "status",
-                    "winemaker",
-                    "winemakerId"
-                  ],
-                  "properties": {
-                    "address": {
-                      "nullable": true,
-                      "type": "object",
-                      "required": [
-                        "city",
-                        "country",
-                        "houseNumber",
-                        "postalCode",
-                        "street"
-                      ],
-                      "properties": {
-                        "city": {
-                          "type": "string"
-                        },
-                        "country": {
-                          "type": "string"
-                        },
-                        "houseNumber": {
-                          "type": "string"
-                        },
-                        "postalCode": {
-                          "type": "string"
-                        },
-                        "street": {
-                          "type": "string"
-                        }
-                      }
-                    },
-                    "addressId": {
-                      "type": "string"
-                    },
-                    "endTime": {
-                      "anyOf": [
-                        {
-                          "format": "date-time",
-                          "type": "string"
-                        },
-                        {
-                          "format": "date",
-                          "type": "string"
-                        },
-                        {
-                          "type": "number"
-                        }
-                      ]
-                    },
-                    "id": {
-                      "type": "string"
-                    },
-                    "name": {
-                      "type": "string"
-                    },
-                    "startTime": {
-                      "anyOf": [
-                        {
-                          "format": "date-time",
-                          "type": "string"
-                        },
-                        {
-                          "format": "date",
-                          "type": "string"
-                        },
-                        {
-                          "type": "number"
-                        }
-                      ]
-                    },
-                    "status": {
-                      "type": "string"
-                    },
-                    "winemaker": {
-                      "nullable": true,
-                      "type": "object",
-                      "required": [
-                        "id",
-                        "name"
-                      ],
-                      "properties": {
-                        "id": {
-                          "type": "string"
-                        },
-                        "name": {
-                          "type": "string"
-                        }
-                      }
-                    },
-                    "winemakerId": {
-                      "type": "string"
-                    }
-                  }
-                }
-              }
-            }
-          },
-          "400": {
-            "description": "Response for status 400",
-            "content": {
-              "text/plain": {
-                "schema": {
-                  "type": "string"
-                }
-              }
-            }
-          },
-          "404": {
-            "description": "Response for status 404",
-            "content": {
-              "text/plain": {
-                "schema": {
-                  "type": "string"
-                }
-              }
-            }
-          }
-        },
-        "operationId": "patchAdminEventsByIdApprove"
-      }
-    },
-    "/admin/events/{id}/reject": {
-      "patch": {
-        "tags": [
-          "admin"
-        ],
-        "security": [
-          {
-            "bearerAuth": []
-          }
-        ],
-        "summary": "Reject a pending event",
-        "parameters": [
-          {
-            "name": "id",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "Response for status 200",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "required": [
-                    "address",
-                    "addressId",
-                    "endTime",
-                    "id",
-                    "name",
-                    "startTime",
-                    "status",
-                    "winemaker",
-                    "winemakerId"
-                  ],
-                  "properties": {
-                    "address": {
-                      "nullable": true,
-                      "type": "object",
-                      "required": [
-                        "city",
-                        "country",
-                        "houseNumber",
-                        "postalCode",
-                        "street"
-                      ],
-                      "properties": {
-                        "city": {
-                          "type": "string"
-                        },
-                        "country": {
-                          "type": "string"
-                        },
-                        "houseNumber": {
-                          "type": "string"
-                        },
-                        "postalCode": {
-                          "type": "string"
-                        },
-                        "street": {
-                          "type": "string"
-                        }
-                      }
-                    },
-                    "addressId": {
-                      "type": "string"
-                    },
-                    "endTime": {
-                      "anyOf": [
-                        {
-                          "format": "date-time",
-                          "type": "string"
-                        },
-                        {
-                          "format": "date",
-                          "type": "string"
-                        },
-                        {
-                          "type": "number"
-                        }
-                      ]
-                    },
-                    "id": {
-                      "type": "string"
-                    },
-                    "name": {
-                      "type": "string"
-                    },
-                    "startTime": {
-                      "anyOf": [
-                        {
-                          "format": "date-time",
-                          "type": "string"
-                        },
-                        {
-                          "format": "date",
-                          "type": "string"
-                        },
-                        {
-                          "type": "number"
-                        }
-                      ]
-                    },
-                    "status": {
-                      "type": "string"
-                    },
-                    "winemaker": {
-                      "nullable": true,
-                      "type": "object",
-                      "required": [
-                        "id",
-                        "name"
-                      ],
-                      "properties": {
-                        "id": {
-                          "type": "string"
-                        },
-                        "name": {
-                          "type": "string"
-                        }
-                      }
-                    },
-                    "winemakerId": {
-                      "type": "string"
-                    }
-                  }
-                }
-              }
-            }
-          },
-          "400": {
-            "description": "Response for status 400",
-            "content": {
-              "text/plain": {
-                "schema": {
-                  "type": "string"
-                }
-              }
-            }
-          },
-          "404": {
-            "description": "Response for status 404",
-            "content": {
-              "text/plain": {
-                "schema": {
-                  "type": "string"
-                }
-              }
-            }
-          }
-        },
-        "operationId": "patchAdminEventsByIdReject"
-      }
-    },
     "/admin/reviews": {
       "get": {
-        "tags": [
-          "admin"
-        ],
+        "description": "List all reviews across the platform.",
         "security": [
           {
             "bearerAuth": []
           }
         ],
-        "summary": "List all reviews for moderation",
+        "summary": "List reviews (admin)",
+        "tags": [
+          "admin"
+        ],
         "parameters": [
           {
-            "name": "limit",
+            "name": "page",
             "in": "query",
             "required": false,
             "schema": {
-              "type": "string"
-            }
-          },
-          {
-            "name": "offset",
-            "in": "query",
-            "required": false,
-            "schema": {
-              "type": "string"
+              "anyOf": [
+                {
+                  "format": "numeric",
+                  "default": 0,
+                  "type": "string"
+                },
+                {
+                  "type": "number"
+                }
+              ]
             }
           }
         ],
@@ -10701,90 +8788,7 @@
             "description": "Response for status 200",
             "content": {
               "application/json": {
-                "schema": {
-                  "type": "object",
-                  "required": [
-                    "data",
-                    "total"
-                  ],
-                  "properties": {
-                    "data": {
-                      "type": "array",
-                      "items": {
-                        "type": "object",
-                        "required": [
-                          "body",
-                          "createdAt",
-                          "entityId",
-                          "entityType",
-                          "id",
-                          "rating",
-                          "user",
-                          "userId"
-                        ],
-                        "properties": {
-                          "body": {
-                            "nullable": true,
-                            "type": "string"
-                          },
-                          "createdAt": {
-                            "anyOf": [
-                              {
-                                "format": "date-time",
-                                "type": "string"
-                              },
-                              {
-                                "format": "date",
-                                "type": "string"
-                              },
-                              {
-                                "type": "number"
-                              }
-                            ]
-                          },
-                          "entityId": {
-                            "type": "string"
-                          },
-                          "entityType": {
-                            "type": "string"
-                          },
-                          "id": {
-                            "type": "string"
-                          },
-                          "rating": {
-                            "type": "number"
-                          },
-                          "user": {
-                            "nullable": true,
-                            "type": "object",
-                            "required": [
-                              "fname",
-                              "id",
-                              "lname"
-                            ],
-                            "properties": {
-                              "fname": {
-                                "type": "string"
-                              },
-                              "id": {
-                                "type": "string"
-                              },
-                              "lname": {
-                                "type": "string"
-                              }
-                            }
-                          },
-                          "userId": {
-                            "type": "string"
-                          }
-                        }
-                      }
-                    },
-                    "total": {
-                      "type": "number"
-                    }
-                  }
-                }
+                "schema": {}
               }
             }
           }
@@ -10794,15 +8798,16 @@
     },
     "/admin/reviews/{id}": {
       "delete": {
-        "tags": [
-          "admin"
-        ],
+        "description": "Delete any review (moderation).",
         "security": [
           {
             "bearerAuth": []
           }
         ],
-        "summary": "Soft-delete a review",
+        "summary": "Delete review (admin)",
+        "tags": [
+          "admin"
+        ],
         "parameters": [
           {
             "name": "id",
@@ -10818,26 +8823,41 @@
             "description": "Response for status 200",
             "content": {
               "application/json": {
-                "schema": {
-                  "type": "object",
-                  "required": [
-                    "success"
-                  ],
-                  "properties": {
-                    "success": {
-                      "type": "boolean"
-                    }
-                  }
-                }
+                "schema": {}
               }
             }
           },
           "404": {
             "description": "Response for status 404",
             "content": {
-              "text/plain": {
+              "application/json": {
                 "schema": {
-                  "type": "string"
+                  "type": "object",
+                  "required": [
+                    "error",
+                    "success"
+                  ],
+                  "properties": {
+                    "error": {
+                      "type": "object",
+                      "required": [
+                        "code",
+                        "message"
+                      ],
+                      "properties": {
+                        "code": {
+                          "type": "string"
+                        },
+                        "message": {
+                          "type": "string"
+                        }
+                      }
+                    },
+                    "success": {
+                      "const": false,
+                      "type": "boolean"
+                    }
+                  }
                 }
               }
             }
@@ -10952,32 +8972,37 @@
               }
             }
           },
-          "400": {
-            "description": "Response for status 400",
-            "content": {
-              "text/plain": {
-                "schema": {
-                  "type": "string"
-                }
-              }
-            }
-          },
-          "403": {
-            "description": "Response for status 403",
-            "content": {
-              "text/plain": {
-                "schema": {
-                  "type": "string"
-                }
-              }
-            }
-          },
           "404": {
             "description": "Response for status 404",
             "content": {
-              "text/plain": {
+              "application/json": {
                 "schema": {
-                  "type": "string"
+                  "type": "object",
+                  "required": [
+                    "error",
+                    "success"
+                  ],
+                  "properties": {
+                    "error": {
+                      "type": "object",
+                      "required": [
+                        "code",
+                        "message"
+                      ],
+                      "properties": {
+                        "code": {
+                          "type": "string"
+                        },
+                        "message": {
+                          "type": "string"
+                        }
+                      }
+                    },
+                    "success": {
+                      "const": false,
+                      "type": "boolean"
+                    }
+                  }
                 }
               }
             }
@@ -11113,9 +9138,34 @@
           "403": {
             "description": "Response for status 403",
             "content": {
-              "text/plain": {
+              "application/json": {
                 "schema": {
-                  "type": "string"
+                  "type": "object",
+                  "required": [
+                    "error",
+                    "success"
+                  ],
+                  "properties": {
+                    "error": {
+                      "type": "object",
+                      "required": [
+                        "code",
+                        "message"
+                      ],
+                      "properties": {
+                        "code": {
+                          "type": "string"
+                        },
+                        "message": {
+                          "type": "string"
+                        }
+                      }
+                    },
+                    "success": {
+                      "const": false,
+                      "type": "boolean"
+                    }
+                  }
                 }
               }
             }
@@ -11123,9 +9173,34 @@
           "404": {
             "description": "Response for status 404",
             "content": {
-              "text/plain": {
+              "application/json": {
                 "schema": {
-                  "type": "string"
+                  "type": "object",
+                  "required": [
+                    "error",
+                    "success"
+                  ],
+                  "properties": {
+                    "error": {
+                      "type": "object",
+                      "required": [
+                        "code",
+                        "message"
+                      ],
+                      "properties": {
+                        "code": {
+                          "type": "string"
+                        },
+                        "message": {
+                          "type": "string"
+                        }
+                      }
+                    },
+                    "success": {
+                      "const": false,
+                      "type": "boolean"
+                    }
+                  }
                 }
               }
             }
@@ -11133,9 +9208,34 @@
           "409": {
             "description": "Response for status 409",
             "content": {
-              "text/plain": {
+              "application/json": {
                 "schema": {
-                  "type": "string"
+                  "type": "object",
+                  "required": [
+                    "error",
+                    "success"
+                  ],
+                  "properties": {
+                    "error": {
+                      "type": "object",
+                      "required": [
+                        "code",
+                        "message"
+                      ],
+                      "properties": {
+                        "code": {
+                          "type": "string"
+                        },
+                        "message": {
+                          "type": "string"
+                        }
+                      }
+                    },
+                    "success": {
+                      "const": false,
+                      "type": "boolean"
+                    }
+                  }
                 }
               }
             }
@@ -11143,9 +9243,34 @@
           "413": {
             "description": "Response for status 413",
             "content": {
-              "text/plain": {
+              "application/json": {
                 "schema": {
-                  "type": "string"
+                  "type": "object",
+                  "required": [
+                    "error",
+                    "success"
+                  ],
+                  "properties": {
+                    "error": {
+                      "type": "object",
+                      "required": [
+                        "code",
+                        "message"
+                      ],
+                      "properties": {
+                        "code": {
+                          "type": "string"
+                        },
+                        "message": {
+                          "type": "string"
+                        }
+                      }
+                    },
+                    "success": {
+                      "const": false,
+                      "type": "boolean"
+                    }
+                  }
                 }
               }
             }
@@ -11153,9 +9278,34 @@
           "415": {
             "description": "Response for status 415",
             "content": {
-              "text/plain": {
+              "application/json": {
                 "schema": {
-                  "type": "string"
+                  "type": "object",
+                  "required": [
+                    "error",
+                    "success"
+                  ],
+                  "properties": {
+                    "error": {
+                      "type": "object",
+                      "required": [
+                        "code",
+                        "message"
+                      ],
+                      "properties": {
+                        "code": {
+                          "type": "string"
+                        },
+                        "message": {
+                          "type": "string"
+                        }
+                      }
+                    },
+                    "success": {
+                      "const": false,
+                      "type": "boolean"
+                    }
+                  }
                 }
               }
             }
@@ -11201,9 +9351,34 @@
           "403": {
             "description": "Response for status 403",
             "content": {
-              "text/plain": {
+              "application/json": {
                 "schema": {
-                  "type": "string"
+                  "type": "object",
+                  "required": [
+                    "error",
+                    "success"
+                  ],
+                  "properties": {
+                    "error": {
+                      "type": "object",
+                      "required": [
+                        "code",
+                        "message"
+                      ],
+                      "properties": {
+                        "code": {
+                          "type": "string"
+                        },
+                        "message": {
+                          "type": "string"
+                        }
+                      }
+                    },
+                    "success": {
+                      "const": false,
+                      "type": "boolean"
+                    }
+                  }
                 }
               }
             }
@@ -11211,9 +9386,34 @@
           "404": {
             "description": "Response for status 404",
             "content": {
-              "text/plain": {
+              "application/json": {
                 "schema": {
-                  "type": "string"
+                  "type": "object",
+                  "required": [
+                    "error",
+                    "success"
+                  ],
+                  "properties": {
+                    "error": {
+                      "type": "object",
+                      "required": [
+                        "code",
+                        "message"
+                      ],
+                      "properties": {
+                        "code": {
+                          "type": "string"
+                        },
+                        "message": {
+                          "type": "string"
+                        }
+                      }
+                    },
+                    "success": {
+                      "const": false,
+                      "type": "boolean"
+                    }
+                  }
                 }
               }
             }
@@ -11296,32 +9496,37 @@
               }
             }
           },
-          "400": {
-            "description": "Response for status 400",
-            "content": {
-              "text/plain": {
-                "schema": {
-                  "type": "string"
-                }
-              }
-            }
-          },
-          "403": {
-            "description": "Response for status 403",
-            "content": {
-              "text/plain": {
-                "schema": {
-                  "type": "string"
-                }
-              }
-            }
-          },
           "404": {
             "description": "Response for status 404",
             "content": {
-              "text/plain": {
+              "application/json": {
                 "schema": {
-                  "type": "string"
+                  "type": "object",
+                  "required": [
+                    "error",
+                    "success"
+                  ],
+                  "properties": {
+                    "error": {
+                      "type": "object",
+                      "required": [
+                        "code",
+                        "message"
+                      ],
+                      "properties": {
+                        "code": {
+                          "type": "string"
+                        },
+                        "message": {
+                          "type": "string"
+                        }
+                      }
+                    },
+                    "success": {
+                      "const": false,
+                      "type": "boolean"
+                    }
+                  }
                 }
               }
             }
@@ -11457,9 +9662,34 @@
           "403": {
             "description": "Response for status 403",
             "content": {
-              "text/plain": {
+              "application/json": {
                 "schema": {
-                  "type": "string"
+                  "type": "object",
+                  "required": [
+                    "error",
+                    "success"
+                  ],
+                  "properties": {
+                    "error": {
+                      "type": "object",
+                      "required": [
+                        "code",
+                        "message"
+                      ],
+                      "properties": {
+                        "code": {
+                          "type": "string"
+                        },
+                        "message": {
+                          "type": "string"
+                        }
+                      }
+                    },
+                    "success": {
+                      "const": false,
+                      "type": "boolean"
+                    }
+                  }
                 }
               }
             }
@@ -11467,9 +9697,34 @@
           "404": {
             "description": "Response for status 404",
             "content": {
-              "text/plain": {
+              "application/json": {
                 "schema": {
-                  "type": "string"
+                  "type": "object",
+                  "required": [
+                    "error",
+                    "success"
+                  ],
+                  "properties": {
+                    "error": {
+                      "type": "object",
+                      "required": [
+                        "code",
+                        "message"
+                      ],
+                      "properties": {
+                        "code": {
+                          "type": "string"
+                        },
+                        "message": {
+                          "type": "string"
+                        }
+                      }
+                    },
+                    "success": {
+                      "const": false,
+                      "type": "boolean"
+                    }
+                  }
                 }
               }
             }
@@ -11477,9 +9732,34 @@
           "409": {
             "description": "Response for status 409",
             "content": {
-              "text/plain": {
+              "application/json": {
                 "schema": {
-                  "type": "string"
+                  "type": "object",
+                  "required": [
+                    "error",
+                    "success"
+                  ],
+                  "properties": {
+                    "error": {
+                      "type": "object",
+                      "required": [
+                        "code",
+                        "message"
+                      ],
+                      "properties": {
+                        "code": {
+                          "type": "string"
+                        },
+                        "message": {
+                          "type": "string"
+                        }
+                      }
+                    },
+                    "success": {
+                      "const": false,
+                      "type": "boolean"
+                    }
+                  }
                 }
               }
             }
@@ -11487,9 +9767,34 @@
           "413": {
             "description": "Response for status 413",
             "content": {
-              "text/plain": {
+              "application/json": {
                 "schema": {
-                  "type": "string"
+                  "type": "object",
+                  "required": [
+                    "error",
+                    "success"
+                  ],
+                  "properties": {
+                    "error": {
+                      "type": "object",
+                      "required": [
+                        "code",
+                        "message"
+                      ],
+                      "properties": {
+                        "code": {
+                          "type": "string"
+                        },
+                        "message": {
+                          "type": "string"
+                        }
+                      }
+                    },
+                    "success": {
+                      "const": false,
+                      "type": "boolean"
+                    }
+                  }
                 }
               }
             }
@@ -11497,9 +9802,34 @@
           "415": {
             "description": "Response for status 415",
             "content": {
-              "text/plain": {
+              "application/json": {
                 "schema": {
-                  "type": "string"
+                  "type": "object",
+                  "required": [
+                    "error",
+                    "success"
+                  ],
+                  "properties": {
+                    "error": {
+                      "type": "object",
+                      "required": [
+                        "code",
+                        "message"
+                      ],
+                      "properties": {
+                        "code": {
+                          "type": "string"
+                        },
+                        "message": {
+                          "type": "string"
+                        }
+                      }
+                    },
+                    "success": {
+                      "const": false,
+                      "type": "boolean"
+                    }
+                  }
                 }
               }
             }
@@ -11545,9 +9875,34 @@
           "403": {
             "description": "Response for status 403",
             "content": {
-              "text/plain": {
+              "application/json": {
                 "schema": {
-                  "type": "string"
+                  "type": "object",
+                  "required": [
+                    "error",
+                    "success"
+                  ],
+                  "properties": {
+                    "error": {
+                      "type": "object",
+                      "required": [
+                        "code",
+                        "message"
+                      ],
+                      "properties": {
+                        "code": {
+                          "type": "string"
+                        },
+                        "message": {
+                          "type": "string"
+                        }
+                      }
+                    },
+                    "success": {
+                      "const": false,
+                      "type": "boolean"
+                    }
+                  }
                 }
               }
             }
@@ -11555,9 +9910,34 @@
           "404": {
             "description": "Response for status 404",
             "content": {
-              "text/plain": {
+              "application/json": {
                 "schema": {
-                  "type": "string"
+                  "type": "object",
+                  "required": [
+                    "error",
+                    "success"
+                  ],
+                  "properties": {
+                    "error": {
+                      "type": "object",
+                      "required": [
+                        "code",
+                        "message"
+                      ],
+                      "properties": {
+                        "code": {
+                          "type": "string"
+                        },
+                        "message": {
+                          "type": "string"
+                        }
+                      }
+                    },
+                    "success": {
+                      "const": false,
+                      "type": "boolean"
+                    }
+                  }
                 }
               }
             }
@@ -11640,32 +10020,37 @@
               }
             }
           },
-          "400": {
-            "description": "Response for status 400",
-            "content": {
-              "text/plain": {
-                "schema": {
-                  "type": "string"
-                }
-              }
-            }
-          },
-          "403": {
-            "description": "Response for status 403",
-            "content": {
-              "text/plain": {
-                "schema": {
-                  "type": "string"
-                }
-              }
-            }
-          },
           "404": {
             "description": "Response for status 404",
             "content": {
-              "text/plain": {
+              "application/json": {
                 "schema": {
-                  "type": "string"
+                  "type": "object",
+                  "required": [
+                    "error",
+                    "success"
+                  ],
+                  "properties": {
+                    "error": {
+                      "type": "object",
+                      "required": [
+                        "code",
+                        "message"
+                      ],
+                      "properties": {
+                        "code": {
+                          "type": "string"
+                        },
+                        "message": {
+                          "type": "string"
+                        }
+                      }
+                    },
+                    "success": {
+                      "const": false,
+                      "type": "boolean"
+                    }
+                  }
                 }
               }
             }
@@ -11801,9 +10186,34 @@
           "403": {
             "description": "Response for status 403",
             "content": {
-              "text/plain": {
+              "application/json": {
                 "schema": {
-                  "type": "string"
+                  "type": "object",
+                  "required": [
+                    "error",
+                    "success"
+                  ],
+                  "properties": {
+                    "error": {
+                      "type": "object",
+                      "required": [
+                        "code",
+                        "message"
+                      ],
+                      "properties": {
+                        "code": {
+                          "type": "string"
+                        },
+                        "message": {
+                          "type": "string"
+                        }
+                      }
+                    },
+                    "success": {
+                      "const": false,
+                      "type": "boolean"
+                    }
+                  }
                 }
               }
             }
@@ -11811,9 +10221,34 @@
           "404": {
             "description": "Response for status 404",
             "content": {
-              "text/plain": {
+              "application/json": {
                 "schema": {
-                  "type": "string"
+                  "type": "object",
+                  "required": [
+                    "error",
+                    "success"
+                  ],
+                  "properties": {
+                    "error": {
+                      "type": "object",
+                      "required": [
+                        "code",
+                        "message"
+                      ],
+                      "properties": {
+                        "code": {
+                          "type": "string"
+                        },
+                        "message": {
+                          "type": "string"
+                        }
+                      }
+                    },
+                    "success": {
+                      "const": false,
+                      "type": "boolean"
+                    }
+                  }
                 }
               }
             }
@@ -11821,9 +10256,34 @@
           "409": {
             "description": "Response for status 409",
             "content": {
-              "text/plain": {
+              "application/json": {
                 "schema": {
-                  "type": "string"
+                  "type": "object",
+                  "required": [
+                    "error",
+                    "success"
+                  ],
+                  "properties": {
+                    "error": {
+                      "type": "object",
+                      "required": [
+                        "code",
+                        "message"
+                      ],
+                      "properties": {
+                        "code": {
+                          "type": "string"
+                        },
+                        "message": {
+                          "type": "string"
+                        }
+                      }
+                    },
+                    "success": {
+                      "const": false,
+                      "type": "boolean"
+                    }
+                  }
                 }
               }
             }
@@ -11831,9 +10291,34 @@
           "413": {
             "description": "Response for status 413",
             "content": {
-              "text/plain": {
+              "application/json": {
                 "schema": {
-                  "type": "string"
+                  "type": "object",
+                  "required": [
+                    "error",
+                    "success"
+                  ],
+                  "properties": {
+                    "error": {
+                      "type": "object",
+                      "required": [
+                        "code",
+                        "message"
+                      ],
+                      "properties": {
+                        "code": {
+                          "type": "string"
+                        },
+                        "message": {
+                          "type": "string"
+                        }
+                      }
+                    },
+                    "success": {
+                      "const": false,
+                      "type": "boolean"
+                    }
+                  }
                 }
               }
             }
@@ -11841,9 +10326,34 @@
           "415": {
             "description": "Response for status 415",
             "content": {
-              "text/plain": {
+              "application/json": {
                 "schema": {
-                  "type": "string"
+                  "type": "object",
+                  "required": [
+                    "error",
+                    "success"
+                  ],
+                  "properties": {
+                    "error": {
+                      "type": "object",
+                      "required": [
+                        "code",
+                        "message"
+                      ],
+                      "properties": {
+                        "code": {
+                          "type": "string"
+                        },
+                        "message": {
+                          "type": "string"
+                        }
+                      }
+                    },
+                    "success": {
+                      "const": false,
+                      "type": "boolean"
+                    }
+                  }
                 }
               }
             }
@@ -11889,9 +10399,34 @@
           "403": {
             "description": "Response for status 403",
             "content": {
-              "text/plain": {
+              "application/json": {
                 "schema": {
-                  "type": "string"
+                  "type": "object",
+                  "required": [
+                    "error",
+                    "success"
+                  ],
+                  "properties": {
+                    "error": {
+                      "type": "object",
+                      "required": [
+                        "code",
+                        "message"
+                      ],
+                      "properties": {
+                        "code": {
+                          "type": "string"
+                        },
+                        "message": {
+                          "type": "string"
+                        }
+                      }
+                    },
+                    "success": {
+                      "const": false,
+                      "type": "boolean"
+                    }
+                  }
                 }
               }
             }
@@ -11899,9 +10434,34 @@
           "404": {
             "description": "Response for status 404",
             "content": {
-              "text/plain": {
+              "application/json": {
                 "schema": {
-                  "type": "string"
+                  "type": "object",
+                  "required": [
+                    "error",
+                    "success"
+                  ],
+                  "properties": {
+                    "error": {
+                      "type": "object",
+                      "required": [
+                        "code",
+                        "message"
+                      ],
+                      "properties": {
+                        "code": {
+                          "type": "string"
+                        },
+                        "message": {
+                          "type": "string"
+                        }
+                      }
+                    },
+                    "success": {
+                      "const": false,
+                      "type": "boolean"
+                    }
+                  }
                 }
               }
             }
@@ -11984,32 +10544,37 @@
               }
             }
           },
-          "400": {
-            "description": "Response for status 400",
-            "content": {
-              "text/plain": {
-                "schema": {
-                  "type": "string"
-                }
-              }
-            }
-          },
-          "403": {
-            "description": "Response for status 403",
-            "content": {
-              "text/plain": {
-                "schema": {
-                  "type": "string"
-                }
-              }
-            }
-          },
           "404": {
             "description": "Response for status 404",
             "content": {
-              "text/plain": {
+              "application/json": {
                 "schema": {
-                  "type": "string"
+                  "type": "object",
+                  "required": [
+                    "error",
+                    "success"
+                  ],
+                  "properties": {
+                    "error": {
+                      "type": "object",
+                      "required": [
+                        "code",
+                        "message"
+                      ],
+                      "properties": {
+                        "code": {
+                          "type": "string"
+                        },
+                        "message": {
+                          "type": "string"
+                        }
+                      }
+                    },
+                    "success": {
+                      "const": false,
+                      "type": "boolean"
+                    }
+                  }
                 }
               }
             }
@@ -12145,9 +10710,34 @@
           "403": {
             "description": "Response for status 403",
             "content": {
-              "text/plain": {
+              "application/json": {
                 "schema": {
-                  "type": "string"
+                  "type": "object",
+                  "required": [
+                    "error",
+                    "success"
+                  ],
+                  "properties": {
+                    "error": {
+                      "type": "object",
+                      "required": [
+                        "code",
+                        "message"
+                      ],
+                      "properties": {
+                        "code": {
+                          "type": "string"
+                        },
+                        "message": {
+                          "type": "string"
+                        }
+                      }
+                    },
+                    "success": {
+                      "const": false,
+                      "type": "boolean"
+                    }
+                  }
                 }
               }
             }
@@ -12155,9 +10745,34 @@
           "404": {
             "description": "Response for status 404",
             "content": {
-              "text/plain": {
+              "application/json": {
                 "schema": {
-                  "type": "string"
+                  "type": "object",
+                  "required": [
+                    "error",
+                    "success"
+                  ],
+                  "properties": {
+                    "error": {
+                      "type": "object",
+                      "required": [
+                        "code",
+                        "message"
+                      ],
+                      "properties": {
+                        "code": {
+                          "type": "string"
+                        },
+                        "message": {
+                          "type": "string"
+                        }
+                      }
+                    },
+                    "success": {
+                      "const": false,
+                      "type": "boolean"
+                    }
+                  }
                 }
               }
             }
@@ -12165,9 +10780,34 @@
           "409": {
             "description": "Response for status 409",
             "content": {
-              "text/plain": {
+              "application/json": {
                 "schema": {
-                  "type": "string"
+                  "type": "object",
+                  "required": [
+                    "error",
+                    "success"
+                  ],
+                  "properties": {
+                    "error": {
+                      "type": "object",
+                      "required": [
+                        "code",
+                        "message"
+                      ],
+                      "properties": {
+                        "code": {
+                          "type": "string"
+                        },
+                        "message": {
+                          "type": "string"
+                        }
+                      }
+                    },
+                    "success": {
+                      "const": false,
+                      "type": "boolean"
+                    }
+                  }
                 }
               }
             }
@@ -12175,9 +10815,34 @@
           "413": {
             "description": "Response for status 413",
             "content": {
-              "text/plain": {
+              "application/json": {
                 "schema": {
-                  "type": "string"
+                  "type": "object",
+                  "required": [
+                    "error",
+                    "success"
+                  ],
+                  "properties": {
+                    "error": {
+                      "type": "object",
+                      "required": [
+                        "code",
+                        "message"
+                      ],
+                      "properties": {
+                        "code": {
+                          "type": "string"
+                        },
+                        "message": {
+                          "type": "string"
+                        }
+                      }
+                    },
+                    "success": {
+                      "const": false,
+                      "type": "boolean"
+                    }
+                  }
                 }
               }
             }
@@ -12185,9 +10850,34 @@
           "415": {
             "description": "Response for status 415",
             "content": {
-              "text/plain": {
+              "application/json": {
                 "schema": {
-                  "type": "string"
+                  "type": "object",
+                  "required": [
+                    "error",
+                    "success"
+                  ],
+                  "properties": {
+                    "error": {
+                      "type": "object",
+                      "required": [
+                        "code",
+                        "message"
+                      ],
+                      "properties": {
+                        "code": {
+                          "type": "string"
+                        },
+                        "message": {
+                          "type": "string"
+                        }
+                      }
+                    },
+                    "success": {
+                      "const": false,
+                      "type": "boolean"
+                    }
+                  }
                 }
               }
             }
@@ -12233,9 +10923,34 @@
           "403": {
             "description": "Response for status 403",
             "content": {
-              "text/plain": {
+              "application/json": {
                 "schema": {
-                  "type": "string"
+                  "type": "object",
+                  "required": [
+                    "error",
+                    "success"
+                  ],
+                  "properties": {
+                    "error": {
+                      "type": "object",
+                      "required": [
+                        "code",
+                        "message"
+                      ],
+                      "properties": {
+                        "code": {
+                          "type": "string"
+                        },
+                        "message": {
+                          "type": "string"
+                        }
+                      }
+                    },
+                    "success": {
+                      "const": false,
+                      "type": "boolean"
+                    }
+                  }
                 }
               }
             }
@@ -12243,9 +10958,34 @@
           "404": {
             "description": "Response for status 404",
             "content": {
-              "text/plain": {
+              "application/json": {
                 "schema": {
-                  "type": "string"
+                  "type": "object",
+                  "required": [
+                    "error",
+                    "success"
+                  ],
+                  "properties": {
+                    "error": {
+                      "type": "object",
+                      "required": [
+                        "code",
+                        "message"
+                      ],
+                      "properties": {
+                        "code": {
+                          "type": "string"
+                        },
+                        "message": {
+                          "type": "string"
+                        }
+                      }
+                    },
+                    "success": {
+                      "const": false,
+                      "type": "boolean"
+                    }
+                  }
                 }
               }
             }
@@ -12328,32 +11068,37 @@
               }
             }
           },
-          "400": {
-            "description": "Response for status 400",
-            "content": {
-              "text/plain": {
-                "schema": {
-                  "type": "string"
-                }
-              }
-            }
-          },
-          "403": {
-            "description": "Response for status 403",
-            "content": {
-              "text/plain": {
-                "schema": {
-                  "type": "string"
-                }
-              }
-            }
-          },
           "404": {
             "description": "Response for status 404",
             "content": {
-              "text/plain": {
+              "application/json": {
                 "schema": {
-                  "type": "string"
+                  "type": "object",
+                  "required": [
+                    "error",
+                    "success"
+                  ],
+                  "properties": {
+                    "error": {
+                      "type": "object",
+                      "required": [
+                        "code",
+                        "message"
+                      ],
+                      "properties": {
+                        "code": {
+                          "type": "string"
+                        },
+                        "message": {
+                          "type": "string"
+                        }
+                      }
+                    },
+                    "success": {
+                      "const": false,
+                      "type": "boolean"
+                    }
+                  }
                 }
               }
             }
@@ -12489,9 +11234,34 @@
           "403": {
             "description": "Response for status 403",
             "content": {
-              "text/plain": {
+              "application/json": {
                 "schema": {
-                  "type": "string"
+                  "type": "object",
+                  "required": [
+                    "error",
+                    "success"
+                  ],
+                  "properties": {
+                    "error": {
+                      "type": "object",
+                      "required": [
+                        "code",
+                        "message"
+                      ],
+                      "properties": {
+                        "code": {
+                          "type": "string"
+                        },
+                        "message": {
+                          "type": "string"
+                        }
+                      }
+                    },
+                    "success": {
+                      "const": false,
+                      "type": "boolean"
+                    }
+                  }
                 }
               }
             }
@@ -12499,9 +11269,34 @@
           "404": {
             "description": "Response for status 404",
             "content": {
-              "text/plain": {
+              "application/json": {
                 "schema": {
-                  "type": "string"
+                  "type": "object",
+                  "required": [
+                    "error",
+                    "success"
+                  ],
+                  "properties": {
+                    "error": {
+                      "type": "object",
+                      "required": [
+                        "code",
+                        "message"
+                      ],
+                      "properties": {
+                        "code": {
+                          "type": "string"
+                        },
+                        "message": {
+                          "type": "string"
+                        }
+                      }
+                    },
+                    "success": {
+                      "const": false,
+                      "type": "boolean"
+                    }
+                  }
                 }
               }
             }
@@ -12509,9 +11304,34 @@
           "409": {
             "description": "Response for status 409",
             "content": {
-              "text/plain": {
+              "application/json": {
                 "schema": {
-                  "type": "string"
+                  "type": "object",
+                  "required": [
+                    "error",
+                    "success"
+                  ],
+                  "properties": {
+                    "error": {
+                      "type": "object",
+                      "required": [
+                        "code",
+                        "message"
+                      ],
+                      "properties": {
+                        "code": {
+                          "type": "string"
+                        },
+                        "message": {
+                          "type": "string"
+                        }
+                      }
+                    },
+                    "success": {
+                      "const": false,
+                      "type": "boolean"
+                    }
+                  }
                 }
               }
             }
@@ -12519,9 +11339,34 @@
           "413": {
             "description": "Response for status 413",
             "content": {
-              "text/plain": {
+              "application/json": {
                 "schema": {
-                  "type": "string"
+                  "type": "object",
+                  "required": [
+                    "error",
+                    "success"
+                  ],
+                  "properties": {
+                    "error": {
+                      "type": "object",
+                      "required": [
+                        "code",
+                        "message"
+                      ],
+                      "properties": {
+                        "code": {
+                          "type": "string"
+                        },
+                        "message": {
+                          "type": "string"
+                        }
+                      }
+                    },
+                    "success": {
+                      "const": false,
+                      "type": "boolean"
+                    }
+                  }
                 }
               }
             }
@@ -12529,9 +11374,34 @@
           "415": {
             "description": "Response for status 415",
             "content": {
-              "text/plain": {
+              "application/json": {
                 "schema": {
-                  "type": "string"
+                  "type": "object",
+                  "required": [
+                    "error",
+                    "success"
+                  ],
+                  "properties": {
+                    "error": {
+                      "type": "object",
+                      "required": [
+                        "code",
+                        "message"
+                      ],
+                      "properties": {
+                        "code": {
+                          "type": "string"
+                        },
+                        "message": {
+                          "type": "string"
+                        }
+                      }
+                    },
+                    "success": {
+                      "const": false,
+                      "type": "boolean"
+                    }
+                  }
                 }
               }
             }
@@ -12577,9 +11447,34 @@
           "403": {
             "description": "Response for status 403",
             "content": {
-              "text/plain": {
+              "application/json": {
                 "schema": {
-                  "type": "string"
+                  "type": "object",
+                  "required": [
+                    "error",
+                    "success"
+                  ],
+                  "properties": {
+                    "error": {
+                      "type": "object",
+                      "required": [
+                        "code",
+                        "message"
+                      ],
+                      "properties": {
+                        "code": {
+                          "type": "string"
+                        },
+                        "message": {
+                          "type": "string"
+                        }
+                      }
+                    },
+                    "success": {
+                      "const": false,
+                      "type": "boolean"
+                    }
+                  }
                 }
               }
             }
@@ -12587,9 +11482,34 @@
           "404": {
             "description": "Response for status 404",
             "content": {
-              "text/plain": {
+              "application/json": {
                 "schema": {
-                  "type": "string"
+                  "type": "object",
+                  "required": [
+                    "error",
+                    "success"
+                  ],
+                  "properties": {
+                    "error": {
+                      "type": "object",
+                      "required": [
+                        "code",
+                        "message"
+                      ],
+                      "properties": {
+                        "code": {
+                          "type": "string"
+                        },
+                        "message": {
+                          "type": "string"
+                        }
+                      }
+                    },
+                    "success": {
+                      "const": false,
+                      "type": "boolean"
+                    }
+                  }
                 }
               }
             }

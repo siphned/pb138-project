@@ -1,5 +1,5 @@
 import { Elysia, t } from "elysia";
-import { errorResponse } from "../../utils/errorPlugin";
+import { errorResponse } from "../../utils/error-plugin";
 import { authPlugin } from "../auth";
 import { reviewsService } from "./reviews.service";
 

@@ -100,6 +100,7 @@ bun run db:migrate     # Apply Drizzle migrations
 | [docs/ROLES/](docs/ROLES/) | Role-permission matrix (RBAC) |
 | [docs/ROUTES/](docs/ROUTES/) | Frontend route structure and guards |
 | [docs/audit/](docs/audit/) | Architecture audit and redesign logs |
+| [docs/CODING_STANDARDS.md](docs/CODING_STANDARDS.md) | Project-wide coding standards and conventions |
 | [wiki/](wiki/) | Pattern guides (React, Elysia, Drizzle, etc.) |
 | [CLAUDE.md](CLAUDE.md) | Primary source of truth for coding patterns |
 

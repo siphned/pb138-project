@@ -2,7 +2,7 @@ import { basename } from "node:path";
 import { fileURLToPath } from "node:url";
 import { Elysia, status, t } from "elysia";
 import { db } from "../../db";
-import { errorResponse } from "../../utils/errorPlugin";
+import { errorResponse } from "../../utils/error-plugin";
 import type { AppRole } from "../auth";
 import { authPlugin } from "../auth";
 import type { EntityType } from "./images.repository";

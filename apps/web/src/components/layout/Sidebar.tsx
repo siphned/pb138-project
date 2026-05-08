@@ -1,4 +1,4 @@
-﻿import { Show, useAuth, useClerk, useUser as useClerkUser } from "@clerk/react";
+import { Show, useAuth, useClerk, useUser as useClerkUser } from "@clerk/react";
 import { Link, useNavigate } from "@tanstack/react-router";
 import {
   Calendar,
@@ -51,14 +51,9 @@ export function Sidebar({ userRoles = [Role.customer], activeRole, onRoleChange 
   const handleLogout = async () => {
     try {
       await signOut({ redirectUrl: "/" });
-<<<<<<< HEAD
     } catch (_error) {
-      //console.error("Sign out error:", error);
-=======
-    } catch (error) {
-      // biome-ignore lint/suspicious/noConsole: error reporting
-      console.error("Sign out error:", error);
->>>>>>> 23a400f (feat: complete Milestone 2 remediation - structural refactor, UI polish, and technical debt cleanup)
+      // TODO: User notification (toast)
+      // console.error("Sign out error:", error);
     }
     navigate({ to: "/" });
   };
@@ -215,17 +210,6 @@ export function Sidebar({ userRoles = [Role.customer], activeRole, onRoleChange 
             <NavItem
               variant="destructive"
               className="mt-2 w-full text-left"
-              onClick={handleLogout}
-            >
-              <LogOut className="h-4 w-4" /> Log out
-            </NavItem>
-          </Show>
-        </div>
-      </SheetContent>
-    </Sheet>
-  );
-}
-mt-2 w-full text-left"
               onClick={handleLogout}
             >
               <LogOut className="h-4 w-4" /> Log out
