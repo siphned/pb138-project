@@ -65,62 +65,59 @@ async function teardown() {
   await db.delete(addresses);
 }
 
-async function insertAddress() {
-  const [row] = await db.insert(addresses).values(czechAddress()).returning();
-  if (!row) throw new Error("Address insert returned no rows");
-  return row;
+// Batch insert addresses
+async function insertAddresses(count: number) {
+  if (count === 0) return [];
+  const rows = await db
+    .insert(addresses)
+    .values(Array.from({ length: count }, () => czechAddress()))
+    .returning();
+  return rows;
 }
 
-async function insertUser(override: { fname: string; lname: string }) {
-  const addr = await insertAddress();
-  const fname = override.fname.slice(0, 30);
-  const lname = override.lname.slice(0, 30);
-  const [row] = await db
-    .insert(users)
-    .values({
+// Batch insert users with addresses
+async function insertUsers(count: number) {
+  const addrs = await insertAddresses(count);
+  const userValues = Array.from({ length: count }, (_, i) => {
+    const fname = faker.person.firstName().slice(0, 30);
+    const lname = faker.person.lastName().slice(0, 30);
+    return {
       clerkId: clerkId(),
-      email: faker.internet
-        .email({ firstName: fname, lastName: lname })
-        .toLowerCase(),
+      email: faker.internet.email({ firstName: fname, lastName: lname }).toLowerCase(),
       fname,
       lname,
-      shippingAddressId: addr.id,
-    })
-    .returning();
-  if (!row) throw new Error("User insert failed");
-  return row;
+      shippingAddressId: addrs[i]?.id || "",
+    };
+  });
+  return await db.insert(users).values(userValues).returning();
 }
 
-async function insertWinemaker(userId: string) {
-  const addr = await insertAddress();
-  const [row] = await db
-    .insert(winemakers)
-    .values({
-      addressId: addr.id,
-      description: faker.lorem.paragraph(),
-      email: faker.internet.email().toLowerCase(),
-      name: `${faker.company.name()} Winery`,
-      phone: faker.phone.number(),
-      userId,
-    })
-    .returning();
-  if (!row) throw new Error("Winemaker insert failed");
-  return row;
+// Batch insert winemakers with addresses
+async function insertWinemakers(ownerIds: string[]) {
+  if (ownerIds.length === 0) return [];
+  const addrs = await insertAddresses(ownerIds.length);
+  const wmValues = ownerIds.map((userId, i) => ({
+    addressId: addrs[i]?.id || "",
+    description: faker.lorem.paragraph(),
+    email: faker.internet.email().toLowerCase(),
+    name: `${faker.company.name()} Winery`,
+    phone: faker.phone.number(),
+    userId,
+  }));
+  return await db.insert(winemakers).values(wmValues).returning();
 }
 
-async function insertShop(ownerUserId: string) {
-  const addr = await insertAddress();
-  const [row] = await db
-    .insert(shops)
-    .values({
-      addressId: addr.id,
-      description: faker.lorem.paragraph(),
-      name: `${faker.company.name()} Wine Shop`,
-      ownerUserId,
-    })
-    .returning();
-  if (!row) throw new Error("Shop insert failed");
-  return row;
+// Batch insert shops with addresses
+async function insertShops(ownerIds: string[]) {
+  if (ownerIds.length === 0) return [];
+  const addrs = await insertAddresses(ownerIds.length);
+  const shopValues = ownerIds.map((ownerUserId, i) => ({
+    addressId: addrs[i]?.id || "",
+    description: faker.lorem.paragraph(),
+    name: `${faker.company.name()} Wine Shop`,
+    ownerUserId,
+  }));
+  return await db.insert(shops).values(shopValues).returning();
 }
 
 async function insertWines(winemakerId: string, count: number) {
@@ -145,105 +142,104 @@ async function insertWines(winemakerId: string, count: number) {
     .returning();
 }
 
+// Batch insert products and product-wine mappings
 async function insertProductsForShop(shopId: string, wineRows: (typeof wines.$inferSelect)[]) {
-  const productsList = [];
-  for (const wine of wineRows) {
-    const [product] = await db
-      .insert(products)
-      .values({
-        isBundle: false,
-        name: wine.name,
-        price: "15.00",
-        quantity: 50,
-        shopId,
-      })
-      .returning();
-    if (product) {
-      await db.insert(productWines).values({ productId: product.id, quantity: 1, wineId: wine.id });
-      productsList.push(product);
-    }
-  }
+  if (wineRows.length === 0) return [];
+
+  const productValues = wineRows.map((wine) => ({
+    isBundle: false,
+    name: wine.name,
+    price: "15.00",
+    quantity: 50,
+    shopId,
+  }));
+  const productsList = await db.insert(products).values(productValues).returning();
+
+  const productWineValues = productsList.map((product, i) => ({
+    productId: product.id,
+    quantity: 1,
+    wineId: wineRows[i]?.id || "",
+  }));
+  await db.insert(productWines).values(productWineValues);
+
   return productsList;
 }
 
+// Batch insert events with addresses
 async function insertEvents(winemakerId: string, count: number) {
-  const rows = [];
-  for (let i = 0; i < count; i++) {
-    const addr = await insertAddress();
-    const [row] = await db
-      .insert(events)
-      .values({
-        addressId: addr.id,
-        capacity: 50,
-        endTime: new Date(),
-        inviteType: "open",
-        name: `Tasting ${i}`,
-        startTime: new Date(),
-        visibility: pick(["public", "private"] as const),
-        winemakerId,
-      })
-      .returning();
-    if (row) rows.push(row);
-  }
-  return rows;
+  if (count === 0) return [];
+  const addrs = await insertAddresses(count);
+  const eventValues = Array.from({ length: count }, (_, i) => ({
+    addressId: addrs[i]?.id || "",
+    capacity: 50,
+    endTime: new Date(),
+    inviteType: "open" as const,
+    name: `Tasting ${i}`,
+    startTime: new Date(),
+    visibility: pick(["public", "private"] as const),
+    winemakerId,
+  }));
+  return await db.insert(events).values(eventValues).returning();
 }
 
 async function main() {
   await teardown();
 
-  const NUM_USERS = Number(process.env.SEED_NUM_USERS) || 1000;
+  const NUM_USERS = Number(process.env.SEED_NUM_USERS) || 100;
   const NUM_WINEMAKERS = Number(process.env.SEED_NUM_WINEMAKERS) || Math.max(1, Math.floor(NUM_USERS * 0.05));
-  const TOTAL_WINES = Number(process.env.SEED_TOTAL_WINES) || 5000;
+  const TOTAL_WINES = Number(process.env.SEED_TOTAL_WINES) || 500;
   const WINES_PER_WINEMAKER = Number(process.env.SEED_WINES_PER_WINEMAKER) || Math.ceil(TOTAL_WINES / NUM_WINEMAKERS);
   const SHOPS_PER_WINEMAKER = Number(process.env.SEED_SHOPS_PER_WINEMAKER) || 1;
   const EVENTS_PER_WINEMAKER = Number(process.env.SEED_EVENTS_PER_WINEMAKER) || 1;
 
   console.log("Seeding counts:", { NUM_USERS, NUM_WINEMAKERS, WINES_PER_WINEMAKER, SHOPS_PER_WINEMAKER, EVENTS_PER_WINEMAKER });
 
-  // insert users
-  const customers: (typeof users.$inferSelect)[] = [];
-  for (let i = 0; i < NUM_USERS; i++) {
-    const u = await insertUser({ fname: faker.person.firstName(), lname: faker.person.lastName() });
-    customers.push(u);
-    if ((i + 1) % 100 === 0) console.log(`Inserted users: ${i + 1}`);
-  }
+  // Batch insert users
+  console.log("Inserting users...");
+  const customers = await insertUsers(NUM_USERS);
+  console.log(`Inserted ${customers.length} users`);
 
-  // choose winemaker owners from users (allow duplicates)
+  // Batch insert winemakers (deduplicate to avoid unique constraint violation)
+  console.log("Inserting winemakers...");
   const wmOwners = Array.from({ length: NUM_WINEMAKERS }, () => pick(customers));
-  const winemakerRows: (typeof winemakers.$inferSelect)[] = [];
-  const shopRows: (typeof shops.$inferSelect)[] = [];
-  for (let i = 0; i < wmOwners.length; i++) {
-    const owner = wmOwners[i];
-    if (!owner) continue;
-    const wm = await insertWinemaker(owner.id);
-    if (wm) winemakerRows.push(wm);
-    for (let s = 0; s < SHOPS_PER_WINEMAKER; s++) {
-      const shop = await insertShop(owner.id);
-      if (shop) shopRows.push(shop);
-    }
-    if ((i + 1) % 10 === 0) console.log(`Inserted winemakers+shops: ${i + 1}`);
-  }
+  const uniqueWmOwnerIds = Array.from(new Set(wmOwners.map((w) => w?.id).filter(Boolean))) as string[];
+  const winemakerRows = await insertWinemakers(uniqueWmOwnerIds);
+  console.log(`Inserted ${winemakerRows.length} winemakers`);
 
-  // insert wines and products per winemaker/shop
+  // Batch insert shops (can have duplicates - one user can own multiple shops)
+  console.log("Inserting shops...");
+  const shopOwnerIds = wmOwners.flatMap((w) => Array(SHOPS_PER_WINEMAKER).fill(w?.id)).filter(Boolean) as string[];
+  const shopRows = await insertShops(shopOwnerIds);
+  console.log(`Inserted ${shopRows.length} shops`);
+
+  // Insert wines and products per winemaker/shop
+  console.log("Inserting wines and products...");
+  let wineCount = 0;
   for (let i = 0; i < winemakerRows.length; i++) {
     const wm = winemakerRows[i];
     if (!wm) continue;
     const wineRows = await insertWines(wm.id, WINES_PER_WINEMAKER);
+    wineCount += wineRows.length;
     const shop = shopRows[i * SHOPS_PER_WINEMAKER];
     if (shop) {
       await insertProductsForShop(shop.id, wineRows);
     }
-    if ((i + 1) % 10 === 0) console.log(`Inserted wines/products for winemaker: ${i + 1}`);
+    if ((i + 1) % 10 === 0) console.log(`Processed wines/products for winemaker: ${i + 1}/${winemakerRows.length}`);
   }
+  console.log(`Inserted ${wineCount} wines`);
 
-  // insert events
+  // Batch insert events
+  console.log("Inserting events...");
+  let eventCount = 0;
   for (let i = 0; i < winemakerRows.length; i++) {
     const wm = winemakerRows[i];
     if (!wm) continue;
-    await insertEvents(wm.id, EVENTS_PER_WINEMAKER);
+    const eventRows = await insertEvents(wm.id, EVENTS_PER_WINEMAKER);
+    eventCount += eventRows.length;
   }
+  console.log(`Inserted ${eventCount} events`);
 
-  console.log("Seeding complete");
+  console.log("Seeding complete!");
 }
 
 // biome-ignore lint/suspicious/noConsole: entry point needs to log errors

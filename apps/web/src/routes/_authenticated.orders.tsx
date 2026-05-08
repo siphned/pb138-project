@@ -94,30 +94,6 @@ function OrderDetailView({ orderId }: { orderId: string }) {
             <CardTitle>Order Summary</CardTitle>
           </CardHeader>
           <CardContent className="space-y-3">
-            {Array.isArray(order?.items) && (
-              <div className="space-y-2">
-                {order.items.map(
-                  (
-                    item: {
-                      product?: { name?: string };
-                      unitPriceAtPurchase?: string;
-                      quantity?: number;
-                    },
-                    i: number
-                  ) => (
-                    <div className="flex justify-between text-sm" key={i}>
-                      <span>
-                        {item.product?.name || "Product"} x {item.quantity}
-                      </span>
-                      <span className="font-medium">
-                        €{(Number(item.unitPriceAtPurchase) * item.quantity).toFixed(2)}
-                      </span>
-                    </div>
-                  )
-                )}
-              </div>
-            )}
-            <Separator />
             <div className="flex justify-between font-bold">
               <span>Total</span>
               <span>€{Number(order?.totalPrice || 0).toFixed(2)}</span>
@@ -125,19 +101,14 @@ function OrderDetailView({ orderId }: { orderId: string }) {
           </CardContent>
         </Card>
 
-        {/* Shipping Address */}
-        {order?.shippingAddress && (
+        {/* Shipping Address ID */}
+        {order?.shippingAddressId && (
           <Card>
             <CardHeader>
               <CardTitle>Shipping Address</CardTitle>
             </CardHeader>
-            <CardContent className="text-sm space-y-1">
-              <p>{order.shippingAddress.street}</p>
-              <p>{order.shippingAddress.houseNumber}</p>
-              <p>
-                {order.shippingAddress.city}, {order.shippingAddress.postalCode}
-              </p>
-              <p>{order.shippingAddress.country}</p>
+            <CardContent className="text-sm">
+              <p className="text-muted-foreground">Address ID: {order.shippingAddressId}</p>
             </CardContent>
           </Card>
         )}
@@ -170,7 +141,7 @@ function OrderHistoryView() {
                 Start shopping to see your orders appear here. Once you place an order, you'll be
                 able to track it from this page.
               </p>
-              <Link className="mt-6" to="/wines">
+              <Link className="mt-6" search={{ page: 1, sort: "newest" }} to="/wines">
                 <Button>
                   Browse Wines
                   <ArrowRight className="ml-2 h-4 w-4" />

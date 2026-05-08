@@ -144,11 +144,11 @@ function EventDetailPage() {
                 <div className="space-y-3">
                   <p className="font-semibold text-primary">{event.winemakerName}</p>
                   {event?.winemakerId && (
-                    <Button asChild className="w-full" variant="outline">
-                      <Link params={{ id: event.winemakerId }} to="/winemakers/$id">
+                    <Link params={{ id: event.winemakerId }} to="/winemakers/$id">
+                      <Button className="w-full" variant="outline">
                         Visit Winemaker Profile
-                      </Link>
-                    </Button>
+                      </Button>
+                    </Link>
                   )}
                 </div>
               </div>
