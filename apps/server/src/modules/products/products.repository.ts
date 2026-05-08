@@ -33,6 +33,7 @@ export type ProductCatalogFilters = {
   rating?: number;
   sort?: "newest" | "price-asc" | "price-desc" | "rating";
   search?: string;
+  wineId?: string;
 };
 
 export type CatalogRow = {
@@ -233,6 +234,13 @@ export async function findAll(
       WHERE pw.product_id = ${products.id}
         AND w.region ILIKE ${regionPattern}
         AND w.deleted_at IS NULL
+    )`);
+  }
+  if (filters.wineId) {
+    conditions.push(sql`EXISTS (
+      SELECT 1 FROM product_wines pw
+      WHERE pw.product_id = ${products.id}
+        AND pw.wine_id = ${filters.wineId}
     )`);
   }
 

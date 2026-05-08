@@ -1,7 +1,7 @@
 # Implementation Plan: Testing Harness Expansion
 
 ## Phase 1: Environment & Worktree Setup
-- [ ] Task: Create a separate git worktree for `track_testing_expansion`.
+- [x] Task: Create a separate git worktree for `track_testing_expansion`.
 - [ ] Task: Transition Jira issues WINE-61 and WINE-74 to "In Progress" (use smart commits: `chore(WINE-61): start testing expansion #in-progress`).
 - [ ] Task: Initialize testing libraries (K6 for performance, etc.).
 - [ ] Task: Configure Vitest coverage reporting in `apps/server` and `apps/web`.
