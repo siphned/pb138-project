@@ -19,10 +19,5 @@ This file tracks all active and completed Conductor tracks.
 
 ---
 
-- [x] **Track: Environment Separation and Automation**
-*Link: [./tracks/env_split_20260508/](./tracks/env_split_20260508/)*
-
----
-
 - [ ] **Track: Server Coverage OOM Resolution & Optimization**
 *Link: [./tracks/oom_resolution_20260508/](./tracks/oom_resolution_20260508/)*
