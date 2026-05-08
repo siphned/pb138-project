@@ -8951,14 +8951,7 @@
                         "type": "string"
                       },
                       "entityType": {
-                        "type": "string",
-                        "enum": [
-                          "event",
-                          "product",
-                          "shop",
-                          "wine",
-                          "winemaker"
-                        ]
+                        "type": "string"
                       },
                       "id": {
                         "type": "string"
@@ -9115,14 +9108,7 @@
                       "type": "string"
                     },
                     "entityType": {
-                      "type": "string",
-                      "enum": [
-                        "event",
-                        "product",
-                        "shop",
-                        "wine",
-                        "winemaker"
-                      ]
+                      "type": "string"
                     },
                     "id": {
                       "type": "string"
@@ -9475,14 +9461,7 @@
                         "type": "string"
                       },
                       "entityType": {
-                        "type": "string",
-                        "enum": [
-                          "event",
-                          "product",
-                          "shop",
-                          "wine",
-                          "winemaker"
-                        ]
+                        "type": "string"
                       },
                       "id": {
                         "type": "string"
@@ -9639,14 +9618,7 @@
                       "type": "string"
                     },
                     "entityType": {
-                      "type": "string",
-                      "enum": [
-                        "event",
-                        "product",
-                        "shop",
-                        "wine",
-                        "winemaker"
-                      ]
+                      "type": "string"
                     },
                     "id": {
                       "type": "string"
@@ -9999,14 +9971,7 @@
                         "type": "string"
                       },
                       "entityType": {
-                        "type": "string",
-                        "enum": [
-                          "event",
-                          "product",
-                          "shop",
-                          "wine",
-                          "winemaker"
-                        ]
+                        "type": "string"
                       },
                       "id": {
                         "type": "string"
@@ -10163,14 +10128,7 @@
                       "type": "string"
                     },
                     "entityType": {
-                      "type": "string",
-                      "enum": [
-                        "event",
-                        "product",
-                        "shop",
-                        "wine",
-                        "winemaker"
-                      ]
+                      "type": "string"
                     },
                     "id": {
                       "type": "string"
@@ -10523,14 +10481,7 @@
                         "type": "string"
                       },
                       "entityType": {
-                        "type": "string",
-                        "enum": [
-                          "event",
-                          "product",
-                          "shop",
-                          "wine",
-                          "winemaker"
-                        ]
+                        "type": "string"
                       },
                       "id": {
                         "type": "string"
@@ -10687,14 +10638,7 @@
                       "type": "string"
                     },
                     "entityType": {
-                      "type": "string",
-                      "enum": [
-                        "event",
-                        "product",
-                        "shop",
-                        "wine",
-                        "winemaker"
-                      ]
+                      "type": "string"
                     },
                     "id": {
                       "type": "string"
@@ -11047,14 +10991,7 @@
                         "type": "string"
                       },
                       "entityType": {
-                        "type": "string",
-                        "enum": [
-                          "event",
-                          "product",
-                          "shop",
-                          "wine",
-                          "winemaker"
-                        ]
+                        "type": "string"
                       },
                       "id": {
                         "type": "string"
@@ -11211,14 +11148,7 @@
                       "type": "string"
                     },
                     "entityType": {
-                      "type": "string",
-                      "enum": [
-                        "event",
-                        "product",
-                        "shop",
-                        "wine",
-                        "winemaker"
-                      ]
+                      "type": "string"
                     },
                     "id": {
                       "type": "string"
