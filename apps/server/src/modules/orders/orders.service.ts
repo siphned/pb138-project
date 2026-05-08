@@ -223,13 +223,11 @@ export class OrdersService {
 
   private async updateStockAfterOrder(tx: Database, items: CreateOrderItem[]) {
     for (const item of items) {
+      // Use atomic decrement to prevent race conditions
+      await productsRepo.decrementStock(tx, item.productId, item.quantity);
+
       const product = await productsRepo.findById(tx, item.productId);
       if (!product) throw new Error("PRODUCT_NOT_FOUND");
-
-      // Use atomic decrement to prevent race conditions
-      await productsRepo.update(tx, item.productId, {
-        quantity: sql`${sql.raw('quantity')} - ${item.quantity}`,
-      });
 
       for (const pw of product.productWines) {
         const totalWineNeeded = pw.quantity * item.quantity;
@@ -237,7 +235,11 @@ export class OrdersService {
         if (currentWineQty === undefined || currentWineQty < totalWineNeeded) {
           throw new Error("INSUFFICIENT_STOCK");
         }
-        await productsRepo.updateWineQuantity(tx, pw.wineId, sql`${sql.raw('quantity')} - ${totalWineNeeded}`);
+        await productsRepo.updateWineQuantity(
+          tx,
+          pw.wineId,
+          sql`${sql.raw("quantity")} - ${totalWineNeeded}`
+        );
       }
     }
   }

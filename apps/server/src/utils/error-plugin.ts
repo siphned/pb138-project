@@ -7,7 +7,7 @@ export const errorResponse = t.Object({
     code: t.String(),
     message: t.String(),
   }),
-  success: t.Literal(false),
+  success: t.Boolean({ default: false }),
 });
 
 export const errorPlugin = new Elysia().onError(({ error, set }) => {

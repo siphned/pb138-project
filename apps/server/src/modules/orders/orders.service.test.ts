@@ -19,6 +19,7 @@ vi.mock("../products/products.repository", async (importOriginal) => {
   const actual = await importOriginal<typeof import("../products/products.repository")>();
   return {
     ...actual,
+    decrementStock: vi.fn(),
     findById: vi.fn(),
     update: vi.fn(),
     updateWineQuantity: vi.fn(),
@@ -47,6 +48,13 @@ vi.mock("../../db", () => {
       }),
     }),
     transaction: vi.fn((cb) => cb(m)),
+    update: vi.fn().mockReturnValue({
+      set: vi.fn().mockReturnValue({
+        where: vi.fn().mockReturnValue({
+          returning: vi.fn().mockResolvedValue([{ id: "u1" }]),
+        }),
+      }),
+    }),
   };
   return { db: m };
 });

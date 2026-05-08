@@ -62,6 +62,16 @@ export async function deleteProductWines(db: Database, productId: string): Promi
   await db.delete(productWines).where(eq(productWines.productId, productId));
 }
 
+export async function decrementStock(db: Database, id: string, amount: number): Promise<void> {
+  await db
+    .update(products)
+    .set({
+      quantity: sql`${products.quantity} - ${amount}`,
+      updatedAt: new Date(),
+    })
+    .where(eq(products.id, id));
+}
+
 export async function update(db: Database, id: string, data: Partial<Product>): Promise<Product> {
   const [updated] = await db
     .update(products)
