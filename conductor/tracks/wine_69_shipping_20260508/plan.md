@@ -1,10 +1,10 @@
 # Implementation Plan: WINE-69 Shipping
 
 ## Phase 1: Selective Isolation & Environment Setup
-- [ ] Task: Create git worktree `track_wine_69_shipping` and checkout branch `WINE-69-wine-and-winemakers-profile`.
-- [ ] Task: Selectively move WINE-69 changes (Backend filters, Review endpoints, Frontend components/routes) to the new branch.
-- [ ] Task: Revert/Stash unrelated changes in the main directory.
-- [ ] Task: Conductor - User Manual Verification 'Phase 1' (Protocol in workflow.md)
+- [x] Task: Create git worktree `track_wine_69_shipping` and checkout branch `WINE-69-wine-and-winemakers-profile`.
+- [x] Task: Selectively move WINE-69 changes (Backend filters, Review endpoints, Frontend components/routes) to the new branch.
+- [x] Task: Revert/Stash unrelated changes in the main directory.
+- [x] Task: Conductor - User Manual Verification 'Phase 1' (Protocol in workflow.md)
 
 ## Phase 2: Backend Formalization (TDD)
 - [ ] Task: Write integration tests for `GET /products?wineId=...` filter.

@@ -2,10 +2,10 @@
 
 ## Phase 1: Environment & Worktree Setup
 - [x] Task: Create a separate git worktree for `track_testing_expansion`.
-- [ ] Task: Transition Jira issues WINE-61 and WINE-74 to "In Progress" (use smart commits: `chore(WINE-61): start testing expansion #in-progress`).
-- [ ] Task: Initialize testing libraries (K6 for performance, etc.).
-- [ ] Task: Configure Vitest coverage reporting in `apps/server` and `apps/web`.
-- [ ] Task: Conductor - User Manual Verification 'Phase 1' (Protocol in workflow.md)
+- [x] Task: Transition Jira issues WINE-61 and WINE-74 to "In Progress" (use smart commits: `chore(WINE-61): start testing expansion #in-progress`).
+- [x] Task: Initialize testing libraries (K6 for performance, etc.).
+- [x] Task: Configure Vitest coverage reporting in `apps/server` and `apps/web`.
+- [x] Task: Conductor - User Manual Verification 'Phase 1' (Protocol in workflow.md)
 
 ## Phase 2: Backend (BE) Coverage Expansion
 - [ ] Task: Create branch `WINE-61-be-testing-expansion` from `dev`.
