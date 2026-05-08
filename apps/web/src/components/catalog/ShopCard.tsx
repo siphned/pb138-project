@@ -1,6 +1,7 @@
 import { Link } from "@tanstack/react-router";
 import type { GetShops200 } from "@/generated/types/GetShops";
 import { CatalogCard } from "./CatalogCard";
+import { CatalogPlaceholder } from "./CatalogPlaceholder";
 
 interface ShopCardProps {
   shop: GetShops200[number];
@@ -15,13 +16,7 @@ export function ShopCard({ shop }: ShopCardProps) {
 
   return (
     <CatalogCard
-      imageSlot={
-        <div className="flex h-full w-full items-center justify-center bg-linear-to-b from-secondary/10 to-secondary/30">
-          <span className="font-heading text-4xl font-bold uppercase text-secondary-foreground/20">
-            {initials}
-          </span>
-        </div>
-      }
+      imageSlot={<CatalogPlaceholder text={initials} textClassName="text-4xl" />}
       renderLink={(children) => (
         <Link
           className="stretched-link font-heading font-bold text-lg"

@@ -1,8 +1,10 @@
 import { Separator } from "@/components/ui/separator";
-import type { GetCarts200Item } from "@/generated/types/GetCarts";
+import type { GetCarts200 } from "@/generated/types/GetCarts";
+
+type CartItem = NonNullable<GetCarts200>["items"][number];
 
 type CartSummaryProps = {
-  items: GetCarts200Item[];
+  items: CartItem[];
   deliveryType?: "pickup" | "shipping";
 };
 

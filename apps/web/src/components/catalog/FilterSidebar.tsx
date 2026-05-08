@@ -1,5 +1,6 @@
 import { Star } from "lucide-react";
 import { useEffect, useState } from "react";
+import { SectionLabel } from "@/components/primitives/section-label";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Label } from "@/components/ui/label";
@@ -39,14 +40,6 @@ export interface FilterSidebarProps {
 
 // ─── Section sub-components ───────────────────────────────────────────────────
 
-function SectionHeading({ children }: { children: React.ReactNode }) {
-  return (
-    <h3 className="text-xs font-bold uppercase tracking-widest text-muted-foreground">
-      {children}
-    </h3>
-  );
-}
-
 function CheckboxSection({
   section,
   values,
@@ -58,7 +51,7 @@ function CheckboxSection({
 }) {
   return (
     <div className="space-y-3">
-      <SectionHeading>{section.label}</SectionHeading>
+      <SectionLabel>{section.label}</SectionLabel>
       <div className="space-y-2">
         {section.options.map((option) => (
           <div className="flex items-center gap-2" key={option.id}>
@@ -125,7 +118,7 @@ function PriceRangeSection({
 
   return (
     <div className="space-y-4">
-      <SectionHeading>{section.label}</SectionHeading>
+      <SectionLabel>{section.label}</SectionLabel>
       <Slider
         max={MAX_PRICE}
         onValueChange={(v) => setLocalValue(v as number[])}
@@ -151,7 +144,7 @@ function RatingSection({
 }) {
   return (
     <div className="space-y-3">
-      <SectionHeading>{section.label}</SectionHeading>
+      <SectionLabel>{section.label}</SectionLabel>
       <div className="space-y-1">
         {[4, 3, 2, 1].map((n) => {
           const isSelected = values[section.key] === n;
