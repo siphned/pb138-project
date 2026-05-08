@@ -8,7 +8,7 @@ import { eventsRoutes } from "./modules/events";
 import { guestSessionsRoutes } from "./modules/guest-sessions";
 import { imagesRoutes } from "./modules/images";
 import { ordersRoutes } from "./modules/orders";
-import { productsRoutes } from "./modules/products";
+import { productsRoutes, shopProductsRoutes } from "./modules/products";
 import { reviewsRoutes } from "./modules/reviews";
 import { roleRequestsRoutes } from "./modules/role-requests";
 import { shopsRoutes } from "./modules/shops";
@@ -70,6 +70,7 @@ export const app = new Elysia()
   .use(roleRequestsRoutes)
   .use(shopsRoutes)
   .use(productsRoutes)
+  .use(shopProductsRoutes)
   .use(availabilityRoutes)
   .use(cartsRoutes)
   .use(eventsRoutes)

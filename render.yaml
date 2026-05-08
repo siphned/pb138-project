@@ -1,0 +1,14 @@
+services:
+  - type: web
+    name: winery-server
+    runtime: node
+    plan: free
+    buildCommand: bun install && turbo run build --filter=server
+    startCommand: bun apps/server/src/index.ts
+    envVars:
+      - key: BUN_VERSION
+        value: latest
+      - key: NODE_ENV
+        value: production
+      - key: PORT
+        value: 10000
