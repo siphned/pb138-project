@@ -14,7 +14,7 @@ export const winemakers = pgTable("winemakers", {
   email: text("email"),
   id: uuid("id").primaryKey().defaultRandom(),
   name: varchar("name", { length: 255 }).notNull(),
-  phone: varchar("phone", { length: 20 }),
+  phone: varchar("phone", { length: 50 }),
   updatedAt: timestamptz("updated_at"),
   userId: uuid("user_id")
     .notNull()

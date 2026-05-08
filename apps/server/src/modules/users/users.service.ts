@@ -103,6 +103,42 @@ export class UsersService {
     ]);
   }
 
+  /**
+   * Proactively syncs user data from Clerk webhooks.
+   */
+  async syncUserFromWebhook(data: {
+    id: string;
+    email_addresses?: { email_address: string }[];
+    first_name?: string | null;
+    last_name?: string | null;
+    public_metadata?: Record<string, unknown>;
+  }): Promise<void> {
+    const { id, email_addresses, first_name, last_name, public_metadata } = data;
+    const email = email_addresses?.[0]?.email_address;
+
+    if (!email) {
+      logger.warn({ clerkId: id }, "Webhook user has no email, skipping sync");
+      return;
+    }
+
+    const user = await usersRepo.upsert(db, {
+      clerkId: id,
+      email,
+      fname: first_name ?? "",
+      lname: last_name ?? "",
+    });
+
+    const roles = (public_metadata?.roles as string[]) || [];
+    await this.syncRolesToDatabase(user.id, roles);
+  }
+
+  async deleteUserFromWebhook(clerkId: string): Promise<void> {
+    const user = await usersRepo.findByClerkId(db, clerkId);
+    if (!user) return;
+    // biome-ignore lint/suspicious/noExplicitAny: Temporary cast for monorepo sync
+    await usersRepo.updateById(db, user.id, { deletedAt: new Date(), status: "deleted" } as any);
+  }
+
   updateProfileById(userId: string, data: { fname?: string; lname?: string }): Promise<User> {
     return usersRepo.updateById(db, userId, data);
   }

@@ -1,4 +1,4 @@
-import { pgTable, text, uuid, varchar } from "drizzle-orm/pg-core";
+import { pgTable, text, unique, uuid, varchar } from "drizzle-orm/pg-core";
 import { createInsertSchema, createSelectSchema } from "drizzle-zod";
 import { z } from "zod";
 import { addresses } from "./addresses";
@@ -22,16 +22,20 @@ export const users = pgTable("users", {
 export const insertUserSchema = createInsertSchema(users);
 export const selectUserSchema = createSelectSchema(users);
 
-export const userRoles = pgTable("user_roles", {
-  createdAt: timestamptz("created_at").notNull().defaultNow(),
-  deletedAt: timestamptz("deleted_at"),
-  id: uuid("id").primaryKey().defaultRandom(),
-  role: varchar("role", { length: 50 }).notNull(),
-  updatedAt: timestamptz("updated_at"),
-  userId: uuid("user_id")
-    .notNull()
-    .references(() => users.id, { onDelete: "cascade" }),
-});
+export const userRoles = pgTable(
+  "user_roles",
+  {
+    createdAt: timestamptz("created_at").notNull().defaultNow(),
+    deletedAt: timestamptz("deleted_at"),
+    id: uuid("id").primaryKey().defaultRandom(),
+    role: varchar("role", { length: 50 }).notNull(),
+    updatedAt: timestamptz("updated_at"),
+    userId: uuid("user_id")
+      .notNull()
+      .references(() => users.id, { onDelete: "cascade" }),
+  },
+  (t) => [unique("user_roles_user_id_role_unique").on(t.userId, t.role)]
+);
 
 export const insertUserRoleSchema = createInsertSchema(userRoles);
 export const selectUserRoleSchema = createSelectSchema(userRoles);

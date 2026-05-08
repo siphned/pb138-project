@@ -2,12 +2,31 @@ name: Deploy
 
 on:
   push:
-    branches: [ main ]
+    branches: [main]
   workflow_dispatch: {}
 
 jobs:
+  migrate-db:
+    name: Migrate Neon Database
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Setup Bun
+        uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: 1.3.11
+      - name: Install dependencies
+        run: bun install --frozen-lockfile
+      - name: Run Drizzle Push
+        run: |
+          cd apps/server
+          bunx drizzle-kit push
+        env:
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+
   deploy-backend:
     name: Deploy Backend to Render
+    needs: migrate-db
     runs-on: ubuntu-latest
     steps:
       - name: Trigger Render Deploy Hook
@@ -20,6 +39,7 @@ jobs:
 
   deploy-frontend:
     name: Deploy Frontend to Vercel
+    needs: migrate-db
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -29,5 +49,5 @@ jobs:
           vercel-token: ${{ secrets.VERCEL_TOKEN }}
           vercel-org-id: ${{ secrets.VERCEL_ORG_ID }}
           vercel-project-id: ${{ secrets.VERCEL_PROJECT_ID }}
-          vercel-args: '--prod'
+          vercel-args: "--prod"
           working-directory: .

@@ -36,7 +36,12 @@ export async function findById(db: Database, id: string): Promise<User | undefin
 export async function updateById(
   db: Database,
   id: string,
-  data: Partial<Pick<User, "fname" | "lname" | "shippingAddressId" | "billingAddressId">>
+  data: Partial<
+    Pick<
+      User,
+      "fname" | "lname" | "shippingAddressId" | "billingAddressId" | "status" | "deletedAt"
+    >
+  >
 ): Promise<User> {
   const [updated] = await db
     .update(users)

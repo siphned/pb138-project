@@ -12,7 +12,7 @@
 - Node.js (Elysia)
 - Bun
 - Drizzle ORM (PostgreSQL)
-- Clerk (Auth)
+- Clerk (Auth & Webhooks via Svix)
 
 ## Tooling
 - Kubb (API Generation)
