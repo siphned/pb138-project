@@ -1,6 +1,5 @@
 import type React from "react";
 import { Card, CardContent, CardFooter, CardHeader } from "@/components/ui/card";
-import { cn } from "@/lib/utils";
 import { StarRating } from "./StarRating";
 
 interface CatalogCardProps {
@@ -56,12 +55,7 @@ export function CatalogCard({
   className,
 }: CatalogCardProps) {
   return (
-    <Card
-      className={cn(
-        "group relative overflow-hidden p-0 rounded-2xl border-none bg-secondary/20 shadow-sm transition-all hover:shadow-md",
-        className
-      )}
-    >
+    <Card variant="catalog" className={className}>
       <CardHeader className="p-2">
         <div className="relative rounded-md aspect-square w-full overflow-hidden bg-muted">
           {imageSlot}
