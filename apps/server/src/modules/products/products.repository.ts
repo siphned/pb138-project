@@ -33,7 +33,6 @@ export type ProductCatalogFilters = {
   rating?: number;
   sort?: "newest" | "price-asc" | "price-desc" | "rating";
   search?: string;
-  wineId?: string;
 };
 
 export type CatalogRow = {
@@ -61,16 +60,6 @@ export async function createProductWines(db: Database, data: NewProductWine[]): 
 
 export async function deleteProductWines(db: Database, productId: string): Promise<void> {
   await db.delete(productWines).where(eq(productWines.productId, productId));
-}
-
-export async function decrementStock(db: Database, id: string, amount: number): Promise<void> {
-  await db
-    .update(products)
-    .set({
-      quantity: sql`${products.quantity} - ${amount}`,
-      updatedAt: new Date(),
-    })
-    .where(eq(products.id, id));
 }
 
 export async function update(db: Database, id: string, data: Partial<Product>): Promise<Product> {
@@ -234,13 +223,6 @@ export async function findAll(
       WHERE pw.product_id = ${products.id}
         AND w.region ILIKE ${regionPattern}
         AND w.deleted_at IS NULL
-    )`);
-  }
-  if (filters.wineId) {
-    conditions.push(sql`EXISTS (
-      SELECT 1 FROM product_wines pw
-      WHERE pw.product_id = ${products.id}
-        AND pw.wine_id = ${filters.wineId}
     )`);
   }
 

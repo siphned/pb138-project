@@ -73,7 +73,6 @@ export const getAllProductsQuery = t.Object({
     ])
   ),
   type: t.Optional(catalogWineType),
-  wineId: t.Optional(t.String({ format: "uuid" })),
 });
 
 const catalogWineItem = t.Object({

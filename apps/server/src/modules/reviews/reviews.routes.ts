@@ -1,5 +1,5 @@
 import { Elysia, t } from "elysia";
-import { errorResponse } from "../../utils/error-plugin";
+import { errorResponse } from "../../utils/errorPlugin";
 import { authPlugin } from "../auth";
 import { reviewsService } from "./reviews.service";
 
@@ -90,48 +90,6 @@ export const reviewsRoutes = new Elysia()
     }
   )
 
-  .get(
-    "/wines/:id/reviews",
-    async ({ params, query }) => {
-      const { page = 1, limit = 10, sort = "newest" } = query;
-      return reviewsService.listWineReviews(params.id, { limit, page, sort });
-    },
-    {
-      detail: {
-        description: "Returns all reviews for a wine.",
-        summary: "List wine reviews",
-        tags: ["reviews"],
-      },
-      params: t.Object({ id: t.String() }),
-      query: t.Object({
-        limit: t.Optional(t.Numeric()),
-        page: t.Optional(t.Numeric()),
-        sort: t.Optional(t.Union([t.Literal("newest"), t.Literal("highest"), t.Literal("lowest")])),
-      }),
-      response: { 200: t.Any() },
-    }
-  )
-
-  .post(
-    "/wines/:id/reviews",
-    ({ params, dbUser, body }) => reviewsService.createWineReview(dbUser.id, params.id, body),
-    {
-      body: t.Object({
-        body: t.Optional(t.String()),
-        rating: t.Numeric({ maximum: 5, minimum: 1 }),
-      }),
-      detail: {
-        description: "Creates a review for a wine. Must have purchased a product with it.",
-        security: [{ bearerAuth: [] }],
-        summary: "Review wine",
-        tags: ["reviews"],
-      },
-      params: t.Object({ id: t.String() }),
-      requireAuth: true,
-      response: { 200: t.Any(), 400: errorResponse, 404: errorResponse },
-    }
-  )
-
   .delete(
     "/reviews/:id",
     async ({ params, dbUser, clerkPayload, query }) => {
@@ -142,7 +100,7 @@ export const reviewsRoutes = new Elysia()
         dbUser.id,
         clerkPayload.roles?.[0] ?? "customer",
         entityId,
-        entityType as "product" | "winemaker" | "wine"
+        entityType as "product" | "winemaker"
       );
       return { success: true };
     },

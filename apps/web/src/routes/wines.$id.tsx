@@ -4,10 +4,7 @@ import { PublicLayout } from "@/components/layout/PublicLayout";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import { useGetWinesById } from "@/generated/hooks/useGetWinesById";
-import { useGetWinesByIdReviews } from "@/generated/hooks/useGetWinesByIdReviews";
 import type { GetWinesById200 } from "@/generated/types/GetWinesById";
-import { ProductReviewsSection } from "./-components/ProductReviewsSection";
-import { WinesAvailableInShops } from "./-components/WinesAvailableInShops";
 
 export const Route = createFileRoute("/wines/$id")({
   component: WineDetailPage,
@@ -16,7 +13,6 @@ export const Route = createFileRoute("/wines/$id")({
 function WineDetailPage() {
   const { id } = Route.useParams();
   const { data: wine, isLoading, isError, refetch } = useGetWinesById(id);
-  const { data: reviews, isLoading: isLoadingReviews } = useGetWinesByIdReviews(id);
 
   if (isLoading) {
     return (
@@ -50,7 +46,7 @@ function WineDetailPage() {
 
   return (
     <PublicLayout>
-      <div className="container mx-auto px-6 py-8 lg:px-12 space-y-12">
+      <div className="container mx-auto px-6 py-8 lg:px-12 space-y-8">
         <Link
           className="flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground"
           search={{ page: 1, sort: "newest" }}
@@ -93,14 +89,6 @@ function WineDetailPage() {
             )}
           </div>
         </div>
-
-        <Separator />
-
-        <WinesAvailableInShops wineId={wine.id} />
-
-        <Separator />
-
-        <ProductReviewsSection isLoading={isLoadingReviews} reviewData={reviews} />
 
         <Separator />
 

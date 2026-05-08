@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import { useGetWinemakersById } from "@/generated/hooks/useGetWinemakersById";
 import { WinemakerHero } from "./-components/WinemakerHero";
-import { WinemakerTabs } from "./-components/WinemakerTabs";
+import { WinemakerWinesList } from "./-components/WinemakerWinesList";
 
 export const Route = createFileRoute("/winemakers/$id")({
   component: WinemakerProfilePage,
@@ -61,7 +61,7 @@ function WinemakerProfilePage() {
 
         <Separator />
 
-        <WinemakerTabs winemaker={winemaker} />
+        <WinemakerWinesList winemakerName={winemaker.name} wines={winemaker.wines} />
       </div>
     </PublicLayout>
   );
