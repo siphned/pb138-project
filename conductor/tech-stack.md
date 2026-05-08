@@ -18,3 +18,9 @@
 - Kubb (API Generation)
 - Biome (Linting/Formatting)
 - Vitest / Playwright (Testing)
+
+## Infrastructure
+- Vercel (Frontend Hosting)
+- Render (Backend Hosting)
+- Neon (Postgres Database)
+- GitHub Actions (CI/CD)

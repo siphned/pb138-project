@@ -5,6 +5,9 @@ Winery is a specialized e-commerce platform for wines, focusing on high-quality 
 ## Vision
 To provide wine enthusiasts with a curated experience that combines product discovery, education, and community.
 
+## Deployment
+The application is live at [winery-prod.vercel.app](https://vercel.com/sinoglmatej-6629s-projects/pb138-project-server).
+
 ## Core Features
 - Wine Catalog (Search, Filter, Detail)
 - User Authentication & Profiles (Role-based: Customer, Producer, Admin)
