@@ -17,7 +17,10 @@
 ## Tooling
 - Kubb (API Generation)
 - Biome (Linting/Formatting)
-- Vitest / Playwright (Testing)
+- Vitest (Unit/Integration, Benchmarking)
+- React Testing Library (Frontend Components)
+- Playwright (e2e Testing)
+- GitHub Actions (Coverage Enforcement & CI/CD)
 
 ## Infrastructure
 - Vercel (Frontend Hosting)
