@@ -13,6 +13,7 @@ import {
   Wine,
 } from "lucide-react";
 import { useState } from "react";
+import { NavItem } from "@/components/primitives/nav-item";
 import {
   Accordion,
   AccordionContent,
@@ -50,8 +51,8 @@ export function Sidebar({ userRoles = [Role.customer], activeRole, onRoleChange 
   const handleLogout = async () => {
     try {
       await signOut({ redirectUrl: "/" });
-    } catch (error) {
-      console.error("Sign out error:", error);
+    } catch (_error) {
+      //console.error("Sign out error:", error);
     }
     navigate({ to: "/" });
   };
@@ -137,86 +138,60 @@ export function Sidebar({ userRoles = [Role.customer], activeRole, onRoleChange 
                   </AccordionItem>
                 </Accordion>
               ) : (
-                <div className="flex-none flex items-center gap-3 px-3 py-3 rounded-md bg-secondary text-sm font-medium text-primary">
+                <NavItem variant="active" render={<div />}>
                   <UserIcon className="h-4 w-4" />
                   {currentActiveRole}
-                </div>
+                </NavItem>
               )}
             </Show>
 
             {/* SHARED PUBLIC LINKS */}
-            <Link
-              className="flex-none flex items-center gap-3 px-3 py-3 rounded-md bg-secondary hover:bg-secondary/80 transition-colors text-sm font-medium text-primary sm:hidden"
-              to="/search"
-            >
+            <NavItem variant="active" className="sm:hidden" render={<Link to="/search" />}>
               <Search className="h-4 w-4" /> Search
-            </Link>
+            </NavItem>
 
-            <Link
-              className="flex-none flex items-center gap-3 px-3 py-3 rounded-md bg-secondary hover:bg-secondary/80 transition-colors text-sm font-medium text-primary sm:hidden"
-              to="/cart"
-            >
+            <NavItem variant="active" className="sm:hidden" render={<Link to="/cart" />}>
               <ShoppingCart className="h-4 w-4" /> Shopping cart
-            </Link>
+            </NavItem>
 
-            <Link
-              className="flex-none flex items-center gap-3 px-3 py-3 rounded-md bg-secondary hover:bg-secondary/80 transition-colors text-sm font-medium text-primary"
-              to="/explore"
-            >
+            <NavItem variant="active" render={<Link to="/explore" />}>
               <Wine className="h-4 w-4" /> Explore Wines
-            </Link>
+            </NavItem>
 
-            <Link
-              className="flex-none flex items-center gap-3 px-3 py-3 rounded-md bg-secondary hover:bg-secondary/80 transition-colors text-sm font-medium text-primary"
-              search={{ page: 1, sort: "newest" }}
-              to="/bundles"
+            <NavItem
+              variant="active"
+              render={<Link search={{ page: 1, sort: "newest" }} to="/bundles" />}
             >
               <Package className="h-4 w-4" /> Bundles
-            </Link>
+            </NavItem>
 
-            <Link
-              className="flex-none flex items-center gap-3 px-3 py-3 rounded-md bg-secondary hover:bg-secondary/80 transition-colors text-sm font-medium text-primary"
-              to="/events"
-            >
+            <NavItem variant="active" render={<Link to="/events" />}>
               <Calendar className="h-4 w-4" /> Events
-            </Link>
+            </NavItem>
 
             <Show when="signed-in">
               {currentActiveRole === Role.customer && (
-                <Link
-                  className="flex-none flex items-center gap-3 px-3 py-3 rounded-md bg-secondary hover:bg-secondary/80 transition-colors text-sm font-medium text-primary"
-                  to="/orders"
-                >
+                <NavItem variant="active" render={<Link to="/orders" />}>
                   <Package className="h-4 w-4" /> Order History
-                </Link>
+                </NavItem>
               )}
 
               {currentActiveRole !== Role.customer && (
                 <>
-                  <Link
-                    className="flex-none flex items-center gap-3 px-3 py-3 rounded-md bg-secondary hover:bg-secondary/80 transition-colors text-sm font-medium text-primary"
-                    to="/shops"
-                  >
+                  <NavItem variant="active" render={<Link to="/shops" />}>
                     <Wine className="h-4 w-4" /> My Wines
-                  </Link>
-                  <Link
-                    className="flex-none flex items-center gap-3 px-3 py-3 rounded-md bg-secondary hover:bg-secondary/80 transition-colors text-sm font-medium text-primary"
-                    to="/shops"
-                  >
+                  </NavItem>
+                  <NavItem variant="active" render={<Link to="/shops" />}>
                     <Package className="h-4 w-4" /> Bundles
-                  </Link>
+                  </NavItem>
                 </>
               )}
             </Show>
 
             <Show when="signed-in">
-              <button
-                className="flex-none flex items-center gap-3 px-3 py-3 rounded-md hover:bg-secondary/50 transition-colors text-sm font-medium text-muted-foreground mt-2"
-                onClick={() => openUserProfile()}
-                type="button"
-              >
+              <NavItem variant="muted" className="mt-2" onClick={() => openUserProfile()}>
                 <Settings className="h-4 w-4" /> Settings
-              </button>
+              </NavItem>
             </Show>
           </nav>
         </div>
@@ -231,13 +206,13 @@ export function Sidebar({ userRoles = [Role.customer], activeRole, onRoleChange 
           </button>
 
           <Show when="signed-in">
-            <button
-              className="flex items-center gap-3 px-3 py-2 rounded-md hover:bg-destructive/10 transition-colors text-sm font-medium text-muted-foreground hover:text-destructive mt-2 w-full text-left"
+            <NavItem
+              variant="destructive"
+              className="mt-2 w-full text-left"
               onClick={handleLogout}
-              type="button"
             >
               <LogOut className="h-4 w-4" /> Log out
-            </button>
+            </NavItem>
           </Show>
         </div>
       </SheetContent>
