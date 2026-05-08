@@ -109,3 +109,13 @@ export async function updateById(
   if (!updated) throw new Error("Winemaker not found");
   return updated;
 }
+
+export const winemakersRepository = {
+  findAll,
+  findById,
+  findByIdWithAddress,
+  findByUserId,
+  findEventsByWinemakerId,
+  findWinesByWinemakerId,
+  updateById,
+};
