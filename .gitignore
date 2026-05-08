@@ -70,3 +70,6 @@ docs/figma/
 # local image uploads
 apps/server/uploads/*
 !apps/server/uploads/.gitkeep
+
+# Personal FE hygiene rules (Adam, not for the team)
+CLAUDE.local.md
