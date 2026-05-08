@@ -3,6 +3,8 @@
  * Single source of truth for type safety across backend and frontend.
  */
 
+export * from "./errors/base";
+
 // Re-export all Zod schemas (model layer)
 // Re-export Drizzle table definitions (server-side only)
 export {

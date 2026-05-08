@@ -1,16 +1,14 @@
-import type { Order, orders } from "@repo/shared/schemas";
-import { Logger } from "../../utils/logger";
-import type { CartWithItems } from "../carts/carts.repository";
-import { type CartsService, cartsService } from "../carts/carts.service";
-import { emailService, type IEmailService } from "../email/email.service";
-import { type IUsersRepository, usersRepository } from "../users/users.repository";
-import {
-  type CreateOrderData,
-  type CreateOrderItem,
-  type IOrdersRepository,
-  type OrderWithItems,
-  ordersRepository,
-} from "./orders.repository";
+import type { Order } from "@repo/shared/schemas";
+import { addresses } from "@repo/shared/schemas";
+import { sql } from "drizzle-orm";
+import { type Database, db } from "../../db";
+import { logger } from "../../utils/logger";
+import { cartsService } from "../carts/carts.service";
+import { emailService } from "../email/email.service";
+import * as productsRepo from "../products/products.repository";
+import * as usersRepo from "../users/users.repository";
+import type { CreateOrderItem, OrderWithItems } from "./orders.repository";
+import * as ordersRepo from "./orders.repository";
 
 export interface CheckoutData {
   guestEmail?: string;
@@ -34,20 +32,13 @@ export interface CheckoutData {
 }
 
 export class OrdersService {
-  constructor(
-    private ordersRepo: IOrdersRepository,
-    private cartsService: CartsService,
-    private emailService: IEmailService,
-    private usersRepo: IUsersRepository
-  ) {}
-
   async afterCheckout(
     order: Order,
     _items: CreateOrderItem[],
     userId?: string,
     data?: CheckoutData
   ) {
-    const orderWithItems = await this.ordersRepo.findById(order.id);
+    const orderWithItems = await ordersRepo.findById(db, order.id);
     if (orderWithItems) {
       const emailData = {
         customerName: userId ? "" : data?.guestName || "Guest",
@@ -61,33 +52,41 @@ export class OrdersService {
       };
 
       if (userId) {
-        const user = await this.usersRepo.findById(userId);
+        const user = await usersRepo.findById(db, userId);
         if (user) {
           emailData.customerName = user.fname;
-          await this.emailService.sendOrderConfirmation(user.email, emailData).catch((error) => {
-            Logger.error("Failed to send order confirmation email", error, {
-              email: user.email,
-              operation: "sendOrderConfirmation",
-              orderId: order.id,
-              userId,
-            });
+          await emailService.sendOrderConfirmation(user.email, emailData).catch((error) => {
+            logger.error(
+              {
+                email: user.email,
+                err: error,
+                operation: "sendOrderConfirmation",
+                orderId: order.id,
+                userId,
+              },
+              "Failed to send order confirmation email"
+            );
           });
         }
       } else if (data?.guestEmail) {
-        await this.emailService.sendOrderConfirmation(data.guestEmail, emailData).catch((error) => {
-          Logger.error("Failed to send order confirmation email to guest", error, {
-            email: data.guestEmail,
-            operation: "sendOrderConfirmation",
-            orderId: order.id,
-          });
+        await emailService.sendOrderConfirmation(data.guestEmail, emailData).catch((error) => {
+          logger.error(
+            {
+              email: data.guestEmail,
+              err: error,
+              operation: "sendOrderConfirmation",
+              orderId: order.id,
+            },
+            "Failed to send order confirmation email to guest"
+          );
         });
       }
     }
 
     if (userId) {
-      await this.cartsService.clearCart(userId);
+      await cartsService.clearCart(userId);
     } else if (order.guestSessionId) {
-      await this.cartsService.clearCartBySession(order.guestSessionId);
+      await cartsService.clearCartBySession(order.guestSessionId);
     }
   }
 
@@ -95,28 +94,57 @@ export class OrdersService {
     { userId, sessionId }: { userId?: string; sessionId?: string },
     data: CheckoutData
   ): Promise<Order> {
-    const cart = await this.getCart(userId, sessionId);
+    // biome-ignore lint/suspicious/noExplicitAny: complex cart type
+    let cart: any = null;
+    if (userId) {
+      cart = await cartsService.getCartForUser(userId);
+    } else if (sessionId) {
+      cart = await cartsService.getCartForSession(sessionId);
+    }
     if (!cart || cart.items.length === 0) throw new Error("CART_EMPTY");
 
-    const { items, totalPrice } = this.processCartItems(cart);
+    const { items, totalPrice } = this.validateAndProcessCart(cart);
 
-    const orderData: CreateOrderData = {
-      billingAddress: data.billingAddress || data.shippingAddress,
-      deliveryType: data.deliveryType,
-      discount: "0.00",
-      guestEmail: data.guestEmail,
-      guestName: data.guestName,
-      guestSessionId: sessionId,
-      paymentMethod: data.paymentMethod,
-      paymentStatus: "pending",
-      shippingAddress: data.shippingAddress,
-      shippingFee: "10.00",
-      status: "pending",
-      totalPrice,
-      userId,
-    };
+    const order = await db.transaction(async (tx) => {
+      const [shippingAddr] = await tx.insert(addresses).values(data.shippingAddress).returning();
+      const [billingAddr] = await tx
+        .insert(addresses)
+        .values(data.billingAddress || data.shippingAddress)
+        .returning();
 
-    const order = await this.ordersRepo.create(orderData, items);
+      if (!(shippingAddr && billingAddr)) throw new Error("Failed to create frozen addresses");
+
+      const createdOrder = await ordersRepo.createOrder(tx, {
+        billingAddressId: billingAddr.id,
+        deliveryType: data.deliveryType,
+        discount: "0.00",
+        guestEmail: data.guestEmail,
+        guestName: data.guestName,
+        guestSessionId: sessionId,
+        paymentMethod: data.paymentMethod,
+        paymentStatus: "pending",
+        shippingAddressId: shippingAddr.id,
+        shippingFee: "10.00",
+        status: "pending",
+        totalPrice,
+        userId,
+      });
+
+      await ordersRepo.createOrderItems(
+        tx,
+        items.map((item) => ({
+          orderId: createdOrder.id,
+          productId: item.productId,
+          quantity: item.quantity,
+          shopId: item.shopId,
+          unitPriceAtPurchase: item.unitPrice,
+        }))
+      );
+
+      await this.updateStockAfterOrder(tx, items);
+
+      return createdOrder;
+    });
 
     // Non-blocking operations
     this.afterCheckout(order, items, userId, data).catch(() => {
@@ -126,20 +154,47 @@ export class OrdersService {
     return order;
   }
 
-  async getCart(userId?: string, sessionId?: string) {
-    if (userId) return await this.cartsService.getCartForUser(userId);
-    if (sessionId) return await this.cartsService.getCartForSession(sessionId);
-    return null;
-  }
-
   async getOrder(id: string, userId: string): Promise<OrderWithItems> {
-    const order = await this.ordersRepo.findById(id);
+    const order = await ordersRepo.findById(db, id);
     if (!order) throw new Error("NOT_FOUND");
     if (order.userId !== userId) throw new Error("FORBIDDEN");
     return order;
   }
 
-  processCartItems(cart: CartWithItems) {
+  async updateStatus(orderId: string, _userId: string, status: Order["status"]): Promise<Order> {
+    const order = await ordersRepo.findById(db, orderId);
+    if (!order) throw new Error("NOT_FOUND");
+
+    const updated = await ordersRepo.updateStatus(db, orderId, status);
+
+    if (order.userId) {
+      const user = await usersRepo.findById(db, order.userId);
+      if (user) {
+        await emailService
+          .sendOrderStatusUpdate(user.email, {
+            orderId: order.id,
+            status: updated.status,
+          })
+          .catch(() => {
+            /* ignore */
+          });
+      }
+    } else if (order.guestEmail) {
+      await emailService
+        .sendOrderStatusUpdate(order.guestEmail, {
+          orderId: order.id,
+          status: updated.status,
+        })
+        .catch(() => {
+          /* ignore */
+        });
+    }
+
+    return updated;
+  }
+
+  // biome-ignore lint/suspicious/noExplicitAny: complex cart type
+  private validateAndProcessCart(cart: any) {
     const items: CreateOrderItem[] = [];
     let subtotal = 0;
 
@@ -163,50 +218,31 @@ export class OrdersService {
 
     const shippingFee = 10;
     const totalPrice = (subtotal + shippingFee).toFixed(2);
-
     return { items, totalPrice };
   }
 
-  async updateStatus(
-    orderId: string,
-    _userId: string,
-    status: typeof orders.$inferSelect.status
-  ): Promise<Order> {
-    const order = await this.ordersRepo.findById(orderId);
-    if (!order) throw new Error("NOT_FOUND");
+  private async updateStockAfterOrder(tx: Database, items: CreateOrderItem[]) {
+    for (const item of items) {
+      // Use atomic decrement to prevent race conditions
+      await productsRepo.decrementStock(tx, item.productId, item.quantity);
 
-    const updated = await this.ordersRepo.updateStatus(orderId, status);
+      const product = await productsRepo.findById(tx, item.productId);
+      if (!product) throw new Error("PRODUCT_NOT_FOUND");
 
-    if (order.userId) {
-      const user = await this.usersRepo.findById(order.userId);
-      if (user) {
-        await this.emailService
-          .sendOrderStatusUpdate(user.email, {
-            orderId: order.id,
-            status: updated.status,
-          })
-          .catch(() => {
-            /* ignore */
-          });
+      for (const pw of product.productWines) {
+        const totalWineNeeded = pw.quantity * item.quantity;
+        const currentWineQty = await productsRepo.getWineQuantityForUpdate(tx, pw.wineId);
+        if (currentWineQty === undefined || currentWineQty < totalWineNeeded) {
+          throw new Error("INSUFFICIENT_STOCK");
+        }
+        await productsRepo.updateWineQuantity(
+          tx,
+          pw.wineId,
+          sql`${sql.raw("quantity")} - ${totalWineNeeded}`
+        );
       }
-    } else if (order.guestEmail) {
-      await this.emailService
-        .sendOrderStatusUpdate(order.guestEmail, {
-          orderId: order.id,
-          status: updated.status,
-        })
-        .catch(() => {
-          /* ignore */
-        });
     }
-
-    return updated;
   }
 }
 
-export const ordersService = new OrdersService(
-  ordersRepository,
-  cartsService,
-  emailService,
-  usersRepository
-);
+export const ordersService = new OrdersService();

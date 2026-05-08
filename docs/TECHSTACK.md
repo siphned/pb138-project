@@ -140,8 +140,7 @@
 - **Node.js 18+** — (optional, if not using Bun)
 - **PostgreSQL 14+** — Local or Docker
 - **VS Code** — Recommended editor with extensions:
-  - ESLint
-  - Prettier
+  - Biome
   - Tailwind CSS IntelliSense
   - PlantUML
   - Thunder Client (API testing, optional)

@@ -3,9 +3,9 @@ name: CI
 
 on:
   push:
-    branches: [ main, dev ]
+    branches: [main, dev]
   pull_request:
-    branches: [ dev, main ]
+    branches: [dev, main]
   workflow_dispatch: {}
 
 # Concurrency: cancel in-progress runs if a new one is triggered
@@ -77,6 +77,10 @@ jobs:
             packages/*/node_modules
           key: ${{ runner.os }}-bun-${{ hashFiles('**/bun.lock') }}
           fail-on-cache-miss: true
+      - name: Migrate Database
+        run: |
+          cd apps/server
+          bunx drizzle-kit push
       - name: Start backend server
         run: bun run apps/server/src/index.ts &
       - name: Wait for server to be ready
@@ -189,6 +193,22 @@ jobs:
     if: github.event_name == 'push'
     needs: install
     runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: winemarket
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+        ports:
+          - 5432:5432
+    env:
+      DATABASE_URL: postgresql://postgres:postgres@localhost:5432/winemarket
     steps:
       - uses: actions/checkout@v4
       - name: Setup Bun
@@ -206,6 +226,10 @@ jobs:
             packages/*/node_modules
           key: ${{ runner.os }}-bun-${{ hashFiles('**/bun.lock') }}
           fail-on-cache-miss: true
+      - name: Migrate Database
+        run: |
+          cd apps/server
+          bunx drizzle-kit push
       - name: Run unit tests
         run: bun run test
       - name: Upload junit results

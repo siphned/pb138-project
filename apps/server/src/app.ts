@@ -8,29 +8,23 @@ import { eventsRoutes } from "./modules/events";
 import { guestSessionsRoutes } from "./modules/guest-sessions";
 import { imagesRoutes } from "./modules/images";
 import { ordersRoutes } from "./modules/orders";
-import { productsRoutes } from "./modules/products";
+import { productsRoutes, shopProductsRoutes } from "./modules/products";
 import { reviewsRoutes } from "./modules/reviews";
 import { roleRequestsRoutes } from "./modules/role-requests";
 import { shopsRoutes } from "./modules/shops";
 import { supplyAgreementsRoutes } from "./modules/supply-agreements";
 import { usersRoutes } from "./modules/users";
+import { webhooksRoutes } from "./modules/webhooks";
 import { winemakersRoutes } from "./modules/winemakers";
 import { winesRoutes } from "./modules/wines";
+import { errorPlugin } from "./utils/error-plugin";
 
 const isProd = process.env.NODE_ENV === "production";
 const frontendUrl = process.env.FRONTEND_URL || "http://localhost:5173";
 const apiUrl = process.env.API_URL || "http://localhost:3000";
 
 export const app = new Elysia()
-  .onError(({ code, error, request }) => {
-    // biome-ignore lint/suspicious/noConsole: global error handler
-    console.error(`Error ${code} during ${request.method} ${request.url}:`, error);
-
-    if (code === "NOT_FOUND") return "Not Found";
-    if (code === "VALIDATION") return error.all;
-
-    return isProd ? "Internal Server Error" : (error as Error).message;
-  })
+  .use(errorPlugin)
   .use(cors({ origin: frontendUrl }))
   .use(
     openapi({
@@ -74,9 +68,11 @@ export const app = new Elysia()
     })
   )
   .use(usersRoutes)
+  .use(webhooksRoutes)
   .use(roleRequestsRoutes)
   .use(shopsRoutes)
   .use(productsRoutes)
+  .use(shopProductsRoutes)
   .use(availabilityRoutes)
   .use(cartsRoutes)
   .use(eventsRoutes)

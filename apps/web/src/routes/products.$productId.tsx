@@ -4,7 +4,7 @@ import { PublicLayout } from "@/components/layout/PublicLayout";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import { useGetProductsById } from "@/generated/hooks/useGetProductsById";
-import { useGetReviewsProductById } from "@/generated/hooks/useGetReviewsProductById";
+import { useGetProductsByIdReviews } from "@/generated/hooks/useGetProductsByIdReviews";
 import { ProductDescriptionCard } from "./-components/ProductDescriptionCard";
 import { ProductGallery } from "./-components/ProductGallery";
 import { ProductInfo } from "./-components/ProductInfo";
@@ -68,7 +68,7 @@ export const Route = createFileRoute("/products/$productId")({
 function ProductDetailPage() {
   const { productId } = Route.useParams();
   const { data, isLoading, isError, refetch } = useGetProductsById(productId);
-  const { data: reviewData, isLoading: reviewsLoading } = useGetReviewsProductById(productId);
+  const { data: reviewData, isLoading: reviewsLoading } = useGetProductsByIdReviews(productId);
 
   if (isLoading) return <ProductPageSkeleton />;
 

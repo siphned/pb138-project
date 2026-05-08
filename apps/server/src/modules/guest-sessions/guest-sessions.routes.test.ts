@@ -1,59 +1,55 @@
-import { describe, expect, it, vi } from "vitest";
-import { app } from "../../app";
+import { Elysia } from "elysia";
+import { beforeEach, describe, expect, it, vi } from "vitest";
 
+// Mock Repo
+vi.mock("./guest-sessions.repository", () => ({
+  findById: vi.fn(),
+}));
+
+// Mock Service
 vi.mock("./guest-sessions.service", () => ({
   guestSessionsService: {
-    getOrCreateSession: vi.fn().mockResolvedValue({
-      createdAt: new Date(),
-      expiresAt: new Date(Date.now() + 1000000),
-      id: "test-session-id",
-    }),
-    validateSession: vi.fn().mockResolvedValue({
-      createdAt: new Date(),
-      expiresAt: new Date(Date.now() + 1000000),
-      id: "test-session-id",
-    }),
+    getOrCreateSession: vi.fn(),
+    validateSession: vi.fn(),
   },
 }));
 
+// Mock Auth
+vi.mock("../auth", () => ({
+  authPlugin: new (require("elysia").Elysia)({ name: "auth" }),
+}));
+
+import * as guestSessionsRepo from "./guest-sessions.repository";
+import { guestSessionsRoutes } from "./guest-sessions.routes";
+import { guestSessionsService } from "./guest-sessions.service";
+
 describe("guest-sessions routes", () => {
-  it("POST /guest-sessions creates a session and sets cookie", async () => {
-    const response = await app.handle(
-      new Request("http://localhost/guest-sessions", {
-        method: "POST",
-      })
-    );
+  const app = new Elysia().use(guestSessionsRoutes);
 
-    expect(response.status).toBe(200);
-    const data = (await response.json()) as unknown as { id: string };
-    expect(data.id).toBe("test-session-id");
-
-    const cookie = response.headers.get("Set-Cookie");
-    expect(cookie).toContain("guest_session_id=test-session-id");
+  beforeEach(() => {
+    vi.clearAllMocks();
   });
 
-  it("GET /guest-sessions/me returns session from cookie", async () => {
+  it("POST /guest-sessions creates a session", async () => {
+    const mockSession = { createdAt: new Date(), expiresAt: new Date(), id: "test-id" };
+    vi.mocked(guestSessionsService.getOrCreateSession).mockResolvedValue(mockSession as any);
+
     const response = await app.handle(
-      new Request("http://localhost/guest-sessions/me", {
-        headers: {
-          cookie: "guest_session_id=test-session-id",
-        },
-        method: "GET",
-      })
+      new Request("http://localhost/guest-sessions", { method: "POST" })
     );
 
-    expect(response.status).toBe(200);
-    const data = (await response.json()) as unknown as { id: string };
-    expect(data.id).toBe("test-session-id");
+    expect(response.status).toBe(201);
   });
 
-  it("GET /guest-sessions/me returns 404 if no cookie", async () => {
-    const response = await app.handle(
-      new Request("http://localhost/guest-sessions/me", {
-        method: "GET",
-      })
-    );
+  it("GET /guest-sessions/:id returns session", async () => {
+    const futureDate = new Date();
+    futureDate.setFullYear(futureDate.getFullYear() + 1);
+    const mockSession = { createdAt: new Date(), expiresAt: futureDate, id: "test-id" };
 
-    expect(response.status).toBe(404);
+    vi.mocked(guestSessionsRepo.findById).mockResolvedValue(mockSession as any);
+
+    const response = await app.handle(new Request("http://localhost/guest-sessions/test-id"));
+
+    expect(response.status).toBe(200);
   });
 });

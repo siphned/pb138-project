@@ -1,4 +1,4 @@
-import type { Elysia } from "elysia";
+import { Elysia } from "elysia";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
 // Mock the service
@@ -14,27 +14,25 @@ vi.mock("./admin.service", () => ({
   },
 }));
 
-import { createAdminRoutes } from "./admin.routes";
+// Mock the auth module BEFORE importing adminRoutes
+vi.mock("../auth", () => ({
+  authPlugin: new (require("elysia").Elysia)({ name: "auth" })
+    .derive(() => ({
+      clerkPayload: { roles: ["admin"], sub: "test-admin" },
+      dbUser: { id: "admin1", role: "admin" },
+    }))
+    .macro(() => ({
+      requireAuth: () => ({}),
+      requireCapability: () => ({}),
+      requireRoles: () => ({}),
+    })),
+}));
+
+import { adminRoutes } from "./admin.routes";
 import { adminService } from "./admin.service";
 
 describe("admin.routes integration", () => {
-  const mockAuthState = {
-    clerkPayload: { roles: ["admin"], sub: "test-admin" },
-    dbUser: { id: "admin1", role: "admin" },
-  };
-
-  const mockAuthPlugin = (app: Elysia) =>
-    app
-      .derive(() => mockAuthState)
-      .macro(
-        () =>
-          ({
-            requireAuth: () => ({}),
-            requireRoles: () => ({}),
-          }) as any
-      );
-
-  const app = createAdminRoutes(mockAuthPlugin as any);
+  const app = new Elysia().use(adminRoutes);
 
   beforeEach(() => {
     vi.clearAllMocks();

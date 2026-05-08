@@ -1,7 +1,9 @@
+import { useQueryClient } from "@tanstack/react-query";
 import { Check, Minus, Plus, ShoppingCart } from "lucide-react";
 import { useState } from "react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { getCartsQueryKey } from "@/generated/hooks/useGetCarts";
 import { usePostCartsItems } from "@/generated/hooks/usePostCartsItems";
 
 interface ProductPriceRowProps {
@@ -11,6 +13,7 @@ interface ProductPriceRowProps {
 }
 
 export function ProductPriceRow({ price, quantity, productId }: ProductPriceRowProps) {
+  const queryClient = useQueryClient();
   const [qty, setQty] = useState(1);
   const [isSuccess, setIsSuccess] = useState(false);
   const { mutate: addToCart, isPending } = usePostCartsItems();
@@ -21,6 +24,7 @@ export function ProductPriceRow({ price, quantity, productId }: ProductPriceRowP
       {
         onSuccess: () => {
           setIsSuccess(true);
+          queryClient.invalidateQueries({ queryKey: getCartsQueryKey() });
           setTimeout(() => setIsSuccess(false), 2000);
         },
       }

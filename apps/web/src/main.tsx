@@ -4,10 +4,20 @@ import { createRouter, RouterProvider } from "@tanstack/react-router";
 import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
 import "./index.css";
+import { AppErrorBoundary } from "./components/AppErrorBoundary";
+import { Button } from "./components/ui/button";
 import { UserProvider } from "./context/UserContext.tsx";
 import { routeTree } from "./routeTree.gen.ts";
 
-const queryClient = new QueryClient();
+const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      retry: 1,
+      staleTime: 1000 * 60 * 5, // 5 minutes
+    },
+  },
+});
+
 const router = createRouter({ routeTree });
 
 declare module "@tanstack/react-router" {
@@ -28,7 +38,21 @@ createRoot(document.getElementById("root")!).render(
     <ClerkProvider afterSignOutUrl="/" publishableKey={PUBLISHABLE_KEY}>
       <QueryClientProvider client={queryClient}>
         <UserProvider>
-          <RouterProvider router={router} />
+          <AppErrorBoundary
+            fallback={
+              <div className="flex flex-col items-center justify-center min-h-screen p-8 text-center bg-background">
+                <h1 className="text-2xl font-bold text-foreground mb-4">Something went wrong</h1>
+                <p className="text-muted-foreground mb-8">
+                  An unexpected error occurred. Please try reloading the application.
+                </p>
+                <Button className="px-6 py-2" onClick={() => window.location.reload()}>
+                  Reload App
+                </Button>
+              </div>
+            }
+          >
+            <RouterProvider router={router} />
+          </AppErrorBoundary>
         </UserProvider>
       </QueryClientProvider>
     </ClerkProvider>

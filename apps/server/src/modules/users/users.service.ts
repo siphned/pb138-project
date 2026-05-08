@@ -1,8 +1,11 @@
 import { createClerkClient } from "@clerk/backend";
 import type { Address, User } from "@repo/shared/schemas";
 import { z } from "zod";
-import { type IUserRolesRepository, userRolesRepository } from "./user-roles.repository";
-import { type IUsersRepository, usersRepository } from "./users.repository";
+import { db } from "../../db";
+import { logger } from "../../utils/logger";
+import * as userRolesRepo from "./user-roles.repository";
+import { UserNotFoundError } from "./users.errors";
+import * as usersRepo from "./users.repository";
 
 // Lazy-load Clerk client to prevent import-time errors if env vars are missing
 let _clerkClient: ReturnType<typeof createClerkClient> | null = null;
@@ -24,23 +27,18 @@ const AddressSchema = z.object({
 });
 
 export class UsersService {
-  constructor(
-    private usersRepo: IUsersRepository,
-    private userRolesRepo: IUserRolesRepository
-  ) {}
-
   /**
    * Get shipping and billing addresses for a user.
    */
   async getAddresses(
     userId: string
   ): Promise<{ shipping: Address | null; billing: Address | null }> {
-    const user = await this.usersRepo.findById(userId);
-    if (!user) throw new Error("User not found");
+    const user = await usersRepo.findById(db, userId);
+    if (!user) throw new UserNotFoundError(userId);
 
     const [shipping, billing] = await Promise.all([
-      user.shippingAddressId ? this.usersRepo.findAddressById(user.shippingAddressId) : null,
-      user.billingAddressId ? this.usersRepo.findAddressById(user.billingAddressId) : null,
+      user.shippingAddressId ? usersRepo.findAddressById(db, user.shippingAddressId) : null,
+      user.billingAddressId ? usersRepo.findAddressById(db, user.billingAddressId) : null,
     ]);
 
     return {
@@ -50,7 +48,7 @@ export class UsersService {
   }
 
   getById(id: string): Promise<User | undefined> {
-    return this.usersRepo.findById(id);
+    return usersRepo.findById(db, id);
   }
 
   /**
@@ -59,7 +57,7 @@ export class UsersService {
    */
   async getProfileWithRoles(clerkId: string): Promise<User & { roles: string[] }> {
     const user = await this.lazyGetOrCreate(clerkId);
-    const roles = await this.userRolesRepo.findByUserId(user.id);
+    const roles = await userRolesRepo.findByUserId(db, user.id);
     return { ...user, roles };
   }
 
@@ -68,14 +66,14 @@ export class UsersService {
    * Orchestrates the sync flow with proper separation of concerns.
    */
   async lazyGetOrCreate(clerkId: string): Promise<User> {
-    const existing = await this.usersRepo.findByClerkId(clerkId);
+    const existing = await usersRepo.findByClerkId(db, clerkId);
     if (existing) return existing;
 
     // 1. Fetch external profile
     const profile = await this.fetchExternalProfile(clerkId);
 
     // 2. Persist local user record
-    const user = await this.usersRepo.upsert({
+    const user = await usersRepo.upsert(db, {
       clerkId,
       email: profile.email,
       fname: profile.fname,
@@ -86,6 +84,77 @@ export class UsersService {
     await this.syncRolesToDatabase(user.id, profile.roles);
 
     return user;
+  }
+
+  /**
+   * Batched role synchronization to prevent N+1 queries.
+   */
+  async syncRolesToDatabase(userId: string, clerkRoles: string[]): Promise<void> {
+    const existingRoles = await userRolesRepo.findByUserId(db, userId);
+
+    const rolesToAdd = clerkRoles.filter((r: string) => !existingRoles.includes(r));
+    const rolesToRemove = existingRoles.filter((r: string) => !clerkRoles.includes(r));
+
+    if (rolesToAdd.length === 0 && rolesToRemove.length === 0) return;
+
+    await Promise.all([
+      userRolesRepo.addRoles(db, userId, rolesToAdd),
+      userRolesRepo.removeRoles(db, userId, rolesToRemove),
+    ]);
+  }
+
+  /**
+   * Proactively syncs user data from Clerk webhooks.
+   */
+  async syncUserFromWebhook(data: {
+    id: string;
+    email_addresses?: { email_address: string }[];
+    first_name?: string | null;
+    last_name?: string | null;
+    public_metadata?: Record<string, unknown>;
+  }): Promise<void> {
+    const { id, email_addresses, first_name, last_name, public_metadata } = data;
+    const email = email_addresses?.[0]?.email_address;
+
+    if (!email) {
+      logger.warn({ clerkId: id }, "Webhook user has no email, skipping sync");
+      return;
+    }
+
+    const user = await usersRepo.upsert(db, {
+      clerkId: id,
+      email,
+      fname: first_name ?? "",
+      lname: last_name ?? "",
+    });
+
+    const roles = (public_metadata?.roles as string[]) || [];
+    await this.syncRolesToDatabase(user.id, roles);
+  }
+
+  async deleteUserFromWebhook(clerkId: string): Promise<void> {
+    const user = await usersRepo.findByClerkId(db, clerkId);
+    if (!user) return;
+    // biome-ignore lint/suspicious/noExplicitAny: Temporary cast for monorepo sync
+    await usersRepo.updateById(db, user.id, { deletedAt: new Date(), status: "deleted" } as any);
+  }
+
+  updateProfileById(userId: string, data: { fname?: string; lname?: string }): Promise<User> {
+    return usersRepo.updateById(db, userId, data);
+  }
+
+  async upsertAddress(
+    userId: string,
+    type: "shipping" | "billing",
+    addressData: unknown
+  ): Promise<Address> {
+    const validated = AddressSchema.parse(addressData);
+    const address = await usersRepo.createAddress(db, validated);
+
+    const field = type === "shipping" ? "shippingAddressId" : "billingAddressId";
+    await usersRepo.updateById(db, userId, { [field]: address.id });
+
+    return address;
   }
 
   /**
@@ -114,10 +183,7 @@ export class UsersService {
           .updateUser(clerkId, {
             publicMetadata: { ...clerkUser.publicMetadata, roles: defaultRoles },
           })
-          .catch((e) =>
-            // biome-ignore lint/suspicious/noConsole: background sync
-            console.error(`Failed to seed Clerk roles for ${clerkId}:`, e)
-          );
+          .catch((e) => logger.error({ clerkId }, `Failed to seed Clerk roles: ${e.message}`));
         return {
           email,
           fname: clerkUser.firstName ?? "",
@@ -137,41 +203,6 @@ export class UsersService {
       throw new Error(`External profile sync failed for ${clerkId}`);
     }
   }
-
-  /**
-   * Batched role synchronization to prevent N+1 queries.
-   */
-  async syncRolesToDatabase(userId: string, clerkRoles: string[]): Promise<void> {
-    const existingRoles = await this.userRolesRepo.findByUserId(userId);
-
-    const rolesToAdd = clerkRoles.filter((r: string) => !existingRoles.includes(r));
-    const rolesToRemove = existingRoles.filter((r: string) => !clerkRoles.includes(r));
-
-    if (rolesToAdd.length === 0 && rolesToRemove.length === 0) return;
-
-    await Promise.all([
-      this.userRolesRepo.addRoles(userId, rolesToAdd),
-      this.userRolesRepo.removeRoles(userId, rolesToRemove),
-    ]);
-  }
-
-  updateProfileById(userId: string, data: { fname?: string; lname?: string }): Promise<User> {
-    return this.usersRepo.updateById(userId, data);
-  }
-
-  async upsertAddress(
-    userId: string,
-    type: "shipping" | "billing",
-    addressData: unknown
-  ): Promise<Address> {
-    const validated = AddressSchema.parse(addressData);
-    const address = await this.usersRepo.createAddress(validated);
-
-    const field = type === "shipping" ? "shippingAddressId" : "billingAddressId";
-    await this.usersRepo.updateById(userId, { [field]: address.id });
-
-    return address;
-  }
 }
 
-export const usersService = new UsersService(usersRepository, userRolesRepository);
+export const usersService = new UsersService();

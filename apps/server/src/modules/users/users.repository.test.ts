@@ -1,7 +1,7 @@
 import { addresses, users } from "@repo/shared/schemas";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { db } from "../../db";
-import { usersRepository } from "./users.repository";
+import * as usersRepo from "./users.repository";
 
 interface MockChained {
   from: () => MockChained;
@@ -48,7 +48,7 @@ describe("usersRepository", () => {
     it("delegates to db.query", async () => {
       const mockUser = { id: "u1" };
       vi.mocked(db.query.users.findFirst).mockResolvedValue(mockUser as never);
-      const result = await usersRepository.findById("u1");
+      const result = await usersRepo.findById(db, "u1");
       expect(result).toBe(mockUser);
     });
   });
@@ -58,7 +58,7 @@ describe("usersRepository", () => {
       const mockUser = { id: "new-u" };
       vi.mocked(mockDb.returning).mockResolvedValueOnce([mockUser]);
 
-      const result = await usersRepository.create({
+      const result = await usersRepo.create(db, {
         clerkId: "c1",
         email: "a@b.com",
         fname: "A",
@@ -75,7 +75,7 @@ describe("usersRepository", () => {
       const mockAddr = { id: "a1" };
       vi.mocked(mockDb.returning).mockResolvedValueOnce([mockAddr]);
 
-      const result = await usersRepository.createAddress({
+      const result = await usersRepo.createAddress(db, {
         city: "B",
         country: "CZ",
         houseNumber: "1",

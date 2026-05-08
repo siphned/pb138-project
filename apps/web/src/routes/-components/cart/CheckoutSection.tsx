@@ -1,9 +1,10 @@
+import { useQueryClient } from "@tanstack/react-query";
 import { useNavigate } from "@tanstack/react-router";
 import { useMemo, useRef } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useUser } from "@/context/UserContext";
-import { useGetUsersMeAddresses, usePostOrdersCheckout } from "@/generated";
+import { getCartsQueryKey, useGetUsersMeAddresses, usePostOrdersCheckout } from "@/generated";
 import type { GetCarts200 } from "@/generated/types/GetCarts";
 import type { PostOrdersCheckout200 } from "@/generated/types/PostOrdersCheckout";
 import { AddressForm, type AddressFormValues } from "./AddressForm";
@@ -15,6 +16,7 @@ type CheckoutSectionProps = {
 
 export function CheckoutSection({ cart, onDeliveryTypeChange }: CheckoutSectionProps) {
   const navigate = useNavigate();
+  const queryClient = useQueryClient();
   const formRef = useRef<HTMLFormElement>(null);
   const { user } = useUser();
 
@@ -71,6 +73,7 @@ export function CheckoutSection({ cart, onDeliveryTypeChange }: CheckoutSectionP
       },
       {
         onSuccess: (result: PostOrdersCheckout200) => {
+          queryClient.invalidateQueries({ queryKey: getCartsQueryKey() });
           navigate({
             search: { orderId: result.id },
             to: "/checkout/confirmed",

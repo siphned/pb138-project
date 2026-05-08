@@ -1,1 +1,2 @@
-export { productsRoutes } from "./products.routes";
+export { productsRoutes, shopProductsRoutes } from "./products.routes";
+export { productsService } from "./products.service";

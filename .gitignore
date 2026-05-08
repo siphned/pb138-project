@@ -51,6 +51,10 @@ yarn-error.log*
 # Misc
 .DS_Store
 *.pem
+*.key
+*.crt
+secrets/
+credentials*.json
 
 # LLM resources (not tracked - may contain embedded repos/files)
 raw/

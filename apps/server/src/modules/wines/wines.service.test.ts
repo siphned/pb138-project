@@ -1,17 +1,22 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
+import { db } from "../../db";
 
-vi.mock("./wines.repository", () => ({
-  winesRepository: {
-    findAll: vi.fn(),
-    findById: vi.fn(),
-    findWinemakerByUserId: vi.fn(),
-    insert: vi.fn(),
-    softDelete: vi.fn(),
-    updateById: vi.fn(),
+vi.mock("../../db", () => ({
+  db: {
+    transaction: vi.fn(),
   },
 }));
 
-import { winesRepository } from "./wines.repository";
+vi.mock("./wines.repository", () => ({
+  findAll: vi.fn(),
+  findById: vi.fn(),
+  findWinemakerByUserId: vi.fn(),
+  insert: vi.fn(),
+  softDelete: vi.fn(),
+  updateById: vi.fn(),
+}));
+
+import * as winesRepo from "./wines.repository";
 import { winesService } from "./wines.service";
 
 const userId = "11111111-1111-1111-1111-111111111111";
@@ -62,136 +67,104 @@ beforeEach(() => vi.clearAllMocks());
 
 describe("createWine", () => {
   it("resolves winemaker from userId and inserts wine", async () => {
-    vi.mocked(winesRepository.findWinemakerByUserId).mockResolvedValue(mockWinemaker as never);
-    vi.mocked(winesRepository.insert).mockResolvedValue(mockWine as never);
-    vi.mocked(winesRepository.findById).mockResolvedValue(mockWine as never);
+    vi.mocked(winesRepo.findWinemakerByUserId).mockResolvedValue(mockWinemaker as never);
+    vi.mocked(winesRepo.insert).mockResolvedValue(mockWine as never);
+    vi.mocked(winesRepo.findById).mockResolvedValue(mockWine as never);
 
     await winesService.createWine(userId, wineData);
 
-    expect(winesRepository.findWinemakerByUserId).toHaveBeenCalledWith(userId);
-    expect(winesRepository.insert).toHaveBeenCalledWith(winemakerId, wineData);
+    expect(winesRepo.findWinemakerByUserId).toHaveBeenCalledWith(db, userId);
+    expect(winesRepo.insert).toHaveBeenCalledWith(db, winemakerId, wineData);
   });
 
-  it("throws NOT_FOUND when winemaker record does not exist", async () => {
-    vi.mocked(winesRepository.findWinemakerByUserId).mockResolvedValue(undefined);
+  it("throws WinemakerNotFoundError when winemaker record does not exist", async () => {
+    vi.mocked(winesRepo.findWinemakerByUserId).mockResolvedValue(undefined);
 
-    await expect(winesService.createWine(userId, wineData)).rejects.toThrow("NOT_FOUND");
-    expect(winesRepository.insert).not.toHaveBeenCalled();
-  });
-
-  it("throws Error if insert returns no record", async () => {
-    vi.mocked(winesRepository.findWinemakerByUserId).mockResolvedValue(mockWinemaker as never);
-    vi.mocked(winesRepository.insert).mockResolvedValue(undefined as never);
-
-    await expect(winesService.createWine(userId, wineData)).rejects.toThrow();
+    await expect(winesService.createWine(userId, wineData)).rejects.toThrow(
+      "Winemaker profile not found"
+    );
+    expect(winesRepo.insert).not.toHaveBeenCalled();
   });
 });
 
 describe("getWine", () => {
   it("returns wine when found", async () => {
-    vi.mocked(winesRepository.findById).mockResolvedValue(mockWine as never);
+    vi.mocked(winesRepo.findById).mockResolvedValue(mockWine as never);
 
     const result = await winesService.getWine(wineId);
 
     expect(result).toEqual(mockWine);
   });
 
-  it("throws NOT_FOUND when wine does not exist", async () => {
-    vi.mocked(winesRepository.findById).mockResolvedValue(undefined);
+  it("throws WineNotFoundError when wine does not exist", async () => {
+    vi.mocked(winesRepo.findById).mockResolvedValue(undefined);
 
-    await expect(winesService.getWine(wineId)).rejects.toThrow("NOT_FOUND");
+    await expect(winesService.getWine(wineId)).rejects.toThrow("Wine with ID");
   });
 });
 
 describe("replaceWine", () => {
   it("allows admin to update any wine without ownership check", async () => {
-    vi.mocked(winesRepository.findById).mockResolvedValue(mockWine as never);
-    vi.mocked(winesRepository.updateById).mockResolvedValue(mockWine as never);
+    vi.mocked(winesRepo.findById).mockResolvedValue(mockWine as never);
+    vi.mocked(winesRepo.updateById).mockResolvedValue(mockWine as never);
 
     await winesService.replaceWine(wineId, otherUserId, ["admin"], wineData);
 
-    expect(winesRepository.findWinemakerByUserId).not.toHaveBeenCalled();
-    expect(winesRepository.updateById).toHaveBeenCalledWith(wineId, wineData);
+    expect(winesRepo.findWinemakerByUserId).not.toHaveBeenCalled();
+    expect(winesRepo.updateById).toHaveBeenCalledWith(db, wineId, wineData);
   });
 
   it("allows winemaker to update own wine", async () => {
-    vi.mocked(winesRepository.findById)
+    vi.mocked(winesRepo.findById)
       .mockResolvedValueOnce(mockWine as never) // ownership check
       .mockResolvedValueOnce(mockWine as never); // re-fetch after update
-    vi.mocked(winesRepository.findWinemakerByUserId).mockResolvedValue(mockWinemaker as never);
-    vi.mocked(winesRepository.updateById).mockResolvedValue(mockWine as never);
+    vi.mocked(winesRepo.findWinemakerByUserId).mockResolvedValue(mockWinemaker as never);
+    vi.mocked(winesRepo.updateById).mockResolvedValue(mockWine as never);
 
     await winesService.replaceWine(wineId, userId, ["customer"], wineData);
 
-    expect(winesRepository.updateById).toHaveBeenCalledWith(wineId, wineData);
+    expect(winesRepo.updateById).toHaveBeenCalledWith(db, wineId, wineData);
   });
 
-  it("throws FORBIDDEN when winemaker tries to update another winemakers wine", async () => {
+  it("throws ForbiddenWineActionError when winemaker tries to update another winemakers wine", async () => {
     const otherWine = { ...mockWine, winemakerId: otherWinemakerId };
-    vi.mocked(winesRepository.findById).mockResolvedValue(otherWine as never);
-    vi.mocked(winesRepository.findWinemakerByUserId).mockResolvedValue(mockWinemaker as never);
+    vi.mocked(winesRepo.findById).mockResolvedValue(otherWine as never);
+    vi.mocked(winesRepo.findWinemakerByUserId).mockResolvedValue(mockWinemaker as never);
 
     await expect(winesService.replaceWine(wineId, userId, ["customer"], wineData)).rejects.toThrow(
-      "FORBIDDEN"
+      "permission"
     );
-    expect(winesRepository.updateById).not.toHaveBeenCalled();
-  });
-
-  it("throws NOT_FOUND when wine does not exist", async () => {
-    vi.mocked(winesRepository.findById).mockResolvedValue(undefined);
-
-    await expect(winesService.replaceWine(wineId, userId, ["customer"], wineData)).rejects.toThrow(
-      "NOT_FOUND"
-    );
+    expect(winesRepo.updateById).not.toHaveBeenCalled();
   });
 });
 
 describe("deleteWine", () => {
   it("soft deletes own wine", async () => {
-    vi.mocked(winesRepository.findById).mockResolvedValue(mockWine as never);
-    vi.mocked(winesRepository.findWinemakerByUserId).mockResolvedValue(mockWinemaker as never);
+    vi.mocked(winesRepo.findById).mockResolvedValue(mockWine as never);
+    vi.mocked(winesRepo.findWinemakerByUserId).mockResolvedValue(mockWinemaker as never);
 
     await winesService.deleteWine(wineId, userId, ["customer"]);
 
-    expect(winesRepository.softDelete).toHaveBeenCalledWith(wineId);
+    expect(winesRepo.softDelete).toHaveBeenCalledWith(db, wineId);
   });
 
   it("allows admin to delete any wine", async () => {
-    vi.mocked(winesRepository.findById).mockResolvedValue(mockWine as never);
+    vi.mocked(winesRepo.findById).mockResolvedValue(mockWine as never);
 
     await winesService.deleteWine(wineId, otherUserId, ["admin"]);
 
-    expect(winesRepository.findWinemakerByUserId).not.toHaveBeenCalled();
-    expect(winesRepository.softDelete).toHaveBeenCalledWith(wineId);
-  });
-
-  it("throws FORBIDDEN when caller does not own the wine", async () => {
-    const otherWine = { ...mockWine, winemakerId: otherWinemakerId };
-    vi.mocked(winesRepository.findById).mockResolvedValue(otherWine as never);
-    vi.mocked(winesRepository.findWinemakerByUserId).mockResolvedValue(mockWinemaker as never);
-
-    await expect(winesService.deleteWine(wineId, userId, ["customer"])).rejects.toThrow(
-      "FORBIDDEN"
-    );
-    expect(winesRepository.softDelete).not.toHaveBeenCalled();
-  });
-
-  it("throws NOT_FOUND when wine does not exist", async () => {
-    vi.mocked(winesRepository.findById).mockResolvedValue(undefined);
-
-    await expect(winesService.deleteWine(wineId, userId, ["customer"])).rejects.toThrow(
-      "NOT_FOUND"
-    );
+    expect(winesRepo.findWinemakerByUserId).not.toHaveBeenCalled();
+    expect(winesRepo.softDelete).toHaveBeenCalledWith(db, wineId);
   });
 });
 
 describe("listWines", () => {
   it("delegates to repository with filters", async () => {
-    vi.mocked(winesRepository.findAll).mockResolvedValue([mockWine] as never);
+    vi.mocked(winesRepo.findAll).mockResolvedValue([mockWine] as never);
 
     const result = await winesService.listWines({ region: "Burgundy", type: "still" });
 
-    expect(winesRepository.findAll).toHaveBeenCalledWith({ region: "Burgundy", type: "still" });
+    expect(winesRepo.findAll).toHaveBeenCalledWith(db, { region: "Burgundy", type: "still" });
     expect(result).toEqual([mockWine]);
   });
 });

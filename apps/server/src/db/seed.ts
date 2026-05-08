@@ -21,6 +21,7 @@ import {
   winemakers,
   wines,
 } from "@repo/shared/schemas";
+import { logger } from "../utils/logger";
 import { db } from "./index";
 
 const seed = process.env.SEED_FAKER_SEED ? Number(process.env.SEED_FAKER_SEED) : undefined;
@@ -182,6 +183,22 @@ async function insertEvents(winemakerId: string, count: number) {
   return await db.insert(events).values(eventValues).returning();
 }
 
+async function seedWinesAndProducts(winemakerRows: (typeof winemakers.$inferSelect)[], shopRows: (typeof shops.$inferSelect)[], winesPerWinemaker: number, shopsPerWinemaker: number) {
+  let wineCount = 0;
+  for (let i = 0; i < winemakerRows.length; i++) {
+    const wm = winemakerRows[i];
+    if (!wm) continue;
+    const wineRows = await insertWines(wm.id, winesPerWinemaker);
+    wineCount += wineRows.length;
+    const shop = shopRows[i * shopsPerWinemaker];
+    if (shop) {
+      await insertProductsForShop(shop.id, wineRows);
+    }
+    if ((i + 1) % 10 === 0) logger.info(`Processed wines/products for winemaker: ${i + 1}/${winemakerRows.length}`);
+  }
+  return wineCount;
+}
+
 async function main() {
   await teardown();
 
@@ -192,55 +209,39 @@ async function main() {
   const SHOPS_PER_WINEMAKER = Number(process.env.SEED_SHOPS_PER_WINEMAKER) || 1;
   const EVENTS_PER_WINEMAKER = Number(process.env.SEED_EVENTS_PER_WINEMAKER) || 1;
 
-  console.log("Seeding counts:", { NUM_USERS, NUM_WINEMAKERS, WINES_PER_WINEMAKER, SHOPS_PER_WINEMAKER, EVENTS_PER_WINEMAKER });
+  logger.info({ NUM_USERS, NUM_WINEMAKERS, WINES_PER_WINEMAKER, SHOPS_PER_WINEMAKER, EVENTS_PER_WINEMAKER }, "Seeding counts");
 
-  // Batch insert users
-  console.log("Inserting users...");
+  logger.info("Inserting users...");
   const customers = await insertUsers(NUM_USERS);
-  console.log(`Inserted ${customers.length} users`);
+  logger.info(`Inserted ${customers.length} users`);
 
-  // Batch insert winemakers (deduplicate to avoid unique constraint violation)
-  console.log("Inserting winemakers...");
+  logger.info("Inserting winemakers...");
   const wmOwners = Array.from({ length: NUM_WINEMAKERS }, () => pick(customers));
   const uniqueWmOwnerIds = Array.from(new Set(wmOwners.map((w) => w?.id).filter(Boolean))) as string[];
   const winemakerRows = await insertWinemakers(uniqueWmOwnerIds);
-  console.log(`Inserted ${winemakerRows.length} winemakers`);
+  logger.info(`Inserted ${winemakerRows.length} winemakers`);
 
-  // Batch insert shops (can have duplicates - one user can own multiple shops)
-  console.log("Inserting shops...");
+  logger.info("Inserting shops...");
   const shopOwnerIds = wmOwners.flatMap((w) => Array(SHOPS_PER_WINEMAKER).fill(w?.id)).filter(Boolean) as string[];
   const shopRows = await insertShops(shopOwnerIds);
-  console.log(`Inserted ${shopRows.length} shops`);
+  logger.info(`Inserted ${shopRows.length} shops`);
 
-  // Insert wines and products per winemaker/shop
-  console.log("Inserting wines and products...");
-  let wineCount = 0;
-  for (let i = 0; i < winemakerRows.length; i++) {
-    const wm = winemakerRows[i];
-    if (!wm) continue;
-    const wineRows = await insertWines(wm.id, WINES_PER_WINEMAKER);
-    wineCount += wineRows.length;
-    const shop = shopRows[i * SHOPS_PER_WINEMAKER];
-    if (shop) {
-      await insertProductsForShop(shop.id, wineRows);
-    }
-    if ((i + 1) % 10 === 0) console.log(`Processed wines/products for winemaker: ${i + 1}/${winemakerRows.length}`);
-  }
-  console.log(`Inserted ${wineCount} wines`);
+  logger.info("Inserting wines and products...");
+  const wineCount = await seedWinesAndProducts(winemakerRows, shopRows, WINES_PER_WINEMAKER, SHOPS_PER_WINEMAKER);
+  logger.info(`Inserted ${wineCount} wines`);
 
-  // Batch insert events
-  console.log("Inserting events...");
+  logger.info("Inserting events...");
   let eventCount = 0;
-  for (let i = 0; i < winemakerRows.length; i++) {
-    const wm = winemakerRows[i];
-    if (!wm) continue;
+  for (const wm of winemakerRows) {
     const eventRows = await insertEvents(wm.id, EVENTS_PER_WINEMAKER);
     eventCount += eventRows.length;
   }
-  console.log(`Inserted ${eventCount} events`);
+  logger.info(`Inserted ${eventCount} events`);
 
-  console.log("Seeding complete!");
+  logger.info("Seeding complete!");
 }
 
-// biome-ignore lint/suspicious/noConsole: entry point needs to log errors
-main().catch(console.error);
+main().catch((err) => {
+  logger.error(err, "Seeding failed");
+  process.exit(1);
+});

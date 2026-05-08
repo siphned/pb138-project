@@ -1,3 +1,4 @@
+import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 
 interface ShopGalleryThumbnailStripProps {
@@ -14,20 +15,19 @@ export function ShopGalleryThumbnailStrip({
   return (
     <div className="flex gap-2 overflow-x-auto [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
       {images.map((src, i) => (
-        <button
+        <Button
           className={cn(
-            "h-20 shrink-0 overflow-hidden rounded-lg border-2 transition-all",
-            "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring",
+            "h-20 shrink-0 overflow-hidden rounded-lg border-2 p-0",
             i === selectedIndex
               ? "border-primary"
               : "border-transparent opacity-70 hover:opacity-100"
           )}
           key={src}
           onClick={() => onSelect(i)}
-          type="button"
+          variant="ghost"
         >
           <img alt={`Shop ${i + 1}`} className="h-full w-full object-cover" src={src} />
-        </button>
+        </Button>
       ))}
     </div>
   );

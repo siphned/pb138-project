@@ -3,8 +3,10 @@ import { unlink } from "node:fs/promises";
 import { join } from "node:path";
 import { fileURLToPath } from "node:url";
 import type { Image } from "@repo/shared/schemas";
-import type { EntityType, IImagesRepository } from "./images.repository";
-import { imagesRepository } from "./images.repository";
+import { db } from "../../db";
+import { ForbiddenWineActionError } from "../wines/wines.errors";
+import type { EntityType } from "./images.repository";
+import * as imagesRepo from "./images.repository";
 
 const UPLOADS_DIR = fileURLToPath(new URL("../../../uploads", import.meta.url));
 const ALLOWED_MIME_TYPES = ["image/jpeg", "image/png", "image/webp", "image/gif"] as const;
@@ -20,12 +22,10 @@ const IMAGE_LIMITS: Record<string, number> = {
 type Caller = { roles: string[]; userId: string };
 
 export class ImagesService {
-  constructor(private repo: IImagesRepository) {}
-
   async listImages(entityType: EntityType, entityId: string): Promise<Image[]> {
-    const exists = await this.repo.entityExists(entityType, entityId);
+    const exists = await imagesRepo.entityExists(db, entityType, entityId);
     if (!exists) throw new Error("NOT_FOUND");
-    return this.repo.findByEntity(entityType, entityId);
+    return imagesRepo.findByEntity(db, entityType, entityId);
   }
 
   async uploadImage(
@@ -39,7 +39,7 @@ export class ImagesService {
     }
     if (file.size > MAX_FILE_SIZE) throw new Error("PAYLOAD_TOO_LARGE");
 
-    const exists = await this.repo.entityExists(entityType, entityId);
+    const exists = await imagesRepo.entityExists(db, entityType, entityId);
     if (!exists) throw new Error("NOT_FOUND");
 
     if (!caller.roles.includes("admin")) {
@@ -47,7 +47,7 @@ export class ImagesService {
     }
 
     const limit = IMAGE_LIMITS[entityType] ?? 10;
-    const currentCount = await this.repo.countByEntity(entityType, entityId);
+    const currentCount = await imagesRepo.countByEntity(db, entityType, entityId);
     if (currentCount >= limit) throw new Error("IMAGE_LIMIT_EXCEEDED");
 
     const mimeToExt: Record<string, string> = {
@@ -65,7 +65,7 @@ export class ImagesService {
     await Bun.write(filePath, file);
 
     try {
-      return await this.repo.insert({
+      return await imagesRepo.insert(db, {
         entityId,
         entityType,
         url: `/uploads/${entityType}/${filename}`,
@@ -84,7 +84,7 @@ export class ImagesService {
     entityId: string,
     imageId: string
   ): Promise<void> {
-    const image = await this.repo.findById(imageId);
+    const image = await imagesRepo.findById(db, imageId);
     if (!image || image.entityType !== entityType || image.entityId !== entityId) {
       throw new Error("NOT_FOUND");
     }
@@ -93,7 +93,7 @@ export class ImagesService {
       await this.verifyOwnership(caller.userId, entityType, entityId);
     }
 
-    await this.repo.softDelete(imageId);
+    await imagesRepo.softDelete(db, imageId);
   }
 
   private async verifyOwnership(
@@ -101,10 +101,10 @@ export class ImagesService {
     entityType: EntityType,
     entityId: string
   ): Promise<void> {
-    const ownerUserId = await this.repo.findOwnerUserId(entityType, entityId);
+    const ownerUserId = await imagesRepo.findOwnerUserId(db, entityType, entityId);
     if (ownerUserId === undefined) throw new Error("NOT_FOUND");
-    if (ownerUserId !== userId) throw new Error("FORBIDDEN");
+    if (ownerUserId !== userId) throw new ForbiddenWineActionError();
   }
 }
 
-export const imagesService = new ImagesService(imagesRepository);
+export const imagesService = new ImagesService();

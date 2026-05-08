@@ -1,5 +1,5 @@
+import { useQuery } from "@tanstack/react-query";
 import { ExternalLink } from "lucide-react";
-import { useEffect, useState } from "react";
 import type { GetShopsById200 } from "@/generated/types/GetShopsById";
 
 interface ShopMapEmbedProps {
@@ -11,36 +11,27 @@ interface Coords {
   lon: string;
 }
 
-export function ShopMapEmbed({ address }: ShopMapEmbedProps) {
-  const [coords, setCoords] = useState<Coords | null>(null);
-  const [failed, setFailed] = useState(false);
+async function geocode(query: string): Promise<Coords> {
+  const res = await fetch(
+    `https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(query)}&format=json&limit=1`,
+    { headers: { "Accept-Language": "en" } }
+  );
+  const data: { lat: string; lon: string }[] = await res.json();
+  if (!data[0]) throw new Error("NOT_FOUND");
+  return { lat: data[0].lat, lon: data[0].lon };
+}
 
+export function ShopMapEmbed({ address }: ShopMapEmbedProps) {
   const query = `${address.street} ${address.houseNumber}, ${address.city}, ${address.country}`;
   const osmSearchUrl = `https://www.openstreetmap.org/search?query=${encodeURIComponent(query)}`;
 
-  useEffect(() => {
-    const controller = new AbortController();
-    fetch(
-      `https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(query)}&format=json&limit=1`,
-      { headers: { "Accept-Language": "en" }, signal: controller.signal }
-    )
-      .then((r) => r.json())
-      .then((data: { lat: string; lon: string }[]) => {
-        if (data[0]) {
-          setCoords({ lat: data[0].lat, lon: data[0].lon });
-        } else {
-          setFailed(true);
-        }
-      })
-      .catch((err: unknown) => {
-        if (err instanceof Error && err.name === "AbortError") return;
-        setFailed(true);
-      });
+  const { data: coords, isError } = useQuery({
+    queryFn: () => geocode(query),
+    queryKey: ["osm-geocode", query],
+    retry: false,
+  });
 
-    return () => controller.abort();
-  }, [query]);
-
-  if (failed) {
+  if (isError) {
     return (
       <div className="flex h-64 w-full items-center justify-center rounded-2xl border bg-secondary/10">
         <a

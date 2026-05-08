@@ -1,7 +1,7 @@
 import { wines } from "@repo/shared/schemas";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { db } from "../../db";
-import { winesRepository } from "./wines.repository";
+import * as winesRepo from "./wines.repository";
 
 interface MockChained {
   returning: () => Promise<unknown[]>;
@@ -56,7 +56,7 @@ describe("winesRepository", () => {
     it("applies filters correctly", async () => {
       vi.mocked(db.query.wines.findMany).mockResolvedValue([]);
 
-      await winesRepository.findAll({ region: "Bordeaux", type: "still" });
+      await winesRepo.findAll(db, { region: "Bordeaux", type: "still" });
 
       expect(db.query.wines.findMany).toHaveBeenCalled();
     });
@@ -68,7 +68,7 @@ describe("winesRepository", () => {
       ];
       vi.mocked(db.query.wines.findMany).mockResolvedValue(mockRows as never);
 
-      const result = await winesRepository.findAll({});
+      const result = await winesRepo.findAll(db, {});
 
       expect(result).toHaveLength(1);
       expect(result[0]?.id).toBe("w1");
@@ -79,14 +79,14 @@ describe("winesRepository", () => {
     it("delegates to db.query and filters deleted winemaker", async () => {
       const mockWine = { id: "w1", winemaker: { deletedAt: null, id: "wm1" } };
       vi.mocked(db.query.wines.findFirst).mockResolvedValue(mockWine as never);
-      const result = await winesRepository.findById("w1");
+      const result = await winesRepo.findById(db, "w1");
       expect(result?.id).toBe("w1");
     });
 
     it("returns undefined if winemaker is deleted", async () => {
       const mockWine = { id: "w1", winemaker: { deletedAt: new Date(), id: "wm1" } };
       vi.mocked(db.query.wines.findFirst).mockResolvedValue(mockWine as never);
-      const result = await winesRepository.findById("w1");
+      const result = await winesRepo.findById(db, "w1");
       expect(result).toBeUndefined();
     });
   });
@@ -96,7 +96,7 @@ describe("winesRepository", () => {
       const mockWine = { id: "new-w" };
       vi.mocked(mockDb.returning).mockResolvedValueOnce([mockWine]);
 
-      const result = await winesRepository.insert("wm1", {
+      const result = await winesRepo.insert(db, "wm1", {
         alcoholContent: "13.5",
         attribution: "Attr",
         color: "red",
@@ -119,7 +119,7 @@ describe("winesRepository", () => {
     it("updates wine record", async () => {
       vi.mocked(mockDb.returning).mockResolvedValueOnce([{ id: "w1" }]);
 
-      await winesRepository.updateById("w1", { name: "Updated" } as never);
+      await winesRepo.updateById(db, "w1", { name: "Updated" } as never);
 
       expect(db.update).toHaveBeenCalledWith(wines);
     });
@@ -127,7 +127,7 @@ describe("winesRepository", () => {
 
   describe("softDelete", () => {
     it("sets deletedAt for the record", async () => {
-      await winesRepository.softDelete("w1");
+      await winesRepo.softDelete(db, "w1");
       expect(db.update).toHaveBeenCalledWith(wines);
     });
   });
