@@ -1,10 +1,12 @@
 import { Wine, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import type { GetCarts200Item } from "@/generated/types/GetCarts";
+import type { GetCarts200 } from "@/generated/types/GetCarts";
 import { QuantityControl } from "./QuantityControl";
 
+type CartItem = NonNullable<GetCarts200>["items"][number];
+
 type CartItemRowProps = {
-  item: GetCarts200Item;
+  item: CartItem;
   onQuantityChange: (productId: string, quantity: number) => void;
   onRemove: (productId: string) => void;
 };
