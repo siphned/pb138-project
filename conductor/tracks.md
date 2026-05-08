@@ -16,8 +16,3 @@ This file tracks all active and completed Conductor tracks.
 
 - [x] **Track: Finish deployment of the project to the web (Vercel + Render + Neon)**
 *Link: [./tracks/deployment_completion_20260508/](./tracks/deployment_completion_20260508/)*
-
----
-
-- [ ] **Track: Server Coverage OOM Resolution & Optimization**
-*Link: [./tracks/oom_resolution_20260508/](./tracks/oom_resolution_20260508/)*
