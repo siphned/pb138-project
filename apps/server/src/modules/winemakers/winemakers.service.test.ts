@@ -55,7 +55,7 @@ describe("listWinemakers", () => {
     const result = await winemakersService.listWinemakers();
 
     expect(result).toEqual([mockWinemakerWithAddress]);
-    expect(winemakersRepo.findAll).toHaveBeenCalledOnce();
+    expect(winemakersRepo.findAll).toHaveBeenCalledWith(expect.anything());
   });
 });
 
@@ -66,12 +66,15 @@ describe("getWinemaker", () => {
     const result = await winemakersService.getWinemaker(winemakerId);
 
     expect(result).toEqual(mockWinemakerWithRelations);
+    expect(winemakersRepo.findById).toHaveBeenCalledWith(expect.anything(), winemakerId);
   });
 
   it("throws NOT_FOUND when winemaker does not exist", async () => {
     vi.mocked(winemakersRepo.findById).mockResolvedValue(undefined);
 
-    await expect(winemakersService.getWinemaker(winemakerId)).rejects.toThrow("NOT_FOUND");
+    await expect(winemakersService.getWinemaker(winemakerId)).rejects.toThrow(
+      "Winemaker profile not found for this user"
+    );
   });
 });
 
@@ -87,15 +90,17 @@ describe("updateMyProfile", () => {
 
     await winemakersService.updateMyProfile(userId, { name: "New Name" });
 
-    expect(winemakersRepo.updateById).toHaveBeenCalledWith(winemakerId, { name: "New Name" });
-    expect(winemakersRepo.findByIdWithAddress).toHaveBeenCalledWith(winemakerId);
+    expect(winemakersRepo.updateById).toHaveBeenCalledWith(expect.anything(), winemakerId, {
+      name: "New Name",
+    });
+    expect(winemakersRepo.findByIdWithAddress).toHaveBeenCalledWith(expect.anything(), winemakerId);
   });
 
   it("throws NOT_FOUND when winemaker profile does not exist", async () => {
     vi.mocked(winemakersRepo.findByUserId).mockResolvedValue(undefined);
 
     await expect(winemakersService.updateMyProfile(userId, { name: "X" })).rejects.toThrow(
-      "NOT_FOUND"
+      "Winemaker profile not found for this user"
     );
     expect(winemakersRepo.updateById).not.toHaveBeenCalled();
   });
@@ -108,13 +113,18 @@ describe("getWinemakerWines", () => {
 
     await winemakersService.getWinemakerWines(winemakerId);
 
-    expect(winemakersRepo.findWinesByWinemakerId).toHaveBeenCalledWith(winemakerId);
+    expect(winemakersRepo.findWinesByWinemakerId).toHaveBeenCalledWith(
+      expect.anything(),
+      winemakerId
+    );
   });
 
   it("throws NOT_FOUND when winemaker does not exist", async () => {
     vi.mocked(winemakersRepo.findById).mockResolvedValue(undefined);
 
-    await expect(winemakersService.getWinemakerWines(winemakerId)).rejects.toThrow("NOT_FOUND");
+    await expect(winemakersService.getWinemakerWines(winemakerId)).rejects.toThrow(
+      "Winemaker profile not found for this user"
+    );
   });
 });
 
@@ -125,12 +135,17 @@ describe("getWinemakerEvents", () => {
 
     await winemakersService.getWinemakerEvents(winemakerId);
 
-    expect(winemakersRepo.findEventsByWinemakerId).toHaveBeenCalledWith(winemakerId);
+    expect(winemakersRepo.findEventsByWinemakerId).toHaveBeenCalledWith(
+      expect.anything(),
+      winemakerId
+    );
   });
 
   it("throws NOT_FOUND when winemaker does not exist", async () => {
     vi.mocked(winemakersRepo.findById).mockResolvedValue(undefined);
 
-    await expect(winemakersService.getWinemakerEvents(winemakerId)).rejects.toThrow("NOT_FOUND");
+    await expect(winemakersService.getWinemakerEvents(winemakerId)).rejects.toThrow(
+      "Winemaker profile not found for this user"
+    );
   });
 });

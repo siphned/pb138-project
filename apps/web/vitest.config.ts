@@ -12,16 +12,12 @@ export default defineConfig({
     coverage: {
       exclude: ["src/gen/**"],
     },
-    environment: "jsdom",
+    environment: "happy-dom",
     exclude: ["src/__tests__/e2e/**"],
+    fileParallelism: true,
     globals: true,
     include: ["src/**/*.test.{ts,tsx}"],
+    isolate: true,
     setupFiles: ["./src/__tests__/setup.ts"],
-    poolOptions: {
-      threads: {
-        isolate: true,
-        useAtomics: true,
-      },
-    },
   },
 });

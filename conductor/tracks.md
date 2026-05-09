@@ -5,7 +5,7 @@ This file tracks all major tracks for the project. Each track has its own detail
 
 ---
 
-- [~] **Track: Test harness performance and crashing fix**
+- [x] **Track: Test harness performance and crashing fix**
 *Link: [./tracks/test_harness_fix_20260509/](./tracks/test_harness_fix_20260509/)*
 
 ---

@@ -55,7 +55,7 @@ export function CatalogCard({
   className,
 }: CatalogCardProps) {
   return (
-    <Card variant="catalog" className={className}>
+    <Card className={className} variant="catalog">
       <CardHeader className="p-2">
         <div className="relative rounded-md aspect-square w-full overflow-hidden bg-muted">
           {imageSlot}

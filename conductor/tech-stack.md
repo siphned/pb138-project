@@ -1,5 +1,8 @@
 # Winery Tech Stack
 
+## Package Management
+This project exclusively uses **Bun** for package management and script execution. Do not use `npm`, `yarn`, or `pnpm`.
+
 ## Frontend
 - React (TypeScript)
 - Vite
@@ -10,7 +13,7 @@
 
 ## Backend
 - Node.js (Elysia)
-- Bun
+- Bun (as runtime)
 - Drizzle ORM (PostgreSQL)
 - Clerk (Auth & Webhooks via Svix)
 
