@@ -18,25 +18,25 @@ function WinemakersImagesStub() {
   return (
     <StubPage
       title={`Winemaker ${id} images`}
-      role="winemaker (owner)"
+      actorRole="winemaker (owner)"
       hookName="useGetWinemakersByIdImages + upload/delete"
     >
       <StubGet
         title="Existing images"
-        role="winemaker (owner)"
+        actorRole="winemaker (owner)"
         hookName="useGetWinemakersByIdImages"
         query={query}
       />
       <StubMutation
         title="Upload image"
-        role="winemaker (owner)"
+        actorRole="winemaker (owner)"
         hookName="usePostWinemakersByIdImages"
         mutation={uploadMutation}
         payloadExample={{ id, data: { file: "BLOB_PLACEHOLDER" } }}
       />
       <StubMutation
         title="Delete image"
-        role="winemaker (owner)"
+        actorRole="winemaker (owner)"
         hookName="useDeleteWinemakersByIdImagesByImageId"
         mutation={deleteMutation}
         payloadExample={{ id, imageId: "REPLACE_WITH_IMAGE_ID" }}

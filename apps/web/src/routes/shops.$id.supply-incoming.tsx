@@ -11,7 +11,7 @@ function ShopsSupplyIncomingStub() {
   return (
     <StubGet
       title="Incoming supply agreement requests"
-      role="winemaker (owner)"
+      actorRole="winemaker (owner)"
       hookName="useGetSupplyAgreementsWinemaker"
       query={query}
     />

@@ -1,49 +1,59 @@
-import { useState } from "react";
 import type { UseMutationResult } from "@tanstack/react-query";
-import { StubPage } from "./StubPage";
+import { useState } from "react";
 import { Button } from "@/components/ui/button";
+import { type ActorRole, StubPage } from "./StubPage";
 
-interface StubMutationProps {
+interface StubMutationProps<TData, TVariables> {
   title: string;
-  role?: string;
+  actorRole?: ActorRole;
   hookName: string;
-  mutation: UseMutationResult<unknown, unknown, any, unknown>;
-  payloadExample?: any;
+  mutation: UseMutationResult<TData, unknown, TVariables>;
+  payloadExample?: TVariables;
 }
 
-export function StubMutation({ title, role, hookName, mutation, payloadExample }: StubMutationProps) {
-  const [payload, setPayload] = useState(JSON.stringify(payloadExample || {}, null, 2));
+export function StubMutation<TData, TVariables>({
+  title,
+  actorRole,
+  hookName,
+  mutation,
+  payloadExample,
+}: StubMutationProps<TData, TVariables>) {
+  const [payload, setPayload] = useState(JSON.stringify(payloadExample ?? {}, null, 2));
+  const [parseError, setParseError] = useState<string | null>(null);
 
   const handleFire = () => {
     try {
-      const parsed = JSON.parse(payload);
+      const parsed = JSON.parse(payload) as TVariables;
+      setParseError(null);
       mutation.mutate(parsed);
     } catch (e) {
-      alert("Invalid JSON payload");
+      setParseError(e instanceof Error ? e.message : "Invalid JSON payload");
     }
   };
 
   return (
-    <StubPage title={title} role={role} hookName={hookName}>
+    <StubPage hookName={hookName} actorRole={actorRole} title={title}>
       <div className="space-y-4 border rounded-lg p-4 bg-background">
-        <div className="space-y-2">
-          <label className="text-xs font-bold uppercase text-muted-foreground">Payload (JSON)</label>
+        <label className="space-y-2 block">
+          <span className="text-xs font-bold uppercase text-muted-foreground">
+            Payload (JSON)
+          </span>
           <textarea
             className="w-full h-40 p-2 font-mono text-xs bg-muted border rounded"
-            value={payload}
             onChange={(e) => setPayload(e.target.value)}
+            value={payload}
           />
-        </div>
+        </label>
+
+        {parseError && (
+          <p className="text-destructive text-sm">JSON parse error: {parseError}</p>
+        )}
 
         <div className="flex items-center gap-4">
-          <Button 
-            onClick={handleFire} 
-            disabled={mutation.isPending}
-            variant="default"
-          >
+          <Button disabled={mutation.isPending} onClick={handleFire} variant="default">
             {mutation.isPending ? "Firing..." : "Fire Mutation"}
           </Button>
-          
+
           <div className="text-xs font-mono">
             Status: <span className="px-1 rounded bg-muted">{mutation.status}</span>
           </div>
@@ -55,9 +65,9 @@ export function StubMutation({ title, role, hookName, mutation, payloadExample }
           </pre>
         )}
 
-        {mutation.data && (
+        {mutation.data !== undefined && (
           <div className="space-y-2">
-            <label className="text-xs font-bold uppercase text-muted-foreground">Response</label>
+            <span className="text-xs font-bold uppercase text-muted-foreground">Response</span>
             <pre className="p-4 bg-green-50 text-green-900 rounded text-xs overflow-auto max-h-60">
               {JSON.stringify(mutation.data, null, 2)}
             </pre>

@@ -7,7 +7,7 @@ export const Route = createFileRoute("/shops/$id/orders")({
 
 function ShopsOrdersStub() {
   return (
-    <StubPage title="Shop orders" role="shop_owner (owner)" hookName="useGetOrdersByShopId (MISSING BE)">
+    <StubPage title="Shop orders" actorRole="shop_owner (owner)" hookName="useGetOrdersByShopId (MISSING BE)">
       <p className="text-destructive">
         Hook <code>useGetOrdersByShopId</code> not present in generated client.
         Backend endpoint missing or Orval has not regenerated. Recorded in audit.

@@ -12,7 +12,7 @@ function ShopsAvailabilityStub() {
   return (
     <StubGet
       title={`Shop ${id} availability`}
-      role="shop_owner (owner)"
+      actorRole="shop_owner (owner)"
       hookName="useGetShopsByIdAvailability"
       query={query}
     />

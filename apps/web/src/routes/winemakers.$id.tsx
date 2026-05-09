@@ -88,13 +88,13 @@ function WinemakerDetailStubAudit({ id }: { id: string }) {
   const reviewMutation = usePostReviewsWinemakerById();
   return (
     <>
-      <StubGet title="Winemaker images" role="guest+" hookName="useGetWinemakersByIdImages" query={imagesQuery} />
-      <StubGet title="Their wines" role="guest+" hookName="useGetWines?winemakerId=" query={winesQuery} />
-      <StubGet title="Their events" role="guest+" hookName="useGetEvents?winemakerId=" query={eventsQuery} />
-      <StubGet title="Reviews" role="guest+" hookName="useGetReviewsWinemakerById" query={reviewsQuery} />
+      <StubGet title="Winemaker images" actorRole="guest+" hookName="useGetWinemakersByIdImages" query={imagesQuery} />
+      <StubGet title="Their wines" actorRole="guest+" hookName="useGetWines?winemakerId=" query={winesQuery} />
+      <StubGet title="Their events" actorRole="guest+" hookName="useGetEvents?winemakerId=" query={eventsQuery} />
+      <StubGet title="Reviews" actorRole="guest+" hookName="useGetReviewsWinemakerById" query={reviewsQuery} />
       <StubMutation
         title="Write review"
-        role="customer+"
+        actorRole="customer+"
         hookName="usePostReviewsWinemakerById"
         mutation={reviewMutation}
         payloadExample={{ id, data: { rating: 5, body: "Test review" } }}

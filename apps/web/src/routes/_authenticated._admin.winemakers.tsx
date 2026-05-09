@@ -11,7 +11,7 @@ function AdminWinemakersStub() {
   return (
     <StubGet
       title="Admin winemakers (all)"
-      role="admin"
+      actorRole="admin"
       hookName="useGetWinemakers"
       query={query}
     />

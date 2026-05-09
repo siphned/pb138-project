@@ -11,7 +11,7 @@ function ShopCreateStub() {
   return (
     <StubMutation
       title="Create new shop"
-      role="guest+ (shop_owner request)"
+      actorRole="guest+ (shop_owner request)"
       hookName="usePostShops"
       mutation={mutation}
       payloadExample={{ data: { name: "My New Shop", city: "Brno", address: "Main St 1" } }}

@@ -11,7 +11,7 @@ function AdminEventsStub() {
   return (
     <StubGet
       title="Admin: All events"
-      role="admin"
+      actorRole="admin"
       hookName="useGetAdminEvents"
       query={query}
     />

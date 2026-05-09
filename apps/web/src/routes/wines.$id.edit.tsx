@@ -7,7 +7,7 @@ export const Route = createFileRoute("/wines/$id/edit")({
 
 function WineEditStub() {
   return (
-    <StubPage title="Edit wine (current data)" role="winemaker" hookName="usePatchWinesById (MISSING BE)">
+    <StubPage title="Edit wine (current data)" actorRole="winemaker" hookName="usePatchWinesById (MISSING BE)">
       <p className="text-destructive">
         Mutation hook <code>usePatchWinesById</code> not present in generated client.
         Backend endpoint missing or Orval has not regenerated. Recorded in audit.

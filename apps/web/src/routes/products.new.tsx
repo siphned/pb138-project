@@ -15,7 +15,7 @@ function ProductCreateStub() {
   return (
     <StubMutation
       title="Create new product"
-      role="shop_owner"
+      actorRole="shop_owner"
       hookName="usePostShopsByIdProducts"
       mutation={mutation}
       payloadExample={{ id: shopId, data: { wineId: "wine-uuid", price: 299, stock: 10 } }}

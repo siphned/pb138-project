@@ -18,7 +18,7 @@ function ExploreStub() {
   return (
     <StubGet
       title={`Explore wine types${Object.keys(search).length ? " (filtered)" : ""}`}
-      role="guest+"
+      actorRole="guest+"
       hookName="useGetWines"
       query={query}
     />

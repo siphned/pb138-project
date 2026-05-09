@@ -4,7 +4,7 @@ import { PublicLayout } from "@/components/layout/PublicLayout";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import { useGetProductsById } from "@/generated/hooks/useGetProductsById";
-import { useGetProductsByIdReviews } from "@/generated/hooks/useGetProductsByIdReviews";
+import { useGetReviewsProductById } from "@/generated/hooks/useGetReviewsProductById";
 import { ProductDescriptionCard } from "./-components/ProductDescriptionCard";
 import { ProductGallery } from "./-components/ProductGallery";
 import { ProductInfo } from "./-components/ProductInfo";
@@ -14,8 +14,6 @@ import { ProductRelatedSection } from "./-components/ProductRelatedSection";
 import { ProductReviewsSection } from "./-components/ProductReviewsSection";
 import { ProductSoldAtCard } from "./-components/ProductSoldAtCard";
 import { ProductWinemakerCard } from "./-components/ProductWinemakerCard";
-import { StubGet } from "@/components/dev/StubGet";
-import { useGetProducts } from "@/generated/hooks/useGetProducts";
 
 type RawProductDetail = {
   id: string;
@@ -70,7 +68,7 @@ export const Route = createFileRoute("/products/$productId")({
 function ProductDetailPage() {
   const { productId } = Route.useParams();
   const { data, isLoading, isError, refetch } = useGetProductsById(productId);
-  const { data: reviewData, isLoading: reviewsLoading } = useGetProductsByIdReviews(productId);
+  const { data: reviewData, isLoading: reviewsLoading } = useGetReviewsProductById(productId);
 
   if (isLoading) return <ProductPageSkeleton />;
 
@@ -160,14 +158,14 @@ function ProductDetailPage() {
         {/* [STUB] hook audit */}
         <details className="container mx-auto p-6">
           <summary className="cursor-pointer font-mono text-sm">[STUB] hook audit</summary>
-          <ProductDetailStubAudit productId={productId} />
+          <ProductDetailStubAudit />
         </details>
       </div>
     </PublicLayout>
   );
 }
 
-function ProductDetailStubAudit({ productId }: { productId: string }) {
+function ProductDetailStubAudit() {
   // Reverse-bundle: list bundles containing this product (when isBundle=false)
   // useGetProducts does not accept containsProductId - recording gap
   return (

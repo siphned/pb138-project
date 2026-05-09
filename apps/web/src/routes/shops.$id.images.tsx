@@ -18,25 +18,25 @@ function ShopsImagesStub() {
   return (
     <StubPage
       title={`Shop ${id} images`}
-      role="shop_owner (owner)"
+      actorRole="shop_owner (owner)"
       hookName="useGetShopsByIdImages + upload/delete"
     >
       <StubGet
         title="Existing images"
-        role="shop_owner (owner)"
+        actorRole="shop_owner (owner)"
         hookName="useGetShopsByIdImages"
         query={query}
       />
       <StubMutation
         title="Upload image"
-        role="shop_owner (owner)"
+        actorRole="shop_owner (owner)"
         hookName="usePostShopsByIdImages"
         mutation={uploadMutation}
         payloadExample={{ id, data: { file: "BLOB_PLACEHOLDER" } }}
       />
       <StubMutation
         title="Delete image"
-        role="shop_owner (owner)"
+        actorRole="shop_owner (owner)"
         hookName="useDeleteShopsByIdImagesByImageId"
         mutation={deleteMutation}
         payloadExample={{ id, imageId: "REPLACE_WITH_IMAGE_ID" }}

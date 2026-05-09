@@ -18,7 +18,7 @@ function ProductsListStub() {
   return (
     <StubGet
       title={`All products${Object.keys(search).length ? " (filtered)" : ""}`}
-      role="guest+"
+      actorRole="guest+"
       hookName="useGetProducts"
       query={query}
     />

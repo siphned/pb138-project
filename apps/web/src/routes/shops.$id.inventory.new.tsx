@@ -12,7 +12,7 @@ function ShopsInventoryNewStub() {
   return (
     <StubMutation
       title={`Create product at shop ${id}`}
-      role="shop_owner (owner)"
+      actorRole="shop_owner (owner)"
       hookName="usePostShopsByIdProducts"
       mutation={mutation}
       payloadExample={{ id, data: { wineId: "WINE_ID", price: 29.99, stock: 12 } }}

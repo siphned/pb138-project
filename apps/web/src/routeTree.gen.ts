@@ -9,10 +9,8 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
-import { Route as ShopsRouteImport } from './routes/shops'
 import { Route as SearchRouteImport } from './routes/search'
 import { Route as ExploreRouteImport } from './routes/explore'
-import { Route as EventsRouteImport } from './routes/events'
 import { Route as CartRouteImport } from './routes/cart'
 import { Route as AuthenticatedRouteImport } from './routes/_authenticated'
 import { Route as IndexRouteImport } from './routes/index'
@@ -65,11 +63,6 @@ import { Route as AuthenticatedAdminUsersIdRouteImport } from './routes/_authent
 import { Route as AuthenticatedAdminRoleRequestsIdRouteImport } from './routes/_authenticated._admin.role-requests.$id'
 import { Route as ShopsIdInventoryProductIdEditRouteImport } from './routes/shops.$id.inventory.$productId.edit'
 
-const ShopsRoute = ShopsRouteImport.update({
-  id: '/shops',
-  path: '/shops',
-  getParentRoute: () => rootRouteImport,
-} as any)
 const SearchRoute = SearchRouteImport.update({
   id: '/search',
   path: '/search',
@@ -78,11 +71,6 @@ const SearchRoute = SearchRouteImport.update({
 const ExploreRoute = ExploreRouteImport.update({
   id: '/explore',
   path: '/explore',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const EventsRoute = EventsRouteImport.update({
-  id: '/events',
-  path: '/events',
   getParentRoute: () => rootRouteImport,
 } as any)
 const CartRoute = CartRouteImport.update({
@@ -110,9 +98,9 @@ const WinemakersIndexRoute = WinemakersIndexRouteImport.update({
   getParentRoute: () => rootRouteImport,
 } as any)
 const ShopsIndexRoute = ShopsIndexRouteImport.update({
-  id: '/',
-  path: '/',
-  getParentRoute: () => ShopsRoute,
+  id: '/shops/',
+  path: '/shops/',
+  getParentRoute: () => rootRouteImport,
 } as any)
 const ProductsIndexRoute = ProductsIndexRouteImport.update({
   id: '/products/',
@@ -120,9 +108,9 @@ const ProductsIndexRoute = ProductsIndexRouteImport.update({
   getParentRoute: () => rootRouteImport,
 } as any)
 const EventsIndexRoute = EventsIndexRouteImport.update({
-  id: '/',
-  path: '/',
-  getParentRoute: () => EventsRoute,
+  id: '/events/',
+  path: '/events/',
+  getParentRoute: () => rootRouteImport,
 } as any)
 const WinesNewRoute = WinesNewRouteImport.update({
   id: '/wines/new',
@@ -140,14 +128,14 @@ const WinemakersIdRoute = WinemakersIdRouteImport.update({
   getParentRoute: () => rootRouteImport,
 } as any)
 const ShopsNewRoute = ShopsNewRouteImport.update({
-  id: '/new',
-  path: '/new',
-  getParentRoute: () => ShopsRoute,
+  id: '/shops/new',
+  path: '/shops/new',
+  getParentRoute: () => rootRouteImport,
 } as any)
 const ShopsIdRoute = ShopsIdRouteImport.update({
-  id: '/$id',
-  path: '/$id',
-  getParentRoute: () => ShopsRoute,
+  id: '/shops/$id',
+  path: '/shops/$id',
+  getParentRoute: () => rootRouteImport,
 } as any)
 const ProductsNewRoute = ProductsNewRouteImport.update({
   id: '/products/new',
@@ -160,14 +148,14 @@ const ProductsProductIdRoute = ProductsProductIdRouteImport.update({
   getParentRoute: () => rootRouteImport,
 } as any)
 const EventsNewRoute = EventsNewRouteImport.update({
-  id: '/new',
-  path: '/new',
-  getParentRoute: () => EventsRoute,
+  id: '/events/new',
+  path: '/events/new',
+  getParentRoute: () => rootRouteImport,
 } as any)
 const EventsIdRoute = EventsIdRouteImport.update({
-  id: '/$id',
-  path: '/$id',
-  getParentRoute: () => EventsRoute,
+  id: '/events/$id',
+  path: '/events/$id',
+  getParentRoute: () => rootRouteImport,
 } as any)
 const CheckoutConfirmedRoute = CheckoutConfirmedRouteImport.update({
   id: '/checkout/confirmed',
@@ -350,10 +338,8 @@ const ShopsIdInventoryProductIdEditRoute =
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/cart': typeof CartRoute
-  '/events': typeof AuthenticatedAdminEventsRoute
   '/explore': typeof ExploreRoute
   '/search': typeof SearchRoute
-  '/shops': typeof AuthenticatedAdminShopsRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
   '/orders': typeof AuthenticatedOrdersRouteWithChildren
   '/stats': typeof AuthenticatedStatsRoute
@@ -375,9 +361,11 @@ export interface FileRoutesByFullPath {
   '/winemakers/': typeof WinemakersIndexRoute
   '/wines/': typeof WinesIndexRoute
   '/admin': typeof AuthenticatedAdminAdminRoute
+  '/events': typeof AuthenticatedAdminEventsRoute
   '/moderation': typeof AuthenticatedAdminModerationRoute
   '/products': typeof AuthenticatedAdminProductsRoute
   '/role-requests': typeof AuthenticatedAdminRoleRequestsRouteWithChildren
+  '/shops': typeof AuthenticatedAdminShopsRoute
   '/users': typeof AuthenticatedAdminUsersRouteWithChildren
   '/winemakers': typeof AuthenticatedAdminWinemakersRoute
   '/orders/$id': typeof AuthenticatedOrdersIdRoute
@@ -454,10 +442,8 @@ export interface FileRoutesById {
   '/': typeof IndexRoute
   '/_authenticated': typeof AuthenticatedRouteWithChildren
   '/cart': typeof CartRoute
-  '/events': typeof EventsRouteWithChildren
   '/explore': typeof ExploreRoute
   '/search': typeof SearchRoute
-  '/shops': typeof ShopsRouteWithChildren
   '/_authenticated/_admin': typeof AuthenticatedAdminRouteWithChildren
   '/_authenticated/dashboard': typeof AuthenticatedDashboardRoute
   '/_authenticated/orders': typeof AuthenticatedOrdersRouteWithChildren
@@ -512,10 +498,8 @@ export interface FileRouteTypes {
   fullPaths:
     | '/'
     | '/cart'
-    | '/events'
     | '/explore'
     | '/search'
-    | '/shops'
     | '/dashboard'
     | '/orders'
     | '/stats'
@@ -537,9 +521,11 @@ export interface FileRouteTypes {
     | '/winemakers/'
     | '/wines/'
     | '/admin'
+    | '/events'
     | '/moderation'
     | '/products'
     | '/role-requests'
+    | '/shops'
     | '/users'
     | '/winemakers'
     | '/orders/$id'
@@ -615,10 +601,8 @@ export interface FileRouteTypes {
     | '/'
     | '/_authenticated'
     | '/cart'
-    | '/events'
     | '/explore'
     | '/search'
-    | '/shops'
     | '/_authenticated/_admin'
     | '/_authenticated/dashboard'
     | '/_authenticated/orders'
@@ -673,32 +657,29 @@ export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AuthenticatedRoute: typeof AuthenticatedRouteWithChildren
   CartRoute: typeof CartRoute
-  EventsRoute: typeof EventsRouteWithChildren
   ExploreRoute: typeof ExploreRoute
   SearchRoute: typeof SearchRoute
-  ShopsRoute: typeof ShopsRouteWithChildren
   AuthLoginRoute: typeof AuthLoginRoute
   AuthRegisterRoute: typeof AuthRegisterRoute
   CheckoutConfirmedRoute: typeof CheckoutConfirmedRoute
+  EventsIdRoute: typeof EventsIdRouteWithChildren
+  EventsNewRoute: typeof EventsNewRoute
   ProductsProductIdRoute: typeof ProductsProductIdRoute
   ProductsNewRoute: typeof ProductsNewRoute
+  ShopsIdRoute: typeof ShopsIdRouteWithChildren
+  ShopsNewRoute: typeof ShopsNewRoute
   WinemakersIdRoute: typeof WinemakersIdRouteWithChildren
   WinesIdRoute: typeof WinesIdRouteWithChildren
   WinesNewRoute: typeof WinesNewRoute
+  EventsIndexRoute: typeof EventsIndexRoute
   ProductsIndexRoute: typeof ProductsIndexRoute
+  ShopsIndexRoute: typeof ShopsIndexRoute
   WinemakersIndexRoute: typeof WinemakersIndexRoute
   WinesIndexRoute: typeof WinesIndexRoute
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
-    '/shops': {
-      id: '/shops'
-      path: '/shops'
-      fullPath: '/shops'
-      preLoaderRoute: typeof ShopsRouteImport
-      parentRoute: typeof rootRouteImport
-    }
     '/search': {
       id: '/search'
       path: '/search'
@@ -711,13 +692,6 @@ declare module '@tanstack/react-router' {
       path: '/explore'
       fullPath: '/explore'
       preLoaderRoute: typeof ExploreRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/events': {
-      id: '/events'
-      path: '/events'
-      fullPath: '/events'
-      preLoaderRoute: typeof EventsRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/cart': {
@@ -757,10 +731,10 @@ declare module '@tanstack/react-router' {
     }
     '/shops/': {
       id: '/shops/'
-      path: '/'
+      path: '/shops'
       fullPath: '/shops/'
       preLoaderRoute: typeof ShopsIndexRouteImport
-      parentRoute: typeof ShopsRoute
+      parentRoute: typeof rootRouteImport
     }
     '/products/': {
       id: '/products/'
@@ -771,10 +745,10 @@ declare module '@tanstack/react-router' {
     }
     '/events/': {
       id: '/events/'
-      path: '/'
+      path: '/events'
       fullPath: '/events/'
       preLoaderRoute: typeof EventsIndexRouteImport
-      parentRoute: typeof EventsRoute
+      parentRoute: typeof rootRouteImport
     }
     '/wines/new': {
       id: '/wines/new'
@@ -799,17 +773,17 @@ declare module '@tanstack/react-router' {
     }
     '/shops/new': {
       id: '/shops/new'
-      path: '/new'
+      path: '/shops/new'
       fullPath: '/shops/new'
       preLoaderRoute: typeof ShopsNewRouteImport
-      parentRoute: typeof ShopsRoute
+      parentRoute: typeof rootRouteImport
     }
     '/shops/$id': {
       id: '/shops/$id'
-      path: '/$id'
+      path: '/shops/$id'
       fullPath: '/shops/$id'
       preLoaderRoute: typeof ShopsIdRouteImport
-      parentRoute: typeof ShopsRoute
+      parentRoute: typeof rootRouteImport
     }
     '/products/new': {
       id: '/products/new'
@@ -827,17 +801,17 @@ declare module '@tanstack/react-router' {
     }
     '/events/new': {
       id: '/events/new'
-      path: '/new'
+      path: '/events/new'
       fullPath: '/events/new'
       preLoaderRoute: typeof EventsNewRouteImport
-      parentRoute: typeof EventsRoute
+      parentRoute: typeof rootRouteImport
     }
     '/events/$id': {
       id: '/events/$id'
-      path: '/$id'
+      path: '/events/$id'
       fullPath: '/events/$id'
       preLoaderRoute: typeof EventsIdRouteImport
-      parentRoute: typeof EventsRoute
+      parentRoute: typeof rootRouteImport
     }
     '/checkout/confirmed': {
       id: '/checkout/confirmed'
@@ -1180,21 +1154,6 @@ const EventsIdRouteWithChildren = EventsIdRoute._addFileChildren(
   EventsIdRouteChildren,
 )
 
-interface EventsRouteChildren {
-  EventsIdRoute: typeof EventsIdRouteWithChildren
-  EventsNewRoute: typeof EventsNewRoute
-  EventsIndexRoute: typeof EventsIndexRoute
-}
-
-const EventsRouteChildren: EventsRouteChildren = {
-  EventsIdRoute: EventsIdRouteWithChildren,
-  EventsNewRoute: EventsNewRoute,
-  EventsIndexRoute: EventsIndexRoute,
-}
-
-const EventsRouteWithChildren =
-  EventsRoute._addFileChildren(EventsRouteChildren)
-
 interface ShopsIdInventoryRouteChildren {
   ShopsIdInventoryNewRoute: typeof ShopsIdInventoryNewRoute
   ShopsIdInventoryProductIdEditRoute: typeof ShopsIdInventoryProductIdEditRoute
@@ -1231,20 +1190,6 @@ const ShopsIdRouteChildren: ShopsIdRouteChildren = {
 const ShopsIdRouteWithChildren =
   ShopsIdRoute._addFileChildren(ShopsIdRouteChildren)
 
-interface ShopsRouteChildren {
-  ShopsIdRoute: typeof ShopsIdRouteWithChildren
-  ShopsNewRoute: typeof ShopsNewRoute
-  ShopsIndexRoute: typeof ShopsIndexRoute
-}
-
-const ShopsRouteChildren: ShopsRouteChildren = {
-  ShopsIdRoute: ShopsIdRouteWithChildren,
-  ShopsNewRoute: ShopsNewRoute,
-  ShopsIndexRoute: ShopsIndexRoute,
-}
-
-const ShopsRouteWithChildren = ShopsRoute._addFileChildren(ShopsRouteChildren)
-
 interface WinemakersIdRouteChildren {
   WinemakersIdEditRoute: typeof WinemakersIdEditRoute
   WinemakersIdImagesRoute: typeof WinemakersIdImagesRoute
@@ -1276,19 +1221,23 @@ const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AuthenticatedRoute: AuthenticatedRouteWithChildren,
   CartRoute: CartRoute,
-  EventsRoute: EventsRouteWithChildren,
   ExploreRoute: ExploreRoute,
   SearchRoute: SearchRoute,
-  ShopsRoute: ShopsRouteWithChildren,
   AuthLoginRoute: AuthLoginRoute,
   AuthRegisterRoute: AuthRegisterRoute,
   CheckoutConfirmedRoute: CheckoutConfirmedRoute,
+  EventsIdRoute: EventsIdRouteWithChildren,
+  EventsNewRoute: EventsNewRoute,
   ProductsProductIdRoute: ProductsProductIdRoute,
   ProductsNewRoute: ProductsNewRoute,
+  ShopsIdRoute: ShopsIdRouteWithChildren,
+  ShopsNewRoute: ShopsNewRoute,
   WinemakersIdRoute: WinemakersIdRouteWithChildren,
   WinesIdRoute: WinesIdRouteWithChildren,
   WinesNewRoute: WinesNewRoute,
+  EventsIndexRoute: EventsIndexRoute,
   ProductsIndexRoute: ProductsIndexRoute,
+  ShopsIndexRoute: ShopsIndexRoute,
   WinemakersIndexRoute: WinemakersIndexRoute,
   WinesIndexRoute: WinesIndexRoute,
 }

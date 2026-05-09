@@ -22,19 +22,19 @@ function DashboardStub() {
   return (
     <StubPage
       title={`Dashboard (active roles: ${roles.join(", ") || "customer"})`}
-      role="customer+"
+      actorRole="customer+"
       hookName="useGetUsersMe + useGetUsersMeAddresses + usePostRoleRequests"
     >
-      <StubGet title="My profile" role="customer+" hookName="useGetUsersMe" query={userQuery} />
+      <StubGet title="My profile" actorRole="customer+" hookName="useGetUsersMe" query={userQuery} />
       <StubGet
         title="My addresses"
-        role="customer+"
+        actorRole="customer+"
         hookName="useGetUsersMeAddresses"
         query={addressesQuery}
       />
       <StubMutation
         title="Request new role"
-        role="customer+"
+        actorRole="customer+"
         hookName="usePostRoleRequests"
         mutation={roleRequestMutation}
         payloadExample={{ data: { requestedRole: "winemaker", justification: "Test request" } }}

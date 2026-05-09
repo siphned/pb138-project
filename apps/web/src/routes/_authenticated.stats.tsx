@@ -33,27 +33,27 @@ function StatsStub() {
   return (
     <StubPage
       title={`Stats (active roles: ${roles.join(", ") || "none"})`}
-      role="role-aware"
+      actorRole="role-aware"
       hookName="composed per role — see sections"
     >
-      <StubGet title="Customer: my profile" role="customer" hookName="useGetUsersMe" query={userQuery} />
+      <StubGet title="Customer: my profile" actorRole="customer" hookName="useGetUsersMe" query={userQuery} />
       {roles.includes("winemaker") && (
         <>
           <StubGet
             title="Winemaker: my wines (filter winemakerId=me — verify BE)"
-            role="winemaker"
+            actorRole="winemaker"
             hookName="useGetWines"
             query={myWinesQuery}
           />
           <StubGet
             title="Winemaker: my events (filter winemakerId=me — verify BE)"
-            role="winemaker"
+            actorRole="winemaker"
             hookName="useGetEvents"
             query={myEventsQuery}
           />
           <StubGet
             title="Winemaker: my supply agreements"
-            role="winemaker"
+            actorRole="winemaker"
             hookName="useGetSupplyAgreementsWinemaker"
             query={supplyQuery}
           />
@@ -62,17 +62,17 @@ function StatsStub() {
       {roles.includes("shop_owner") && (
         <StubGet
           title="Shop owner: my shops"
-          role="shop_owner"
+          actorRole="shop_owner"
           hookName="useGetShops (filter ownerUserId=me — verify BE)"
           query={myShopsQuery}
         />
       )}
       {roles.includes("admin") && (
         <>
-          <StubGet title="Admin: all users" role="admin" hookName="useGetAdminUsers" query={adminUsersQuery} />
-          <StubGet title="Admin: pending role requests" role="admin" hookName="useGetRoleRequests" query={adminRoleReqQuery} />
-          <StubGet title="Admin: pending events" role="admin" hookName="useGetAdminEvents" query={adminEventsQuery} />
-          <StubGet title="Admin: review moderation queue" role="admin" hookName="useGetAdminReviews" query={adminReviewsQuery} />
+          <StubGet title="Admin: all users" actorRole="admin" hookName="useGetAdminUsers" query={adminUsersQuery} />
+          <StubGet title="Admin: pending role requests" actorRole="admin" hookName="useGetRoleRequests" query={adminRoleReqQuery} />
+          <StubGet title="Admin: pending events" actorRole="admin" hookName="useGetAdminEvents" query={adminEventsQuery} />
+          <StubGet title="Admin: review moderation queue" actorRole="admin" hookName="useGetAdminReviews" query={adminReviewsQuery} />
         </>
       )}
     </StubPage>

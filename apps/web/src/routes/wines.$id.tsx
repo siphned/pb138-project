@@ -4,9 +4,7 @@ import { PublicLayout } from "@/components/layout/PublicLayout";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import { useGetWinesById } from "@/generated/hooks/useGetWinesById";
-import { useGetWinesByIdReviews } from "@/generated/hooks/useGetWinesByIdReviews";
 import type { GetWinesById200 } from "@/generated/types/GetWinesById";
-import { EntityReviewsSection } from "./-components/EntityReviewsSection";
 import { WinesAvailableInShops } from "./-components/WinesAvailableInShops";
 import { StubGet } from "@/components/dev/StubGet";
 import { useGetWinesByIdImages } from "@/generated/hooks/useGetWinesByIdImages";
@@ -19,7 +17,6 @@ export const Route = createFileRoute("/wines/$id")({
 function WineDetailPage() {
   const { id } = Route.useParams();
   const { data: wine, isLoading, isError, refetch } = useGetWinesById(id);
-  const { data: reviews, isLoading: isLoadingReviews } = useGetWinesByIdReviews(id);
 
   if (isLoading) {
     return (
@@ -103,15 +100,6 @@ function WineDetailPage() {
 
         <Separator />
 
-        <EntityReviewsSection
-          emptyMessage="No reviews for this wine yet."
-          isLoading={isLoadingReviews}
-          reviewData={reviews}
-          title="Wine Reviews"
-        />
-
-        <Separator />
-
         {/* Winemaker Card */}
         <WinemakerCard wine={wine} />
 
@@ -132,13 +120,13 @@ function WineDetailStubAudit({ id }: { id: string }) {
     <>
       <StubGet
         title="Wine images"
-        role="guest+"
+        actorRole="guest+"
         hookName="useGetWinesByIdImages"
         query={imagesQuery}
       />
       <StubGet
         title="Products selling this wine"
-        role="guest+"
+        actorRole="guest+"
         hookName="useGetProducts?wineId="
         query={productsQuery}
       />

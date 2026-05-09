@@ -8,7 +8,7 @@ export const Route = createFileRoute("/_authenticated/_admin/users/$id")({
 function AdminUserDetailStub() {
   const { id } = Route.useParams();
   return (
-    <StubPage title={`Admin: User ${id}`} role="admin" hookName="useGetAdminUsersById (MISSING BE)">
+    <StubPage title={`Admin: User ${id}`} actorRole="admin" hookName="useGetAdminUsersById (MISSING BE)">
       <p className="text-destructive">
         Hook <code>useGetAdminUsersById</code> not present in generated client.
         Backend endpoint missing or Orval has not regenerated. Recorded in audit.

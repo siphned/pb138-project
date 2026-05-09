@@ -24,14 +24,14 @@ function SearchStub() {
   return (
     <StubPage
       title={`Search "${q}"`}
-      role="guest+"
+      actorRole="guest+"
       hookName="5 hooks composed in parallel"
     >
-      <StubGet title="Wines" role="guest+" hookName="useGetWines" query={winesQuery} />
-      <StubGet title="Products" role="guest+" hookName="useGetProducts" query={productsQuery} />
-      <StubGet title="Events" role="guest+" hookName="useGetEvents" query={eventsQuery} />
-      <StubGet title="Winemakers" role="guest+" hookName="useGetWinemakers" query={winemakersQuery} />
-      <StubGet title="Shops" role="guest+" hookName="useGetShops" query={shopsQuery} />
+      <StubGet title="Wines" actorRole="guest+" hookName="useGetWines" query={winesQuery} />
+      <StubGet title="Products" actorRole="guest+" hookName="useGetProducts" query={productsQuery} />
+      <StubGet title="Events" actorRole="guest+" hookName="useGetEvents" query={eventsQuery} />
+      <StubGet title="Winemakers" actorRole="guest+" hookName="useGetWinemakers" query={winemakersQuery} />
+      <StubGet title="Shops" actorRole="guest+" hookName="useGetShops" query={shopsQuery} />
     </StubPage>
   );
 }

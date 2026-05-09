@@ -181,11 +181,11 @@ function EventDetailStubAudit({ id }: { id: string }) {
   const commentMutation = usePostEventsByIdComments();
   return (
     <>
-      <StubGet title="Comments" role="guest+" hookName="useGetEventsByIdComments" query={commentsQuery} />
-      <StubGet title="Images" role="guest+" hookName="useGetEventsByIdImages" query={imagesQuery} />
-      <StubMutation title="Register" role="customer+" hookName="usePostEventsByIdRegister" mutation={registerMutation} payloadExample={{ id }} />
-      <StubMutation title="Cancel registration" role="customer+" hookName="useDeleteEventsByIdRegister" mutation={cancelMutation} payloadExample={{ id }} />
-      <StubMutation title="Post comment" role="customer+" hookName="usePostEventsByIdComments" mutation={commentMutation} payloadExample={{ id, data: { body: "Test comment" } }} />
+      <StubGet title="Comments" actorRole="guest+" hookName="useGetEventsByIdComments" query={commentsQuery} />
+      <StubGet title="Images" actorRole="guest+" hookName="useGetEventsByIdImages" query={imagesQuery} />
+      <StubMutation title="Register" actorRole="customer+" hookName="usePostEventsByIdRegister" mutation={registerMutation} payloadExample={{ id }} />
+      <StubMutation title="Cancel registration" actorRole="customer+" hookName="useDeleteEventsByIdRegister" mutation={cancelMutation} payloadExample={{ id }} />
+      <StubMutation title="Post comment" actorRole="customer+" hookName="usePostEventsByIdComments" mutation={commentMutation} payloadExample={{ id, data: { body: "Test comment" } }} />
     </>
   );
 }

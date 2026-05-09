@@ -7,7 +7,7 @@ export const Route = createFileRoute("/_authenticated/orders")({
 
 function OrdersListStub() {
   return (
-    <StubPage title="My orders" role="customer+" hookName="useGetOrders (MISSING BE)">
+    <StubPage title="My orders" actorRole="customer+" hookName="useGetOrders (MISSING BE)">
       <p className="text-destructive">
         Hook <code>useGetOrders</code> / <code>useGetOrdersMe</code> not present in generated
         client. BE list endpoint missing — see audit. To browse a single order, use{" "}

@@ -18,24 +18,24 @@ function ShopsSupplyBrowseStub() {
   return (
     <StubPage
       title={`Browse supply for shop ${id}`}
-      role="shop_owner (owner)"
+      actorRole="shop_owner (owner)"
       hookName="useGetWinemakers + useGetSupplyAgreementsShopByShopId + usePostSupplyAgreements"
     >
       <StubGet
         title="Existing agreements"
-        role="shop_owner (owner)"
+        actorRole="shop_owner (owner)"
         hookName="useGetSupplyAgreementsShopByShopId"
         query={agreementsQuery}
       />
       <StubGet
         title="Browse winemakers"
-        role="shop_owner (owner)"
+        actorRole="shop_owner (owner)"
         hookName="useGetWinemakers"
         query={winemakersQuery}
       />
       <StubMutation
         title="Propose agreement"
-        role="shop_owner (owner)"
+        actorRole="shop_owner (owner)"
         hookName="usePostSupplyAgreements"
         mutation={mutation}
         payloadExample={{ data: { shopId: id, winemakerId: "WINEMAKER_ID" } }}

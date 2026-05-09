@@ -7,7 +7,7 @@ export const Route = createFileRoute("/events/$id/invitations")({
 
 function EventsInvitationsStub() {
   return (
-    <StubPage title="Event invitations" role="winemaker (owner)" hookName="useGetEventsByIdInvitations (MISSING BE)">
+    <StubPage title="Event invitations" actorRole="winemaker (owner)" hookName="useGetEventsByIdInvitations (MISSING BE)">
       <p className="text-destructive">
         Hook <code>useGetEventsByIdInvitations</code> not present in generated client.
         Backend endpoint missing or Orval has not regenerated. Recorded in audit.

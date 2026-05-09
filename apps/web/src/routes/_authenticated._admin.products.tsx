@@ -11,7 +11,7 @@ function AdminProductsStub() {
   return (
     <StubGet
       title="Admin products (all)"
-      role="admin"
+      actorRole="admin"
       hookName="useGetProducts"
       query={query}
     />

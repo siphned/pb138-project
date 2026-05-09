@@ -16,12 +16,12 @@ function HomeStub() {
   return (
     <StubPage
       title="Home / Featured"
-      role="guest+"
+      actorRole="guest+"
       hookName="useGetWines + useGetWinemakers + useGetEvents (limited)"
     >
-      <StubGet title="Featured wines" role="guest+" hookName="useGetWines" query={winesQuery} />
-      <StubGet title="Featured winemakers" role="guest+" hookName="useGetWinemakers" query={winemakersQuery} />
-      <StubGet title="Featured events" role="guest+" hookName="useGetEvents" query={eventsQuery} />
+      <StubGet title="Featured wines" actorRole="guest+" hookName="useGetWines" query={winesQuery} />
+      <StubGet title="Featured winemakers" actorRole="guest+" hookName="useGetWinemakers" query={winemakersQuery} />
+      <StubGet title="Featured events" actorRole="guest+" hookName="useGetEvents" query={eventsQuery} />
     </StubPage>
   );
 }
