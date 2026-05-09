@@ -160,7 +160,7 @@ export function Sidebar({ userRoles = [Role.customer], activeRole, onRoleChange 
             </NavItem>
 
             <NavItem
-              render={<Link search={{ page: 1, sort: "newest" }} to="/bundles" />}
+              render={<Link search={{ isBundle: true }} to="/products" />}
               variant="active"
             >
               <Package className="h-4 w-4" /> Bundles
@@ -179,10 +179,16 @@ export function Sidebar({ userRoles = [Role.customer], activeRole, onRoleChange 
 
               {currentActiveRole !== Role.customer && (
                 <>
-                  <NavItem render={<Link to="/shops" />} variant="active">
+                  <NavItem
+                    render={<Link search={{ winemakerId: "me" }} to="/explore" />}
+                    variant="active"
+                  >
                     <Wine className="h-4 w-4" /> My Wines
                   </NavItem>
-                  <NavItem render={<Link to="/shops" />} variant="active">
+                  <NavItem
+                    render={<Link search={{ isBundle: true }} to="/products" />}
+                    variant="active"
+                  >
                     <Package className="h-4 w-4" /> Bundles
                   </NavItem>
                 </>

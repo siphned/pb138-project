@@ -1,23 +1,27 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { Header } from "@/components/layout/Header";
+import { StubPage } from "@/components/dev/StubPage";
+import { StubGet } from "@/components/dev/StubGet";
+import { useGetWines } from "@/generated/hooks/useGetWines";
+import { useGetWinemakers } from "@/generated/hooks/useGetWinemakers";
+import { useGetEvents } from "@/generated/hooks/useGetEvents";
 
 export const Route = createFileRoute("/")({
-  component: HomePage,
+  component: HomeStub,
 });
 
-function HomePage() {
+function HomeStub() {
+  const winesQuery = useGetWines();
+  const winemakersQuery = useGetWinemakers();
+  const eventsQuery = useGetEvents();
   return (
-    <div className="min-h-screen bg-background">
-      <Header />
-      <main className="container mx-auto px-6 py-12">
-        <div className="flex flex-col items-center justify-center text-center space-y-6">
-          <h1 className="text-4xl md:text-6xl font-heading font-bold">Welcome to Wine Enjoyers</h1>
-          <p className="text-xl text-muted-foreground max-w-2xl">
-            A premium marketplace for winemakers and wine lovers. Discover, buy, and enjoy the
-            finest wines from across the region.
-          </p>
-        </div>
-      </main>
-    </div>
+    <StubPage
+      title="Home / Featured"
+      role="guest+"
+      hookName="useGetWines + useGetWinemakers + useGetEvents (limited)"
+    >
+      <StubGet title="Featured wines" role="guest+" hookName="useGetWines" query={winesQuery} />
+      <StubGet title="Featured winemakers" role="guest+" hookName="useGetWinemakers" query={winemakersQuery} />
+      <StubGet title="Featured events" role="guest+" hookName="useGetEvents" query={eventsQuery} />
+    </StubPage>
   );
 }

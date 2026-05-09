@@ -1,24 +1,26 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { PublicLayout } from "@/components/layout/PublicLayout";
-import { ExploreSection } from "./-components/ExploreSection";
+import { StubGet } from "@/components/dev/StubGet";
+import { useGetWines } from "@/generated/hooks/useGetWines";
 
 export const Route = createFileRoute("/explore")({
-  component: ExplorePage,
+  component: ExploreStub,
+  validateSearch: (search) => ({
+    q: typeof search.q === "string" ? search.q : undefined,
+    color: typeof search.color === "string" ? search.color : undefined,
+    region: typeof search.region === "string" ? search.region : undefined,
+    winemakerId: typeof search.winemakerId === "string" ? search.winemakerId : undefined,
+  }),
 });
 
-function ExplorePage() {
+function ExploreStub() {
+  const search = Route.useSearch();
+  const query = useGetWines(search);
   return (
-    <PublicLayout>
-      <div className="container mx-auto space-y-12 px-6 py-8 lg:px-12">
-        <div className="space-y-2">
-          <h1 className="font-heading text-4xl font-bold">Explore</h1>
-          <p className="text-muted-foreground">
-            Discover wines and curated bundles from our marketplace.
-          </p>
-        </div>
-        <ExploreSection mode="wines" />
-        <ExploreSection mode="bundles" />
-      </div>
-    </PublicLayout>
+    <StubGet
+      title={`Explore wine types${Object.keys(search).length ? " (filtered)" : ""}`}
+      role="guest+"
+      hookName="useGetWines"
+      query={query}
+    />
   );
 }
