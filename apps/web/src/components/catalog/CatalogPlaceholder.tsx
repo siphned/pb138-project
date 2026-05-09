@@ -6,11 +6,7 @@ interface CatalogPlaceholderProps {
   textClassName?: string;
 }
 
-export function CatalogPlaceholder({
-  text,
-  className,
-  textClassName,
-}: CatalogPlaceholderProps) {
+export function CatalogPlaceholder({ text, className, textClassName }: CatalogPlaceholderProps) {
   return (
     <div
       className={cn(

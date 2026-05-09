@@ -13,8 +13,7 @@ const navItemVariants = cva(
     variants: {
       variant: {
         active: "bg-secondary text-primary hover:bg-secondary/80",
-        destructive:
-          "text-muted-foreground hover:bg-destructive/10 hover:text-destructive",
+        destructive: "text-muted-foreground hover:bg-destructive/10 hover:text-destructive",
         muted: "text-muted-foreground hover:bg-secondary/50",
       },
     },
@@ -29,10 +28,7 @@ function NavItem({
 }: useRender.ComponentProps<"button"> & VariantProps<typeof navItemVariants>) {
   return useRender({
     defaultTagName: "button",
-    props: mergeProps<"button">(
-      { className: cn(navItemVariants({ variant }), className) },
-      props
-    ),
+    props: mergeProps<"button">({ className: cn(navItemVariants({ variant }), className) }, props),
     render,
     state: { slot: "nav-item", variant },
   });
