@@ -14,6 +14,8 @@ import { ProductRelatedSection } from "./-components/ProductRelatedSection";
 import { ProductReviewsSection } from "./-components/ProductReviewsSection";
 import { ProductSoldAtCard } from "./-components/ProductSoldAtCard";
 import { ProductWinemakerCard } from "./-components/ProductWinemakerCard";
+import { StubGet } from "@/components/dev/StubGet";
+import { useGetProducts } from "@/generated/hooks/useGetProducts";
 
 type RawProductDetail = {
   id: string;
@@ -154,7 +156,27 @@ function ProductDetailPage() {
         <Separator />
 
         <ProductReviewsSection isLoading={reviewsLoading} reviewData={reviewData} />
+
+        {/* [STUB] hook audit */}
+        <details className="container mx-auto p-6">
+          <summary className="cursor-pointer font-mono text-sm">[STUB] hook audit</summary>
+          <ProductDetailStubAudit productId={productId} />
+        </details>
       </div>
     </PublicLayout>
+  );
+}
+
+function ProductDetailStubAudit({ productId }: { productId: string }) {
+  // Reverse-bundle: list bundles containing this product (when isBundle=false)
+  // useGetProducts does not accept containsProductId - recording gap
+  return (
+    <div className="space-y-4">
+      <h2 className="font-heading text-xl">[STUB] Reverse-bundle nav</h2>
+      <p className="text-destructive">
+        Hook <code>useGetProducts</code> does not accept <code>containsProductId</code>.
+        Backend endpoint filter missing. Recorded in audit.
+      </p>
+    </div>
   );
 }

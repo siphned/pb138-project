@@ -8,6 +8,9 @@ import { useGetWinesByIdReviews } from "@/generated/hooks/useGetWinesByIdReviews
 import type { GetWinesById200 } from "@/generated/types/GetWinesById";
 import { EntityReviewsSection } from "./-components/EntityReviewsSection";
 import { WinesAvailableInShops } from "./-components/WinesAvailableInShops";
+import { StubGet } from "@/components/dev/StubGet";
+import { useGetWinesByIdImages } from "@/generated/hooks/useGetWinesByIdImages";
+import { useGetProducts } from "@/generated/hooks/useGetProducts";
 
 export const Route = createFileRoute("/wines/$id")({
   component: WineDetailPage,
@@ -111,8 +114,35 @@ function WineDetailPage() {
 
         {/* Winemaker Card */}
         <WinemakerCard wine={wine} />
+
+        {/* [STUB] hook audit — remove when real UI ships */}
+        <details className="container mx-auto p-6">
+          <summary className="cursor-pointer font-mono text-sm">[STUB] hook audit</summary>
+          <WineDetailStubAudit id={id} />
+        </details>
       </div>
     </PublicLayout>
+  );
+}
+
+function WineDetailStubAudit({ id }: { id: string }) {
+  const imagesQuery = useGetWinesByIdImages({ id });
+  const productsQuery = useGetProducts({ wineId: id });
+  return (
+    <>
+      <StubGet
+        title="Wine images"
+        role="guest+"
+        hookName="useGetWinesByIdImages"
+        query={imagesQuery}
+      />
+      <StubGet
+        title="Products selling this wine"
+        role="guest+"
+        hookName="useGetProducts?wineId="
+        query={productsQuery}
+      />
+    </>
   );
 }
 

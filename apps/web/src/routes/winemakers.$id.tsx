@@ -6,6 +6,13 @@ import { Separator } from "@/components/ui/separator";
 import { useGetWinemakersById } from "@/generated/hooks/useGetWinemakersById";
 import { WinemakerHero } from "./-components/WinemakerHero";
 import { WinemakerTabs } from "./-components/WinemakerTabs";
+import { StubGet } from "@/components/dev/StubGet";
+import { StubMutation } from "@/components/dev/StubMutation";
+import { useGetWinemakersByIdImages } from "@/generated/hooks/useGetWinemakersByIdImages";
+import { useGetWines } from "@/generated/hooks/useGetWines";
+import { useGetEvents } from "@/generated/hooks/useGetEvents";
+import { useGetReviewsWinemakerById } from "@/generated/hooks/useGetReviewsWinemakerById";
+import { usePostReviewsWinemakerById } from "@/generated/hooks/usePostReviewsWinemakerById";
 
 export const Route = createFileRoute("/winemakers/$id")({
   component: WinemakerProfilePage,
@@ -62,7 +69,36 @@ function WinemakerProfilePage() {
         <Separator />
 
         <WinemakerTabs winemaker={winemaker} />
+
+        {/* [STUB] hook audit */}
+        <details className="container mx-auto p-6">
+          <summary className="cursor-pointer font-mono text-sm">[STUB] hook audit</summary>
+          <WinemakerDetailStubAudit id={id} />
+        </details>
       </div>
     </PublicLayout>
+  );
+}
+
+function WinemakerDetailStubAudit({ id }: { id: string }) {
+  const imagesQuery = useGetWinemakersByIdImages({ id });
+  const winesQuery = useGetWines({ winemakerId: id });
+  const eventsQuery = useGetEvents({ winemakerId: id });
+  const reviewsQuery = useGetReviewsWinemakerById({ id });
+  const reviewMutation = usePostReviewsWinemakerById();
+  return (
+    <>
+      <StubGet title="Winemaker images" role="guest+" hookName="useGetWinemakersByIdImages" query={imagesQuery} />
+      <StubGet title="Their wines" role="guest+" hookName="useGetWines?winemakerId=" query={winesQuery} />
+      <StubGet title="Their events" role="guest+" hookName="useGetEvents?winemakerId=" query={eventsQuery} />
+      <StubGet title="Reviews" role="guest+" hookName="useGetReviewsWinemakerById" query={reviewsQuery} />
+      <StubMutation
+        title="Write review"
+        role="customer+"
+        hookName="usePostReviewsWinemakerById"
+        mutation={reviewMutation}
+        payloadExample={{ id, data: { rating: 5, body: "Test review" } }}
+      />
+    </>
   );
 }

@@ -4,6 +4,13 @@ import { PublicLayout } from "@/components/layout/PublicLayout";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import { useGetEventsById } from "@/generated/hooks/useGetEventsById";
+import { StubGet } from "@/components/dev/StubGet";
+import { StubMutation } from "@/components/dev/StubMutation";
+import { useGetEventsByIdComments } from "@/generated/hooks/useGetEventsByIdComments";
+import { useGetEventsByIdImages } from "@/generated/hooks/useGetEventsByIdImages";
+import { usePostEventsByIdRegister } from "@/generated/hooks/usePostEventsByIdRegister";
+import { useDeleteEventsByIdRegister } from "@/generated/hooks/useDeleteEventsByIdRegister";
+import { usePostEventsByIdComments } from "@/generated/hooks/usePostEventsByIdComments";
 
 export const Route = createFileRoute("/events/$id")({
   component: EventDetailPage,
@@ -155,7 +162,30 @@ function EventDetailPage() {
             )}
           </div>
         </div>
+
+        {/* [STUB] hook audit */}
+        <details className="container mx-auto p-6">
+          <summary className="cursor-pointer font-mono text-sm">[STUB] hook audit</summary>
+          <EventDetailStubAudit id={id} />
+        </details>
       </div>
     </PublicLayout>
+  );
+}
+
+function EventDetailStubAudit({ id }: { id: string }) {
+  const commentsQuery = useGetEventsByIdComments({ id });
+  const imagesQuery = useGetEventsByIdImages({ id });
+  const registerMutation = usePostEventsByIdRegister();
+  const cancelMutation = useDeleteEventsByIdRegister();
+  const commentMutation = usePostEventsByIdComments();
+  return (
+    <>
+      <StubGet title="Comments" role="guest+" hookName="useGetEventsByIdComments" query={commentsQuery} />
+      <StubGet title="Images" role="guest+" hookName="useGetEventsByIdImages" query={imagesQuery} />
+      <StubMutation title="Register" role="customer+" hookName="usePostEventsByIdRegister" mutation={registerMutation} payloadExample={{ id }} />
+      <StubMutation title="Cancel registration" role="customer+" hookName="useDeleteEventsByIdRegister" mutation={cancelMutation} payloadExample={{ id }} />
+      <StubMutation title="Post comment" role="customer+" hookName="usePostEventsByIdComments" mutation={commentMutation} payloadExample={{ id, data: { body: "Test comment" } }} />
+    </>
   );
 }
