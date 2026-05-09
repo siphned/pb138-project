@@ -9,10 +9,19 @@ export default defineConfig({
     },
   },
   test: {
+    coverage: {
+      exclude: ["src/gen/**"],
+    },
     environment: "jsdom",
     exclude: ["src/__tests__/e2e/**"],
     globals: true,
     include: ["src/**/*.test.{ts,tsx}"],
     setupFiles: ["./src/__tests__/setup.ts"],
+    poolOptions: {
+      threads: {
+        isolate: true,
+        useAtomics: true,
+      },
+    },
   },
 });
