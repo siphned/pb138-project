@@ -1,10 +1,37 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { RouteStub } from "./-components/RouteStub";
+import { StubPage } from "@/components/dev/StubPage";
+import { StubGet } from "@/components/dev/StubGet";
+import { useGetWines } from "@/generated/hooks/useGetWines";
+import { useGetProducts } from "@/generated/hooks/useGetProducts";
+import { useGetEvents } from "@/generated/hooks/useGetEvents";
+import { useGetWinemakers } from "@/generated/hooks/useGetWinemakers";
+import { useGetShops } from "@/generated/hooks/useGetShops";
 
 export const Route = createFileRoute("/search")({
-  component: SearchPage,
+  component: SearchStub,
+  validateSearch: (search) => ({
+    q: typeof search.q === "string" ? search.q : "",
+  }),
 });
 
-function SearchPage() {
-  return <RouteStub title="Search" />;
+function SearchStub() {
+  const { q } = Route.useSearch();
+  const winesQuery = useGetWines({ q });
+  const productsQuery = useGetProducts({ q });
+  const eventsQuery = useGetEvents({ q });
+  const winemakersQuery = useGetWinemakers({ q });
+  const shopsQuery = useGetShops({ q });
+  return (
+    <StubPage
+      title={`Search "${q}"`}
+      role="guest+"
+      hookName="5 hooks composed in parallel"
+    >
+      <StubGet title="Wines" role="guest+" hookName="useGetWines" query={winesQuery} />
+      <StubGet title="Products" role="guest+" hookName="useGetProducts" query={productsQuery} />
+      <StubGet title="Events" role="guest+" hookName="useGetEvents" query={eventsQuery} />
+      <StubGet title="Winemakers" role="guest+" hookName="useGetWinemakers" query={winemakersQuery} />
+      <StubGet title="Shops" role="guest+" hookName="useGetShops" query={shopsQuery} />
+    </StubPage>
+  );
 }

@@ -75,5 +75,6 @@ docs/figma/
 apps/server/uploads/*
 !apps/server/uploads/.gitkeep
 
-# Personal FE hygiene rules (Adam, not for the team)
-CLAUDE.local.md
+# UI Audit (local/temporary)
+docs/UI_AUDIT_hooks.txt
+docs/UI_AUDIT.md
