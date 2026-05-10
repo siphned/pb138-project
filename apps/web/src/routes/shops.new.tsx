@@ -10,11 +10,11 @@ function ShopCreateStub() {
   const mutation = usePostShops();
   return (
     <StubMutation
-      title="Create new shop"
       actorRole="guest+ (shop_owner request)"
       hookName="usePostShops"
       mutation={mutation}
-      payloadExample={{ data: { name: "My New Shop", city: "Brno", address: "Main St 1" } }}
+      payloadExample={{ data: { address: "Main St 1", city: "Brno", name: "My New Shop" } }}
+      title="Create new shop"
     />
   );
 }

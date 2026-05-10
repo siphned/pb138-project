@@ -14,10 +14,10 @@ function WinemakersListStub() {
   const query = useGetWinemakers(search);
   return (
     <StubGet
-      title={`All winemakers${Object.keys(search).length ? " (filtered)" : ""}`}
       actorRole="guest+"
       hookName="useGetWinemakers"
       query={query}
+      title={`All winemakers${Object.keys(search).length ? " (filtered)" : ""}`}
     />
   );
 }

@@ -1,5 +1,5 @@
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { useGetReviewsWinemakerById } from "@/generated/hooks/useGetReviewsWinemakerById";
+import { useGetWinemakersByIdReviews } from "@/generated/hooks/useGetWinemakersByIdReviews";
 import type { GetWinemakersById200 } from "@/generated/types/GetWinemakersById";
 import { EntityReviewsSection } from "./EntityReviewsSection";
 import { EventCard } from "./EventCard";
@@ -10,10 +10,10 @@ interface WinemakerTabsProps {
 }
 
 export function WinemakerTabs({ winemaker }: WinemakerTabsProps) {
-  const { data: reviews, isLoading: isLoadingReviews } = useGetReviewsWinemakerById(winemaker.id);
+  const { data: reviews, isLoading: isLoadingReviews } = useGetWinemakersByIdReviews(winemaker.id);
 
   return (
-    <Tabs className="w-full" defaultValue="wines">
+    <Tabs className="flex flex-col w-full" defaultValue="wines">
       <TabsList className="grid w-full grid-cols-3 mb-8">
         <TabsTrigger value="wines">Wines</TabsTrigger>
         <TabsTrigger value="events">Events</TabsTrigger>

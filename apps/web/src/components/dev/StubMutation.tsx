@@ -32,12 +32,10 @@ export function StubMutation<TData, TVariables>({
   };
 
   return (
-    <StubPage hookName={hookName} actorRole={actorRole} title={title}>
+    <StubPage actorRole={actorRole} hookName={hookName} title={title}>
       <div className="space-y-4 border rounded-lg p-4 bg-background">
         <label className="space-y-2 block">
-          <span className="text-xs font-bold uppercase text-muted-foreground">
-            Payload (JSON)
-          </span>
+          <span className="text-xs font-bold uppercase text-muted-foreground">Payload (JSON)</span>
           <textarea
             className="w-full h-40 p-2 font-mono text-xs bg-muted border rounded"
             onChange={(e) => setPayload(e.target.value)}
@@ -45,9 +43,7 @@ export function StubMutation<TData, TVariables>({
           />
         </label>
 
-        {parseError && (
-          <p className="text-destructive text-sm">JSON parse error: {parseError}</p>
-        )}
+        {parseError && <p className="text-destructive text-sm">JSON parse error: {parseError}</p>}
 
         <div className="flex items-center gap-4">
           <Button disabled={mutation.isPending} onClick={handleFire} variant="default">

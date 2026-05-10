@@ -10,10 +10,10 @@ function AdminEventsStub() {
   const query = useGetAdminEvents();
   return (
     <StubGet
-      title="Admin: All events"
       actorRole="admin"
       hookName="useGetAdminEvents"
       query={query}
+      title="Admin: All events"
     />
   );
 }

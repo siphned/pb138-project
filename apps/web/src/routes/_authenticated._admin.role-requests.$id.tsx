@@ -8,10 +8,14 @@ export const Route = createFileRoute("/_authenticated/_admin/role-requests/$id")
 function AdminRoleRequestDetailStub() {
   const { id } = Route.useParams();
   return (
-    <StubPage title={`Admin: Role Request ${id}`} actorRole="admin" hookName="useGetRoleRequestsById (MISSING BE)">
+    <StubPage
+      actorRole="admin"
+      hookName="useGetRoleRequestsById (MISSING BE)"
+      title={`Admin: Role Request ${id}`}
+    >
       <p className="text-destructive">
-        Hook <code>useGetRoleRequestsById</code> not present in generated client.
-        Backend endpoint missing or Orval has not regenerated. Recorded in audit.
+        Hook <code>useGetRoleRequestsById</code> not present in generated client. Backend endpoint
+        missing or Orval has not regenerated. Recorded in audit.
       </p>
     </StubPage>
   );

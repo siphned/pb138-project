@@ -1,9 +1,7 @@
-import { PublicLayout } from "@/components/layout/PublicLayout";
 import { Skeleton } from "@/components/ui/skeleton";
 
 export function ProductPageSkeleton() {
   return (
-    <PublicLayout>
       <div className="container mx-auto px-6 py-8 lg:px-12 space-y-8">
         <Skeleton className="h-6 w-32 rounded-md" />
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12">
@@ -15,6 +13,5 @@ export function ProductPageSkeleton() {
           </div>
         </div>
       </div>
-    </PublicLayout>
   );
 }

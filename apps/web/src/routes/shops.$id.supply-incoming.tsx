@@ -10,10 +10,10 @@ function ShopsSupplyIncomingStub() {
   const query = useGetSupplyAgreementsWinemaker();
   return (
     <StubGet
-      title="Incoming supply agreement requests"
       actorRole="winemaker (owner)"
       hookName="useGetSupplyAgreementsWinemaker"
       query={query}
+      title="Incoming supply agreement requests"
     />
   );
 }

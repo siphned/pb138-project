@@ -9,8 +9,8 @@ vi.mock("@tanstack/react-router", () => ({
 }));
 
 // Mock the hook
-vi.mock("@/generated/hooks/useGetReviewsWinemakerById", () => ({
-  useGetReviewsWinemakerById: vi.fn(),
+vi.mock("@/generated/hooks/useGetWinemakersByIdReviews", () => ({
+  useGetWinemakersByIdReviews: vi.fn(),
 }));
 
 // Mock the components used inside - use paths relative to the test file
@@ -24,7 +24,7 @@ vi.mock("../routes/-components/EntityReviewsSection", () => ({
   EntityReviewsSection: ({ title }: any) => <div data-testid="reviews-section">{title}</div>,
 }));
 
-import { useGetReviewsWinemakerById } from "@/generated/hooks/useGetReviewsWinemakerById";
+import { useGetWinemakersByIdReviews } from "@/generated/hooks/useGetWinemakersByIdReviews";
 
 describe("WinemakerTabs", () => {
   const mockWinemaker = {
@@ -36,7 +36,7 @@ describe("WinemakerTabs", () => {
 
   beforeEach(() => {
     vi.clearAllMocks();
-    vi.mocked(useGetReviewsWinemakerById).mockReturnValue({ isLoading: false } as any);
+    vi.mocked(useGetWinemakersByIdReviews).mockReturnValue({ isLoading: false } as any);
   });
 
   it("renders wines tab by default", () => {

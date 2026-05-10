@@ -1,14 +1,13 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { ArrowLeft, Droplets, Flame, Grape, Leaf } from "lucide-react";
-import { PublicLayout } from "@/components/layout/PublicLayout";
+import { StubGet } from "@/components/dev/StubGet";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
+import { useGetProducts } from "@/generated/hooks/useGetProducts";
 import { useGetWinesById } from "@/generated/hooks/useGetWinesById";
+import { useGetWinesByIdImages } from "@/generated/hooks/useGetWinesByIdImages";
 import type { GetWinesById200 } from "@/generated/types/GetWinesById";
 import { WinesAvailableInShops } from "./-components/WinesAvailableInShops";
-import { StubGet } from "@/components/dev/StubGet";
-import { useGetWinesByIdImages } from "@/generated/hooks/useGetWinesByIdImages";
-import { useGetProducts } from "@/generated/hooks/useGetProducts";
 
 export const Route = createFileRoute("/wines/$id")({
   component: WineDetailPage,
@@ -20,7 +19,6 @@ function WineDetailPage() {
 
   if (isLoading) {
     return (
-      <PublicLayout>
         <div className="container mx-auto px-6 py-8 lg:px-12 space-y-8">
           <div className="h-6 w-32 animate-pulse rounded-md bg-secondary/20" />
           <div className="space-y-6">
@@ -31,25 +29,21 @@ function WineDetailPage() {
             </div>
           </div>
         </div>
-      </PublicLayout>
     );
   }
 
   if (isError || !wine) {
     return (
-      <PublicLayout>
         <div className="container mx-auto flex flex-col items-center py-24 text-center">
           <p className="font-bold text-destructive">Failed to load wine details.</p>
           <Button onClick={() => refetch()} variant="link">
             Retry
           </Button>
         </div>
-      </PublicLayout>
     );
   }
 
   return (
-    <PublicLayout>
       <div className="container mx-auto px-6 py-8 lg:px-12 space-y-12">
         <Link
           className="flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground"
@@ -109,7 +103,6 @@ function WineDetailPage() {
           <WineDetailStubAudit id={id} />
         </details>
       </div>
-    </PublicLayout>
   );
 }
 
@@ -119,16 +112,16 @@ function WineDetailStubAudit({ id }: { id: string }) {
   return (
     <>
       <StubGet
-        title="Wine images"
         actorRole="guest+"
         hookName="useGetWinesByIdImages"
         query={imagesQuery}
+        title="Wine images"
       />
       <StubGet
-        title="Products selling this wine"
         actorRole="guest+"
         hookName="useGetProducts?wineId="
         query={productsQuery}
+        title="Products selling this wine"
       />
     </>
   );

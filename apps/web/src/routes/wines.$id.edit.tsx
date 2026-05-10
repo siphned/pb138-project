@@ -7,10 +7,14 @@ export const Route = createFileRoute("/wines/$id/edit")({
 
 function WineEditStub() {
   return (
-    <StubPage title="Edit wine (current data)" actorRole="winemaker" hookName="usePatchWinesById (MISSING BE)">
+    <StubPage
+      actorRole="winemaker"
+      hookName="usePatchWinesById (MISSING BE)"
+      title="Edit wine (current data)"
+    >
       <p className="text-destructive">
-        Mutation hook <code>usePatchWinesById</code> not present in generated client.
-        Backend endpoint missing or Orval has not regenerated. Recorded in audit.
+        Mutation hook <code>usePatchWinesById</code> not present in generated client. Backend
+        endpoint missing or Orval has not regenerated. Recorded in audit.
       </p>
     </StubPage>
   );

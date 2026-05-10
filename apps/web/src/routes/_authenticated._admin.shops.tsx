@@ -9,11 +9,6 @@ export const Route = createFileRoute("/_authenticated/_admin/shops")({
 function AdminShopsStub() {
   const query = useGetShops();
   return (
-    <StubGet
-      title="Admin shops (all)"
-      actorRole="admin"
-      hookName="useGetShops"
-      query={query}
-    />
+    <StubGet actorRole="admin" hookName="useGetShops" query={query} title="Admin shops (all)" />
   );
 }

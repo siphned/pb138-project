@@ -11,11 +11,11 @@ function EventEditStub() {
   const mutation = usePatchEventsById();
   return (
     <StubMutation
-      title={`Edit event ${id}`}
       actorRole="winemaker"
       hookName="usePatchEventsById"
       mutation={mutation}
-      payloadExample={{ id, data: { title: "Updated Title" } }}
+      payloadExample={{ data: { title: "Updated Title" }, id }}
+      title={`Edit event ${id}`}
     />
   );
 }

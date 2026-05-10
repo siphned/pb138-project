@@ -10,11 +10,11 @@ function WineCreateStub() {
   const mutation = usePostWines();
   return (
     <StubMutation
-      title="Create new wine (type)"
       actorRole="winemaker"
       hookName="usePostWines"
       mutation={mutation}
-      payloadExample={{ data: { name: "New Wine", color: "red", region: "South Moravia" } }}
+      payloadExample={{ data: { color: "red", name: "New Wine", region: "South Moravia" } }}
+      title="Create new wine (type)"
     />
   );
 }

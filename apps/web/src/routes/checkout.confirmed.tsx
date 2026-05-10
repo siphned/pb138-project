@@ -15,17 +15,19 @@ function CheckoutConfirmedStub() {
   const query = useGetOrdersById({ id: orderId });
   if (!orderId) {
     return (
-      <StubPage title="Checkout confirmed" actorRole="customer+" hookName="useGetOrdersById">
-        <p>Missing <code>?orderId=</code> search param.</p>
+      <StubPage actorRole="customer+" hookName="useGetOrdersById" title="Checkout confirmed">
+        <p>
+          Missing <code>?orderId=</code> search param.
+        </p>
       </StubPage>
     );
   }
   return (
     <StubGet
-      title={`Order ${orderId} — confirmed`}
       actorRole="customer+"
       hookName="useGetOrdersById"
       query={query}
+      title={`Order ${orderId} — confirmed`}
     />
   );
 }

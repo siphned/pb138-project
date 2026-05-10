@@ -14,11 +14,11 @@ function ProductCreateStub() {
   const mutation = usePostShopsByIdProducts();
   return (
     <StubMutation
-      title="Create new product"
       actorRole="shop_owner"
       hookName="usePostShopsByIdProducts"
       mutation={mutation}
-      payloadExample={{ id: shopId, data: { wineId: "wine-uuid", price: 299, stock: 10 } }}
+      payloadExample={{ data: { price: 299, stock: 10, wineId: "wine-uuid" }, id: shopId }}
+      title="Create new product"
     />
   );
 }

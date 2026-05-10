@@ -10,11 +10,13 @@ function EventCreateStub() {
   const mutation = usePostEvents();
   return (
     <StubMutation
-      title="Create new event"
       actorRole="winemaker"
       hookName="usePostEvents"
       mutation={mutation}
-      payloadExample={{ data: { title: "Wine Tasting", date: "2026-06-01T18:00:00Z", location: "Cellar" } }}
+      payloadExample={{
+        data: { date: "2026-06-01T18:00:00Z", location: "Cellar", title: "Wine Tasting" },
+      }}
+      title="Create new event"
     />
   );
 }

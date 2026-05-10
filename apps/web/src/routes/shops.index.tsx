@@ -3,7 +3,6 @@ import { SearchIcon, StoreIcon } from "lucide-react";
 import { useEffect, useState } from "react";
 import { z } from "zod";
 import { ShopCard } from "@/components/catalog/ShopCard";
-import { PublicLayout } from "@/components/layout/PublicLayout";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useGetShops } from "@/generated/hooks/useGetShops";
@@ -36,7 +35,6 @@ function ShopsPage() {
   );
 
   return (
-    <PublicLayout>
       <div className="container mx-auto px-6 py-8 lg:px-12">
         <h1 className="font-heading text-4xl font-bold mb-8">Explore Shops</h1>
 
@@ -88,6 +86,5 @@ function ShopsPage() {
           </div>
         )}
       </div>
-    </PublicLayout>
   );
 }

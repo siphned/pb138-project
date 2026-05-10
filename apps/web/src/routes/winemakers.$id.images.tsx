@@ -1,10 +1,10 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { StubGet } from "@/components/dev/StubGet";
 import { StubMutation } from "@/components/dev/StubMutation";
+import { StubPage } from "@/components/dev/StubPage";
+import { useDeleteWinemakersByIdImagesByImageId } from "@/generated/hooks/useDeleteWinemakersByIdImagesByImageId";
 import { useGetWinemakersByIdImages } from "@/generated/hooks/useGetWinemakersByIdImages";
 import { usePostWinemakersByIdImages } from "@/generated/hooks/usePostWinemakersByIdImages";
-import { useDeleteWinemakersByIdImagesByImageId } from "@/generated/hooks/useDeleteWinemakersByIdImagesByImageId";
-import { StubPage } from "@/components/dev/StubPage";
 
 export const Route = createFileRoute("/winemakers/$id/images")({
   component: WinemakersImagesStub,
@@ -17,29 +17,29 @@ function WinemakersImagesStub() {
   const deleteMutation = useDeleteWinemakersByIdImagesByImageId();
   return (
     <StubPage
-      title={`Winemaker ${id} images`}
       actorRole="winemaker (owner)"
       hookName="useGetWinemakersByIdImages + upload/delete"
+      title={`Winemaker ${id} images`}
     >
       <StubGet
-        title="Existing images"
         actorRole="winemaker (owner)"
         hookName="useGetWinemakersByIdImages"
         query={query}
+        title="Existing images"
       />
       <StubMutation
-        title="Upload image"
         actorRole="winemaker (owner)"
         hookName="usePostWinemakersByIdImages"
         mutation={uploadMutation}
-        payloadExample={{ id, data: { file: "BLOB_PLACEHOLDER" } }}
+        payloadExample={{ data: { file: "BLOB_PLACEHOLDER" }, id }}
+        title="Upload image"
       />
       <StubMutation
-        title="Delete image"
         actorRole="winemaker (owner)"
         hookName="useDeleteWinemakersByIdImagesByImageId"
         mutation={deleteMutation}
         payloadExample={{ id, imageId: "REPLACE_WITH_IMAGE_ID" }}
+        title="Delete image"
       />
     </StubPage>
   );

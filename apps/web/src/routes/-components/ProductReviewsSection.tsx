@@ -1,8 +1,8 @@
-import type { GetReviewsProductById200 } from "@/generated/types/GetReviewsProductById";
+import type { GetProductsByIdReviews200 } from "@/generated/types/GetProductsByIdReviews";
 import { EntityReviewsSection } from "./EntityReviewsSection";
 
 interface ProductReviewsSectionProps {
-  reviewData?: GetReviewsProductById200;
+  reviewData?: GetProductsByIdReviews200;
   isLoading: boolean;
 }
 

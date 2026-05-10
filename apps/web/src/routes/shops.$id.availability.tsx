@@ -11,10 +11,10 @@ function ShopsAvailabilityStub() {
   const query = useGetShopsByIdAvailability({ id });
   return (
     <StubGet
-      title={`Shop ${id} availability`}
       actorRole="shop_owner (owner)"
       hookName="useGetShopsByIdAvailability"
       query={query}
+      title={`Shop ${id} availability`}
     />
   );
 }

@@ -1,8 +1,8 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { useUser } from "@/context/UserContext";
-import { StubPage } from "@/components/dev/StubPage";
 import { StubGet } from "@/components/dev/StubGet";
 import { StubMutation } from "@/components/dev/StubMutation";
+import { StubPage } from "@/components/dev/StubPage";
+import { useUser } from "@/context/UserContext";
 import { useGetUsersMe } from "@/generated/hooks/useGetUsersMe";
 import { useGetUsersMeAddresses } from "@/generated/hooks/useGetUsersMeAddresses";
 import { usePostRoleRequests } from "@/generated/hooks/usePostRoleRequests";
@@ -21,33 +21,42 @@ function DashboardStub() {
 
   return (
     <StubPage
-      title={`Dashboard (active roles: ${roles.join(", ") || "customer"})`}
       actorRole="customer+"
       hookName="useGetUsersMe + useGetUsersMeAddresses + usePostRoleRequests"
+      title={`Dashboard (active roles: ${roles.join(", ") || "customer"})`}
     >
-      <StubGet title="My profile" actorRole="customer+" hookName="useGetUsersMe" query={userQuery} />
       <StubGet
-        title="My addresses"
+        actorRole="customer+"
+        hookName="useGetUsersMe"
+        query={userQuery}
+        title="My profile"
+      />
+      <StubGet
         actorRole="customer+"
         hookName="useGetUsersMeAddresses"
         query={addressesQuery}
+        title="My addresses"
       />
       <StubMutation
-        title="Request new role"
         actorRole="customer+"
         hookName="usePostRoleRequests"
         mutation={roleRequestMutation}
-        payloadExample={{ data: { requestedRole: "winemaker", justification: "Test request" } }}
+        payloadExample={{ data: { justification: "Test request", requestedRole: "winemaker" } }}
+        title="Request new role"
       />
       <div className="rounded-md bg-muted p-4 text-sm space-y-1">
         <div className="font-bold">Quick links</div>
-        <Link className="block text-primary hover:underline" to="/orders">My orders</Link>
-        <Link className="block text-primary hover:underline" to="/stats">Full stats</Link>
+        <Link className="block text-primary hover:underline" to="/orders">
+          My orders
+        </Link>
+        <Link className="block text-primary hover:underline" to="/stats">
+          Full stats
+        </Link>
         {roles.includes("winemaker") && (
           <Link
             className="block text-primary hover:underline"
-            to="/explore"
             search={{ winemakerId: "me" }}
+            to="/explore"
           >
             My wines
           </Link>
@@ -55,8 +64,8 @@ function DashboardStub() {
         {roles.includes("winemaker") && (
           <Link
             className="block text-primary hover:underline"
-            to="/events"
             search={{ winemakerId: "me" }}
+            to="/events"
           >
             My events
           </Link>
@@ -64,8 +73,8 @@ function DashboardStub() {
         {roles.includes("shop_owner") && (
           <Link
             className="block text-primary hover:underline"
-            to="/shops"
             search={{ ownerUserId: "me" }}
+            to="/shops"
           >
             My shops
           </Link>

@@ -21,10 +21,10 @@ function ShopsInventoryStub() {
   const query = useGetShopsByIdProducts({ id, isBundle });
   return (
     <StubGet
-      title={`Shop ${id} inventory`}
       actorRole="shop_owner (owner)"
       hookName="useGetShopsByIdProducts"
       query={query}
+      title={`Shop ${id} inventory`}
     />
   );
 }

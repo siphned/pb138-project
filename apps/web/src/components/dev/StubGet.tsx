@@ -12,7 +12,7 @@ export function StubGet({ title, actorRole, hookName, query }: StubGetProps) {
   const { data, status, error, isLoading } = query;
 
   return (
-    <StubPage title={title} actorRole={actorRole} hookName={hookName}>
+    <StubPage actorRole={actorRole} hookName={hookName} title={title}>
       <div className="space-y-2">
         <div className="flex gap-2 text-xs font-mono">
           <span

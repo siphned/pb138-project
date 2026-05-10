@@ -5,8 +5,8 @@ import { useGetProducts } from "@/generated/hooks/useGetProducts";
 export const Route = createFileRoute("/products/")({
   component: ProductsListStub,
   validateSearch: (search) => ({
-    q: typeof search.q === "string" ? search.q : undefined,
     isBundle: typeof search.isBundle === "boolean" ? search.isBundle : undefined,
+    q: typeof search.q === "string" ? search.q : undefined,
     shopId: typeof search.shopId === "string" ? search.shopId : undefined,
     wineId: typeof search.wineId === "string" ? search.wineId : undefined,
   }),
@@ -17,10 +17,10 @@ function ProductsListStub() {
   const query = useGetProducts(search);
   return (
     <StubGet
-      title={`All products${Object.keys(search).length ? " (filtered)" : ""}`}
       actorRole="guest+"
       hookName="useGetProducts"
       query={query}
+      title={`All products${Object.keys(search).length ? " (filtered)" : ""}`}
     />
   );
 }

@@ -11,10 +11,10 @@ function OrdersDetailStub() {
   const query = useGetOrdersById({ id });
   return (
     <StubGet
-      title={`Order ${id}`}
       actorRole="customer+"
       hookName="useGetOrdersById"
       query={query}
+      title={`Order ${id}`}
     />
   );
 }

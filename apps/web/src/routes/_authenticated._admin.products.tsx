@@ -10,10 +10,10 @@ function AdminProductsStub() {
   const query = useGetProducts();
   return (
     <StubGet
-      title="Admin products (all)"
       actorRole="admin"
       hookName="useGetProducts"
       query={query}
+      title="Admin products (all)"
     />
   );
 }

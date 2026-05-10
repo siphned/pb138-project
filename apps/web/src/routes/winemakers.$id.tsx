@@ -1,18 +1,17 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { ArrowLeft } from "lucide-react";
-import { PublicLayout } from "@/components/layout/PublicLayout";
-import { Button } from "@/components/ui/button";
-import { Separator } from "@/components/ui/separator";
-import { useGetWinemakersById } from "@/generated/hooks/useGetWinemakersById";
-import { WinemakerHero } from "./-components/WinemakerHero";
-import { WinemakerTabs } from "./-components/WinemakerTabs";
 import { StubGet } from "@/components/dev/StubGet";
 import { StubMutation } from "@/components/dev/StubMutation";
+import { Button } from "@/components/ui/button";
+import { Separator } from "@/components/ui/separator";
+import { useGetEvents } from "@/generated/hooks/useGetEvents";
+import { useGetWinemakersByIdReviews } from "@/generated/hooks/useGetWinemakersByIdReviews";
+import { useGetWinemakersById } from "@/generated/hooks/useGetWinemakersById";
 import { useGetWinemakersByIdImages } from "@/generated/hooks/useGetWinemakersByIdImages";
 import { useGetWines } from "@/generated/hooks/useGetWines";
-import { useGetEvents } from "@/generated/hooks/useGetEvents";
-import { useGetReviewsWinemakerById } from "@/generated/hooks/useGetReviewsWinemakerById";
-import { usePostReviewsWinemakerById } from "@/generated/hooks/usePostReviewsWinemakerById";
+import { usePostWinemakersByIdReviews } from "@/generated/hooks/usePostWinemakersByIdReviews";
+import { WinemakerHero } from "./-components/WinemakerHero";
+import { WinemakerTabs } from "./-components/WinemakerTabs";
 
 export const Route = createFileRoute("/winemakers/$id")({
   component: WinemakerProfilePage,
@@ -24,7 +23,6 @@ function WinemakerProfilePage() {
 
   if (isLoading) {
     return (
-      <PublicLayout>
         <div className="container mx-auto px-6 py-8 lg:px-12 space-y-8">
           <div className="h-6 w-32 animate-pulse rounded-md bg-secondary/20" />
           <div className="space-y-6">
@@ -35,25 +33,21 @@ function WinemakerProfilePage() {
             </div>
           </div>
         </div>
-      </PublicLayout>
     );
   }
 
   if (isError || !winemaker) {
     return (
-      <PublicLayout>
         <div className="container mx-auto flex flex-col items-center py-24 text-center">
           <p className="font-bold text-destructive">Failed to load winemaker details.</p>
           <Button className="mt-2" onClick={() => refetch()} variant="link">
             Retry
           </Button>
         </div>
-      </PublicLayout>
     );
   }
 
   return (
-    <PublicLayout>
       <div className="container mx-auto px-6 py-8 lg:px-12 space-y-12">
         <Link
           className="flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground"
@@ -76,7 +70,6 @@ function WinemakerProfilePage() {
           <WinemakerDetailStubAudit id={id} />
         </details>
       </div>
-    </PublicLayout>
   );
 }
 
@@ -84,20 +77,40 @@ function WinemakerDetailStubAudit({ id }: { id: string }) {
   const imagesQuery = useGetWinemakersByIdImages({ id });
   const winesQuery = useGetWines({ winemakerId: id });
   const eventsQuery = useGetEvents({ winemakerId: id });
-  const reviewsQuery = useGetReviewsWinemakerById({ id });
-  const reviewMutation = usePostReviewsWinemakerById();
+  const reviewsQuery = useGetWinemakersByIdReviews({ id });
+  const reviewMutation = usePostWinemakersByIdReviews();
   return (
     <>
-      <StubGet title="Winemaker images" actorRole="guest+" hookName="useGetWinemakersByIdImages" query={imagesQuery} />
-      <StubGet title="Their wines" actorRole="guest+" hookName="useGetWines?winemakerId=" query={winesQuery} />
-      <StubGet title="Their events" actorRole="guest+" hookName="useGetEvents?winemakerId=" query={eventsQuery} />
-      <StubGet title="Reviews" actorRole="guest+" hookName="useGetReviewsWinemakerById" query={reviewsQuery} />
+      <StubGet
+        actorRole="guest+"
+        hookName="useGetWinemakersByIdImages"
+        query={imagesQuery}
+        title="Winemaker images"
+      />
+      <StubGet
+        actorRole="guest+"
+        hookName="useGetWines?winemakerId="
+        query={winesQuery}
+        title="Their wines"
+      />
+      <StubGet
+        actorRole="guest+"
+        hookName="useGetEvents?winemakerId="
+        query={eventsQuery}
+        title="Their events"
+      />
+      <StubGet
+        actorRole="guest+"
+        hookName="useGetWinemakersByIdReviews"
+        query={reviewsQuery}
+        title="Reviews"
+      />
       <StubMutation
-        title="Write review"
         actorRole="customer+"
-        hookName="usePostReviewsWinemakerById"
+        hookName="usePostWinemakersByIdReviews"
         mutation={reviewMutation}
-        payloadExample={{ id, data: { rating: 5, body: "Test review" } }}
+        payloadExample={{ data: { body: "Test review", rating: 5 }, id }}
+        title="Write review"
       />
     </>
   );

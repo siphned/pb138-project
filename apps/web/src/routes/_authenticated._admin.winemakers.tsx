@@ -10,10 +10,10 @@ function AdminWinemakersStub() {
   const query = useGetWinemakers();
   return (
     <StubGet
-      title="Admin winemakers (all)"
       actorRole="admin"
       hookName="useGetWinemakers"
       query={query}
+      title="Admin winemakers (all)"
     />
   );
 }
