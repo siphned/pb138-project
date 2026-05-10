@@ -7,6 +7,10 @@
  *   - anyOf + {type:"null"} → nullable: true
  *   - anyOf + {type:"Date"} → removes the non-standard entry
  */
+// The app import transitively loads db/index.ts which requires DATABASE_URL.
+// Spec generation never touches the DB, so use NODE_ENV=test to bypass the check.
+if (!process.env.DATABASE_URL) process.env.NODE_ENV = "test";
+
 import { writeFile } from "node:fs/promises";
 import { app } from "../src/app";
 
