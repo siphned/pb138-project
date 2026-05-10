@@ -345,18 +345,6 @@ export async function productsExist(db: Database, ids: string[]): Promise<boolea
   });
   return found.length === uniqueIds.length;
 }
-
-// export async function decrementStock(
-//   db: Database,
-//   productId: string,
-//   quantity: number
-// ): Promise<void> {
-//   await db
-//     .update(products)
-//     .set({ quantity: sql`${products.quantity} - ${quantity}` })
-//     .where(eq(products.id, productId));
-// }
-
 export async function winesExist(db: Database, wineIds: string[]): Promise<boolean> {
   const uniqueIds = [...new Set(wineIds)];
   const found = await db.query.wines.findMany({

@@ -10,7 +10,7 @@ export default defineConfig({
   projects: [
     {
       name: "chromium",
-      use: { ...devices["iPhone 11"] },
+      use: { ...devices["Desktop Chrome"] },
     },
   ],
   reporter: "html",
@@ -28,5 +28,5 @@ export default defineConfig({
       url: "http://localhost:5173",
     },
   ],
-  workers: process.env.CI ? 1 : undefined,
+  workers: undefined,
 });

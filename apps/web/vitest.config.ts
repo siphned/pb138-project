@@ -12,6 +12,9 @@ export default defineConfig({
     coverage: {
       exclude: ["src/gen/**"],
     },
+    // happy-dom is ~30% faster than jsdom but lacks full layout API
+    // (getBoundingClientRect, scroll, canvas). Revert to jsdom if tests
+    // relying on those APIs start failing.
     environment: "happy-dom",
     exclude: ["src/__tests__/e2e/**"],
     fileParallelism: true,
