@@ -1,16 +1,15 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { ArrowLeft, Calendar, MapPin, Share2, Users } from "lucide-react";
-import { PublicLayout } from "@/components/layout/PublicLayout";
-import { Button } from "@/components/ui/button";
-import { Separator } from "@/components/ui/separator";
-import { useGetEventsById } from "@/generated/hooks/useGetEventsById";
 import { StubGet } from "@/components/dev/StubGet";
 import { StubMutation } from "@/components/dev/StubMutation";
+import { Button } from "@/components/ui/button";
+import { Separator } from "@/components/ui/separator";
+import { useDeleteEventsByIdRegister } from "@/generated/hooks/useDeleteEventsByIdRegister";
+import { useGetEventsById } from "@/generated/hooks/useGetEventsById";
 import { useGetEventsByIdComments } from "@/generated/hooks/useGetEventsByIdComments";
 import { useGetEventsByIdImages } from "@/generated/hooks/useGetEventsByIdImages";
-import { usePostEventsByIdRegister } from "@/generated/hooks/usePostEventsByIdRegister";
-import { useDeleteEventsByIdRegister } from "@/generated/hooks/useDeleteEventsByIdRegister";
 import { usePostEventsByIdComments } from "@/generated/hooks/usePostEventsByIdComments";
+import { usePostEventsByIdRegister } from "@/generated/hooks/usePostEventsByIdRegister";
 
 export const Route = createFileRoute("/events/$id")({
   component: EventDetailPage,
@@ -22,7 +21,6 @@ function EventDetailPage() {
 
   if (isLoading) {
     return (
-      <PublicLayout>
         <div className="container mx-auto px-6 py-8 lg:px-12 space-y-8">
           <div className="h-6 w-32 animate-pulse rounded-md bg-secondary/20" />
           <div className="space-y-6">
@@ -33,20 +31,17 @@ function EventDetailPage() {
             </div>
           </div>
         </div>
-      </PublicLayout>
     );
   }
 
   if (isError || !event) {
     return (
-      <PublicLayout>
         <div className="container mx-auto flex flex-col items-center py-24 text-center">
           <p className="font-bold text-destructive">Failed to load event details.</p>
           <Button onClick={() => refetch()} variant="link">
             Retry
           </Button>
         </div>
-      </PublicLayout>
     );
   }
 
@@ -55,7 +50,6 @@ function EventDetailPage() {
   const endDate = event?.endDate ? new Date(event.endDate) : null;
 
   return (
-    <PublicLayout>
       <div className="container mx-auto px-6 py-8 lg:px-12 space-y-8">
         <Link
           className="flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground"
@@ -169,7 +163,6 @@ function EventDetailPage() {
           <EventDetailStubAudit id={id} />
         </details>
       </div>
-    </PublicLayout>
   );
 }
 
@@ -181,11 +174,39 @@ function EventDetailStubAudit({ id }: { id: string }) {
   const commentMutation = usePostEventsByIdComments();
   return (
     <>
-      <StubGet title="Comments" actorRole="guest+" hookName="useGetEventsByIdComments" query={commentsQuery} />
-      <StubGet title="Images" actorRole="guest+" hookName="useGetEventsByIdImages" query={imagesQuery} />
-      <StubMutation title="Register" actorRole="customer+" hookName="usePostEventsByIdRegister" mutation={registerMutation} payloadExample={{ id }} />
-      <StubMutation title="Cancel registration" actorRole="customer+" hookName="useDeleteEventsByIdRegister" mutation={cancelMutation} payloadExample={{ id }} />
-      <StubMutation title="Post comment" actorRole="customer+" hookName="usePostEventsByIdComments" mutation={commentMutation} payloadExample={{ id, data: { body: "Test comment" } }} />
+      <StubGet
+        actorRole="guest+"
+        hookName="useGetEventsByIdComments"
+        query={commentsQuery}
+        title="Comments"
+      />
+      <StubGet
+        actorRole="guest+"
+        hookName="useGetEventsByIdImages"
+        query={imagesQuery}
+        title="Images"
+      />
+      <StubMutation
+        actorRole="customer+"
+        hookName="usePostEventsByIdRegister"
+        mutation={registerMutation}
+        payloadExample={{ id }}
+        title="Register"
+      />
+      <StubMutation
+        actorRole="customer+"
+        hookName="useDeleteEventsByIdRegister"
+        mutation={cancelMutation}
+        payloadExample={{ id }}
+        title="Cancel registration"
+      />
+      <StubMutation
+        actorRole="customer+"
+        hookName="usePostEventsByIdComments"
+        mutation={commentMutation}
+        payloadExample={{ data: { body: "Test comment" }, id }}
+        title="Post comment"
+      />
     </>
   );
 }
