@@ -30,6 +30,7 @@ dist
 # Generated code (Kubb, code generation)
 apps/web/src/generated/
 apps/server/openapi.json
+/openapi.json
 
 # Test results
 test-results/

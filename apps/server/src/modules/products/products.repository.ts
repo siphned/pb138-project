@@ -157,36 +157,35 @@ export async function findByShopId(
   shopId: string,
   isBundle?: boolean
 ): Promise<ProductWithWines[]> {
-  return db.query.products
-    .findMany({
-      where: and(
-        eq(products.shopId, shopId),
-        isNull(products.deletedAt),
-        isBundle !== undefined ? eq(products.isBundle, isBundle) : undefined
-      ),
-      with: {
-        productWines: {
-          with: {
-            wine: {
-              columns: {
-                alcoholContent: true,
-                color: true,
-                deletedAt: true,
-                id: true,
-                name: true,
-                type: true,
-                vintageYear: true,
-                volumeMl: true,
-              },
-              with: {
-                winemaker: { columns: { id: true, name: true } },
-              },
+  const rows = await db.query.products.findMany({
+    where: and(
+      eq(products.shopId, shopId),
+      isNull(products.deletedAt),
+      isBundle !== undefined ? eq(products.isBundle, isBundle) : undefined
+    ),
+    with: {
+      productWines: {
+        with: {
+          wine: {
+            columns: {
+              alcoholContent: true,
+              color: true,
+              deletedAt: true,
+              id: true,
+              name: true,
+              type: true,
+              vintageYear: true,
+              volumeMl: true,
+            },
+            with: {
+              winemaker: { columns: { id: true, name: true } },
             },
           },
         },
       },
-    })
-    .then((rows) => rows as unknown as ProductWithWines[]);
+    },
+  });
+  return rows as unknown as ProductWithWines[];
 }
 
 export async function findAll(
