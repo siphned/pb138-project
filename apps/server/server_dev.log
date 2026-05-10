@@ -1,0 +1,4 @@
+$ bun run src/index.ts
+[04:11:12.224] [32mINFO[39m (227453): [36mStarting server at http://localhost:3000[39m
+[04:11:12.224] [32mINFO[39m (227453): [36mOpenAPI spec available at http://localhost:3000/swagger/json[39m
+error: script "dev" was terminated by signal SIGTERM (Polite quit request)
