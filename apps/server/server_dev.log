@@ -1,0 +1,3 @@
+$ bun run src/index.ts
+[11:08:28.764] [32mINFO[39m (425182): [36mStarting server at http://localhost:3000[39m
+[11:08:28.765] [32mINFO[39m (425182): [36mOpenAPI spec available at http://localhost:3000/swagger/json[39m

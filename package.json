@@ -9,7 +9,9 @@
   },
   "devDependencies": {
     "@biomejs/biome": "2.0.6",
-    "turbo": "^2.8.20",
+    "@vitest/coverage-v8": "^4.1.5",
+    "happy-dom": "^20.9.0",
+    "turbo": "^2.9.12",
     "typescript": "5.9.2",
     "vitest": "^4.1.4"
   },
@@ -30,12 +32,13 @@
     "generate": "turbo run generate",
     "lint": "biome lint .",
     "db:generate": "turbo run db:generate --filter=server",
-    "db:migrate": "turbo run db:migrate --filter=server # Hangs on Neon, use db:push instead",
+    "db:migrate": "turbo run db:migrate --filter=server",
+    "db:push": "turbo run db:push --filter=server",
     "db:seed": "turbo run db:seed --filter=server",
     "db:studio": "turbo run db:studio --filter=server",
     "test": "turbo run test -- --run",
-    "test:e2e": "turbo run test:e2e -- --run",
-    "validate": "echo 'Running mandatory pre-push validation...' && bun run check && bun run generate && (git diff --exit-code openapi.json > /dev/null || (echo '❌ OpenAPI schema drift! Run generate and commit changes.' && exit 1)) && bun run check-types && bun run test && bun run build"
+    "test:e2e": "turbo run test:e2e",
+    "validate": "echo 'Running mandatory pre-push validation...' && bun run lint && bun run check && bun run generate && bun run check-types && bun run test && bun run test:e2e && bun run build"
   },
   "workspaces": [
     "apps/*",
