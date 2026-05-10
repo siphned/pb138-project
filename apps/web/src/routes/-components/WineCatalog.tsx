@@ -1,7 +1,6 @@
 import { useNavigate } from "@tanstack/react-router";
 import { Search as SearchIcon, SlidersHorizontal } from "lucide-react";
 import { useEffect, useState } from "react";
-import { PublicLayout } from "@/components/layout/PublicLayout";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import {
@@ -285,8 +284,7 @@ export function WineCatalog({ search, shopId, shopName, mode = "wines" }: WineCa
   };
 
   return (
-    <PublicLayout>
-      <div className="container mx-auto px-6 py-8 lg:px-12">
+    <div className="container mx-auto px-6 py-8 lg:px-12">
         <div className="flex flex-col gap-8 lg:flex-row">
           {/* Sidebar — desktop only */}
           <aside className="hidden w-64 flex-shrink-0 lg:block">
@@ -381,6 +379,5 @@ export function WineCatalog({ search, shopId, shopName, mode = "wines" }: WineCa
           </div>
         </div>
       </div>
-    </PublicLayout>
   );
 }
