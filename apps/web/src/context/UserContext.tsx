@@ -3,6 +3,7 @@ import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { createContext, type ReactNode, useContext, useEffect, useState } from "react";
 import { getUsersMeQueryKey, getUsersMeQueryOptions } from "@/generated/hooks/useGetUsersMe";
 import { usePutUsersMe } from "@/generated/hooks/usePutUsersMe";
+import { Role } from "@/types/roles";
 
 export interface UserProfile {
   id: string;
@@ -10,13 +11,15 @@ export interface UserProfile {
   lname: string;
   email: string;
   clerkId: string;
-  roles: string[];
+  roles: Role[];
 }
 
 interface UserContextType {
   user: UserProfile | null;
   updateUser: (newData: Partial<Pick<UserProfile, "fname" | "lname">>) => Promise<UserProfile>;
   isLoading: boolean;
+  activeRole: Role;
+  setActiveRole: (role: Role) => void;
 }
 
 const defaultUser: UserProfile | null = null;
@@ -38,6 +41,8 @@ export function UserProvider({ children }: { children: ReactNode }) {
     },
   });
 
+  
+
   const [user, setUser] = useState<UserProfile | null>(defaultUser);
   useEffect(() => {
     if (profile) {
@@ -53,6 +58,13 @@ export function UserProvider({ children }: { children: ReactNode }) {
       setUser(null);
     }
   }, [profile, isLoaded, isSignedIn]);
+
+  const [activeRole, setActiveRole] = useState<Role>(Role.customer);
+  useEffect(() => {
+    if(user && !user.roles.includes(activeRole)) {
+      setActiveRole(user.roles[0] as Role);
+    }}, [user]);
+
 
   const updateUser = async (
     newData: Partial<Pick<UserProfile, "fname" | "lname">>
@@ -72,7 +84,9 @@ export function UserProvider({ children }: { children: ReactNode }) {
   const isLoading = !isLoaded || (isSignedIn && isQueryLoading);
 
   return (
-    <UserContext.Provider value={{ isLoading, updateUser, user }}>{children}</UserContext.Provider>
+    <UserContext.Provider value={{ isLoading, updateUser, user, activeRole, setActiveRole }}>
+      {children}
+    </UserContext.Provider>
   );
 }
 

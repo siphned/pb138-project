@@ -3,17 +3,15 @@ import { Link } from "@tanstack/react-router";
 import { Search, ShoppingCart, User } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
-import { Role } from "@/types/roles";
 import { Sidebar } from "./Sidebar";
+import { useUser } from "@/context/UserContext";
 
-interface HeaderProps {
-  activeRole?: Role;
-  onRoleChange?: (role: Role) => void;
-}
 
-export function Header({ activeRole, onRoleChange }: HeaderProps) {
+export function Header() {
   const { user: clerkUser } = useClerk();
   const initials = clerkUser ? (clerkUser.fullName || "User").substring(0, 2).toUpperCase() : "GU";
+  const { activeRole, setActiveRole, user } = useUser();
+
   return (
     <header className="h-16 border-b bg-background flex items-center justify-between px-6 lg:px-12">
       {/* Left: Logo Area */}
@@ -56,8 +54,8 @@ export function Header({ activeRole, onRoleChange }: HeaderProps) {
 
         <Sidebar
           activeRole={activeRole}
-          onRoleChange={onRoleChange}
-          userRoles={[Role.winemaker, Role.shopOwner, Role.customer]}
+          onRoleChange={setActiveRole}
+          userRoles={user?.roles}
         />
       </div>
     </header>
