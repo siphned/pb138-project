@@ -7,12 +7,12 @@
  *   - anyOf + {type:"null"} → nullable: true
  *   - anyOf + {type:"Date"} → removes the non-standard entry
  */
-// The app import transitively loads db/index.ts which requires DATABASE_URL.
-// Spec generation never touches the DB, so use NODE_ENV=test to bypass the check.
-if (!process.env.DATABASE_URL) process.env.NODE_ENV = "test";
-
 import { writeFile } from "node:fs/promises";
-import { app } from "../src/app";
+
+// Use dynamic import so we can set NODE_ENV before db/index.ts loads.
+// Static imports are hoisted and would execute before this line.
+if (!process.env.DATABASE_URL) process.env.NODE_ENV = "test";
+const { app } = await import("../src/app");
 
 const OUTPUT_PATH = "./openapi.json";
 const ROOT_OUTPUT_PATH = "../../openapi.json";
