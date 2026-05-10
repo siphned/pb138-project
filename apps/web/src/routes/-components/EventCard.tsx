@@ -7,7 +7,7 @@ interface EventCardProps {
     id: string;
     title?: string;
     name?: string;
-    description?: string;
+    description?: string | null;
     startDate?: string | Date;
     endDate?: string | Date;
     location?: string;

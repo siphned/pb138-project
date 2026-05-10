@@ -49,19 +49,15 @@ export class RoleRequestsService {
 
     const result = await roleRequestsRepo.updateStatus(db, requestId, "rejected", adminUserId);
 
-    usersRepo
-      .findById(db, request.userId)
-      .then((user) => {
-        if (user) {
-          emailService.sendRoleRequestRejected(user.email, {
-            fname: user.fname,
-            role: request.type,
-          });
-        }
-      })
-      .catch(() => {
-        /* ignore */
-      });
+    const rejectedUser = await usersRepo.findById(db, request.userId).catch(() => null);
+    if (rejectedUser) {
+      emailService
+        .sendRoleRequestRejected(rejectedUser.email, {
+          fname: rejectedUser.fname,
+          role: request.type,
+        })
+        .catch(() => {});
+    }
 
     return result;
   }

@@ -54,7 +54,7 @@ describe("supplyAgreementsService", () => {
       const result = await supplyAgreementsService.createRequest("user-1", "winemaker-1", "shop-1");
 
       expect(result.id).toBe("agreement-1");
-      expect(supplyAgreementsRepo.create).toHaveBeenCalledWith({
+      expect(supplyAgreementsRepo.create).toHaveBeenCalledWith(expect.anything(), {
         shopId: "shop-1",
         winemakerId: "winemaker-1",
       });
@@ -95,7 +95,7 @@ describe("supplyAgreementsService", () => {
 
       await expect(
         supplyAgreementsService.createRequest("user-1", "winemaker-1", "shop-1")
-      ).rejects.toThrow("FORBIDDEN");
+      ).rejects.toThrow("You do not have permission to manage this shop");
     });
 
     it("throws FORBIDDEN if shop does not exist", async () => {
@@ -103,7 +103,7 @@ describe("supplyAgreementsService", () => {
 
       await expect(
         supplyAgreementsService.createRequest("user-1", "winemaker-1", "shop-1")
-      ).rejects.toThrow("FORBIDDEN");
+      ).rejects.toThrow("You do not have permission to manage this shop");
     });
   });
 
@@ -127,7 +127,11 @@ describe("supplyAgreementsService", () => {
       );
 
       expect(result.status).toBe("approved");
-      expect(supplyAgreementsRepo.updateStatus).toHaveBeenCalledWith("agreement-1", "approved");
+      expect(supplyAgreementsRepo.updateStatus).toHaveBeenCalledWith(
+        expect.anything(),
+        "agreement-1",
+        "approved"
+      );
     });
 
     it("throws NOT_FOUND if agreement doesn't exist", async () => {
@@ -191,7 +195,9 @@ describe("supplyAgreementsService", () => {
         ownerUserId: "other",
       } as never);
 
-      await expect(supplyAgreementsService.listForShop("u1", "s1")).rejects.toThrow("FORBIDDEN");
+      await expect(supplyAgreementsService.listForShop("u1", "s1")).rejects.toThrow(
+        "You do not have permission to manage this shop"
+      );
     });
   });
 

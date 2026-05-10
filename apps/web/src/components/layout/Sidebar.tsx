@@ -139,7 +139,7 @@ export function Sidebar({ userRoles = [Role.customer], activeRole, onRoleChange 
                   </AccordionItem>
                 </Accordion>
               ) : (
-                <NavItem variant="active" render={<div />}>
+                <NavItem render={<div />} variant="active">
                   <UserIcon className="h-4 w-4" />
                   {currentActiveRole}
                 </NavItem>
@@ -147,42 +147,42 @@ export function Sidebar({ userRoles = [Role.customer], activeRole, onRoleChange 
             </Show>
 
             {/* SHARED PUBLIC LINKS */}
-            <NavItem variant="active" className="sm:hidden" render={<Link to="/search" />}>
+            <NavItem className="sm:hidden" render={<Link to="/search" />} variant="active">
               <Search className="h-4 w-4" /> Search
             </NavItem>
 
-            <NavItem variant="active" className="sm:hidden" render={<Link to="/cart" />}>
+            <NavItem className="sm:hidden" render={<Link to="/cart" />} variant="active">
               <ShoppingCart className="h-4 w-4" /> Shopping cart
             </NavItem>
 
-            <NavItem variant="active" render={<Link to="/explore" />}>
+            <NavItem render={<Link to="/explore" />} variant="active">
               <Wine className="h-4 w-4" /> Explore Wines
             </NavItem>
 
             <NavItem
-              variant="active"
               render={<Link search={{ page: 1, sort: "newest" }} to="/bundles" />}
+              variant="active"
             >
               <Package className="h-4 w-4" /> Bundles
             </NavItem>
 
-            <NavItem variant="active" render={<Link to="/events" />}>
+            <NavItem render={<Link to="/events" />} variant="active">
               <Calendar className="h-4 w-4" /> Events
             </NavItem>
 
             <Show when="signed-in">
               {currentActiveRole === Role.customer && (
-                <NavItem variant="active" render={<Link to="/orders" />}>
+                <NavItem render={<Link to="/orders" />} variant="active">
                   <Package className="h-4 w-4" /> Order History
                 </NavItem>
               )}
 
               {currentActiveRole !== Role.customer && (
                 <>
-                  <NavItem variant="active" render={<Link to="/shops" />}>
+                  <NavItem render={<Link to="/shops" />} variant="active">
                     <Wine className="h-4 w-4" /> My Wines
                   </NavItem>
-                  <NavItem variant="active" render={<Link to="/shops" />}>
+                  <NavItem render={<Link to="/shops" />} variant="active">
                     <Package className="h-4 w-4" /> Bundles
                   </NavItem>
                 </>
@@ -190,7 +190,7 @@ export function Sidebar({ userRoles = [Role.customer], activeRole, onRoleChange 
             </Show>
 
             <Show when="signed-in">
-              <NavItem variant="muted" className="mt-2" onClick={() => openUserProfile()}>
+              <NavItem className="mt-2" onClick={() => openUserProfile()} variant="muted">
                 <Settings className="h-4 w-4" /> Settings
               </NavItem>
             </Show>
@@ -207,11 +207,7 @@ export function Sidebar({ userRoles = [Role.customer], activeRole, onRoleChange 
           </Button>
 
           <Show when="signed-in">
-            <NavItem
-              variant="destructive"
-              className="mt-2 w-full text-left"
-              onClick={handleLogout}
-            >
+            <NavItem className="mt-2 w-full text-left" onClick={handleLogout} variant="destructive">
               <LogOut className="h-4 w-4" /> Log out
             </NavItem>
           </Show>

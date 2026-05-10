@@ -1,4 +1,8 @@
+import path from "node:path";
+import { fileURLToPath } from "node:url";
 import { defineConfig, devices } from "@playwright/test";
+
+const root = path.resolve(fileURLToPath(import.meta.url), "../../..");
 
 export default defineConfig({
   forbidOnly: !!process.env.CI,
@@ -6,7 +10,7 @@ export default defineConfig({
   projects: [
     {
       name: "chromium",
-      use: { ...devices["iPhone 11"] },
+      use: { ...devices["Desktop Chrome"] },
     },
   ],
   reporter: "html",
@@ -16,11 +20,13 @@ export default defineConfig({
     baseURL: "http://localhost:5173",
     trace: "on-first-retry",
   },
-  webServer: {
-    command: "bun run dev",
-    reuseExistingServer: !process.env.CI,
-    timeout: 30_000,
-    url: "http://localhost:5173",
-  },
-  workers: process.env.CI ? 1 : undefined,
+  webServer: [
+    {
+      command: `bun run --cwd "${root}" dev`,
+      reuseExistingServer: !process.env.CI,
+      timeout: 60_000,
+      url: "http://localhost:5173",
+    },
+  ],
+  workers: undefined,
 });

@@ -1,5 +1,12 @@
 import { Webhook } from "svix";
-import { beforeAll, beforeEach, describe, expect, it } from "vitest";
+import { beforeAll, beforeEach, describe, expect, it, vi } from "vitest";
+
+vi.mock("../users/users.service", () => ({
+  usersService: {
+    deleteUserFromWebhook: vi.fn(),
+    syncUserFromWebhook: vi.fn(),
+  },
+}));
 
 const WEBHOOK_SECRET = "whsec_testsecret";
 
