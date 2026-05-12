@@ -6,7 +6,7 @@
 
 **Architecture:** Single route file orchestrates 4 role-specific section components in `apps/web/src/components/stats/`. Each section composes `<Card variant="section">` "stat tiles" displaying a label + a number. Numbers come from BE aggregate endpoint(s) — or, as a fallback while BE catches up, from FE-side composition of existing list hooks (count by `data.length`, sum by manual map-reduce — cheap for small datasets, terrible for large but acceptable for a school project at week 8).
 
-**Tech Stack:** Same as WINE-68.
+**Tech Stack:** Same as WINE-189.
 
 **Predecessors:** WINE-187 merged. **BE-blocked unless using FE composition fallback** — see §3.2.
 
@@ -14,26 +14,24 @@
 
 ## Hard rules
 
-Identical to WINE-68 §"Hard rules". Conventional commit prefix here: `feat(WINE-188):` / `refactor(WINE-188):` / `chore(WINE-188):`.
+Identical to WINE-189 §"Hard rules". Conventional commit prefix here: `feat(WINE-188):` / `refactor(WINE-188):` / `chore(WINE-188):`.
 
 ---
 
 ## 1. Branch bootstrap
 
+Branch `WINE-188-implement-statistic-pages` exists locally clean.
+
 ```powershell
 git fetch origin
 git checkout WINE-188-implement-statistic-pages
-git reset --hard origin/dev
 git merge origin/WINE-187-Foundation-primitives --no-ff -m "merge(WINE-188): bring in WINE-187 foundation primitives"
-```
-
-If branch doesn't exist remotely, create locally and push:
-
-```powershell
-git checkout -b WINE-188-implement-statistic-pages origin/dev
-git merge origin/WINE-187-Foundation-primitives --no-ff -m "merge(WINE-188): bring in WINE-187 foundation primitives"
+bun run --filter web test --run
+bun run --filter web check-types
 git push -u origin WINE-188-implement-statistic-pages
 ```
+
+Once WINE-187 lands in dev, the merge is unnecessary.
 
 ---
 
@@ -179,7 +177,7 @@ Tiles: "Users (total)", "Pending role requests", "Pending events", "Flagged revi
 
 ## 7. Verification gates
 
-Same as WINE-68 §7, MINUS visual sweep for non-default roles if Clerk test users for those roles aren't set up — substitute by manually flipping `useUser().activeRole` via UserContext setter (`setActiveRole`) in the dev environment.
+Same as WINE-189 §7, MINUS visual sweep for non-default roles if Clerk test users for those roles aren't set up — substitute by manually flipping `useUser().activeRole` via UserContext setter (`setActiveRole`) in the dev environment.
 
 ---
 

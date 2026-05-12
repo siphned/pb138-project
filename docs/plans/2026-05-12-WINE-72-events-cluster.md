@@ -4,30 +4,34 @@
 
 **Goal:** Replace page stubs on `/events` and `/events/$id` with real UI. `/events/$id` includes registration (`usePostEventsByIdRegister` / `useDeleteEventsByIdRegister`), comments (`useGetEventsByIdComments` + `usePostEventsByIdComments`), and an owner-conditional Edit menu for the winemaker who created the event.
 
-**Architecture:** Same cascade pattern as WINE-68. Domain components in `apps/web/src/components/events/` (new folder). Existing `routes/-components/EventCard.tsx` is moved to `components/events/`.
+**Architecture:** Same cascade pattern as WINE-189. Domain components in `apps/web/src/components/events/` (new folder). Existing `routes/-components/EventCard.tsx` is moved to `components/events/`.
 
-**Tech Stack:** Same as WINE-68.
+**Tech Stack:** Same as WINE-189.
 
-**Predecessor:** WINE-187 merged. Independent of WINE-68 and WINE-70.
+**Predecessor:** WINE-187 merged. Independent of WINE-189 and WINE-190.
 
 ---
 
 ## Hard rules
 
-Identical to WINE-68 §"Hard rules". Conventional commit prefix here: `feat(WINE-72):` / `refactor(WINE-72):` / `chore(WINE-72):`.
+Identical to WINE-189 §"Hard rules". Conventional commit prefix here: `feat(WINE-72):` / `refactor(WINE-72):` / `chore(WINE-72):`.
 
 ---
 
 ## 1. Branch bootstrap
 
+Branch `WINE-72-build-event-pages-browsing-detail-registration` exists locally clean. Check out, merge primitives.
+
+Once WINE-187 lands in dev, the merge is unnecessary.
+
 ```powershell
 git fetch origin
 git checkout WINE-72-build-event-pages-browsing-detail-registration
-git reset --hard origin/dev
 git merge origin/WINE-187-Foundation-primitives --no-ff -m "merge(WINE-72): bring in WINE-187 foundation primitives"
+bun run --filter web test --run
+bun run --filter web check-types
+git push -u origin WINE-72-build-event-pages-browsing-detail-registration
 ```
-
-Sanity test + force-push as in WINE-68 §1.
 
 ---
 
@@ -135,7 +139,7 @@ Owner-gated dropdown with: Edit event → `/events/$id/edit`; Manage images → 
 
 ### Task 8: Extend `<CatalogFilters>` with `entity="events"`
 
-Add filter variant to `apps/web/src/components/catalog/CatalogFilters.tsx` (created in WINE-68). New filter rows: q (text), winemaker (select), status (approved/pending/canceled — admin-only? skip for public route). If WINE-68 hasn't merged yet, replicate the component locally. Commit: `feat(WINE-72): extend CatalogFilters with events variant`.
+Add filter variant to `apps/web/src/components/catalog/CatalogFilters.tsx` (created in WINE-189). New filter rows: q (text), winemaker (select), status (approved/pending/canceled — admin-only? skip for public route). If WINE-189 hasn't merged yet, replicate the component locally. Commit: `feat(WINE-72): extend CatalogFilters with events variant`.
 
 ### Task 9: Migrate `/events` route
 
@@ -151,7 +155,7 @@ Replace stub with `<EventHero>` + `<EventDetailsCard>` + `<EventManageMenu>` (ga
 
 ### Task 12: Final verification
 
-Same as WINE-68 Task 20. Manual sweep:
+Same as WINE-189 Task 20. Manual sweep:
 - `/events`
 - `/events/<id>` as guest (Register button shows "Sign in")
 - `/events/<id>` as customer (Register works, comments work)
@@ -179,7 +183,7 @@ Same as WINE-68 Task 20. Manual sweep:
 
 ## 7. Verification gates
 
-Same as WINE-68 §7.
+Same as WINE-189 §7.
 
 ---
 
@@ -187,7 +191,7 @@ Same as WINE-68 §7.
 
 - **Registration status detection.** If `useGetEventsById` response doesn't include "is the current user registered?", `<EventRegistrationButton>` can't decide which state to render. Spec assumes the BE returns `registeredUserIds` or `isRegisteredByMe`. If neither exists, flag under §10 BE backlog; meanwhile button always shows "Register" and the BE responds with 409 on duplicate.
 - **Cancel event mutation.** Disabled in this ticket — wiring requires owner-forms ticket.
-- **`<ShowRole>` not in primitive layer.** Reasoning: only events list page needs role-gated CTA so far. If this pattern recurs in WINE-59 (dashboard quick-actions), promote it. Until then, inline `useUser()` check is fine.
+- **`<ShowRole>` not in primitive layer.** Reasoning: only events list page needs role-gated CTA so far. If this pattern recurs in WINE-191 (dashboard quick-actions), promote it. Until then, inline `useUser()` check is fine.
 
 ---
 
@@ -215,4 +219,4 @@ Likely items:
 
 ## 11. Cross-ticket coordination
 
-`<CatalogFilters>` lives in `components/catalog/` from WINE-68. Extending it from WINE-72 touches a file owned by WINE-68's branch. Coordinate merge order: ideally WINE-68 lands first; otherwise the conflict resolution merges both variant additions.
+`<CatalogFilters>` lives in `components/catalog/` from WINE-189. Extending it from WINE-72 touches a file owned by WINE-189's branch. Coordinate merge order: ideally WINE-189 lands first; otherwise the conflict resolution merges both variant additions.
