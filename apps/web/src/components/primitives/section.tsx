@@ -22,7 +22,7 @@ export function Section({ heading, className, children, render, ...props }: Sect
           </>
         ),
       },
-      props,
+      props
     ),
     render,
     state: { slot: "section" },

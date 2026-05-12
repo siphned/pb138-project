@@ -15,7 +15,7 @@ describe("ShowOwner", () => {
     render(
       <ShowOwner ownerUserId="u1">
         <span>owner-only</span>
-      </ShowOwner>,
+      </ShowOwner>
     );
     expect(screen.getByText("owner-only")).toBeInTheDocument();
   });
@@ -25,7 +25,7 @@ describe("ShowOwner", () => {
     render(
       <ShowOwner fallback={<span>not-owner</span>} ownerUserId="u2">
         <span>owner-only</span>
-      </ShowOwner>,
+      </ShowOwner>
     );
     expect(screen.queryByText("owner-only")).toBeNull();
     expect(screen.getByText("not-owner")).toBeInTheDocument();
@@ -36,7 +36,7 @@ describe("ShowOwner", () => {
     const { container } = render(
       <ShowOwner ownerUserId="u1">
         <span>owner-only</span>
-      </ShowOwner>,
+      </ShowOwner>
     );
     expect(container.textContent).toBe("");
   });

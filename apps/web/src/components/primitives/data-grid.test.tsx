@@ -7,7 +7,7 @@ describe("DataGrid", () => {
     const { container } = render(
       <DataGrid>
         <div>a</div>
-      </DataGrid>,
+      </DataGrid>
     );
     const grid = container.firstElementChild;
     expect(grid?.className).toMatch(/grid-cols-1/);
@@ -19,7 +19,7 @@ describe("DataGrid", () => {
     const { container } = render(
       <DataGrid variant="gallery">
         <div>a</div>
-      </DataGrid>,
+      </DataGrid>
     );
     expect(container.firstElementChild?.className).toMatch(/lg:grid-cols-4/);
   });
@@ -28,7 +28,7 @@ describe("DataGrid", () => {
     const { container } = render(
       <DataGrid variant="list">
         <div>a</div>
-      </DataGrid>,
+      </DataGrid>
     );
     expect(container.firstElementChild?.className).toMatch(/grid-cols-1/);
     expect(container.firstElementChild?.className).not.toMatch(/sm:grid-cols-/);

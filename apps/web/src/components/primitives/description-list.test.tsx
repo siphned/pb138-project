@@ -8,7 +8,7 @@ describe("DescriptionList + PropertyRow", () => {
       <DescriptionList>
         <PropertyRow label="Region" value="Tokaj" />
         <PropertyRow label="Vintage" value="2021" />
-      </DescriptionList>,
+      </DescriptionList>
     );
     expect(screen.getByText("Region")).toBeInTheDocument();
     expect(screen.getByText("Tokaj")).toBeInTheDocument();
@@ -20,7 +20,7 @@ describe("DescriptionList + PropertyRow", () => {
     const { container } = render(
       <DescriptionList>
         <PropertyRow label="X" value="Y" />
-      </DescriptionList>,
+      </DescriptionList>
     );
     expect(container.querySelector("dl")).not.toBeNull();
     expect(container.querySelector("dt")?.textContent).toBe("X");

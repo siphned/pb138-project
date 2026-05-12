@@ -7,7 +7,7 @@ describe("Section", () => {
     render(
       <Section heading="Reviews">
         <p>body</p>
-      </Section>,
+      </Section>
     );
     expect(screen.getByText("Reviews")).toBeInTheDocument();
     expect(screen.getByText("body")).toBeInTheDocument();
@@ -17,7 +17,7 @@ describe("Section", () => {
     render(
       <Section>
         <p>body</p>
-      </Section>,
+      </Section>
     );
     expect(screen.getByText("body")).toBeInTheDocument();
   });
@@ -26,7 +26,7 @@ describe("Section", () => {
     const { container } = render(
       <Section render={<article data-testid="art" />}>
         <p>body</p>
-      </Section>,
+      </Section>
     );
     expect(container.querySelector("article")).not.toBeNull();
   });

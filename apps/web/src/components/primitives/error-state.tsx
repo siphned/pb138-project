@@ -20,7 +20,7 @@ export function ErrorState({
     <div
       className={cn(
         "flex flex-col items-center gap-3 rounded-2xl border border-border bg-card p-8 text-center",
-        className,
+        className
       )}
       data-slot="error-state"
       role="alert"

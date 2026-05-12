@@ -11,10 +11,7 @@ interface PageHeaderProps {
 export function PageHeader({ title, description, actions, className }: PageHeaderProps) {
   return (
     <header
-      className={cn(
-        "flex flex-col gap-2 sm:flex-row sm:items-end sm:justify-between",
-        className,
-      )}
+      className={cn("flex flex-col gap-2 sm:flex-row sm:items-end sm:justify-between", className)}
     >
       <div className="space-y-1">
         <h1 className="font-heading text-3xl font-bold tracking-tight text-foreground">{title}</h1>

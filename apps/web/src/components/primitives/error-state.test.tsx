@@ -19,7 +19,7 @@ describe("ErrorState", () => {
   it("renders Retry only when onRetry is provided", () => {
     const { rerender } = render(<ErrorState />);
     expect(screen.queryByRole("button", { name: /try again/i })).toBeNull();
-    rerender(<ErrorState onRetry={() => {}} />);
+    rerender(<ErrorState onRetry={vi.fn()} />);
     expect(screen.getByRole("button", { name: /try again/i })).toBeInTheDocument();
   });
 
