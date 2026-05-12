@@ -7,7 +7,9 @@ import type { Database } from "../../db";
 export type WineInfo = Pick<
   Wine,
   "id" | "name" | "type" | "color" | "vintageYear" | "alcoholContent" | "volumeMl" | "deletedAt"
->;
+> & {
+  winemaker: { id: string; name: string };
+};
 
 export type ProductWineWithInfo = ProductWine & { wine: WineInfo };
 
@@ -100,6 +102,9 @@ export async function findById(db: Database, id: string): Promise<ProductWithWin
               vintageYear: true,
               volumeMl: true,
             },
+            with: {
+              winemaker: { columns: { id: true, name: true } },
+            },
           },
         },
       },
@@ -152,7 +157,7 @@ export async function findByShopId(
   shopId: string,
   isBundle?: boolean
 ): Promise<ProductWithWines[]> {
-  return db.query.products.findMany({
+  const rows = await db.query.products.findMany({
     where: and(
       eq(products.shopId, shopId),
       isNull(products.deletedAt),
@@ -172,11 +177,15 @@ export async function findByShopId(
               vintageYear: true,
               volumeMl: true,
             },
+            with: {
+              winemaker: { columns: { id: true, name: true } },
+            },
           },
         },
       },
     },
-  }) as Promise<ProductWithWines[]>;
+  });
+  return rows as unknown as ProductWithWines[];
 }
 
 export async function findAll(
@@ -335,7 +344,6 @@ export async function productsExist(db: Database, ids: string[]): Promise<boolea
   });
   return found.length === uniqueIds.length;
 }
-
 export async function winesExist(db: Database, wineIds: string[]): Promise<boolean> {
   const uniqueIds = [...new Set(wineIds)];
   const found = await db.query.wines.findMany({
