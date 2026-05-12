@@ -6,7 +6,7 @@
 
 **Architecture:** Same cascade pattern. New domain components in `apps/web/src/components/admin/`. Heavy on TanStack Table-style row layouts but using shadcn `<Table>` directly (no react-table dep — keep deps minimal). Mutation actions surface inline per row via shadcn `<DropdownMenu>` or buttons.
 
-**Tech Stack:** Same as WINE-68 + shadcn `<Table>`.
+**Tech Stack:** Same as WINE-189 + shadcn `<Table>`.
 
 **Predecessor:** WINE-187 merged.
 
@@ -14,22 +14,24 @@
 
 ## Hard rules
 
-Identical to WINE-68 §"Hard rules". Conventional commit prefix here: `feat(WINE-82):` / `refactor(WINE-82):` / `chore(WINE-82):`.
+Identical to WINE-189 §"Hard rules". Conventional commit prefix here: `feat(WINE-82):` / `refactor(WINE-82):` / `chore(WINE-82):`.
 
 ---
 
 ## 1. Branch bootstrap
 
+Branch `WINE-82-build-admin-interface-user-management-and-moderat` exists locally clean.
+
 ```powershell
 git fetch origin
 git checkout WINE-82-build-admin-interface-user-management-and-moderat
-git reset --hard origin/dev
 git merge origin/WINE-187-Foundation-primitives --no-ff -m "merge(WINE-82): bring in WINE-187 foundation primitives"
+bun run --filter web test --run
+bun run --filter web check-types
+git push -u origin WINE-82-build-admin-interface-user-management-and-moderat
 ```
 
-If branch doesn't exist remotely, create off origin/dev locally.
-
-Sanity test + force-push.
+Once WINE-187 lands in dev, the merge is unnecessary.
 
 ---
 
@@ -217,7 +219,7 @@ Read-only admin views. `<AdminTable>` of `<AdminContentRow>` with View link to t
 
 ## 7. Verification gates
 
-Same as WINE-68 §7.
+Same as WINE-189 §7.
 
 ---
 
