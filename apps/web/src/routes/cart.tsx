@@ -14,12 +14,12 @@ function CartPage() {
   const [deliveryType, setDeliveryType] = useState<"pickup" | "shipping">("shipping");
 
   return (
-      <div className="container mx-auto max-w-6xl px-4 py-8">
-        <h2 className="mb-8">Cart & Checkout</h2>
-        <div className="grid grid-cols-1 gap-8 lg:grid-cols-2">
-          <CartSection cart={cartData} deliveryType={deliveryType} />
-          <CheckoutSection cart={cartData} onDeliveryTypeChange={setDeliveryType} />
-        </div>
+    <div className="container mx-auto max-w-6xl px-4 py-8">
+      <h2 className="mb-8">Cart & Checkout</h2>
+      <div className="grid grid-cols-1 gap-8 lg:grid-cols-2">
+        <CartSection cart={cartData} deliveryType={deliveryType} />
+        <CheckoutSection cart={cartData} onDeliveryTypeChange={setDeliveryType} />
       </div>
+    </div>
   );
 }

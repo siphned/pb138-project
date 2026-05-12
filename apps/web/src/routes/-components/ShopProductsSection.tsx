@@ -113,7 +113,7 @@ export function ShopProductsSection({ shopId }: ShopProductsSectionProps) {
           <Link
             className="flex items-center gap-2 text-sm "
             search={{ page: 1, shopId: shopId, sort: "newest" }}
-            to="/products" 
+            to="/products"
           >
             Show Inventory
             <ArrowRight className="h-4 w-4" />

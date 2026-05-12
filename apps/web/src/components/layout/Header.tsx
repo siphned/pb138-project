@@ -3,9 +3,8 @@ import { Link } from "@tanstack/react-router";
 import { Search, ShoppingCart, User } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
-import { Sidebar } from "./Sidebar";
 import { useUser } from "@/context/UserContext";
-
+import { Sidebar } from "./Sidebar";
 
 export function Header() {
   const { user: clerkUser } = useClerk();
@@ -54,11 +53,7 @@ export function Header() {
           </Link>
         </Show>
 
-        <Sidebar
-          activeRole={activeRole}
-          onRoleChange={setActiveRole}
-          userRoles={user?.roles}
-        />
+        <Sidebar activeRole={activeRole} onRoleChange={setActiveRole} userRoles={user?.roles} />
       </div>
     </header>
   );

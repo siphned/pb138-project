@@ -41,8 +41,6 @@ export function UserProvider({ children }: { children: ReactNode }) {
     },
   });
 
-  
-
   const [user, setUser] = useState<UserProfile | null>(defaultUser);
   useEffect(() => {
     if (profile) {
@@ -61,10 +59,10 @@ export function UserProvider({ children }: { children: ReactNode }) {
 
   const [activeRole, setActiveRole] = useState<Role>(Role.customer);
   useEffect(() => {
-    if(user && !user.roles.includes(activeRole)) {
+    if (user && !user.roles.includes(activeRole)) {
       setActiveRole(user.roles[0] as Role);
-    }}, [user]);
-
+    }
+  }, [user, activeRole]);
 
   const updateUser = async (
     newData: Partial<Pick<UserProfile, "fname" | "lname">>
@@ -84,7 +82,7 @@ export function UserProvider({ children }: { children: ReactNode }) {
   const isLoading = !isLoaded || (isSignedIn && isQueryLoading);
 
   return (
-    <UserContext.Provider value={{ isLoading, updateUser, user, activeRole, setActiveRole }}>
+    <UserContext.Provider value={{ activeRole, isLoading, setActiveRole, updateUser, user }}>
       {children}
     </UserContext.Provider>
   );

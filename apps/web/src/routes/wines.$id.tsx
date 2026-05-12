@@ -19,90 +19,90 @@ function WineDetailPage() {
 
   if (isLoading) {
     return (
-        <div className="container mx-auto px-6 py-8 lg:px-12 space-y-8">
-          <div className="h-6 w-32 animate-pulse rounded-md bg-secondary/20" />
-          <div className="space-y-6">
-            <div className="h-12 w-1/2 animate-pulse rounded-md bg-secondary/20" />
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-              <div className="h-40 animate-pulse rounded-2xl bg-secondary/20" />
-              <div className="h-40 animate-pulse rounded-2xl bg-secondary/20" />
-            </div>
+      <div className="container mx-auto px-6 py-8 lg:px-12 space-y-8">
+        <div className="h-6 w-32 animate-pulse rounded-md bg-secondary/20" />
+        <div className="space-y-6">
+          <div className="h-12 w-1/2 animate-pulse rounded-md bg-secondary/20" />
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+            <div className="h-40 animate-pulse rounded-2xl bg-secondary/20" />
+            <div className="h-40 animate-pulse rounded-2xl bg-secondary/20" />
           </div>
         </div>
+      </div>
     );
   }
 
   if (isError || !wine) {
     return (
-        <div className="container mx-auto flex flex-col items-center py-24 text-center">
-          <p className="font-bold text-destructive">Failed to load wine details.</p>
-          <Button onClick={() => refetch()} variant="link">
-            Retry
-          </Button>
-        </div>
+      <div className="container mx-auto flex flex-col items-center py-24 text-center">
+        <p className="font-bold text-destructive">Failed to load wine details.</p>
+        <Button onClick={() => refetch()} variant="link">
+          Retry
+        </Button>
+      </div>
     );
   }
 
   return (
-      <div className="container mx-auto px-6 py-8 lg:px-12 space-y-12">
-        <Link
-          className="flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground"
-          search={{ page: 1, sort: "newest" }}
-          to="/wines"
-        >
-          <ArrowLeft className="h-4 w-4" />
-          Back to catalog
-        </Link>
+    <div className="container mx-auto px-6 py-8 lg:px-12 space-y-12">
+      <Link
+        className="flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground"
+        search={{ page: 1, sort: "newest" }}
+        to="/wines"
+      >
+        <ArrowLeft className="h-4 w-4" />
+        Back to catalog
+      </Link>
 
-        <div className="grid grid-cols-1 gap-8 lg:grid-cols-2">
-          {/* Wine Visual & Specs */}
-          <div className="space-y-8">
-            <WineHeroVisual wine={wine} />
-            <WineSpecsGrid wine={wine} />
-          </div>
-
-          {/* Wine Info */}
-          <div className="space-y-6">
-            <WineHeader wine={wine} />
-
-            {wine.description && (
-              <div className="space-y-3">
-                <h3 className="font-heading text-lg font-semibold">Tasting Notes</h3>
-                <p className="text-muted-foreground leading-relaxed">{wine.description}</p>
-              </div>
-            )}
-
-            {wine.composition && (
-              <div className="space-y-3">
-                <h3 className="font-heading text-lg font-semibold">Composition</h3>
-                <p className="text-muted-foreground leading-relaxed">{wine.composition}</p>
-              </div>
-            )}
-
-            {wine.attribution && (
-              <div className="space-y-3">
-                <h3 className="font-heading text-lg font-semibold">Notes</h3>
-                <p className="text-muted-foreground leading-relaxed">{wine.attribution}</p>
-              </div>
-            )}
-          </div>
+      <div className="grid grid-cols-1 gap-8 lg:grid-cols-2">
+        {/* Wine Visual & Specs */}
+        <div className="space-y-8">
+          <WineHeroVisual wine={wine} />
+          <WineSpecsGrid wine={wine} />
         </div>
 
-        <Separator />
+        {/* Wine Info */}
+        <div className="space-y-6">
+          <WineHeader wine={wine} />
 
-        <WinesAvailableInShops wineId={wine.id} />
+          {wine.description && (
+            <div className="space-y-3">
+              <h3 className="font-heading text-lg font-semibold">Tasting Notes</h3>
+              <p className="text-muted-foreground leading-relaxed">{wine.description}</p>
+            </div>
+          )}
 
-        <Separator />
+          {wine.composition && (
+            <div className="space-y-3">
+              <h3 className="font-heading text-lg font-semibold">Composition</h3>
+              <p className="text-muted-foreground leading-relaxed">{wine.composition}</p>
+            </div>
+          )}
 
-        {/* Winemaker Card */}
-        <WinemakerCard wine={wine} />
-
-        {/* [STUB] hook audit — remove when real UI ships */}
-        <details className="container mx-auto p-6">
-          <summary className="cursor-pointer font-mono text-sm">[STUB] hook audit</summary>
-          <WineDetailStubAudit id={id} />
-        </details>
+          {wine.attribution && (
+            <div className="space-y-3">
+              <h3 className="font-heading text-lg font-semibold">Notes</h3>
+              <p className="text-muted-foreground leading-relaxed">{wine.attribution}</p>
+            </div>
+          )}
+        </div>
       </div>
+
+      <Separator />
+
+      <WinesAvailableInShops wineId={wine.id} />
+
+      <Separator />
+
+      {/* Winemaker Card */}
+      <WinemakerCard wine={wine} />
+
+      {/* [STUB] hook audit — remove when real UI ships */}
+      <details className="container mx-auto p-6">
+        <summary className="cursor-pointer font-mono text-sm">[STUB] hook audit</summary>
+        <WineDetailStubAudit id={id} />
+      </details>
+    </div>
   );
 }
 

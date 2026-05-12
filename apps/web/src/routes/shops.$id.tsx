@@ -21,29 +21,28 @@ function ShopDetailPage() {
 
   if (isLoading) {
     return (
-      
-        <div className="container mx-auto px-6 py-8 lg:px-12 space-y-8">
-          <div className="h-8 w-40 animate-pulse rounded-md bg-secondary/20" />
-          <div className="grid grid-cols-1 gap-8 lg:grid-cols-3">
-            <div className="lg:col-span-2 h-72 animate-pulse rounded-2xl bg-secondary/20 lg:h-96" />
-            <div className="h-64 animate-pulse rounded-2xl bg-secondary/20" />
-          </div>
-          <div className="space-y-6">
-            <div className="h-24 w-full animate-pulse rounded-2xl bg-secondary/20" />
-            <div className="h-64 w-full animate-pulse rounded-2xl bg-secondary/20" />
-          </div>
+      <div className="container mx-auto px-6 py-8 lg:px-12 space-y-8">
+        <div className="h-8 w-40 animate-pulse rounded-md bg-secondary/20" />
+        <div className="grid grid-cols-1 gap-8 lg:grid-cols-3">
+          <div className="lg:col-span-2 h-72 animate-pulse rounded-2xl bg-secondary/20 lg:h-96" />
+          <div className="h-64 animate-pulse rounded-2xl bg-secondary/20" />
         </div>
+        <div className="space-y-6">
+          <div className="h-24 w-full animate-pulse rounded-2xl bg-secondary/20" />
+          <div className="h-64 w-full animate-pulse rounded-2xl bg-secondary/20" />
+        </div>
+      </div>
     );
   }
 
   if (isError || !shop) {
     return (
-        <div className="container mx-auto flex flex-col items-center py-24 text-center">
-          <p className="font-bold text-destructive">Failed to load shop details.</p>
-          <Button onClick={() => refetch()} variant="link">
-            Retry
-          </Button>
-        </div>
+      <div className="container mx-auto flex flex-col items-center py-24 text-center">
+        <p className="font-bold text-destructive">Failed to load shop details.</p>
+        <Button onClick={() => refetch()} variant="link">
+          Retry
+        </Button>
+      </div>
     );
   }
 
@@ -94,6 +93,6 @@ function ShopDetailPage() {
           </p>
         </div>
       </div>
-    </div>    
+    </div>
   );
 }
