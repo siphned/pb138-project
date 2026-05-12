@@ -25,7 +25,9 @@ export function Header() {
       {/* Right: Icons & Menus */}
       <div className="flex items-center gap-4">
         <Button className="hidden sm:flex" size="icon" variant="ghost">
-          <Search className="h-5 w-5" />
+          <Link to="/search">
+            <Search className="h-5 w-5" />
+          </Link>
         </Button>
         <Button className="hidden sm:flex" size="icon" variant="ghost">
           <Link to="/cart">

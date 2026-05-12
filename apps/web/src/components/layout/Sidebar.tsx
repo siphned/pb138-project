@@ -186,7 +186,7 @@ export function Sidebar({ userRoles = [Role.customer], activeRole, onRoleChange 
                     render={<Link search={{ isBundle: true }} to="/products" />}
                     variant="active"
                   >
-                    <Package className="h-4 w-4" /> Bundles
+                    <Package className="h-4 w-4" /> My Bundles
                   </NavItem>
                 </>
               )}
