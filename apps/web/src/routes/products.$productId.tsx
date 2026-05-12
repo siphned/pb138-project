@@ -1,64 +1,15 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { ArrowLeft } from "lucide-react";
-import { Button } from "@/components/ui/button";
+import { ArrowLeft02Icon } from "@hugeicons/core-free-icons";
+import { HugeiconsIcon } from "@hugeicons/react";
+import { ProductDetailsCard } from "@/components/catalog/ProductDetailsCard";
+import { ErrorState } from "@/components/primitives/error-state";
+import { LoadingState } from "@/components/primitives/loading-state";
 import { Separator } from "@/components/ui/separator";
 import { useGetProductsById } from "@/generated/hooks/useGetProductsById";
-import { useGetProductsByIdReviews } from "@/generated/hooks/useGetProductsByIdReviews";
-import { ProductDescriptionCard } from "./-components/ProductDescriptionCard";
-import { ProductGallery } from "./-components/ProductGallery";
-import { ProductInfo } from "./-components/ProductInfo";
-import { ProductPageSkeleton } from "./-components/ProductPageSkeleton";
-import { ProductPriceRow } from "./-components/ProductPriceRow";
+import { usePostCartsItems } from "@/generated/hooks/usePostCartsItems";
 import { ProductRelatedSection } from "./-components/ProductRelatedSection";
 import { ProductReviewsSection } from "./-components/ProductReviewsSection";
 import { ProductSoldAtCard } from "./-components/ProductSoldAtCard";
-import { ProductWinemakerCard } from "./-components/ProductWinemakerCard";
-
-type RawProductDetail = {
-  id: string;
-  name: string;
-  description?: string | null;
-  price?: string;
-  quantity?: number;
-  isBundle?: boolean;
-  shopId?: string;
-  shop?: { id: string; name: string };
-  // GET /products/:id returns productWines, not wines
-  productWines?: {
-    wine: {
-      id: string;
-      name: string;
-      type: string;
-      color: string;
-      vintageYear: number;
-      // region and winemaker not returned by findById — backend gap
-      region?: string;
-      winemaker?: { id: string; name: string };
-    };
-  }[];
-};
-
-function toProductDetail(raw: RawProductDetail) {
-  return {
-    description: raw.description ?? null,
-    id: raw.id,
-    isBundle: !!raw.isBundle,
-    name: raw.name,
-    price: raw.price ?? "0",
-    quantity: Number(raw.quantity ?? 0),
-    shop: raw.shop,
-    shopId: raw.shopId ?? "",
-    wines: (raw.productWines ?? []).map((pw) => ({
-      color: pw.wine.color,
-      id: pw.wine.id,
-      name: pw.wine.name,
-      region: pw.wine.region ?? "",
-      type: pw.wine.type,
-      vintageYear: Number(pw.wine.vintageYear),
-      winemaker: pw.wine.winemaker ?? { id: "", name: "" },
-    })),
-  };
-}
 
 export const Route = createFileRoute("/products/$productId")({
   component: ProductDetailPage,
@@ -66,110 +17,64 @@ export const Route = createFileRoute("/products/$productId")({
 
 function ProductDetailPage() {
   const { productId } = Route.useParams();
-  const { data, isLoading, isError, refetch } = useGetProductsById(productId);
-  const { data: reviewData, isLoading: reviewsLoading } = useGetProductsByIdReviews(productId);
+  const { data: product, isLoading, isError, refetch } = useGetProductsById(productId);
+  const addToCartMutation = usePostCartsItems();
 
-  if (isLoading) return <ProductPageSkeleton />;
+  const handleAddToCart = () => {
+    addToCartMutation.mutate({ data: { productId, quantity: 1 } });
+  };
 
-  if (isError || !data) {
+  if (isLoading) {
     return (
-      <div className="container mx-auto flex flex-col items-center py-24 text-center">
-        <p className="font-bold text-destructive">Failed to load product details.</p>
-        <Button onClick={() => refetch()} variant="link">
-          Retry
-        </Button>
+      <div className="container mx-auto px-6 py-8 lg:px-12">
+        <LoadingState variant="detail" />
       </div>
     );
   }
 
-  const product = toProductDetail(data);
+  if (isError || !product) {
+    return (
+      <div className="container mx-auto px-6 py-8 lg:px-12">
+        <ErrorState onRetry={() => refetch()} />
+      </div>
+    );
+  }
 
   return (
-    <div className="container mx-auto px-6 py-8 lg:px-12 space-y-8">
+    <div className="container mx-auto space-y-12 px-6 py-8 lg:px-12">
       <Link
-        className="flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground"
-        search={{ page: 1, sort: "newest" }}
-        to="/wines"
+        className="inline-flex items-center gap-2 text-sm text-muted-foreground transition-colors hover:text-foreground"
+        to="/products"
       >
-        <ArrowLeft className="h-4 w-4" />
-        Back to catalog
+        <HugeiconsIcon className="h-4 w-4" icon={ArrowLeft02Icon} />
+        Back to products
       </Link>
 
-      <div className="grid grid-cols-1 gap-8 lg:grid-cols-2">
-        <ProductGallery productName={product.name} />
+      <div className="grid grid-cols-1 gap-12 lg:grid-cols-[1fr_400px]">
+        <div className="space-y-12">
+          <ProductDetailsCard
+            isAddingToCart={addToCartMutation.isPending}
+            onAddToCart={handleAddToCart}
+            product={product}
+          />
 
-        <div className="space-y-6">
-          <div className="space-y-6">
-            <ProductInfo
-              isBundle={product.isBundle}
-              name={product.name}
-              rating={reviewData?.averageRating ?? undefined}
-              reviewCount={reviewData?.reviews?.length}
-              wines={product.wines}
-            />
+          <Separator />
 
-            {product.description && (
-              <ProductDescriptionCard
-                description={product.description}
-                isBundle={product.isBundle}
-              />
-            )}
-          </div>
-
-          <div className="space-y-4">
-            <div className="lg:sticky lg:top-8 space-y-4">
-              <ProductPriceRow
-                price={product.price}
-                productId={product.id}
-                quantity={product.quantity}
-              />
-
-              {product.shopId && (
-                <ProductSoldAtCard shopId={product.shopId} shopName={product.shop?.name} />
-              )}
-
-              {!product.isBundle && product.wines[0]?.winemaker?.id && (
-                <ProductWinemakerCard
-                  winemakerId={product.wines[0].winemaker.id}
-                  winemakerName={product.wines[0].winemaker.name}
-                />
-              )}
-            </div>
-          </div>
+          <ProductRelatedSection
+            isBundle={!!product.isBundle}
+            shopId={product.shopId}
+            wines={product.productWines?.map((pw: any) => pw.wine) || []}
+          />
         </div>
+
+        <aside className="space-y-12">
+          {product.shop && (
+            <ProductSoldAtCard shopId={product.shop.id} shopName={product.shop.name} />
+          )}
+
+          <ProductReviewsSection productId={productId} />
+        </aside>
       </div>
-
-      <Separator />
-
-      <ProductRelatedSection
-        isBundle={product.isBundle}
-        shopId={product.shopId}
-        wines={product.wines}
-      />
-
-      <Separator />
-
-      <ProductReviewsSection isLoading={reviewsLoading} reviewData={reviewData} />
-
-      {/* [STUB] hook audit */}
-      <details className="container mx-auto p-6">
-        <summary className="cursor-pointer font-mono text-sm">[STUB] hook audit</summary>
-        <ProductDetailStubAudit />
-      </details>
-    </div>
-  );
-}
-
-function ProductDetailStubAudit() {
-  // Reverse-bundle: list bundles containing this product (when isBundle=false)
-  // useGetProducts does not accept containsProductId - recording gap
-  return (
-    <div className="space-y-4">
-      <h2 className="font-heading text-xl">[STUB] Reverse-bundle nav</h2>
-      <p className="text-destructive">
-        Hook <code>useGetProducts</code> does not accept <code>containsProductId</code>. Backend
-        endpoint filter missing. Recorded in audit.
-      </p>
     </div>
   );
 }
