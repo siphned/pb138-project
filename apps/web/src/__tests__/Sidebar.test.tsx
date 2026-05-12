@@ -326,10 +326,10 @@ describe("Sidebar", () => {
       expect(screen.getByText("Log out")).toBeInTheDocument();
     });
 
-    it("shows Bundles link pointing to /bundles", () => {
+    it("shows Bundles link pointing to /products with isBundle filter", () => {
       render(<Sidebar />);
       const bundlesLink = screen.getByText("Bundles").closest("a");
-      expect(bundlesLink).toHaveAttribute("href", "/bundles");
+      expect(bundlesLink).toHaveAttribute("href", "/products");
     });
 
     it("shows Events link", () => {
@@ -401,10 +401,10 @@ describe("Sidebar", () => {
       expect(screen.getByText("Log out")).toBeInTheDocument();
     });
 
-    it("shows Bundles link pointing to /bundles", () => {
+    it("shows Bundles link pointing to /products with isBundle filter", () => {
       render(<Sidebar />);
       const bundlesLink = screen.getByText("Bundles").closest("a");
-      expect(bundlesLink).toHaveAttribute("href", "/bundles");
+      expect(bundlesLink).toHaveAttribute("href", "/products");
     });
 
     it("shows Events link", () => {
