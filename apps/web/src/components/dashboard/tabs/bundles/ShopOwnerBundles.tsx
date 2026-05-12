@@ -49,7 +49,7 @@ export function ShopOwnerBundles() {
         </div>
         <div className="flex items-center w-full md:w-auto">
           <Select defaultValue="all">
-            <SelectTrigger className="w-full sm:w-[180px] bg-background border-none rounded-lg h-10">
+            <SelectTrigger className="w-full sm:w-45 bg-background border-none rounded-lg h-10">
               <SelectValue placeholder="Filter by Winemaker" />
             </SelectTrigger>
             <SelectContent>

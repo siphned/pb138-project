@@ -1,0 +1,22 @@
+import { createFileRoute } from "@tanstack/react-router";
+import { StubPage } from "@/components/dev/StubPage";
+
+export const Route = createFileRoute("/_authenticated/_admin/role-requests/$id")({
+  component: AdminRoleRequestDetailStub,
+});
+
+function AdminRoleRequestDetailStub() {
+  const { id } = Route.useParams();
+  return (
+    <StubPage
+      actorRole="admin"
+      hookName="useGetRoleRequestsById (MISSING BE)"
+      title={`Admin: Role Request ${id}`}
+    >
+      <p className="text-destructive">
+        Hook <code>useGetRoleRequestsById</code> not present in generated client. Backend endpoint
+        missing or Orval has not regenerated. Recorded in audit.
+      </p>
+    </StubPage>
+  );
+}

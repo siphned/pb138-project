@@ -1,6 +1,5 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { ArrowLeft } from "lucide-react";
-import { PublicLayout } from "@/components/layout/PublicLayout";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import { useGetProductsById } from "@/generated/hooks/useGetProductsById";
@@ -74,87 +73,103 @@ function ProductDetailPage() {
 
   if (isError || !data) {
     return (
-      <PublicLayout>
-        <div className="container mx-auto flex flex-col items-center py-24 text-center">
-          <p className="font-bold text-destructive">Failed to load product details.</p>
-          <Button onClick={() => refetch()} variant="link">
-            Retry
-          </Button>
-        </div>
-      </PublicLayout>
+      <div className="container mx-auto flex flex-col items-center py-24 text-center">
+        <p className="font-bold text-destructive">Failed to load product details.</p>
+        <Button onClick={() => refetch()} variant="link">
+          Retry
+        </Button>
+      </div>
     );
   }
 
   const product = toProductDetail(data);
 
   return (
-    <PublicLayout>
-      <div className="container mx-auto px-6 py-8 lg:px-12 space-y-8">
-        <Link
-          className="flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground"
-          search={{ page: 1, sort: "newest" }}
-          to="/wines"
-        >
-          <ArrowLeft className="h-4 w-4" />
-          Back to catalog
-        </Link>
+    <div className="container mx-auto px-6 py-8 lg:px-12 space-y-8">
+      <Link
+        className="flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground"
+        search={{ page: 1, sort: "newest" }}
+        to="/wines"
+      >
+        <ArrowLeft className="h-4 w-4" />
+        Back to catalog
+      </Link>
 
-        <div className="grid grid-cols-1 gap-8 lg:grid-cols-2">
-          <ProductGallery productName={product.name} />
+      <div className="grid grid-cols-1 gap-8 lg:grid-cols-2">
+        <ProductGallery productName={product.name} />
 
+        <div className="space-y-6">
           <div className="space-y-6">
-            <div className="space-y-6">
-              <ProductInfo
+            <ProductInfo
+              isBundle={product.isBundle}
+              name={product.name}
+              rating={reviewData?.averageRating ?? undefined}
+              reviewCount={reviewData?.reviews?.length}
+              wines={product.wines}
+            />
+
+            {product.description && (
+              <ProductDescriptionCard
+                description={product.description}
                 isBundle={product.isBundle}
-                name={product.name}
-                rating={reviewData?.averageRating ?? undefined}
-                reviewCount={reviewData?.reviews?.length}
-                wines={product.wines}
+              />
+            )}
+          </div>
+
+          <div className="space-y-4">
+            <div className="lg:sticky lg:top-8 space-y-4">
+              <ProductPriceRow
+                price={product.price}
+                productId={product.id}
+                quantity={product.quantity}
               />
 
-              {product.description && (
-                <ProductDescriptionCard
-                  description={product.description}
-                  isBundle={product.isBundle}
+              {product.shopId && (
+                <ProductSoldAtCard shopId={product.shopId} shopName={product.shop?.name} />
+              )}
+
+              {!product.isBundle && product.wines[0]?.winemaker?.id && (
+                <ProductWinemakerCard
+                  winemakerId={product.wines[0].winemaker.id}
+                  winemakerName={product.wines[0].winemaker.name}
                 />
               )}
             </div>
-
-            <div className="space-y-4">
-              <div className="lg:sticky lg:top-8 space-y-4">
-                <ProductPriceRow
-                  price={product.price}
-                  productId={product.id}
-                  quantity={product.quantity}
-                />
-
-                {product.shopId && (
-                  <ProductSoldAtCard shopId={product.shopId} shopName={product.shop?.name} />
-                )}
-
-                {!product.isBundle && product.wines[0]?.winemaker?.id && (
-                  <ProductWinemakerCard
-                    winemakerId={product.wines[0].winemaker.id}
-                    winemakerName={product.wines[0].winemaker.name}
-                  />
-                )}
-              </div>
-            </div>
           </div>
         </div>
-
-        <Separator />
-
-        <ProductRelatedSection
-          isBundle={product.isBundle}
-          shopId={product.shopId}
-          wines={product.wines}
-        />
-
-        <Separator />
-
-        <ProductReviewsSection isLoading={reviewsLoading} reviewData={reviewData} />
       </div>
-    </PublicLayout>
+
+      <Separator />
+
+      <ProductRelatedSection
+        isBundle={product.isBundle}
+        shopId={product.shopId}
+        wines={product.wines}
+      />
+
+      <Separator />
+
+      <ProductReviewsSection isLoading={reviewsLoading} reviewData={reviewData} />
+
+      {/* [STUB] hook audit */}
+      <details className="container mx-auto p-6">
+        <summary className="cursor-pointer font-mono text-sm">[STUB] hook audit</summary>
+        <ProductDetailStubAudit />
+      </details>
+    </div>
+  );
+}
+
+function ProductDetailStubAudit() {
+  // Reverse-bundle: list bundles containing this product (when isBundle=false)
+  // useGetProducts does not accept containsProductId - recording gap
+  return (
+    <div className="space-y-4">
+      <h2 className="font-heading text-xl">[STUB] Reverse-bundle nav</h2>
+      <p className="text-destructive">
+        Hook <code>useGetProducts</code> does not accept <code>containsProductId</code>. Backend
+        endpoint filter missing. Recorded in audit.
+      </p>
+    </div>
   );
 }

@@ -1,128 +1,85 @@
-import { createFileRoute } from "@tanstack/react-router";
-import { Calendar, DollarSign, ShoppingBag, TrendingUp, Wine } from "lucide-react";
-import { useState } from "react";
-import { DashboardTabs } from "@/components/dashboard/DashboardTabs";
-import { ProfileEditForm } from "@/components/dashboard/ProfileEditForm";
-import { UserInfoCard } from "@/components/dashboard/UserInfoCard";
-import { AuthLayout } from "@/components/layout/AuthLayout";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { createFileRoute, Link } from "@tanstack/react-router";
+import { StubGet } from "@/components/dev/StubGet";
+import { StubMutation } from "@/components/dev/StubMutation";
+import { StubPage } from "@/components/dev/StubPage";
 import { useUser } from "@/context/UserContext";
-import { useRoles } from "@/hooks/useRoles";
-import { Role } from "@/types/roles";
+import { useGetUsersMe } from "@/generated/hooks/useGetUsersMe";
+import { useGetUsersMeAddresses } from "@/generated/hooks/useGetUsersMeAddresses";
+import { usePostRoleRequests } from "@/generated/hooks/usePostRoleRequests";
 
 export const Route = createFileRoute("/_authenticated/dashboard")({
-  component: DashboardPage,
+  component: DashboardStub,
 });
 
-function appRoleToDisplayRole(appRoles: ReturnType<typeof useRoles>): Role {
-  if (appRoles.includes("winemaker")) return Role.winemaker;
-  if (appRoles.includes("shop_owner")) return Role.shopOwner;
-  return Role.customer;
-}
+function DashboardStub() {
+  const { user } = useUser();
+  const roles = user?.roles ?? [];
 
-function availableRoles(appRoles: ReturnType<typeof useRoles>): Role[] {
-  const roles: Role[] = [];
-  if (appRoles.includes("winemaker") || appRoles.includes("admin")) roles.push(Role.winemaker);
-  if (appRoles.includes("shop_owner") || appRoles.includes("admin")) roles.push(Role.shopOwner);
-  roles.push(Role.customer);
-  return roles;
-}
-
-function DashboardPage() {
-  const { isLoading } = useUser();
-  const appRoles = useRoles();
-  const [currentRole, setCurrentRole] = useState<Role>(() => appRoleToDisplayRole(appRoles));
-  const [isEditing, setIsEditing] = useState(false);
-
-  const allowedRoles = availableRoles(appRoles);
-
-  const getStatsForRole = (role: Role) => {
-    switch (role) {
-      case Role.customer:
-        return [
-          { icon: ShoppingBag, title: "Total Orders", trend: "5 new this month", value: "15" },
-          { icon: Calendar, title: "Events Attended", trend: "Next: May 12", value: "4" },
-        ];
-      case Role.shopOwner:
-        return [
-          {
-            icon: DollarSign,
-            title: "Total Revenue",
-            trend: "+12% vs last month",
-            value: "$12,450",
-          },
-          { icon: ShoppingBag, title: "Total Orders", trend: "24 pending", value: "156" },
-        ];
-      default:
-        return [
-          { icon: Wine, title: "My Wines", trend: "+2 this month", value: "24" },
-          {
-            icon: TrendingUp,
-            title: "Total Wine Sales",
-            trend: "Best seller: Merlot",
-            value: "842",
-          },
-          { icon: Calendar, title: "Events Participated", trend: "Next: Jun 05", value: "3" },
-        ];
-    }
-  };
-
-  const stats = getStatsForRole(currentRole);
-
-  if (isLoading) {
-    return (
-      <div className="flex h-screen w-full items-center justify-center bg-background">
-        <div className="flex flex-col items-center gap-4">
-          <div className="h-12 w-12 animate-spin rounded-full border-4 border-primary border-t-transparent" />
-          <p className="text-muted-foreground animate-pulse font-heading">
-            Loading your dashboard...
-          </p>
-        </div>
-      </div>
-    );
-  }
+  const userQuery = useGetUsersMe();
+  const addressesQuery = useGetUsersMeAddresses();
+  const roleRequestMutation = usePostRoleRequests();
 
   return (
-    <AuthLayout
-      activeRole={currentRole}
-      onRoleChange={(newRole) => {
-        if (allowedRoles.includes(newRole)) setCurrentRole(newRole);
-      }}
+    <StubPage
+      actorRole="customer+"
+      hookName="useGetUsersMe + useGetUsersMeAddresses + usePostRoleRequests"
+      title={`Dashboard (active roles: ${roles.join(", ") || "customer"})`}
     >
-      <div className="space-y-8 pb-12">
-        {isEditing ? (
-          <ProfileEditForm
-            onCancel={() => setIsEditing(false)}
-            onSuccess={() => setIsEditing(false)}
-          />
-        ) : (
-          <>
-            <UserInfoCard onEdit={() => setIsEditing(true)} />
-
-            <div className="grid gap-4 grid-cols-1 lg:grid-flow-col lg:auto-cols-fr">
-              {stats.map((stat) => (
-                <Card
-                  className="border-none shadow-sm bg-secondary/20 rounded-2xl"
-                  key={stat.title}
-                >
-                  <CardHeader className="flex flex-row items-center justify-between pb-2 space-y-0">
-                    <CardTitle className="text-sm font-medium text-muted-foreground">
-                      {stat.title}
-                    </CardTitle>
-                    <stat.icon className="w-4 h-4 text-primary" />
-                  </CardHeader>
-                  <CardContent>
-                    <div className="text-2xl font-bold">{stat.value}</div>
-                    <p className="text-xs text-muted-foreground mt-1">{stat.trend}</p>
-                  </CardContent>
-                </Card>
-              ))}
-            </div>
-
-            <DashboardTabs role={currentRole} />
-          </>
+      <StubGet
+        actorRole="customer+"
+        hookName="useGetUsersMe"
+        query={userQuery}
+        title="My profile"
+      />
+      <StubGet
+        actorRole="customer+"
+        hookName="useGetUsersMeAddresses"
+        query={addressesQuery}
+        title="My addresses"
+      />
+      <StubMutation
+        actorRole="customer+"
+        hookName="usePostRoleRequests"
+        mutation={roleRequestMutation}
+        payloadExample={{ data: { justification: "Test request", requestedRole: "winemaker" } }}
+        title="Request new role"
+      />
+      <div className="rounded-md bg-muted p-4 text-sm space-y-1">
+        <div className="font-bold">Quick links</div>
+        <Link className="block text-primary hover:underline" to="/orders">
+          My orders
+        </Link>
+        <Link className="block text-primary hover:underline" to="/stats">
+          Full stats
+        </Link>
+        {roles.includes("winemaker") && (
+          <Link
+            className="block text-primary hover:underline"
+            search={{ winemakerId: "me" }}
+            to="/explore"
+          >
+            My wines
+          </Link>
+        )}
+        {roles.includes("winemaker") && (
+          <Link
+            className="block text-primary hover:underline"
+            search={{ winemakerId: "me" }}
+            to="/events"
+          >
+            My events
+          </Link>
+        )}
+        {roles.includes("shop_owner") && (
+          <Link
+            className="block text-primary hover:underline"
+            search={{ ownerUserId: "me" }}
+            to="/shops"
+          >
+            My shops
+          </Link>
         )}
       </div>
-    </AuthLayout>
+    </StubPage>
   );
 }
