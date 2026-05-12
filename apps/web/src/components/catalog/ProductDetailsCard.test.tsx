@@ -1,7 +1,7 @@
-import { render, screen, fireEvent } from "@testing-library/react";
+import { fireEvent, render, screen } from "@testing-library/react";
 import { describe, expect, it, vi } from "vitest";
-import { ProductDetailsCard } from "./ProductDetailsCard";
 import { useUser } from "@/context/UserContext";
+import { ProductDetailsCard } from "./ProductDetailsCard";
 
 vi.mock("@/context/UserContext", () => ({
   useUser: vi.fn(),
@@ -13,14 +13,12 @@ vi.mock("@tanstack/react-router", () => ({
 
 const mockProduct = {
   id: "prod-1",
+  isBundle: true,
   name: "Gala Pálava Bundle",
   price: "1200",
-  isBundle: true,
+  productWines: [{ wine: { color: "white", id: "wine-1", name: "Pálava 2022" } }],
   quantity: 10,
   shop: { id: "shop-1", name: "Vinotéka u Adama", ownerUserId: "user-1" },
-  productWines: [
-    { wine: { id: "wine-1", name: "Pálava 2022", color: "white" } }
-  ]
 } as any;
 
 describe("ProductDetailsCard", () => {
@@ -30,9 +28,9 @@ describe("ProductDetailsCard", () => {
     vi.mocked(useUser).mockReturnValue({ user: null } as any);
     render(
       <ProductDetailsCard
-        product={mockProduct}
-        onAddToCart={mockOnAddToCart}
         isAddingToCart={false}
+        onAddToCart={mockOnAddToCart}
+        product={mockProduct}
       />
     );
     expect(screen.getByText("Gala Pálava Bundle")).toBeInTheDocument();
@@ -44,9 +42,9 @@ describe("ProductDetailsCard", () => {
   it("calls onAddToCart when button is clicked", () => {
     render(
       <ProductDetailsCard
-        product={mockProduct}
-        onAddToCart={mockOnAddToCart}
         isAddingToCart={false}
+        onAddToCart={mockOnAddToCart}
+        product={mockProduct}
       />
     );
     fireEvent.click(screen.getByText(/add to cart/i));
@@ -56,9 +54,9 @@ describe("ProductDetailsCard", () => {
   it("disables button when isAddingToCart is true", () => {
     render(
       <ProductDetailsCard
-        product={mockProduct}
-        onAddToCart={mockOnAddToCart}
         isAddingToCart={true}
+        onAddToCart={mockOnAddToCart}
+        product={mockProduct}
       />
     );
     expect(screen.getByRole("button", { name: /adding/i })).toBeDisabled();
@@ -67,9 +65,9 @@ describe("ProductDetailsCard", () => {
   it("renders wines in bundle", () => {
     render(
       <ProductDetailsCard
-        product={mockProduct}
-        onAddToCart={mockOnAddToCart}
         isAddingToCart={false}
+        onAddToCart={mockOnAddToCart}
+        product={mockProduct}
       />
     );
     expect(screen.getByText("Wines in this product")).toBeInTheDocument();
@@ -82,9 +80,9 @@ describe("ProductDetailsCard", () => {
     } as any);
     render(
       <ProductDetailsCard
-        product={mockProduct}
-        onAddToCart={mockOnAddToCart}
         isAddingToCart={false}
+        onAddToCart={mockOnAddToCart}
+        product={mockProduct}
       />
     );
     expect(screen.getByText(/edit product/i)).toBeInTheDocument();

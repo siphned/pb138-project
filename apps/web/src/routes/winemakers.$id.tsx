@@ -83,7 +83,7 @@ function WinemakerProfilePage() {
               <EmptyState title="No upcoming events" />
             ) : (
               <DataGrid variant="catalog">
-                {events.map((event: any) => (
+                {events.map((event: { id: string; startTime: any; endTime: any }) => (
                   <EventCard
                     event={{
                       ...event,

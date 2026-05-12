@@ -1,15 +1,15 @@
-import { Link } from "@tanstack/react-router";
-import { useEffect } from "react";
 import { ShoppingCart01Icon } from "@hugeicons/core-free-icons";
 import { HugeiconsIcon } from "@hugeicons/react";
-import type { GetProductsById200 } from "@/generated/types/GetProductsById";
-import { Card, CardContent } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { Section } from "@/components/primitives/section";
-import { PageHeader } from "@/components/primitives/page-header";
-import { DescriptionList, PropertyRow } from "@/components/primitives/description-list";
-import { ShowOwner } from "@/components/primitives/show-owner";
+import { Link } from "@tanstack/react-router";
+import { useEffect } from "react";
 import { DataGrid } from "@/components/primitives/data-grid";
+import { DescriptionList, PropertyRow } from "@/components/primitives/description-list";
+import { PageHeader } from "@/components/primitives/page-header";
+import { Section } from "@/components/primitives/section";
+import { ShowOwner } from "@/components/primitives/show-owner";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent } from "@/components/ui/card";
+import type { GetProductsById200 } from "@/generated/types/GetProductsById";
 import { WineCard } from "./WineCard";
 
 interface ProductDetailsCardProps {
@@ -25,6 +25,7 @@ export function ProductDetailsCard({
 }: ProductDetailsCardProps) {
   useEffect(() => {
     if (product.shop && !product.shop.ownerUserId) {
+      // biome-ignore lint/suspicious/noConsole: intentional warning for BE gap mentioned in plan §8
       console.warn("ProductDetailsCard: shop object missing ownerUserId. Owner gating may fail.");
     }
   }, [product.shop]);
@@ -70,8 +71,8 @@ export function ProductDetailsCard({
           {product.productWines && product.productWines.length > 0 && (
             <Section heading="Wines in this product">
               <DataGrid variant="catalog">
-                {product.productWines.map((pw: any) => (
-                  <WineCard key={pw.wine.id} wine={pw.wine} />
+                {product.productWines.map((pw) => (
+                  <WineCard key={pw.wine.id} wine={pw.wine as any} />
                 ))}
               </DataGrid>
             </Section>

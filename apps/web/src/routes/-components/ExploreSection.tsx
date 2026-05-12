@@ -1,9 +1,10 @@
 import { Link } from "@tanstack/react-router";
-import { ArrowRight } from "lucide-react";
+import { ArrowRight02Icon } from "@hugeicons/core-free-icons";
+import { HugeiconsIcon } from "@hugeicons/react";
 import { BundleCard } from "@/components/catalog/BundleCard";
+import { ProductCard } from "@/components/catalog/ProductCard";
 import { buttonVariants } from "@/components/ui/button";
 import { useGetProducts } from "@/generated/hooks/useGetProducts";
-import { WineCard } from "./WineCard";
 
 interface ExploreSectionProps {
   mode: "wines" | "bundles";
@@ -39,7 +40,7 @@ export function ExploreSection({ mode }: ExploreSectionProps) {
     return (
       <section aria-label={title} className="space-y-4">
         <h2 className="font-heading text-2xl font-bold">{title}</h2>
-        <p className="text-sm text-muted-foreground italic">
+        <p className="italic text-muted-foreground text-sm">
           No {mode} available to feature right now.
         </p>
       </section>
@@ -53,20 +54,20 @@ export function ExploreSection({ mode }: ExploreSectionProps) {
         <Link
           className={buttonVariants({ size: "sm", variant: "ghost" })}
           search={{ page: 1, sort: "newest" }}
-          to={linkTo}
+          to={linkTo as any}
         >
-          {linkLabel} <ArrowRight className="ml-1 h-4 w-4" />
+          {linkLabel} <HugeiconsIcon className="ml-1 h-4 w-4" icon={ArrowRight02Icon} />
         </Link>
       </div>
       <div className="flex gap-4 overflow-x-auto p-2 [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
         {products.map((product) =>
           mode === "bundles" ? (
             <div className="w-70 shrink-0" key={product.id}>
-              <BundleCard product={product} />
+              <BundleCard product={product as any} />
             </div>
           ) : (
             <div className="w-70 shrink-0" key={product.id}>
-              <WineCard product={product} />
+              <ProductCard product={product as any} />
             </div>
           )
         )}

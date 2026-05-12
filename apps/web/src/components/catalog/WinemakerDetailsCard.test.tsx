@@ -1,7 +1,7 @@
 import { render, screen } from "@testing-library/react";
 import { describe, expect, it, vi } from "vitest";
-import { WinemakerDetailsCard } from "./WinemakerDetailsCard";
 import { useUser } from "@/context/UserContext";
+import { WinemakerDetailsCard } from "./WinemakerDetailsCard";
 
 vi.mock("@/context/UserContext", () => ({
   useUser: vi.fn(),
@@ -12,13 +12,13 @@ vi.mock("@tanstack/react-router", () => ({
 }));
 
 const mockWinemaker = {
-  id: "wm-1",
-  name: "Jan Novák",
+  address: { city: "Velké Bílovice", country: "Czech Republic" },
   description: "Traditional winemaker from Velké Bílovice.",
   email: "jan@novak.cz",
+  id: "wm-1",
+  name: "Jan Novák",
   phone: "+420 123 456 789",
   websiteUrl: "https://novak.cz",
-  address: { city: "Velké Bílovice", country: "Czech Republic" },
 } as any;
 
 describe("WinemakerDetailsCard", () => {

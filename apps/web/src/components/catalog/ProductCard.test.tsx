@@ -11,13 +11,11 @@ vi.mock("@tanstack/react-router", () => ({
 
 const mockProduct = {
   id: "prod-1",
+  isBundle: true,
   name: "Gala Pálava Bundle",
   price: "1200",
-  isBundle: true,
   shop: { id: "shop-1", name: "Vinotéka u Adama" },
-  wines: [
-    { color: "white", name: "Pálava 2022" }
-  ]
+  wines: [{ color: "white", name: "Pálava 2022" }],
 } as any;
 
 describe("ProductCard", () => {

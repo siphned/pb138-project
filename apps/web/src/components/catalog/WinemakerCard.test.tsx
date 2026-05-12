@@ -4,15 +4,13 @@ import { WinemakerCard } from "./WinemakerCard";
 
 // Mock @tanstack/react-router
 vi.mock("@tanstack/react-router", () => ({
-  Link: ({ children, to, params }: any) => (
-    <a href={`${to}/${params?.id || ""}`}>{children}</a>
-  ),
+  Link: ({ children, to, params }: any) => <a href={`${to}/${params?.id || ""}`}>{children}</a>,
 }));
 
 const mockWinemaker = {
+  address: { city: "Velké Bílovice", country: "Czech Republic" },
   id: "wm-1",
   name: "Jan Novák",
-  address: { city: "Velké Bílovice", country: "Czech Republic" },
 } as any;
 
 describe("WinemakerCard", () => {

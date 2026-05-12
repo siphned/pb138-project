@@ -23,8 +23,8 @@ function ProductsPage() {
   const navigate = useNavigate({ from: Route.fullPath });
   const query = useGetProducts(search);
 
-  const handleSearchChange = (next: Record<string, any>) => {
-    navigate({ search: next, replace: true });
+  const handleSearchChange = (next: Record<string, unknown>) => {
+    navigate({ replace: true, search: next as any });
   };
 
   if (query.isLoading) {

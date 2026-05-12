@@ -1,14 +1,14 @@
 import { Link } from "@tanstack/react-router";
 import type { ReactNode } from "react";
-import { Section } from "@/components/primitives/section";
 import { DataGrid } from "@/components/primitives/data-grid";
+import { Section } from "@/components/primitives/section";
 import { Button } from "@/components/ui/button";
 
 interface SearchSectionProps {
   heading: string;
   count: number;
   viewAllHref: string;
-  viewAllSearch?: Record<string, any>;
+  viewAllSearch?: Record<string, unknown>;
   children: ReactNode;
 }
 

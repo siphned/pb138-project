@@ -10,9 +10,9 @@ vi.mock("@tanstack/react-router", () => ({
 }));
 
 const mockWine = {
+  color: "white",
   id: "wine-1",
   name: "Chardonnay 2022",
-  color: "white",
   region: "Moravia",
   vintageYear: 2022,
   winemaker: { id: "wm-1", name: "Lechovice" },

@@ -1,5 +1,5 @@
 import { useGetShopsByIdProducts } from "@/generated/hooks/useGetShopsByIdProducts";
-import { WineCard } from "./WineCard";
+import { ProductCard } from "@/components/catalog/ProductCard";
 
 type ShopProductRaw = {
   id: string;
@@ -76,7 +76,7 @@ export function BundleWinesCarousel({ shopId, wineIds }: BundleWinesCarouselProp
 
           return (
             <div className="w-60 shrink-0" key={p.id}>
-              <WineCard
+              <ProductCard
                 product={{
                   createdAt: p.createdAt ?? "",
                   description: p.description ?? null,
@@ -87,7 +87,7 @@ export function BundleWinesCarousel({ shopId, wineIds }: BundleWinesCarouselProp
                   quantity: Number(p.quantity ?? 0),
                   rating: Number(p.rating ?? 0),
                   reviewCount: Number(p.reviewCount ?? 0),
-                  shopId: p.shopId ?? shopId,
+                  shop: { id: p.shopId ?? shopId, name: "" },
                   updatedAt: p.updatedAt ?? null,
                   wines: wine
                     ? [
@@ -102,7 +102,7 @@ export function BundleWinesCarousel({ shopId, wineIds }: BundleWinesCarouselProp
                         },
                       ]
                     : [],
-                }}
+                } as any}
               />
             </div>
           );

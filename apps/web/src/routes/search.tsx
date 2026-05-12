@@ -1,4 +1,5 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
+import type React from "react";
 import { CatalogFilters } from "@/components/catalog/CatalogFilters";
 import { ProductCard } from "@/components/catalog/ProductCard";
 import { SearchSection } from "@/components/catalog/SearchSection";
@@ -29,8 +30,8 @@ function SearchPage() {
   const winemakersQuery = useGetWinemakers({ q: q || undefined });
   const shopsQuery = useGetShops({ q: q || undefined });
 
-  const handleSearchChange = (next: Record<string, any>) => {
-    navigate({ search: { q: next.q || "" }, replace: true });
+  const handleSearchChange = (next: Record<string, unknown>) => {
+    navigate({ replace: true, search: { q: String(next.q || "") } });
   };
 
   const isLoading =
@@ -39,12 +40,67 @@ function SearchPage() {
     winemakersQuery.isLoading ||
     shopsQuery.isLoading;
 
-  const hasResults =
-    (winesQuery.data?.length || 0) +
-      (productsQuery.data?.data?.length || 0) +
-      (winemakersQuery.data?.length || 0) +
-      (shopsQuery.data?.length || 0) >
-    0;
+  const wineCount = winesQuery.data?.length || 0;
+  const productCount = Number(productsQuery.data?.total || 0);
+  const winemakerCount = winemakersQuery.data?.length || 0;
+  const shopCount = shopsQuery.data?.length || 0;
+
+  const hasResults = wineCount + productCount + winemakerCount + shopCount > 0;
+
+  let content: React.ReactNode;
+  if (isLoading) {
+    content = <LoadingState variant="catalog" />;
+  } else if (!hasResults) {
+    content = (
+      <EmptyState
+        description="We couldn't find anything matching your search."
+        title="No results found"
+      />
+    );
+  } else {
+    content = (
+      <>
+        <SearchSection
+          count={wineCount}
+          heading="Wines"
+          viewAllHref="/explore"
+          viewAllSearch={{ q }}
+        >
+          {winesQuery.data?.slice(0, 3).map((wine) => (
+            <WineCard key={wine.id} wine={wine} />
+          ))}
+        </SearchSection>
+
+        <SearchSection
+          count={productCount}
+          heading="Products"
+          viewAllHref="/products"
+          viewAllSearch={{ q }}
+        >
+          {productsQuery.data?.data?.slice(0, 3).map((product) => (
+            <ProductCard key={product.id} product={product} />
+          ))}
+        </SearchSection>
+
+        <SearchSection
+          count={winemakerCount}
+          heading="Winemakers"
+          viewAllHref="/winemakers"
+          viewAllSearch={{ q }}
+        >
+          {winemakersQuery.data?.slice(0, 3).map((winemaker) => (
+            <WinemakerCard key={winemaker.id} winemaker={winemaker} />
+          ))}
+        </SearchSection>
+
+        <SearchSection count={shopCount} heading="Shops" viewAllHref="/shops" viewAllSearch={{ q }}>
+          {shopsQuery.data?.slice(0, 3).map((shop) => (
+            <ShopCard key={shop.id} shop={shop} />
+          ))}
+        </SearchSection>
+      </>
+    );
+  }
 
   return (
     <div className="container mx-auto space-y-8 px-6 py-8 lg:px-12">
@@ -55,69 +111,10 @@ function SearchPage() {
 
       <div className="grid grid-cols-1 gap-12 lg:grid-cols-[280px_1fr]">
         <aside>
-          <CatalogFilters
-            entity="wines"
-            onSearchChange={handleSearchChange}
-            search={{ q }}
-          />
+          <CatalogFilters entity="wines" onSearchChange={handleSearchChange} search={{ q }} />
         </aside>
 
-        <main className="space-y-12">
-          {isLoading ? (
-            <LoadingState variant="catalog" />
-          ) : !hasResults ? (
-            <EmptyState
-              description="We couldn't find anything matching your search."
-              title="No results found"
-            />
-          ) : (
-            <>
-              <SearchSection
-                count={winesQuery.data?.length || 0}
-                heading="Wines"
-                viewAllHref="/explore"
-                viewAllSearch={{ q }}
-              >
-                {winesQuery.data?.slice(0, 3).map((wine) => (
-                  <WineCard key={wine.id} wine={wine} />
-                ))}
-              </SearchSection>
-
-              <SearchSection
-                count={Number(productsQuery.data?.total || 0)}
-                heading="Products"
-                viewAllHref="/products"
-                viewAllSearch={{ q }}
-              >
-                {productsQuery.data?.data?.slice(0, 3).map((product) => (
-                  <ProductCard key={product.id} product={product} />
-                ))}
-              </SearchSection>
-
-              <SearchSection
-                count={winemakersQuery.data?.length || 0}
-                heading="Winemakers"
-                viewAllHref="/winemakers"
-                viewAllSearch={{ q }}
-              >
-                {winemakersQuery.data?.slice(0, 3).map((winemaker) => (
-                  <WinemakerCard key={winemaker.id} winemaker={winemaker} />
-                ))}
-              </SearchSection>
-
-              <SearchSection
-                count={shopsQuery.data?.length || 0}
-                heading="Shops"
-                viewAllHref="/shops"
-                viewAllSearch={{ q }}
-              >
-                {shopsQuery.data?.slice(0, 3).map((shop) => (
-                  <ShopCard key={shop.id} shop={shop} />
-                ))}
-              </SearchSection>
-            </>
-          )}
-        </main>
+        <main className="space-y-12">{content}</main>
       </div>
     </div>
   );

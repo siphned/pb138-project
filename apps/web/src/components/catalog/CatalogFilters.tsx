@@ -1,6 +1,8 @@
 import type React from "react";
-import { Input } from "@/components/ui/input";
+import { SectionLabel } from "@/components/primitives/section-label";
 import { Checkbox } from "@/components/ui/checkbox";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import {
   Select,
   SelectContent,
@@ -9,13 +11,11 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Slider } from "@/components/ui/slider";
-import { Label } from "@/components/ui/label";
-import { SectionLabel } from "@/components/primitives/section-label";
 
 interface CatalogFiltersProps {
   entity: "wines" | "products" | "winemakers";
-  search: Record<string, any>;
-  onSearchChange: (next: Record<string, any>) => void;
+  search: Record<string, unknown>;
+  onSearchChange: (next: Record<string, unknown>) => void;
 }
 
 export function CatalogFilters({ entity, search, onSearchChange }: CatalogFiltersProps) {
@@ -36,7 +36,7 @@ export function CatalogFilters({ entity, search, onSearchChange }: CatalogFilter
   };
 
   const handlePriceChange = (values: number[]) => {
-    onSearchChange({ ...search, minPrice: values[0], maxPrice: values[1] });
+    onSearchChange({ ...search, maxPrice: values[1], minPrice: values[0] });
   };
 
   const handleBundleChange = (checked: boolean) => {
@@ -47,11 +47,7 @@ export function CatalogFilters({ entity, search, onSearchChange }: CatalogFilter
     <div className="space-y-8">
       <div className="space-y-2">
         <SectionLabel>Search</SectionLabel>
-        <Input
-          onChange={handleQChange}
-          placeholder="Search by name..."
-          value={search.q || ""}
-        />
+        <Input onChange={handleQChange} placeholder="Search by name..." value={search.q || ""} />
       </div>
 
       {entity === "wines" && (
@@ -60,7 +56,7 @@ export function CatalogFilters({ entity, search, onSearchChange }: CatalogFilter
             <SectionLabel>Color</SectionLabel>
             <div className="space-y-2">
               {["Red", "White", "Rosé"].map((color) => (
-                <div key={color} className="flex items-center space-x-2">
+                <div className="flex items-center space-x-2" key={color}>
                   <Checkbox
                     checked={(search.color as string[])?.includes(color.toLowerCase())}
                     id={`color-${color}`}

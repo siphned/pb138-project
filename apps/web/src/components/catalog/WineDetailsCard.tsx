@@ -1,11 +1,11 @@
 import { Link } from "@tanstack/react-router";
 import { useEffect } from "react";
-import type { GetWinesById200 } from "@/generated/types/GetWinesById";
-import { Card, CardContent } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { Section } from "@/components/primitives/section";
 import { DescriptionList, PropertyRow } from "@/components/primitives/description-list";
+import { Section } from "@/components/primitives/section";
 import { ShowOwner } from "@/components/primitives/show-owner";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent } from "@/components/ui/card";
+import type { GetWinesById200 } from "@/generated/types/GetWinesById";
 
 interface WineDetailsCardProps {
   wine: GetWinesById200;
@@ -15,7 +15,10 @@ export function WineDetailsCard({ wine }: WineDetailsCardProps) {
   useEffect(() => {
     // @ts-expect-error - checking for BE gap mentioned in plan §8
     if (wine.winemaker && !wine.winemaker.userId && !wine.winemaker.id) {
-      console.warn("WineDetailsCard: winemaker object missing both userId and id. Owner gating may fail.");
+      // biome-ignore lint/suspicious/noConsole: intentional warning for BE gap mentioned in plan §8
+      console.warn(
+        "WineDetailsCard: winemaker object missing both userId and id. Owner gating may fail."
+      );
     }
   }, [wine.winemaker]);
 
@@ -32,14 +35,10 @@ export function WineDetailsCard({ wine }: WineDetailsCardProps) {
               <PropertyRow label="Region" value={wine.region} />
               <PropertyRow label="Vintage" value={String(wine.vintageYear)} />
               <PropertyRow label="Alcohol" value={`${wine.alcoholContent}%`} />
-              {wine.composition && (
-                <PropertyRow label="Composition" value={wine.composition} />
-              )}
+              {wine.composition && <PropertyRow label="Composition" value={wine.composition} />}
             </DescriptionList>
             {wine.description && (
-              <p className="text-sm leading-relaxed text-muted-foreground">
-                {wine.description}
-              </p>
+              <p className="text-sm leading-relaxed text-muted-foreground">{wine.description}</p>
             )}
           </CardContent>
         </Card>

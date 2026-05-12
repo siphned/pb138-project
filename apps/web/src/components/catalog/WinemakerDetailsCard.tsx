@@ -1,11 +1,11 @@
 import { Link } from "@tanstack/react-router";
 import { useEffect } from "react";
-import type { GetWinemakersById200 } from "@/generated/types/GetWinemakersById";
-import { Card, CardContent } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { Section } from "@/components/primitives/section";
 import { DescriptionList, PropertyRow } from "@/components/primitives/description-list";
+import { Section } from "@/components/primitives/section";
 import { ShowOwner } from "@/components/primitives/show-owner";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent } from "@/components/ui/card";
+import type { GetWinemakersById200 } from "@/generated/types/GetWinemakersById";
 
 interface WinemakerDetailsCardProps {
   winemaker: GetWinemakersById200;
@@ -15,6 +15,7 @@ export function WinemakerDetailsCard({ winemaker }: WinemakerDetailsCardProps) {
   useEffect(() => {
     // @ts-expect-error - checking for BE gap
     if (winemaker && !winemaker.userId && !winemaker.id) {
+      // biome-ignore lint/suspicious/noConsole: intentional warning for BE gap
       console.warn("WinemakerDetailsCard: winemaker missing both userId and id.");
     }
   }, [winemaker]);
@@ -34,9 +35,7 @@ export function WinemakerDetailsCard({ winemaker }: WinemakerDetailsCardProps) {
       <Section heading="About">
         <Card variant="default">
           <CardContent className="space-y-4 pt-6">
-            <p className="text-sm leading-relaxed text-muted-foreground">
-              {winemaker.description}
-            </p>
+            <p className="text-sm leading-relaxed text-muted-foreground">{winemaker.description}</p>
           </CardContent>
         </Card>
       </Section>

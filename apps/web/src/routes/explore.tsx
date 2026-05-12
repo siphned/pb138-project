@@ -23,8 +23,8 @@ function ExplorePage() {
   const navigate = useNavigate({ from: Route.fullPath });
   const query = useGetWines(search);
 
-  const handleSearchChange = (next: Record<string, any>) => {
-    navigate({ search: next, replace: true });
+  const handleSearchChange = (next: Record<string, unknown>) => {
+    navigate({ replace: true, search: next as any });
   };
 
   if (query.isLoading) {
@@ -47,10 +47,7 @@ function ExplorePage() {
 
   return (
     <div className="container mx-auto space-y-8 px-6 py-8 lg:px-12">
-      <PageHeader
-        description="Discover wines from independent winemakers."
-        title="Explore wines"
-      />
+      <PageHeader description="Discover wines from independent winemakers." title="Explore wines" />
 
       <div className="grid grid-cols-1 gap-12 lg:grid-cols-[280px_1fr]">
         <aside>

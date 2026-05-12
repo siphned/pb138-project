@@ -1,7 +1,7 @@
 import { render, screen } from "@testing-library/react";
 import { describe, expect, it, vi } from "vitest";
-import { WineDetailsCard } from "./WineDetailsCard";
 import { useUser } from "@/context/UserContext";
+import { WineDetailsCard } from "./WineDetailsCard";
 
 vi.mock("@/context/UserContext", () => ({
   useUser: vi.fn(),
@@ -12,14 +12,14 @@ vi.mock("@tanstack/react-router", () => ({
 }));
 
 const mockWine = {
+  alcoholContent: "12.5",
+  color: "white",
+  description: "A fine white wine.",
   id: "wine-1",
   name: "Chardonnay",
-  color: "white",
   region: "Moravia",
   vintageYear: 2022,
-  alcoholContent: "12.5",
-  description: "A fine white wine.",
-  winemaker: { userId: "user-1", name: "Lechovice" },
+  winemaker: { name: "Lechovice", userId: "user-1" },
 } as any;
 
 describe("WineDetailsCard", () => {

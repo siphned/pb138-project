@@ -1,5 +1,6 @@
 import { Link } from "@tanstack/react-router";
-import { MapPin, Users } from "lucide-react";
+import { Location01Icon, UserGroupIcon } from "@hugeicons/core-free-icons";
+import { HugeiconsIcon } from "@hugeicons/react";
 import { Button } from "@/components/ui/button";
 
 interface EventCardProps {
@@ -49,7 +50,7 @@ export function EventCard({ event }: EventCardProps) {
         {/* Location */}
         {event.location && (
           <div className="mb-4 flex items-center gap-2 text-sm text-muted-foreground">
-            <MapPin className="h-4 w-4" />
+            <HugeiconsIcon className="h-4 w-4" icon={Location01Icon} />
             <span className="line-clamp-1">{event.location}</span>
           </div>
         )}
@@ -64,7 +65,7 @@ export function EventCard({ event }: EventCardProps) {
           )}
           {event.attendees !== undefined && (
             <div className="flex items-center gap-2 text-sm text-muted-foreground">
-              <Users className="h-4 w-4" />
+              <HugeiconsIcon className="h-4 w-4" icon={UserGroupIcon} />
               <span>{event.attendees} attending</span>
             </div>
           )}

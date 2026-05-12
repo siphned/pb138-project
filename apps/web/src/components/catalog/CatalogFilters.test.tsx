@@ -1,4 +1,4 @@
-import { render, screen, fireEvent } from "@testing-library/react";
+import { fireEvent, render, screen } from "@testing-library/react";
 import { describe, expect, it, vi } from "vitest";
 import { CatalogFilters } from "./CatalogFilters";
 
@@ -14,7 +14,9 @@ describe("CatalogFilters", () => {
     rerender(<CatalogFilters entity="products" onSearchChange={mockOnSearchChange} search={{}} />);
     expect(screen.getByPlaceholderText(/search/i)).toBeInTheDocument();
 
-    rerender(<CatalogFilters entity="winemakers" onSearchChange={mockOnSearchChange} search={{}} />);
+    rerender(
+      <CatalogFilters entity="winemakers" onSearchChange={mockOnSearchChange} search={{}} />
+    );
     expect(screen.getByPlaceholderText(/search/i)).toBeInTheDocument();
   });
 
@@ -35,7 +37,9 @@ describe("CatalogFilters", () => {
     );
     expect(screen.getAllByText(/region/i).length).toBeGreaterThan(0);
 
-    rerender(<CatalogFilters entity="winemakers" onSearchChange={mockOnSearchChange} search={{}} />);
+    rerender(
+      <CatalogFilters entity="winemakers" onSearchChange={mockOnSearchChange} search={{}} />
+    );
     expect(screen.getAllByText(/region/i).length).toBeGreaterThan(0);
 
     rerender(<CatalogFilters entity="products" onSearchChange={mockOnSearchChange} search={{}} />);

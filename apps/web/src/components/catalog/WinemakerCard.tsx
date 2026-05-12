@@ -46,9 +46,7 @@ export function WinemakerCard({ winemaker }: WinemakerCardProps) {
         </h3>
 
         <p className="text-sm text-muted-foreground">
-          {[winemaker.address?.city, winemaker.address?.country]
-            .filter(Boolean)
-            .join(", ")}
+          {[winemaker.address?.city, winemaker.address?.country].filter(Boolean).join(", ")}
         </p>
       </CardContent>
     </Card>

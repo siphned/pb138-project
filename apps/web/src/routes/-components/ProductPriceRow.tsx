@@ -1,5 +1,11 @@
 import { useQueryClient } from "@tanstack/react-query";
-import { Check, Minus, Plus, ShoppingCart } from "lucide-react";
+import {
+  Minus01Icon,
+  Plus01Icon,
+  ShoppingCart01Icon,
+  Tick01Icon,
+} from "@hugeicons/core-free-icons";
+import { HugeiconsIcon } from "@hugeicons/react";
 import { useState } from "react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -31,7 +37,7 @@ export function ProductPriceRow({ price, quantity, productId }: ProductPriceRowP
     );
   };
 
-  const formattedPrice = new Intl.NumberFormat("cs-CZ", {
+  const formattedPrice = new Intl.NumberFormat("en-IE", {
     currency: "EUR",
     style: "currency",
   }).format(Number.parseFloat(price));
@@ -58,7 +64,7 @@ export function ProductPriceRow({ price, quantity, productId }: ProductPriceRowP
               size="icon"
               variant="outline"
             >
-              <Minus className="h-4 w-4" />
+              <HugeiconsIcon className="h-4 w-4" icon={Minus01Icon} />
             </Button>
             <span className="w-4 text-center font-medium">{qty}</span>
             <Button
@@ -68,7 +74,7 @@ export function ProductPriceRow({ price, quantity, productId }: ProductPriceRowP
               size="icon"
               variant="outline"
             >
-              <Plus className="h-4 w-4" />
+              <HugeiconsIcon className="h-4 w-4" icon={Plus01Icon} />
             </Button>
           </div>
         </div>
@@ -81,14 +87,14 @@ export function ProductPriceRow({ price, quantity, productId }: ProductPriceRowP
         >
           {isSuccess && (
             <>
-              <Check className="mr-2 h-4 w-4" />
+              <HugeiconsIcon className="mr-2 h-4 w-4" icon={Tick01Icon} />
               Added to cart!
             </>
           )}
           {!isSuccess && isPending && "Adding..."}
           {!isSuccess && !isPending && (
             <>
-              <ShoppingCart className="mr-2 h-4 w-4" />
+              <HugeiconsIcon className="mr-2 h-4 w-4" icon={ShoppingCart01Icon} />
               Add to cart
             </>
           )}
