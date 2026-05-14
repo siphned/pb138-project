@@ -65,6 +65,7 @@ CLAUDE.md
 GEMINI.md
 .claude/settings.local.json
 apps/server/src/db/seed.ts
+apps/server/src/db/seed.demo.ts
 
 docs/figma/
 
