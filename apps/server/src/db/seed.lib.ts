@@ -1,6 +1,8 @@
 import {
   addresses,
   availabilityRegular,
+  cartItems,
+  carts,
   comments,
   eventRegistrations,
   events,
@@ -25,6 +27,8 @@ export async function teardown() {
   await db.delete(eventRegistrations);
   await db.delete(orderItems);
   await db.delete(orders);
+  await db.delete(cartItems);
+  await db.delete(carts);
   await db.delete(availabilityRegular);
   await db.delete(supplyAgreements);
   await db.delete(productWines);
