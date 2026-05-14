@@ -20,7 +20,7 @@ export const winesRoutes = new Elysia()
         if (!payload) return status(401, "Authentication required");
         const dbUser = await usersService.lazyGetOrCreate(payload.sub);
         const winemaker = await winesRepo.findWinemakerByUserId(db, dbUser.id);
-        if (!winemaker) return status(404, "Winemaker profile not found");
+        if (!winemaker) return [];
         winemakerId = winemaker.id;
       }
       return winesService.listWines({ ...query, winemakerId });
@@ -33,7 +33,7 @@ export const winesRoutes = new Elysia()
         tags: ["wines"],
       },
       query: wineFiltersQuery,
-      response: { 200: t.Array(wineResponse), 401: t.String(), 404: t.String() },
+      response: { 200: t.Array(wineResponse), 401: t.String() },
     }
   )
 
