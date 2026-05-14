@@ -1,22 +1,41 @@
 import { Elysia, status, t } from "elysia";
 import { errorResponse } from "../../utils/error-plugin";
+import { db } from "../../db";
 import { authPlugin } from "../auth";
+import { verifyClerkToken } from "../auth/auth.utils";
+import { usersService } from "../users/users.service";
+import * as winesRepo from "./wines.repository";
 import { createWineBody, updateWineBody, wineFiltersQuery, wineResponse } from "./wines.schema";
 import { winesService } from "./wines.service";
 
 export const winesRoutes = new Elysia()
   .use(authPlugin)
 
-  .get("/wines", ({ query }) => winesService.listWines(query), {
-    detail: {
-      description:
-        "Returns all non-deleted wines. Filterable by region, type, color, vintageYear, winemakerId.",
-      summary: "List wines",
-      tags: ["wines"],
+  .get(
+    "/wines",
+    async ({ query, headers }) => {
+      let winemakerId = query.winemakerId;
+      if (winemakerId === "me") {
+        const payload = await verifyClerkToken(headers.authorization);
+        if (!payload) return status(401, "Authentication required");
+        const dbUser = await usersService.lazyGetOrCreate(payload.sub);
+        const winemaker = await winesRepo.findWinemakerByUserId(db, dbUser.id);
+        if (!winemaker) return status(404, "Winemaker profile not found");
+        winemakerId = winemaker.id;
+      }
+      return winesService.listWines({ ...query, winemakerId });
     },
-    query: wineFiltersQuery,
-    response: { 200: t.Array(wineResponse) },
-  })
+    {
+      detail: {
+        description:
+          "Returns all non-deleted wines. Filterable by region, type, color, vintageYear, winemakerId. Use winemakerId=me to filter by the authenticated winemaker.",
+        summary: "List wines",
+        tags: ["wines"],
+      },
+      query: wineFiltersQuery,
+      response: { 200: t.Array(wineResponse), 401: t.String(), 404: t.String() },
+    }
+  )
 
   .get("/wines/:id", ({ params }) => winesService.getWine(params.id), {
     detail: {
