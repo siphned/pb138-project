@@ -1,6 +1,6 @@
-import { Link } from "@tanstack/react-router";
 import { Store01Icon } from "@hugeicons/core-free-icons";
 import { HugeiconsIcon } from "@hugeicons/react";
+import { Link } from "@tanstack/react-router";
 import { Card } from "@/components/ui/card";
 
 interface ProductSoldAtCardProps {

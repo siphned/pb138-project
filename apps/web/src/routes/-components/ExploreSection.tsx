@@ -1,6 +1,6 @@
-import { Link } from "@tanstack/react-router";
 import { ArrowRight02Icon } from "@hugeicons/core-free-icons";
 import { HugeiconsIcon } from "@hugeicons/react";
+import { Link } from "@tanstack/react-router";
 import { BundleCard } from "@/components/catalog/BundleCard";
 import { ProductCard } from "@/components/catalog/ProductCard";
 import { buttonVariants } from "@/components/ui/button";

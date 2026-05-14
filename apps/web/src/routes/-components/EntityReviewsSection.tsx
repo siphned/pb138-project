@@ -1,8 +1,8 @@
+import { ReviewList } from "@/components/reviews/ReviewList";
+import { ReviewsSummary } from "@/components/reviews/ReviewsSummary";
 import { useGetProductsByIdReviews } from "@/generated/hooks/useGetProductsByIdReviews";
 import { useGetWinemakersByIdReviews } from "@/generated/hooks/useGetWinemakersByIdReviews";
 import { useGetWinesByIdReviews } from "@/generated/hooks/useGetWinesByIdReviews";
-import { ReviewList } from "@/components/reviews/ReviewList";
-import { ReviewsSummary } from "@/components/reviews/ReviewsSummary";
 
 interface EntityReviewsSectionProps {
   entityId?: string;
@@ -21,9 +21,13 @@ export function EntityReviewsSection({
   title = "Customer Reviews",
   emptyMessage = "Be the first to review.",
 }: EntityReviewsSectionProps) {
-  const wineQuery = useGetWinesByIdReviews(entityType === "wine" ? entityId : undefined, undefined, {
-    query: { enabled: entityType === "wine" && !!entityId },
-  });
+  const wineQuery = useGetWinesByIdReviews(
+    entityType === "wine" ? entityId : undefined,
+    undefined,
+    {
+      query: { enabled: entityType === "wine" && !!entityId },
+    }
+  );
   const productQuery = useGetProductsByIdReviews(
     entityType === "product" ? entityId : undefined,
     undefined,
@@ -42,15 +46,17 @@ export function EntityReviewsSection({
   const reviewData =
     initialReviewData || wineQuery.data || productQuery.data || winemakerQuery.data;
   const isLoading =
-    initialIsLoading ??
-    (wineQuery.isLoading || productQuery.isLoading || winemakerQuery.isLoading);
+    initialIsLoading ?? (wineQuery.isLoading || productQuery.isLoading || winemakerQuery.isLoading);
 
   return (
     <div className="space-y-6">
       <h2 className="font-heading text-2xl font-bold">{title}</h2>
 
       {reviewData && reviewData.averageRating !== null && (
-        <ReviewsSummary averageRating={reviewData.averageRating} reviewCount={reviewData.totalCount} />
+        <ReviewsSummary
+          averageRating={reviewData.averageRating}
+          reviewCount={reviewData.totalCount}
+        />
       )}
 
       <ReviewList

@@ -1,11 +1,11 @@
-import { useQueryClient } from "@tanstack/react-query";
 import {
-  Minus01Icon,
-  Plus01Icon,
+  MinusSignIcon,
+  PlusSignIcon,
   ShoppingCart01Icon,
   Tick01Icon,
 } from "@hugeicons/core-free-icons";
 import { HugeiconsIcon } from "@hugeicons/react";
+import { useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -64,7 +64,7 @@ export function ProductPriceRow({ price, quantity, productId }: ProductPriceRowP
               size="icon"
               variant="outline"
             >
-              <HugeiconsIcon className="h-4 w-4" icon={Minus01Icon} />
+              <HugeiconsIcon className="h-4 w-4" icon={MinusSignIcon} />
             </Button>
             <span className="w-4 text-center font-medium">{qty}</span>
             <Button
@@ -74,7 +74,7 @@ export function ProductPriceRow({ price, quantity, productId }: ProductPriceRowP
               size="icon"
               variant="outline"
             >
-              <HugeiconsIcon className="h-4 w-4" icon={Plus01Icon} />
+              <HugeiconsIcon className="h-4 w-4" icon={PlusSignIcon} />
             </Button>
           </div>
         </div>

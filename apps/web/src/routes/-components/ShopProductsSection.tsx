@@ -1,9 +1,9 @@
-import { Link } from "@tanstack/react-router";
 import { ArrowRight02Icon } from "@hugeicons/core-free-icons";
 import { HugeiconsIcon } from "@hugeicons/react";
+import { Link } from "@tanstack/react-router";
+import { ProductCard } from "@/components/catalog/ProductCard";
 import { Button } from "@/components/ui/button";
 import { useGetShopsByIdProducts } from "@/generated/hooks/useGetShopsByIdProducts";
-import { ProductCard } from "@/components/catalog/ProductCard";
 
 // Shape returned by GET /shops/:id/products (no response schema in OpenAPI)
 type ShopProductRaw = {
@@ -74,37 +74,39 @@ export function ShopProductsSection({ shopId }: ShopProductsSectionProps) {
         {products.map((product) => (
           <div className="w-60 shrink-0" key={product.id}>
             <ProductCard
-              product={{
-                ...product,
-                createdAt: product.createdAt ?? "",
-                description: product.description ?? null,
-                isBundle: !!product.isBundle,
-                quantity: product.quantity ?? 0,
-                rating: 0,
-                reviewCount: 0,
-                shop: { id: shopId, name: "" }, // minimal shop object for ProductCard
-                updatedAt: product.updatedAt ?? null,
-                wines:
-                  Array.isArray(product.wines) && product.wines.length > 0
-                    ? product.wines.map((w) => ({
-                        color: w.color,
-                        id: w.id,
-                        name: w.name,
-                        region: w.region ?? "",
-                        type: w.type,
-                        vintageYear: w.vintageYear,
-                        winemaker: w.winemaker ?? { id: "", name: "" },
-                      }))
-                    : (product.productWines ?? []).map((pw) => ({
-                        color: pw.wine.color,
-                        id: pw.wine.id,
-                        name: pw.wine.name,
-                        region: "",
-                        type: pw.wine.type,
-                        vintageYear: pw.wine.vintageYear,
-                        winemaker: { id: "", name: "" },
-                      })),
-              } as any}
+              product={
+                {
+                  ...product,
+                  createdAt: product.createdAt ?? "",
+                  description: product.description ?? null,
+                  isBundle: !!product.isBundle,
+                  quantity: product.quantity ?? 0,
+                  rating: 0,
+                  reviewCount: 0,
+                  shop: { id: shopId, name: "" }, // minimal shop object for ProductCard
+                  updatedAt: product.updatedAt ?? null,
+                  wines:
+                    Array.isArray(product.wines) && product.wines.length > 0
+                      ? product.wines.map((w) => ({
+                          color: w.color,
+                          id: w.id,
+                          name: w.name,
+                          region: w.region ?? "",
+                          type: w.type,
+                          vintageYear: w.vintageYear,
+                          winemaker: w.winemaker ?? { id: "", name: "" },
+                        }))
+                      : (product.productWines ?? []).map((pw) => ({
+                          color: pw.wine.color,
+                          id: pw.wine.id,
+                          name: pw.wine.name,
+                          region: "",
+                          type: pw.wine.type,
+                          vintageYear: pw.wine.vintageYear,
+                          winemaker: { id: "", name: "" },
+                        })),
+                } as any
+              }
             />
           </div>
         ))}
