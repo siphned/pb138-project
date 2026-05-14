@@ -25,5 +25,7 @@ if (!envResult.data.RESEND_API_KEY) {
 
 const port = process.env.PORT || 3000;
 logger.info(`Starting server at http://localhost:${port}`);
-logger.info(`OpenAPI spec available at http://localhost:${port}/openapi`);
+logger.info(
+  `OpenAPI spec available at http://localhost:${port}/openapi and http://localhost:${port}/swagger/json`
+);
 app.listen(port);
