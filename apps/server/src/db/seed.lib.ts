@@ -1,9 +1,11 @@
 import {
   addresses,
+  availabilityExceptions,
   availabilityRegular,
   cartItems,
   carts,
   comments,
+  eventComments,
   eventRegistrations,
   events,
   images,
@@ -26,11 +28,13 @@ export async function teardown() {
   await db.delete(images);
   await db.delete(comments);
   await db.delete(reviews);
+  await db.delete(eventComments);
   await db.delete(eventRegistrations);
   await db.delete(orderItems);
   await db.delete(orders);
   await db.delete(cartItems);
   await db.delete(carts);
+  await db.delete(availabilityExceptions);
   await db.delete(availabilityRegular);
   await db.delete(supplyAgreements);
   await db.delete(productWines);
@@ -273,4 +277,29 @@ export type ImageInput = {
 export async function insertImages(data: ImageInput[]) {
   if (data.length === 0) return;
   await db.insert(images).values(data);
+}
+
+export type EventCommentInput = {
+  eventId: string;
+  userId: string;
+  body: string;
+};
+
+export async function insertEventComments(data: EventCommentInput[]) {
+  if (data.length === 0) return;
+  await db.insert(eventComments).values(data);
+}
+
+export type AvailabilityExceptionInput = {
+  shopId: string;
+  winemakerId?: string;
+  startsAt: Date;
+  endsAt: Date;
+  action: string;
+  reason?: string;
+};
+
+export async function insertAvailabilityExceptions(data: AvailabilityExceptionInput[]) {
+  if (data.length === 0) return;
+  await db.insert(availabilityExceptions).values(data);
 }

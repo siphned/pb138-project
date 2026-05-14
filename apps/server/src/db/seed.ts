@@ -2,8 +2,10 @@ import { faker } from "@faker-js/faker";
 import { logger } from "../utils/logger";
 import {
   type AddressInput,
+  type AvailabilityExceptionInput,
   type AvailabilityInput,
   type CommentInput,
+  type EventCommentInput,
   type EventInput,
   type ImageInput,
   type OrderInput,
@@ -15,8 +17,10 @@ import {
   type WineInput,
   type WinemakerId,
   insertAddresses,
+  insertAvailabilityExceptions,
   insertAvailabilityRegular,
   insertComments,
+  insertEventComments,
   insertEventRegistrations,
   insertEvents,
   insertImages,
@@ -303,6 +307,22 @@ async function main() {
       });
     await insertEventRegistrations(registrationInputs);
     logger.info(`Inserted ${registrationInputs.length} event registrations`);
+
+    // Event comments — ~40% of events get 2–6 comments from random users
+    logger.info("Inserting event comments...");
+    const commentableEvents = faker.helpers.arrayElements(
+      insertedEvents,
+      Math.ceil(insertedEvents.length * 0.4),
+    );
+    const eventCommentInputs: EventCommentInput[] = commentableEvents.flatMap((event) =>
+      Array.from({ length: faker.number.int({ min: 2, max: 6 }) }, () => ({
+        eventId: event.id,
+        userId: pick(customers).id,
+        body: faker.lorem.sentences({ min: 1, max: 3 }),
+      })),
+    );
+    await insertEventComments(eventCommentInputs);
+    logger.info(`Inserted ${eventCommentInputs.length} event comments`);
   }
 
   // ── UserRoles ──────────────────────────────────────────────────────────────
@@ -343,6 +363,25 @@ async function main() {
   });
   await insertAvailabilityRegular(availInputs);
   logger.info(`Inserted ${availInputs.length} availability rows`);
+
+  // Availability exceptions — ~50% of shops have 1–3 holiday/special closures
+  const exceptionReasons = ["Public holiday", "Staff training", "Renovation", "Private event", "Inventory"] as const;
+  const exceptionInputs: AvailabilityExceptionInput[] = shopRows.flatMap((shop) => {
+    if (Math.random() < 0.5) return [];
+    const count = faker.number.int({ min: 1, max: 3 });
+    return Array.from({ length: count }, () => {
+      const startsAt = faker.date.soon({ days: 90 });
+      return {
+        shopId: shop.id,
+        startsAt,
+        endsAt: new Date(startsAt.getTime() + faker.number.int({ min: 4, max: 24 }) * 3_600_000),
+        action: pick(["closed", "modified_hours"] as const),
+        reason: pick(exceptionReasons),
+      };
+    });
+  });
+  await insertAvailabilityExceptions(exceptionInputs);
+  logger.info(`Inserted ${exceptionInputs.length} availability exceptions`);
 
   // ── Supply Agreements ──────────────────────────────────────────────────────
   // Fix 6: deduplicate shop-winemaker pairs
