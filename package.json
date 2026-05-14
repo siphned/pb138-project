@@ -35,6 +35,7 @@
     "db:migrate": "turbo run db:migrate --filter=server",
     "db:push": "turbo run db:push --filter=server",
     "db:seed": "turbo run db:seed --filter=server",
+    "db:seed:demo": "turbo run db:seed:demo --filter=server",
     "db:studio": "turbo run db:studio --filter=server",
     "test": "turbo run test -- --run",
     "test:e2e": "turbo run test:e2e",
