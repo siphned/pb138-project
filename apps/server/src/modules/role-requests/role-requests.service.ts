@@ -3,7 +3,13 @@ import type { RoleRequest } from "@repo/shared/schemas";
 import { db } from "../../db";
 import { logger } from "../../utils/logger";
 import { emailService } from "../email/email.service";
+import { UserNotFoundError } from "../users/users.errors";
 import * as usersRepo from "../users/users.repository";
+import {
+  AlreadyHasPendingRequestError,
+  AlreadyRespondedError,
+  RoleRequestNotFoundError,
+} from "./role-requests.errors";
 import * as roleRequestsRepo from "./role-requests.repository";
 
 const clerkClient = createClerkClient({
@@ -13,11 +19,11 @@ const clerkClient = createClerkClient({
 export class RoleRequestsService {
   async approve(requestId: string, adminUserId: string): Promise<RoleRequest> {
     const request = await roleRequestsRepo.findById(db, requestId);
-    if (!request) throw new Error("NOT_FOUND");
-    if (request.status !== "pending") throw new Error("ALREADY_RESPONDED");
+    if (!request) throw new RoleRequestNotFoundError();
+    if (request.status !== "pending") throw new AlreadyRespondedError();
 
     const user = await usersRepo.findById(db, request.userId);
-    if (!user) throw new Error("USER_NOT_FOUND");
+    if (!user) throw new UserNotFoundError(request.userId);
 
     const metadataKey = request.type === "winemaker" ? "is_winemaker" : "is_shop_owner";
 
@@ -45,8 +51,8 @@ export class RoleRequestsService {
 
   async reject(requestId: string, adminUserId: string): Promise<RoleRequest> {
     const request = await roleRequestsRepo.findById(db, requestId);
-    if (!request) throw new Error("NOT_FOUND");
-    if (request.status !== "pending") throw new Error("ALREADY_RESPONDED");
+    if (!request) throw new RoleRequestNotFoundError();
+    if (request.status !== "pending") throw new AlreadyRespondedError();
 
     const result = await roleRequestsRepo.updateStatus(db, requestId, "rejected", adminUserId);
 
@@ -77,7 +83,7 @@ export class RoleRequestsService {
     const existing = await roleRequestsRepo.findByUserId(db, userId);
     const pending = existing.find((r) => r.type === type && r.status === "pending");
 
-    if (pending) throw new Error("ALREADY_HAS_PENDING_REQUEST");
+    if (pending) throw new AlreadyHasPendingRequestError();
 
     return roleRequestsRepo.create(db, {
       businessName,

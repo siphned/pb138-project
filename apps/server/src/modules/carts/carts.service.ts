@@ -3,6 +3,8 @@ import { db } from "../../db";
 import * as productsRepo from "../products/products.repository";
 import type { CartWithItems } from "./carts.repository";
 import * as cartsRepo from "./carts.repository";
+import { CartNotFoundError } from "./carts.errors";
+import { InsufficientStockError, ProductNotFoundError } from "../products/products.errors";
 
 export class CartsService {
   async addItem(
@@ -11,8 +13,8 @@ export class CartsService {
     quantity: number
   ): Promise<void> {
     const product = await productsRepo.findById(db, productId);
-    if (!product) throw new Error("PRODUCT_NOT_FOUND");
-    if (product.quantity < quantity) throw new Error("INSUFFICIENT_STOCK");
+    if (!product) throw new ProductNotFoundError(productId);
+    if (product.quantity < quantity) throw new InsufficientStockError(product.name);
 
     let cart: Cart | undefined;
     if (userId) {
@@ -23,7 +25,7 @@ export class CartsService {
       if (!cart) cart = await cartsRepo.create(db, { sessionId });
     }
 
-    if (!cart) throw new Error("Could not find or create cart");
+    if (!cart) throw new CartNotFoundError();
 
     await cartsRepo.addItem(db, cart.id, productId, quantity);
   }
@@ -93,7 +95,7 @@ export class CartsService {
       cart = await cartsRepo.findBySessionId(db, sessionId);
     }
 
-    if (!cart) throw new Error("Cart not found");
+    if (!cart) throw new CartNotFoundError();
 
     await cartsRepo.removeItem(db, cart.id, productId);
   }
@@ -110,7 +112,7 @@ export class CartsService {
       cart = await cartsRepo.findBySessionId(db, sessionId);
     }
 
-    if (!cart) throw new Error("Cart not found");
+    if (!cart) throw new CartNotFoundError();
 
     if (quantity <= 0) {
       await cartsRepo.removeItem(db, cart.id, productId);
