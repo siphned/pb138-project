@@ -1,4 +1,5 @@
 import { Elysia, t } from "elysia";
+import { errorResponse } from "../../utils/error-plugin";
 import { authPlugin } from "../auth";
 import { winemakerListItemResponse, winemakerProfileResponse } from "./winemakers.schema";
 import { winemakersService } from "./winemakers.service";
@@ -26,11 +27,11 @@ export const winemakersRoutes = new Elysia({ prefix: "/winemakers", tags: ["wine
       summary: "Update own winemaker profile",
     },
     requireRoles: ["winemaker"],
-    response: { 200: winemakerListItemResponse },
+    response: { 200: winemakerListItemResponse, 404: errorResponse },
   })
 
   .get("/:id", ({ params }) => winemakersService.getWinemaker(params.id), {
     detail: { summary: "Get winemaker by ID" },
     params: t.Object({ id: t.String() }),
-    response: { 200: winemakerProfileResponse },
+    response: { 200: winemakerProfileResponse, 404: errorResponse },
   });

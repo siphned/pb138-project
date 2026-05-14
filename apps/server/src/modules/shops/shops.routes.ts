@@ -1,4 +1,5 @@
 import { Elysia, status, t } from "elysia";
+import { errorResponse } from "../../utils/error-plugin";
 import { authPlugin } from "../auth";
 import { createShopBody, shopResponse, updateShopBody } from "./shops.schema";
 import { shopsService } from "./shops.service";
@@ -33,7 +34,7 @@ export const shopsRoutes = new Elysia()
       tags: ["shops"],
     },
     params: t.Object({ id: t.String() }),
-    response: { 200: shopResponse },
+    response: { 200: shopResponse, 404: errorResponse },
   })
 
   .post(
@@ -65,6 +66,6 @@ export const shopsRoutes = new Elysia()
       },
       params: t.Object({ id: t.String() }),
       requireRoles: ["shop_owner", "admin"],
-      response: { 200: shopResponse },
+      response: { 200: shopResponse, 403: errorResponse, 404: errorResponse },
     }
   );
