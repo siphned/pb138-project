@@ -1,6 +1,7 @@
 import { createClerkClient } from "@clerk/backend";
 import type { RoleRequest } from "@repo/shared/schemas";
 import { db } from "../../db";
+import { logger } from "../../utils/logger";
 import { emailService } from "../email/email.service";
 import * as usersRepo from "../users/users.repository";
 import * as roleRequestsRepo from "./role-requests.repository";
@@ -56,7 +57,12 @@ export class RoleRequestsService {
           fname: rejectedUser.fname,
           role: request.type,
         })
-        .catch(() => {});
+        .catch((e) =>
+          logger.error(
+            { err: e, requestId, userId: request.userId },
+            "Failed to send role rejection email"
+          )
+        );
     }
 
     return result;
