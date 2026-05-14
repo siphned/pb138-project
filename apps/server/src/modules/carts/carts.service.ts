@@ -12,6 +12,7 @@ export class CartsService {
   ): Promise<void> {
     const product = await productsRepo.findById(db, productId);
     if (!product) throw new Error("PRODUCT_NOT_FOUND");
+    if (product.quantity < quantity) throw new Error("INSUFFICIENT_STOCK");
 
     let cart: Cart | undefined;
     if (userId) {
@@ -111,7 +112,11 @@ export class CartsService {
 
     if (!cart) throw new Error("Cart not found");
 
-    await cartsRepo.updateItemQuantity(db, cart.id, productId, quantity);
+    if (quantity <= 0) {
+      await cartsRepo.removeItem(db, cart.id, productId);
+    } else {
+      await cartsRepo.setItemQuantity(db, cart.id, productId, quantity);
+    }
   }
 }
 
