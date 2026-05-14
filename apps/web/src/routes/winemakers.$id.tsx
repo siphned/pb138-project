@@ -1,17 +1,17 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
 import { ArrowLeft02Icon } from "@hugeicons/core-free-icons";
 import { HugeiconsIcon } from "@hugeicons/react";
-import { WinemakerDetailsCard } from "@/components/catalog/WinemakerDetailsCard";
+import { createFileRoute, Link } from "@tanstack/react-router";
 import { WineCard } from "@/components/catalog/WineCard";
-import { LoadingState } from "@/components/primitives/loading-state";
-import { ErrorState } from "@/components/primitives/error-state";
-import { Section } from "@/components/primitives/section";
+import { WinemakerDetailsCard } from "@/components/catalog/WinemakerDetailsCard";
 import { DataGrid } from "@/components/primitives/data-grid";
 import { EmptyState } from "@/components/primitives/empty-state";
+import { ErrorState } from "@/components/primitives/error-state";
+import { LoadingState } from "@/components/primitives/loading-state";
+import { Section } from "@/components/primitives/section";
 import { Separator } from "@/components/ui/separator";
+import { useGetEvents } from "@/generated/hooks/useGetEvents";
 import { useGetWinemakersById } from "@/generated/hooks/useGetWinemakersById";
 import { useGetWines } from "@/generated/hooks/useGetWines";
-import { useGetEvents } from "@/generated/hooks/useGetEvents";
 import { EntityReviewsSection } from "./-components/EntityReviewsSection";
 import { EventCard } from "./-components/EventCard";
 
@@ -23,7 +23,10 @@ function WinemakerProfilePage() {
   const { id } = Route.useParams();
   const { data: winemaker, isLoading, isError, refetch } = useGetWinemakersById(id);
   const winesQuery = useGetWines({ winemakerId: id });
-  const eventsQuery = useGetEvents({ winemakerName: winemaker?.name });
+  const eventsQuery = useGetEvents(
+    { winemakerName: winemaker?.name },
+    { query: { enabled: !!winemaker?.name } }
+  );
 
   if (isLoading) {
     return (
@@ -42,7 +45,7 @@ function WinemakerProfilePage() {
   }
 
   const wines = winesQuery.data || [];
-  const events = eventsQuery.data || [];
+  const events = (eventsQuery.data || []) as any[];
 
   return (
     <div className="container mx-auto space-y-12 px-6 py-8 lg:px-12">
@@ -83,7 +86,7 @@ function WinemakerProfilePage() {
               <EmptyState title="No upcoming events" />
             ) : (
               <DataGrid variant="catalog">
-                {events.map((event: { id: string; startTime: any; endTime: any }) => (
+                {events.map((event) => (
                   <EventCard
                     event={{
                       ...event,

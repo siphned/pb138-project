@@ -1,71 +1,138 @@
+import { FilterIcon } from "@hugeicons/core-free-icons";
+import { HugeiconsIcon } from "@hugeicons/react";
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { CatalogFilters } from "@/components/catalog/CatalogFilters";
+import { CatalogPagination } from "@/components/catalog/CatalogPagination";
 import { CatalogResults } from "@/components/catalog/CatalogResults";
 import { ProductCard } from "@/components/catalog/ProductCard";
+import type { ProductSearch } from "@/components/catalog/types";
 import { EmptyState } from "@/components/primitives/empty-state";
 import { ErrorState } from "@/components/primitives/error-state";
 import { LoadingState } from "@/components/primitives/loading-state";
 import { PageHeader } from "@/components/primitives/page-header";
+import { Button } from "@/components/ui/button";
+import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { useGetProducts } from "@/generated/hooks/useGetProducts";
+import {
+  type GetProductsQueryParamsColorEnumKey,
+  type GetProductsQueryParamsSortEnumKey,
+  type GetProductsQueryParamsTypeEnumKey,
+  getProductsQueryParamsColorEnum,
+  getProductsQueryParamsSortEnum,
+  getProductsQueryParamsTypeEnum,
+} from "@/generated/types/GetProducts";
+
+const COLOR_VALUES = Object.values(getProductsQueryParamsColorEnum) as readonly string[];
+const isColor = (v: unknown): v is GetProductsQueryParamsColorEnumKey =>
+  typeof v === "string" && COLOR_VALUES.includes(v);
+
+const SORT_VALUES = Object.values(getProductsQueryParamsSortEnum) as readonly string[];
+const isSort = (v: unknown): v is GetProductsQueryParamsSortEnumKey =>
+  typeof v === "string" && SORT_VALUES.includes(v);
+
+const TYPE_VALUES = Object.values(getProductsQueryParamsTypeEnum) as readonly string[];
+const isProductType = (v: unknown): v is GetProductsQueryParamsTypeEnumKey =>
+  typeof v === "string" && TYPE_VALUES.includes(v);
 
 export const Route = createFileRoute("/products/")({
   component: ProductsPage,
-  validateSearch: (search) => ({
-    isBundle: typeof search.isBundle === "boolean" ? search.isBundle : undefined,
-    q: typeof search.q === "string" ? search.q : undefined,
-    shopId: typeof search.shopId === "string" ? search.shopId : undefined,
-    wineId: typeof search.wineId === "string" ? search.wineId : undefined,
-  }),
+  validateSearch: (raw): ProductSearch =>
+    ({
+      color: isColor(raw.color) ? raw.color : undefined,
+      isBundle: typeof raw.isBundle === "boolean" ? raw.isBundle : undefined,
+      maxPrice:
+        typeof raw.maxPrice === "string" || typeof raw.maxPrice === "number"
+          ? raw.maxPrice
+          : undefined,
+      minPrice:
+        typeof raw.minPrice === "string" || typeof raw.minPrice === "number"
+          ? raw.minPrice
+          : undefined,
+      page: typeof raw.page === "string" || typeof raw.page === "number" ? raw.page : undefined,
+      rating:
+        typeof raw.rating === "string" || typeof raw.rating === "number" ? raw.rating : undefined,
+      region: typeof raw.region === "string" ? raw.region : undefined,
+      search: typeof raw.search === "string" ? raw.search : undefined,
+      shopId: typeof raw.shopId === "string" ? raw.shopId : undefined,
+      sort: isSort(raw.sort) ? raw.sort : undefined,
+      type: isProductType(raw.type) ? raw.type : undefined,
+      wineId: typeof raw.wineId === "string" ? raw.wineId : undefined,
+    }) as ProductSearch,
 });
 
 function ProductsPage() {
   const search = Route.useSearch();
   const navigate = useNavigate({ from: Route.fullPath });
-  const query = useGetProducts(search);
 
-  const handleSearchChange = (next: Record<string, unknown>) => {
-    navigate({ replace: true, search: next as any });
+  // isBundle is a UI-only filter until BE adds it to OpenAPI (see types.ts).
+  const { isBundle: _isBundle, ...apiSearchParams } = search;
+  const query = useGetProducts(apiSearchParams);
+
+  const handleSearchChange = (next: ProductSearch) => {
+    navigate({ replace: true, search: next });
   };
 
-  if (query.isLoading) {
-    return (
-      <div className="container mx-auto px-6 py-8 lg:px-12">
-        <LoadingState variant="catalog" />
-      </div>
-    );
-  }
-
-  if (query.isError) {
-    return (
-      <div className="container mx-auto px-6 py-8 lg:px-12">
-        <ErrorState onRetry={() => query.refetch()} />
-      </div>
-    );
-  }
-
   const products = query.data?.data || [];
+  const total = Number(query.data?.total || 0);
+  const page = Number(query.data?.page || 1);
+  const limit = Number(query.data?.limit || 20);
+
+  const handlePageChange = (newPage: number) => {
+    handleSearchChange({ ...search, page: newPage });
+  };
 
   return (
     <div className="container mx-auto space-y-8 px-6 py-8 lg:px-12">
       <PageHeader description="Browse wines available for purchase." title="Products" />
 
       <div className="grid grid-cols-1 gap-12 lg:grid-cols-[280px_1fr]">
-        <aside>
+        <div className="lg:hidden">
+          <Sheet>
+            <SheetTrigger render={<Button className="w-full" size="sm" variant="outline" />}>
+              <HugeiconsIcon className="mr-2 h-4 w-4" icon={FilterIcon} />
+              Filters
+            </SheetTrigger>
+            <SheetContent className="w-[300px]" side="left">
+              <div className="py-8 px-4 h-full overflow-y-auto">
+                <CatalogFilters
+                  entity="products"
+                  onSearchChange={handleSearchChange}
+                  search={search}
+                />
+              </div>
+            </SheetContent>
+          </Sheet>
+        </div>
+
+        <aside className="hidden lg:block">
           <CatalogFilters entity="products" onSearchChange={handleSearchChange} search={search} />
         </aside>
 
-        <main>
-          {products.length === 0 ? (
+        <main className="space-y-8">
+          {query.isLoading ? (
+            <LoadingState variant="catalog" />
+          ) : query.isError ? (
+            <ErrorState onRetry={() => query.refetch()} />
+          ) : products.length === 0 ? (
             <EmptyState
               description="Try adjusting your filters to find what you're looking for."
               title="No products found"
             />
           ) : (
-            <CatalogResults count={products.length}>
-              {products.map((product) => (
-                <ProductCard key={product.id} product={product} />
-              ))}
-            </CatalogResults>
+            <>
+              <CatalogResults count={total}>
+                {products.map((product) => (
+                  <ProductCard key={product.id} product={product} />
+                ))}
+              </CatalogResults>
+
+              <CatalogPagination
+                limit={limit}
+                onPageChange={handlePageChange}
+                page={page}
+                total={total}
+              />
+            </>
           )}
         </main>
       </div>
