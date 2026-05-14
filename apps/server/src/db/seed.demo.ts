@@ -142,8 +142,11 @@ async function main() {
 
   // ── Winemakers + wines + events ──────────────────────────────────────────────
   logger.info("Inserting winemakers, wines and events...");
-  const allWineIds: string[] = [];
-  const allEventIds: string[] = [];
+  type ImageEntry = { id: string; url?: string };
+  const allWineImages: ImageEntry[] = [];
+  const allEventImages: ImageEntry[] = [];
+  const allWinemakerImages: ImageEntry[] = [];
+  const allShopImages: ImageEntry[] = [];
 
   for (const wm of WINEMAKERS) {
     // Create owner user if fake
@@ -177,6 +180,7 @@ async function main() {
     };
     const [wmRow] = await insertWinemakers([winemakerInput]);
     wmIdMap.set(wm.key, wmRow!.id);
+    allWinemakerImages.push({ id: wmRow!.id, url: wm.imageUrl });
 
     // Wines
     const wineInputs: WineInput[] = wm.wines.map((w) => ({
@@ -196,7 +200,7 @@ async function main() {
     const insertedWines = await insertWines(wineInputs);
     insertedWines.forEach((row, i) => {
       wineIdMap.set(`${wm.key}::${wm.wines[i]!.name}`, row.id);
-      allWineIds.push(row.id);
+      allWineImages.push({ id: row.id, url: wm.wines[i]!.imageUrl });
     });
 
     // Events
@@ -220,10 +224,10 @@ async function main() {
     const insertedEvents = await insertEvents(eventInputs);
     insertedEvents.forEach((row, i) => {
       eventIdMap.set(`${wm.key}-${i}`, row.id);
-      allEventIds.push(row.id);
+      allEventImages.push({ id: row.id, url: wm.events[i]!.imageUrl });
     });
   }
-  logger.info(`Inserted ${wmIdMap.size} winemakers, ${allWineIds.length} wines, ${allEventIds.length} events`);
+  logger.info(`Inserted ${wmIdMap.size} winemakers, ${allWineImages.length} wines, ${allEventImages.length} events`);
 
   // ── Shops + products + bundles ───────────────────────────────────────────────
   logger.info("Inserting shops, products and bundles...");
@@ -258,6 +262,7 @@ async function main() {
     };
     const [shopRow] = await insertShops([shopInput]);
     shopIdMap.set(shop.key, shopRow!.id);
+    allShopImages.push({ id: shopRow!.id, url: shop.imageUrl });
 
     // Products: all wines from source winemakers
     for (const wmKey of shop.sourceWinemakerKeys) {
@@ -617,10 +622,25 @@ async function main() {
   logger.info(`Inserted ${reqPool.length} role requests`);
 
   // ── Images ───────────────────────────────────────────────────────────────────
+  // Custom URLs from data file take priority; picsum is the fallback.
   logger.info("Inserting images...");
   const imageInputs: ImageInput[] = [
-    ...allWineIds.map((id) => ({ entityType: "wine", entityId: id, url: `https://picsum.photos/seed/${id}/800/600` })),
-    ...allEventIds.map((id) => ({ entityType: "event", entityId: id, url: `https://picsum.photos/seed/${id}/1200/600` })),
+    ...allWineImages.map(({ id, url }) => ({
+      entityType: "wine", entityId: id,
+      url: url ?? `https://picsum.photos/seed/${id}/800/600`,
+    })),
+    ...allEventImages.map(({ id, url }) => ({
+      entityType: "event", entityId: id,
+      url: url ?? `https://picsum.photos/seed/${id}/1200/600`,
+    })),
+    ...allWinemakerImages.map(({ id, url }) => ({
+      entityType: "winemaker", entityId: id,
+      url: url ?? `https://picsum.photos/seed/${id}/1200/400`,
+    })),
+    ...allShopImages.map(({ id, url }) => ({
+      entityType: "shop", entityId: id,
+      url: url ?? `https://picsum.photos/seed/${id}/800/400`,
+    })),
   ];
   await insertImages(imageInputs);
   logger.info(`Inserted ${imageInputs.length} images`);

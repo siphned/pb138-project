@@ -16,6 +16,7 @@ export type WineData = {
   composition: string;
   description: string; // ← replace with AI content
   basePrice: number; // shops may vary ±15%
+  imageUrl?: string; // ← paste your custom wine bottle/label photo URL here
 };
 
 export type EventData = {
@@ -26,6 +27,7 @@ export type EventData = {
   durationHours: number;
   capacity: number;
   visibility: "public" | "private";
+  imageUrl?: string; // ← event banner/venue photo URL
 };
 
 export type WinemakerData = {
@@ -37,6 +39,7 @@ export type WinemakerData = {
   phone: string;
   websiteUrl: string;
   city: string;
+  imageUrl?: string; // ← winery/vineyard photo URL
   wines: WineData[];
   events: EventData[];
 };
@@ -55,6 +58,7 @@ export type ShopData = {
   name: string;
   description: string; // ← replace with AI content
   city: string;
+  imageUrl?: string; // ← storefront/shop interior photo URL
   sourceWinemakerKeys: string[]; // supply agreements + which wines to list as products
   bundles: BundleData[];
 };
