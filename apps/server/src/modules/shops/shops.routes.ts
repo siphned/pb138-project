@@ -26,32 +26,19 @@ export const shopsRoutes = new Elysia()
     response: { 200: t.Array(shopResponse) },
   })
 
-  .get(
-    "/shops/:id",
-    async ({ params }) => {
-      try {
-        return await shopsService.getShop(params.id);
-      } catch (e: unknown) {
-        if (e instanceof Error && e.message === "NOT_FOUND") return status(404, "Shop not found");
-        throw e;
-      }
+  .get("/shops/:id", ({ params }) => shopsService.getShop(params.id), {
+    detail: {
+      description: "Returns a single shop with address. 404 if not found or deleted.",
+      summary: "Get shop by ID",
+      tags: ["shops"],
     },
-    {
-      detail: {
-        description: "Returns a single shop with address. 404 if not found or deleted.",
-        summary: "Get shop by ID",
-        tags: ["shops"],
-      },
-      params: t.Object({ id: t.String() }),
-      response: { 200: shopResponse, 404: t.String() },
-    }
-  )
+    params: t.Object({ id: t.String() }),
+    response: { 200: shopResponse },
+  })
 
   .post(
     "/shops",
-    async ({ dbUser, body }) => {
-      return status(201, await shopsService.createShop(dbUser.id, body));
-    },
+    async ({ dbUser, body }) => status(201, await shopsService.createShop(dbUser.id, body)),
     {
       body: createShopBody,
       detail: {
@@ -67,17 +54,7 @@ export const shopsRoutes = new Elysia()
 
   .patch(
     "/shops/:id",
-    async ({ params, dbUser, body }) => {
-      try {
-        return await shopsService.updateShop(params.id, dbUser.id, body);
-      } catch (e: unknown) {
-        if (e instanceof Error) {
-          if (e.message === "NOT_FOUND") return status(404, "Shop not found");
-          if (e.message === "FORBIDDEN") return status(403, "You do not own this shop");
-        }
-        throw e;
-      }
-    },
+    ({ params, dbUser, body }) => shopsService.updateShop(params.id, dbUser.id, body),
     {
       body: updateShopBody,
       detail: {
@@ -88,6 +65,6 @@ export const shopsRoutes = new Elysia()
       },
       params: t.Object({ id: t.String() }),
       requireRoles: ["shop_owner", "admin"],
-      response: { 200: shopResponse, 403: t.String(), 404: t.String() },
+      response: { 200: shopResponse },
     }
   );

@@ -1,6 +1,7 @@
 import type { AvailabilityException, AvailabilityRegular } from "@repo/shared/schemas";
 import { db } from "../../db";
 import { ForbiddenShopActionError, ShopNotFoundError } from "../shops/shops.errors";
+import { AvailabilityEntryNotFoundError, InvalidTimeRangeError } from "./availability.errors";
 import * as availabilityRepo from "./availability.repository";
 
 function parseTime(hhmm: string): Date {
@@ -31,7 +32,7 @@ export class AvailabilityService {
 
     const starts = new Date(data.startsAt);
     const ends = new Date(data.endsAt);
-    if (ends <= starts) throw new Error("INVALID_TIME_RANGE");
+    if (ends <= starts) throw new InvalidTimeRangeError();
 
     return availabilityRepo.insertException(db, {
       action: data.action,
@@ -58,10 +59,10 @@ export class AvailabilityService {
 
     const start = parseTime(data.startTime);
     const end = parseTime(data.endTime);
-    if (end <= start) throw new Error("INVALID_TIME_RANGE");
+    if (end <= start) throw new InvalidTimeRangeError();
 
     if (data.validTo !== undefined && data.validTo <= data.validFrom)
-      throw new Error("INVALID_TIME_RANGE");
+      throw new InvalidTimeRangeError();
 
     return availabilityRepo.insertRegular(db, {
       dow: data.dow,
@@ -78,7 +79,7 @@ export class AvailabilityService {
     await this.assertShopOwnership(shopId, requesterId);
 
     const entry = await availabilityRepo.findExceptionById(db, entryId);
-    if (!entry || entry.shopId !== shopId) throw new Error("NOT_FOUND");
+    if (!entry || entry.shopId !== shopId) throw new AvailabilityEntryNotFoundError();
 
     await availabilityRepo.deleteException(db, entryId);
   }
@@ -87,7 +88,7 @@ export class AvailabilityService {
     await this.assertShopOwnership(shopId, requesterId);
 
     const entry = await availabilityRepo.findRegularById(db, entryId);
-    if (!entry || entry.shopId !== shopId) throw new Error("NOT_FOUND");
+    if (!entry || entry.shopId !== shopId) throw new AvailabilityEntryNotFoundError();
 
     await availabilityRepo.deleteRegular(db, entryId);
   }
