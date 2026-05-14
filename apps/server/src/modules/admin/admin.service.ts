@@ -1,5 +1,6 @@
 import { db } from "../../db";
 import { emailService } from "../email/email.service";
+import { logger } from "../../utils/logger";
 import * as winemakersRepo from "../winemakers/winemakers.repository";
 import {
   AdminEventNotFoundError,
@@ -30,9 +31,7 @@ export class AdminService {
           startTime: updated.startTime,
           winemakerName: winemaker.name,
         })
-        .catch(() => {
-          /* ignore */
-        });
+        .catch((e) => logger.error({ err: e, eventId }, "Failed to send event approval email"));
     }
 
     return updated;

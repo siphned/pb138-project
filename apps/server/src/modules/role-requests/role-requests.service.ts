@@ -38,9 +38,12 @@ export class RoleRequestsService {
         fname: user.fname,
         role: request.type,
       })
-      .catch(() => {
-        /* ignore */
-      });
+      .catch((e) =>
+        logger.error(
+          { err: e, requestId, userId: request.userId },
+          "Failed to send role approval email"
+        )
+      );
 
     return result;
   }

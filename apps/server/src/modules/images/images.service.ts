@@ -1,5 +1,6 @@
 import { mkdirSync } from "node:fs";
 import { unlink } from "node:fs/promises";
+import { logger } from "../../utils/logger";
 import { join } from "node:path";
 import { fileURLToPath } from "node:url";
 import type { Image } from "@repo/shared/schemas";
@@ -81,9 +82,12 @@ export class ImagesService {
         url: `/uploads/${entityType}/${filename}`,
       });
     } catch (e) {
-      await unlink(filePath).catch(() => {
-        /* Ignore cleanup errors */
-      });
+      await unlink(filePath).catch((unlinkErr) =>
+        logger.error(
+          { err: unlinkErr, filePath },
+          "Failed to clean up uploaded file after DB error"
+        )
+      );
       throw e;
     }
   }
