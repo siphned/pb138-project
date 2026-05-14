@@ -6,7 +6,12 @@
       "Bash(bun run *)",
       "Bash(git add *)",
       "Bash(git commit *)",
-      "Bash(git *)"
+      "Bash(git *)",
+      "Bash(cat)",
+      "Read(//tmp/**)",
+      "Skill(superpowers:brainstorming)",
+      "Skill(superpowers:writing-plans)",
+      "Skill(superpowers:executing-plans)"
     ]
   }
 }
