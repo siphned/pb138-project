@@ -46,7 +46,7 @@ export const availabilityRoutes = new Elysia()
         tags: ["availability"],
       },
       params: shopParams,
-      requireAuth: true,
+      requireRoles: ["shop_owner", "admin"],
     }
   )
 
@@ -63,7 +63,7 @@ export const availabilityRoutes = new Elysia()
         tags: ["availability"],
       },
       params: shopEntryParams,
-      requireAuth: true,
+      requireRoles: ["shop_owner", "admin"],
     }
   )
 
@@ -80,7 +80,7 @@ export const availabilityRoutes = new Elysia()
         tags: ["availability"],
       },
       params: shopParams,
-      requireAuth: true,
+      requireRoles: ["shop_owner", "admin"],
     }
   )
 
@@ -97,6 +97,6 @@ export const availabilityRoutes = new Elysia()
         tags: ["availability"],
       },
       params: shopEntryParams,
-      requireAuth: true,
+      requireRoles: ["shop_owner", "admin"],
     }
   );
