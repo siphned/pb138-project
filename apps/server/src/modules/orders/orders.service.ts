@@ -153,10 +153,10 @@ export class OrdersService {
     return order;
   }
 
-  async getOrder(id: string, userId: string): Promise<OrderWithItems> {
+  async getOrder(id: string, userId: string, isAdmin = false): Promise<OrderWithItems> {
     const order = await ordersRepo.findById(db, id);
     if (!order) throw new Error("NOT_FOUND");
-    if (order.userId !== userId) throw new Error("FORBIDDEN");
+    if (!isAdmin && order.userId !== userId) throw new Error("FORBIDDEN");
     return order;
   }
 
