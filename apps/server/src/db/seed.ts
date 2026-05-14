@@ -6,6 +6,7 @@ import {
   type CommentInput,
   type EventInput,
   type OrderInput,
+  type OrderItemInput,
   type ProductInput,
   type ReviewInput,
   type ShopInput,
@@ -15,7 +16,9 @@ import {
   insertAddresses,
   insertAvailabilityRegular,
   insertComments,
+  insertEventRegistrations,
   insertEvents,
+  insertOrderItems,
   insertOrders,
   insertProductWines,
   insertProducts,
@@ -50,6 +53,34 @@ function czechAddress(): AddressInput {
 function pick<T>(arr: readonly T[]): T {
   return faker.helpers.arrayElement(arr as T[]);
 }
+
+// Gap 4: real wine variety names instead of faker.commerce.productName()
+const VARIETIES = [
+  "Pálava",
+  "Welschriesling",
+  "Frankovka",
+  "Müller-Thurgau",
+  "Rulandské šedé",
+  "Zweigeltrebe",
+  "Sauvignon",
+  "Neuburské",
+  "Modrý Portugal",
+  "Ryzlink vlašský",
+  "Chardonnay",
+  "Pinot Noir",
+  "Cabernet Sauvignon",
+  "Merlot",
+  "Riesling",
+  "Grüner Veltliner",
+  "Syrah",
+  "Sangiovese",
+  "Hibernal",
+  "André",
+  "Dornfelder",
+  "Regent",
+  "Tramín červený",
+  "Rulandské modré",
+] as const;
 
 async function main() {
   await teardown();
@@ -138,25 +169,38 @@ async function main() {
   ] as const;
 
   let totalWineCount = 0;
-  const allProducts: { id: string }[] = [];
+  const allProducts: { id: string; price: string; shopId: string }[] = [];
+  // Gap 3: track wines per winemaker for bundle extra product_wines
+  const winemakerWinesMap = new Map<string, { id: string }[]>();
+
   for (let i = 0; i < winemakerRows.length; i++) {
     const wm = winemakerRows[i]!;
-    const wineInputs: WineInput[] = Array.from({ length: WINES_PER_WINEMAKER }, () => ({
-      winemakerId: wm.id,
-      name: faker.commerce.productName(),
-      color: pick(COLORS),
-      type: pick(TYPES),
-      region: pick(REGIONS),
-      vintageYear: faker.number.int({ min: 2015, max: 2023 }),
-      alcoholContent: faker.number.float({ min: 9, max: 16, fractionDigits: 1 }).toFixed(2),
-      volumeMl: pick([375, 750, 1500] as const),
-      quantity: faker.number.int({ min: 10, max: 500 }),
-      attribution: faker.helpers.arrayElement(["Estate", "Single Vineyard", "Reserve", "Grand Cru"]),
-      composition: faker.helpers.arrayElement(["100% Cabernet", "Blend", "Single varietal", "Mixed"]),
-      description: faker.lorem.paragraph(),
-    }));
+
+    // Gap 4: use real variety names
+    const wineInputs: WineInput[] = Array.from({ length: WINES_PER_WINEMAKER }, () => {
+      const variety = pick(VARIETIES);
+      const vintageYear = faker.number.int({ min: 2015, max: 2023 });
+      const isBlend = Math.random() < 0.25;
+      return {
+        winemakerId: wm.id,
+        name: `${variety} ${vintageYear}`,
+        color: pick(COLORS),
+        type: pick(TYPES),
+        region: pick(REGIONS),
+        vintageYear,
+        alcoholContent: faker.number.float({ min: 9, max: 16, fractionDigits: 1 }).toFixed(2),
+        volumeMl: pick([375, 750, 1500] as const),
+        quantity: faker.number.int({ min: 10, max: 500 }),
+        attribution: faker.helpers.arrayElement(["Estate", "Single Vineyard", "Reserve", "Grand Cru"]),
+        composition: isBlend
+          ? `${pick(VARIETIES)}, ${pick(VARIETIES)}`
+          : `100% ${variety}`,
+        description: faker.lorem.paragraph(),
+      };
+    });
     const insertedWines = await insertWines(wineInputs);
     totalWineCount += insertedWines.length;
+    winemakerWinesMap.set(wm.id, insertedWines.map((w) => ({ id: w.id })));
 
     const shop = shopRows[i * SHOPS_PER_WINEMAKER];
     if (shop) {
@@ -169,14 +213,24 @@ async function main() {
         description: faker.lorem.sentence(),
       }));
       const insertedProducts = await insertProducts(productInputs);
-      await insertProductWines(
-        insertedProducts.map((product, j) => ({
-          productId: product.id,
-          wineId: insertedWines[j]!.id,
-          quantity: 1,
-        })),
-      );
-      allProducts.push(...insertedProducts);
+
+      // Gap 3: fix bundle product_wines (2–4 wines per bundle)
+      const productWineRows: { productId: string; wineId: string; quantity: number }[] = [];
+      const wmWines = winemakerWinesMap.get(wm.id) ?? [];
+      for (const [j, product] of insertedProducts.entries()) {
+        const primaryWineId = insertedWines[j]!.id;
+        productWineRows.push({ productId: product.id, wineId: primaryWineId, quantity: 1 });
+        if (product.isBundle && wmWines.length > 1) {
+          const extraCount = faker.number.int({ min: 1, max: Math.min(3, wmWines.length - 1) });
+          const extras = faker.helpers
+            .arrayElements(wmWines.filter((w) => w.id !== primaryWineId), extraCount);
+          for (const extra of extras) {
+            productWineRows.push({ productId: product.id, wineId: extra.id, quantity: 1 });
+          }
+        }
+      }
+      await insertProductWines(productWineRows);
+      allProducts.push(...insertedProducts.map((p) => ({ id: p.id, price: p.price, shopId: shop.id })));
     }
 
     if ((i + 1) % 10 === 0)
@@ -215,8 +269,23 @@ async function main() {
       };
     }),
   );
-  await insertEvents(eventInputs);
-  logger.info(`Inserted ${eventInputs.length} events`);
+  const insertedEvents = await insertEvents(eventInputs);
+  logger.info(`Inserted ${insertedEvents.length} events`);
+
+  // Gap 2: event registrations — ~30% of customers register for a random event
+  if (insertedEvents.length > 0) {
+    logger.info("Inserting event registrations...");
+    const registrationPool = faker.helpers.arrayElements(
+      customers,
+      Math.floor(customers.length * 0.3),
+    );
+    const registrationInputs = registrationPool.map((user) => ({
+      eventId: pick(insertedEvents).id,
+      userId: user.id,
+    }));
+    await insertEventRegistrations(registrationInputs);
+    logger.info(`Inserted ${registrationInputs.length} event registrations`);
+  }
 
   // ── UserRoles ──────────────────────────────────────────────────────────────
   logger.info("Inserting user roles...");
@@ -233,18 +302,28 @@ async function main() {
   logger.info(`Inserted ${userRoleInputs.length} user roles`);
 
   // ── Availability ───────────────────────────────────────────────────────────
+  // Gap 5: randomize hours and include weekends for some shops
   logger.info("Inserting availability...");
   const today = new Date();
   const validFrom = today.toISOString().slice(0, 10);
-  const availInputs: AvailabilityInput[] = shopRows.flatMap((shop) =>
-    [1, 2, 3, 4, 5].map((dow) => {
+  const availInputs: AvailabilityInput[] = shopRows.flatMap((shop) => {
+    const openHour = faker.number.int({ min: 8, max: 10 });
+    const closeHour = faker.number.int({ min: 17, max: 20 });
+    const hasSaturday = Math.random() < 0.6;
+    const hasSunday = Math.random() < 0.2;
+    const makeSlot = (dow: number, open: number, close: number): AvailabilityInput => {
       const start = new Date(today);
-      start.setHours(9, 0, 0, 0);
+      start.setHours(open, 0, 0, 0);
       const end = new Date(today);
-      end.setHours(18, 0, 0, 0);
+      end.setHours(close, 0, 0, 0);
       return { shopId: shop.id, dow, startTime: start, endTime: end, type: "open", validFrom };
-    }),
-  );
+    };
+    return [
+      ...[1, 2, 3, 4, 5].map((dow) => makeSlot(dow, openHour, closeHour)),
+      ...(hasSaturday ? [makeSlot(6, openHour + 1, closeHour - 1)] : []),
+      ...(hasSunday ? [makeSlot(0, 10, 16)] : []),
+    ];
+  });
   await insertAvailabilityRegular(availInputs);
   logger.info(`Inserted ${availInputs.length} availability rows`);
 
@@ -305,29 +384,73 @@ async function main() {
   await insertComments(commentInputs);
   logger.info(`Inserted ${commentInputs.length} comments`);
 
-  // ── Orders ─────────────────────────────────────────────────────────────────
-  logger.info("Inserting orders...");
-  const buyerPool = faker.helpers.arrayElements(
-    customers,
-    Math.floor(customers.length * 0.3),
-  );
-  const orderAddrRows = await insertAddresses(
-    buyerPool.flatMap(() => [czechAddress(), czechAddress()]),
-  );
-  const orderInputs: OrderInput[] = buyerPool.map((buyer, i) => ({
-    userId: buyer.id,
-    shippingAddressId: orderAddrRows[i * 2]!.id,
-    billingAddressId: orderAddrRows[i * 2 + 1]!.id,
-    status: pick(["confirmed", "shipped", "delivered"] as const),
-    deliveryType: pick(["pickup", "shipping"] as const),
-    paymentMethod: pick(["card", "bank_transfer", "cash_on_delivery"] as const),
-    paymentStatus: "captured" as const,
-    totalPrice: faker.commerce.price({ min: 15, max: 300 }),
-    discount: "0.00",
-    shippingFee: pick(["0.00", "5.00", "10.00"] as const),
-  }));
-  const insertedOrders = await insertOrders(orderInputs);
-  logger.info(`Inserted ${insertedOrders.length} orders`);
+  // ── Orders + Order Items ───────────────────────────────────────────────────
+  // Gap 1: pre-compute items per buyer so totalPrice is correct
+  logger.info("Inserting orders and order items...");
+
+  // Group products by shop for item selection
+  const shopProductMap = new Map<string, { id: string; price: string }[]>();
+  for (const p of allProducts) {
+    const existing = shopProductMap.get(p.shopId) ?? [];
+    existing.push({ id: p.id, price: p.price });
+    shopProductMap.set(p.shopId, existing);
+  }
+  const shopEntries = [...shopProductMap.entries()];
+
+  if (shopEntries.length > 0) {
+    const buyerPool = faker.helpers.arrayElements(
+      customers,
+      Math.floor(customers.length * 0.3),
+    );
+    const orderAddrRows = await insertAddresses(
+      buyerPool.flatMap(() => [czechAddress(), czechAddress()]),
+    );
+
+    type PendingItem = { productId: string; shopId: string; quantity: number; unitPriceAtPurchase: string };
+    type PendingOrder = { input: OrderInput; items: PendingItem[] };
+
+    const pending: PendingOrder[] = buyerPool.map((buyer, i) => {
+      const [shopId, shopProducts] = pick(shopEntries);
+      const itemCount = faker.number.int({ min: 1, max: 4 });
+      const pickedProds = faker.helpers.arrayElements(
+        shopProducts,
+        Math.min(itemCount, shopProducts.length),
+      );
+      const shippingFee = pick(["0.00", "5.00", "10.00"] as const);
+      let itemsTotal = 0;
+      const items: PendingItem[] = pickedProds.map((prod) => {
+        const qty = faker.number.int({ min: 1, max: 3 });
+        itemsTotal += qty * Number.parseFloat(prod.price);
+        return { productId: prod.id, shopId, quantity: qty, unitPriceAtPurchase: prod.price };
+      });
+      const totalPrice = (itemsTotal + Number.parseFloat(shippingFee)).toFixed(2);
+      return {
+        input: {
+          userId: buyer.id,
+          shippingAddressId: orderAddrRows[i * 2]!.id,
+          billingAddressId: orderAddrRows[i * 2 + 1]!.id,
+          status: pick(["confirmed", "shipped", "delivered"] as const),
+          deliveryType: pick(["pickup", "shipping"] as const),
+          paymentMethod: pick(["card", "bank_transfer", "cash_on_delivery"] as const),
+          paymentStatus: "captured" as const,
+          totalPrice,
+          discount: "0.00",
+          shippingFee,
+        },
+        items,
+      };
+    });
+
+    const insertedOrders = await insertOrders(pending.map((p) => p.input));
+
+    const orderItemInputs: OrderItemInput[] = insertedOrders.flatMap((order, i) =>
+      (pending[i]?.items ?? []).map((item) => ({ ...item, orderId: order.id })),
+    );
+    await insertOrderItems(orderItemInputs);
+    logger.info(
+      `Inserted ${insertedOrders.length} orders with ${orderItemInputs.length} order items`,
+    );
+  }
 
   // ── Role Requests ──────────────────────────────────────────────────────────
   logger.info("Inserting role requests...");
