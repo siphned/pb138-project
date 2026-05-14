@@ -51,6 +51,13 @@ export class UsersService {
     return usersRepo.findById(db, id);
   }
 
+  async getUserWithRoles(userId: string): Promise<User & { roles: string[] }> {
+    const user = await usersRepo.findById(db, userId);
+    if (!user) throw new UserNotFoundError(userId);
+    const roles = await userRolesRepo.findByUserId(db, userId);
+    return { ...user, roles };
+  }
+
   /**
    * Returns user with their current roles from DB.
    * Lazily syncs with Clerk if user doesn't exist locally.

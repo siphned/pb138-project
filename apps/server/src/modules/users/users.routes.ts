@@ -1,7 +1,5 @@
 import { Elysia } from "elysia";
-import { db } from "../../db";
 import { authPlugin } from "../auth";
-import * as userRolesRepo from "./user-roles.repository";
 import {
   addressBody,
   addressesResponseSchema,
@@ -14,31 +12,23 @@ import { usersService } from "./users.service";
 export const usersRoutes = new Elysia({ prefix: "/users" })
   .use(authPlugin)
 
-  .get(
-    "/me",
-    async ({ dbUser }) => {
-      const roles = await userRolesRepo.findByUserId(db, dbUser.id);
-      return { ...dbUser, roles };
+  .get("/me", ({ dbUser }) => usersService.getUserWithRoles(dbUser.id), {
+    detail: {
+      description:
+        "Returns the caller's user record with their roles. If no local row exists yet, one is lazily created from Clerk profile data on first call.",
+      security: [{ bearerAuth: [] }],
+      summary: "Get current authenticated user",
+      tags: ["users"],
     },
-    {
-      detail: {
-        description:
-          "Returns the caller's user record with their roles. If no local row exists yet, one is lazily created from Clerk profile data on first call.",
-        security: [{ bearerAuth: [] }],
-        summary: "Get current authenticated user",
-        tags: ["users"],
-      },
-      requireAuth: true,
-      response: userResponseSchema,
-    }
-  )
+    requireAuth: true,
+    response: userResponseSchema,
+  })
 
   .put(
     "/me",
     async ({ dbUser, body }) => {
-      const updated = await usersService.updateProfileById(dbUser.id, body);
-      const roles = await userRolesRepo.findByUserId(db, dbUser.id);
-      return { ...updated, roles };
+      await usersService.updateProfileById(dbUser.id, body);
+      return usersService.getUserWithRoles(dbUser.id);
     },
 
     {
