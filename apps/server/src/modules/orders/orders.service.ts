@@ -3,6 +3,7 @@ import { addresses } from "@repo/shared/schemas";
 import { type Database, db } from "../../db";
 import { logger } from "../../utils/logger";
 import { cartsService } from "../carts/carts.service";
+import type { CartWithItems } from "../carts/carts.repository";
 import { emailService } from "../email/email.service";
 import * as productsRepo from "../products/products.repository";
 import * as usersRepo from "../users/users.repository";
@@ -93,8 +94,7 @@ export class OrdersService {
     { userId, sessionId }: { userId?: string; sessionId?: string },
     data: CheckoutData
   ): Promise<Order> {
-    // biome-ignore lint/suspicious/noExplicitAny: complex cart type
-    let cart: any = null;
+    let cart: CartWithItems | undefined;
     if (userId) {
       cart = await cartsService.getCartForUser(userId);
     } else if (sessionId) {
@@ -192,8 +192,7 @@ export class OrdersService {
     return updated;
   }
 
-  // biome-ignore lint/suspicious/noExplicitAny: complex cart type
-  private validateAndProcessCart(cart: any) {
+  private validateAndProcessCart(cart: CartWithItems) {
     const items: CreateOrderItem[] = [];
     let subtotal = 0;
 
