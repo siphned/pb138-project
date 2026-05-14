@@ -17,7 +17,7 @@ export async function createAddress(db: Database, data: NewAddress): Promise<Add
 
 export async function findAddressById(db: Database, id: string): Promise<Address | undefined> {
   return await db.query.addresses.findFirst({
-    where: eq(addresses.id, id),
+    where: and(eq(addresses.id, id), isNull(addresses.deletedAt)),
   });
 }
 
