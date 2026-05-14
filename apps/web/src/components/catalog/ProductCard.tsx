@@ -1,5 +1,5 @@
 import { Link } from "@tanstack/react-router";
-import { Card, CardContent } from "@/components/ui/card";
+import { Card } from "@/components/ui/card";
 import type { GetProducts200 } from "@/generated/types/GetProducts";
 import { CatalogPlaceholder } from "./CatalogPlaceholder";
 
@@ -18,9 +18,11 @@ export function ProductCard({ product }: ProductCardProps) {
     style: "currency",
   });
 
+  const firstWineColor = product.wines?.[0]?.color;
+
   return (
-    <Card className="group relative" variant="catalog">
-      <div className="aspect-square w-full overflow-hidden rounded-t-xl bg-muted">
+    <Card className="group relative" variant="polaroid">
+      <div className="aspect-square w-full overflow-hidden rounded-lg bg-muted shadow-xs">
         {imageUrl ? (
           <img
             alt={product.name}
@@ -28,23 +30,20 @@ export function ProductCard({ product }: ProductCardProps) {
             src={imageUrl}
           />
         ) : (
-          <CatalogPlaceholder
-            text={product.isBundle ? "BUNDLE" : "PRODUCT"}
-            textClassName="text-2xl tracking-widest"
-          />
+          <CatalogPlaceholder color={firstWineColor} text={product.name} />
         )}
 
         {product.isBundle && (
-          <div className="absolute top-3 right-3 z-10">
-            <span className="rounded-full bg-primary px-2.5 py-0.5 text-[10px] font-bold tracking-wider text-primary-foreground shadow-sm">
+          <div className="absolute top-2 right-2 z-10">
+            <span className="rounded-full bg-primary px-2 py-0.5 text-[10px] font-bold tracking-wider text-primary-foreground shadow-sm">
               BUNDLE
             </span>
           </div>
         )}
       </div>
 
-      <CardContent className="p-4 space-y-1">
-        <h3 className="font-heading text-lg font-bold leading-tight">
+      <div className="pt-4 text-center">
+        <h3 className="font-heading text-base font-bold leading-tight">
           <Link
             className="stretched-link transition-colors hover:text-primary focus:outline-none"
             params={{ productId: product.id }}
@@ -54,10 +53,10 @@ export function ProductCard({ product }: ProductCardProps) {
           </Link>
         </h3>
 
-        <p className="text-sm text-muted-foreground">{product.shop.name}</p>
+        <p className="text-xs text-muted-foreground mt-1">{product.shop.name}</p>
 
-        <div className="mt-2 text-xl font-bold text-foreground">{price}</div>
-      </CardContent>
+        <div className="mt-2 text-lg font-bold text-foreground">{price}</div>
+      </div>
     </Card>
   );
 }

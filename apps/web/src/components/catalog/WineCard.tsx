@@ -1,5 +1,5 @@
 import { Link } from "@tanstack/react-router";
-import { Card, CardContent } from "@/components/ui/card";
+import { Card } from "@/components/ui/card";
 import type { GetWines200 } from "@/generated/types/GetWines";
 import { CatalogPlaceholder } from "./CatalogPlaceholder";
 
@@ -16,8 +16,8 @@ export function WineCard({ wine, minPrice }: WineCardProps) {
   const imageUrl = wine.images?.[0]?.url;
 
   return (
-    <Card className="group relative" variant="catalog">
-      <div className="aspect-square w-full overflow-hidden rounded-t-xl bg-muted">
+    <Card className="group relative" variant="polaroid">
+      <div className="aspect-square w-full overflow-hidden rounded-lg bg-muted shadow-xs">
         {imageUrl ? (
           <img
             alt={wine.name}
@@ -25,15 +25,12 @@ export function WineCard({ wine, minPrice }: WineCardProps) {
             src={imageUrl}
           />
         ) : (
-          <CatalogPlaceholder
-            text={wine.color.toUpperCase()}
-            textClassName="text-2xl tracking-widest"
-          />
+          <CatalogPlaceholder color={wine.color} text={wine.name} />
         )}
       </div>
 
-      <CardContent className="p-4 space-y-1">
-        <h3 className="font-heading text-lg font-bold leading-tight">
+      <div className="pt-4 text-center">
+        <h3 className="font-heading text-base font-bold leading-tight">
           <Link
             className="stretched-link transition-colors hover:text-primary focus:outline-none"
             params={{ id: wine.id }}
@@ -43,16 +40,16 @@ export function WineCard({ wine, minPrice }: WineCardProps) {
           </Link>
         </h3>
 
-        <p className="text-sm text-muted-foreground">
+        <p className="text-xs text-muted-foreground mt-1">
           {[wine.color, wine.region, wine.vintageYear].filter(Boolean).join(" · ")}
         </p>
 
         {minPrice !== undefined && (
-          <span className="mt-2 inline-block rounded-full bg-primary/10 px-2 py-0.5 text-xs font-semibold text-primary">
+          <span className="mt-2 inline-block rounded-full bg-primary/10 px-2 py-0.5 text-[10px] font-semibold text-primary">
             from €{minPrice}
           </span>
         )}
-      </CardContent>
+      </div>
     </Card>
   );
 }

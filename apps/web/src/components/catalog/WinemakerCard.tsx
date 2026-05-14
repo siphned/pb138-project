@@ -1,5 +1,5 @@
 import { Link } from "@tanstack/react-router";
-import { Card, CardContent } from "@/components/ui/card";
+import { Card } from "@/components/ui/card";
 import type { GetWinemakers200 } from "@/generated/types/GetWinemakers";
 import { CatalogPlaceholder } from "./CatalogPlaceholder";
 
@@ -13,16 +13,10 @@ interface WinemakerCardProps {
 
 export function WinemakerCard({ winemaker }: WinemakerCardProps) {
   const imageUrl = winemaker.images?.[0]?.url;
-  const initials = winemaker.name
-    .split(" ")
-    .map((w) => w[0])
-    .slice(0, 2)
-    .join("")
-    .toUpperCase();
 
   return (
-    <Card className="group relative" variant="catalog">
-      <div className="aspect-square w-full overflow-hidden rounded-t-xl bg-muted">
+    <Card className="group relative" variant="polaroid">
+      <div className="aspect-square w-full overflow-hidden rounded-lg bg-muted shadow-xs">
         {imageUrl ? (
           <img
             alt={winemaker.name}
@@ -30,12 +24,12 @@ export function WinemakerCard({ winemaker }: WinemakerCardProps) {
             src={imageUrl}
           />
         ) : (
-          <CatalogPlaceholder text={initials} textClassName="text-4xl" />
+          <CatalogPlaceholder text={winemaker.name} />
         )}
       </div>
 
-      <CardContent className="p-4 space-y-1">
-        <h3 className="font-heading text-lg font-bold leading-tight">
+      <div className="pt-4 text-center">
+        <h3 className="font-heading text-base font-bold leading-tight">
           <Link
             className="stretched-link transition-colors hover:text-primary focus:outline-none"
             params={{ id: winemaker.id }}
@@ -45,10 +39,10 @@ export function WinemakerCard({ winemaker }: WinemakerCardProps) {
           </Link>
         </h3>
 
-        <p className="text-sm text-muted-foreground">
+        <p className="text-xs text-muted-foreground mt-1">
           {[winemaker.address?.city, winemaker.address?.country].filter(Boolean).join(", ")}
         </p>
-      </CardContent>
+      </div>
     </Card>
   );
 }
