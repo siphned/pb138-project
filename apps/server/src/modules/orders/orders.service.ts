@@ -1,6 +1,5 @@
 import type { Order } from "@repo/shared/schemas";
 import { addresses } from "@repo/shared/schemas";
-import { sql } from "drizzle-orm";
 import { type Database, db } from "../../db";
 import { logger } from "../../utils/logger";
 import { cartsService } from "../carts/carts.service";
@@ -235,11 +234,7 @@ export class OrdersService {
         if (currentWineQty === undefined || currentWineQty < totalWineNeeded) {
           throw new Error("INSUFFICIENT_STOCK");
         }
-        await productsRepo.updateWineQuantity(
-          tx,
-          pw.wineId,
-          sql`${sql.raw("quantity")} - ${totalWineNeeded}`
-        );
+        await productsRepo.updateWineQuantity(tx, pw.wineId, -totalWineNeeded);
       }
     }
   }

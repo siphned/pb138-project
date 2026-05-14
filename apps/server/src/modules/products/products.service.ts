@@ -1,5 +1,4 @@
 import type { Product, ProductWine } from "@repo/shared/schemas";
-import { sql } from "drizzle-orm";
 import { type Database, db } from "../../db";
 import type { PaginatedResult } from "../../utils/pagination";
 import { parsePagination } from "../../utils/pagination";
@@ -49,7 +48,7 @@ export class ProductsService {
         throw new InsufficientStockError();
       }
 
-      await productsRepo.updateWineQuantity(tx, tw.wineId, sql`${sql.raw("quantity")} - ${total}`);
+      await productsRepo.updateWineQuantity(tx, tw.wineId, -total);
     }
   }
 
@@ -58,11 +57,7 @@ export class ProductsService {
     product: Product & { productWines: ProductWine[] }
   ) {
     for (const pw of product.productWines) {
-      await productsRepo.updateWineQuantity(
-        tx,
-        pw.wineId,
-        sql`${sql.raw("quantity")} + ${pw.quantity * product.quantity}`
-      );
+      await productsRepo.updateWineQuantity(tx, pw.wineId, pw.quantity * product.quantity);
     }
   }
 
@@ -128,11 +123,7 @@ export class ProductsService {
         throw new InsufficientStockError();
       }
 
-      await productsRepo.updateWineQuantity(
-        tx,
-        data.wineId,
-        sql`${sql.raw("quantity")} - ${data.quantity}`
-      );
+      await productsRepo.updateWineQuantity(tx, data.wineId, -data.quantity);
 
       const product = await productsRepo.create(tx, {
         description: data.description ?? null,

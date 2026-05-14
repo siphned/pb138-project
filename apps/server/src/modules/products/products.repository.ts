@@ -3,6 +3,7 @@ import { products, productWines, reviews, shops, wines } from "@repo/shared/sche
 import type { SQL } from "drizzle-orm";
 import { and, asc, desc, eq, ilike, inArray, isNull, or, sql } from "drizzle-orm";
 import type { Database } from "../../db";
+import { InsufficientStockError } from "./products.errors";
 
 export type WineInfo = Pick<
   Wine,
@@ -66,13 +67,16 @@ export async function deleteProductWines(db: Database, productId: string): Promi
 }
 
 export async function decrementStock(db: Database, id: string, amount: number): Promise<void> {
-  await db
+  const [updated] = await db
     .update(products)
     .set({
       quantity: sql`${products.quantity} - ${amount}`,
       updatedAt: new Date(),
     })
-    .where(eq(products.id, id));
+    .where(and(eq(products.id, id), sql`${products.quantity} >= ${amount}`))
+    .returning({ id: products.id });
+
+  if (!updated) throw new InsufficientStockError();
 }
 
 export async function update(db: Database, id: string, data: Partial<Product>): Promise<Product> {
@@ -330,9 +334,12 @@ export async function getWineQuantityForUpdate(
 export async function updateWineQuantity(
   db: Database,
   wineId: string,
-  quantitySql: SQL
+  delta: number
 ): Promise<void> {
-  await db.update(wines).set({ quantity: quantitySql }).where(eq(wines.id, wineId));
+  await db
+    .update(wines)
+    .set({ quantity: sql`${wines.quantity} + ${delta}` })
+    .where(eq(wines.id, wineId));
 }
 
 export async function productsExist(db: Database, ids: string[]): Promise<boolean> {
