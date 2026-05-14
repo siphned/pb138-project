@@ -22,6 +22,10 @@ const IMAGE_LIMITS: Record<string, number> = {
 type Caller = { roles: string[]; userId: string };
 
 export class ImagesService {
+  existsByUrl(url: string): Promise<boolean> {
+    return imagesRepo.findByUrl(db, url).then(Boolean);
+  }
+
   async listImages(entityType: EntityType, entityId: string): Promise<Image[]> {
     const exists = await imagesRepo.entityExists(db, entityType, entityId);
     if (!exists) throw new Error("NOT_FOUND");

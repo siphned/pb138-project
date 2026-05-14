@@ -1,12 +1,10 @@
 import { basename } from "node:path";
 import { fileURLToPath } from "node:url";
 import { Elysia, status, t } from "elysia";
-import { db } from "../../db";
 import { errorResponse } from "../../utils/error-plugin";
 import type { AppRole } from "../auth";
 import { authPlugin } from "../auth";
 import type { EntityType } from "./images.repository";
-import * as imagesRepo from "./images.repository";
 import { imageResponse, uploadImageBody, VALID_ENTITY_TYPES } from "./images.schema";
 import { imagesService } from "./images.service";
 
@@ -106,8 +104,7 @@ export const imagesRoutes = new Elysia()
       }
       const safeName = basename(params.filename);
       const url = `/uploads/${params.entityType}/${safeName}`;
-      const record = await imagesRepo.findByUrl(db, url);
-      if (!record) return status(404, "Not found");
+      if (!(await imagesService.existsByUrl(url))) return status(404, "Not found");
       const file = Bun.file(`${UPLOADS_DIR}/${params.entityType}/${safeName}`);
       if (!(await file.exists())) return status(404, "Not found");
       return file;
