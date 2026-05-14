@@ -64,7 +64,7 @@ export const app = new Elysia()
         ],
       },
       provider: "scalar",
-      specPath: "/swagger/json",
+      specPath: "/openapi",
     })
   )
   .use(usersRoutes)
