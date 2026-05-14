@@ -76,10 +76,8 @@ export class UsersService {
     const existing = await usersRepo.findByClerkId(db, clerkId);
     if (existing) return existing;
 
-    // 1. Fetch external profile
     const profile = await this.fetchExternalProfile(clerkId);
 
-    // 2. Persist local user record
     const user = await usersRepo.upsert(db, {
       clerkId,
       email: profile.email,
@@ -87,7 +85,6 @@ export class UsersService {
       lname: profile.lname,
     });
 
-    // 3. Sync roles to DB
     await this.syncRolesToDatabase(user.id, profile.roles);
 
     return user;

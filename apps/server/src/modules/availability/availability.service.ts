@@ -4,10 +4,10 @@ import { ForbiddenShopActionError, ShopNotFoundError } from "../shops/shops.erro
 import * as availabilityRepo from "./availability.repository";
 
 function parseTime(hhmm: string): Date {
-  const [h = 0, m = 0] = hhmm.split(":").map(Number);
-  const d = new Date(0);
-  d.setUTCHours(h, m, 0, 0);
-  return d;
+  const [hours = 0, minutes = 0] = hhmm.split(":").map(Number);
+  const date = new Date(0);
+  date.setUTCHours(hours, minutes, 0, 0);
+  return date;
 }
 
 export class AvailabilityService {

@@ -6,8 +6,6 @@ import { z } from "zod";
  * Zod for shared types, TypeBox for Elysia route validation.
  */
 
-// ─── Zod Schemas ──────────────────────────────────────────────────────────
-
 const cartProductResponseSchema = z.object({
   id: z.string(),
   name: z.string(),
@@ -53,8 +51,6 @@ export const mergeBodySchema = z.object({
     )
     .min(1),
 });
-
-// ─── TypeBox Schemas ──────────────────────────────────────────────────────
 
 const cartProductResponse = t.Object({
   id: t.String(),
