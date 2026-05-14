@@ -6,6 +6,7 @@ import {
   comments,
   eventRegistrations,
   events,
+  images,
   orderItems,
   orders,
   productWines,
@@ -22,6 +23,7 @@ import {
 import { db } from "./index";
 
 export async function teardown() {
+  await db.delete(images);
   await db.delete(comments);
   await db.delete(reviews);
   await db.delete(eventRegistrations);
@@ -260,4 +262,15 @@ export async function insertRoleRequests(
 ) {
   if (data.length === 0) return;
   await db.insert(roleRequests).values(data);
+}
+
+export type ImageInput = {
+  entityType: string;
+  entityId: string;
+  url: string;
+};
+
+export async function insertImages(data: ImageInput[]) {
+  if (data.length === 0) return;
+  await db.insert(images).values(data);
 }

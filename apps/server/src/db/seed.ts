@@ -5,6 +5,7 @@ import {
   type AvailabilityInput,
   type CommentInput,
   type EventInput,
+  type ImageInput,
   type OrderInput,
   type OrderItemInput,
   type ProductInput,
@@ -18,6 +19,7 @@ import {
   insertComments,
   insertEventRegistrations,
   insertEvents,
+  insertImages,
   insertOrderItems,
   insertOrders,
   insertProductWines,
@@ -54,7 +56,6 @@ function pick<T>(arr: readonly T[]): T {
   return faker.helpers.arrayElement(arr as T[]);
 }
 
-// Gap 4: real wine variety names instead of faker.commerce.productName()
 const VARIETIES = [
   "Pálava",
   "Welschriesling",
@@ -81,6 +82,8 @@ const VARIETIES = [
   "Tramín červený",
   "Rulandské modré",
 ] as const;
+
+const NAME_SUFFIXES = ["Estate", "Reserve", "Selection", "Classic", "Premium", "Old Vine"] as const;
 
 async function main() {
   await teardown();
@@ -170,20 +173,27 @@ async function main() {
 
   let totalWineCount = 0;
   const allProducts: { id: string; price: string; shopId: string }[] = [];
-  // Gap 3: track wines per winemaker for bundle extra product_wines
   const winemakerWinesMap = new Map<string, { id: string }[]>();
+  const allWineIds: string[] = [];
+  const allEventIds: string[] = [];
 
   for (let i = 0; i < winemakerRows.length; i++) {
     const wm = winemakerRows[i]!;
 
-    // Gap 4: use real variety names
+    // Fix 4: unique wine names per winemaker
+    const usedNames = new Set<string>();
     const wineInputs: WineInput[] = Array.from({ length: WINES_PER_WINEMAKER }, () => {
       const variety = pick(VARIETIES);
       const vintageYear = faker.number.int({ min: 2015, max: 2023 });
       const isBlend = Math.random() < 0.25;
+      let name = `${variety} ${vintageYear}`;
+      if (usedNames.has(name)) {
+        name = `${variety} ${pick(NAME_SUFFIXES)} ${vintageYear}`;
+      }
+      usedNames.add(name);
       return {
         winemakerId: wm.id,
-        name: `${variety} ${vintageYear}`,
+        name,
         color: pick(COLORS),
         type: pick(TYPES),
         region: pick(REGIONS),
@@ -201,6 +211,7 @@ async function main() {
     const insertedWines = await insertWines(wineInputs);
     totalWineCount += insertedWines.length;
     winemakerWinesMap.set(wm.id, insertedWines.map((w) => ({ id: w.id })));
+    allWineIds.push(...insertedWines.map((w) => w.id));
 
     const shop = shopRows[i * SHOPS_PER_WINEMAKER];
     if (shop) {
@@ -214,7 +225,6 @@ async function main() {
       }));
       const insertedProducts = await insertProducts(productInputs);
 
-      // Gap 3: fix bundle product_wines (2–4 wines per bundle)
       const productWineRows: { productId: string; wineId: string; quantity: number }[] = [];
       const wmWines = winemakerWinesMap.get(wm.id) ?? [];
       for (const [j, product] of insertedProducts.entries()) {
@@ -222,8 +232,10 @@ async function main() {
         productWineRows.push({ productId: product.id, wineId: primaryWineId, quantity: 1 });
         if (product.isBundle && wmWines.length > 1) {
           const extraCount = faker.number.int({ min: 1, max: Math.min(3, wmWines.length - 1) });
-          const extras = faker.helpers
-            .arrayElements(wmWines.filter((w) => w.id !== primaryWineId), extraCount);
+          const extras = faker.helpers.arrayElements(
+            wmWines.filter((w) => w.id !== primaryWineId),
+            extraCount,
+          );
           for (const extra of extras) {
             productWineRows.push({ productId: product.id, wineId: extra.id, quantity: 1 });
           }
@@ -270,19 +282,25 @@ async function main() {
     }),
   );
   const insertedEvents = await insertEvents(eventInputs);
+  allEventIds.push(...insertedEvents.map((e) => e.id));
   logger.info(`Inserted ${insertedEvents.length} events`);
 
-  // Gap 2: event registrations — ~30% of customers register for a random event
+  // Fix 2: deduplicated event registrations
   if (insertedEvents.length > 0) {
     logger.info("Inserting event registrations...");
     const registrationPool = faker.helpers.arrayElements(
       customers,
       Math.floor(customers.length * 0.3),
     );
-    const registrationInputs = registrationPool.map((user) => ({
-      eventId: pick(insertedEvents).id,
-      userId: user.id,
-    }));
+    const regKeys = new Set<string>();
+    const registrationInputs = registrationPool
+      .map((user) => ({ eventId: pick(insertedEvents).id, userId: user.id }))
+      .filter(({ eventId, userId }) => {
+        const key = `${eventId}-${userId}`;
+        if (regKeys.has(key)) return false;
+        regKeys.add(key);
+        return true;
+      });
     await insertEventRegistrations(registrationInputs);
     logger.info(`Inserted ${registrationInputs.length} event registrations`);
   }
@@ -302,7 +320,6 @@ async function main() {
   logger.info(`Inserted ${userRoleInputs.length} user roles`);
 
   // ── Availability ───────────────────────────────────────────────────────────
-  // Gap 5: randomize hours and include weekends for some shops
   logger.info("Inserting availability...");
   const today = new Date();
   const validFrom = today.toISOString().slice(0, 10);
@@ -328,24 +345,39 @@ async function main() {
   logger.info(`Inserted ${availInputs.length} availability rows`);
 
   // ── Supply Agreements ──────────────────────────────────────────────────────
+  // Fix 6: deduplicate shop-winemaker pairs
   logger.info("Inserting supply agreements...");
-  const supplyInputs = shopRows.map((shop) => ({
-    shopId: shop.id,
-    winemakerId: pick(winemakerRows).id,
-    status: "approved" as const,
-  }));
+  const supplyKeys = new Set<string>();
+  const supplyInputs = shopRows
+    .map((shop) => ({
+      shopId: shop.id,
+      winemakerId: pick(winemakerRows).id,
+      status: "approved" as const,
+    }))
+    .filter(({ shopId, winemakerId }) => {
+      const key = `${shopId}-${winemakerId}`;
+      if (supplyKeys.has(key)) return false;
+      supplyKeys.add(key);
+      return true;
+    });
   await insertSupplyAgreements(supplyInputs);
   logger.info(`Inserted ${supplyInputs.length} supply agreements`);
 
   // ── Reviews ────────────────────────────────────────────────────────────────
+  // Fix 1: deduplicate user-entity pairs (one review per user per entity)
   logger.info("Inserting reviews...");
+  const reviewKeys = new Set<string>();
   const reviewInputs: ReviewInput[] = [];
+
   const productReviewers = faker.helpers.arrayElements(
     customers,
     Math.floor(customers.length * 0.4),
   );
   for (const reviewer of productReviewers) {
     const product = pick(allProducts);
+    const key = `${reviewer.id}-product-${product.id}`;
+    if (reviewKeys.has(key)) continue;
+    reviewKeys.add(key);
     reviewInputs.push({
       userId: reviewer.id,
       entityType: "product",
@@ -359,10 +391,14 @@ async function main() {
     Math.floor(customers.length * 0.2),
   );
   for (const reviewer of wmReviewers) {
+    const wm = pick(winemakerRows);
+    const key = `${reviewer.id}-winemaker-${wm.id}`;
+    if (reviewKeys.has(key)) continue;
+    reviewKeys.add(key);
     reviewInputs.push({
       userId: reviewer.id,
       entityType: "winemaker",
-      entityId: pick(winemakerRows).id,
+      entityId: wm.id,
       rating: faker.number.int({ min: 1, max: 5 }),
       body: faker.lorem.sentences({ min: 1, max: 3 }),
     });
@@ -385,10 +421,8 @@ async function main() {
   logger.info(`Inserted ${commentInputs.length} comments`);
 
   // ── Orders + Order Items ───────────────────────────────────────────────────
-  // Gap 1: pre-compute items per buyer so totalPrice is correct
+  // Fix 5: realistic status distribution including pending and cancelled
   logger.info("Inserting orders and order items...");
-
-  // Group products by shop for item selection
   const shopProductMap = new Map<string, { id: string; price: string }[]>();
   for (const p of allProducts) {
     const existing = shopProductMap.get(p.shopId) ?? [];
@@ -417,6 +451,18 @@ async function main() {
         Math.min(itemCount, shopProducts.length),
       );
       const shippingFee = pick(["0.00", "5.00", "10.00"] as const);
+
+      // Fix 5: realistic order status spread
+      const roll = Math.random();
+      const status =
+        roll < 0.15 ? ("pending" as const) :
+        roll < 0.25 ? ("cancelled" as const) :
+        pick(["confirmed", "shipped", "delivered"] as const);
+      const paymentStatus =
+        status === "cancelled" ? ("cancelled" as const) :
+        status === "pending"   ? ("pending" as const) :
+        ("captured" as const);
+
       let itemsTotal = 0;
       const items: PendingItem[] = pickedProds.map((prod) => {
         const qty = faker.number.int({ min: 1, max: 3 });
@@ -424,15 +470,16 @@ async function main() {
         return { productId: prod.id, shopId, quantity: qty, unitPriceAtPurchase: prod.price };
       });
       const totalPrice = (itemsTotal + Number.parseFloat(shippingFee)).toFixed(2);
+
       return {
         input: {
           userId: buyer.id,
           shippingAddressId: orderAddrRows[i * 2]!.id,
           billingAddressId: orderAddrRows[i * 2 + 1]!.id,
-          status: pick(["confirmed", "shipped", "delivered"] as const),
+          status,
           deliveryType: pick(["pickup", "shipping"] as const),
           paymentMethod: pick(["card", "bank_transfer", "cash_on_delivery"] as const),
-          paymentStatus: "captured" as const,
+          paymentStatus,
           totalPrice,
           discount: "0.00",
           shippingFee,
@@ -442,7 +489,6 @@ async function main() {
     });
 
     const insertedOrders = await insertOrders(pending.map((p) => p.input));
-
     const orderItemInputs: OrderItemInput[] = insertedOrders.flatMap((order, i) =>
       (pending[i]?.items ?? []).map((item) => ({ ...item, orderId: order.id })),
     );
@@ -453,16 +499,47 @@ async function main() {
   }
 
   // ── Role Requests ──────────────────────────────────────────────────────────
+  // Fix 3: exclude users who already have the role they're requesting
   logger.info("Inserting role requests...");
-  const roleReqPool = faker.helpers.arrayElements(customers, Math.min(10, customers.length));
-  await insertRoleRequests(
-    roleReqPool.map((user) => ({
-      userId: user.id,
-      type: pick(["winemaker", "shop_owner"] as const),
-      businessName: faker.company.name(),
-      details: faker.lorem.sentence(),
-    })),
+  const assignedRoles = new Set(userRoleInputs.map((r) => `${r.userId}-${r.role}`));
+  const eligibleForRoleReq = customers.filter(
+    (u) =>
+      !assignedRoles.has(`${u.id}-winemaker`) &&
+      !assignedRoles.has(`${u.id}-shop_owner`),
   );
+  if (eligibleForRoleReq.length > 0) {
+    const roleReqPool = faker.helpers.arrayElements(
+      eligibleForRoleReq,
+      Math.min(10, eligibleForRoleReq.length),
+    );
+    await insertRoleRequests(
+      roleReqPool.map((user) => ({
+        userId: user.id,
+        type: pick(["winemaker", "shop_owner"] as const),
+        businessName: faker.company.name(),
+        details: faker.lorem.sentence(),
+      })),
+    );
+    logger.info(`Inserted ${roleReqPool.length} role requests`);
+  }
+
+  // ── Images ─────────────────────────────────────────────────────────────────
+  // Fix 7: placeholder images for wines and events
+  logger.info("Inserting images...");
+  const imageInputs: ImageInput[] = [
+    ...allWineIds.map((id) => ({
+      entityType: "wine",
+      entityId: id,
+      url: `https://picsum.photos/seed/${id}/800/600`,
+    })),
+    ...allEventIds.map((id) => ({
+      entityType: "event",
+      entityId: id,
+      url: `https://picsum.photos/seed/${id}/1200/600`,
+    })),
+  ];
+  await insertImages(imageInputs);
+  logger.info(`Inserted ${imageInputs.length} images`);
 
   logger.info("Dev seeding complete!");
 }
