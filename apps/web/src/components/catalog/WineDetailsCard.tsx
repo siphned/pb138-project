@@ -14,7 +14,7 @@ interface WineDetailsCardProps {
 export function WineDetailsCard({ wine }: WineDetailsCardProps) {
   useEffect(() => {
     // @ts-expect-error - checking for BE gap mentioned in plan §8
-    if (wine.winemaker && !wine.winemaker.userId && !wine.winemaker.id) {
+    if (import.meta.env.DEV && wine.winemaker && !wine.winemaker.userId && !wine.winemaker.id) {
       // biome-ignore lint/suspicious/noConsole: intentional warning for BE gap mentioned in plan §8
       console.warn(
         "WineDetailsCard: winemaker object missing both userId and id. Owner gating may fail."
@@ -23,7 +23,7 @@ export function WineDetailsCard({ wine }: WineDetailsCardProps) {
   }, [wine.winemaker]);
 
   // @ts-expect-error - plan §8 says we might need userId, but generated types only have id
-  const ownerUserId = wine.winemaker?.userId || wine.winemaker?.id;
+  const ownerUserId = wine.winemaker?.userId;
 
   return (
     <div className="space-y-8">
@@ -51,7 +51,7 @@ export function WineDetailsCard({ wine }: WineDetailsCardProps) {
               Edit Wine
             </Link>
           </Button>
-          <Button disabled title="Wired in WINE-XXX owner-forms" variant="destructive">
+          <Button disabled variant="destructive">
             Delete Wine
           </Button>
         </div>

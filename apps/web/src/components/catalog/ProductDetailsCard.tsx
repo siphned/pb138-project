@@ -24,7 +24,7 @@ export function ProductDetailsCard({
   isAddingToCart,
 }: ProductDetailsCardProps) {
   useEffect(() => {
-    if (product.shop && !product.shop.ownerUserId) {
+    if (import.meta.env.DEV && product.shop && !product.shop.ownerUserId) {
       // biome-ignore lint/suspicious/noConsole: intentional warning for BE gap mentioned in plan §8
       console.warn("ProductDetailsCard: shop object missing ownerUserId. Owner gating may fail.");
     }
@@ -72,7 +72,17 @@ export function ProductDetailsCard({
             <Section heading="Wines in this product">
               <DataGrid variant="catalog">
                 {product.productWines.map((pw) => (
-                  <WineCard key={pw.wine.id} wine={pw.wine as any} />
+                  <WineCard
+                    key={pw.wine.id}
+                    wine={
+                      {
+                        color: "unknown",
+                        region: "",
+                        vintageYear: "",
+                        ...pw.wine,
+                      } as any
+                    }
+                  />
                 ))}
               </DataGrid>
             </Section>
@@ -88,7 +98,7 @@ export function ProductDetailsCard({
                     Edit Product
                   </Link>
                 </Button>
-                <Button disabled title="Wired in WINE-XXX owner-forms" variant="destructive">
+                <Button disabled variant="destructive">
                   Delete Product
                 </Button>
               </div>

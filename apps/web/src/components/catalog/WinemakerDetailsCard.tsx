@@ -21,7 +21,7 @@ export function WinemakerDetailsCard({ winemaker }: WinemakerDetailsCardProps) {
   }, [winemaker]);
 
   // @ts-expect-error - plan says userId, types say id
-  const ownerUserId = winemaker.userId || winemaker.id;
+  const ownerUserId = winemaker.userId;
 
   return (
     <div className="space-y-8">
