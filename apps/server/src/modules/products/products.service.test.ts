@@ -1,7 +1,7 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import * as shopsRepo from "../shops/shops.repository";
-import * as productsRepo from "./products.repository";
 import { ProductNotFoundError } from "./products.errors";
+import * as productsRepo from "./products.repository";
 import { productsService } from "./products.service";
 
 vi.mock("./products.repository", async (importOriginal) => {
@@ -40,26 +40,6 @@ describe("productsService", () => {
   const requesterId = "u1";
   const productId = "p1";
 
-  describe("createProduct", () => {
-    it("creates a simple product when winemaker owns the wine", async () => {
-      vi.mocked(shopsRepo.findById).mockResolvedValue({ ownerUserId: requesterId } as any);
-      vi.mocked(productsRepo.winesExist).mockResolvedValue(true);
-      vi.mocked(productsRepo.getWineQuantityForUpdate).mockResolvedValue(100);
-      vi.mocked(productsRepo.create).mockResolvedValue({ id: productId } as any);
-
-      const result = await productsService.createProduct(shopId, requesterId, {
-        description: "Desc",
-        name: "Wine",
-        price: "100",
-        quantity: 10,
-        wineId: "w1",
-      });
-
-      expect(result.id).toBe(productId);
-      expect(productsRepo.create).toHaveBeenCalled();
-    });
-  });
-
   describe("createProductOrBundle", () => {
     it("creates a single product when wineId is present", async () => {
       vi.mocked(shopsRepo.findById).mockResolvedValue({ ownerUserId: requesterId } as any);
@@ -92,8 +72,8 @@ describe("productsService", () => {
         price: "29.99",
         quantity: 3,
         wines: [
-          { wineId: "w1", quantity: 2 },
-          { wineId: "w2", quantity: 1 },
+          { quantity: 2, wineId: "w1" },
+          { quantity: 1, wineId: "w2" },
         ],
       });
 
@@ -110,10 +90,10 @@ describe("productsService", () => {
       vi.mocked(shopsRepo.findById).mockResolvedValue({ ownerUserId: requesterId } as any);
       vi.mocked(productsRepo.findById).mockResolvedValue({
         id: productId,
-        shopId,
         isBundle: false,
+        productWines: [{ quantity: 1, wineId: "w1" }],
         quantity: 5,
-        productWines: [{ wineId: "w1", quantity: 1 }],
+        shopId,
       } as any);
       vi.mocked(productsRepo.update).mockResolvedValue({ id: productId } as any);
 
@@ -130,13 +110,13 @@ describe("productsService", () => {
       vi.mocked(shopsRepo.findById).mockResolvedValue({ ownerUserId: requesterId } as any);
       vi.mocked(productsRepo.findById).mockResolvedValue({
         id: productId,
-        shopId,
         isBundle: true,
-        quantity: 2,
         productWines: [
-          { wineId: "w1", quantity: 3 },
-          { wineId: "w2", quantity: 1 },
+          { quantity: 3, wineId: "w1" },
+          { quantity: 1, wineId: "w2" },
         ],
+        quantity: 2,
+        shopId,
       } as any);
       vi.mocked(productsRepo.update).mockResolvedValue({ id: productId } as any);
 
@@ -153,10 +133,10 @@ describe("productsService", () => {
       vi.mocked(shopsRepo.findById).mockResolvedValue({ ownerUserId: requesterId } as any);
       vi.mocked(productsRepo.findById).mockResolvedValue({
         id: productId,
-        shopId: "other-shop",
         isBundle: false,
-        quantity: 1,
         productWines: [],
+        quantity: 1,
+        shopId: "other-shop",
       } as any);
 
       await expect(
@@ -169,18 +149,18 @@ describe("productsService", () => {
     it("throws CONFLICTING_UPDATE_FIELDS when both wineId and wines are supplied", async () => {
       vi.mocked(productsRepo.findById).mockResolvedValue({
         id: productId,
-        shopId,
         isBundle: false,
+        productWines: [{ quantity: 1, wineId: "w1" }],
         quantity: 5,
-        productWines: [{ wineId: "w1", quantity: 1 }],
+        shopId,
       } as any);
 
       await expect(
         productsService.updateProductOrBundle(shopId, productId, requesterId, {
           wineId: "w1",
           wines: [
-            { wineId: "w1", quantity: 2 },
-            { wineId: "w2", quantity: 1 },
+            { quantity: 2, wineId: "w1" },
+            { quantity: 1, wineId: "w2" },
           ],
         })
       ).rejects.toThrow("CONFLICTING_UPDATE_FIELDS");
@@ -189,17 +169,17 @@ describe("productsService", () => {
     it("throws NOT_A_BUNDLE when wines supplied on a non-bundle product", async () => {
       vi.mocked(productsRepo.findById).mockResolvedValue({
         id: productId,
-        shopId,
         isBundle: false,
+        productWines: [{ quantity: 1, wineId: "w1" }],
         quantity: 5,
-        productWines: [{ wineId: "w1", quantity: 1 }],
+        shopId,
       } as any);
 
       await expect(
         productsService.updateProductOrBundle(shopId, productId, requesterId, {
           wines: [
-            { wineId: "w1", quantity: 2 },
-            { wineId: "w2", quantity: 1 },
+            { quantity: 2, wineId: "w1" },
+            { quantity: 1, wineId: "w2" },
           ],
         })
       ).rejects.toThrow("NOT_A_BUNDLE");
@@ -208,10 +188,10 @@ describe("productsService", () => {
     it("throws ProductNotFoundError when product belongs to a different shop", async () => {
       vi.mocked(productsRepo.findById).mockResolvedValue({
         id: productId,
-        shopId: "other-shop",
         isBundle: false,
-        quantity: 5,
         productWines: [],
+        quantity: 5,
+        shopId: "other-shop",
       } as any);
 
       await expect(

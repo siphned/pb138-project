@@ -154,42 +154,6 @@ export async function findByIds(
   }) as Promise<ProductWithWinesAndWinemaker[]>;
 }
 
-export async function findByShopId(
-  db: Database,
-  shopId: string,
-  isBundle?: boolean
-): Promise<ProductWithWines[]> {
-  const rows = await db.query.products.findMany({
-    where: and(
-      eq(products.shopId, shopId),
-      isNull(products.deletedAt),
-      isBundle !== undefined ? eq(products.isBundle, isBundle) : undefined
-    ),
-    with: {
-      productWines: {
-        with: {
-          wine: {
-            columns: {
-              alcoholContent: true,
-              color: true,
-              deletedAt: true,
-              id: true,
-              name: true,
-              type: true,
-              vintageYear: true,
-              volumeMl: true,
-            },
-            with: {
-              winemaker: { columns: { id: true, name: true } },
-            },
-          },
-        },
-      },
-    },
-  });
-  return rows as unknown as ProductWithWines[];
-}
-
 export async function findAll(
   db: Database,
   filters: ProductCatalogFilters,
@@ -369,7 +333,6 @@ export const productsRepository = {
   findAll,
   findById,
   findByIds,
-  findByShopId,
   getWineQuantityForUpdate,
   productsExist,
   update,
