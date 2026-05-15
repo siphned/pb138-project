@@ -2,12 +2,10 @@ import { Elysia, status, t } from "elysia";
 import { errorResponse } from "../../utils/error-plugin";
 import { authPlugin } from "../auth";
 import {
-  createBundleBody,
-  createProductBody,
+  createProductOrBundleBody,
   getAllProductsQuery,
   getAllProductsResponse,
-  updateBundleBody,
-  updateProductBody,
+  updateProductOrBundleBody,
 } from "./products.schema";
 import { productsService } from "./products.service";
 
@@ -16,7 +14,8 @@ export const productsRoutes = new Elysia({ prefix: "/products" })
 
   .get("/", ({ query }) => productsService.getAllProducts(query), {
     detail: {
-      description: "Returns all non-deleted products. Filterable by price, rating, type, etc.",
+      description:
+        "Returns all non-deleted products. Filterable by shopId, isBundle, q, price, rating, type, etc.",
       summary: "List all products (catalog)",
       tags: ["products"],
     },
@@ -37,30 +36,16 @@ export const productsRoutes = new Elysia({ prefix: "/products" })
 export const shopProductsRoutes = new Elysia({ prefix: "/shops/:id" })
   .use(authPlugin)
 
-  .get(
-    "/products",
-    ({ params, query }) => productsService.listProducts(params.id, query.isBundle === "true"),
-    {
-      detail: {
-        description: "Returns all products belonging to a specific shop.",
-        summary: "List shop products",
-        tags: ["products"],
-      },
-      params: t.Object({ id: t.String() }),
-      query: t.Object({ isBundle: t.Optional(t.String()) }),
-      response: { 200: t.Array(t.Any()), 404: errorResponse },
-    }
-  )
-
   .post(
     "/products",
-    ({ params, dbUser, body }) => productsService.createProduct(params.id, dbUser.id, body),
+    ({ params, dbUser, body }) => productsService.createProductOrBundle(params.id, dbUser.id, body),
     {
-      body: createProductBody,
+      body: createProductOrBundleBody,
       detail: {
-        description: "Creates a single wine product in a shop.",
+        description:
+          "Creates a product (wineId) or bundle (wines array with ≥2 entries) in a shop.",
         security: [{ bearerAuth: [] }],
-        summary: "Create product",
+        summary: "Create product or bundle",
         tags: ["products"],
       },
       params: t.Object({ id: t.String() }),
@@ -72,13 +57,13 @@ export const shopProductsRoutes = new Elysia({ prefix: "/shops/:id" })
   .patch(
     "/products/:productId",
     ({ params, dbUser, body }) =>
-      productsService.updateProduct(params.id, params.productId, dbUser.id, body),
+      productsService.updateProductOrBundle(params.id, params.productId, dbUser.id, body),
     {
-      body: updateProductBody,
+      body: updateProductOrBundleBody,
       detail: {
-        description: "Updates a single wine product.",
+        description: "Updates a product or bundle. Supplying wines on a non-bundle returns 422.",
         security: [{ bearerAuth: [] }],
-        summary: "Update product",
+        summary: "Update product or bundle",
         tags: ["products"],
       },
       params: t.Object({ id: t.String(), productId: t.String() }),
@@ -90,71 +75,17 @@ export const shopProductsRoutes = new Elysia({ prefix: "/shops/:id" })
   .delete(
     "/products/:productId",
     async ({ params, dbUser }) => {
-      await productsService.deleteProduct(params.id, params.productId, dbUser.id);
+      await productsService.deleteProductOrBundle(params.id, params.productId, dbUser.id);
       return status(204, null);
     },
     {
       detail: {
-        description: "Soft-deletes a product and reverts stock allocations.",
+        description: "Soft-deletes a product or bundle and reverts stock allocations.",
         security: [{ bearerAuth: [] }],
-        summary: "Delete product",
+        summary: "Delete product or bundle",
         tags: ["products"],
       },
       params: t.Object({ id: t.String(), productId: t.String() }),
-      requireRoles: ["shop_owner", "admin"],
-      response: { 204: t.Null(), 403: errorResponse, 404: errorResponse },
-    }
-  )
-
-  .post(
-    "/bundles",
-    ({ params, dbUser, body }) => productsService.createBundle(params.id, dbUser.id, body),
-    {
-      body: createBundleBody,
-      detail: {
-        description: "Creates a wine bundle in a shop.",
-        security: [{ bearerAuth: [] }],
-        summary: "Create bundle",
-        tags: ["products"],
-      },
-      params: t.Object({ id: t.String() }),
-      requireRoles: ["shop_owner", "admin"],
-      response: { 201: t.Any(), 403: errorResponse, 404: errorResponse },
-    }
-  )
-
-  .patch(
-    "/bundles/:bundleId",
-    ({ params, dbUser, body }) =>
-      productsService.updateBundle(params.id, params.bundleId, dbUser.id, body),
-    {
-      body: updateBundleBody,
-      detail: {
-        description: "Updates a wine bundle.",
-        security: [{ bearerAuth: [] }],
-        summary: "Update bundle",
-        tags: ["products"],
-      },
-      params: t.Object({ bundleId: t.String(), id: t.String() }),
-      requireRoles: ["shop_owner", "admin"],
-      response: { 200: t.Any(), 403: errorResponse, 404: errorResponse },
-    }
-  )
-
-  .delete(
-    "/bundles/:bundleId",
-    async ({ params, dbUser }) => {
-      await productsService.deleteBundle(params.id, params.bundleId, dbUser.id);
-      return status(204, null);
-    },
-    {
-      detail: {
-        description: "Soft-deletes a bundle and reverts stock allocations.",
-        security: [{ bearerAuth: [] }],
-        summary: "Delete a bundle",
-        tags: ["products"],
-      },
-      params: t.Object({ bundleId: t.String(), id: t.String() }),
       requireRoles: ["shop_owner", "admin"],
       response: { 204: t.Null(), 403: errorResponse, 404: errorResponse },
     }
