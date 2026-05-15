@@ -1,5 +1,5 @@
 import type { Review } from "@repo/shared/schemas";
-import { orderItems, orders, productWines, reviews } from "@repo/shared/schemas";
+import { orderItems, orders, productWines, reviews, wines } from "@repo/shared/schemas";
 import { and, asc, avg, count, desc, eq, isNull } from "drizzle-orm";
 import type { Database } from "../../db";
 
@@ -130,6 +130,28 @@ export async function hasPurchasedWine(
   return rows.length > 0;
 }
 
+export async function hasPurchasedFromWinemaker(
+  db: Database,
+  userId: string,
+  winemakerId: string
+): Promise<boolean> {
+  const rows = await db
+    .select({ id: orderItems.id })
+    .from(orderItems)
+    .innerJoin(orders, eq(orderItems.orderId, orders.id))
+    .innerJoin(productWines, eq(orderItems.productId, productWines.productId))
+    .innerJoin(wines, eq(productWines.wineId, wines.id))
+    .where(
+      and(
+        eq(orders.userId, userId),
+        eq(orders.status, "delivered"),
+        eq(wines.winemakerId, winemakerId)
+      )
+    )
+    .limit(1);
+  return rows.length > 0;
+}
+
 export async function insertReview(
   db: Database,
   userId: string,
@@ -162,6 +184,7 @@ export const reviewsRepository = {
   findReviews,
   findReviewWithUser,
   findUserReview,
+  hasPurchasedFromWinemaker,
   hasPurchasedProduct,
   hasPurchasedWine,
   insertReview,
