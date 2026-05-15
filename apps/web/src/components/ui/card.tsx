@@ -14,7 +14,7 @@ const cardVariants = cva(
         catalog: "relative bg-secondary/20 p-0 shadow-sm transition-all hover:shadow-md",
         default:
           "gap-6 bg-card py-6 ring-1 ring-foreground/10 data-[size=sm]:gap-4 data-[size=sm]:py-4",
-        polaroid: "bg-card p-3 pb-6 shadow-sm transition-transform hover:-rotate-1 hover:shadow-md",
+        polaroid: "bg-card p-3 pb-6 shadow-sm transition-transform hover:shadow-md",
         section: "bg-secondary/10",
       },
     },

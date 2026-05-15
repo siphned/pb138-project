@@ -42,6 +42,9 @@ export function UserProvider({ children }: { children: ReactNode }) {
   });
 
   const [user, setUser] = useState<UserProfile | null>(defaultUser);
+
+  const isRole = (role: string): role is Role => Object.values(Role).includes(role as Role);
+
   useEffect(() => {
     if (profile) {
       setUser({
@@ -50,7 +53,7 @@ export function UserProvider({ children }: { children: ReactNode }) {
         fname: profile.fname,
         id: profile.id,
         lname: profile.lname,
-        roles: profile.roles ?? [],
+        roles: (profile.roles ?? []).filter(isRole),
       });
     } else if (isLoaded && !isSignedIn) {
       setUser(null);
@@ -59,7 +62,7 @@ export function UserProvider({ children }: { children: ReactNode }) {
 
   const [activeRole, setActiveRole] = useState<Role>(Role.customer);
   useEffect(() => {
-    if (user && !user.roles.includes(activeRole)) {
+    if (user && user.roles.length > 0 && !user.roles.includes(activeRole)) {
       setActiveRole(user.roles[0] as Role);
     }
   }, [user, activeRole]);
@@ -75,7 +78,7 @@ export function UserProvider({ children }: { children: ReactNode }) {
       fname: updated.fname,
       id: updated.id,
       lname: updated.lname,
-      roles: updated.roles ?? [],
+      roles: (updated.roles ?? []).filter(isRole),
     };
   };
 

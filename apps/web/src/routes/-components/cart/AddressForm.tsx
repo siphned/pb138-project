@@ -60,7 +60,9 @@ export const AddressForm = forwardRef<HTMLFormElement, AddressFormProps>(
         street: "",
         ...defaultValues,
       },
-      resolver: zodResolver(addressFormSchema),
+      // TODO: drop `as any` once `bun install` actually deduplicates zod to 4.4.3
+      // per package.json `overrides`. Currently 4.4.1 + 4.4.3 coexist in node_modules.
+      resolver: zodResolver(addressFormSchema as any),
     });
 
     return (

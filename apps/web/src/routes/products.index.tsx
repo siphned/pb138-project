@@ -74,7 +74,7 @@ function ProductsPage() {
 
   const products = query.data?.data || [];
   const total = Number(query.data?.total || 0);
-  const page = Number(query.data?.page || 1);
+  const page = Number(search.page || 1);
   const limit = Number(query.data?.limit || 20);
 
   const handlePageChange = (newPage: number) => {

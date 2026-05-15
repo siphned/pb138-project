@@ -5,14 +5,14 @@ import { cn } from "@/lib/utils";
 
 interface EmptyStateProps {
   title?: string;
-  message?: string;
+  description?: string;
   action?: ReactNode;
   className?: string;
 }
 
 export function EmptyState({
   title = "Nothing here yet",
-  message = "There's nothing to show.",
+  description = "There's nothing to show.",
   action,
   className,
 }: EmptyStateProps) {
@@ -26,7 +26,7 @@ export function EmptyState({
     >
       <HugeiconsIcon aria-hidden className="h-10 w-10 text-muted-foreground" icon={InboxIcon} />
       <h2 className="font-heading text-xl font-semibold text-foreground">{title}</h2>
-      <p className="max-w-md text-muted-foreground">{message}</p>
+      <p className="max-w-md text-muted-foreground">{description}</p>
       {action}
     </div>
   );

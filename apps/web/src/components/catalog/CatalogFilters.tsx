@@ -80,6 +80,7 @@ function SearchInput({
   const [local, setLocal] = useState(value);
   const debounced = useDebounce(local, 300);
   const lastSent = useRef(value);
+  const inputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
     if (debounced !== lastSent.current) {
@@ -88,12 +89,20 @@ function SearchInput({
     }
   }, [debounced, onChange]);
 
+  useEffect(() => {
+    if (document.activeElement !== inputRef.current) {
+      setLocal(value);
+      lastSent.current = value;
+    }
+  }, [value]);
+
   return (
     <div className="space-y-2">
       <SectionLabel>Search</SectionLabel>
       <Input
         onChange={(e) => setLocal(e.target.value)}
         placeholder="Search by name..."
+        ref={inputRef}
         value={local}
       />
       {!isProduct && (
@@ -253,7 +262,7 @@ function ProductFilters({
         <div className="space-y-4">
           <SectionLabel>Price Range</SectionLabel>
           <Slider
-            max={5000}
+            max={500}
             onValueChange={(v) => setPriceRange(v as [number, number])}
             onValueCommitted={(v) => {
               const [min, max] = v as [number, number];
