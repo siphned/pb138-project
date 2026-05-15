@@ -4,10 +4,8 @@ import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { CatalogFilters } from "@/components/catalog/CatalogFilters";
 import { CatalogPagination } from "@/components/catalog/CatalogPagination";
 import { CatalogResults } from "@/components/catalog/CatalogResults";
+import { CatalogState } from "@/components/catalog/CatalogState";
 import type { EventSearch } from "@/components/catalog/types";
-import { EmptyState } from "@/components/primitives/empty-state";
-import { ErrorState } from "@/components/primitives/error-state";
-import { LoadingState } from "@/components/primitives/loading-state";
 import { PageHeader } from "@/components/primitives/page-header";
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
@@ -109,31 +107,26 @@ function EventsPage() {
         </aside>
 
         <main className="space-y-8">
-          {query.isLoading ? (
-            <LoadingState variant="catalog" />
-          ) : query.isError ? (
-            <ErrorState onRetry={() => query.refetch()} />
-          ) : eventsList.length === 0 ? (
-            <EmptyState
-              description="Check back soon for new events from your favorite winemakers."
-              title="No events found"
+          <CatalogState
+            emptyDescription="Check back soon for new events from your favorite winemakers."
+            emptyTitle="No events found"
+            isEmpty={eventsList.length === 0}
+            isError={query.isError}
+            isLoading={query.isLoading}
+            onRetry={() => query.refetch()}
+          >
+            <CatalogResults count={total}>
+              {eventsList.map((event) => (
+                <EventCard event={event} key={event.id} />
+              ))}
+            </CatalogResults>
+            <CatalogPagination
+              limit={limit}
+              onPageChange={handlePageChange}
+              page={page}
+              total={total}
             />
-          ) : (
-            <>
-              <CatalogResults count={total}>
-                {eventsList.map((event) => (
-                  <EventCard event={event} key={event.id} />
-                ))}
-              </CatalogResults>
-
-              <CatalogPagination
-                limit={limit}
-                onPageChange={handlePageChange}
-                page={page}
-                total={total}
-              />
-            </>
-          )}
+          </CatalogState>
         </main>
       </div>
     </div>

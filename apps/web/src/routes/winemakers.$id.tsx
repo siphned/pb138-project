@@ -1,10 +1,10 @@
 import { ArrowLeft02Icon } from "@hugeicons/core-free-icons";
 import { HugeiconsIcon } from "@hugeicons/react";
 import { createFileRoute, Link } from "@tanstack/react-router";
+import { CatalogState } from "@/components/catalog/CatalogState";
 import { WineCard } from "@/components/catalog/WineCard";
 import { WinemakerDetailsCard } from "@/components/catalog/WinemakerDetailsCard";
 import { DataGrid } from "@/components/primitives/data-grid";
-import { EmptyState } from "@/components/primitives/empty-state";
 import { ErrorState } from "@/components/primitives/error-state";
 import { LoadingState } from "@/components/primitives/loading-state";
 import { Section } from "@/components/primitives/section";
@@ -71,27 +71,28 @@ function WinemakerProfilePage() {
           <Separator />
 
           <Section heading="Wines">
-            {winesQuery.isLoading ? (
-              <LoadingState variant="catalog" />
-            ) : wines.length === 0 ? (
-              <EmptyState title="No wines listed yet" />
-            ) : (
+            <CatalogState
+              emptyTitle="No wines listed yet"
+              isEmpty={wines.length === 0}
+              isLoading={winesQuery.isLoading}
+            >
               <DataGrid variant="catalog">
                 {wines.map((wine) => (
                   <WineCard key={wine.id} wine={wine} />
                 ))}
               </DataGrid>
-            )}
+            </CatalogState>
           </Section>
 
           <Separator />
 
           <Section heading="Upcoming Events">
-            {eventsQuery.isLoading ? (
-              <LoadingState variant="list" />
-            ) : events.length === 0 ? (
-              <EmptyState title="No upcoming events" />
-            ) : (
+            <CatalogState
+              emptyTitle="No upcoming events"
+              isEmpty={events.length === 0}
+              isLoading={eventsQuery.isLoading}
+              loadingVariant="list"
+            >
               <DataGrid variant="catalog">
                 {events.map((event) => (
                   <EventCard
@@ -106,7 +107,7 @@ function WinemakerProfilePage() {
                   />
                 ))}
               </DataGrid>
-            )}
+            </CatalogState>
           </Section>
         </div>
 

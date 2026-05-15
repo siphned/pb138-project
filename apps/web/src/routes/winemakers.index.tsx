@@ -3,11 +3,9 @@ import { HugeiconsIcon } from "@hugeicons/react";
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { CatalogFilters } from "@/components/catalog/CatalogFilters";
 import { CatalogResults } from "@/components/catalog/CatalogResults";
+import { CatalogState } from "@/components/catalog/CatalogState";
 import type { WinemakerSearch } from "@/components/catalog/types";
 import { WinemakerCard } from "@/components/catalog/WinemakerCard";
-import { EmptyState } from "@/components/primitives/empty-state";
-import { ErrorState } from "@/components/primitives/error-state";
-import { LoadingState } from "@/components/primitives/loading-state";
 import { PageHeader } from "@/components/primitives/page-header";
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
@@ -67,22 +65,20 @@ function WinemakersPage() {
         </aside>
 
         <main>
-          {query.isLoading ? (
-            <LoadingState variant="catalog" />
-          ) : query.isError ? (
-            <ErrorState onRetry={() => query.refetch()} />
-          ) : displayedWinemakers.length === 0 ? (
-            <EmptyState
-              description="Try adjusting your filters to find what you're looking for."
-              title="No winemakers found"
-            />
-          ) : (
+          <CatalogState
+            emptyDescription="Try adjusting your filters to find what you're looking for."
+            emptyTitle="No winemakers found"
+            isEmpty={displayedWinemakers.length === 0}
+            isError={query.isError}
+            isLoading={query.isLoading}
+            onRetry={() => query.refetch()}
+          >
             <CatalogResults count={filteredWinemakers.length}>
               {displayedWinemakers.map((winemaker) => (
                 <WinemakerCard key={winemaker.id} winemaker={winemaker} />
               ))}
             </CatalogResults>
-          )}
+          </CatalogState>
         </main>
       </div>
     </div>

@@ -4,11 +4,9 @@ import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { CatalogFilters } from "@/components/catalog/CatalogFilters";
 import { CatalogPagination } from "@/components/catalog/CatalogPagination";
 import { CatalogResults } from "@/components/catalog/CatalogResults";
+import { CatalogState } from "@/components/catalog/CatalogState";
 import { ProductCard } from "@/components/catalog/ProductCard";
-import type { ProductSearch } from "@/components/catalog/types";
-import { EmptyState } from "@/components/primitives/empty-state";
-import { ErrorState } from "@/components/primitives/error-state";
-import { LoadingState } from "@/components/primitives/loading-state";
+import { asNumOrStr, asString, type ProductSearch } from "@/components/catalog/types";
 import { PageHeader } from "@/components/primitives/page-header";
 import { Button } from "@/components/ui/button";
 import {
@@ -43,28 +41,20 @@ const isProductType = (v: unknown): v is GetProductsQueryParamsTypeEnumKey =>
 
 export const Route = createFileRoute("/products/")({
   component: ProductsPage,
-  validateSearch: (raw): ProductSearch =>
-    ({
-      color: isColor(raw.color) ? raw.color : undefined,
-      isBundle: typeof raw.isBundle === "boolean" ? raw.isBundle : undefined,
-      maxPrice:
-        typeof raw.maxPrice === "string" || typeof raw.maxPrice === "number"
-          ? raw.maxPrice
-          : undefined,
-      minPrice:
-        typeof raw.minPrice === "string" || typeof raw.minPrice === "number"
-          ? raw.minPrice
-          : undefined,
-      page: typeof raw.page === "string" || typeof raw.page === "number" ? raw.page : undefined,
-      rating:
-        typeof raw.rating === "string" || typeof raw.rating === "number" ? raw.rating : undefined,
-      region: typeof raw.region === "string" ? raw.region : undefined,
-      search: typeof raw.search === "string" ? raw.search : undefined,
-      shopId: typeof raw.shopId === "string" ? raw.shopId : undefined,
-      sort: isSort(raw.sort) ? raw.sort : undefined,
-      type: isProductType(raw.type) ? raw.type : undefined,
-      wineId: typeof raw.wineId === "string" ? raw.wineId : undefined,
-    }) as ProductSearch,
+  validateSearch: (raw): ProductSearch => ({
+    color: isColor(raw.color) ? raw.color : undefined,
+    isBundle: typeof raw.isBundle === "boolean" ? raw.isBundle : undefined,
+    maxPrice: asNumOrStr(raw.maxPrice),
+    minPrice: asNumOrStr(raw.minPrice),
+    page: asNumOrStr(raw.page),
+    rating: asNumOrStr(raw.rating),
+    region: asString(raw.region),
+    search: asString(raw.search),
+    shopId: asString(raw.shopId),
+    sort: isSort(raw.sort) ? raw.sort : undefined,
+    type: isProductType(raw.type) ? raw.type : undefined,
+    wineId: asString(raw.wineId),
+  }),
 });
 
 function ProductsPage() {
@@ -116,60 +106,54 @@ function ProductsPage() {
         </aside>
 
         <main className="space-y-8">
-          {query.isLoading ? (
-            <LoadingState variant="catalog" />
-          ) : query.isError ? (
-            <ErrorState onRetry={() => query.refetch()} />
-          ) : products.length === 0 ? (
-            <EmptyState
-              description="Try adjusting your filters to find what you're looking for."
-              title="No products found"
-            />
-          ) : (
-            <>
-              <CatalogResults
-                count={total}
-                rightSlot={
-                  <Select
-                    onValueChange={(v) =>
-                      handleSearchChange({
-                        ...search,
-                        page: 1,
-                        sort:
-                          v === "default" ? undefined : (v as GetProductsQueryParamsSortEnumKey),
-                      })
-                    }
-                    value={search.sort ?? "default"}
+          <CatalogState
+            emptyDescription="Try adjusting your filters to find what you're looking for."
+            emptyTitle="No products found"
+            isEmpty={products.length === 0}
+            isError={query.isError}
+            isLoading={query.isLoading}
+            onRetry={() => query.refetch()}
+          >
+            <CatalogResults
+              count={total}
+              rightSlot={
+                <Select
+                  onValueChange={(v) =>
+                    handleSearchChange({
+                      ...search,
+                      page: 1,
+                      sort: v === "default" ? undefined : (v as GetProductsQueryParamsSortEnumKey),
+                    })
+                  }
+                  value={search.sort ?? "default"}
+                >
+                  <SelectTrigger
+                    className="w-[180px] rounded-md bg-secondary text-secondary-foreground"
+                    size="sm"
                   >
-                    <SelectTrigger
-                      className="w-[180px] rounded-md bg-secondary text-secondary-foreground"
-                      size="sm"
-                    >
-                      <SelectValue placeholder="Sort by" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="default">Default</SelectItem>
-                      <SelectItem value="newest">Newest</SelectItem>
-                      <SelectItem value="price-asc">Price: low to high</SelectItem>
-                      <SelectItem value="price-desc">Price: high to low</SelectItem>
-                      <SelectItem value="rating">Top rated</SelectItem>
-                    </SelectContent>
-                  </Select>
-                }
-              >
-                {products.map((product) => (
-                  <ProductCard key={product.id} product={product} />
-                ))}
-              </CatalogResults>
-
-              <CatalogPagination
-                limit={limit}
-                onPageChange={handlePageChange}
-                page={page}
-                total={total}
-              />
-            </>
-          )}
+                    <SelectValue placeholder="Sort by" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="default">Default</SelectItem>
+                    <SelectItem value="newest">Newest</SelectItem>
+                    <SelectItem value="price-asc">Price: low to high</SelectItem>
+                    <SelectItem value="price-desc">Price: high to low</SelectItem>
+                    <SelectItem value="rating">Top rated</SelectItem>
+                  </SelectContent>
+                </Select>
+              }
+            >
+              {products.map((product) => (
+                <ProductCard key={product.id} product={product} />
+              ))}
+            </CatalogResults>
+            <CatalogPagination
+              limit={limit}
+              onPageChange={handlePageChange}
+              page={page}
+              total={total}
+            />
+          </CatalogState>
         </main>
       </div>
     </div>

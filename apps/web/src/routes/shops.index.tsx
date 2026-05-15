@@ -3,11 +3,9 @@ import { HugeiconsIcon } from "@hugeicons/react";
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { CatalogFilters } from "@/components/catalog/CatalogFilters";
 import { CatalogResults } from "@/components/catalog/CatalogResults";
+import { CatalogState } from "@/components/catalog/CatalogState";
 import { ShopCard } from "@/components/catalog/ShopCard";
 import type { ShopSearch } from "@/components/catalog/types";
-import { EmptyState } from "@/components/primitives/empty-state";
-import { ErrorState } from "@/components/primitives/error-state";
-import { LoadingState } from "@/components/primitives/loading-state";
 import { PageHeader } from "@/components/primitives/page-header";
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
@@ -71,22 +69,20 @@ function ShopsPage() {
         </aside>
 
         <main>
-          {query.isLoading ? (
-            <LoadingState variant="catalog" />
-          ) : query.isError ? (
-            <ErrorState onRetry={() => query.refetch()} />
-          ) : displayedShops.length === 0 ? (
-            <EmptyState
-              description="Try adjusting your filters to find what you're looking for."
-              title="No shops found"
-            />
-          ) : (
+          <CatalogState
+            emptyDescription="Try adjusting your filters to find what you're looking for."
+            emptyTitle="No shops found"
+            isEmpty={displayedShops.length === 0}
+            isError={query.isError}
+            isLoading={query.isLoading}
+            onRetry={() => query.refetch()}
+          >
             <CatalogResults count={filteredShops.length}>
               {displayedShops.map((shop) => (
                 <ShopCard key={shop.id} shop={shop} />
               ))}
             </CatalogResults>
-          )}
+          </CatalogState>
         </main>
       </div>
     </div>

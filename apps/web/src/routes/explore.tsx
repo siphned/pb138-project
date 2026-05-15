@@ -3,11 +3,9 @@ import { HugeiconsIcon } from "@hugeicons/react";
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { CatalogFilters } from "@/components/catalog/CatalogFilters";
 import { CatalogResults } from "@/components/catalog/CatalogResults";
+import { CatalogState } from "@/components/catalog/CatalogState";
 import type { WineSearch } from "@/components/catalog/types";
 import { WineCard } from "@/components/catalog/WineCard";
-import { EmptyState } from "@/components/primitives/empty-state";
-import { ErrorState } from "@/components/primitives/error-state";
-import { LoadingState } from "@/components/primitives/loading-state";
 import { PageHeader } from "@/components/primitives/page-header";
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
@@ -89,22 +87,20 @@ function ExplorePage() {
         </aside>
 
         <main>
-          {query.isLoading ? (
-            <LoadingState variant="catalog" />
-          ) : query.isError ? (
-            <ErrorState onRetry={() => query.refetch()} />
-          ) : filteredWines.length === 0 ? (
-            <EmptyState
-              description="Try adjusting your filters to find what you're looking for."
-              title="No wines found"
-            />
-          ) : (
+          <CatalogState
+            emptyDescription="Try adjusting your filters to find what you're looking for."
+            emptyTitle="No wines found"
+            isEmpty={filteredWines.length === 0}
+            isError={query.isError}
+            isLoading={query.isLoading}
+            onRetry={() => query.refetch()}
+          >
             <CatalogResults count={filteredWines.length}>
               {filteredWines.map((wine) => (
                 <WineCard key={wine.id} wine={wine} />
               ))}
             </CatalogResults>
-          )}
+          </CatalogState>
         </main>
       </div>
     </div>
