@@ -34,8 +34,10 @@ export type ProductCatalogFilters = {
   region?: string;
   rating?: number;
   sort?: "newest" | "price-asc" | "price-desc" | "rating";
-  search?: string;
+  q?: string;
   wineId?: string;
+  shopId?: string;
+  isBundle?: boolean;
 };
 
 export type CatalogRow = {
@@ -201,8 +203,8 @@ export async function findAll(
   if (filters.maxPrice !== undefined) {
     conditions.push(sql`${products.price} <= ${filters.maxPrice}`);
   }
-  if (filters.search) {
-    const pattern = `%${filters.search}%`;
+  if (filters.q) {
+    const pattern = `%${filters.q}%`;
     const searchCond = or(
       ilike(products.name, pattern),
       sql`EXISTS (
@@ -251,6 +253,12 @@ export async function findAll(
       WHERE pw.product_id = ${products.id}
         AND pw.wine_id = ${filters.wineId}
     )`);
+  }
+  if (filters.shopId !== undefined) {
+    conditions.push(eq(products.shopId, filters.shopId));
+  }
+  if (filters.isBundle !== undefined) {
+    conditions.push(eq(products.isBundle, filters.isBundle));
   }
 
   const reviewsJoinCond = and(
