@@ -232,6 +232,75 @@ export class ProductsService {
     return productsRepo.findByShopId(db, shopId, isBundle);
   }
 
+  async createProductOrBundle(
+    shopId: string,
+    requesterId: string,
+    data:
+      | { name: string; description?: string; price: string; quantity: number; wineId: string }
+      | {
+          name: string;
+          description?: string;
+          price: string;
+          quantity: number;
+          wines: { wineId: string; quantity: number }[];
+        }
+  ): Promise<Product> {
+    if ("wines" in data) {
+      return this.createBundle(shopId, requesterId, data);
+    }
+    return this.createProduct(shopId, requesterId, data);
+  }
+
+  async deleteProductOrBundle(
+    shopId: string,
+    productId: string,
+    requesterId: string
+  ): Promise<void> {
+    await this.assertShopOwnership(shopId, requesterId);
+
+    const product = await productsRepo.findById(db, productId);
+    if (!product || product.shopId !== shopId) {
+      throw new ProductNotFoundError(productId);
+    }
+
+    await db.transaction(async (tx) => {
+      await this.revertBundleAllocations(tx, product);
+      await productsRepo.update(tx, productId, { deletedAt: new Date() });
+    });
+  }
+
+  async updateProductOrBundle(
+    shopId: string,
+    productId: string,
+    requesterId: string,
+    data: {
+      name?: string;
+      description?: string | null;
+      price?: string;
+      quantity?: number;
+      wineId?: string;
+      wines?: { wineId: string; quantity: number }[];
+    }
+  ): Promise<Product> {
+    if (data.wines !== undefined && data.wineId !== undefined) {
+      throw new Error("CONFLICTING_UPDATE_FIELDS");
+    }
+
+    const product = await productsRepo.findById(db, productId);
+    if (!product || product.shopId !== shopId) {
+      throw new ProductNotFoundError(productId);
+    }
+
+    if (data.wines !== undefined && !product.isBundle) {
+      throw new Error("NOT_A_BUNDLE");
+    }
+
+    if (product.isBundle) {
+      return this.updateBundle(shopId, productId, requesterId, data);
+    }
+    return this.updateProduct(shopId, productId, requesterId, data);
+  }
+
   async updateBundle(
     shopId: string,
     bundleId: string,
