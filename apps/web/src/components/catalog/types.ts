@@ -14,9 +14,13 @@ export const asNumOrStr = (v: unknown): string | number | undefined =>
   typeof v === "string" || typeof v === "number" ? v : undefined;
 
 export type WineSearch = GetWinesQueryParams & { q?: string };
-// isBundle isn't in the OpenAPI list endpoint yet; we keep it as a UI-only field
-// and strip it before passing to the hook. Track in WINE-XXX BE follow-up.
-export type ProductSearch = GetProductsQueryParams & { isBundle?: boolean };
+// `isBundle` and `shopId` aren't in the OpenAPI list endpoint yet; we keep
+// them as UI-only fields and strip before passing to the hook. Track in
+// WINE-XXX BE follow-up.
+export type ProductSearch = GetProductsQueryParams & {
+  isBundle?: boolean | "true" | "false";
+  shopId?: string;
+};
 export type EventSearch = GetEventsQueryParams;
 export type WinemakerSearch = { q?: string };
 export type ShopSearch = { q?: string };

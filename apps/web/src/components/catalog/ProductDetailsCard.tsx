@@ -71,16 +71,19 @@ export function ProductDetailsCard({
           {product.productWines && product.productWines.length > 0 && (
             <Section heading="Wines in this product">
               <DataGrid variant="catalog">
-                {product.productWines.map((pw) => {
-                  const wineWithFallbacks = {
-                    color: "unknown",
-                    region: "",
-                    vintageYear: "",
-                    ...pw.wine,
-                    // biome-ignore lint/suspicious/noExplicitAny: productWines.wine in OpenAPI is narrower than GetWines200Item (BE follow-up)
-                  } as any;
-                  return <WineCard key={pw.wine.id} wine={wineWithFallbacks} />;
-                })}
+                {
+                  // biome-ignore lint/suspicious/noExplicitAny: GetProductsById200 is `any` in OpenAPI; pw shape lost
+                  product.productWines.map((pw: any) => {
+                    const wineWithFallbacks = {
+                      color: "unknown",
+                      region: "",
+                      vintageYear: "",
+                      ...pw.wine,
+                      // biome-ignore lint/suspicious/noExplicitAny: productWines.wine in OpenAPI is narrower than GetWines200Item (BE follow-up)
+                    } as any;
+                    return <WineCard key={pw.wine.id} wine={wineWithFallbacks} />;
+                  })
+                }
               </DataGrid>
             </Section>
           )}
