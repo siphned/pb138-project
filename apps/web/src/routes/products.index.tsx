@@ -11,6 +11,13 @@ import { ErrorState } from "@/components/primitives/error-state";
 import { LoadingState } from "@/components/primitives/loading-state";
 import { PageHeader } from "@/components/primitives/page-header";
 import { Button } from "@/components/ui/button";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { useGetProducts } from "@/generated/hooks/useGetProducts";
 import {
@@ -120,7 +127,36 @@ function ProductsPage() {
             />
           ) : (
             <>
-              <CatalogResults count={total}>
+              <CatalogResults
+                count={total}
+                rightSlot={
+                  <Select
+                    onValueChange={(v) =>
+                      handleSearchChange({
+                        ...search,
+                        page: 1,
+                        sort:
+                          v === "default" ? undefined : (v as GetProductsQueryParamsSortEnumKey),
+                      })
+                    }
+                    value={search.sort ?? "default"}
+                  >
+                    <SelectTrigger
+                      className="w-[180px] rounded-md bg-secondary text-secondary-foreground"
+                      size="sm"
+                    >
+                      <SelectValue placeholder="Sort by" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="default">Default</SelectItem>
+                      <SelectItem value="newest">Newest</SelectItem>
+                      <SelectItem value="price-asc">Price: low to high</SelectItem>
+                      <SelectItem value="price-desc">Price: high to low</SelectItem>
+                      <SelectItem value="rating">Top rated</SelectItem>
+                    </SelectContent>
+                  </Select>
+                }
+              >
                 {products.map((product) => (
                   <ProductCard key={product.id} product={product} />
                 ))}
