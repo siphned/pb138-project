@@ -45,7 +45,14 @@ function WinemakerProfilePage() {
   }
 
   const wines = winesQuery.data || [];
-  const events = (eventsQuery.data || []) as any[];
+  // GetEvents200 is `any` per OpenAPI; BE may return a raw array or a paginated
+  // envelope. Normalise to an array here (track typed fix in WINE-XXX).
+  const eventsRaw = eventsQuery.data as { data?: unknown[] } | unknown[] | undefined;
+  const events = (Array.isArray(eventsRaw) ? eventsRaw : (eventsRaw?.data ?? [])) as Array<{
+    id: string;
+    startTime?: string;
+    endTime?: string;
+  }>;
 
   return (
     <div className="container mx-auto space-y-12 px-6 py-8 lg:px-12">

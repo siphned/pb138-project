@@ -172,7 +172,7 @@ function SearchPage() {
               <HugeiconsIcon className="mr-2 h-4 w-4" icon={FilterIcon} />
               Filters
             </SheetTrigger>
-            <SheetContent className="w-[300px]" side="left">
+            <SheetContent className="w-75" side="left">
               <div className="h-full overflow-y-auto px-4 py-8">
                 <SearchPageFilters onSearchChange={handleSearchChange} search={search} />
               </div>
