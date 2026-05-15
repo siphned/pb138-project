@@ -1,3 +1,6 @@
+import { copyFileSync, existsSync, mkdirSync } from "node:fs";
+import { join } from "node:path";
+import { fileURLToPath } from "node:url";
 import { faker } from "@faker-js/faker";
 import { logger } from "../utils/logger";
 import {
@@ -89,7 +92,31 @@ const VARIETIES = [
 
 const NAME_SUFFIXES = ["Estate", "Reserve", "Selection", "Classic", "Premium", "Old Vine"] as const;
 
+function copyPlaceholders() {
+  const seedDir = fileURLToPath(new URL(".", import.meta.url));
+  const placeholdersDir = join(seedDir, "seeding_images", "placeholders");
+  const uploadsDir = fileURLToPath(new URL("../../../uploads", import.meta.url));
+
+  const placeholders = [
+    { src: "wine_placeholder.webp", type: "wine" },
+    { src: "winery_placeholder.webp", type: "winemaker" },
+    { src: "shop_placeholder.webp", type: "shop" },
+    { src: "event_placeholder.webp", type: "event" },
+    { src: "user_placeholder.webp", type: "user" },
+  ];
+
+  for (const { src, type } of placeholders) {
+    const destDir = join(uploadsDir, type);
+    if (!existsSync(destDir)) mkdirSync(destDir, { recursive: true });
+    const dest = join(destDir, src);
+    if (existsSync(dest)) continue;
+    const srcPath = join(placeholdersDir, src);
+    if (existsSync(srcPath)) copyFileSync(srcPath, dest);
+  }
+}
+
 async function main() {
+  copyPlaceholders();
   await teardown();
 
   const NUM_USERS = Number(process.env.SEED_NUM_USERS) || 100;
@@ -563,18 +590,17 @@ async function main() {
   }
 
   // ── Images ─────────────────────────────────────────────────────────────────
-  // Fix 7: placeholder images for wines and events
   logger.info("Inserting images...");
   const imageInputs: ImageInput[] = [
     ...allWineIds.map((id) => ({
       entityType: "wine",
       entityId: id,
-      url: `https://picsum.photos/seed/${id}/800/600`,
+      url: "/uploads/wine/wine_placeholder.webp",
     })),
     ...allEventIds.map((id) => ({
       entityType: "event",
       entityId: id,
-      url: `https://picsum.photos/seed/${id}/1200/600`,
+      url: "/uploads/event/event_placeholder.webp",
     })),
   ];
   await insertImages(imageInputs);

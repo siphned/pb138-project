@@ -1,3 +1,6 @@
+import { copyFileSync, existsSync, mkdirSync } from "node:fs";
+import { join } from "node:path";
+import { fileURLToPath } from "node:url";
 import { faker } from "@faker-js/faker";
 import { logger } from "../utils/logger";
 import {
@@ -75,7 +78,102 @@ function pick<T>(arr: readonly T[]): T {
   return faker.helpers.arrayElement(arr as T[]);
 }
 
+// ── Faker bulk data constants ────────────────────────────────────────────────
+
+const CZECH_WINE_VARIETIES = [
+  { variety: "Welschriesling", color: "white" as const, abv: "12.00" },
+  { variety: "Müller-Thurgau", color: "white" as const, abv: "11.50" },
+  { variety: "Pálava", color: "white" as const, abv: "13.50" },
+  { variety: "Sauvignon", color: "white" as const, abv: "12.50" },
+  { variety: "Chardonnay", color: "white" as const, abv: "13.00" },
+  { variety: "Ryzlink vlašský", color: "white" as const, abv: "12.00" },
+  { variety: "Rulandské šedé", color: "white" as const, abv: "13.50" },
+  { variety: "Tramín červený", color: "white" as const, abv: "13.00" },
+  { variety: "Neuburské", color: "white" as const, abv: "12.50" },
+  { variety: "Veltlínské zelené", color: "white" as const, abv: "12.00" },
+  { variety: "Frankovka", color: "red" as const, abv: "13.00" },
+  { variety: "Zweigeltrebe", color: "red" as const, abv: "13.50" },
+  { variety: "Cabernet Sauvignon", color: "red" as const, abv: "14.00" },
+  { variety: "Modrý Portugal", color: "red" as const, abv: "12.00" },
+  { variety: "Regent", color: "red" as const, abv: "13.00" },
+  { variety: "André", color: "red" as const, abv: "12.50" },
+  { variety: "Rulandské modré", color: "red" as const, abv: "14.00" },
+  { variety: "Dornfelder", color: "red" as const, abv: "13.50" },
+];
+
+const CZECH_REGIONS = [
+  "Mikulovská", "Velkopavlovická", "Znojemská", "Slovácká", "Čechy",
+] as const;
+
+const CZECH_WINERY_CITIES = [
+  "Pavlov", "Valtice", "Znojmo", "Mikulov", "Hustopeče",
+  "Velké Bílovice", "Bzenec", "Uherské Hradiště", "Mělník",
+  "Roudnice nad Labem", "Nymburk", "Litoměřice",
+] as const;
+
+const CZECH_SHOP_CITIES = [
+  "Praha", "Brno", "Ostrava", "Plzeň", "Olomouc",
+  "Liberec", "Hradec Králové", "České Budějovice", "Zlín", "Pardubice",
+] as const;
+
+const FAKER_WM_COUNT = 12;
+const FAKER_SHOP_COUNT = 10;
+
+function copyImageAssets() {
+  const seedDir = fileURLToPath(new URL(".", import.meta.url));
+  const seedingDir = join(seedDir, "seeding_images");
+  const uploadsDir = fileURLToPath(new URL("../../../uploads", import.meta.url));
+
+  const imageUrls: string[] = [];
+  for (const wm of WINEMAKERS) {
+    if (wm.imageUrl) imageUrls.push(wm.imageUrl);
+    for (const wine of wm.wines) {
+      if (wine.imageUrl) imageUrls.push(wine.imageUrl);
+    }
+    for (const event of wm.events ?? []) {
+      if (event.imageUrl) imageUrls.push(event.imageUrl);
+    }
+  }
+  for (const shop of SHOPS) {
+    if (shop.imageUrl) imageUrls.push(shop.imageUrl);
+  }
+  imageUrls.push("/uploads/wine/wine_placeholder.webp");
+  imageUrls.push("/uploads/event/event_placeholder.webp");
+
+  const unique = [...new Set(imageUrls)];
+  let copied = 0;
+
+  for (const url of unique) {
+    const parts = url.split("/");
+    const type = parts[2];
+    const filename = parts[3];
+    if (!type || !filename) continue;
+
+    const destDir = join(uploadsDir, type);
+    if (!existsSync(destDir)) mkdirSync(destDir, { recursive: true });
+
+    const dest = join(destDir, filename);
+    if (existsSync(dest)) continue;
+
+    const srcRoot = join(seedingDir, filename);
+    const srcPlaceholders = join(seedingDir, "placeholders", filename);
+
+    if (existsSync(srcRoot)) {
+      copyFileSync(srcRoot, dest);
+      copied++;
+    } else if (existsSync(srcPlaceholders)) {
+      copyFileSync(srcPlaceholders, dest);
+      copied++;
+    } else {
+      logger.warn(`Seed image not found: ${filename}`);
+    }
+  }
+
+  if (copied > 0) logger.info(`Copied ${copied} seed images to uploads/`);
+}
+
 async function main() {
+  copyImageAssets();
   await teardown();
   logger.info("Demo seed started");
 
@@ -227,7 +325,99 @@ async function main() {
       allEventImages.push({ id: row.id, url: wm.events[i]!.imageUrl });
     });
   }
-  logger.info(`Inserted ${wmIdMap.size} winemakers, ${allWineImages.length} wines, ${allEventImages.length} events`);
+  logger.info(`Inserted ${wmIdMap.size} custom winemakers, ${allWineImages.length} wines, ${allEventImages.length} events`);
+
+  // ── Faker winemakers (bulk) ──────────────────────────────────────────────────
+  logger.info(`Inserting ${FAKER_WM_COUNT} faker winemakers...`);
+  const fakerWmKeys: string[] = [];
+  const fakerOwnerRoles: { userId: string; role: string }[] = [];
+
+  for (let i = 0; i < FAKER_WM_COUNT; i++) {
+    const wmKey = `faker-wm-${i}`;
+    const city = pick(CZECH_WINERY_CITIES);
+    const region = pick(CZECH_REGIONS);
+    const lastName = faker.person.lastName();
+    const wmName = pick([
+      `Vinařství ${lastName}`,
+      `Rodinné vinařství ${lastName}`,
+      `Sklepy ${city}`,
+      `Winery ${lastName}`,
+    ]);
+
+    const [fakeOwnerAddr] = await insertAddresses([czechAddress(city)]);
+    const [fakeOwner] = await insertUsers([{
+      clerkId: fakeClerkId(),
+      email: faker.internet.email().slice(0, 60),
+      fname: faker.person.firstName().slice(0, 30),
+      lname: lastName.slice(0, 30),
+      shippingAddressId: fakeOwnerAddr!.id,
+    }]);
+    userIdMap.set(`wm-owner-${wmKey}`, fakeOwner!.id);
+    fakerOwnerRoles.push({ userId: fakeOwner!.id, role: "winemaker" });
+
+    const [wmAddr] = await insertAddresses([czechAddress(city)]);
+    const domain = faker.internet.domainName();
+    const [wmRow] = await insertWinemakers([{
+      userId: fakeOwner!.id,
+      name: wmName,
+      description: faker.lorem.sentences({ min: 2, max: 3 }),
+      addressId: wmAddr!.id,
+      email: `info@${domain}`,
+      phone: `+420 ${faker.string.numeric(3)} ${faker.string.numeric(3)} ${faker.string.numeric(3)}`,
+      websiteUrl: `https://${domain}`,
+    }]);
+    wmIdMap.set(wmKey, wmRow!.id);
+    fakerWmKeys.push(wmKey);
+    allWinemakerImages.push({ id: wmRow!.id, url: undefined });
+
+    // 4-6 wines
+    const wineCount = faker.number.int({ min: 4, max: 6 });
+    const selectedVarieties = faker.helpers.arrayElements(CZECH_WINE_VARIETIES, wineCount);
+    const fakerWineInputs: WineInput[] = selectedVarieties.map((v) => {
+      const year = faker.number.int({ min: 2018, max: 2023 });
+      return {
+        winemakerId: wmRow!.id,
+        name: `${v.variety} ${year}`,
+        color: v.color,
+        type: "still" as const,
+        region,
+        vintageYear: year,
+        alcoholContent: v.abv,
+        volumeMl: 750,
+        quantity: faker.number.int({ min: 80, max: 300 }),
+        attribution: pick(["Estate", "Reserve", "Single Vineyard"] as const),
+        composition: `100% ${v.variety}`,
+        description: faker.lorem.sentences({ min: 1, max: 2 }),
+      };
+    });
+    const insertedFakerWines = await insertWines(fakerWineInputs);
+    insertedFakerWines.forEach((row, idx) => {
+      wineIdMap.set(`${wmKey}::${fakerWineInputs[idx]!.name}`, row.id);
+      allWineImages.push({ id: row.id, url: undefined });
+    });
+
+    // 0 or 1 future event
+    if (faker.datatype.boolean()) {
+      const daysOffset = faker.number.int({ min: 14, max: 90 });
+      const [evAddr] = await insertAddresses([czechAddress(city)]);
+      const startTime = new Date(Date.now() + daysOffset * 86_400_000);
+      const [evRow] = await insertEvents([{
+        winemakerId: wmRow!.id,
+        addressId: evAddr!.id,
+        name: `${faker.helpers.arrayElement(["Premium", "Classic", "Harvest", "Seasonal", "Regional"])} Wine Experience`,
+        description: faker.lorem.sentences(2),
+        startTime,
+        endTime: new Date(startTime.getTime() + 3 * 3_600_000),
+        capacity: faker.number.int({ min: 20, max: 60 }),
+        visibility: "public",
+        inviteType: "open",
+        status: "approved" as const,
+      }]);
+      eventIdMap.set(`${wmKey}-0`, evRow!.id);
+      allEventImages.push({ id: evRow!.id, url: undefined });
+    }
+  }
+  logger.info(`Inserted ${fakerWmKeys.length} faker winemakers`);
 
   // ── Shops + products + bundles ───────────────────────────────────────────────
   logger.info("Inserting shops, products and bundles...");
@@ -317,7 +507,89 @@ async function main() {
       allProductIds.push(bundleProduct!.id);
     }
   }
-  logger.info(`Inserted ${shopIdMap.size} shops with ${allProductIds.length} products`);
+  logger.info(`Inserted ${shopIdMap.size} custom shops with ${allProductIds.length} products`);
+
+  // ── Faker shops (bulk) ───────────────────────────────────────────────────────
+  logger.info(`Inserting ${FAKER_SHOP_COUNT} faker shops...`);
+  const fakerShopKeys: string[] = [];
+
+  for (let i = 0; i < FAKER_SHOP_COUNT; i++) {
+    const shopKey = `faker-shop-${i}`;
+    const city = pick(CZECH_SHOP_CITIES);
+    const shopName = pick([
+      `Vinotéka ${faker.person.lastName()}`,
+      `Vinárna ${city}`,
+      `Víno ${faker.person.lastName()}`,
+      `${city} Wine`,
+      `Sklep ${faker.person.lastName()}`,
+    ]);
+
+    const [fakeOwnerAddr] = await insertAddresses([czechAddress(city)]);
+    const [fakeShopOwner] = await insertUsers([{
+      clerkId: fakeClerkId(),
+      email: faker.internet.email().slice(0, 60),
+      fname: faker.person.firstName().slice(0, 30),
+      lname: faker.person.lastName().slice(0, 30),
+      shippingAddressId: fakeOwnerAddr!.id,
+    }]);
+    userIdMap.set(`shop-owner-${shopKey}`, fakeShopOwner!.id);
+    fakerOwnerRoles.push({ userId: fakeShopOwner!.id, role: "shop_owner" });
+
+    const [shopAddr] = await insertAddresses([czechAddress(city)]);
+    const [shopRow] = await insertShops([{
+      ownerUserId: fakeShopOwner!.id,
+      name: shopName,
+      description: faker.lorem.sentences({ min: 2, max: 3 }),
+      addressId: shopAddr!.id,
+    }]);
+    shopIdMap.set(shopKey, shopRow!.id);
+    fakerShopKeys.push(shopKey);
+    allShopImages.push({ id: shopRow!.id, url: undefined });
+
+    // Source from 2 random faker winemakers
+    const sourceWmKeys = faker.helpers.arrayElements(fakerWmKeys, 2);
+    for (const wmKey of sourceWmKeys) {
+      // faker winemakers are not in WINEMAKERS array — build product inputs from wineIdMap
+      const wmWineEntries = [...wineIdMap.entries()]
+        .filter(([k]) => k.startsWith(`${wmKey}::`));
+
+      const productInputs: ProductInput[] = wmWineEntries.map(([k]) => {
+        const wineName = k.split("::")[1]!;
+        const basePrice = faker.number.float({ min: 10, max: 40, fractionDigits: 2 });
+        return {
+          shopId: shopRow!.id,
+          name: wineName,
+          price: (basePrice * faker.number.float({ min: 0.9, max: 1.15, fractionDigits: 2 })).toFixed(2),
+          quantity: faker.number.int({ min: 10, max: 60 }),
+          isBundle: false,
+        };
+      });
+      if (productInputs.length === 0) continue;
+      const insertedProducts = await insertProducts(productInputs);
+      await insertProductWines(
+        insertedProducts.map((p, idx) => ({
+          productId: p.id,
+          wineId: wmWineEntries[idx]![1],
+          quantity: 1,
+        })),
+      );
+      insertedProducts.forEach((p, idx) => {
+        const wineName = wmWineEntries[idx]![0].split("::")[1]!;
+        productMap.set(`${shopKey}::${wmKey}::${wineName}`, { id: p.id, price: p.price, shopId: shopRow!.id });
+        allProductIds.push(p.id);
+      });
+    }
+
+    // Supply agreements for faker shop
+    await insertSupplyAgreements(
+      sourceWmKeys.map((wmKey) => ({
+        shopId: shopRow!.id,
+        winemakerId: wmIdMap.get(wmKey)!,
+        status: "approved" as const,
+      })),
+    );
+  }
+  logger.info(`Inserted ${fakerShopKeys.length} faker shops`);
 
   // ── User roles ───────────────────────────────────────────────────────────────
   logger.info("Inserting user roles...");
@@ -341,7 +613,8 @@ async function main() {
     }
   }
   await insertUserRoles(userRoleEntries);
-  logger.info(`Inserted ${userRoleEntries.length} user roles`);
+  await insertUserRoles(fakerOwnerRoles);
+  logger.info(`Inserted ${userRoleEntries.length + fakerOwnerRoles.length} user roles`);
 
   // ── Supply agreements ────────────────────────────────────────────────────────
   logger.info("Inserting supply agreements...");
@@ -360,8 +633,9 @@ async function main() {
   const today = new Date();
   const validFrom = today.toISOString().slice(0, 10);
   const availRows: AvailabilityInput[] = [];
-  for (const shop of SHOPS) {
-    const shopId = shopIdMap.get(shop.key)!;
+  const allShopKeys = [...SHOPS.map((s) => s.key), ...fakerShopKeys];
+  for (const key of allShopKeys) {
+    const shopId = shopIdMap.get(key)!;
     const openHour = faker.number.int({ min: 9, max: 10 });
     const closeHour = faker.number.int({ min: 17, max: 20 });
     const hasSaturday = Math.random() < 0.7;
