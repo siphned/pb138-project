@@ -111,7 +111,13 @@ export async function hasPurchasedProduct(
     .select({ id: orderItems.id })
     .from(orderItems)
     .innerJoin(orders, eq(orderItems.orderId, orders.id))
-    .where(and(eq(orders.userId, userId), eq(orderItems.productId, productId)))
+    .where(
+      and(
+        eq(orders.userId, userId),
+        eq(orders.status, "delivered"),
+        eq(orderItems.productId, productId)
+      )
+    )
     .limit(1);
   return rows.length > 0;
 }
@@ -126,7 +132,13 @@ export async function hasPurchasedWine(
     .from(orderItems)
     .innerJoin(orders, eq(orderItems.orderId, orders.id))
     .innerJoin(productWines, eq(orderItems.productId, productWines.productId))
-    .where(and(eq(orders.userId, userId), eq(productWines.wineId, wineId)))
+    .where(
+      and(
+        eq(orders.userId, userId),
+        eq(orders.status, "delivered"),
+        eq(productWines.wineId, wineId)
+      )
+    )
     .limit(1);
   return rows.length > 0;
 }

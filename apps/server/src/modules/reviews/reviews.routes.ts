@@ -48,7 +48,7 @@ export const createReviewsRoutes = (auth = authPlugin) =>
         },
         params: t.Object({ id: t.String() }),
         requireAuth: true,
-        response: { 200: t.Any(), 400: errorResponse, 404: errorResponse },
+        response: { 200: t.Any(), 400: errorResponse, 403: errorResponse, 404: errorResponse },
       }
     )
 
@@ -137,7 +137,7 @@ export const createReviewsRoutes = (auth = authPlugin) =>
         },
         params: t.Object({ id: t.String() }),
         requireAuth: true,
-        response: { 200: t.Any(), 400: errorResponse, 404: errorResponse },
+        response: { 200: t.Any(), 400: errorResponse, 403: errorResponse, 404: errorResponse },
       }
     )
 
