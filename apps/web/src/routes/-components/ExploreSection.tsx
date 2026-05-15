@@ -54,6 +54,7 @@ export function ExploreSection({ mode }: ExploreSectionProps) {
         <Link
           className={buttonVariants({ size: "sm", variant: "ghost" })}
           search={{ page: 1, sort: "newest" }}
+          // biome-ignore lint/suspicious/noExplicitAny: linkTo is a dynamic route literal narrowed at call site
           to={linkTo as any}
         >
           {linkLabel} <HugeiconsIcon className="ml-1 h-4 w-4" icon={ArrowRight02Icon} />
@@ -63,10 +64,12 @@ export function ExploreSection({ mode }: ExploreSectionProps) {
         {products.map((product) =>
           mode === "bundles" ? (
             <div className="w-70 shrink-0" key={product.id}>
+              {/* biome-ignore lint/suspicious/noExplicitAny: product shape from explore endpoint is a superset; BundleCard widens later */}
               <BundleCard product={product as any} />
             </div>
           ) : (
             <div className="w-70 shrink-0" key={product.id}>
+              {/* biome-ignore lint/suspicious/noExplicitAny: product shape from explore endpoint is a superset; ProductCard widens later */}
               <ProductCard product={product as any} />
             </div>
           )

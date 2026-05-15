@@ -7,6 +7,7 @@ import { useGetWinesByIdReviews } from "@/generated/hooks/useGetWinesByIdReviews
 interface EntityReviewsSectionProps {
   entityId?: string;
   entityType?: "wine" | "product" | "winemaker";
+  // biome-ignore lint/suspicious/noExplicitAny: reviewData shapes vary by entity; unified narrowing pending BE consolidation
   reviewData?: any;
   isLoading?: boolean;
   title?: string;
@@ -63,6 +64,7 @@ export function EntityReviewsSection({
         emptyMessage={emptyMessage}
         isLoading={isLoading}
         reviews={
+          // biome-ignore lint/suspicious/noExplicitAny: review row shape varies per BE response (see reviewData prop comment)
           reviewData?.reviews.map((r: any) => ({
             authorName: `${r.user.fname} ${r.user.lname}`,
             body: r.body ?? "",

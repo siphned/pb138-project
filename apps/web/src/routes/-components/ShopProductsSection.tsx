@@ -71,45 +71,45 @@ export function ShopProductsSection({ shopId }: ShopProductsSectionProps) {
     <div className="space-y-4">
       <h2 className="font-heading text-2xl font-bold">Best Seller Wines</h2>
       <div className="flex gap-4 overflow-x-auto p-4 [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
-        {products.map((product) => (
-          <div className="w-60 shrink-0" key={product.id}>
-            <ProductCard
-              product={
-                {
-                  ...product,
-                  createdAt: product.createdAt ?? "",
-                  description: product.description ?? null,
-                  isBundle: !!product.isBundle,
-                  quantity: product.quantity ?? 0,
-                  rating: 0,
-                  reviewCount: 0,
-                  shop: { id: shopId, name: "" }, // minimal shop object for ProductCard
-                  updatedAt: product.updatedAt ?? null,
-                  wines:
-                    Array.isArray(product.wines) && product.wines.length > 0
-                      ? product.wines.map((w) => ({
-                          color: w.color,
-                          id: w.id,
-                          name: w.name,
-                          region: w.region ?? "",
-                          type: w.type,
-                          vintageYear: w.vintageYear,
-                          winemaker: w.winemaker ?? { id: "", name: "" },
-                        }))
-                      : (product.productWines ?? []).map((pw) => ({
-                          color: pw.wine.color,
-                          id: pw.wine.id,
-                          name: pw.wine.name,
-                          region: "",
-                          type: pw.wine.type,
-                          vintageYear: pw.wine.vintageYear,
-                          winemaker: { id: "", name: "" },
-                        })),
-                } as any
-              }
-            />
-          </div>
-        ))}
+        {products.map((product) => {
+          const productForCard = {
+            ...product,
+            createdAt: product.createdAt ?? "",
+            description: product.description ?? null,
+            isBundle: !!product.isBundle,
+            quantity: product.quantity ?? 0,
+            rating: 0,
+            reviewCount: 0,
+            shop: { id: shopId, name: "" }, // minimal shop object for ProductCard
+            updatedAt: product.updatedAt ?? null,
+            wines:
+              Array.isArray(product.wines) && product.wines.length > 0
+                ? product.wines.map((w) => ({
+                    color: w.color,
+                    id: w.id,
+                    name: w.name,
+                    region: w.region ?? "",
+                    type: w.type,
+                    vintageYear: w.vintageYear,
+                    winemaker: w.winemaker ?? { id: "", name: "" },
+                  }))
+                : (product.productWines ?? []).map((pw) => ({
+                    color: pw.wine.color,
+                    id: pw.wine.id,
+                    name: pw.wine.name,
+                    region: "",
+                    type: pw.wine.type,
+                    vintageYear: pw.wine.vintageYear,
+                    winemaker: { id: "", name: "" },
+                  })),
+            // biome-ignore lint/suspicious/noExplicitAny: shop-by-id products endpoint returns a narrower shape than GetProducts200 (BE follow-up)
+          } as any;
+          return (
+            <div className="w-60 shrink-0" key={product.id}>
+              <ProductCard product={productForCard} />
+            </div>
+          );
+        })}
       </div>
       <div className="flex justify-center">
         <Button

@@ -1,6 +1,6 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
 import { ArrowLeft02Icon } from "@hugeicons/core-free-icons";
 import { HugeiconsIcon } from "@hugeicons/react";
+import { createFileRoute, Link } from "@tanstack/react-router";
 import { ProductDetailsCard } from "@/components/catalog/ProductDetailsCard";
 import { ErrorState } from "@/components/primitives/error-state";
 import { LoadingState } from "@/components/primitives/loading-state";
@@ -63,6 +63,7 @@ function ProductDetailPage() {
           <ProductRelatedSection
             isBundle={!!product.isBundle}
             shopId={product.shopId}
+            // biome-ignore lint/suspicious/noExplicitAny: productWines.wine shape is too narrow in OpenAPI (track in BE follow-up)
             wines={product.productWines?.map((pw: any) => pw.wine) || []}
           />
         </div>

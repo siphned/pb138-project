@@ -14,6 +14,8 @@ export interface UserProfile {
   roles: Role[];
 }
 
+const isRole = (role: string): role is Role => Object.values(Role).includes(role as Role);
+
 interface UserContextType {
   user: UserProfile | null;
   updateUser: (newData: Partial<Pick<UserProfile, "fname" | "lname">>) => Promise<UserProfile>;
@@ -42,8 +44,6 @@ export function UserProvider({ children }: { children: ReactNode }) {
   });
 
   const [user, setUser] = useState<UserProfile | null>(defaultUser);
-
-  const isRole = (role: string): role is Role => Object.values(Role).includes(role as Role);
 
   useEffect(() => {
     if (profile) {

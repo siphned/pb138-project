@@ -74,38 +74,37 @@ export function BundleWinesCarousel({ shopId, wineIds }: BundleWinesCarouselProp
         {products.map((p) => {
           const wine = Array.isArray(p.wines) ? p.wines[0] : p.productWines?.[0]?.wine;
 
+          const productForCard = {
+            createdAt: p.createdAt ?? "",
+            description: p.description ?? null,
+            id: p.id,
+            isBundle: false,
+            name: p.name,
+            price: p.price,
+            quantity: Number(p.quantity ?? 0),
+            rating: Number(p.rating ?? 0),
+            reviewCount: Number(p.reviewCount ?? 0),
+            shop: { id: p.shopId ?? shopId, name: "" },
+            updatedAt: p.updatedAt ?? null,
+            wines: wine
+              ? [
+                  {
+                    color: wine.color,
+                    id: wine.id,
+                    name: wine.name,
+                    region: wine.region ?? "",
+                    type: wine.type,
+                    vintageYear: wine.vintageYear,
+                    winemaker: wine.winemaker ?? { id: "", name: "" },
+                  },
+                ]
+              : [],
+            // biome-ignore lint/suspicious/noExplicitAny: shop-by-id product shape doesn't line up with GetProducts200 item; will narrow once BE unifies the two endpoints
+          } as any;
+
           return (
             <div className="w-60 shrink-0" key={p.id}>
-              <ProductCard
-                product={
-                  {
-                    createdAt: p.createdAt ?? "",
-                    description: p.description ?? null,
-                    id: p.id,
-                    isBundle: false,
-                    name: p.name,
-                    price: p.price,
-                    quantity: Number(p.quantity ?? 0),
-                    rating: Number(p.rating ?? 0),
-                    reviewCount: Number(p.reviewCount ?? 0),
-                    shop: { id: p.shopId ?? shopId, name: "" },
-                    updatedAt: p.updatedAt ?? null,
-                    wines: wine
-                      ? [
-                          {
-                            color: wine.color,
-                            id: wine.id,
-                            name: wine.name,
-                            region: wine.region ?? "",
-                            type: wine.type,
-                            vintageYear: wine.vintageYear,
-                            winemaker: wine.winemaker ?? { id: "", name: "" },
-                          },
-                        ]
-                      : [],
-                  } as any
-                }
-              />
+              <ProductCard product={productForCard} />
             </div>
           );
         })}
