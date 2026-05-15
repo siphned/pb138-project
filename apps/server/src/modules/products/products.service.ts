@@ -1,4 +1,5 @@
 import type { Product, ProductWine } from "@repo/shared/schemas";
+import { BadRequestError } from "@repo/shared";
 import { sql } from "drizzle-orm";
 import { type Database, db } from "../../db";
 import type { PaginatedResult } from "../../utils/pagination";
@@ -307,7 +308,10 @@ export class ProductsService {
     }
   ): Promise<Product> {
     if (data.wines !== undefined && data.wineId !== undefined) {
-      throw new Error("CONFLICTING_UPDATE_FIELDS");
+      throw new BadRequestError(
+        "Provide either wineId or wines, not both",
+        "CONFLICTING_UPDATE_FIELDS"
+      );
     }
 
     const product = await productsRepo.findById(db, productId);
@@ -316,7 +320,10 @@ export class ProductsService {
     }
 
     if (data.wines !== undefined && !product.isBundle) {
-      throw new Error("NOT_A_BUNDLE");
+      throw new BadRequestError(
+        "Cannot update bundle wines on a non-bundle product",
+        "NOT_A_BUNDLE"
+      );
     }
 
     await this.assertShopOwnership(shopId, requesterId);

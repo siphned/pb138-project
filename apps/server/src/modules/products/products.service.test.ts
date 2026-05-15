@@ -163,7 +163,7 @@ describe("productsService", () => {
             { quantity: 1, wineId: "w2" },
           ],
         })
-      ).rejects.toThrow("CONFLICTING_UPDATE_FIELDS");
+      ).rejects.toMatchObject({ code: "CONFLICTING_UPDATE_FIELDS" });
     });
 
     it("throws NOT_A_BUNDLE when wines supplied on a non-bundle product", async () => {
@@ -182,7 +182,7 @@ describe("productsService", () => {
             { quantity: 1, wineId: "w2" },
           ],
         })
-      ).rejects.toThrow("NOT_A_BUNDLE");
+      ).rejects.toMatchObject({ code: "NOT_A_BUNDLE" });
     });
 
     it("throws ProductNotFoundError when product belongs to a different shop", async () => {
