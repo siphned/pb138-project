@@ -39,25 +39,24 @@ export function HeaderSearch() {
     return (
       <Button
         aria-label="Open search"
-        className="hidden sm:flex"
         onClick={() => setOpen(true)}
         size="icon"
         variant="ghost"
       >
-        <HugeiconsIcon className="h-5 w-5" icon={Search01Icon} />
+        <HugeiconsIcon className="h-5 w-5" icon={Search01Icon} strokeWidth={2} />
       </Button>
     );
   }
 
   return (
-    <form className="hidden sm:flex items-center" onSubmit={handleSubmit}>
+    <form className="flex items-center" onSubmit={handleSubmit}>
       <Input
         aria-label="Search the catalog"
-        className="w-48 lg:w-64"
+        className="w-36 sm:w-48 lg:w-64"
         onBlur={handleBlur}
         onChange={(e) => setValue(e.target.value)}
         onKeyDown={handleKeyDown}
-        placeholder="Search wines, shops, winemakers…"
+        placeholder="Search…"
         ref={inputRef}
         value={value}
       />
