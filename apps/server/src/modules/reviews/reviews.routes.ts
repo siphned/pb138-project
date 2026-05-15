@@ -1,3 +1,4 @@
+import { BadRequestError } from "@repo/shared";
 import { Elysia, t } from "elysia";
 import { errorResponse } from "../../utils/error-plugin";
 import { authPlugin } from "../auth";
@@ -144,7 +145,8 @@ export const createReviewsRoutes = (auth = authPlugin) =>
       "/reviews/:id",
       async ({ params, dbUser, clerkPayload, query }) => {
         const { entityId, entityType } = query;
-        if (!entityId || !entityType) throw new Error("BAD_REQUEST");
+        if (!entityId || !entityType)
+          throw new BadRequestError("entityId and entityType are required", "BAD_REQUEST");
         await reviewsService.deleteReview(
           params.id,
           dbUser.id,

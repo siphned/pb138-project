@@ -1,3 +1,4 @@
+import { NotFoundError } from "@repo/shared";
 import type { Review } from "@repo/shared/schemas";
 import { orderItems, orders, productWines, reviews, wines } from "@repo/shared/schemas";
 import { and, asc, avg, count, desc, eq, isNull } from "drizzle-orm";
@@ -169,7 +170,7 @@ export async function insertReview(
       userId,
     })
     .returning();
-  if (!review) throw new Error("Review insert returned no rows");
+  if (!review) throw new NotFoundError("Review insert returned no rows");
   return review;
 }
 
