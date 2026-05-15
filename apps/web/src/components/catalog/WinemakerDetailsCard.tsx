@@ -72,15 +72,17 @@ export function WinemakerDetailsCard({ winemaker }: WinemakerDetailsCardProps) {
 
       <ShowOwner ownerUserId={ownerUserId}>
         <div className="flex flex-wrap gap-4">
-          <Button asChild variant="outline">
-            <Link params={{ id: winemaker.id }} to="/winemakers/$id/edit">
-              Edit Profile
-            </Link>
+          <Button
+            render={<Link params={{ id: winemaker.id }} to="/winemakers/$id/edit" />}
+            variant="outline"
+          >
+            Edit Profile
           </Button>
-          <Button asChild variant="outline">
-            <Link params={{ id: winemaker.id }} to="/winemakers/$id/images">
-              Manage Images
-            </Link>
+          <Button
+            render={<Link params={{ id: winemaker.id }} to="/winemakers/$id/images" />}
+            variant="outline"
+          >
+            Manage Images
           </Button>
         </div>
       </ShowOwner>

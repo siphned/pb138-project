@@ -93,10 +93,13 @@ export function ProductDetailsCard({
           <ShowOwner ownerUserId={product.shop?.ownerUserId}>
             <Section heading="Owner Actions">
               <div className="flex flex-col gap-4">
-                <Button asChild variant="outline">
-                  <Link params={{ productId: product.id }} to="/products/$productId/edit">
-                    Edit Product
-                  </Link>
+                <Button
+                  render={
+                    <Link params={{ productId: product.id }} to="/products/$productId/edit" />
+                  }
+                  variant="outline"
+                >
+                  Edit Product
                 </Button>
                 <Button disabled variant="destructive">
                   Delete Product

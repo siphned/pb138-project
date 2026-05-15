@@ -46,10 +46,8 @@ export function WineDetailsCard({ wine }: WineDetailsCardProps) {
 
       <ShowOwner ownerUserId={ownerUserId}>
         <div className="flex flex-wrap gap-4">
-          <Button asChild variant="outline">
-            <Link params={{ id: wine.id }} to="/wines/$id/edit">
-              Edit Wine
-            </Link>
+          <Button render={<Link params={{ id: wine.id }} to="/wines/$id/edit" />} variant="outline">
+            Edit Wine
           </Button>
           <Button disabled variant="destructive">
             Delete Wine

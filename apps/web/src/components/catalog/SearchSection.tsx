@@ -4,14 +4,19 @@ import React from "react";
 import { DataGrid } from "@/components/primitives/data-grid";
 import { Section } from "@/components/primitives/section";
 import { Button } from "@/components/ui/button";
+import type { ProductSearch, ShopSearch, WinemakerSearch, WineSearch } from "./types";
 
-interface SearchSectionProps {
+type ViewAllProps =
+  | { viewAllHref: "/explore"; viewAllSearch?: WineSearch }
+  | { viewAllHref: "/products"; viewAllSearch?: ProductSearch }
+  | { viewAllHref: "/winemakers"; viewAllSearch?: WinemakerSearch }
+  | { viewAllHref: "/shops"; viewAllSearch?: ShopSearch };
+
+type SearchSectionProps = {
   heading: string;
   count: number;
-  viewAllHref: "/explore" | "/products" | "/winemakers" | "/shops";
-  viewAllSearch?: Record<string, unknown>;
   children: ReactNode;
-}
+} & ViewAllProps;
 
 export function SearchSection({
   heading,
@@ -38,10 +43,11 @@ export function SearchSection({
         </div>
 
         <div className="flex justify-start">
-          <Button asChild variant="outline">
-            <Link search={viewAllSearch as any} to={viewAllHref}>
-              View all ({count})
-            </Link>
+          <Button
+            render={<Link search={viewAllSearch as never} to={viewAllHref} />}
+            variant="outline"
+          >
+            View all ({count})
           </Button>
         </div>
       </div>

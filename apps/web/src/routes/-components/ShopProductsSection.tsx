@@ -112,15 +112,18 @@ export function ShopProductsSection({ shopId }: ShopProductsSectionProps) {
         ))}
       </div>
       <div className="flex justify-center">
-        <Button asChild variant="outline">
-          <Link
-            className="flex items-center gap-2 text-sm "
-            search={{ page: 1, shopId: shopId, sort: "newest" }}
-            to="/products"
-          >
-            Show Inventory
-            <HugeiconsIcon className="h-4 w-4" icon={ArrowRight02Icon} />
-          </Link>
+        <Button
+          render={
+            <Link
+              className="flex items-center gap-2 text-sm"
+              search={{ page: 1, shopId: shopId, sort: "newest" }}
+              to="/products"
+            />
+          }
+          variant="outline"
+        >
+          Show Inventory
+          <HugeiconsIcon className="h-4 w-4" icon={ArrowRight02Icon} />
         </Button>
       </div>
     </div>
