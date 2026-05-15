@@ -6,7 +6,12 @@ import { ProductCard } from "@/components/catalog/ProductCard";
 import { SearchPageFilters } from "@/components/catalog/SearchPageFilters";
 import { SearchSection } from "@/components/catalog/SearchSection";
 import { ShopCard } from "@/components/catalog/ShopCard";
-import type { SearchPageSearch, WineSearch } from "@/components/catalog/types";
+import {
+  asNumOrStr,
+  asString,
+  type SearchPageSearch,
+  type WineSearch,
+} from "@/components/catalog/types";
 import { WineCard } from "@/components/catalog/WineCard";
 import { WinemakerCard } from "@/components/catalog/WinemakerCard";
 import { EmptyState } from "@/components/primitives/empty-state";
@@ -32,18 +37,29 @@ export const Route = createFileRoute("/search")({
   validateSearch: (raw): SearchPageSearch => ({
     color: isColor(raw.color) ? raw.color : undefined,
     isBundle: typeof raw.isBundle === "boolean" ? raw.isBundle : undefined,
-    maxPrice:
-      typeof raw.maxPrice === "string" || typeof raw.maxPrice === "number"
-        ? raw.maxPrice
-        : undefined,
-    minPrice:
-      typeof raw.minPrice === "string" || typeof raw.minPrice === "number"
-        ? raw.minPrice
-        : undefined,
-    q: typeof raw.q === "string" ? raw.q : "",
-    region: typeof raw.region === "string" ? raw.region : undefined,
+    maxPrice: asNumOrStr(raw.maxPrice),
+    minPrice: asNumOrStr(raw.minPrice),
+    q: asString(raw.q) ?? "",
+    region: asString(raw.region),
   }),
 });
+
+const matchesByName = <T extends { name: string }>(items: T[] | undefined, needle: string): T[] => {
+  if (!needle) return items ?? [];
+  const lower = needle.toLowerCase();
+  return (items ?? []).filter((item) => item.name.toLowerCase().includes(lower));
+};
+
+const matchesShop = <T extends { name: string; address: { city: string } }>(
+  items: T[] | undefined,
+  needle: string
+): T[] => {
+  if (!needle) return items ?? [];
+  const lower = needle.toLowerCase();
+  return (items ?? []).filter(
+    (s) => s.name.toLowerCase().includes(lower) || s.address.city.toLowerCase().includes(lower)
+  );
+};
 
 function SearchPage() {
   const search = Route.useSearch();
@@ -79,21 +95,9 @@ function SearchPage() {
     shopsQuery.isLoading;
 
   // Client-side filtering for entities without BE search support
-  const filteredWines = q
-    ? (winesQuery.data || []).filter((w) => w.name.toLowerCase().includes(q.toLowerCase()))
-    : winesQuery.data || [];
-
-  const filteredWinemakers = q
-    ? (winemakersQuery.data || []).filter((w) => w.name.toLowerCase().includes(q.toLowerCase()))
-    : winemakersQuery.data || [];
-
-  const filteredShops = q
-    ? (shopsQuery.data || []).filter(
-        (s) =>
-          s.name.toLowerCase().includes(q.toLowerCase()) ||
-          s.address.city.toLowerCase().includes(q.toLowerCase())
-      )
-    : shopsQuery.data || [];
+  const filteredWines = matchesByName(winesQuery.data, q);
+  const filteredWinemakers = matchesByName(winemakersQuery.data, q);
+  const filteredShops = matchesShop(shopsQuery.data, q);
 
   const wineCount = filteredWines.length;
   const products = productsQuery.data?.data || [];

@@ -2,6 +2,17 @@ import type { GetEventsQueryParams } from "@/generated/types/GetEvents";
 import type { GetProductsQueryParams } from "@/generated/types/GetProducts";
 import type { GetWinesQueryParams } from "@/generated/types/GetWines";
 
+/** Coerces an unknown URL-search value into `string | undefined`. */
+export const asString = (v: unknown): string | undefined => (typeof v === "string" ? v : undefined);
+
+/**
+ * Coerces an unknown URL-search value into a numeric/stringy ID that the
+ * generated Kubb param types accept (most numeric query params are typed
+ * as `string | number` because TanStack Router serialises them as strings).
+ */
+export const asNumOrStr = (v: unknown): string | number | undefined =>
+  typeof v === "string" || typeof v === "number" ? v : undefined;
+
 export type WineSearch = GetWinesQueryParams & { q?: string };
 // isBundle isn't in the OpenAPI list endpoint yet; we keep it as a UI-only field
 // and strip it before passing to the hook. Track in WINE-XXX BE follow-up.
