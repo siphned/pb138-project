@@ -1,6 +1,6 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
 import { ArrowLeft02Icon } from "@hugeicons/core-free-icons";
 import { HugeiconsIcon } from "@hugeicons/react";
+import { createFileRoute, Link } from "@tanstack/react-router";
 import { WineDetailsCard } from "@/components/catalog/WineDetailsCard";
 import { ErrorState } from "@/components/primitives/error-state";
 import { LoadingState } from "@/components/primitives/loading-state";
