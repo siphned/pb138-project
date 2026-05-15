@@ -37,12 +37,7 @@ export function HeaderSearch() {
 
   if (!open) {
     return (
-      <Button
-        aria-label="Open search"
-        onClick={() => setOpen(true)}
-        size="icon"
-        variant="ghost"
-      >
+      <Button aria-label="Open search" onClick={() => setOpen(true)} size="icon" variant="ghost">
         <HugeiconsIcon className="h-5 w-5" icon={Search01Icon} strokeWidth={2} />
       </Button>
     );

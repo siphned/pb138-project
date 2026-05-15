@@ -22,7 +22,7 @@ export function CatalogPlaceholder({
       tawny: "bg-amber-700/30 dark:bg-amber-900/50",
       white: "bg-amber-100 dark:bg-amber-900/30",
       yellow: "bg-yellow-100 dark:bg-yellow-900/30",
-    }[color?.toLowerCase() || ""] ?? "bg-muted";
+    }[color?.toLowerCase() || ""] ?? "bg-green-800/50 dark:bg-green-900/50";
 
   return (
     <div

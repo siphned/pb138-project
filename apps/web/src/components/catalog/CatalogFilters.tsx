@@ -228,11 +228,11 @@ function ProductFilters({
 }) {
   const [priceRange, setPriceRange] = useState<[number, number]>([
     Number(search.minPrice) || 0,
-    Number(search.maxPrice) || 2000,
+    Number(search.maxPrice) || 300,
   ]);
 
   useEffect(() => {
-    setPriceRange([Number(search.minPrice) || 0, Number(search.maxPrice) || 2000]);
+    setPriceRange([Number(search.minPrice) || 0, Number(search.maxPrice) || 300]);
   }, [search.minPrice, search.maxPrice]);
 
   const handleSearchChange = useCallback(
@@ -262,7 +262,7 @@ function ProductFilters({
         <div className="space-y-4">
           <SectionLabel>Price Range</SectionLabel>
           <Slider
-            max={500}
+            max={search.maxPrice ? Math.max(Number(search.maxPrice), 500) : 500}
             onValueChange={(v) => setPriceRange(v as [number, number])}
             onValueCommitted={(v) => {
               const [min, max] = v as [number, number];
