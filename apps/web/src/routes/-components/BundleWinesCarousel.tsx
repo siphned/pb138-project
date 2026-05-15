@@ -1,4 +1,4 @@
-import { useGetShopsByIdProducts } from "@/generated/hooks/useGetShopsByIdProducts";
+import { useGetProducts } from "@/generated/hooks/useGetProducts";
 import { WineCard } from "./WineCard";
 
 type ShopProductRaw = {
@@ -41,8 +41,8 @@ interface BundleWinesCarouselProps {
 }
 
 export function BundleWinesCarousel({ shopId, wineIds }: BundleWinesCarouselProps) {
-  const { data, isLoading } = useGetShopsByIdProducts(shopId, { isBundle: "false" });
-  const allProducts = data as ShopProductRaw[] | undefined;
+  const { data: rawData, isLoading } = useGetProducts({ shopId, isBundle: false });
+  const allProducts = rawData?.data as ShopProductRaw[] | undefined;
 
   const products =
     allProducts?.filter((p) => {

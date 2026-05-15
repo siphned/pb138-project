@@ -13,7 +13,6 @@ import {
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useGetProducts } from "@/generated/hooks/useGetProducts";
-import { useGetShopsByIdProducts } from "@/generated/hooks/useGetShopsByIdProducts";
 import { WineCard } from "./WineCard";
 import { WineFiltersSidebar } from "./WineFiltersSidebar";
 
@@ -121,7 +120,7 @@ export function WineCatalog({ search, shopId, shopName, mode = "wines" }: WineCa
 
   const productsResult = useGetProducts();
 
-  const shopProductsResult = useGetShopsByIdProducts(shopId ?? "", { isBundle: "false" });
+  const shopProductsResult = useGetProducts({ shopId, isBundle: "false" });
 
   const { data: rawData, isLoading, error, refetch } = shopId ? shopProductsResult : productsResult;
 
