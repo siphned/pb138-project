@@ -138,7 +138,10 @@ function copyImageAssets() {
     if (shop.imageUrl) imageUrls.push(shop.imageUrl);
   }
   imageUrls.push("/uploads/wine/wine_placeholder.webp");
+  imageUrls.push("/uploads/winemaker/winery_placeholder.webp");
+  imageUrls.push("/uploads/shop/shop_placeholder.webp");
   imageUrls.push("/uploads/event/event_placeholder.webp");
+  imageUrls.push("/uploads/user/user_placeholder.webp");
 
   const unique = [...new Set(imageUrls)];
   let copied = 0;
