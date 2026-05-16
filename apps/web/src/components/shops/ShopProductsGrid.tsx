@@ -48,7 +48,7 @@ export function ShopProductsGrid({ shopId, isBundle }: ShopProductsGridProps) {
   return (
     <DataGrid variant="catalog">
       {products.map((product) => (
-        <ProductCard key={product.id} product={product} />
+        <ProductCard key={product.id} product={product} showShopName={false} />
       ))}
     </DataGrid>
   );
