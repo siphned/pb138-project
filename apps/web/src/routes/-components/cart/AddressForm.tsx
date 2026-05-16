@@ -1,7 +1,7 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import { forwardRef } from "react";
 import { useForm } from "react-hook-form";
-import { z } from "zod";
+import z from "zod";
 import { Checkbox } from "@/components/ui/checkbox";
 import {
   Form,

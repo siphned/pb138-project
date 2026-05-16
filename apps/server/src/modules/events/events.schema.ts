@@ -1,5 +1,5 @@
 import { t } from "elysia";
-import { z } from "zod";
+import z from "zod";
 
 /**
  * Request/response schemas for events module.
