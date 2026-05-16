@@ -1,4 +1,4 @@
-import { render, screen, fireEvent } from "@testing-library/react";
+import { fireEvent, render, screen } from "@testing-library/react";
 import { describe, expect, it, vi } from "vitest";
 import { ShopManageMenu } from "./ShopManageMenu";
 
@@ -6,10 +6,10 @@ import { ShopManageMenu } from "./ShopManageMenu";
 vi.mock("@tanstack/react-router", () => ({
   Link: ({ children, to, params, search }: any) => (
     <div
-      data-testid="link"
-      data-to={to}
       data-params={JSON.stringify(params)}
       data-search={JSON.stringify(search)}
+      data-testid="link"
+      data-to={to}
     >
       {children}
     </div>
@@ -45,18 +45,18 @@ describe("ShopManageMenu", () => {
   it("contains all management links with correct hrefs", () => {
     vi.mocked(useIsOwner).mockReturnValue(true);
     render(<ShopManageMenu shop={mockShop as any} />);
-    
+
     // We need to open the menu to see the items
     const trigger = screen.getByRole("button", { name: /open management menu/i });
     fireEvent.click(trigger);
 
     const expectedLinks = [
-      { to: "/shops/$id/edit", text: /edit shop details/i },
-      { to: "/shops/$id/images", text: /manage images/i },
-      { to: "/shops/$id/availability", text: /manage availability/i },
-      { to: "/shops/$id/inventory", text: /manage inventory/i, search: { isBundle: undefined } },
-      { to: "/shops/$id/orders", text: /incoming orders/i },
-      { to: "/shops/$id/supply-browse", text: /supply agreements/i },
+      { text: /edit shop details/i, to: "/shops/$id/edit" },
+      { text: /manage images/i, to: "/shops/$id/images" },
+      { text: /manage availability/i, to: "/shops/$id/availability" },
+      { search: { isBundle: undefined }, text: /manage inventory/i, to: "/shops/$id/inventory" },
+      { text: /incoming orders/i, to: "/shops/$id/orders" },
+      { text: /supply agreements/i, to: "/shops/$id/supply-browse" },
     ];
 
     for (const link of expectedLinks) {

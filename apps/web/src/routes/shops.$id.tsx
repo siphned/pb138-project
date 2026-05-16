@@ -1,15 +1,14 @@
 import { ArrowLeft02Icon } from "@hugeicons/core-free-icons";
 import { HugeiconsIcon } from "@hugeicons/react";
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { EmptyState } from "@/components/primitives/empty-state";
 import { ErrorState } from "@/components/primitives/error-state";
 import { LoadingState } from "@/components/primitives/loading-state";
 import { Section } from "@/components/primitives/section";
-import { ShowOwner } from "@/components/primitives/show-owner";
+import { ShopDetailsCard } from "@/components/shops/ShopDetailsCard";
 import { ShopHero } from "@/components/shops/ShopHero";
-import { ShopManageMenu } from "@/components/shops/ShopManageMenu";
 import { ShopProductsRow } from "@/components/shops/ShopProductsRow";
 import { useGetShopsById } from "@/generated/hooks/useGetShopsById";
+import { ShopHeroGallery } from "./-components/ShopHeroGallery";
 import { ShopMapEmbed } from "./-components/ShopMapEmbed";
 
 export const Route = createFileRoute("/shops/$id")({
@@ -52,26 +51,29 @@ function ShopDetailPage() {
 
       <ShopHero shop={shop} />
 
-      <div className="overflow-hidden rounded-xl">
-        <ShopMapEmbed address={shop.address} />
+      <div className="grid grid-cols-1 gap-12 lg:grid-cols-2">
+        <div className="overflow-hidden rounded-3xl bg-muted shadow-lg">
+          <ShopHeroGallery shopName={shop.name} />
+        </div>
+
+        <ShopDetailsCard shop={shop} />
       </div>
+
+      <Section heading="Location">
+        <div className="overflow-hidden rounded-3xl border border-border shadow-md">
+          <ShopMapEmbed address={shop.address} />
+        </div>
+      </Section>
 
       <div className="space-y-16">
         <ShopProductsRow isBundle={false} shopId={id} />
         <ShopProductsRow isBundle={true} shopId={id} />
 
-        <Section heading="Reviews">
-          <EmptyState
-            description="We're working on bringing customer reviews to shop profiles."
-            title="Reviews coming soon"
-          />
+        <Section heading="Customer Reviews">
+          <p className="text-sm italic text-muted-foreground">
+            Coming soon — we're working on bringing customer reviews to shop profiles!
+          </p>
         </Section>
-
-        <ShowOwner ownerUserId={shop.ownerUserId}>
-          <Section heading="Owner Actions">
-            <ShopManageMenu shop={shop} />
-          </Section>
-        </ShowOwner>
       </div>
     </div>
   );

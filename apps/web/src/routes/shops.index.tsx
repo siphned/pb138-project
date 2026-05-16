@@ -4,9 +4,9 @@ import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { CatalogFilters } from "@/components/catalog/CatalogFilters";
 import { CatalogResults } from "@/components/catalog/CatalogResults";
 import { CatalogState } from "@/components/catalog/CatalogState";
-import { ShopCard } from "@/components/shops/ShopCard";
 import type { ShopSearch } from "@/components/catalog/types";
 import { PageHeader } from "@/components/primitives/page-header";
+import { ShopCard } from "@/components/shops/ShopCard";
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { useGetShops } from "@/generated/hooks/useGetShops";
@@ -45,10 +45,8 @@ function ShopsPage() {
         return false;
       }
     }
-    if (search.ownerUserId) {
-      if (s.ownerUserId !== search.ownerUserId) {
-        return false;
-      }
+    if (search.ownerUserId && s.ownerUserId !== search.ownerUserId) {
+      return false;
     }
     return true;
   });

@@ -2,12 +2,8 @@ import { render, screen } from "@testing-library/react";
 import { describe, expect, it, vi } from "vitest";
 import { ShopHero } from "./ShopHero";
 
-vi.mock("@/routes/-components/ShopHeroGallery", () => ({
-  ShopHeroGallery: () => <div data-testid="shop-hero-gallery" />,
-}));
-
-vi.mock("@/routes/-components/ShopHoursDisplay", () => ({
-  ShopHoursDisplay: () => <div data-testid="shop-hours" />,
+vi.mock("./ShopManageMenu", () => ({
+  ShopManageMenu: () => <div data-testid="shop-manage-menu" />,
 }));
 
 const mockShop = {
@@ -28,9 +24,11 @@ const mockShop = {
 };
 
 describe("ShopHero", () => {
-  it("renders shop name", () => {
+  it("renders shop name with large font structure", () => {
     render(<ShopHero shop={mockShop as any} />);
-    expect(screen.getByRole("heading", { name: "Gourmet Wine Shop" })).toBeInTheDocument();
+    expect(
+      screen.getByRole("heading", { level: 1, name: "Gourmet Wine Shop" })
+    ).toBeInTheDocument();
   });
 
   it("renders address summary", () => {
@@ -38,14 +36,8 @@ describe("ShopHero", () => {
     expect(screen.getByText("Prague, Czech Republic")).toBeInTheDocument();
   });
 
-  it("renders description in About section", () => {
+  it("renders the management menu", () => {
     render(<ShopHero shop={mockShop as any} />);
-    expect(screen.getByText(/About/i)).toBeInTheDocument();
-    expect(screen.getByText("Best wines in town")).toBeInTheDocument();
-  });
-
-  it("has the shop-hero data slot", () => {
-    const { container } = render(<ShopHero shop={mockShop as any} />);
-    expect(container.querySelector("[data-slot='shop-hero']")).not.toBeNull();
+    expect(screen.getByTestId("shop-manage-menu")).toBeInTheDocument();
   });
 });

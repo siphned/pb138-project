@@ -1,5 +1,4 @@
 import { useCallback, useEffect, useRef, useState } from "react";
-import { useUser } from "@/context/UserContext";
 import { SectionLabel } from "@/components/primitives/section-label";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Input } from "@/components/ui/input";
@@ -12,6 +11,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Slider } from "@/components/ui/slider";
+import { useUser } from "@/context/UserContext";
 import type {
   GetWinesQueryParamsColorEnumKey,
   GetWinesQueryParamsTypeEnumKey,
@@ -397,4 +397,3 @@ function GenericFilters({
     </div>
   );
 }
-

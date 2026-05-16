@@ -5,7 +5,6 @@ import type React from "react";
 import { ProductCard } from "@/components/catalog/ProductCard";
 import { SearchPageFilters } from "@/components/catalog/SearchPageFilters";
 import { SearchSection } from "@/components/catalog/SearchSection";
-import { ShopCard } from "@/components/shops/ShopCard";
 import {
   asNumOrStr,
   asString,
@@ -17,6 +16,7 @@ import { WinemakerCard } from "@/components/catalog/WinemakerCard";
 import { EmptyState } from "@/components/primitives/empty-state";
 import { LoadingState } from "@/components/primitives/loading-state";
 import { PageHeader } from "@/components/primitives/page-header";
+import { ShopCard } from "@/components/shops/ShopCard";
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { useGetProducts } from "@/generated/hooks/useGetProducts";

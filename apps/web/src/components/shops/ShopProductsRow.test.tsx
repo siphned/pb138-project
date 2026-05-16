@@ -72,7 +72,7 @@ describe("ShopProductsRow", () => {
 
     expect(screen.getByText("Wine Bundles")).toBeInTheDocument();
     const link = screen.getByTestId("link");
-    expect(JSON.parse(link.getAttribute("data-search")!)).toEqual({
+    expect(JSON.parse(link.getAttribute("data-search") ?? "")).toEqual({
       isBundle: true,
       shopId: "shop-1",
     });

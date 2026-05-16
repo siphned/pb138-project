@@ -5,20 +5,20 @@ import { ShopCard } from "./ShopCard";
 // Mock @tanstack/react-router
 vi.mock("@tanstack/react-router", () => ({
   Link: ({ children, to, params }: any) => (
-    <a href={to} data-params={JSON.stringify(params)}>
+    <a data-params={JSON.stringify(params)} href={to}>
       {children}
     </a>
   ),
 }));
 
 const mockShop = {
-  id: "shop-1",
-  name: "Test Wine Shop",
   address: {
     city: "Brno",
     country: "Czech Republic",
   },
+  id: "shop-1",
   images: [{ url: "https://example.com/shop.jpg" }],
+  name: "Test Wine Shop",
 };
 
 describe("ShopCard", () => {
