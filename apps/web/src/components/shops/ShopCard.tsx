@@ -1,7 +1,7 @@
 import { Link } from "@tanstack/react-router";
 import { Card } from "@/components/ui/card";
 import type { GetShops200 } from "@/generated/types/GetShops";
-import { CatalogPlaceholder } from "./CatalogPlaceholder";
+import { CatalogPlaceholder } from "../catalog/CatalogPlaceholder";
 
 export type GetShops200Item = GetShops200[number] & {
   images?: { url: string }[];

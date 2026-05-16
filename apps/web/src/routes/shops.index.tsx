@@ -4,7 +4,7 @@ import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { CatalogFilters } from "@/components/catalog/CatalogFilters";
 import { CatalogResults } from "@/components/catalog/CatalogResults";
 import { CatalogState } from "@/components/catalog/CatalogState";
-import { ShopCard } from "@/components/catalog/ShopCard";
+import { ShopCard } from "@/components/shops/ShopCard";
 import type { ShopSearch } from "@/components/catalog/types";
 import { PageHeader } from "@/components/primitives/page-header";
 import { Button } from "@/components/ui/button";

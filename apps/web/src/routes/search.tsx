@@ -5,7 +5,7 @@ import type React from "react";
 import { ProductCard } from "@/components/catalog/ProductCard";
 import { SearchPageFilters } from "@/components/catalog/SearchPageFilters";
 import { SearchSection } from "@/components/catalog/SearchSection";
-import { ShopCard } from "@/components/catalog/ShopCard";
+import { ShopCard } from "@/components/shops/ShopCard";
 import {
   asNumOrStr,
   asString,
