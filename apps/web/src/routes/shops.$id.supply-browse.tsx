@@ -13,7 +13,7 @@ export const Route = createFileRoute("/shops/$id/supply-browse")({
 function ShopsSupplyBrowseStub() {
   const { id } = Route.useParams();
   const winemakersQuery = useGetWinemakers();
-  const agreementsQuery = useGetSupplyAgreementsShopByShopId({ shopId: id });
+  const agreementsQuery = useGetSupplyAgreementsShopByShopId(id);
   const mutation = usePostSupplyAgreements();
   return (
     <StubPage

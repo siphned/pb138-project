@@ -1,12 +1,10 @@
 import { t } from "elysia";
-import { z } from "zod";
+import z from "zod";
 
 /**
  * Request/response schemas for events module.
  * Zod for shared types, TypeBox for Elysia route validation.
  */
-
-// ─── Zod Schemas ──────────────────────────────────────────────────────────
 
 const addressBodySchema = z.object({
   city: z.string().min(1).max(255),
@@ -118,10 +116,6 @@ export const paginatedCommentsResponseSchema = z.object({
   total: z.number(),
 });
 
-// ─── TypeBox Schemas ──────────────────────────────────────────────────────
-
-// ─── Shared sub-schemas ───────────────────────────────────────────────────────
-
 const addressBody = t.Object({
   city: t.String({ maxLength: 255, minLength: 1 }),
   country: t.String({ maxLength: 50, minLength: 1 }),
@@ -129,8 +123,6 @@ const addressBody = t.Object({
   postalCode: t.String({ maxLength: 20, minLength: 1 }),
   street: t.String({ maxLength: 255, minLength: 1 }),
 });
-
-// ─── Request schemas ──────────────────────────────────────────────────────────
 
 export const createEventBody = t.Object({
   address: addressBody,
@@ -169,8 +161,6 @@ export const createCommentBody = t.Object({
 });
 
 export const eventParams = t.Object({ id: t.String() });
-
-// ─── Response schemas ─────────────────────────────────────────────────────────
 
 export const eventResponse = t.Object({
   address: t.Nullable(

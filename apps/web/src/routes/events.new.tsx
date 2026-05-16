@@ -14,7 +14,21 @@ function EventCreateStub() {
       hookName="usePostEvents"
       mutation={mutation}
       payloadExample={{
-        data: { date: "2026-06-01T18:00:00Z", location: "Cellar", title: "Wine Tasting" },
+        data: {
+          address: {
+            city: "Velké Bílovice",
+            country: "Czech Republic",
+            houseNumber: "1",
+            postalCode: "69102",
+            street: "Cellar Street",
+          },
+          capacity: 50,
+          endTime: "2026-06-01T22:00:00Z",
+          inviteType: "open",
+          name: "Wine Tasting",
+          startTime: "2026-06-01T18:00:00Z",
+          visibility: "public",
+        },
       }}
       title="Create new event"
     />

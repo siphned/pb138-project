@@ -89,16 +89,11 @@ describe("cartsRepository", () => {
     });
   });
 
-  describe("updateItemQuantity", () => {
-    it("updates quantity if > 0", async () => {
-      await cartsRepo.updateItemQuantity(db, "c1", "p1", 5);
+  describe("setItemQuantity", () => {
+    it("updates quantity in cart_items", async () => {
+      await cartsRepo.setItemQuantity(db, "c1", "p1", 5);
       expect(db.update).toHaveBeenCalledWith(cartItems);
       expect(mockDb.set).toHaveBeenCalled();
-    });
-
-    it("deletes item if quantity <= 0", async () => {
-      await cartsRepo.updateItemQuantity(db, "c1", "p1", 0);
-      expect(db.delete).toHaveBeenCalledWith(cartItems);
     });
   });
 

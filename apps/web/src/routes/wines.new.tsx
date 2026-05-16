@@ -13,7 +13,21 @@ function WineCreateStub() {
       actorRole="winemaker"
       hookName="usePostWines"
       mutation={mutation}
-      payloadExample={{ data: { color: "red", name: "New Wine", region: "South Moravia" } }}
+      payloadExample={{
+        data: {
+          alcoholContent: "12.5",
+          attribution: "Lechovice 2022",
+          color: "red",
+          composition: "Pinot Noir 100%",
+          description: "A medium-bodied red wine with notes of cherry and oak.",
+          name: "New Wine",
+          quantity: 100,
+          region: "South Moravia",
+          type: "still",
+          vintageYear: 2022,
+          volumeMl: 750,
+        },
+      }}
       title="Create new wine (type)"
     />
   );

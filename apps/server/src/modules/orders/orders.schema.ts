@@ -1,12 +1,10 @@
 import { t } from "elysia";
-import { z } from "zod";
+import z from "zod";
 
 /**
  * Request/response schemas for orders module.
  * Zod for shared types, TypeBox for Elysia route validation.
  */
-
-// ─── Zod Schemas ──────────────────────────────────────────────────────────
 
 const addressInputSchema = z.object({
   city: z.string().min(1),
@@ -59,8 +57,6 @@ export const orderResponseSchema = z.object({
 export const updateItemStatusBodySchema = z.object({
   status: z.enum(["confirmed", "shipped", "delivered", "cancelled"]),
 });
-
-// ─── TypeBox Schemas ──────────────────────────────────────────────────────
 
 const addressInput = t.Object({
   city: t.String({ minLength: 1 }),

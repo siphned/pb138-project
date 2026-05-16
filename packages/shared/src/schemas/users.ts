@@ -1,6 +1,6 @@
 import { pgTable, text, unique, uuid, varchar } from "drizzle-orm/pg-core";
 import { createInsertSchema, createSelectSchema } from "drizzle-zod";
-import { z } from "zod";
+import z from "zod";
 import { addresses } from "./addresses";
 import { userStatusEnum } from "./enums";
 import { timestamptz } from "./helpers";

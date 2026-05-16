@@ -51,7 +51,7 @@
   "private": true,
   "scripts": {
     "build": "tsc -b && vite build",
-    "check-types": "tsc --noEmit",
+    "check-types": "tsc --noEmit -p tsconfig.app.json && tsc --noEmit -p tsconfig.node.json",
     "dev": "vite",
     "generate": "kubb",
     "preview": "vite preview",

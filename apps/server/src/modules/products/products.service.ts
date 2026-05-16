@@ -1,11 +1,17 @@
 import type { Product, ProductWine } from "@repo/shared/schemas";
-import { sql } from "drizzle-orm";
 import { type Database, db } from "../../db";
 import type { PaginatedResult } from "../../utils/pagination";
 import { parsePagination } from "../../utils/pagination";
 import { ForbiddenShopActionError, ShopNotFoundError } from "../shops/shops.errors";
 import * as shopsRepo from "../shops/shops.repository";
-import { InsufficientStockError, InvalidWineError, ProductNotFoundError } from "./products.errors";
+import {
+  BundleMinWinesError,
+  DuplicateWineError,
+  InconsistentDataError,
+  InsufficientStockError,
+  InvalidWineError,
+  ProductNotFoundError,
+} from "./products.errors";
 import type { ProductCatalogFilters, ProductWithWines } from "./products.repository";
 import * as productsRepo from "./products.repository";
 
@@ -49,7 +55,7 @@ export class ProductsService {
         throw new InsufficientStockError();
       }
 
-      await productsRepo.updateWineQuantity(tx, tw.wineId, sql`${sql.raw("quantity")} - ${total}`);
+      await productsRepo.updateWineQuantity(tx, tw.wineId, -total);
     }
   }
 
@@ -58,11 +64,7 @@ export class ProductsService {
     product: Product & { productWines: ProductWine[] }
   ) {
     for (const pw of product.productWines) {
-      await productsRepo.updateWineQuantity(
-        tx,
-        pw.wineId,
-        sql`${sql.raw("quantity")} + ${pw.quantity * product.quantity}`
-      );
+      await productsRepo.updateWineQuantity(tx, pw.wineId, pw.quantity * product.quantity);
     }
   }
 
@@ -79,10 +81,10 @@ export class ProductsService {
   ): Promise<Product> {
     await this.assertShopOwnership(shopId, requesterId);
 
-    if (data.wines.length < 2) throw new Error("BUNDLE_MIN_WINES");
+    if (data.wines.length < 2) throw new BundleMinWinesError();
 
     const wineIds = data.wines.map((w) => w.wineId);
-    if (new Set(wineIds).size !== wineIds.length) throw new Error("DUPLICATE_WINE");
+    if (new Set(wineIds).size !== wineIds.length) throw new DuplicateWineError();
 
     const winesExist = await productsRepo.winesExist(db, wineIds);
     if (!winesExist) throw new InvalidWineError();
@@ -128,11 +130,7 @@ export class ProductsService {
         throw new InsufficientStockError();
       }
 
-      await productsRepo.updateWineQuantity(
-        tx,
-        data.wineId,
-        sql`${sql.raw("quantity")} - ${data.quantity}`
-      );
+      await productsRepo.updateWineQuantity(tx, data.wineId, -data.quantity);
 
       const product = await productsRepo.create(tx, {
         description: data.description ?? null,
@@ -252,9 +250,9 @@ export class ProductsService {
     }
 
     if (data.wines !== undefined) {
-      if (data.wines.length < 2) throw new Error("BUNDLE_MIN_WINES");
+      if (data.wines.length < 2) throw new BundleMinWinesError();
       const wineIds = data.wines.map((w) => w.wineId);
-      if (new Set(wineIds).size !== wineIds.length) throw new Error("DUPLICATE_WINE");
+      if (new Set(wineIds).size !== wineIds.length) throw new DuplicateWineError();
       const winesExist = await productsRepo.winesExist(db, wineIds);
       if (!winesExist) throw new InvalidWineError();
     }
@@ -319,7 +317,7 @@ export class ProductsService {
       await this.revertBundleAllocations(tx, product);
 
       const targetWineId = data.wineId ?? product.productWines[0]?.wineId;
-      if (!targetWineId) throw new Error("INCONSISTENT_DATA");
+      if (!targetWineId) throw new InconsistentDataError();
 
       const newQty = data.quantity ?? product.quantity;
       await this.applyBundleAllocations(tx, [{ quantity: 1, wineId: targetWineId }], newQty);

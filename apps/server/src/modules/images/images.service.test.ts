@@ -39,11 +39,13 @@ const makeFile = (type = "image/jpeg") => new File(["content"], "test.jpg", { ty
 
 beforeEach(() => {
   vi.clearAllMocks();
-  vi.stubGlobal("Bun", { write: vi.fn().mockResolvedValue(0) });
+  // `Bun` is a non-configurable global in the Bun runtime, so `vi.stubGlobal`
+  // throws. Spy on `Bun.write` directly instead.
+  vi.spyOn(Bun, "write").mockResolvedValue(0);
 });
 
 afterEach(() => {
-  vi.unstubAllGlobals();
+  vi.restoreAllMocks();
 });
 
 describe("listImages", () => {
