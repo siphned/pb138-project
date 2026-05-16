@@ -55,11 +55,11 @@ export function StubMutation<TData, TVariables>({
           </div>
         </div>
 
-        {mutation.error && (
+        {mutation.error ? (
           <pre className="p-4 bg-destructive/10 text-destructive rounded text-xs overflow-auto max-h-40">
             {JSON.stringify(mutation.error, null, 2)}
           </pre>
-        )}
+        ) : null}
 
         {mutation.data !== undefined && (
           <div className="space-y-2">

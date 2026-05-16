@@ -8,7 +8,7 @@ export const Route = createFileRoute("/_authenticated/orders/$id")({
 
 function OrdersDetailStub() {
   const { id } = Route.useParams();
-  const query = useGetOrdersById({ id });
+  const query = useGetOrdersById(id);
   return (
     <StubGet
       actorRole="customer+"

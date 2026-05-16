@@ -53,7 +53,8 @@ export function ExploreSection({ mode }: ExploreSectionProps) {
         <h2 className="font-heading text-2xl font-bold">{title}</h2>
         <Link
           className={buttonVariants({ size: "sm", variant: "ghost" })}
-          search={{ page: 1, sort: "newest" }}
+          // biome-ignore lint/suspicious/noExplicitAny: linkTo is a dynamic route literal — search shape isn't inferable
+          search={{ page: 1, sort: "newest" } as any}
           // biome-ignore lint/suspicious/noExplicitAny: linkTo is a dynamic route literal narrowed at call site
           to={linkTo as any}
         >

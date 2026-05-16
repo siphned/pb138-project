@@ -11,6 +11,7 @@ import { useGetShops } from "@/generated/hooks/useGetShops";
 import { useGetSupplyAgreementsWinemaker } from "@/generated/hooks/useGetSupplyAgreementsWinemaker";
 import { useGetUsersMe } from "@/generated/hooks/useGetUsersMe";
 import { useGetWines } from "@/generated/hooks/useGetWines";
+import { Role } from "@/types/roles";
 
 export const Route = createFileRoute("/_authenticated/stats")({
   component: StatsStub,
@@ -42,7 +43,7 @@ function StatsStub() {
         query={userQuery}
         title="Customer: my profile"
       />
-      {roles.includes("winemaker") && (
+      {roles.includes(Role.winemaker) && (
         <>
           <StubGet
             actorRole="winemaker"
@@ -64,7 +65,7 @@ function StatsStub() {
           />
         </>
       )}
-      {roles.includes("shop_owner") && (
+      {roles.includes(Role.shopOwner) && (
         <StubGet
           actorRole="shop_owner"
           hookName="useGetShops (filter ownerUserId=me — verify BE)"
@@ -72,7 +73,7 @@ function StatsStub() {
           title="Shop owner: my shops"
         />
       )}
-      {roles.includes("admin") && (
+      {roles.includes(Role.admin) && (
         <>
           <StubGet
             actorRole="admin"

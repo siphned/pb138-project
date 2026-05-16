@@ -17,7 +17,10 @@ function ProductCreateStub() {
       actorRole="shop_owner"
       hookName="usePostShopsByIdProducts"
       mutation={mutation}
-      payloadExample={{ data: { price: 299, stock: 10, wineId: "wine-uuid" }, id: shopId }}
+      payloadExample={{
+        data: { name: "New Product", price: "299", quantity: 10, wineId: "wine-uuid" },
+        id: shopId,
+      }}
       title="Create new product"
     />
   );

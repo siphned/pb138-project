@@ -8,7 +8,7 @@ export const Route = createFileRoute("/shops/$id/availability")({
 
 function ShopsAvailabilityStub() {
   const { id } = Route.useParams();
-  const query = useGetShopsByIdAvailability({ id });
+  const query = useGetShopsByIdAvailability(id);
   return (
     <StubGet
       actorRole="shop_owner (owner)"
