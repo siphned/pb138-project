@@ -1,63 +1,63 @@
 import { z } from "zod";
 
 export const customerStatsSchema = z.object({
-  role: z.literal("customer"),
-  ordersCount: z.number().int().nonnegative(),
-  totalSpent: z.number().nonnegative(),
   eventsAttended: z.number().int().nonnegative(),
+  ordersCount: z.number().int().nonnegative(),
   reviewsWritten: z.number().int().nonnegative(),
+  role: z.literal("customer"),
+  totalSpent: z.number().nonnegative(),
 });
 
 export const winemakerStatsSchema = z.object({
-  role: z.literal("winemaker"),
-  wineCount: z.number().int().nonnegative(),
-  totalStock: z.number().int().nonnegative(),
-  eventsByStatus: z.object({
-    pending: z.number().int().nonnegative(),
-    approved: z.number().int().nonnegative(),
-    rejected: z.number().int().nonnegative(),
-  }),
-  supplyAgreementsByStatus: z.object({
-    pending: z.number().int().nonnegative(),
-    approved: z.number().int().nonnegative(),
-    rejected: z.number().int().nonnegative(),
-  }),
   avgReviewScore: z.number().nonnegative().nullable(),
+  eventsByStatus: z.object({
+    approved: z.number().int().nonnegative(),
+    pending: z.number().int().nonnegative(),
+    rejected: z.number().int().nonnegative(),
+  }),
+  role: z.literal("winemaker"),
+  supplyAgreementsByStatus: z.object({
+    approved: z.number().int().nonnegative(),
+    pending: z.number().int().nonnegative(),
+    rejected: z.number().int().nonnegative(),
+  }),
+  totalStock: z.number().int().nonnegative(),
+  wineCount: z.number().int().nonnegative(),
 });
 
 export const shopOwnerStatsSchema = z.object({
+  orderItemsProcessed: z.number().int().nonnegative(),
+  productsByType: z.object({
+    bundles: z.number().int().nonnegative(),
+    standard: z.number().int().nonnegative(),
+  }),
+  revenue: z.number().nonnegative(),
   role: z.literal("shop_owner"),
   shopsCount: z.number().int().nonnegative(),
-  productsByType: z.object({
-    standard: z.number().int().nonnegative(),
-    bundles: z.number().int().nonnegative(),
-  }),
-  totalStockValue: z.number().nonnegative(),
-  orderItemsProcessed: z.number().int().nonnegative(),
-  revenue: z.number().nonnegative(),
   supplyAgreementsByStatus: z.object({
-    pending: z.number().int().nonnegative(),
     approved: z.number().int().nonnegative(),
+    pending: z.number().int().nonnegative(),
     rejected: z.number().int().nonnegative(),
   }),
+  totalStockValue: z.number().nonnegative(),
 });
 
 export const adminStatsSchema = z.object({
+  deletedReviews: z.number().int().nonnegative(),
+  pendingEvents: z.number().int().nonnegative(),
+  pendingRoleRequests: z.number().int().nonnegative(),
   role: z.literal("admin"),
-  usersByRole: z.object({
-    customer: z.number().int().nonnegative(),
-    winemaker: z.number().int().nonnegative(),
-    shop_owner: z.number().int().nonnegative(),
-    admin: z.number().int().nonnegative(),
-  }),
-  totalRevenue: z.number().nonnegative(),
+  totalEvents: z.number().int().nonnegative(),
   totalProducts: z.number().int().nonnegative(),
+  totalRevenue: z.number().nonnegative(),
   totalShops: z.number().int().nonnegative(),
   totalWinemakers: z.number().int().nonnegative(),
-  totalEvents: z.number().int().nonnegative(),
-  pendingRoleRequests: z.number().int().nonnegative(),
-  pendingEvents: z.number().int().nonnegative(),
-  deletedReviews: z.number().int().nonnegative(),
+  usersByRole: z.object({
+    admin: z.number().int().nonnegative(),
+    customer: z.number().int().nonnegative(),
+    shop_owner: z.number().int().nonnegative(),
+    winemaker: z.number().int().nonnegative(),
+  }),
 });
 
 export const statsResponseSchema = z.discriminatedUnion("role", [
