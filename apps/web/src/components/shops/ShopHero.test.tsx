@@ -6,6 +6,10 @@ vi.mock("@/routes/-components/ShopHeroGallery", () => ({
   ShopHeroGallery: () => <div data-testid="shop-hero-gallery" />,
 }));
 
+vi.mock("@/routes/-components/ShopHoursDisplay", () => ({
+  ShopHoursDisplay: () => <div data-testid="shop-hours" />,
+}));
+
 const mockShop = {
   address: {
     city: "Prague",

@@ -1,6 +1,7 @@
 import { Section } from "@/components/primitives/section";
 import type { GetShopsById200 } from "@/generated/types/GetShopsById";
 import { ShopHeroGallery } from "@/routes/-components/ShopHeroGallery";
+import { ShopHoursDisplay } from "@/routes/-components/ShopHoursDisplay";
 
 interface ShopHeroProps {
   shop: GetShopsById200;
@@ -28,6 +29,10 @@ export function ShopHero({ shop }: ShopHeroProps) {
             <p className="text-sm leading-relaxed text-muted-foreground">{shop.description}</p>
           </Section>
         )}
+
+        <Section heading="Opening Hours">
+          <ShopHoursDisplay shopId={shop.id} />
+        </Section>
       </div>
     </div>
   );

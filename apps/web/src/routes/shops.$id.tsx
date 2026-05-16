@@ -9,9 +9,7 @@ import { ShowOwner } from "@/components/primitives/show-owner";
 import { ShopHero } from "@/components/shops/ShopHero";
 import { ShopManageMenu } from "@/components/shops/ShopManageMenu";
 import { ShopProductsRow } from "@/components/shops/ShopProductsRow";
-import { Card, CardContent } from "@/components/ui/card";
 import { useGetShopsById } from "@/generated/hooks/useGetShopsById";
-import { ShopHoursDisplay } from "./-components/ShopHoursDisplay";
 import { ShopMapEmbed } from "./-components/ShopMapEmbed";
 
 export const Route = createFileRoute("/shops/$id")({
@@ -57,14 +55,6 @@ function ShopDetailPage() {
       <div className="overflow-hidden rounded-xl">
         <ShopMapEmbed address={shop.address} />
       </div>
-
-      <Section heading="Opening Hours">
-        <Card variant="default">
-          <CardContent className="pt-6">
-            <ShopHoursDisplay shopId={shop.id} />
-          </CardContent>
-        </Card>
-      </Section>
 
       <div className="space-y-16">
         <ShopProductsRow isBundle={false} shopId={id} />
