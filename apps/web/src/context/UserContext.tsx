@@ -14,7 +14,17 @@ export interface UserProfile {
   roles: Role[];
 }
 
-const isRole = (role: string): role is Role => Object.values(Role).includes(role as Role);
+// Backend sends lowercase/snake-case role strings (`customer`/`winemaker`/
+// `shop_owner`/`admin`); the FE Role enum uses Title-Case display values.
+// Map between them at the boundary; unknown roles (e.g. `admin`) are dropped.
+const API_TO_ROLE: Record<string, Role> = {
+  customer: Role.customer,
+  shop_owner: Role.shopOwner,
+  winemaker: Role.winemaker,
+};
+
+const toRoles = (apiRoles: readonly string[] | null | undefined): Role[] =>
+  (apiRoles ?? []).map((r) => API_TO_ROLE[r]).filter((r): r is Role => Boolean(r));
 
 interface UserContextType {
   user: UserProfile | null;
@@ -53,7 +63,7 @@ export function UserProvider({ children }: { children: ReactNode }) {
         fname: profile.fname,
         id: profile.id,
         lname: profile.lname,
-        roles: (profile.roles ?? []).filter(isRole),
+        roles: toRoles(profile.roles),
       });
     } else if (isLoaded && !isSignedIn) {
       setUser(null);
@@ -78,7 +88,7 @@ export function UserProvider({ children }: { children: ReactNode }) {
       fname: updated.fname,
       id: updated.id,
       lname: updated.lname,
-      roles: (updated.roles ?? []).filter(isRole),
+      roles: toRoles(updated.roles),
     };
   };
 
