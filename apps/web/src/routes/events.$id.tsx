@@ -167,8 +167,8 @@ function EventDetailPage() {
 }
 
 function EventDetailStubAudit({ id }: { id: string }) {
-  const commentsQuery = useGetEventsByIdComments({ id });
-  const imagesQuery = useGetEventsByIdImages({ id });
+  const commentsQuery = useGetEventsByIdComments(id);
+  const imagesQuery = useGetEventsByIdImages(id);
   const registerMutation = usePostEventsByIdRegister();
   const cancelMutation = useDeleteEventsByIdRegister();
   const commentMutation = usePostEventsByIdComments();

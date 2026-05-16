@@ -12,7 +12,7 @@ export const Route = createFileRoute("/checkout/confirmed")({
 
 function CheckoutConfirmedStub() {
   const { orderId } = Route.useSearch();
-  const query = useGetOrdersById({ id: orderId });
+  const query = useGetOrdersById(orderId);
   if (!orderId) {
     return (
       <StubPage actorRole="customer+" hookName="useGetOrdersById" title="Checkout confirmed">

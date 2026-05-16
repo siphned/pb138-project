@@ -1,69 +1,134 @@
-import { createFileRoute } from "@tanstack/react-router";
-import { Calendar } from "lucide-react";
+import { FilterIcon } from "@hugeicons/core-free-icons";
+import { HugeiconsIcon } from "@hugeicons/react";
+import { createFileRoute, useNavigate } from "@tanstack/react-router";
+import { CatalogFilters } from "@/components/catalog/CatalogFilters";
+import { CatalogPagination } from "@/components/catalog/CatalogPagination";
+import { CatalogResults } from "@/components/catalog/CatalogResults";
+import { CatalogState } from "@/components/catalog/CatalogState";
+import type { EventSearch } from "@/components/catalog/types";
+import { PageHeader } from "@/components/primitives/page-header";
 import { Button } from "@/components/ui/button";
+import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { useGetEvents } from "@/generated/hooks/useGetEvents";
 import { EventCard } from "./-components/EventCard";
 
+const toNum = (v: unknown): number | undefined => {
+  if (typeof v === "number" && Number.isFinite(v)) return v;
+  if (typeof v === "string" && v.trim() !== "" && Number.isFinite(Number(v))) return Number(v);
+  return undefined;
+};
+
+// GetEvents200 is typed as `any` in the OpenAPI spec; track BE fix in WINE-XXX.
+type EventListItem = {
+  id: string;
+  title?: string;
+  name?: string;
+  description?: string | null;
+  startDate?: string | Date;
+  endDate?: string | Date;
+  location?: string;
+  winemakerName?: string;
+  winemakerId?: string;
+  attendees?: number;
+};
+type EventsResponse =
+  | EventListItem[]
+  | { data?: EventListItem[]; total?: number; page?: number; limit?: number }
+  | undefined;
+
+function normaliseEventsResponse(raw: EventsResponse, search: EventSearch) {
+  const isArr = Array.isArray(raw);
+  const list = isArr ? raw : (raw?.data ?? []);
+  const total = isArr ? list.length : (raw?.total ?? list.length);
+  const page = isArr ? (toNum(search.page) ?? 1) : (raw?.page ?? toNum(search.page) ?? 1);
+  const limit = isArr ? (toNum(search.limit) ?? 10) : (raw?.limit ?? toNum(search.limit) ?? 10);
+  return { limit, list, page, total };
+}
+
 export const Route = createFileRoute("/events/")({
   component: EventsPage,
+  validateSearch: (raw): EventSearch => ({
+    from: typeof raw.from === "string" ? raw.from : undefined,
+    limit: toNum(raw.limit),
+    page: toNum(raw.page),
+    to: typeof raw.to === "string" ? raw.to : undefined,
+    winemakerName: typeof raw.winemakerName === "string" ? raw.winemakerName : undefined,
+  }),
 });
 
 function EventsPage() {
-  const { data: events = [], isLoading, error, refetch } = useGetEvents({});
+  const search = Route.useSearch();
+  const navigate = useNavigate({ from: Route.fullPath });
+  const query = useGetEvents(search);
 
-  if (isLoading) {
-    return (
-      <div className="container mx-auto px-6 py-8 lg:px-12 space-y-8">
-        <h1 className="font-heading text-4xl font-bold">Upcoming Events</h1>
-        <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
-          {[1, 2, 3, 4, 5, 6].map((i) => (
-            <div className="h-60 animate-pulse rounded-2xl bg-secondary/20" key={i} />
-          ))}
-        </div>
-      </div>
-    );
-  }
+  const handleSearchChange = (next: EventSearch) => {
+    navigate({ replace: true, search: next });
+  };
 
-  if (error) {
-    return (
-      <div className="container mx-auto flex flex-col items-center py-24 text-center">
-        <p className="font-bold text-destructive">Failed to load events.</p>
-        <Button onClick={() => refetch()} variant="link">
-          Retry
-        </Button>
-      </div>
-    );
-  }
+  const {
+    list: eventsList,
+    total,
+    page,
+    limit,
+  } = normaliseEventsResponse(query.data as EventsResponse, search);
 
-  const eventsList = Array.isArray(events) ? events : events.data || [];
+  const handlePageChange = (newPage: number) => {
+    handleSearchChange({ ...search, page: newPage });
+  };
 
   return (
-    <div className="container mx-auto px-6 py-8 lg:px-12 space-y-8">
-      <div className="space-y-2">
-        <div className="flex items-center gap-2">
-          <Calendar className="h-6 w-6 text-primary" />
-          <h1 className="font-heading text-4xl font-bold">Upcoming Events</h1>
-        </div>
-        <p className="text-muted-foreground">
-          Discover wine tastings, festivals, and exclusive gatherings hosted by our winemakers.
-        </p>
-      </div>
+    <div className="container mx-auto space-y-8 px-6 py-8 lg:px-12">
+      <PageHeader
+        description="Discover wine tastings, festivals, and exclusive gatherings hosted by our winemakers."
+        title="Upcoming Events"
+      />
 
-      {eventsList.length === 0 ? (
-        <div className="flex flex-col items-center justify-center space-y-4 py-20 text-center">
-          <Calendar className="h-16 w-16 text-muted-foreground/30" />
-          <h3 className="text-xl font-bold">No events available</h3>
-          <p className="max-w-xs text-muted-foreground">
-            Check back soon for new events from your favorite winemakers.
-          </p>
+      <div className="grid grid-cols-1 gap-12 lg:grid-cols-[280px_1fr]">
+        <div className="lg:hidden">
+          <Sheet>
+            <SheetTrigger render={<Button className="w-full" size="sm" variant="outline" />}>
+              <HugeiconsIcon className="mr-2 h-4 w-4" icon={FilterIcon} />
+              Filters
+            </SheetTrigger>
+            <SheetContent className="w-[300px]" side="left">
+              <div className="h-full overflow-y-auto px-4 py-8">
+                <CatalogFilters
+                  entity="events"
+                  onSearchChange={handleSearchChange}
+                  search={search}
+                />
+              </div>
+            </SheetContent>
+          </Sheet>
         </div>
-      ) : (
-        <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
-          {eventsList.map((event: (typeof eventsList)[0]) => (
-            <EventCard event={event} key={event.id} />
-          ))}
-        </div>
-      )}
+
+        <aside className="hidden lg:block">
+          <CatalogFilters entity="events" onSearchChange={handleSearchChange} search={search} />
+        </aside>
+
+        <main className="space-y-8">
+          <CatalogState
+            emptyDescription="Check back soon for new events from your favorite winemakers."
+            emptyTitle="No events found"
+            isEmpty={eventsList.length === 0}
+            isError={query.isError}
+            isLoading={query.isLoading}
+            onRetry={() => query.refetch()}
+          >
+            <CatalogResults count={total}>
+              {eventsList.map((event) => (
+                <EventCard event={event} key={event.id} />
+              ))}
+            </CatalogResults>
+            <CatalogPagination
+              limit={limit}
+              onPageChange={handlePageChange}
+              page={page}
+              total={total}
+            />
+          </CatalogState>
+        </main>
+      </div>
     </div>
   );
 }
