@@ -6,6 +6,7 @@ import { useUser } from "@/context/UserContext";
 import { useGetUsersMe } from "@/generated/hooks/useGetUsersMe";
 import { useGetUsersMeAddresses } from "@/generated/hooks/useGetUsersMeAddresses";
 import { usePostRoleRequests } from "@/generated/hooks/usePostRoleRequests";
+import { Role } from "@/types/roles";
 
 export const Route = createFileRoute("/_authenticated/dashboard")({
   component: DashboardStub,
@@ -41,7 +42,9 @@ function DashboardStub() {
         actorRole="customer+"
         hookName="usePostRoleRequests"
         mutation={roleRequestMutation}
-        payloadExample={{ data: { justification: "Test request", requestedRole: "winemaker" } }}
+        payloadExample={{
+          data: { businessName: "My Business", details: "Test request", type: "winemaker" },
+        }}
         title="Request new role"
       />
       <div className="rounded-md bg-muted p-4 text-sm space-y-1">
@@ -52,7 +55,7 @@ function DashboardStub() {
         <Link className="block text-primary hover:underline" to="/stats">
           Full stats
         </Link>
-        {roles.includes("winemaker") && (
+        {roles.includes(Role.winemaker) && (
           <Link
             className="block text-primary hover:underline"
             search={{ winemakerId: "me" }}
@@ -61,24 +64,21 @@ function DashboardStub() {
             My wines
           </Link>
         )}
-        {roles.includes("winemaker") && (
+        {roles.includes(Role.winemaker) && (
           <Link
             className="block text-primary hover:underline"
-            search={{ winemakerId: "me" }}
+            search={{ winemakerName: "me" }}
             to="/events"
           >
             My events
           </Link>
         )}
-        {roles.includes("shop_owner") && (
-          <Link
-            className="block text-primary hover:underline"
-            search={{ ownerUserId: "me" }}
-            to="/shops"
-          >
+        {roles.includes(Role.shopOwner) && (
+          <Link className="block text-primary hover:underline" to="/shops">
             My shops
           </Link>
         )}
+        {/* dropped `?ownerUserId=me` on /shops because ShopSearch only validates `q` */}
       </div>
     </StubPage>
   );

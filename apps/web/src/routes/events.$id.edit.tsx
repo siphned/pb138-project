@@ -14,7 +14,7 @@ function EventEditStub() {
       actorRole="winemaker"
       hookName="usePatchEventsById"
       mutation={mutation}
-      payloadExample={{ data: { title: "Updated Title" }, id }}
+      payloadExample={{ data: { name: "Updated Title" }, id }}
       title={`Edit event ${id}`}
     />
   );

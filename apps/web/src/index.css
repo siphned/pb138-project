@@ -221,3 +221,11 @@
 @utility aspect-shop-hero-mobile {
   aspect-ratio: 4 / 3;
 }
+
+@utility no-scrollbar {
+  &::-webkit-scrollbar {
+    display: none;
+  }
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}

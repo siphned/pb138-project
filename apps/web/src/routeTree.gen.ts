@@ -46,6 +46,7 @@ import { Route as ShopsIdInventoryRouteImport } from './routes/shops.$id.invento
 import { Route as ShopsIdImagesRouteImport } from './routes/shops.$id.images'
 import { Route as ShopsIdEditRouteImport } from './routes/shops.$id.edit'
 import { Route as ShopsIdAvailabilityRouteImport } from './routes/shops.$id.availability'
+import { Route as ProductsProductIdEditRouteImport } from './routes/products.$productId.edit'
 import { Route as EventsIdInvitationsRouteImport } from './routes/events.$id.invitations'
 import { Route as EventsIdImagesRouteImport } from './routes/events.$id.images'
 import { Route as EventsIdEditRouteImport } from './routes/events.$id.edit'
@@ -246,6 +247,11 @@ const ShopsIdAvailabilityRoute = ShopsIdAvailabilityRouteImport.update({
   path: '/availability',
   getParentRoute: () => ShopsIdRoute,
 } as any)
+const ProductsProductIdEditRoute = ProductsProductIdEditRouteImport.update({
+  id: '/edit',
+  path: '/edit',
+  getParentRoute: () => ProductsProductIdRoute,
+} as any)
 const EventsIdInvitationsRoute = EventsIdInvitationsRouteImport.update({
   id: '/invitations',
   path: '/invitations',
@@ -348,7 +354,7 @@ export interface FileRoutesByFullPath {
   '/checkout/confirmed': typeof CheckoutConfirmedRoute
   '/events/$id': typeof EventsIdRouteWithChildren
   '/events/new': typeof EventsNewRoute
-  '/products/$productId': typeof ProductsProductIdRoute
+  '/products/$productId': typeof ProductsProductIdRouteWithChildren
   '/products/new': typeof ProductsNewRoute
   '/shops/$id': typeof ShopsIdRouteWithChildren
   '/shops/new': typeof ShopsNewRoute
@@ -372,6 +378,7 @@ export interface FileRoutesByFullPath {
   '/events/$id/edit': typeof EventsIdEditRoute
   '/events/$id/images': typeof EventsIdImagesRoute
   '/events/$id/invitations': typeof EventsIdInvitationsRoute
+  '/products/$productId/edit': typeof ProductsProductIdEditRoute
   '/shops/$id/availability': typeof ShopsIdAvailabilityRoute
   '/shops/$id/edit': typeof ShopsIdEditRoute
   '/shops/$id/images': typeof ShopsIdImagesRoute
@@ -401,7 +408,7 @@ export interface FileRoutesByTo {
   '/checkout/confirmed': typeof CheckoutConfirmedRoute
   '/events/$id': typeof EventsIdRouteWithChildren
   '/events/new': typeof EventsNewRoute
-  '/products/$productId': typeof ProductsProductIdRoute
+  '/products/$productId': typeof ProductsProductIdRouteWithChildren
   '/products/new': typeof ProductsNewRoute
   '/shops/$id': typeof ShopsIdRouteWithChildren
   '/shops/new': typeof ShopsNewRoute
@@ -421,6 +428,7 @@ export interface FileRoutesByTo {
   '/events/$id/edit': typeof EventsIdEditRoute
   '/events/$id/images': typeof EventsIdImagesRoute
   '/events/$id/invitations': typeof EventsIdInvitationsRoute
+  '/products/$productId/edit': typeof ProductsProductIdEditRoute
   '/shops/$id/availability': typeof ShopsIdAvailabilityRoute
   '/shops/$id/edit': typeof ShopsIdEditRoute
   '/shops/$id/images': typeof ShopsIdImagesRoute
@@ -453,7 +461,7 @@ export interface FileRoutesById {
   '/checkout/confirmed': typeof CheckoutConfirmedRoute
   '/events/$id': typeof EventsIdRouteWithChildren
   '/events/new': typeof EventsNewRoute
-  '/products/$productId': typeof ProductsProductIdRoute
+  '/products/$productId': typeof ProductsProductIdRouteWithChildren
   '/products/new': typeof ProductsNewRoute
   '/shops/$id': typeof ShopsIdRouteWithChildren
   '/shops/new': typeof ShopsNewRoute
@@ -477,6 +485,7 @@ export interface FileRoutesById {
   '/events/$id/edit': typeof EventsIdEditRoute
   '/events/$id/images': typeof EventsIdImagesRoute
   '/events/$id/invitations': typeof EventsIdInvitationsRoute
+  '/products/$productId/edit': typeof ProductsProductIdEditRoute
   '/shops/$id/availability': typeof ShopsIdAvailabilityRoute
   '/shops/$id/edit': typeof ShopsIdEditRoute
   '/shops/$id/images': typeof ShopsIdImagesRoute
@@ -532,6 +541,7 @@ export interface FileRouteTypes {
     | '/events/$id/edit'
     | '/events/$id/images'
     | '/events/$id/invitations'
+    | '/products/$productId/edit'
     | '/shops/$id/availability'
     | '/shops/$id/edit'
     | '/shops/$id/images'
@@ -581,6 +591,7 @@ export interface FileRouteTypes {
     | '/events/$id/edit'
     | '/events/$id/images'
     | '/events/$id/invitations'
+    | '/products/$productId/edit'
     | '/shops/$id/availability'
     | '/shops/$id/edit'
     | '/shops/$id/images'
@@ -636,6 +647,7 @@ export interface FileRouteTypes {
     | '/events/$id/edit'
     | '/events/$id/images'
     | '/events/$id/invitations'
+    | '/products/$productId/edit'
     | '/shops/$id/availability'
     | '/shops/$id/edit'
     | '/shops/$id/images'
@@ -664,7 +676,7 @@ export interface RootRouteChildren {
   CheckoutConfirmedRoute: typeof CheckoutConfirmedRoute
   EventsIdRoute: typeof EventsIdRouteWithChildren
   EventsNewRoute: typeof EventsNewRoute
-  ProductsProductIdRoute: typeof ProductsProductIdRoute
+  ProductsProductIdRoute: typeof ProductsProductIdRouteWithChildren
   ProductsNewRoute: typeof ProductsNewRoute
   ShopsIdRoute: typeof ShopsIdRouteWithChildren
   ShopsNewRoute: typeof ShopsNewRoute
@@ -939,6 +951,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ShopsIdAvailabilityRouteImport
       parentRoute: typeof ShopsIdRoute
     }
+    '/products/$productId/edit': {
+      id: '/products/$productId/edit'
+      path: '/edit'
+      fullPath: '/products/$productId/edit'
+      preLoaderRoute: typeof ProductsProductIdEditRouteImport
+      parentRoute: typeof ProductsProductIdRoute
+    }
     '/events/$id/invitations': {
       id: '/events/$id/invitations'
       path: '/invitations'
@@ -1154,6 +1173,17 @@ const EventsIdRouteWithChildren = EventsIdRoute._addFileChildren(
   EventsIdRouteChildren,
 )
 
+interface ProductsProductIdRouteChildren {
+  ProductsProductIdEditRoute: typeof ProductsProductIdEditRoute
+}
+
+const ProductsProductIdRouteChildren: ProductsProductIdRouteChildren = {
+  ProductsProductIdEditRoute: ProductsProductIdEditRoute,
+}
+
+const ProductsProductIdRouteWithChildren =
+  ProductsProductIdRoute._addFileChildren(ProductsProductIdRouteChildren)
+
 interface ShopsIdInventoryRouteChildren {
   ShopsIdInventoryNewRoute: typeof ShopsIdInventoryNewRoute
   ShopsIdInventoryProductIdEditRoute: typeof ShopsIdInventoryProductIdEditRoute
@@ -1228,7 +1258,7 @@ const rootRouteChildren: RootRouteChildren = {
   CheckoutConfirmedRoute: CheckoutConfirmedRoute,
   EventsIdRoute: EventsIdRouteWithChildren,
   EventsNewRoute: EventsNewRoute,
-  ProductsProductIdRoute: ProductsProductIdRoute,
+  ProductsProductIdRoute: ProductsProductIdRouteWithChildren,
   ProductsNewRoute: ProductsNewRoute,
   ShopsIdRoute: ShopsIdRouteWithChildren,
   ShopsNewRoute: ShopsNewRoute,

@@ -76,7 +76,8 @@ describe("UserContext", () => {
     renderWithProvider();
     await waitFor(() => {
       expect(screen.getByTestId("fname")).toHaveTextContent("Jan");
-      expect(screen.getByTestId("roles")).toHaveTextContent("customer,winemaker");
+      // UserContext maps BE lowercase role strings to the FE Title-Case Role enum.
+      expect(screen.getByTestId("roles")).toHaveTextContent("Customer,Winemaker");
     });
   });
 
@@ -170,7 +171,8 @@ describe("UserContext", () => {
         fname: "Updated",
         id: "1",
         lname: "Novák",
-        roles: ["customer"],
+        // UserContext maps BE lowercase → FE Title-Case Role enum.
+        roles: ["Customer"],
       });
       // must not have extra raw fields
       expect(returnValue).not.toHaveProperty("createdAt");
