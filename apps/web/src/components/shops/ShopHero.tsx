@@ -1,4 +1,5 @@
 import { ShopHeroGallery } from "@/routes/-components/ShopHeroGallery";
+import { ShopManageMenu } from "./ShopManageMenu";
 import type { GetShopsById200 } from "@/generated/types/GetShopsById";
 
 interface ShopHeroProps {
@@ -22,7 +23,7 @@ export function ShopHero({ shop }: ShopHeroProps) {
           </p>
         </div>
 
-        {/* <ShopManageMenu> will be added here in Task 6 */}
+        <ShopManageMenu shop={shop} />
       </div>
     </div>
   );

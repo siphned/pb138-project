@@ -8,6 +8,10 @@ vi.mock("@/routes/-components/ShopHeroGallery", () => ({
   ),
 }));
 
+vi.mock("./ShopManageMenu", () => ({
+  ShopManageMenu: () => <div data-testid="shop-manage-menu" />,
+}));
+
 const mockShop = {
   id: "shop-1",
   name: "Gourmet Wine Shop",
