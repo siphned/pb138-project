@@ -1,14 +1,18 @@
 import { ArrowLeft02Icon } from "@hugeicons/core-free-icons";
 import { HugeiconsIcon } from "@hugeicons/react";
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { ShopDetailsCard } from "@/components/shops/ShopDetailsCard";
-import { ShopHero } from "@/components/shops/ShopHero";
-import { ShopProductsRow } from "@/components/shops/ShopProductsRow";
+import { EmptyState } from "@/components/primitives/empty-state";
 import { ErrorState } from "@/components/primitives/error-state";
 import { LoadingState } from "@/components/primitives/loading-state";
+import { Section } from "@/components/primitives/section";
+import { ShowOwner } from "@/components/primitives/show-owner";
+import { ShopHero } from "@/components/shops/ShopHero";
+import { ShopManageMenu } from "@/components/shops/ShopManageMenu";
+import { ShopProductsRow } from "@/components/shops/ShopProductsRow";
+import { Card, CardContent } from "@/components/ui/card";
 import { useGetShopsById } from "@/generated/hooks/useGetShopsById";
+import { ShopHoursDisplay } from "./-components/ShopHoursDisplay";
 import { ShopMapEmbed } from "./-components/ShopMapEmbed";
-import { ShopHeroGallery } from "./-components/ShopHeroGallery";
 
 export const Route = createFileRoute("/shops/$id")({
   component: ShopDetailPage,
@@ -50,39 +54,34 @@ function ShopDetailPage() {
 
       <ShopHero shop={shop} />
 
-      <div className="grid grid-cols-1 gap-12 lg:grid-cols-2">
-        <div className="overflow-hidden rounded-3xl bg-muted shadow-lg">
-          <ShopHeroGallery shopName={shop.name} />
-        </div>
-        
-        <div className="flex flex-col gap-8">
-          {shop.description && (
-            <div className="prose prose-lg dark:prose-invert max-w-none">
-              <p className="text-muted-foreground leading-relaxed">
-                {shop.description}
-              </p>
-            </div>
-          )}
-          <ShopDetailsCard shop={shop} />
-        </div>
-      </div>
-
-      <div className="overflow-hidden rounded-3xl border border-border shadow-md">
+      <div className="overflow-hidden rounded-xl">
         <ShopMapEmbed address={shop.address} />
       </div>
+
+      <Section heading="Opening Hours">
+        <Card variant="default">
+          <CardContent className="pt-6">
+            <ShopHoursDisplay shopId={shop.id} />
+          </CardContent>
+        </Card>
+      </Section>
 
       <div className="space-y-16">
         <ShopProductsRow isBundle={false} shopId={id} />
         <ShopProductsRow isBundle={true} shopId={id} />
 
-        <section className="space-y-4">
-          <h3 className="text-xs font-bold uppercase tracking-widest text-muted-foreground">
-            Reviews
-          </h3>
-          <p className="text-sm italic text-muted-foreground">
-            Coming soon — we're working on bringing customer reviews to shop profiles!
-          </p>
-        </section>
+        <Section heading="Reviews">
+          <EmptyState
+            description="We're working on bringing customer reviews to shop profiles."
+            title="Reviews coming soon"
+          />
+        </Section>
+
+        <ShowOwner ownerUserId={shop.ownerUserId}>
+          <Section heading="Owner Actions">
+            <ShopManageMenu shop={shop} />
+          </Section>
+        </ShowOwner>
       </div>
     </div>
   );
