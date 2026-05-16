@@ -18,7 +18,9 @@ export const Route = createFileRoute("/shops/$id/inventory")({
 function ShopsInventoryStub() {
   const { id } = Route.useParams();
   const { isBundle } = Route.useSearch();
-  const query = useGetShopsByIdProducts({ id, isBundle });
+  const query = useGetShopsByIdProducts(id, {
+    isBundle: isBundle === undefined ? undefined : String(isBundle),
+  });
   return (
     <StubGet
       actorRole="shop_owner (owner)"

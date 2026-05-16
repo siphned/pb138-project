@@ -42,6 +42,8 @@ export function Sidebar({ userRoles = [Role.customer], activeRole, onRoleChange 
 
   const currentActiveRole = activeRole || userRoles[0];
   const [accordionState, setAccordionState] = useState<string[]>([]);
+  const [open, setOpen] = useState(false);
+  const closeSheet = () => setOpen(false);
 
   const displayUserName = isSignedIn ? clerkUser?.fullName || "User" : "Guest";
   const fullName = user ? `${user.fname || ""} ${user.lname || ""}`.trim() : "Guest";
@@ -49,6 +51,7 @@ export function Sidebar({ userRoles = [Role.customer], activeRole, onRoleChange 
   const hasMultipleRoles = userRoles.length > 1;
 
   const handleLogout = async () => {
+    closeSheet();
     try {
       await signOut({ redirectUrl: "/" });
     } catch (_error) {
@@ -59,7 +62,7 @@ export function Sidebar({ userRoles = [Role.customer], activeRole, onRoleChange 
   };
 
   return (
-    <Sheet>
+    <Sheet onOpenChange={setOpen} open={open}>
       <SheetTrigger
         render={
           <Button size="icon" variant="ghost">
@@ -93,7 +96,7 @@ export function Sidebar({ userRoles = [Role.customer], activeRole, onRoleChange 
             <p className="text-sm text-muted-foreground">
               Sign in to manage your wines and orders.
             </p>
-            <Link className="mt-4 block" to="/auth/login">
+            <Link className="mt-4 block" onClick={closeSheet} to="/auth/login">
               <Button className="w-full">Sign In</Button>
             </Link>
           </div>
@@ -147,29 +150,43 @@ export function Sidebar({ userRoles = [Role.customer], activeRole, onRoleChange 
             </Show>
 
             {/* SHARED PUBLIC LINKS */}
-            <NavItem className="sm:hidden" render={<Link to="/search" />} variant="active">
+            <NavItem
+              className="sm:hidden"
+              onClick={closeSheet}
+              render={<Link to="/search" />}
+              variant="active"
+            >
               <Search className="h-4 w-4" /> Search
             </NavItem>
 
-            <NavItem className="sm:hidden" render={<Link to="/cart" />} variant="active">
+            <NavItem
+              className="sm:hidden"
+              onClick={closeSheet}
+              render={<Link to="/cart" />}
+              variant="active"
+            >
               <ShoppingCart className="h-4 w-4" /> Shopping cart
             </NavItem>
 
-            <NavItem render={<Link to="/explore" />} variant="active">
+            <NavItem onClick={closeSheet} render={<Link to="/explore" />} variant="active">
               <Wine className="h-4 w-4" /> Explore Wines
             </NavItem>
 
-            <NavItem render={<Link search={{ isBundle: true }} to="/products" />} variant="active">
+            <NavItem
+              onClick={closeSheet}
+              render={<Link search={{ isBundle: true }} to="/products" />}
+              variant="active"
+            >
               <Package className="h-4 w-4" /> Bundles
             </NavItem>
 
-            <NavItem render={<Link to="/events" />} variant="active">
+            <NavItem onClick={closeSheet} render={<Link to="/events" />} variant="active">
               <Calendar className="h-4 w-4" /> Events
             </NavItem>
 
             <Show when="signed-in">
               {currentActiveRole === Role.customer && (
-                <NavItem render={<Link to="/orders" />} variant="active">
+                <NavItem onClick={closeSheet} render={<Link to="/orders" />} variant="active">
                   <Package className="h-4 w-4" /> Order History
                 </NavItem>
               )}
@@ -177,12 +194,14 @@ export function Sidebar({ userRoles = [Role.customer], activeRole, onRoleChange 
               {currentActiveRole !== Role.customer && (
                 <>
                   <NavItem
+                    onClick={closeSheet}
                     render={<Link search={{ winemakerId: "me" }} to="/explore" />}
                     variant="active"
                   >
                     <Wine className="h-4 w-4" /> My Wines
                   </NavItem>
                   <NavItem
+                    onClick={closeSheet}
                     render={<Link search={{ isBundle: true }} to="/products" />}
                     variant="active"
                   >
@@ -193,7 +212,14 @@ export function Sidebar({ userRoles = [Role.customer], activeRole, onRoleChange 
             </Show>
 
             <Show when="signed-in">
-              <NavItem className="mt-2" onClick={() => openUserProfile()} variant="muted">
+              <NavItem
+                className="mt-2"
+                onClick={() => {
+                  closeSheet();
+                  openUserProfile();
+                }}
+                variant="muted"
+              >
                 <Settings className="h-4 w-4" /> Settings
               </NavItem>
             </Show>

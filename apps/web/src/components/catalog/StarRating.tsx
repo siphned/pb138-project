@@ -1,4 +1,5 @@
-import { Star } from "lucide-react";
+import { StarIcon } from "@hugeicons/core-free-icons";
+import { HugeiconsIcon } from "@hugeicons/react";
 import { cn } from "@/lib/utils";
 
 interface StarRatingProps {
@@ -20,11 +21,12 @@ export function StarRating({
     <div className={cn("flex items-center gap-1.5", size === "sm" ? "text-sm" : "text-base")}>
       <div className="flex items-center gap-0.5">
         {[1, 2, 3, 4, 5].map((star) => (
-          <Star
+          <HugeiconsIcon
             className={cn(
               iconSize,
-              star <= Math.floor(rating) ? "fill-star text-star" : "text-muted-foreground"
+              star <= Math.floor(rating) ? "fill-primary text-primary" : "text-muted-foreground"
             )}
+            icon={StarIcon}
             key={star}
           />
         ))}

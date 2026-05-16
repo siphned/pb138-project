@@ -1,6 +1,6 @@
 import { createClerkClient } from "@clerk/backend";
 import type { Address, User } from "@repo/shared/schemas";
-import { z } from "zod";
+import z from "zod";
 import { db } from "../../db";
 import { logger } from "../../utils/logger";
 import * as userRolesRepo from "./user-roles.repository";
