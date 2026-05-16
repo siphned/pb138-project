@@ -23,7 +23,7 @@ export type ProductSearch = GetProductsQueryParams & {
 };
 export type EventSearch = GetEventsQueryParams;
 export type WinemakerSearch = { q?: string };
-export type ShopSearch = { q?: string };
+export type ShopSearch = { q?: string; city?: string; ownerUserId?: string };
 
 // Aggregated search-page state — spans wines + products + winemakers + shops.
 // Each sub-query strips the fields its endpoint doesn't accept.

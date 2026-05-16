@@ -14,6 +14,8 @@ import { useGetShops } from "@/generated/hooks/useGetShops";
 export const Route = createFileRoute("/shops/")({
   component: ShopsPage,
   validateSearch: (raw): ShopSearch => ({
+    city: typeof raw.city === "string" ? raw.city : undefined,
+    ownerUserId: typeof raw.ownerUserId === "string" ? raw.ownerUserId : undefined,
     q: typeof raw.q === "string" ? raw.q : undefined,
   }),
 });
@@ -29,14 +31,27 @@ function ShopsPage() {
 
   const shops = query.data || [];
 
-  // Client-side filtering for 'q' until BE supports it
-  const filteredShops = search.q
-    ? shops.filter(
-        (s) =>
-          s.name.toLowerCase().includes(String(search.q).toLowerCase()) ||
-          s.address.city.toLowerCase().includes(String(search.q).toLowerCase())
-      )
-    : shops;
+  // Client-side filtering until BE supports it
+  const filteredShops = shops.filter((s) => {
+    if (search.q) {
+      const lowQ = search.q.toLowerCase();
+      if (!s.name.toLowerCase().includes(lowQ) && !s.address.city.toLowerCase().includes(lowQ)) {
+        return false;
+      }
+    }
+    if (search.city) {
+      const lowCity = search.city.toLowerCase();
+      if (!s.address.city.toLowerCase().includes(lowCity)) {
+        return false;
+      }
+    }
+    if (search.ownerUserId) {
+      if (s.ownerUserId !== search.ownerUserId) {
+        return false;
+      }
+    }
+    return true;
+  });
 
   // TODO(WINE-XXX): cap at 20 until BE adds pagination
   const displayedShops = filteredShops.slice(0, 20);
