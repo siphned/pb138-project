@@ -1,4 +1,3 @@
-import { ShopHeroGallery } from "@/routes/-components/ShopHeroGallery";
 import { ShopManageMenu } from "./ShopManageMenu";
 import type { GetShopsById200 } from "@/generated/types/GetShopsById";
 
@@ -8,23 +7,17 @@ interface ShopHeroProps {
 
 export function ShopHero({ shop }: ShopHeroProps) {
   return (
-    <div className="space-y-6" data-slot="shop-hero">
-      <div className="overflow-hidden rounded-3xl bg-muted shadow-lg">
-        <ShopHeroGallery shopName={shop.name} />
+    <div className="flex flex-col gap-4 md:flex-row md:items-end md:justify-between" data-slot="shop-hero">
+      <div className="space-y-1">
+        <h1 className="font-heading text-4xl font-bold tracking-tight lg:text-5xl text-foreground">
+          {shop.name}
+        </h1>
+        <p className="text-lg text-muted-foreground font-medium">
+          {[shop.address.city, shop.address.country].filter(Boolean).join(", ")}
+        </p>
       </div>
 
-      <div className="flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
-        <div className="space-y-1">
-          <h1 className="font-heading text-3xl font-bold tracking-tight md:text-4xl">
-            {shop.name}
-          </h1>
-          <p className="text-lg text-muted-foreground">
-            {[shop.address.city, shop.address.country].filter(Boolean).join(", ")}
-          </p>
-        </div>
-
-        <ShopManageMenu shop={shop} />
-      </div>
+      <ShopManageMenu shop={shop} />
     </div>
   );
 }

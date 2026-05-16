@@ -2,12 +2,6 @@ import { render, screen } from "@testing-library/react";
 import { describe, expect, it, vi } from "vitest";
 import { ShopHero } from "./ShopHero";
 
-vi.mock("@/routes/-components/ShopHeroGallery", () => ({
-  ShopHeroGallery: ({ shopName }: { shopName: string }) => (
-    <div data-testid="shop-hero-gallery">{shopName}</div>
-  ),
-}));
-
 vi.mock("./ShopManageMenu", () => ({
   ShopManageMenu: () => <div data-testid="shop-manage-menu" />,
 }));
@@ -38,13 +32,6 @@ describe("ShopHero", () => {
   it("renders address summary", () => {
     render(<ShopHero shop={mockShop as any} />);
     expect(screen.getByText("Prague, Czech Republic")).toBeInTheDocument();
-  });
-
-  it("renders the ShopHeroGallery with shop name", () => {
-    render(<ShopHero shop={mockShop as any} />);
-    const gallery = screen.getByTestId("shop-hero-gallery");
-    expect(gallery).toBeInTheDocument();
-    expect(gallery).toHaveTextContent("Gourmet Wine Shop");
   });
 
   it("has the shop-hero data slot", () => {

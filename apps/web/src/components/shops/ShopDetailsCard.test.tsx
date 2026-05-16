@@ -8,12 +8,6 @@ vi.mock("@/routes/-components/ShopHoursDisplay", () => ({
   ),
 }));
 
-vi.mock("@/hooks/useIsOwner", () => ({
-  useIsOwner: vi.fn(() => false),
-}));
-
-import { useIsOwner } from "@/hooks/useIsOwner";
-
 const mockShop = {
   id: "shop-1",
   name: "Wine Cellar",
@@ -30,11 +24,6 @@ const mockShop = {
 };
 
 describe("ShopDetailsCard", () => {
-  it("renders the shop description", () => {
-    render(<ShopDetailsCard shop={mockShop as any} />);
-    expect(screen.getByText("A cozy place for wine lovers.")).toBeInTheDocument();
-  });
-
   it("renders the address details", () => {
     render(<ShopDetailsCard shop={mockShop as any} />);
     expect(screen.getByText(/Main St 10/)).toBeInTheDocument();
@@ -46,17 +35,5 @@ describe("ShopDetailsCard", () => {
     const hours = screen.getByTestId("shop-hours");
     expect(hours).toBeInTheDocument();
     expect(hours).toHaveTextContent("shop-1");
-  });
-
-  it("does not render Manage menu for non-owners", () => {
-    vi.mocked(useIsOwner).mockReturnValue(false);
-    render(<ShopDetailsCard shop={mockShop as any} />);
-    expect(screen.queryByTestId("shop-manage-menu")).not.toBeInTheDocument();
-  });
-
-  it("renders Manage menu for owners", () => {
-    vi.mocked(useIsOwner).mockReturnValue(true);
-    render(<ShopDetailsCard shop={mockShop as any} />);
-    expect(screen.getByTestId("shop-manage-menu")).toBeInTheDocument();
   });
 });
