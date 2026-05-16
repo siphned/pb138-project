@@ -18,6 +18,7 @@ export interface UserProfile {
 // `shop_owner`/`admin`); the FE Role enum uses Title-Case display values.
 // Map between them at the boundary; unknown roles (e.g. `admin`) are dropped.
 const API_TO_ROLE: Record<string, Role> = {
+  admin: Role.admin,
   customer: Role.customer,
   shop_owner: Role.shopOwner,
   winemaker: Role.winemaker,
