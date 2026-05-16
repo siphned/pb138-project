@@ -1,3 +1,4 @@
+import { Skeleton } from "@/components/ui/skeleton";
 import { useGetShopsByIdAvailability } from "@/generated/hooks/useGetShopsByIdAvailability";
 
 interface ShopHoursDisplayProps {
@@ -10,7 +11,7 @@ export function ShopHoursDisplay({ shopId }: ShopHoursDisplayProps) {
   const { data, isLoading } = useGetShopsByIdAvailability(shopId);
 
   if (isLoading) {
-    return <div className="h-20 w-full animate-pulse rounded-lg bg-secondary/20" />;
+    return <Skeleton className="h-20 w-full rounded-lg" />;
   }
 
   if (!data?.regular || data.regular.length === 0) {
