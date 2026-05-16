@@ -43,9 +43,8 @@ export async function findAll(
 
   const filtered = results.filter((s) => s.address && !s.address.deletedAt) as ShopWithAddress[];
   if (filters.city) {
-    return filtered.filter((s) =>
-      s.address.city.toLowerCase().includes(filters.city?.toLowerCase())
-    );
+    const city = filters.city.toLowerCase();
+    return filtered.filter((s) => s.address.city.toLowerCase().includes(city));
   }
   return filtered;
 }

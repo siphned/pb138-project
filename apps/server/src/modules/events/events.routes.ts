@@ -1,9 +1,10 @@
-import { Elysia, status } from "elysia";
+import { Elysia, status, t } from "elysia";
 import { authPlugin } from "../auth";
 import {
   createCommentBody,
   createEventBody,
   eventParams,
+  invitationResponse,
   listEventsQuery,
   paginationQuery,
   updateEventBody,
@@ -39,8 +40,11 @@ export const eventsRoutes = new Elysia()
     "/events",
     async ({ query }) => {
       try {
-        const { page, limit, ...filters } = query;
-        return await eventsService.listEvents(filters, { limit, page });
+        const { page, limit, q, winemakerId, winemakerName, from, to } = query;
+        return await eventsService.listEvents(
+          { from, q, to, winemakerId, winemakerName },
+          { limit, page }
+        );
       } catch (e) {
         return handleError(e);
       }
@@ -185,6 +189,31 @@ export const eventsRoutes = new Elysia()
       detail: { summary: "List event comments", tags: ["events"] },
       params: eventParams,
       query: paginationQuery,
+    }
+  )
+
+  .get(
+    "/events/:id/invitations",
+    async ({ params, dbUser }) => {
+      try {
+        return await eventsService.listInvitations(params.id, dbUser.id);
+      } catch (e: unknown) {
+        if (e instanceof Error) {
+          if (e.message === "NOT_FOUND") return status(404, "Not found");
+          if (e.message === "FORBIDDEN") return status(403, "Forbidden");
+        }
+        throw e;
+      }
+    },
+    {
+      detail: {
+        security: [{ bearerAuth: [] }],
+        summary: "List invitations for own event",
+        tags: ["events"],
+      },
+      params: eventParams,
+      requireCapability: "winemaker",
+      response: { 200: t.Array(invitationResponse), 403: t.String(), 404: t.String() },
     }
   )
 

@@ -39,7 +39,7 @@ interface ShopProductsSectionProps {
 }
 
 export function ShopProductsSection({ shopId }: ShopProductsSectionProps) {
-  const { data: rawData, isLoading } = useGetProducts({ shopId, isBundle: false });
+  const { data: rawData, isLoading } = useGetProducts({ isBundle: false, shopId });
   const products = rawData?.data as ShopProductRaw[] | undefined;
 
   if (isLoading) {

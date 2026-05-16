@@ -52,6 +52,7 @@ const catalogWineColor = t.Union([
 
 export const getAllProductsQuery = t.Object({
   color: t.Optional(catalogWineColor),
+  containsProductId: t.Optional(t.String({ format: "uuid" })),
   isBundle: t.Optional(t.BooleanString()),
   maxPrice: t.Optional(t.Numeric()),
   minPrice: t.Optional(t.Numeric()),

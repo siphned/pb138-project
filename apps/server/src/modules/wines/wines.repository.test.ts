@@ -61,6 +61,14 @@ describe("winesRepository", () => {
       expect(db.query.wines.findMany).toHaveBeenCalled();
     });
 
+    it("accepts q filter for name search", async () => {
+      vi.mocked(db.query.wines.findMany).mockResolvedValue([]);
+
+      await winesRepo.findAll(db, { q: "merlot" });
+
+      expect(db.query.wines.findMany).toHaveBeenCalled();
+    });
+
     it("filters out deleted winemakers in-memory", async () => {
       const mockRows = [
         { id: "w1", winemaker: { deletedAt: null, id: "wm1" } },

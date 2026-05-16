@@ -143,7 +143,14 @@ export async function getShopOwnerStats(
       db
         .select({ orderItemsProcessed: count() })
         .from(orderItems)
-        .where(and(inArray(orderItems.shopId, shopIds), isNull(orderItems.deletedAt))),
+        .innerJoin(orders, eq(orderItems.orderId, orders.id))
+        .where(
+          and(
+            inArray(orderItems.shopId, shopIds),
+            inArray(orders.status, ["confirmed", "shipped", "delivered"]),
+            isNull(orderItems.deletedAt)
+          )
+        ),
 
       db
         .select({

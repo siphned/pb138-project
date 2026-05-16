@@ -5,6 +5,12 @@ import type { AdminEventRow, AdminReviewRow, AdminUserRow } from "./admin.reposi
 import * as adminRepo from "./admin.repository";
 
 export class AdminService {
+  async getUser(userId: string): Promise<AdminUserRow> {
+    const user = await adminRepo.findUserById(db, userId);
+    if (!user) throw new Error("NOT_FOUND");
+    return user;
+  }
+
   async approveEvent(eventId: string): Promise<AdminEventRow> {
     const event = await adminRepo.findEventById(db, eventId);
     if (!event) throw new Error("NOT_FOUND");

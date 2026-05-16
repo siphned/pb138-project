@@ -329,5 +329,19 @@ describe("productsRepository", () => {
       expect(result.rows).toEqual(mockRows);
       expect(result.total).toBe(1);
     });
+
+    it("accepts containsProductId filter without throwing", async () => {
+      const mockRows: unknown[] = [];
+      makeChains(mockRows);
+
+      const result = await productsRepo.findAll(
+        db,
+        { containsProductId: "p1" },
+        { limit: 20, offset: 0 }
+      );
+
+      expect(result.rows).toEqual(mockRows);
+      expect(result.total).toBe(1);
+    });
   });
 });

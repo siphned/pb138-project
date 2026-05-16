@@ -70,6 +70,28 @@ export const roleRequestsRoutes = new Elysia({
     }
   )
 
+  .get(
+    "/:id",
+    async ({ params }) => {
+      try {
+        return await roleRequestsService.getById(params.id);
+      } catch (e: unknown) {
+        if (e instanceof Error && e.message === "NOT_FOUND")
+          return status(404, "Request not found");
+        throw e;
+      }
+    },
+    {
+      detail: {
+        security: [{ bearerAuth: [] }],
+        summary: "Get a role request by ID",
+      },
+      params: t.Object({ id: t.String() }),
+      requireRoles: ["admin"],
+      response: { 200: roleRequestResponse, 404: t.String() },
+    }
+  )
+
   .patch(
     "/:id/approve",
     async ({ dbUser, params }: { dbUser: { id: string }; params: { id: string } }) => {

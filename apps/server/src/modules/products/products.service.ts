@@ -1,5 +1,5 @@
-import type { Product, ProductWine } from "@repo/shared/schemas";
 import { BadRequestError } from "@repo/shared";
+import type { Product, ProductWine } from "@repo/shared/schemas";
 import { sql } from "drizzle-orm";
 import { type Database, db } from "../../db";
 import type { PaginatedResult } from "../../utils/pagination";
@@ -319,14 +319,14 @@ export class ProductsService {
       throw new ProductNotFoundError(productId);
     }
 
+    await this.assertShopOwnership(shopId, requesterId);
+
     if (data.wines !== undefined && !product.isBundle) {
       throw new BadRequestError(
         "Cannot update bundle wines on a non-bundle product",
         "NOT_A_BUNDLE"
       );
     }
-
-    await this.assertShopOwnership(shopId, requesterId);
 
     if (product.isBundle) {
       if (data.wines !== undefined) {

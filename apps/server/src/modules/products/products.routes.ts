@@ -38,7 +38,8 @@ export const shopProductsRoutes = new Elysia({ prefix: "/shops/:id" })
 
   .post(
     "/products",
-    ({ params, dbUser, body }) => productsService.createProductOrBundle(params.id, dbUser.id, body),
+    async ({ params, dbUser, body }) =>
+      status(201, await productsService.createProductOrBundle(params.id, dbUser.id, body)),
     {
       body: createProductOrBundleBody,
       detail: {

@@ -41,7 +41,7 @@ interface BundleWinesCarouselProps {
 }
 
 export function BundleWinesCarousel({ shopId, wineIds }: BundleWinesCarouselProps) {
-  const { data: rawData, isLoading } = useGetProducts({ shopId, isBundle: false });
+  const { data: rawData, isLoading } = useGetProducts({ isBundle: false, shopId });
   const allProducts = rawData?.data as ShopProductRaw[] | undefined;
 
   const products =

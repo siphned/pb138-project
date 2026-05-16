@@ -1,6 +1,11 @@
 import { Elysia, status, t } from "elysia";
+import { errorResponse } from "../../utils/error-plugin";
 import { authPlugin } from "../auth";
-import { winemakerListItemResponse, winemakerProfileResponse } from "./winemakers.schema";
+import {
+  winemakerFiltersQuery,
+  winemakerListItemResponse,
+  winemakerProfileResponse,
+} from "./winemakers.schema";
 import { winemakersService } from "./winemakers.service";
 
 export const winemakersRoutes = new Elysia({ prefix: "/winemakers", tags: ["winemakers"] })
@@ -8,14 +13,30 @@ export const winemakersRoutes = new Elysia({ prefix: "/winemakers", tags: ["wine
 
   .get(
     "/",
-    async () => {
-      return await winemakersService.listWinemakers();
+    async ({ query }) => {
+      return await winemakersService.listWinemakers({ q: query.q });
     },
     {
       detail: {
         summary: "List all winemakers",
       },
+      query: winemakerFiltersQuery,
       response: { 200: t.Array(winemakerListItemResponse) },
+    }
+  )
+
+  .get(
+    "/me",
+    async ({ dbUser }) => {
+      return await winemakersService.getMyProfile(dbUser.id);
+    },
+    {
+      detail: {
+        security: [{ bearerAuth: [] }],
+        summary: "Get own winemaker profile",
+      },
+      requireRoles: ["winemaker"],
+      response: { 200: winemakerListItemResponse, 404: errorResponse },
     }
   )
 
