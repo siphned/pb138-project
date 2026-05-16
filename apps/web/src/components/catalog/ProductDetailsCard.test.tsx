@@ -71,7 +71,8 @@ describe("ProductDetailsCard", () => {
       />
     );
     expect(screen.getByText("Wines in this product")).toBeInTheDocument();
-    expect(screen.getByText("Pálava 2022")).toBeInTheDocument();
+    // Wine name appears in both the polaroid placeholder caption and the heading link.
+    expect(screen.getAllByText("Pálava 2022").length).toBeGreaterThan(0);
   });
 
   it("shows owner actions for shop owner", () => {

@@ -18,6 +18,8 @@ const mockWinemaker = {
   id: "wm-1",
   name: "Jan Novák",
   phone: "+420 123 456 789",
+  // Owner gating reads `winemaker.userId`, not `winemaker.id` (the latter is the entity PK).
+  userId: "wm-1",
   websiteUrl: "https://novak.cz",
 } as any;
 

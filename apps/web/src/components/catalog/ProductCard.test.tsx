@@ -21,7 +21,8 @@ const mockProduct = {
 describe("ProductCard", () => {
   it("renders product name and price", () => {
     render(<ProductCard product={mockProduct} />);
-    expect(screen.getByText("Gala Pálava Bundle")).toBeInTheDocument();
+    // Name appears in both the polaroid placeholder caption and the heading link.
+    expect(screen.getAllByText("Gala Pálava Bundle").length).toBeGreaterThan(0);
     expect(screen.getByText(/€1,200/)).toBeInTheDocument();
   });
 

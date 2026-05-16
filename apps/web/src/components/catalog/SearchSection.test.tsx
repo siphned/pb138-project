@@ -17,7 +17,9 @@ describe("SearchSection", () => {
       </SearchSection>
     );
     expect(screen.getByText("Wines")).toBeInTheDocument();
-    expect(screen.getByTestId("child")).toBeInTheDocument();
+    // SearchSection renders children twice: once in the mobile horizontal
+    // scroller (md:hidden) and once in the desktop grid (hidden md:block).
+    expect(screen.getAllByTestId("child").length).toBeGreaterThan(0);
   });
 
   it("renders 'View all' link with correct count and search params", () => {

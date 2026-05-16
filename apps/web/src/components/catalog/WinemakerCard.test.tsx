@@ -16,7 +16,8 @@ const mockWinemaker = {
 describe("WinemakerCard", () => {
   it("renders winemaker name and location", () => {
     render(<WinemakerCard winemaker={mockWinemaker} />);
-    expect(screen.getByText("Jan Novák")).toBeInTheDocument();
+    // Name appears in both the polaroid placeholder caption and the heading link.
+    expect(screen.getAllByText("Jan Novák").length).toBeGreaterThan(0);
     expect(screen.getByText(/Velké Bílovice/)).toBeInTheDocument();
   });
 
@@ -26,8 +27,9 @@ describe("WinemakerCard", () => {
     expect(link).toHaveAttribute("href", "/winemakers/$id/wm-1");
   });
 
-  it("renders initials placeholder", () => {
+  it("renders name placeholder when no image", () => {
     render(<WinemakerCard winemaker={mockWinemaker} />);
-    expect(screen.getByText("JN")).toBeInTheDocument();
+    // Polaroid placeholder caption is the winemaker name (was initials in pre-polaroid design).
+    expect(screen.getAllByText("Jan Novák").length).toBeGreaterThan(0);
   });
 });
