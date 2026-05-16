@@ -12,7 +12,7 @@ export const Route = createFileRoute("/shops/$id/images")({
 
 function ShopsImagesStub() {
   const { id } = Route.useParams();
-  const query = useGetShopsByIdImages({ id });
+  const query = useGetShopsByIdImages(id);
   const uploadMutation = usePostShopsByIdImages();
   const deleteMutation = useDeleteShopsByIdImagesByImageId();
   return (
@@ -31,7 +31,7 @@ function ShopsImagesStub() {
         actorRole="shop_owner (owner)"
         hookName="usePostShopsByIdImages"
         mutation={uploadMutation}
-        payloadExample={{ data: { file: "BLOB_PLACEHOLDER" }, id }}
+        payloadExample={{ data: { file: new Blob(["BLOB_PLACEHOLDER"]) }, id }}
         title="Upload image"
       />
       <StubMutation

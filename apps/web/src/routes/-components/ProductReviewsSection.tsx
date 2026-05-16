@@ -1,17 +1,15 @@
-import type { GetProductsByIdReviews200 } from "@/generated/types/GetProductsByIdReviews";
 import { EntityReviewsSection } from "./EntityReviewsSection";
 
 interface ProductReviewsSectionProps {
-  reviewData?: GetProductsByIdReviews200;
-  isLoading: boolean;
+  productId: string;
 }
 
-export function ProductReviewsSection({ reviewData, isLoading }: ProductReviewsSectionProps) {
+export function ProductReviewsSection({ productId }: ProductReviewsSectionProps) {
   return (
     <EntityReviewsSection
       emptyMessage="Be the first to review this product."
-      isLoading={isLoading}
-      reviewData={reviewData}
+      entityId={productId}
+      entityType="product"
       title="Customer Reviews"
     />
   );

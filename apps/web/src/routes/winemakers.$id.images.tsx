@@ -12,7 +12,7 @@ export const Route = createFileRoute("/winemakers/$id/images")({
 
 function WinemakersImagesStub() {
   const { id } = Route.useParams();
-  const query = useGetWinemakersByIdImages({ id });
+  const query = useGetWinemakersByIdImages(id);
   const uploadMutation = usePostWinemakersByIdImages();
   const deleteMutation = useDeleteWinemakersByIdImagesByImageId();
   return (
@@ -31,7 +31,7 @@ function WinemakersImagesStub() {
         actorRole="winemaker (owner)"
         hookName="usePostWinemakersByIdImages"
         mutation={uploadMutation}
-        payloadExample={{ data: { file: "BLOB_PLACEHOLDER" }, id }}
+        payloadExample={{ data: { file: new Blob(["BLOB_PLACEHOLDER"]) }, id }}
         title="Upload image"
       />
       <StubMutation
