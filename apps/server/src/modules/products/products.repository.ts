@@ -27,6 +27,7 @@ export type ProductWithWinesAndWinemaker = Product & {
 };
 
 export type ProductCatalogFilters = {
+  containsProductId?: string;
   minPrice?: number;
   maxPrice?: number;
   type?: string;
@@ -154,11 +155,7 @@ export async function findByIds(
   }) as Promise<ProductWithWinesAndWinemaker[]>;
 }
 
-export async function findAll(
-  db: Database,
-  filters: ProductCatalogFilters,
-  pagination: { limit: number; offset: number }
-): Promise<{ rows: CatalogRow[]; total: number }> {
+function buildFilterConditions(filters: ProductCatalogFilters): SQL[] {
   const conditions: SQL[] = [isNull(products.deletedAt), isNull(shops.deletedAt)];
 
   if (filters.minPrice !== undefined) {
@@ -218,12 +215,33 @@ export async function findAll(
         AND pw.wine_id = ${filters.wineId}
     )`);
   }
+  if (filters.containsProductId) {
+    conditions.push(sql`EXISTS (
+      SELECT 1 FROM product_wines bundle_pw
+      WHERE bundle_pw.product_id = ${products.id}
+        AND bundle_pw.wine_id IN (
+          SELECT pw2.wine_id FROM product_wines pw2
+          WHERE pw2.product_id = ${filters.containsProductId}
+        )
+    )`);
+    conditions.push(eq(products.isBundle, true));
+  }
   if (filters.shopId !== undefined) {
     conditions.push(eq(products.shopId, filters.shopId));
   }
   if (filters.isBundle !== undefined) {
     conditions.push(eq(products.isBundle, filters.isBundle));
   }
+
+  return conditions;
+}
+
+export async function findAll(
+  db: Database,
+  filters: ProductCatalogFilters,
+  pagination: { limit: number; offset: number }
+): Promise<{ rows: CatalogRow[]; total: number }> {
+  const conditions = buildFilterConditions(filters);
 
   const reviewsJoinCond = and(
     eq(reviews.entityId, products.id),

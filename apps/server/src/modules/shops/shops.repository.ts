@@ -1,6 +1,6 @@
 import type { Address, Shop } from "@repo/shared/schemas";
 import { addresses, shops } from "@repo/shared/schemas";
-import { and, eq, isNull } from "drizzle-orm";
+import { and, eq, ilike, isNull } from "drizzle-orm";
 import type { Database } from "../../db";
 
 export type ShopWithAddress = Shop & { address: Address };
@@ -28,15 +28,26 @@ export async function insertAddress(db: Database, data: AddressData): Promise<Ad
   return address;
 }
 
-export async function findAll(db: Database): Promise<ShopWithAddress[]> {
+export async function findAll(
+  db: Database,
+  filters: { q?: string; city?: string; ownerUserId?: string } = {}
+): Promise<ShopWithAddress[]> {
+  const conditions = [isNull(shops.deletedAt)];
+  if (filters.q) conditions.push(ilike(shops.name, `%${filters.q}%`));
+  if (filters.ownerUserId) conditions.push(eq(shops.ownerUserId, filters.ownerUserId));
+
   const results = await db.query.shops.findMany({
-    where: isNull(shops.deletedAt),
-    with: {
-      address: true,
-    },
+    where: and(...conditions),
+    with: { address: true },
   });
 
-  return results.filter((s) => s.address && !s.address.deletedAt) as ShopWithAddress[];
+  const filtered = results.filter((s) => s.address && !s.address.deletedAt) as ShopWithAddress[];
+  if (filters.city) {
+    return filtered.filter((s) =>
+      s.address.city.toLowerCase().includes(filters.city?.toLowerCase())
+    );
+  }
+  return filtered;
 }
 
 export async function findAllByOwnerUserId(db: Database, ownerUserId: string): Promise<Shop[]> {
@@ -66,6 +77,10 @@ export async function findByOwnerUserId(
   return db.query.shops.findFirst({
     where: and(eq(shops.ownerUserId, ownerUserId), isNull(shops.deletedAt)),
   });
+}
+
+export async function softDeleteById(db: Database, id: string): Promise<void> {
+  await db.update(shops).set({ deletedAt: new Date() }).where(eq(shops.id, id));
 }
 
 export async function updateById(

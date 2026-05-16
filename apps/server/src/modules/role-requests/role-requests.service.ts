@@ -38,6 +38,12 @@ export class RoleRequestsService {
     return result;
   }
 
+  async getById(requestId: string): Promise<RoleRequest> {
+    const request = await roleRequestsRepo.findById(db, requestId);
+    if (!request) throw new Error("NOT_FOUND");
+    return request;
+  }
+
   listPending(): Promise<RoleRequest[]> {
     return roleRequestsRepo.findPending(db);
   }
@@ -56,7 +62,9 @@ export class RoleRequestsService {
           fname: rejectedUser.fname,
           role: request.type,
         })
-        .catch(() => {});
+        .catch(() => {
+          // fire-and-forget: email failure should not block the response
+        });
     }
 
     return result;
