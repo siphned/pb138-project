@@ -1,3 +1,7 @@
+const captureStackTrace = (
+  Error as unknown as { captureStackTrace?: (obj: object, ctor: object) => void }
+).captureStackTrace;
+
 export class AppError extends Error {
   public statusCode: number;
   public code?: string;
@@ -7,11 +11,7 @@ export class AppError extends Error {
     this.statusCode = statusCode;
     this.code = code;
     this.name = this.constructor.name;
-    // @ts-ignore
-    if (Error.captureStackTrace) {
-      // @ts-ignore
-      Error.captureStackTrace(this, this.constructor);
-    }
+    captureStackTrace?.(this, this.constructor);
   }
 }
 
@@ -30,5 +30,11 @@ export class ForbiddenError extends AppError {
 export class BadRequestError extends AppError {
   constructor(message = "Bad request", code = "BAD_REQUEST") {
     super(message, 400, code);
+  }
+}
+
+export class ConflictError extends AppError {
+  constructor(message = "Conflict", code = "CONFLICT") {
+    super(message, 409, code);
   }
 }

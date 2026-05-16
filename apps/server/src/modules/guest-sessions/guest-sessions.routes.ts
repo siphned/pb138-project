@@ -1,7 +1,5 @@
-import { Elysia, t } from "elysia";
-import { db } from "../../db";
+import { Elysia, status, t } from "elysia";
 import { authPlugin } from "../auth";
-import * as guestSessionsRepo from "./guest-sessions.repository";
 import { guestSessionsService } from "./guest-sessions.service";
 
 export const guestSessionsRoutes = new Elysia({
@@ -34,10 +32,8 @@ export const guestSessionsRoutes = new Elysia({
   .get(
     "/:id",
     async ({ params }) => {
-      const session = await guestSessionsRepo.findById(db, params.id);
-      if (!session || session.expiresAt < new Date()) {
-        throw new Error("NOT_FOUND");
-      }
+      const session = await guestSessionsService.validateSession(params.id);
+      if (!session) return status(404, "Session not found or expired");
       return session;
     },
     {
@@ -46,10 +42,9 @@ export const guestSessionsRoutes = new Elysia({
         summary: "Validate guest session",
       },
       params: t.Object({ id: t.String() }),
-      response: t.Object({
-        createdAt: t.Date(),
-        expiresAt: t.Date(),
-        id: t.String(),
-      }),
+      response: {
+        200: t.Object({ createdAt: t.Date(), expiresAt: t.Date(), id: t.String() }),
+        404: t.String(),
+      },
     }
   );

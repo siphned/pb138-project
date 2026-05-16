@@ -37,8 +37,6 @@ export const updateBundleBody = t.Object({
   wines: t.Optional(t.Array(wineEntry, { minItems: 2 })),
 });
 
-// ── Catalog (GET /products) ────────────────────────────────────────────────
-
 const catalogWineType = t.Union([
   t.Literal("still"),
   t.Literal("sparkling"),

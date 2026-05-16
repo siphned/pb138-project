@@ -139,7 +139,7 @@ describe("supplyAgreementsService", () => {
 
       await expect(
         supplyAgreementsService.respondToRequest("user-wm", "a1", "approved")
-      ).rejects.toThrow("NOT_FOUND");
+      ).rejects.toThrow("Supply agreement not found");
     });
 
     it("throws FORBIDDEN if user is not the winemaker of the agreement", async () => {
@@ -155,7 +155,7 @@ describe("supplyAgreementsService", () => {
 
       await expect(
         supplyAgreementsService.respondToRequest("user-wm", "a1", "approved")
-      ).rejects.toThrow("FORBIDDEN");
+      ).rejects.toThrow("Forbidden");
     });
 
     it("throws ALREADY_RESPONDED if status is not pending", async () => {
@@ -171,7 +171,7 @@ describe("supplyAgreementsService", () => {
 
       await expect(
         supplyAgreementsService.respondToRequest("user-wm", "a1", "rejected")
-      ).rejects.toThrow("ALREADY_RESPONDED");
+      ).rejects.toThrow("This request has already been responded to");
     });
   });
 
@@ -216,7 +216,7 @@ describe("supplyAgreementsService", () => {
       vi.mocked(winemakersRepo.findByUserId).mockResolvedValue(undefined);
 
       await expect(supplyAgreementsService.listForWinemaker("u1")).rejects.toThrow(
-        "NOT_A_WINEMAKER"
+        "User is not a winemaker"
       );
     });
   });

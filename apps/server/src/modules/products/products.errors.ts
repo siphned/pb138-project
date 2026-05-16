@@ -1,4 +1,4 @@
-import { BadRequestError, NotFoundError } from "@repo/shared";
+import { AppError, BadRequestError, NotFoundError } from "@repo/shared";
 
 export class ProductNotFoundError extends NotFoundError {
   constructor(id?: string) {
@@ -18,5 +18,23 @@ export class InsufficientStockError extends BadRequestError {
 export class InvalidWineError extends BadRequestError {
   constructor() {
     super("One or more wines in the bundle are invalid or deleted", "INVALID_WINE");
+  }
+}
+
+export class BundleMinWinesError extends BadRequestError {
+  constructor() {
+    super("A bundle requires at least 2 wines", "BUNDLE_MIN_WINES");
+  }
+}
+
+export class DuplicateWineError extends BadRequestError {
+  constructor() {
+    super("Bundle cannot contain duplicate wines", "DUPLICATE_WINE");
+  }
+}
+
+export class InconsistentDataError extends AppError {
+  constructor() {
+    super("Internal data inconsistency detected", 500, "INCONSISTENT_DATA");
   }
 }

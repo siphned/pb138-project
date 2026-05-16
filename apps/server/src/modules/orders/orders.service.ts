@@ -1,9 +1,9 @@
 import type { Order } from "@repo/shared/schemas";
 import { addresses } from "@repo/shared/schemas";
-import { sql } from "drizzle-orm";
 import { type Database, db } from "../../db";
 import { logger } from "../../utils/logger";
 import { cartsService } from "../carts/carts.service";
+import type { CartWithItems } from "../carts/carts.repository";
 import { emailService } from "../email/email.service";
 import * as productsRepo from "../products/products.repository";
 import * as usersRepo from "../users/users.repository";
@@ -94,8 +94,7 @@ export class OrdersService {
     { userId, sessionId }: { userId?: string; sessionId?: string },
     data: CheckoutData
   ): Promise<Order> {
-    // biome-ignore lint/suspicious/noExplicitAny: complex cart type
-    let cart: any = null;
+    let cart: CartWithItems | undefined;
     if (userId) {
       cart = await cartsService.getCartForUser(userId);
     } else if (sessionId) {
@@ -154,10 +153,10 @@ export class OrdersService {
     return order;
   }
 
-  async getOrder(id: string, userId: string): Promise<OrderWithItems> {
+  async getOrder(id: string, userId: string, isAdmin = false): Promise<OrderWithItems> {
     const order = await ordersRepo.findById(db, id);
     if (!order) throw new Error("NOT_FOUND");
-    if (order.userId !== userId) throw new Error("FORBIDDEN");
+    if (!isAdmin && order.userId !== userId) throw new Error("FORBIDDEN");
     return order;
   }
 
@@ -193,8 +192,7 @@ export class OrdersService {
     return updated;
   }
 
-  // biome-ignore lint/suspicious/noExplicitAny: complex cart type
-  private validateAndProcessCart(cart: any) {
+  private validateAndProcessCart(cart: CartWithItems) {
     const items: CreateOrderItem[] = [];
     let subtotal = 0;
 
@@ -235,11 +233,7 @@ export class OrdersService {
         if (currentWineQty === undefined || currentWineQty < totalWineNeeded) {
           throw new Error("INSUFFICIENT_STOCK");
         }
-        await productsRepo.updateWineQuantity(
-          tx,
-          pw.wineId,
-          sql`${sql.raw("quantity")} - ${totalWineNeeded}`
-        );
+        await productsRepo.updateWineQuantity(tx, pw.wineId, -totalWineNeeded);
       }
     }
   }

@@ -3,6 +3,15 @@ import { db } from "../../db";
 import type { PaginatedResult } from "../../utils/pagination";
 import { parsePagination } from "../../utils/pagination";
 import { ForbiddenWineActionError, WinemakerNotFoundError } from "../wines/wines.errors";
+import {
+  AlreadyRegisteredError,
+  CapacityFullError,
+  CapacityTooLowError,
+  EventNotAvailableError,
+  EventNotFoundError,
+  EventStatusConflictError,
+  InvalidDatesError,
+} from "./events.errors";
 import type { CommentWithUser, EventWithDetails } from "./events.repository";
 import * as eventsRepo from "./events.repository";
 
@@ -11,14 +20,14 @@ function validateEventDates(
   startTime: Date,
   endTime: Date
 ) {
-  if (data.startTime && startTime <= new Date()) throw new Error("INVALID_DATES");
-  if ((data.startTime || data.endTime) && endTime <= startTime) throw new Error("INVALID_DATES");
+  if (data.startTime && startTime <= new Date()) throw new InvalidDatesError();
+  if ((data.startTime || data.endTime) && endTime <= startTime) throw new InvalidDatesError();
 }
 
 export class EventsService {
   async addComment(eventId: string, userId: string, body: string): Promise<EventComment> {
     const event = await eventsRepo.findById(db, eventId);
-    if (!event || event.status !== "approved") throw new Error("EVENT_NOT_AVAILABLE");
+    if (!event || event.status !== "approved") throw new EventNotAvailableError();
     return eventsRepo.createComment(db, eventId, userId, body);
   }
 
@@ -46,8 +55,8 @@ export class EventsService {
 
     const startTime = new Date(data.startTime);
     const endTime = new Date(data.endTime);
-    if (startTime <= new Date()) throw new Error("INVALID_DATES");
-    if (endTime <= startTime) throw new Error("INVALID_DATES");
+    if (startTime <= new Date()) throw new InvalidDatesError();
+    if (endTime <= startTime) throw new InvalidDatesError();
 
     return db.transaction(async (tx) => {
       const address = await eventsRepo.insertAddress(tx, data.address);
@@ -65,7 +74,7 @@ export class EventsService {
 
   async deleteEvent(id: string, userId: string): Promise<void> {
     const event = await eventsRepo.findById(db, id);
-    if (!event) throw new Error("NOT_FOUND");
+    if (!event) throw new EventNotFoundError();
 
     const winemaker = await eventsRepo.findWinemakerByUserId(db, userId);
     if (!winemaker || winemaker.id !== event.winemakerId) throw new ForbiddenWineActionError();
@@ -75,7 +84,7 @@ export class EventsService {
 
   async getEvent(id: string): Promise<EventWithDetails> {
     const event = await eventsRepo.findById(db, id);
-    if (!event || event.status !== "approved") throw new Error("NOT_FOUND");
+    if (!event || event.status !== "approved") throw new EventNotFoundError();
     return event;
   }
 
@@ -84,7 +93,7 @@ export class EventsService {
     paginationQuery: { page?: number; limit?: number }
   ): Promise<PaginatedResult<CommentWithUser>> {
     const event = await eventsRepo.findById(db, eventId);
-    if (!event || event.status !== "approved") throw new Error("NOT_FOUND");
+    if (!event || event.status !== "approved") throw new EventNotFoundError();
 
     const { limit, offset } = parsePagination(paginationQuery);
     const page = Math.max(1, paginationQuery.page ?? 1);
@@ -128,15 +137,15 @@ export class EventsService {
   async registerForEvent(eventId: string, userId: string): Promise<EventRegistration> {
     const event = await eventsRepo.findById(db, eventId);
     if (!event || event.status !== "approved" || event.startTime <= new Date()) {
-      throw new Error("EVENT_NOT_AVAILABLE");
+      throw new EventNotAvailableError();
     }
 
     return db.transaction(async (tx) => {
       const existing = await eventsRepo.findRegistration(tx, eventId, userId);
-      if (existing) throw new Error("ALREADY_REGISTERED");
+      if (existing) throw new AlreadyRegisteredError();
 
       const count = await eventsRepo.countActiveRegistrations(tx, eventId);
-      if (count >= event.capacity) throw new Error("CAPACITY_FULL");
+      if (count >= event.capacity) throw new CapacityFullError();
 
       return eventsRepo.createRegistration(tx, eventId, userId);
     });
@@ -144,7 +153,7 @@ export class EventsService {
 
   async unregisterFromEvent(eventId: string, userId: string): Promise<void> {
     const reg = await eventsRepo.findRegistration(db, eventId, userId);
-    if (!reg) throw new Error("NOT_FOUND");
+    if (!reg) throw new EventNotFoundError();
     await eventsRepo.softDeleteRegistration(db, reg.id);
   }
 
@@ -160,11 +169,11 @@ export class EventsService {
     }
   ): Promise<Event> {
     const event = await eventsRepo.findById(db, id);
-    if (!event) throw new Error("NOT_FOUND");
+    if (!event) throw new EventNotFoundError();
 
     const winemaker = await eventsRepo.findWinemakerByUserId(db, userId);
     if (!winemaker || winemaker.id !== event.winemakerId) throw new ForbiddenWineActionError();
-    if (event.status !== "pending") throw new Error("CONFLICT");
+    if (event.status !== "pending") throw new EventStatusConflictError();
 
     const startTime = data.startTime ? new Date(data.startTime) : event.startTime;
     const endTime = data.endTime ? new Date(data.endTime) : event.endTime;
@@ -173,7 +182,7 @@ export class EventsService {
 
     if (data.capacity !== undefined) {
       const registrationCount = await eventsRepo.countActiveRegistrations(db, id);
-      if (data.capacity < registrationCount) throw new Error("CAPACITY_TOO_LOW");
+      if (data.capacity < registrationCount) throw new CapacityTooLowError();
     }
 
     const updates: Parameters<typeof eventsRepo.update>[2] = {};

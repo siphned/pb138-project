@@ -4,15 +4,16 @@ import { and, eq, inArray, isNull } from "drizzle-orm";
 import type { Database } from "../../db";
 
 export async function addRole(db: Database, userId: string, role: string): Promise<UserRole> {
-  const existing = await db.query.userRoles.findFirst({
-    where: and(eq(userRoles.userId, userId), eq(userRoles.role, role), isNull(userRoles.deletedAt)),
-  });
-
-  if (existing) return existing;
-
-  const [newRole] = await db.insert(userRoles).values({ role, userId }).returning();
-  if (!newRole) throw new Error("Failed to add role");
-  return newRole;
+  const [result] = await db
+    .insert(userRoles)
+    .values({ role, userId })
+    .onConflictDoUpdate({
+      set: { deletedAt: null },
+      target: [userRoles.userId, userRoles.role],
+    })
+    .returning();
+  if (!result) throw new Error("Failed to add role");
+  return result;
 }
 
 export async function addRoles(db: Database, userId: string, roles: string[]): Promise<void> {
