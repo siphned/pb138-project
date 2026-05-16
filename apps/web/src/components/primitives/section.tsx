@@ -6,10 +6,18 @@ import { cn } from "@/lib/utils";
 
 interface SectionProps extends useRender.ComponentProps<"section"> {
   heading?: string;
+  actions?: ReactNode;
   children: ReactNode;
 }
 
-export function Section({ heading, className, children, render, ...props }: SectionProps) {
+export function Section({
+  heading,
+  actions,
+  className,
+  children,
+  render,
+  ...props
+}: SectionProps) {
   return useRender({
     defaultTagName: "section",
     props: mergeProps<"section">(
@@ -17,7 +25,12 @@ export function Section({ heading, className, children, render, ...props }: Sect
       {
         children: (
           <>
-            {heading && <SectionLabel>{heading}</SectionLabel>}
+            {(heading || actions) && (
+              <div className="flex items-center justify-between gap-4">
+                {heading && <SectionLabel>{heading}</SectionLabel>}
+                {actions}
+              </div>
+            )}
             {children}
           </>
         ),
