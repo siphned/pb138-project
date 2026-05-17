@@ -102,7 +102,7 @@ describe("reviewsService", () => {
 
       await expect(
         reviewsService.createWinemakerReview(userId, winemakerId, { rating: 4 })
-      ).rejects.toMatchObject({ code: "NOT_PURCHASED", statusCode: 403 });
+      ).rejects.toMatchObject({ code: "NOT_PURCHASED", statusCode: 400 });
     });
 
     it("throws BadRequestError when user already reviewed this winemaker", async () => {
@@ -111,7 +111,7 @@ describe("reviewsService", () => {
 
       await expect(
         reviewsService.createWinemakerReview(userId, winemakerId, { rating: 4 })
-      ).rejects.toMatchObject({ code: "ALREADY_REVIEWED", statusCode: 400 });
+      ).rejects.toMatchObject({ code: "ALREADY_REVIEWED", statusCode: 409 });
     });
 
     it("creates and returns the review when all checks pass", async () => {
