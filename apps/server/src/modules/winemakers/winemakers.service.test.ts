@@ -55,7 +55,7 @@ describe("listWinemakers", () => {
     const result = await winemakersService.listWinemakers();
 
     expect(result).toEqual([mockWinemakerWithAddress]);
-    expect(winemakersRepo.findAll).toHaveBeenCalledWith(expect.anything());
+    expect(winemakersRepo.findAll).toHaveBeenCalledWith(expect.anything(), expect.any(Object));
   });
 });
 

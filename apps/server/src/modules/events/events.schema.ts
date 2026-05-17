@@ -37,7 +37,9 @@ export const listEventsQuerySchema = z.object({
   from: z.string().datetime().optional(),
   limit: z.number().min(1).max(100).optional(),
   page: z.number().min(1).optional(),
+  q: z.string().max(255).optional(),
   to: z.string().datetime().optional(),
+  winemakerId: z.string().optional(),
   winemakerName: z.string().max(255).optional(),
 });
 
@@ -147,7 +149,9 @@ export const listEventsQuery = t.Object({
   from: t.Optional(t.String({ format: "date-time" })),
   limit: t.Optional(t.Number({ maximum: 100, minimum: 1 })),
   page: t.Optional(t.Number({ minimum: 1 })),
+  q: t.Optional(t.String({ maxLength: 255 })),
   to: t.Optional(t.String({ format: "date-time" })),
+  winemakerId: t.Optional(t.String()),
   winemakerName: t.Optional(t.String({ maxLength: 255 })),
 });
 
@@ -224,4 +228,15 @@ export const paginatedCommentsResponse = t.Object({
   limit: t.Number(),
   page: t.Number(),
   total: t.Number(),
+});
+
+export const invitationResponse = t.Object({
+  createdAt: t.Date(),
+  deletedAt: t.Nullable(t.Date()),
+  email: t.String(),
+  eventId: t.String(),
+  expiresAt: t.Date(),
+  id: t.String(),
+  token: t.String(),
+  updatedAt: t.Nullable(t.Date()),
 });

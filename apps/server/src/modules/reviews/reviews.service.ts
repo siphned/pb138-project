@@ -31,7 +31,12 @@ export class ReviewsService {
     winemakerId: string,
     data: { rating: number; body?: string }
   ): Promise<ReviewWithUser> {
-    const existing = await reviewsRepo.findUserReview(db, userId, winemakerId, "winemaker");
+    const [hasPurchased, existing] = await Promise.all([
+      reviewsRepo.hasPurchasedFromWinemaker(db, userId, winemakerId),
+      reviewsRepo.findUserReview(db, userId, winemakerId, "winemaker"),
+    ]);
+
+    if (!hasPurchased) throw new NotPurchasedError();
     if (existing) throw new AlreadyReviewedError();
 
     const review = await reviewsRepo.insertReview(db, userId, winemakerId, "winemaker", data);
@@ -68,7 +73,6 @@ export class ReviewsService {
   ): Promise<void> {
     const review = await reviewsRepo.findUserReview(db, userId, entityId, entityType);
     if (!review || review.id !== reviewId) {
-      // Also check by ID if it's admin
       if (userRole === "admin") {
         const byId = await reviewsRepo.findById(db, reviewId);
         if (!byId) throw new ReviewNotFoundError();

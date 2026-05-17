@@ -1,3 +1,4 @@
+import { BadRequestError } from "@repo/shared";
 import type { Product, ProductWine } from "@repo/shared/schemas";
 import { type Database, db } from "../../db";
 import type { PaginatedResult } from "../../utils/pagination";
@@ -7,7 +8,6 @@ import * as shopsRepo from "../shops/shops.repository";
 import {
   BundleMinWinesError,
   DuplicateWineError,
-  InconsistentDataError,
   InsufficientStockError,
   InvalidWineError,
   ProductNotFoundError,
@@ -68,115 +68,6 @@ export class ProductsService {
     }
   }
 
-  async createBundle(
-    shopId: string,
-    requesterId: string,
-    data: {
-      name: string;
-      description?: string;
-      price: string;
-      quantity: number;
-      wines: { wineId: string; quantity: number }[];
-    }
-  ): Promise<Product> {
-    await this.assertShopOwnership(shopId, requesterId);
-
-    if (data.wines.length < 2) throw new BundleMinWinesError();
-
-    const wineIds = data.wines.map((w) => w.wineId);
-    if (new Set(wineIds).size !== wineIds.length) throw new DuplicateWineError();
-
-    const winesExist = await productsRepo.winesExist(db, wineIds);
-    if (!winesExist) throw new InvalidWineError();
-
-    return db.transaction(async (tx) => {
-      await this.applyBundleAllocations(tx, data.wines, data.quantity);
-
-      const product = await productsRepo.create(tx, {
-        description: data.description ?? null,
-        isBundle: true,
-        name: data.name,
-        price: data.price,
-        quantity: data.quantity,
-        shopId,
-      });
-
-      await productsRepo.createProductWines(
-        tx,
-        data.wines.map((w) => ({
-          productId: product.id,
-          quantity: w.quantity,
-          wineId: w.wineId,
-        }))
-      );
-
-      return product;
-    });
-  }
-
-  async createProduct(
-    shopId: string,
-    requesterId: string,
-    data: { name: string; description?: string; price: string; quantity: number; wineId: string }
-  ): Promise<Product> {
-    await this.assertShopOwnership(shopId, requesterId);
-
-    const winesExist = await productsRepo.winesExist(db, [data.wineId]);
-    if (!winesExist) throw new InvalidWineError();
-
-    return db.transaction(async (tx) => {
-      const currentQty = await productsRepo.getWineQuantityForUpdate(tx, data.wineId);
-      if (currentQty === undefined || currentQty < data.quantity) {
-        throw new InsufficientStockError();
-      }
-
-      await productsRepo.updateWineQuantity(tx, data.wineId, -data.quantity);
-
-      const product = await productsRepo.create(tx, {
-        description: data.description ?? null,
-        isBundle: false,
-        name: data.name,
-        price: data.price,
-        quantity: data.quantity,
-        shopId,
-      });
-
-      await productsRepo.createProductWines(tx, [
-        { productId: product.id, quantity: 1, wineId: data.wineId },
-      ]);
-
-      return product;
-    });
-  }
-
-  async deleteBundle(shopId: string, bundleId: string, requesterId: string): Promise<void> {
-    await this.assertShopOwnership(shopId, requesterId);
-
-    const product = await productsRepo.findById(db, bundleId);
-    if (!product || product.shopId !== shopId || !product.isBundle) {
-      throw new ProductNotFoundError(bundleId);
-    }
-
-    await db.transaction(async (tx) => {
-      await this.revertBundleAllocations(tx, product);
-      await productsRepo.update(tx, bundleId, { deletedAt: new Date() });
-    });
-  }
-
-  async deleteProduct(shopId: string, productId: string, requesterId: string): Promise<void> {
-    await this.assertShopOwnership(shopId, requesterId);
-
-    const product = await productsRepo.findById(db, productId);
-    if (!product || product.shopId !== shopId || product.isBundle) {
-      throw new ProductNotFoundError(productId);
-    }
-
-    await db.transaction(async (tx) => {
-      await this.revertBundleAllocations(tx, product);
-      await productsRepo.update(tx, productId, { deletedAt: new Date() });
-    });
-  }
-
   async getAllProducts(
     query: ProductCatalogFilters & { page?: number }
   ): Promise<PaginatedResult<CatalogProductItem>> {
@@ -224,16 +115,105 @@ export class ProductsService {
     return product;
   }
 
-  async listProducts(shopId: string, isBundle?: boolean): Promise<ProductWithWines[]> {
-    const shop = await shopsRepo.findById(db, shopId);
-    if (!shop) throw new ShopNotFoundError(shopId);
-    return productsRepo.findByShopId(db, shopId, isBundle);
+  async createProductOrBundle(
+    shopId: string,
+    requesterId: string,
+    data:
+      | { name: string; description?: string; price: string; quantity: number; wineId: string }
+      | {
+          name: string;
+          description?: string;
+          price: string;
+          quantity: number;
+          wines: { wineId: string; quantity: number }[];
+        }
+  ): Promise<Product> {
+    await this.assertShopOwnership(shopId, requesterId);
+
+    if ("wines" in data) {
+      if (data.wines.length < 2) throw new Error("BUNDLE_MIN_WINES");
+
+      const wineIds = data.wines.map((w) => w.wineId);
+      if (new Set(wineIds).size !== wineIds.length) throw new Error("DUPLICATE_WINE");
+
+      const winesExist = await productsRepo.winesExist(db, wineIds);
+      if (!winesExist) throw new InvalidWineError();
+
+      return db.transaction(async (tx) => {
+        await this.applyBundleAllocations(tx, data.wines, data.quantity);
+
+        const product = await productsRepo.create(tx, {
+          description: data.description ?? null,
+          isBundle: true,
+          name: data.name,
+          price: data.price,
+          quantity: data.quantity,
+          shopId,
+        });
+
+        await productsRepo.createProductWines(
+          tx,
+          data.wines.map((w) => ({
+            productId: product.id,
+            quantity: w.quantity,
+            wineId: w.wineId,
+          }))
+        );
+
+        return product;
+      });
+    }
+
+    const winesExist = await productsRepo.winesExist(db, [data.wineId]);
+    if (!winesExist) throw new InvalidWineError();
+
+    return db.transaction(async (tx) => {
+      const currentQty = await productsRepo.getWineQuantityForUpdate(tx, data.wineId);
+      if (currentQty === undefined || currentQty < data.quantity) {
+        throw new InsufficientStockError();
+      }
+
+      await productsRepo.updateWineQuantity(tx, data.wineId, -data.quantity);
+
+      const product = await productsRepo.create(tx, {
+        description: data.description ?? null,
+        isBundle: false,
+        name: data.name,
+        price: data.price,
+        quantity: data.quantity,
+        shopId,
+      });
+
+      await productsRepo.createProductWines(tx, [
+        { productId: product.id, quantity: 1, wineId: data.wineId },
+      ]);
+
+      return product;
+    });
   }
 
-  async updateBundle(
+  async deleteProductOrBundle(
     shopId: string,
-    bundleId: string,
-    requesterId: string,
+    productId: string,
+    requesterId: string
+  ): Promise<void> {
+    await this.assertShopOwnership(shopId, requesterId);
+
+    const product = await productsRepo.findById(db, productId);
+    if (!product || product.shopId !== shopId) {
+      throw new ProductNotFoundError(productId);
+    }
+
+    await db.transaction(async (tx) => {
+      await this.revertBundleAllocations(tx, product);
+      await productsRepo.update(tx, productId, { deletedAt: new Date() });
+    });
+  }
+
+  private async applyBundleUpdate(
+    tx: Database,
+    productId: string,
+    product: ProductWithWines,
     data: {
       name?: string;
       description?: string | null;
@@ -242,12 +222,20 @@ export class ProductsService {
       wines?: { wineId: string; quantity: number }[];
     }
   ): Promise<Product> {
-    await this.assertShopOwnership(shopId, requesterId);
+    await this.revertBundleAllocations(tx, product);
 
-    const product = await productsRepo.findById(db, bundleId);
-    if (!product || product.shopId !== shopId || !product.isBundle) {
-      throw new ProductNotFoundError(bundleId);
-    }
+    const targetWines =
+      data.wines ??
+      product.productWines.map((pw) => ({ quantity: pw.quantity, wineId: pw.wineId }));
+    const newQty = data.quantity ?? product.quantity;
+    await this.applyBundleAllocations(tx, targetWines, newQty);
+
+    const updated = await productsRepo.update(tx, productId, {
+      description: data.description,
+      name: data.name,
+      price: data.price,
+      quantity: data.quantity,
+    });
 
     if (data.wines !== undefined) {
       if (data.wines.length < 2) throw new BundleMinWinesError();
@@ -255,41 +243,60 @@ export class ProductsService {
       if (new Set(wineIds).size !== wineIds.length) throw new DuplicateWineError();
       const winesExist = await productsRepo.winesExist(db, wineIds);
       if (!winesExist) throw new InvalidWineError();
+      await productsRepo.deleteProductWines(tx, productId);
+      await productsRepo.createProductWines(
+        tx,
+        data.wines.map((w) => ({ productId, quantity: w.quantity, wineId: w.wineId }))
+      );
     }
 
-    return db.transaction(async (tx) => {
-      await this.revertBundleAllocations(tx, product);
-
-      const targetWines =
-        data.wines ??
-        product.productWines.map((pw) => ({ quantity: pw.quantity, wineId: pw.wineId }));
-      const newQty = data.quantity ?? product.quantity;
-      await this.applyBundleAllocations(tx, targetWines, newQty);
-
-      const updated = await productsRepo.update(tx, bundleId, {
-        description: data.description,
-        name: data.name,
-        price: data.price,
-        quantity: data.quantity,
-      });
-
-      if (data.wines !== undefined) {
-        await productsRepo.deleteProductWines(tx, bundleId);
-        await productsRepo.createProductWines(
-          tx,
-          data.wines.map((w) => ({
-            productId: bundleId,
-            quantity: w.quantity,
-            wineId: w.wineId,
-          }))
-        );
-      }
-
-      return updated;
-    });
+    return updated;
   }
 
-  async updateProduct(
+  private async applySingleProductUpdate(
+    tx: Database,
+    productId: string,
+    product: ProductWithWines,
+    data: {
+      name?: string;
+      description?: string | null;
+      price?: string;
+      quantity?: number;
+      wineId?: string;
+    }
+  ): Promise<Product> {
+    await this.revertBundleAllocations(tx, product);
+
+    const targetWineId = data.wineId ?? product.productWines[0]?.wineId;
+    if (!targetWineId) throw new Error("INCONSISTENT_DATA");
+
+    const newQty = data.quantity ?? product.quantity;
+    await this.applyBundleAllocations(tx, [{ quantity: 1, wineId: targetWineId }], newQty);
+
+    const updated = await productsRepo.update(tx, productId, {
+      description: data.description,
+      name: data.name,
+      price: data.price,
+      quantity: data.quantity,
+    });
+
+    if (data.wineId !== undefined) {
+      await productsRepo.deleteProductWines(tx, productId);
+      await productsRepo.createProductWines(tx, [{ productId, quantity: 1, wineId: data.wineId }]);
+    }
+
+    return updated;
+  }
+
+  private async validateBundleWines(wines: { wineId: string; quantity: number }[]): Promise<void> {
+    if (wines.length < 2) throw new Error("BUNDLE_MIN_WINES");
+    const wineIds = wines.map((w) => w.wineId);
+    if (new Set(wineIds).size !== wineIds.length) throw new Error("DUPLICATE_WINE");
+    const winesExist = await productsRepo.winesExist(db, wineIds);
+    if (!winesExist) throw new InvalidWineError();
+  }
+
+  async updateProductOrBundle(
     shopId: string,
     productId: string,
     requesterId: string,
@@ -299,13 +306,35 @@ export class ProductsService {
       price?: string;
       quantity?: number;
       wineId?: string;
+      wines?: { wineId: string; quantity: number }[];
     }
   ): Promise<Product> {
-    await this.assertShopOwnership(shopId, requesterId);
+    if (data.wines !== undefined && data.wineId !== undefined) {
+      throw new BadRequestError(
+        "Provide either wineId or wines, not both",
+        "CONFLICTING_UPDATE_FIELDS"
+      );
+    }
 
     const product = await productsRepo.findById(db, productId);
-    if (!product || product.shopId !== shopId || product.isBundle) {
+    if (!product || product.shopId !== shopId) {
       throw new ProductNotFoundError(productId);
+    }
+
+    await this.assertShopOwnership(shopId, requesterId);
+
+    if (data.wines !== undefined && !product.isBundle) {
+      throw new BadRequestError(
+        "Cannot update bundle wines on a non-bundle product",
+        "NOT_A_BUNDLE"
+      );
+    }
+
+    if (product.isBundle) {
+      if (data.wines !== undefined) {
+        await this.validateBundleWines(data.wines);
+      }
+      return db.transaction((tx) => this.applyBundleUpdate(tx, productId, product, data));
     }
 
     if (data.wineId !== undefined) {
@@ -313,31 +342,7 @@ export class ProductsService {
       if (!winesExist) throw new InvalidWineError();
     }
 
-    return db.transaction(async (tx) => {
-      await this.revertBundleAllocations(tx, product);
-
-      const targetWineId = data.wineId ?? product.productWines[0]?.wineId;
-      if (!targetWineId) throw new InconsistentDataError();
-
-      const newQty = data.quantity ?? product.quantity;
-      await this.applyBundleAllocations(tx, [{ quantity: 1, wineId: targetWineId }], newQty);
-
-      const updated = await productsRepo.update(tx, productId, {
-        description: data.description,
-        name: data.name,
-        price: data.price,
-        quantity: data.quantity,
-      });
-
-      if (data.wineId !== undefined) {
-        await productsRepo.deleteProductWines(tx, productId);
-        await productsRepo.createProductWines(tx, [
-          { productId, quantity: 1, wineId: data.wineId },
-        ]);
-      }
-
-      return updated;
-    });
+    return db.transaction((tx) => this.applySingleProductUpdate(tx, productId, product, data));
   }
 }
 

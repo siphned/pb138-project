@@ -1,4 +1,4 @@
-import { Elysia, t } from "elysia";
+import { Elysia, status, t } from "elysia";
 import { errorResponse } from "../../utils/error-plugin";
 import { parsePagination } from "../../utils/pagination";
 import { authPlugin } from "../auth";
@@ -77,6 +77,29 @@ export const adminRoutes = new Elysia({ prefix: "/admin" })
       }),
       requireRoles: ["admin"],
       response: { 200: t.Any() },
+    }
+  )
+
+  .get(
+    "/users/:id",
+    async ({ params }) => {
+      try {
+        return await adminService.getUser(params.id);
+      } catch (e: unknown) {
+        if (e instanceof Error && e.message === "NOT_FOUND") return status(404, "User not found");
+        throw e;
+      }
+    },
+    {
+      detail: {
+        description: "Get a single user by ID.",
+        security: [{ bearerAuth: [] }],
+        summary: "Get user by ID (admin)",
+        tags: ["admin"],
+      },
+      params: t.Object({ id: t.String() }),
+      requireRoles: ["admin"],
+      response: { 200: t.Any(), 404: t.String() },
     }
   )
 

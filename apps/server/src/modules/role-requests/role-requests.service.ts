@@ -1,5 +1,6 @@
 import { createClerkClient } from "@clerk/backend";
 import type { RoleRequest } from "@repo/shared/schemas";
+import { NotFoundError } from "@repo/shared";
 import { db } from "../../db";
 import { logger } from "../../utils/logger";
 import { emailService } from "../email/email.service";
@@ -46,6 +47,12 @@ export class RoleRequestsService {
       );
 
     return result;
+  }
+
+  async getById(requestId: string): Promise<RoleRequest> {
+    const request = await roleRequestsRepo.findById(db, requestId);
+    if (!request) throw new NotFoundError("Role request not found", "ROLE_REQUEST_NOT_FOUND");
+    return request;
   }
 
   listPending(): Promise<RoleRequest[]> {

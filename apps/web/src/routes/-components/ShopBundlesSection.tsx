@@ -2,9 +2,8 @@ import { Link } from "@tanstack/react-router";
 import { ArrowRight } from "lucide-react";
 import { BundleCard } from "@/components/catalog/BundleCard";
 import { Button } from "@/components/ui/button";
-import { useGetShopsByIdProducts } from "@/generated/hooks/useGetShopsByIdProducts";
+import { useGetProducts } from "@/generated/hooks/useGetProducts";
 
-// Shape returned by GET /shops/:id/products (no response schema in OpenAPI)
 type ShopProductRaw = {
   id: string;
   name: string;
@@ -18,8 +17,8 @@ interface ShopBundlesSectionProps {
 }
 
 export function ShopBundlesSection({ shopId }: ShopBundlesSectionProps) {
-  const { data, isLoading } = useGetShopsByIdProducts(shopId, { isBundle: "true" });
-  const products = data as ShopProductRaw[] | undefined;
+  const { data: rawData, isLoading } = useGetProducts({ isBundle: true, shopId });
+  const products = rawData?.data as ShopProductRaw[] | undefined;
 
   if (isLoading) {
     return (

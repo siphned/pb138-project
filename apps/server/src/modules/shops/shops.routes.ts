@@ -1,18 +1,20 @@
 import { Elysia, status, t } from "elysia";
 import { errorResponse } from "../../utils/error-plugin";
 import { authPlugin } from "../auth";
-import { createShopBody, shopResponse, updateShopBody } from "./shops.schema";
+import { createShopBody, shopFiltersQuery, shopResponse, updateShopBody } from "./shops.schema";
 import { shopsService } from "./shops.service";
 
 export const shopsRoutes = new Elysia()
   .use(authPlugin)
 
-  .get("/shops", () => shopsService.listShops(), {
+  .get("/shops", ({ query }) => shopsService.listShops(query), {
     detail: {
-      description: "Returns all non-deleted shops with their addresses.",
+      description:
+        "Returns all non-deleted shops with their addresses. Filterable by q, city, ownerUserId.",
       summary: "List all shops",
       tags: ["shops"],
     },
+    query: shopFiltersQuery,
     response: { 200: t.Array(shopResponse) },
   })
 
@@ -50,6 +52,29 @@ export const shopsRoutes = new Elysia()
       },
       requireRoles: ["shop_owner"],
       response: { 201: shopResponse },
+    }
+  )
+
+  .delete(
+    "/shops/:id",
+    async ({ params, dbUser }) => {
+      await shopsService.deleteShop(params.id, dbUser.id);
+      return { success: true };
+    },
+    {
+      detail: {
+        description: "Soft-delete own shop.",
+        security: [{ bearerAuth: [] }],
+        summary: "Delete shop",
+        tags: ["shops"],
+      },
+      params: t.Object({ id: t.String() }),
+      requireRoles: ["shop_owner"],
+      response: {
+        200: t.Object({ success: t.Boolean() }),
+        403: errorResponse,
+        404: errorResponse,
+      },
     }
   )
 

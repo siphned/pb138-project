@@ -1,4 +1,9 @@
-import type { Event, EventComment, EventRegistration } from "@repo/shared/schemas";
+import type {
+  Event,
+  EventComment,
+  EventInvitationModel,
+  EventRegistration,
+} from "@repo/shared/schemas";
 import { db } from "../../db";
 import type { PaginatedResult } from "../../utils/pagination";
 import { parsePagination } from "../../utils/pagination";
@@ -88,6 +93,16 @@ export class EventsService {
     return event;
   }
 
+  async listInvitations(eventId: string, userId: string): Promise<EventInvitationModel[]> {
+    const event = await eventsRepo.findById(db, eventId);
+    if (!event) throw new Error("NOT_FOUND");
+
+    const winemaker = await eventsRepo.findWinemakerByUserId(db, userId);
+    if (!winemaker || winemaker.id !== event.winemakerId) throw new Error("FORBIDDEN");
+
+    return eventsRepo.findInvitationsByEventId(db, eventId);
+  }
+
   async listComments(
     eventId: string,
     paginationQuery: { page?: number; limit?: number }
@@ -107,20 +122,29 @@ export class EventsService {
   }
 
   async listEvents(
-    filters: { winemakerName?: string; from?: string; to?: string },
+    filters: {
+      winemakerName?: string;
+      winemakerId?: string;
+      q?: string;
+      from?: string;
+      to?: string;
+    },
     paginationQuery: { page?: number; limit?: number }
   ): Promise<PaginatedResult<EventWithDetails>> {
     const { limit, offset } = parsePagination(paginationQuery);
     const page = Math.max(1, paginationQuery.page ?? 1);
 
     let winemakerIds: string[] | undefined;
-    if (filters.winemakerName) {
+    if (filters.winemakerId) {
+      winemakerIds = [filters.winemakerId];
+    } else if (filters.winemakerName) {
       winemakerIds = await eventsRepo.resolveWinemakerIdsByName(db, filters.winemakerName);
       if (winemakerIds.length === 0) return { data: [], limit, page, total: 0 };
     }
 
     const repoFilters = {
       from: filters.from ? new Date(filters.from) : undefined,
+      q: filters.q,
       status: "approved" as const,
       to: filters.to ? new Date(filters.to) : undefined,
       winemakerIds,
