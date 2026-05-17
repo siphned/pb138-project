@@ -9,8 +9,8 @@ import type { EventSearch } from "@/components/catalog/types";
 import { PageHeader } from "@/components/primitives/page-header";
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
+import { EventCard } from "@/components/events/EventCard";
 import { useGetEvents } from "@/generated/hooks/useGetEvents";
-import { EventCard } from "./-components/EventCard";
 
 const toNum = (v: unknown): number | undefined => {
   if (typeof v === "number" && Number.isFinite(v)) return v;
