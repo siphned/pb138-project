@@ -1,6 +1,6 @@
-import { FilterIcon, PlusSignIcon } from "@hugeicons/core-free-icons";
+import { FilterIcon } from "@hugeicons/core-free-icons";
 import { HugeiconsIcon } from "@hugeicons/react";
-import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
+import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { CatalogFilters } from "@/components/catalog/CatalogFilters";
 import { CatalogPagination } from "@/components/catalog/CatalogPagination";
 import { CatalogResults } from "@/components/catalog/CatalogResults";
@@ -10,9 +10,7 @@ import { EventCard } from "@/components/events/EventCard";
 import { PageHeader } from "@/components/primitives/page-header";
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
-import { useUser } from "@/context/UserContext";
 import { useGetEvents } from "@/generated/hooks/useGetEvents";
-import { Role } from "@/types/roles";
 
 const toNum = (v: unknown): number | undefined => {
   if (typeof v === "number" && Number.isFinite(v)) return v;

@@ -3,8 +3,14 @@ import { describe, expect, it, vi } from "vitest";
 import { EventDetailsCard } from "./EventDetailsCard";
 
 vi.mock("./EventRegistrationButton", () => ({
-  EventRegistrationButton: ({ eventId, isRegistered }: any) => (
-    <button data-testid="register-btn" data-event-id={eventId}>
+  EventRegistrationButton: ({
+    eventId,
+    isRegistered,
+  }: {
+    eventId: string;
+    isRegistered: boolean;
+  }) => (
+    <button data-event-id={eventId} data-testid="register-btn" type="button">
       {isRegistered ? "registered" : "register"}
     </button>
   ),
