@@ -41,7 +41,7 @@
     "jsdom": "^29.0.2",
     "typescript": "~5.9.3",
     "vite": "^8.0.1",
-    "vitest": "^2.1.8"
+    "vitest": "^4.1.6"
   },
   "name": "web",
   "private": true,

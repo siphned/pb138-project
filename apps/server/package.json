@@ -16,7 +16,7 @@
     "@types/pg": "^8.20.0",
     "dotenv": "^17.4.2",
     "drizzle-kit": "^0.31.10",
-    "vitest": "^2.1.8"
+    "vitest": "^4.1.6"
   },
   "module": "index.ts",
   "name": "server",
