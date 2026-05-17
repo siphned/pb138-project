@@ -16,10 +16,10 @@ export default defineConfig({
     // (getBoundingClientRect, scroll, canvas). Revert to jsdom if tests
     // relying on those APIs start failing.
     environment: "happy-dom",
-    exclude: ["src/__tests__/e2e/**"],
+    exclude: ["src/__tests__/e2e/**/*"],
     fileParallelism: true,
     globals: true,
-    include: ["src/**/*.test.{ts,tsx}"],
+    include: ["src/**/*.test.ts", "src/**/*.test.tsx"],
     isolate: true,
     setupFiles: ["./src/__tests__/setup.ts"],
   },

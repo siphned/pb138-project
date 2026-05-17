@@ -1,17 +1,18 @@
 import { Show, useAuth, useClerk, useUser as useClerkUser } from "@clerk/react";
-import { Link, useNavigate } from "@tanstack/react-router";
 import {
-  Calendar,
-  LogOut,
-  Menu,
-  Moon,
-  Package,
-  Search,
-  Settings,
-  ShoppingCart,
-  User as UserIcon,
-  Wine,
-} from "lucide-react";
+  Calendar01Icon,
+  LogoutSquare02Icon,
+  Menu01Icon,
+  Moon01Icon,
+  Package01Icon,
+  Search01Icon,
+  Settings01Icon,
+  ShoppingCart01Icon,
+  Sun01Icon,
+  User02Icon,
+} from "@hugeicons/core-free-icons";
+import { HugeiconsIcon } from "@hugeicons/react";
+import { Link, useNavigate } from "@tanstack/react-router";
 import { useState } from "react";
 import { NavItem } from "@/components/primitives/nav-item";
 import {
@@ -23,7 +24,7 @@ import {
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
-import { useUser } from "@/context/UserContext";
+import { useTheme, useUser } from "@/context";
 
 import { Role } from "@/types/roles";
 
@@ -39,6 +40,7 @@ export function Sidebar({ userRoles = [Role.customer], activeRole, onRoleChange 
   const { isSignedIn } = useAuth();
   const { signOut, openUserProfile } = useClerk();
   const navigate = useNavigate();
+  const { theme, toggleTheme } = useTheme();
 
   const currentActiveRole = activeRole || userRoles[0];
   const [accordionState, setAccordionState] = useState<string[]>([]);
@@ -66,7 +68,7 @@ export function Sidebar({ userRoles = [Role.customer], activeRole, onRoleChange 
       <SheetTrigger
         render={
           <Button size="icon" variant="ghost">
-            <Menu className="h-6 w-6" />
+            <HugeiconsIcon icon={Menu01Icon} />
           </Button>
         }
       />
@@ -114,7 +116,7 @@ export function Sidebar({ userRoles = [Role.customer], activeRole, onRoleChange 
                   <AccordionItem className="border-none" value="user-roles">
                     <AccordionTrigger className="flex items-center gap-3 px-3 py-3 rounded-md bg-secondary hover:bg-secondary/80 transition-colors text-sm font-medium hover:no-underline text-primary">
                       <div className="flex items-center gap-3">
-                        <UserIcon className="h-4 w-4" />
+                        <HugeiconsIcon icon={User02Icon} />
                         {currentActiveRole}
                       </div>
                     </AccordionTrigger>
@@ -143,7 +145,7 @@ export function Sidebar({ userRoles = [Role.customer], activeRole, onRoleChange 
                 </Accordion>
               ) : (
                 <NavItem render={<div />} variant="active">
-                  <UserIcon className="h-4 w-4" />
+                  <HugeiconsIcon icon={User02Icon} />
                   {currentActiveRole}
                 </NavItem>
               )}
@@ -156,7 +158,7 @@ export function Sidebar({ userRoles = [Role.customer], activeRole, onRoleChange 
               render={<Link to="/search" />}
               variant="active"
             >
-              <Search className="h-4 w-4" /> Search
+              <HugeiconsIcon icon={Search01Icon} /> Search
             </NavItem>
 
             <NavItem
@@ -165,11 +167,11 @@ export function Sidebar({ userRoles = [Role.customer], activeRole, onRoleChange 
               render={<Link to="/cart" />}
               variant="active"
             >
-              <ShoppingCart className="h-4 w-4" /> Shopping cart
+              <HugeiconsIcon icon={ShoppingCart01Icon} /> Shopping cart
             </NavItem>
 
             <NavItem onClick={closeSheet} render={<Link to="/explore" />} variant="active">
-              <Wine className="h-4 w-4" /> Explore Wines
+              <HugeiconsIcon icon={Package01Icon} /> Explore Wines
             </NavItem>
 
             <NavItem
@@ -177,17 +179,17 @@ export function Sidebar({ userRoles = [Role.customer], activeRole, onRoleChange 
               render={<Link search={{ isBundle: true }} to="/products" />}
               variant="active"
             >
-              <Package className="h-4 w-4" /> Bundles
+              <HugeiconsIcon icon={Package01Icon} /> Bundles
             </NavItem>
 
             <NavItem onClick={closeSheet} render={<Link to="/events" />} variant="active">
-              <Calendar className="h-4 w-4" /> Events
+              <HugeiconsIcon icon={Calendar01Icon} /> Events
             </NavItem>
 
             <Show when="signed-in">
               {currentActiveRole === Role.customer && (
                 <NavItem onClick={closeSheet} render={<Link to="/orders" />} variant="active">
-                  <Package className="h-4 w-4" /> Order History
+                  <HugeiconsIcon icon={Package01Icon} /> Order History
                 </NavItem>
               )}
 
@@ -198,14 +200,14 @@ export function Sidebar({ userRoles = [Role.customer], activeRole, onRoleChange 
                     render={<Link search={{ winemakerId: "me" }} to="/explore" />}
                     variant="active"
                   >
-                    <Wine className="h-4 w-4" /> My Wines
+                    <HugeiconsIcon icon={Package01Icon} /> My Wines
                   </NavItem>
                   <NavItem
                     onClick={closeSheet}
                     render={<Link search={{ isBundle: true }} to="/products" />}
                     variant="active"
                   >
-                    <Package className="h-4 w-4" /> My Bundles
+                    <HugeiconsIcon icon={Package01Icon} /> My Bundles
                   </NavItem>
                 </>
               )}
@@ -220,7 +222,7 @@ export function Sidebar({ userRoles = [Role.customer], activeRole, onRoleChange 
                 }}
                 variant="muted"
               >
-                <Settings className="h-4 w-4" /> Settings
+                <HugeiconsIcon icon={Settings01Icon} /> Settings
               </NavItem>
             </Show>
           </nav>
@@ -229,15 +231,17 @@ export function Sidebar({ userRoles = [Role.customer], activeRole, onRoleChange 
         <div className="flex-none border-t pt-4 pb-6 px-6 flex flex-col gap-1 bg-background z-10">
           <Button
             className="flex items-center justify-between px-3 py-2 rounded-md text-sm font-medium text-muted-foreground w-full"
+            onClick={toggleTheme}
+            title={`Switch to ${theme === "light" ? "dark" : "light"} mode`}
             variant="ghost"
           >
             Theme
-            <Moon className="h-4 w-4" />
+            <HugeiconsIcon icon={theme === "light" ? Moon01Icon : Sun01Icon} />
           </Button>
 
           <Show when="signed-in">
             <NavItem className="mt-2 w-full text-left" onClick={handleLogout} variant="destructive">
-              <LogOut className="h-4 w-4" /> Log out
+              <HugeiconsIcon icon={LogoutSquare02Icon} /> Log out
             </NavItem>
           </Show>
         </div>
