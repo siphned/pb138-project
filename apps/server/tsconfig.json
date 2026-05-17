@@ -32,5 +32,5 @@
     "noUnusedParameters": true,
     "noPropertyAccessFromIndexSignature": false
   },
-  "exclude": ["src/**/*.test.ts", "src/**/*.spec.ts", "**/*.test.ts", "**/*.spec.ts"]
+  "exclude": ["src/**/*.test.*", "src/**/*.spec.*", "**/*.test.*", "**/*.spec.*"]
 }
