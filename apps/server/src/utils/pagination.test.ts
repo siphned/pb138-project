@@ -4,7 +4,7 @@ import { parsePagination } from "./pagination";
 describe("parsePagination", () => {
   it("uses default values when query is empty", () => {
     const result = parsePagination({});
-    expect(result.limit).toBe(20);
+    expect(result.limit).toBe(24);
     expect(result.offset).toBe(0);
   });
 
