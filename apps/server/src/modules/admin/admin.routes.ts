@@ -1,5 +1,6 @@
 import { Elysia, status, t } from "elysia";
 import { errorResponse } from "../../utils/error-plugin";
+import { parsePagination } from "../../utils/pagination";
 import { authPlugin } from "../auth";
 import { adminService } from "./admin.service";
 
@@ -9,8 +10,8 @@ export const adminRoutes = new Elysia({ prefix: "/admin" })
   .get(
     "/events",
     async ({ query }) => {
-      const { page = 1, status = "pending" } = query;
-      return adminService.listEvents({ status }, { offset: (page - 1) * 20 });
+      const { page, status = "pending" } = query;
+      return adminService.listEvents({ status }, parsePagination({ page }));
     },
     {
       detail: {
@@ -57,8 +58,8 @@ export const adminRoutes = new Elysia({ prefix: "/admin" })
   .get(
     "/users",
     async ({ query }) => {
-      const { page = 1, status, role } = query;
-      return adminService.listUsers({ role, status }, { offset: (page - 1) * 20 });
+      const { page, status, role } = query;
+      return adminService.listUsers({ role, status }, parsePagination({ page }));
     },
     {
       detail: {
@@ -124,8 +125,8 @@ export const adminRoutes = new Elysia({ prefix: "/admin" })
   .get(
     "/reviews",
     async ({ query }) => {
-      const { page = 1 } = query;
-      return adminService.listAllReviews({ offset: (page - 1) * 20 });
+      const { page } = query;
+      return adminService.listAllReviews(parsePagination({ page }));
     },
     {
       detail: {

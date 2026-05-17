@@ -1,6 +1,6 @@
-import { BadRequestError, ForbiddenError, NotFoundError } from "@repo/shared";
 import { db } from "../../db";
 import { parsePagination } from "../../utils/pagination";
+import { AlreadyReviewedError, NotPurchasedError, ReviewNotFoundError } from "./reviews.errors";
 import type { ReviewWithUser } from "./reviews.repository";
 import * as reviewsRepo from "./reviews.repository";
 
@@ -17,17 +17,12 @@ export class ReviewsService {
       reviewsRepo.findUserReview(db, userId, productId, "product"),
     ]);
 
-    if (!hasPurchased)
-      throw new ForbiddenError(
-        "You must have purchased this product to leave a review",
-        "NOT_PURCHASED"
-      );
-    if (existing)
-      throw new BadRequestError("You have already reviewed this product", "ALREADY_REVIEWED");
+    if (!hasPurchased) throw new NotPurchasedError();
+    if (existing) throw new AlreadyReviewedError();
 
     const review = await reviewsRepo.insertReview(db, userId, productId, "product", data);
     const withUser = await reviewsRepo.findReviewWithUser(db, review.id);
-    if (!withUser) throw new NotFoundError("Review not found after insert");
+    if (!withUser) throw new ReviewNotFoundError();
     return withUser;
   }
 
@@ -41,17 +36,12 @@ export class ReviewsService {
       reviewsRepo.findUserReview(db, userId, winemakerId, "winemaker"),
     ]);
 
-    if (!hasPurchased)
-      throw new ForbiddenError(
-        "You must have purchased a product from this winemaker to leave a review",
-        "NOT_PURCHASED"
-      );
-    if (existing)
-      throw new BadRequestError("You have already reviewed this winemaker", "ALREADY_REVIEWED");
+    if (!hasPurchased) throw new NotPurchasedError();
+    if (existing) throw new AlreadyReviewedError();
 
     const review = await reviewsRepo.insertReview(db, userId, winemakerId, "winemaker", data);
     const withUser = await reviewsRepo.findReviewWithUser(db, review.id);
-    if (!withUser) throw new NotFoundError("Review not found after insert");
+    if (!withUser) throw new ReviewNotFoundError();
     return withUser;
   }
 
@@ -65,17 +55,12 @@ export class ReviewsService {
       reviewsRepo.findUserReview(db, userId, wineId, "wine"),
     ]);
 
-    if (!hasPurchased)
-      throw new ForbiddenError(
-        "You must have purchased a product with this wine to leave a review",
-        "NOT_PURCHASED"
-      );
-    if (existing)
-      throw new BadRequestError("You have already reviewed this wine", "ALREADY_REVIEWED");
+    if (!hasPurchased) throw new NotPurchasedError();
+    if (existing) throw new AlreadyReviewedError();
 
     const review = await reviewsRepo.insertReview(db, userId, wineId, "wine", data);
     const withUser = await reviewsRepo.findReviewWithUser(db, review.id);
-    if (!withUser) throw new NotFoundError("Review not found after insert");
+    if (!withUser) throw new ReviewNotFoundError();
     return withUser;
   }
 
@@ -90,9 +75,9 @@ export class ReviewsService {
     if (!review || review.id !== reviewId) {
       if (userRole === "admin") {
         const byId = await reviewsRepo.findById(db, reviewId);
-        if (!byId) throw new NotFoundError();
+        if (!byId) throw new ReviewNotFoundError();
       } else {
-        throw new NotFoundError();
+        throw new ReviewNotFoundError();
       }
     }
 

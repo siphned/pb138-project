@@ -1,12 +1,10 @@
 import { t } from "elysia";
-import { z } from "zod";
+import z from "zod";
 
 /**
  * Request/response schemas for users module.
  * Zod for shared types, TypeBox for Elysia route validation.
  */
-
-// ─── Zod Schemas ──────────────────────────────────────────────────────────
 
 export const userResponseSchemaZod = z.object({
   billingAddressId: z.union([z.string(), z.null()]),
@@ -48,8 +46,6 @@ export const addressesResponseSchemaZod = z.object({
   billing: z.union([addressResponseSchemaZod, z.null()]),
   shipping: z.union([addressResponseSchemaZod, z.null()]),
 });
-
-// ─── TypeBox Schemas ──────────────────────────────────────────────────────
 
 export const userResponseSchema = t.Object({
   billingAddressId: t.Union([t.String(), t.Null()]),

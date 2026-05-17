@@ -35,6 +35,7 @@
     "db:migrate": "drizzle-kit migrate",
     "db:push": "drizzle-kit push",
     "db:seed": "bun run src/db/seed.ts",
+    "db:seed:demo": "bun run src/db/seed.demo.ts",
     "db:studio": "drizzle-kit studio",
     "dev": "bun run src/index.ts",
     "format": "biome format --write .",

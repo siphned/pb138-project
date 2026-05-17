@@ -164,7 +164,10 @@ export const createReviewsRoutes = (auth = authPlugin) =>
           tags: ["reviews"],
         },
         params: t.Object({ id: t.String() }),
-        query: t.Object({ entityId: t.String(), entityType: t.String() }),
+        query: t.Object({
+          entityId: t.String(),
+          entityType: t.Union([t.Literal("product"), t.Literal("winemaker"), t.Literal("wine")]),
+        }),
         requireAuth: true,
         response: { 200: t.Any(), 403: errorResponse, 404: errorResponse },
       }

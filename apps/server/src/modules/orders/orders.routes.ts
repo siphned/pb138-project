@@ -58,10 +58,16 @@ export const ordersRoutes = new Elysia({ prefix: "/orders", tags: ["orders"] })
         await cartsService.mergeOnLogin(dbUser.id, guestSessionId);
         guest_session_id?.remove();
       }
-      return { clerkPayload: payload, sessionId: undefined as string | undefined, user: dbUser };
+      return {
+        clerkPayload: payload,
+        isAdmin: payload.roles?.includes("admin") ?? false,
+        sessionId: undefined as string | undefined,
+        user: dbUser,
+      };
     }
     return {
       clerkPayload: null as Awaited<ReturnType<typeof verifyClerkToken>>,
+      isAdmin: false,
       sessionId: guest_session_id?.value as string | undefined,
       user: undefined,
     };
@@ -132,10 +138,10 @@ export const ordersRoutes = new Elysia({ prefix: "/orders", tags: ["orders"] })
 
   .get(
     "/:id",
-    async ({ user, params }) => {
+    async ({ user, params, isAdmin }) => {
       if (!user) return status(401, "Auth required");
       try {
-        return await ordersService.getOrder(params.id, user.id);
+        return await ordersService.getOrder(params.id, user.id, isAdmin);
       } catch (e: unknown) {
         if (e instanceof Error) {
           if (e.message === "NOT_FOUND") return status(404, "Not found");
@@ -146,7 +152,7 @@ export const ordersRoutes = new Elysia({ prefix: "/orders", tags: ["orders"] })
     },
     {
       detail: {
-        description: "Returns an order by ID. Only the owning user can access it.",
+        description: "Returns an order by ID. The owning user or an admin can access it.",
         summary: "Get order by ID",
       },
       params: t.Object({ id: t.String() }),

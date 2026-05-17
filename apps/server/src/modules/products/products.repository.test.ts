@@ -140,7 +140,7 @@ describe("productsRepository", () => {
 
   describe("updateWineQuantity", () => {
     it("updates wine quantity in db", async () => {
-      await productsRepo.updateWineQuantity(db, "w1", 10 as any);
+      await productsRepo.updateWineQuantity(db, "w1", 10);
       expect(db.update).toHaveBeenCalledWith(wines);
     });
   });
