@@ -1,10 +1,10 @@
 import type { Cart } from "@repo/shared/schemas";
 import { db } from "../../db";
+import { InsufficientStockError, ProductNotFoundError } from "../products/products.errors";
 import * as productsRepo from "../products/products.repository";
+import { CartNotFoundError } from "./carts.errors";
 import type { CartWithItems } from "./carts.repository";
 import * as cartsRepo from "./carts.repository";
-import { CartNotFoundError } from "./carts.errors";
-import { InsufficientStockError, ProductNotFoundError } from "../products/products.errors";
 
 export class CartsService {
   async addItem(
