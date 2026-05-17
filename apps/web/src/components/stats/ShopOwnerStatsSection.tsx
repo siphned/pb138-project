@@ -20,7 +20,7 @@ export function ShopOwnerStatsSection() {
     );
   }
 
-  const shops = (shopsQuery.data ?? []) as Array<unknown>;
+  const shops = (shopsQuery.data ?? []) as unknown[];
   const shopsCount = Array.isArray(shops) ? shops.length : 0;
 
   return (

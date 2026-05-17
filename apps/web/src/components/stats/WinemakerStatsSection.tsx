@@ -32,9 +32,9 @@ export function WinemakerStatsSection() {
     );
   }
 
-  const wines = (winesQuery.data ?? []) as Array<{ quantity: string | number }>;
-  const events = (eventsQuery.data ?? []) as Array<unknown>;
-  const supply = (supplyQuery.data ?? []) as Array<unknown>;
+  const wines = (winesQuery.data ?? []) as { quantity: string | number }[];
+  const events = (eventsQuery.data ?? []) as unknown[];
+  const supply = (supplyQuery.data ?? []) as unknown[];
 
   const winesCount = wines.length;
   const totalStock = wines.reduce((acc, w) => acc + toNumber(w.quantity), 0);

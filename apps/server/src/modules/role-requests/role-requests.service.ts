@@ -56,7 +56,9 @@ export class RoleRequestsService {
           fname: rejectedUser.fname,
           role: request.type,
         })
-        .catch(() => {});
+        .catch(() => {
+          // Email failure must not block the rejection itself.
+        });
     }
 
     return result;
