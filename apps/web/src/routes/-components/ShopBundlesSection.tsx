@@ -60,8 +60,8 @@ export function ShopBundlesSection({ shopId }: ShopBundlesSectionProps) {
         <Button variant="outline">
           <Link
             className="flex items-center gap-2 text-sm "
-            search={{ page: 1, sort: "newest" }}
-            to="/bundles"
+            search={{ isBundle: "true", page: 1, shopId: shopId, sort: "newest" }}
+            to="/products"
           >
             Show Inventory
             <ArrowRight className="h-4 w-4" />

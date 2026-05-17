@@ -14,6 +14,19 @@ export interface UserProfile {
   roles: Role[];
 }
 
+// Backend sends lowercase/snake-case role strings (`customer`/`winemaker`/
+// `shop_owner`/`admin`); the FE Role enum uses Title-Case display values.
+// Map between them at the boundary; unknown roles (e.g. `admin`) are dropped.
+const API_TO_ROLE: Record<string, Role> = {
+  admin: Role.admin,
+  customer: Role.customer,
+  shop_owner: Role.shopOwner,
+  winemaker: Role.winemaker,
+};
+
+const toRoles = (apiRoles: readonly string[] | null | undefined): Role[] =>
+  (apiRoles ?? []).map((r) => API_TO_ROLE[r]).filter((r): r is Role => Boolean(r));
+
 interface UserContextType {
   user: UserProfile | null;
   updateUser: (newData: Partial<Pick<UserProfile, "fname" | "lname">>) => Promise<UserProfile>;
@@ -42,6 +55,7 @@ export function UserProvider({ children }: { children: ReactNode }) {
   });
 
   const [user, setUser] = useState<UserProfile | null>(defaultUser);
+
   useEffect(() => {
     if (profile) {
       setUser({
@@ -50,7 +64,7 @@ export function UserProvider({ children }: { children: ReactNode }) {
         fname: profile.fname,
         id: profile.id,
         lname: profile.lname,
-        roles: profile.roles ?? [],
+        roles: toRoles(profile.roles),
       });
     } else if (isLoaded && !isSignedIn) {
       setUser(null);
@@ -59,7 +73,7 @@ export function UserProvider({ children }: { children: ReactNode }) {
 
   const [activeRole, setActiveRole] = useState<Role>(Role.customer);
   useEffect(() => {
-    if (user && !user.roles.includes(activeRole)) {
+    if (user && user.roles.length > 0 && !user.roles.includes(activeRole)) {
       setActiveRole(user.roles[0] as Role);
     }
   }, [user, activeRole]);
@@ -75,7 +89,7 @@ export function UserProvider({ children }: { children: ReactNode }) {
       fname: updated.fname,
       id: updated.id,
       lname: updated.lname,
-      roles: updated.roles ?? [],
+      roles: toRoles(updated.roles),
     };
   };
 

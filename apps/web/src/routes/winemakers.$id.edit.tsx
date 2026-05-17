@@ -8,7 +8,7 @@ export const Route = createFileRoute("/winemakers/$id/edit")({
 function WinemakerEditStub() {
   return (
     <StubPage
-      actorRole="admin / winemaker"
+      actorRole="winemaker (owner)"
       hookName="usePatchWinemakersById (MISSING BE)"
       title="Edit winemaker"
     >
