@@ -1,48 +1,24 @@
 import { DataGrid } from "@/components/primitives/data-grid";
+import { ErrorState } from "@/components/primitives/error-state";
 import { LoadingState } from "@/components/primitives/loading-state";
 import { Section } from "@/components/primitives/section";
-import { useGetAdminEvents } from "@/generated/hooks/useGetAdminEvents";
-import { useGetAdminReviews } from "@/generated/hooks/useGetAdminReviews";
-import { useGetAdminUsers } from "@/generated/hooks/useGetAdminUsers";
-import { useGetProducts } from "@/generated/hooks/useGetProducts";
-import { useGetRoleRequests } from "@/generated/hooks/useGetRoleRequests";
-import { useGetShops } from "@/generated/hooks/useGetShops";
+import { useGetStats } from "@/generated/hooks/useGetStats";
 import { StatTile } from "./StatTile";
 
-type Paged = { total?: string | number; data?: unknown[] };
-
-const totalOf = (resp: unknown): number => {
-  if (resp && typeof resp === "object") {
-    const r = resp as Paged;
-    if (r.total != null) {
-      const n = Number(r.total);
-      return Number.isFinite(n) ? n : 0;
-    }
-    if (Array.isArray(r.data)) return r.data.length;
+const toNumber = (n: unknown): number => {
+  if (typeof n === "number") return n;
+  if (typeof n === "string") {
+    const parsed = Number(n);
+    return Number.isFinite(parsed) ? parsed : 0;
   }
-  if (Array.isArray(resp)) return resp.length;
   return 0;
 };
 
-// TODO(BE): expose a single `/admin/stats` aggregator so the admin overview
-// does not need six parallel list queries (plus a per-status pending events
-// call). Also expose `/admin/reviews?status=flagged` for the Flagged reviews
-// tile — current endpoint returns *all* reviews.
-export function AdminStatsSection() {
-  const usersQuery = useGetAdminUsers();
-  const eventsQuery = useGetAdminEvents({ status: "pending" });
-  const reviewsQuery = useGetAdminReviews();
-  const roleRequestsQuery = useGetRoleRequests();
-  const shopsQuery = useGetShops();
-  const productsQuery = useGetProducts();
+const eur = (n: number) =>
+  n.toLocaleString("en-IE", { currency: "EUR", maximumFractionDigits: 0, style: "currency" });
 
-  const isLoading =
-    usersQuery.isLoading ||
-    eventsQuery.isLoading ||
-    reviewsQuery.isLoading ||
-    roleRequestsQuery.isLoading ||
-    shopsQuery.isLoading ||
-    productsQuery.isLoading;
+export function AdminStatsSection() {
+  const { data, isLoading, isError, refetch } = useGetStats({ role: "admin" });
 
   if (isLoading) {
     return (
@@ -52,19 +28,35 @@ export function AdminStatsSection() {
     );
   }
 
+  if (isError || !data || data.role !== "admin") {
+    return (
+      <Section heading="Platform overview">
+        <ErrorState
+          message="We couldn't load platform stats."
+          onRetry={() => refetch()}
+          title="Stats unavailable"
+        />
+      </Section>
+    );
+  }
+
+  const admin = data as Extract<typeof data, { usersByRole: object }>;
+  const totalUsers = Object.values(admin.usersByRole ?? {}).reduce<number>(
+    (acc, n) => acc + toNumber(n),
+    0
+  );
+
   return (
     <Section heading="Platform overview">
       <DataGrid variant="gallery">
-        <StatTile label="Users (total)" value={totalOf(usersQuery.data)} />
-        <StatTile label="Pending role requests" value={totalOf(roleRequestsQuery.data)} />
-        <StatTile label="Pending events" value={totalOf(eventsQuery.data)} />
-        <StatTile
-          hint="All reviews — flagged filter pending BE"
-          label="Flagged reviews"
-          value={totalOf(reviewsQuery.data)}
-        />
-        <StatTile label="Total products" value={totalOf(productsQuery.data)} />
-        <StatTile label="Total shops" value={totalOf(shopsQuery.data)} />
+        <StatTile label="Users (total)" value={totalUsers} />
+        <StatTile label="Pending role requests" value={toNumber(admin.pendingRoleRequests)} />
+        <StatTile label="Pending events" value={toNumber(admin.pendingEvents)} />
+        <StatTile label="Deleted reviews" value={toNumber(admin.deletedReviews)} />
+        <StatTile label="Total products" value={toNumber(admin.totalProducts)} />
+        <StatTile label="Total shops" value={toNumber(admin.totalShops)} />
+        <StatTile label="Total winemakers" value={toNumber(admin.totalWinemakers)} />
+        <StatTile label="Total revenue" value={eur(toNumber(admin.totalRevenue))} />
       </DataGrid>
     </Section>
   );

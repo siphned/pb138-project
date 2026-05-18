@@ -1,18 +1,26 @@
 import { DataGrid } from "@/components/primitives/data-grid";
+import { ErrorState } from "@/components/primitives/error-state";
 import { LoadingState } from "@/components/primitives/loading-state";
 import { Section } from "@/components/primitives/section";
-import { useGetShopsMe } from "@/generated/hooks/useGetShopsMe";
+import { useGetStats } from "@/generated/hooks/useGetStats";
 import { StatTile } from "./StatTile";
 
-// TODO(BE): per-shop aggregator endpoint (`useGetShopsMeStats`) for product /
-// bundle counts and stock value — iterating `useGetShopsByIdProducts` from FE
-// is not possible without dynamic hook calls.
-// TODO(BE): expose `useGetOrdersByShopId` (or `/orders/me/shops`) for Orders
-// processed and Revenue tiles.
-export function ShopOwnerStatsSection() {
-  const shopsQuery = useGetShopsMe();
+const toNumber = (n: unknown): number => {
+  if (typeof n === "number") return n;
+  if (typeof n === "string") {
+    const parsed = Number(n);
+    return Number.isFinite(parsed) ? parsed : 0;
+  }
+  return 0;
+};
 
-  if (shopsQuery.isLoading) {
+const eur = (n: number) =>
+  n.toLocaleString("en-IE", { currency: "EUR", maximumFractionDigits: 0, style: "currency" });
+
+export function ShopOwnerStatsSection() {
+  const { data, isLoading, isError, refetch } = useGetStats({ role: "shop_owner" });
+
+  if (isLoading) {
     return (
       <Section heading="Shop performance">
         <LoadingState variant="catalog" />
@@ -20,18 +28,29 @@ export function ShopOwnerStatsSection() {
     );
   }
 
-  const shops = (shopsQuery.data ?? []) as unknown[];
-  const shopsCount = Array.isArray(shops) ? shops.length : 0;
+  if (isError || !data || data.role !== "shop_owner") {
+    return (
+      <Section heading="Shop performance">
+        <ErrorState
+          message="We couldn't load your shop stats."
+          onRetry={() => refetch()}
+          title="Stats unavailable"
+        />
+      </Section>
+    );
+  }
+
+  const owner = data as Extract<typeof data, { shopsCount: string | number }>;
 
   return (
     <Section heading="Shop performance">
       <DataGrid variant="gallery">
-        <StatTile label="Shops" value={shopsCount} />
-        <StatTile hint="BE backlog" label="Products" value="—" />
-        <StatTile hint="BE backlog" label="Bundles" value="—" />
-        <StatTile hint="BE backlog" label="Total stock value" value="—" />
-        <StatTile hint="BE backlog" label="Orders processed" value="—" />
-        <StatTile hint="BE backlog" label="Revenue" value="—" />
+        <StatTile label="Shops" value={toNumber(owner.shopsCount)} />
+        <StatTile label="Products" value={toNumber(owner.productsByType?.standard)} />
+        <StatTile label="Bundles" value={toNumber(owner.productsByType?.bundles)} />
+        <StatTile label="Total stock value" value={eur(toNumber(owner.totalStockValue))} />
+        <StatTile label="Orders processed" value={toNumber(owner.orderItemsProcessed)} />
+        <StatTile label="Revenue" value={eur(toNumber(owner.revenue))} />
       </DataGrid>
     </Section>
   );

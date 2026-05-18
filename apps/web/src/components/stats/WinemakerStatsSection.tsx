@@ -1,9 +1,8 @@
 import { DataGrid } from "@/components/primitives/data-grid";
+import { ErrorState } from "@/components/primitives/error-state";
 import { LoadingState } from "@/components/primitives/loading-state";
 import { Section } from "@/components/primitives/section";
-import { useGetEvents } from "@/generated/hooks/useGetEvents";
-import { useGetSupplyAgreementsWinemaker } from "@/generated/hooks/useGetSupplyAgreementsWinemaker";
-import { useGetWines } from "@/generated/hooks/useGetWines";
+import { useGetStats } from "@/generated/hooks/useGetStats";
 import { StatTile } from "./StatTile";
 
 const toNumber = (n: unknown): number => {
@@ -15,14 +14,8 @@ const toNumber = (n: unknown): number => {
   return 0;
 };
 
-// TODO(BE): support `winemakerId=me` server-side OR expose `useGetWinemakerMine` aggregator.
-// TODO(BE): expose `useGetReviewsByWinemakerMe` (or aggregate into a stats endpoint) for Average review score.
 export function WinemakerStatsSection() {
-  const winesQuery = useGetWines();
-  const eventsQuery = useGetEvents();
-  const supplyQuery = useGetSupplyAgreementsWinemaker();
-
-  const isLoading = winesQuery.isLoading || eventsQuery.isLoading || supplyQuery.isLoading;
+  const { data, isLoading, isError, refetch } = useGetStats({ role: "winemaker" });
 
   if (isLoading) {
     return (
@@ -32,23 +25,34 @@ export function WinemakerStatsSection() {
     );
   }
 
-  const wines = (winesQuery.data ?? []) as { quantity: string | number }[];
-  const events = (eventsQuery.data ?? []) as unknown[];
-  const supply = (supplyQuery.data ?? []) as unknown[];
+  if (isError || !data || data.role !== "winemaker") {
+    return (
+      <Section heading="Winemaker performance">
+        <ErrorState
+          message="We couldn't load your winemaker stats."
+          onRetry={() => refetch()}
+          title="Stats unavailable"
+        />
+      </Section>
+    );
+  }
 
-  const winesCount = wines.length;
-  const totalStock = wines.reduce((acc, w) => acc + toNumber(w.quantity), 0);
-  const eventsCount = Array.isArray(events) ? events.length : 0;
-  const supplyCount = Array.isArray(supply) ? supply.length : 0;
+  const winemaker = data as Extract<typeof data, { wineCount: string | number }>;
+  const avgScore = winemaker.avgReviewScore;
+  const eventsApproved = toNumber(winemaker.eventsByStatus?.approved);
+  const supplyApproved = toNumber(winemaker.supplyAgreementsByStatus?.approved);
 
   return (
     <Section heading="Winemaker performance">
       <DataGrid variant="gallery">
-        <StatTile label="Wines in catalog" value={winesCount} />
-        <StatTile label="Total stock" value={totalStock} />
-        <StatTile label="Events created" value={eventsCount} />
-        <StatTile label="Supply agreements" value={supplyCount} />
-        <StatTile hint="BE backlog" label="Average review score" value="—" />
+        <StatTile label="Wines in catalog" value={toNumber(winemaker.wineCount)} />
+        <StatTile label="Total stock" value={toNumber(winemaker.totalStock)} />
+        <StatTile label="Approved events" value={eventsApproved} />
+        <StatTile label="Approved supply agreements" value={supplyApproved} />
+        <StatTile
+          label="Average review score"
+          value={avgScore === null ? "—" : avgScore.toFixed(1)}
+        />
       </DataGrid>
     </Section>
   );
