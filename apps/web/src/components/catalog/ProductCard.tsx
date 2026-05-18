@@ -1,18 +1,15 @@
 import { Link } from "@tanstack/react-router";
 import { Card } from "@/components/ui/card";
 import type { GetProducts200 } from "@/generated/types/GetProducts";
-import { CatalogPlaceholder } from "./CatalogPlaceholder";
+import { ProductImage } from "./ProductImage";
 
-export type GetProducts200Item = GetProducts200["data"][number] & {
-  images?: { url: string }[];
-};
+export type GetProducts200Item = GetProducts200["data"][number];
 
 interface ProductCardProps {
   product: GetProducts200Item;
 }
 
 export function ProductCard({ product }: ProductCardProps) {
-  const imageUrl = product.images?.[0]?.url;
   const price = Number(product.price).toLocaleString("en-IE", {
     currency: "EUR",
     style: "currency",
@@ -22,16 +19,13 @@ export function ProductCard({ product }: ProductCardProps) {
 
   return (
     <Card className="group relative" variant="polaroid">
-      <div className="aspect-square w-full overflow-hidden rounded-lg bg-muted shadow-xs">
-        {imageUrl ? (
-          <img
-            alt={product.name}
-            className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-105"
-            src={imageUrl}
-          />
-        ) : (
-          <CatalogPlaceholder color={firstWineColor} text={product.name} />
-        )}
+      <div className="aspect-[2/1] w-full overflow-hidden rounded-lg bg-muted shadow-xs">
+        <ProductImage
+          alt={product.name}
+          fallbackColor={firstWineColor}
+          fallbackText={product.name}
+          productId={product.id}
+        />
 
         {product.isBundle && (
           <div className="absolute top-2 right-2 z-10">

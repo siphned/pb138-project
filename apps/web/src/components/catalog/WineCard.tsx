@@ -1,11 +1,9 @@
 import { Link } from "@tanstack/react-router";
 import { Card } from "@/components/ui/card";
 import type { GetWines200 } from "@/generated/types/GetWines";
-import { CatalogPlaceholder } from "./CatalogPlaceholder";
+import { WineImage } from "./WineImage";
 
-export type GetWines200Item = GetWines200[number] & {
-  images?: { url: string }[];
-};
+export type GetWines200Item = GetWines200[number];
 
 interface WineCardProps {
   wine: GetWines200Item;
@@ -13,20 +11,10 @@ interface WineCardProps {
 }
 
 export function WineCard({ wine, minPrice }: WineCardProps) {
-  const imageUrl = wine.images?.[0]?.url;
-
   return (
     <Card className="group relative" variant="polaroid">
-      <div className="aspect-square w-full overflow-hidden rounded-lg bg-muted shadow-xs">
-        {imageUrl ? (
-          <img
-            alt={wine.name}
-            className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-105"
-            src={imageUrl}
-          />
-        ) : (
-          <CatalogPlaceholder color={wine.color} text={wine.name} />
-        )}
+      <div className="aspect-[2/1] w-full overflow-hidden rounded-lg bg-muted shadow-xs">
+        <WineImage alt={wine.name} fallbackColor={wine.color} fallbackText={wine.name} wineId={wine.id} />
       </div>
 
       <div className="pt-4 text-center">
