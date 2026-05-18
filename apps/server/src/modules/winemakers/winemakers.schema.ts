@@ -1,5 +1,9 @@
 import { t } from "elysia";
 
+export const winemakerFiltersQuery = t.Object({
+  q: t.Optional(t.String({ maxLength: 255 })),
+});
+
 export const updateWinemakerBody = t.Object({
   description: t.Optional(t.String({ minLength: 1 })),
   email: t.Optional(t.String({ format: "email", maxLength: 255 })),

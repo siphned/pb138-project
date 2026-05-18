@@ -236,13 +236,13 @@ function ProductFilters({
   }, [search.minPrice, search.maxPrice]);
 
   const handleSearchChange = useCallback(
-    (s: string) => onSearchChange({ ...search, search: s || undefined }),
+    (s: string) => onSearchChange({ ...search, q: s || undefined }),
     [onSearchChange, search]
   );
 
   return (
     <div className="space-y-8">
-      <SearchInput isProduct={true} onChange={handleSearchChange} value={search.search || ""} />
+      <SearchInput isProduct={true} onChange={handleSearchChange} value={search.q || ""} />
 
       <div className="space-y-6">
         <ColorFilter

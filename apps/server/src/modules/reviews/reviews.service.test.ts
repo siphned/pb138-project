@@ -13,7 +13,9 @@ vi.mock("./reviews.repository", async (importOriginal) => {
     findReviews: vi.fn(),
     findReviewWithUser: vi.fn(),
     findUserReview: vi.fn(),
+    hasPurchasedFromWinemaker: vi.fn(),
     hasPurchasedProduct: vi.fn(),
+    hasPurchasedWine: vi.fn(),
     insertReview: vi.fn(),
     softDelete: vi.fn(),
   };
@@ -89,6 +91,40 @@ describe("reviewsService", () => {
       expect(result.id).toBe(reviewId);
       expect(reviewsRepo.insertReview).toHaveBeenCalledWith(db, userId, productId, "product", {
         rating: 5,
+      });
+    });
+  });
+
+  describe("createWinemakerReview", () => {
+    it("throws ForbiddenError when user has no qualifying purchase", async () => {
+      vi.mocked(reviewsRepo.hasPurchasedFromWinemaker).mockResolvedValue(false);
+      vi.mocked(reviewsRepo.findUserReview).mockResolvedValue(undefined);
+
+      await expect(
+        reviewsService.createWinemakerReview(userId, winemakerId, { rating: 4 })
+      ).rejects.toMatchObject({ code: "NOT_PURCHASED", statusCode: 400 });
+    });
+
+    it("throws BadRequestError when user already reviewed this winemaker", async () => {
+      vi.mocked(reviewsRepo.hasPurchasedFromWinemaker).mockResolvedValue(true);
+      vi.mocked(reviewsRepo.findUserReview).mockResolvedValue({ id: reviewId } as any);
+
+      await expect(
+        reviewsService.createWinemakerReview(userId, winemakerId, { rating: 4 })
+      ).rejects.toMatchObject({ code: "ALREADY_REVIEWED", statusCode: 409 });
+    });
+
+    it("creates and returns the review when all checks pass", async () => {
+      vi.mocked(reviewsRepo.hasPurchasedFromWinemaker).mockResolvedValue(true);
+      vi.mocked(reviewsRepo.findUserReview).mockResolvedValue(undefined);
+      vi.mocked(reviewsRepo.insertReview).mockResolvedValue({ id: reviewId } as any);
+      vi.mocked(reviewsRepo.findReviewWithUser).mockResolvedValue({ id: reviewId } as any);
+
+      const result = await reviewsService.createWinemakerReview(userId, winemakerId, { rating: 4 });
+
+      expect(result.id).toBe(reviewId);
+      expect(reviewsRepo.insertReview).toHaveBeenCalledWith(db, userId, winemakerId, "winemaker", {
+        rating: 4,
       });
     });
   });

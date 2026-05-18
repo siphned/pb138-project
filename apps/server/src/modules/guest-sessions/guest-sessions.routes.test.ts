@@ -19,7 +19,6 @@ vi.mock("../auth", () => ({
   authPlugin: new (require("elysia").Elysia)({ name: "auth" }),
 }));
 
-import * as guestSessionsRepo from "./guest-sessions.repository";
 import { guestSessionsRoutes } from "./guest-sessions.routes";
 import { guestSessionsService } from "./guest-sessions.service";
 
@@ -46,7 +45,7 @@ describe("guest-sessions routes", () => {
     futureDate.setFullYear(futureDate.getFullYear() + 1);
     const mockSession = { createdAt: new Date(), expiresAt: futureDate, id: "test-id" };
 
-    vi.mocked(guestSessionsRepo.findById).mockResolvedValue(mockSession as any);
+    vi.mocked(guestSessionsService.validateSession).mockResolvedValue(mockSession as any);
 
     const response = await app.handle(new Request("http://localhost/guest-sessions/test-id"));
 

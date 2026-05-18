@@ -51,6 +51,20 @@ describe("shopsRepository", () => {
     });
   });
 
+  describe("findAll with filters", () => {
+    it("accepts q filter", async () => {
+      vi.mocked(db.query.shops.findMany).mockResolvedValue([]);
+      await shopsRepository.findAll(db, { q: "boutique" });
+      expect(db.query.shops.findMany).toHaveBeenCalled();
+    });
+
+    it("accepts ownerUserId filter", async () => {
+      vi.mocked(db.query.shops.findMany).mockResolvedValue([]);
+      await shopsRepository.findAll(db, { ownerUserId: "u1" });
+      expect(db.query.shops.findMany).toHaveBeenCalled();
+    });
+  });
+
   describe("createShop", () => {
     it("inserts shop and returns it", async () => {
       vi.mocked(mockDb.insert).mockReturnValue({

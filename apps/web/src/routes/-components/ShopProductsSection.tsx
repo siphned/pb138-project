@@ -3,9 +3,8 @@ import { HugeiconsIcon } from "@hugeicons/react";
 import { Link } from "@tanstack/react-router";
 import { ProductCard } from "@/components/catalog/ProductCard";
 import { Button } from "@/components/ui/button";
-import { useGetShopsByIdProducts } from "@/generated/hooks/useGetShopsByIdProducts";
+import { useGetProducts } from "@/generated/hooks/useGetProducts";
 
-// Shape returned by GET /shops/:id/products (no response schema in OpenAPI)
 type ShopProductRaw = {
   id: string;
   shopId?: string;
@@ -16,7 +15,6 @@ type ShopProductRaw = {
   isBundle?: boolean;
   createdAt?: string;
   updatedAt?: string | null;
-  // API may return either shape:
   productWines?: {
     wine: {
       id: string;
@@ -42,8 +40,8 @@ interface ShopProductsSectionProps {
 }
 
 export function ShopProductsSection({ shopId }: ShopProductsSectionProps) {
-  const { data, isLoading } = useGetShopsByIdProducts(shopId, { isBundle: "false" });
-  const products = data as ShopProductRaw[] | undefined;
+  const { data: rawData, isLoading } = useGetProducts({ isBundle: false, shopId });
+  const products = rawData?.data as ShopProductRaw[] | undefined;
 
   if (isLoading) {
     return (
