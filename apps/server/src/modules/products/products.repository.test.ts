@@ -140,7 +140,7 @@ describe("productsRepository", () => {
 
   describe("updateWineQuantity", () => {
     it("updates wine quantity in db", async () => {
-      await productsRepo.updateWineQuantity(db, "w1", 10 as any);
+      await productsRepo.updateWineQuantity(db, "w1", 10);
       expect(db.update).toHaveBeenCalledWith(wines);
     });
   });
@@ -251,6 +251,94 @@ describe("productsRepository", () => {
         .mockReturnValueOnce(countOuterChain as never);
 
       const result = await productsRepo.findAll(db, {}, { limit: 20, offset: 0 });
+
+      expect(result.rows).toEqual(mockRows);
+      expect(result.total).toBe(1);
+    });
+
+    function makeChains(mockRows: unknown[]) {
+      const mainChain = {
+        as: vi.fn().mockReturnThis(),
+        from: vi.fn().mockReturnThis(),
+        groupBy: vi.fn().mockReturnThis(),
+        having: vi.fn().mockReturnThis(),
+        innerJoin: vi.fn().mockReturnThis(),
+        leftJoin: vi.fn().mockReturnThis(),
+        limit: vi.fn().mockReturnThis(),
+        offset: vi.fn().mockResolvedValue(mockRows),
+        orderBy: vi.fn().mockReturnThis(),
+        where: vi.fn().mockReturnThis(),
+      };
+      const countSubqChain = {
+        as: vi.fn().mockReturnValue({ _subq: true }),
+        from: vi.fn().mockReturnThis(),
+        groupBy: vi.fn().mockReturnThis(),
+        having: vi.fn().mockReturnThis(),
+        innerJoin: vi.fn().mockReturnThis(),
+        leftJoin: vi.fn().mockReturnThis(),
+        where: vi.fn().mockReturnThis(),
+      };
+      const countOuterChain = {
+        from: vi.fn().mockResolvedValue([{ total: 1 }]),
+      };
+      vi.mocked(mockDb.select)
+        .mockReturnValueOnce(mainChain as never)
+        .mockReturnValueOnce(countSubqChain as never)
+        .mockReturnValueOnce(countOuterChain as never);
+      return mockRows;
+    }
+
+    it("accepts q filter without throwing", async () => {
+      const mockRows = [
+        {
+          avgRating: null,
+          id: "p1",
+          isBundle: false,
+          name: "Pinot",
+          price: "12.99",
+          quantity: 5,
+          reviewCount: 0,
+          shopId: "s1",
+          shopName: "Shop",
+        },
+      ];
+      makeChains(mockRows);
+
+      const result = await productsRepo.findAll(db, { q: "pinot" }, { limit: 20, offset: 0 });
+
+      expect(result.rows).toEqual(mockRows);
+      expect(result.total).toBe(1);
+    });
+
+    it("accepts shopId filter without throwing", async () => {
+      const mockRows: unknown[] = [];
+      makeChains(mockRows);
+
+      const result = await productsRepo.findAll(db, { shopId: "s1" }, { limit: 20, offset: 0 });
+
+      expect(result.rows).toEqual(mockRows);
+      expect(result.total).toBe(1);
+    });
+
+    it("accepts isBundle filter without throwing", async () => {
+      const mockRows: unknown[] = [];
+      makeChains(mockRows);
+
+      const result = await productsRepo.findAll(db, { isBundle: true }, { limit: 20, offset: 0 });
+
+      expect(result.rows).toEqual(mockRows);
+      expect(result.total).toBe(1);
+    });
+
+    it("accepts containsProductId filter without throwing", async () => {
+      const mockRows: unknown[] = [];
+      makeChains(mockRows);
+
+      const result = await productsRepo.findAll(
+        db,
+        { containsProductId: "p1" },
+        { limit: 20, offset: 0 }
+      );
 
       expect(result.rows).toEqual(mockRows);
       expect(result.total).toBe(1);

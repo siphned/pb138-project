@@ -1,49 +1,24 @@
-import { Elysia, status } from "elysia";
+import { Elysia, status, t } from "elysia";
 import { authPlugin } from "../auth";
 import {
   createCommentBody,
   createEventBody,
   eventParams,
+  invitationResponse,
   listEventsQuery,
   paginationQuery,
   updateEventBody,
 } from "./events.schema";
 import { eventsService } from "./events.service";
 
-const errorMessages: Record<string, [number, string]> = {
-  ALREADY_REGISTERED: [409, "Already registered for this event"],
-  CAPACITY_FULL: [409, "Event is at full capacity"],
-  CAPACITY_TOO_LOW: [409, "Capacity cannot be lower than current registration count"],
-  CONFLICT: [409, "Event cannot be edited in its current status"],
-  EVENT_NOT_AVAILABLE: [409, "Event is not available for this action"],
-  FORBIDDEN: [403, "Forbidden"],
-  INVALID_DATES: [422, "Invalid dates: start must be in future, end must be after start"],
-  NOT_FOUND: [404, "Not found"],
-};
-
-function handleError(e: unknown) {
-  if (e instanceof Error) {
-    const errorData = errorMessages[e.message];
-    if (errorData) {
-      const [code, message] = errorData;
-      return status(code, message);
-    }
-  }
-  throw e;
-}
-
 export const eventsRoutes = new Elysia()
   .use(authPlugin)
 
   .get(
     "/events",
-    async ({ query }) => {
-      try {
-        const { page, limit, ...filters } = query;
-        return await eventsService.listEvents(filters, { limit, page });
-      } catch (e) {
-        return handleError(e);
-      }
+    ({ query }) => {
+      const { page, limit, ...filters } = query;
+      return eventsService.listEvents(filters, { limit, page });
     },
     {
       detail: { summary: "List approved events", tags: ["events"] },
@@ -51,30 +26,14 @@ export const eventsRoutes = new Elysia()
     }
   )
 
-  .get(
-    "/events/:id",
-    async ({ params }) => {
-      try {
-        return await eventsService.getEvent(params.id);
-      } catch (e) {
-        return handleError(e);
-      }
-    },
-    {
-      detail: { summary: "Get event by ID", tags: ["events"] },
-      params: eventParams,
-    }
-  )
+  .get("/events/:id", ({ params }) => eventsService.getEvent(params.id), {
+    detail: { summary: "Get event by ID", tags: ["events"] },
+    params: eventParams,
+  })
 
   .post(
     "/events",
-    async ({ body, dbUser }) => {
-      try {
-        return status(201, await eventsService.createEvent(dbUser.id, body));
-      } catch (e) {
-        return handleError(e);
-      }
-    },
+    async ({ body, dbUser }) => status(201, await eventsService.createEvent(dbUser.id, body)),
     {
       body: createEventBody,
       detail: {
@@ -88,13 +47,7 @@ export const eventsRoutes = new Elysia()
 
   .patch(
     "/events/:id",
-    async ({ params, body, dbUser }) => {
-      try {
-        return await eventsService.updateEvent(params.id, dbUser.id, body);
-      } catch (e) {
-        return handleError(e);
-      }
-    },
+    ({ params, body, dbUser }) => eventsService.updateEvent(params.id, dbUser.id, body),
     {
       body: updateEventBody,
       detail: {
@@ -110,12 +63,8 @@ export const eventsRoutes = new Elysia()
   .delete(
     "/events/:id",
     async ({ params, dbUser }) => {
-      try {
-        await eventsService.deleteEvent(params.id, dbUser.id);
-        return status(204, null);
-      } catch (e) {
-        return handleError(e);
-      }
+      await eventsService.deleteEvent(params.id, dbUser.id);
+      return status(204, null);
     },
     {
       detail: {
@@ -130,13 +79,8 @@ export const eventsRoutes = new Elysia()
 
   .post(
     "/events/:id/register",
-    async ({ params, dbUser }) => {
-      try {
-        return status(201, await eventsService.registerForEvent(params.id, dbUser.id));
-      } catch (e) {
-        return handleError(e);
-      }
-    },
+    async ({ params, dbUser }) =>
+      status(201, await eventsService.registerForEvent(params.id, dbUser.id)),
     {
       detail: {
         security: [{ bearerAuth: [] }],
@@ -151,12 +95,8 @@ export const eventsRoutes = new Elysia()
   .delete(
     "/events/:id/register",
     async ({ params, dbUser }) => {
-      try {
-        await eventsService.unregisterFromEvent(params.id, dbUser.id);
-        return status(204, null);
-      } catch (e) {
-        return handleError(e);
-      }
+      await eventsService.unregisterFromEvent(params.id, dbUser.id);
+      return status(204, null);
     },
     {
       detail: {
@@ -171,16 +111,8 @@ export const eventsRoutes = new Elysia()
 
   .get(
     "/events/:id/comments",
-    async ({ params, query }) => {
-      try {
-        return await eventsService.listComments(params.id, {
-          limit: query.limit,
-          page: query.page,
-        });
-      } catch (e) {
-        return handleError(e);
-      }
-    },
+    ({ params, query }) =>
+      eventsService.listComments(params.id, { limit: query.limit, page: query.page }),
     {
       detail: { summary: "List event comments", tags: ["events"] },
       params: eventParams,
@@ -188,15 +120,35 @@ export const eventsRoutes = new Elysia()
     }
   )
 
-  .post(
-    "/events/:id/comments",
-    async ({ params, body, dbUser }) => {
+  .get(
+    "/events/:id/invitations",
+    async ({ params, dbUser }) => {
       try {
-        return status(201, await eventsService.addComment(params.id, dbUser.id, body.body));
-      } catch (e) {
-        return handleError(e);
+        return await eventsService.listInvitations(params.id, dbUser.id);
+      } catch (e: unknown) {
+        if (e instanceof Error) {
+          if (e.message === "NOT_FOUND") return status(404, "Not found");
+          if (e.message === "FORBIDDEN") return status(403, "Forbidden");
+        }
+        throw e;
       }
     },
+    {
+      detail: {
+        security: [{ bearerAuth: [] }],
+        summary: "List invitations for own event",
+        tags: ["events"],
+      },
+      params: eventParams,
+      requireCapability: "winemaker",
+      response: { 200: t.Array(invitationResponse), 403: t.String(), 404: t.String() },
+    }
+  )
+
+  .post(
+    "/events/:id/comments",
+    async ({ params, body, dbUser }) =>
+      status(201, await eventsService.addComment(params.id, dbUser.id, body.body)),
     {
       body: createCommentBody,
       detail: {

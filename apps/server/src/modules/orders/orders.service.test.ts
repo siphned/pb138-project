@@ -1,8 +1,14 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { cartsService } from "../carts/carts.service";
 import * as productsRepo from "../products/products.repository";
+import * as shopsRepo from "../shops/shops.repository";
 import * as ordersRepo from "./orders.repository";
 import { ordersService } from "./orders.service";
+
+vi.mock("../shops/shops.repository", async (importOriginal) => {
+  const actual = await importOriginal<typeof import("../shops/shops.repository")>();
+  return { ...actual, findAllByOwnerUserId: vi.fn(), findById: vi.fn() };
+});
 
 vi.mock("./orders.repository", async (importOriginal) => {
   const actual = await importOriginal<typeof import("./orders.repository")>();
@@ -11,6 +17,8 @@ vi.mock("./orders.repository", async (importOriginal) => {
     createOrder: vi.fn(),
     createOrderItems: vi.fn(),
     findById: vi.fn(),
+    listForShop: vi.fn(),
+    listForUser: vi.fn(),
     updateStatus: vi.fn(),
   };
 });
@@ -37,6 +45,22 @@ vi.mock("../carts/carts.service", () => ({
     clearCartBySession: vi.fn(),
     getCartForSession: vi.fn(),
     getCartForUser: vi.fn(),
+  },
+}));
+
+vi.mock("../email/email.service", () => ({
+  emailService: {
+    sendOrderConfirmation: vi.fn().mockResolvedValue(undefined),
+    sendOrderStatusUpdate: vi.fn().mockResolvedValue(undefined),
+  },
+}));
+
+vi.mock("../../utils/logger", () => ({
+  logger: {
+    debug: vi.fn(),
+    error: vi.fn(),
+    info: vi.fn(),
+    warn: vi.fn(),
   },
 }));
 
@@ -122,18 +146,112 @@ describe("ordersService", () => {
     });
   });
 
+  describe("listForUser", () => {
+    it("returns orders for the authenticated user", async () => {
+      const mockOrders = [{ id: "o1" }, { id: "o2" }];
+      vi.mocked(ordersRepo.listForUser).mockResolvedValue(mockOrders as any);
+
+      const result = await ordersService.listForUser("u1");
+
+      expect(result).toBe(mockOrders);
+      expect(ordersRepo.listForUser).toHaveBeenCalledWith(expect.anything(), "u1");
+    });
+  });
+
+  describe("listForShop", () => {
+    it("returns orders for the shop when requester is admin (bypasses ownership)", async () => {
+      vi.mocked(ordersRepo.listForShop).mockResolvedValue([{ order: { id: "o1" } }] as any);
+
+      const result = await ordersService.listForShop("shop1", "admin1", true);
+
+      expect(result).toEqual([{ id: "o1" }]);
+    });
+
+    it("returns orders when shop owner owns the shop", async () => {
+      vi.mocked(shopsRepo.findById).mockResolvedValue({ id: "shop1", ownerUserId: "u1" } as any);
+      vi.mocked(ordersRepo.listForShop).mockResolvedValue([{ order: { id: "o1" } }] as any);
+
+      const result = await ordersService.listForShop("shop1", "u1", false);
+
+      expect(result).toEqual([{ id: "o1" }]);
+    });
+
+    it("throws FORBIDDEN when requester does not own the shop", async () => {
+      vi.mocked(shopsRepo.findById).mockResolvedValue({
+        id: "shop1",
+        ownerUserId: "other-user",
+      } as any);
+
+      await expect(ordersService.listForShop("shop1", "u1", false)).rejects.toThrow("FORBIDDEN");
+    });
+
+    it("throws NOT_FOUND when the shop does not exist", async () => {
+      vi.mocked(shopsRepo.findById).mockResolvedValue(undefined);
+
+      await expect(ordersService.listForShop("nonexistent", "u1", false)).rejects.toThrow(
+        "NOT_FOUND"
+      );
+    });
+  });
+
   describe("updateStatus", () => {
-    it("updates status of an existing order", async () => {
-      vi.mocked(ordersRepo.findById).mockResolvedValue({ id: "o1" } as any);
+    it("updates status of an existing order as admin (bypasses ownership)", async () => {
+      vi.mocked(ordersRepo.findById).mockResolvedValue({
+        id: "o1",
+        items: [{ shopId: "shop-other" }],
+        status: "confirmed",
+      } as any);
       vi.mocked(ordersRepo.updateStatus).mockResolvedValue({
         id: "o1",
         status: "shipped",
       } as any);
 
-      const result = await ordersService.updateStatus("o1", "u1", "shipped");
+      const result = await ordersService.updateStatus("o1", "admin1", "shipped", true);
 
       expect(result.status).toBe("shipped");
       expect(ordersRepo.updateStatus).toHaveBeenCalledWith(expect.anything(), "o1", "shipped");
+    });
+
+    it("throws INVALID_TRANSITION when transition is not in the allowed set", async () => {
+      vi.mocked(ordersRepo.findById).mockResolvedValue({
+        id: "o1",
+        items: [{ shopId: "shop-mine" }],
+        status: "pending",
+      } as any);
+
+      await expect(ordersService.updateStatus("o1", "u1", "delivered", true)).rejects.toThrow(
+        "INVALID_TRANSITION"
+      );
+    });
+
+    it("throws FORBIDDEN when shop owner has no shop matching the order items", async () => {
+      vi.mocked(ordersRepo.findById).mockResolvedValue({
+        id: "o1",
+        items: [{ shopId: "shop-other" }],
+        status: "pending",
+      } as any);
+      vi.mocked(shopsRepo.findAllByOwnerUserId).mockResolvedValue([{ id: "shop-mine" }] as any);
+
+      await expect(ordersService.updateStatus("o1", "u1", "confirmed", false)).rejects.toThrow(
+        "FORBIDDEN"
+      );
+    });
+
+    it("updates status when shop owner owns a shop matching an order item", async () => {
+      vi.mocked(ordersRepo.findById).mockResolvedValue({
+        id: "o1",
+        items: [{ shopId: "shop-mine" }],
+        status: "pending",
+      } as any);
+      vi.mocked(shopsRepo.findAllByOwnerUserId).mockResolvedValue([{ id: "shop-mine" }] as any);
+      vi.mocked(ordersRepo.updateStatus).mockResolvedValue({
+        id: "o1",
+        status: "confirmed",
+      } as any);
+
+      const result = await ordersService.updateStatus("o1", "u1", "confirmed", false);
+
+      expect(result.status).toBe("confirmed");
     });
   });
 });

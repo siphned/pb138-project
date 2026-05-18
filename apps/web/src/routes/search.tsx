@@ -76,8 +76,8 @@ function SearchPage() {
     color: search.color,
     maxPrice: search.maxPrice,
     minPrice: search.minPrice,
+    q: q || undefined,
     region: search.region,
-    search: q || undefined,
   });
 
   // Note: Winemakers and Shops don't support query params in current BE
@@ -135,7 +135,7 @@ function SearchPage() {
           count={productCount}
           heading="Products"
           viewAllHref="/products"
-          viewAllSearch={{ ...search, search: q || undefined }}
+          viewAllSearch={{ ...search, q: q || undefined }}
         >
           {products.slice(0, 3).map((product) => (
             <ProductCard key={product.id} product={product} />
