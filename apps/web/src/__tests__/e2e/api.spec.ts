@@ -15,26 +15,16 @@ const API_BASE_URL = "http://localhost:3000";
  */
 
 test.describe("API Integration Tests", () => {
-  let _testToken: string;
-  let _testAdminToken: string;
-  let _testWineId: string;
-  let _testProductId: string;
-
-  test.beforeAll(async () => {
-    /**
-     * In a real scenario, we would:
-     * 1. Create test users via Clerk API
-     * 2. Get JWT tokens for them
-     *
-     * For now, we'll use environment tokens or generate test data
-     * This assumes the test database is seeded with sample data
-     */
-
-    // Get a valid Clerk token from environment or create a test user
-    // NOTE: This requires CLERK_SECRET_KEY and proper JWT generation
-    _testToken = process.env.TEST_USER_TOKEN || "test-token-placeholder";
-    _testAdminToken = process.env.TEST_ADMIN_TOKEN || "test-admin-token-placeholder";
-  });
+  /**
+   * TODO: Setup test fixtures
+   * In a real scenario, we would:
+   * 1. Create test users via Clerk API
+   * 2. Get JWT tokens for them
+   * 3. Use them in tests below
+   *
+   * For now, we'll use environment tokens or generate test data
+   * This assumes the test database is seeded with sample data
+   */
 
   test.describe("GET /wines - List wines with filters", () => {
     test("should return list of wines with valid response structure", async ({ request }) => {
@@ -47,7 +37,6 @@ test.describe("API Integration Tests", () => {
 
       if (wines.length > 0) {
         const wine = wines[0];
-        _testWineId = wine.id;
 
         // Validate wine response schema
         expect(wine).toHaveProperty("id");
@@ -171,7 +160,6 @@ test.describe("API Integration Tests", () => {
       expect(wines.length).toBeGreaterThan(0);
 
       const wineId = wines[0].id;
-      _testWineId = wineId;
 
       const response = await request.get(`${API_BASE_URL}/wines/${wineId}`);
       expect(response.status()).toBe(200);
@@ -270,9 +258,6 @@ test.describe("API Integration Tests", () => {
         return;
       }
 
-      const wineId = wines[0].id;
-      _testWineId = wineId;
-
       // Get products for a shop - need to find a product
       const productsResponse = await request.get(`${API_BASE_URL}/products`);
       expect(productsResponse.status()).toBe(200);
@@ -284,7 +269,6 @@ test.describe("API Integration Tests", () => {
       }
 
       const productId = products[0].id;
-      _testProductId = productId;
 
       // Add to cart with guest session
       const response = await request.post(`${API_BASE_URL}/carts/items`, {
