@@ -46,12 +46,12 @@ export function ShopManageMenu({ shop }: ShopManageMenuProps) {
           <DropdownMenuSeparator />
 
           <DropdownMenuGroup>
-            <DropdownMenuItem render={<Link params={{ id }} to="/shops/$id/edit" />}>
+            <DropdownMenuItem render={<Link params={{ id: id }} to="/shops/$id/edit" />}>
               <HugeiconsIcon className="mr-2 h-4 w-4" icon={Edit01Icon} />
               <span>Edit shop details</span>
             </DropdownMenuItem>
 
-            <DropdownMenuItem render={<Link params={{ id }} to="/shops/$id/images" />}>
+            <DropdownMenuItem render={<Link params={{ id: id }} to="/shops/$id/images" />}>
               <HugeiconsIcon className="mr-2 h-4 w-4" icon={Image01Icon} />
               <span>Manage images</span>
             </DropdownMenuItem>

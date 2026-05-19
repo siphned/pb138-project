@@ -18,9 +18,9 @@ export function Section({ heading, actions, className, children, render, ...prop
       {
         children: (
           <>
-            {(heading || actions) && (
+            {(heading != null || actions) && (
               <div className="flex items-center justify-between gap-4">
-                {heading && <SectionLabel>{heading}</SectionLabel>}
+                {heading ? <SectionLabel>{heading}</SectionLabel> : null}
                 {actions}
               </div>
             )}

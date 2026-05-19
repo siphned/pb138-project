@@ -39,8 +39,8 @@ const makeFile = (type = "image/jpeg") => new File(["content"], "test.jpg", { ty
 
 beforeEach(() => {
   vi.clearAllMocks();
-  // `Bun` is a non-configurable global in the Bun runtime, so `vi.stubGlobal`
-  // throws. Spy on `Bun.write` directly instead.
+  // `Bun` is only available in Bun runtime, stub it for vitest (Node.js)
+  globalThis.Bun ??= { write: vi.fn().mockResolvedValue(0) } as unknown as typeof Bun;
   vi.spyOn(Bun, "write").mockResolvedValue(0);
 });
 
