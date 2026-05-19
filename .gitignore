@@ -75,9 +75,24 @@ docs/figma/
 .claude/worktrees/
 conductor/
 
-# local image uploads
+# local image uploads (subdirs and user-uploaded files ignored, seed assets temporarly committed)
 apps/server/uploads/*
 !apps/server/uploads/.gitkeep
+!apps/server/uploads/wine/
+!apps/server/uploads/winemaker/
+!apps/server/uploads/shop/
+!apps/server/uploads/event/
+!apps/server/uploads/user/
+apps/server/uploads/wine/*
+apps/server/uploads/winemaker/*
+apps/server/uploads/shop/*
+apps/server/uploads/event/*
+apps/server/uploads/user/*
+!apps/server/uploads/wine/*.webp
+!apps/server/uploads/winemaker/*.webp
+!apps/server/uploads/shop/*.webp
+!apps/server/uploads/event/*.webp
+!apps/server/uploads/user/*.webp
 
 # UI Audit (local/temporary)
 docs/UI_AUDIT_hooks.txt
