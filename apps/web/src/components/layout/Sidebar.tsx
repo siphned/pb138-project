@@ -1,6 +1,7 @@
 import { Show, useAuth, useClerk, useUser as useClerkUser } from "@clerk/react";
 import { Link, useNavigate } from "@tanstack/react-router";
 import {
+  BarChart3,
   Calendar,
   LogOut,
   Menu,
@@ -9,11 +10,15 @@ import {
   Search,
   Settings,
   ShoppingCart,
+  Store,
   User as UserIcon,
+  Users,
   Wine,
 } from "lucide-react";
 import { useState } from "react";
 import { NavItem } from "@/components/primitives/nav-item";
+import { useGetShopsMe } from "@/generated/hooks/useGetShopsMe";
+import { useGetWinemakersMe } from "@/generated/hooks/useGetWinemakersMe";
 import {
   Accordion,
   AccordionContent,
@@ -44,6 +49,19 @@ export function Sidebar({ userRoles = [Role.customer], activeRole, onRoleChange 
   const [accordionState, setAccordionState] = useState<string[]>([]);
   const [open, setOpen] = useState(false);
   const closeSheet = () => setOpen(false);
+
+  // Fetch the user's winemaker / shop profile so "My Wines" / "My Bundles" /
+  // "My Events" links can carry the real ids instead of a magic `"me"` string.
+  // Each hook is gated by the active role so we don't 404 non-winemakers etc.
+  const winemakerProfile = useGetWinemakersMe({
+    query: { enabled: isSignedIn === true && currentActiveRole === Role.winemaker },
+  });
+  const shopOwnerProfile = useGetShopsMe({
+    query: { enabled: isSignedIn === true && currentActiveRole === Role.shopOwner },
+  });
+  const winemakerId = winemakerProfile.data?.id;
+  const winemakerName = winemakerProfile.data?.name;
+  const firstShopId = shopOwnerProfile.data?.[0]?.id;
 
   const displayUserName = isSignedIn ? clerkUser?.fullName || "User" : "Guest";
   const fullName = user ? `${user.fname || ""} ${user.lname || ""}`.trim() : "Guest";
@@ -169,46 +187,38 @@ export function Sidebar({ userRoles = [Role.customer], activeRole, onRoleChange 
             </NavItem>
 
             <NavItem onClick={closeSheet} render={<Link to="/explore" />} variant="active">
-              <Wine className="h-4 w-4" /> Explore Wines
+              <Wine className="h-4 w-4" /> Wines
             </NavItem>
 
-            <NavItem
-              onClick={closeSheet}
-              render={<Link search={{ isBundle: true }} to="/products" />}
-              variant="active"
-            >
-              <Package className="h-4 w-4" /> Bundles
+            <NavItem onClick={closeSheet} render={<Link to="/products" />} variant="active">
+              <Package className="h-4 w-4" /> Products
+            </NavItem>
+
+            <NavItem onClick={closeSheet} render={<Link to="/winemakers" />} variant="active">
+              <Users className="h-4 w-4" /> Winemakers
             </NavItem>
 
             <NavItem onClick={closeSheet} render={<Link to="/events" />} variant="active">
               <Calendar className="h-4 w-4" /> Events
             </NavItem>
 
-            <Show when="signed-in">
-              {currentActiveRole === Role.customer && (
-                <NavItem onClick={closeSheet} render={<Link to="/orders" />} variant="active">
-                  <Package className="h-4 w-4" /> Order History
-                </NavItem>
-              )}
+            <NavItem onClick={closeSheet} render={<Link to="/shops" />} variant="active">
+              <Store className="h-4 w-4" /> Shops
+            </NavItem>
 
-              {currentActiveRole !== Role.customer && (
-                <>
-                  <NavItem
-                    onClick={closeSheet}
-                    render={<Link search={{ winemakerId: "me" }} to="/explore" />}
-                    variant="active"
-                  >
-                    <Wine className="h-4 w-4" /> My Wines
-                  </NavItem>
-                  <NavItem
-                    onClick={closeSheet}
-                    render={<Link search={{ isBundle: true }} to="/products" />}
-                    variant="active"
-                  >
-                    <Package className="h-4 w-4" /> My Bundles
-                  </NavItem>
-                </>
-              )}
+            <Show when="signed-in">
+              <RoleNavItems
+                closeSheet={closeSheet}
+                firstShopId={firstShopId}
+                role={currentActiveRole}
+                userId={user?.id}
+                winemakerId={winemakerId}
+                winemakerName={winemakerName}
+              />
+
+              <NavItem onClick={closeSheet} render={<Link to="/stats" />} variant="active">
+                <BarChart3 className="h-4 w-4" /> Statistics
+              </NavItem>
             </Show>
 
             <Show when="signed-in">
@@ -244,4 +254,90 @@ export function Sidebar({ userRoles = [Role.customer], activeRole, onRoleChange 
       </SheetContent>
     </Sheet>
   );
+}
+
+interface RoleNavItemsProps {
+  role: Role;
+  closeSheet: () => void;
+  userId?: string;
+  winemakerId?: string;
+  winemakerName?: string;
+  firstShopId?: string;
+}
+
+/**
+ * Role-specific "My X" sidebar entries. Extracted from `<Sidebar>` to keep its
+ * cognitive complexity in check.
+ *
+ *  - Customer: Order History, My Events
+ *  - Winemaker: My Wines (filtered by winemakerId once loaded), My Events
+ *    (filtered by winemakerName)
+ *  - Shop Owner: My Shops (filtered by ownerUserId), My Products (filtered by
+ *    first shop id once loaded)
+ *  - Admin: nothing here (admin operates via dedicated admin routes)
+ */
+function RoleNavItems({
+  role,
+  closeSheet,
+  userId,
+  winemakerId,
+  winemakerName,
+  firstShopId,
+}: RoleNavItemsProps) {
+  if (role === Role.customer) {
+    return (
+      <>
+        <NavItem onClick={closeSheet} render={<Link to="/orders" />} variant="active">
+          <Package className="h-4 w-4" /> Order History
+        </NavItem>
+        <NavItem onClick={closeSheet} render={<Link to="/events" />} variant="active">
+          <Calendar className="h-4 w-4" /> My Events
+        </NavItem>
+      </>
+    );
+  }
+
+  if (role === Role.winemaker) {
+    return (
+      <>
+        <NavItem
+          onClick={closeSheet}
+          render={<Link search={winemakerId ? { winemakerId } : undefined} to="/explore" />}
+          variant="active"
+        >
+          <Wine className="h-4 w-4" /> My Wines
+        </NavItem>
+        <NavItem
+          onClick={closeSheet}
+          render={<Link search={winemakerName ? { winemakerName } : undefined} to="/events" />}
+          variant="active"
+        >
+          <Calendar className="h-4 w-4" /> My Events
+        </NavItem>
+      </>
+    );
+  }
+
+  if (role === Role.shopOwner) {
+    return (
+      <>
+        <NavItem
+          onClick={closeSheet}
+          render={<Link search={userId ? { ownerUserId: userId } : undefined} to="/shops" />}
+          variant="active"
+        >
+          <Store className="h-4 w-4" /> My Shops
+        </NavItem>
+        <NavItem
+          onClick={closeSheet}
+          render={<Link search={firstShopId ? { shopId: firstShopId } : undefined} to="/products" />}
+          variant="active"
+        >
+          <Package className="h-4 w-4" /> My Products
+        </NavItem>
+      </>
+    );
+  }
+
+  return null;
 }
