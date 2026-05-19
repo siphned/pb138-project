@@ -7,20 +7,30 @@ import { EventImage } from "@/components/catalog/EventImage";
 import { Button } from "@/components/ui/button";
 import { usePostEventsByIdRegister } from "@/generated/hooks/usePostEventsByIdRegister";
 
+interface EventLike {
+  id: string;
+  /** Preferred BE field. `title` is a legacy alias from earlier stubs. */
+  name?: string;
+  title?: string;
+  description?: string | null;
+  /** BE returns `startTime` / `endTime` as ISO strings; legacy callers pass `startDate` / `endDate`. */
+  startTime?: string | Date;
+  endTime?: string | Date;
+  startDate?: string | Date;
+  endDate?: string | Date;
+  /** BE relation; legacy callers may flatten to `location`. */
+  address?: { city?: string; country?: string; street?: string; houseNumber?: string } | null;
+  location?: string;
+  /** BE relation; legacy callers may flatten to `winemakerName` + `winemakerId`. */
+  winemaker?: { id?: string; name?: string } | null;
+  winemakerName?: string;
+  winemakerId?: string;
+  attendees?: number;
+  capacity?: number;
+}
+
 interface EventCardProps {
-  event: {
-    id: string;
-    title?: string;
-    name?: string;
-    description?: string | null;
-    startDate?: string | Date;
-    endDate?: string | Date;
-    location?: string;
-    winemakerName?: string;
-    winemakerId?: string;
-    attendees?: number;
-    capacity?: number;
-  };
+  event: EventLike;
 }
 
 function is409(error: unknown): boolean {
@@ -29,29 +39,44 @@ function is409(error: unknown): boolean {
   return maybe.response?.status === 409 || maybe.status === 409;
 }
 
+function formatLocation(event: EventLike): string | undefined {
+  if (event.location) return event.location;
+  const a = event.address;
+  if (!a) return undefined;
+  return [a.city, a.country].filter(Boolean).join(", ") || undefined;
+}
+
+function renderCapacityLabel(attendees?: number, capacity?: number): string | null {
+  if (attendees !== undefined && capacity !== undefined) return `${attendees}/${capacity}`;
+  if (attendees !== undefined) return `${attendees}`;
+  if (capacity !== undefined) return `max ${capacity}`;
+  return null;
+}
+
 export function EventCard({ event }: EventCardProps) {
-  const title = event.title || event.name || "Untitled Event";
-  const startDate = event.startDate ? new Date(event.startDate) : null;
+  const title = event.name || event.title || "Untitled Event";
+  const start = event.startTime ?? event.startDate;
+  const startDate = start ? new Date(start) : null;
   const formattedDate = startDate?.toLocaleDateString("en-US", {
     day: "numeric",
     month: "short",
     year: "numeric",
   });
 
+  const winemakerName = event.winemaker?.name || event.winemakerName;
+  const locationLabel = formatLocation(event);
+  const capacityLabel = renderCapacityLabel(event.attendees, event.capacity);
+
   const mutation = usePostEventsByIdRegister();
   const alreadyRegistered = mutation.isSuccess || is409(mutation.error);
 
   const handleRegister = (e: MouseEvent<HTMLButtonElement>) => {
-    // Stop the stretched title-link from navigating to the detail page.
     e.preventDefault();
     e.stopPropagation();
     if (mutation.isPending) return;
     mutation.mutate({ id: event.id });
   };
 
-  // When the user is already registered, the CTA navigates to the event detail
-  // instead of being an inert disabled control (so the button area isn't a
-  // dead zone covering the stretched title link).
   const registeredCta = (
     <Button
       className="relative z-10 mt-1 w-full"
@@ -84,33 +109,31 @@ export function EventCard({ event }: EventCardProps) {
         </Link>
       }
     >
-      {(formattedDate || event.attendees !== undefined) && (
+      {(formattedDate || capacityLabel) && (
         <div className="flex flex-wrap items-center justify-center gap-2">
           {formattedDate && (
             <span className="rounded-md bg-primary/10 px-2 py-0.5 text-[10px] font-semibold tracking-wide text-primary">
               {formattedDate}
             </span>
           )}
-          {event.attendees !== undefined && (
+          {capacityLabel && (
             <span className="inline-flex items-center gap-1 rounded-md bg-muted px-2 py-0.5 text-[10px] font-semibold tracking-wide text-muted-foreground">
               <HugeiconsIcon className="h-3 w-3" icon={UserGroupIcon} />
-              {event.capacity !== undefined
-                ? `${event.attendees}/${event.capacity}`
-                : `${event.attendees}`}
+              {capacityLabel}
             </span>
           )}
         </div>
       )}
 
-      {event.location && (
+      {locationLabel && (
         <div className="flex items-center justify-center gap-1.5 text-xs text-muted-foreground">
           <HugeiconsIcon className="h-3 w-3" icon={Location01Icon} />
-          <span className="line-clamp-1">{event.location}</span>
+          <span className="line-clamp-1">{locationLabel}</span>
         </div>
       )}
 
-      {event.winemakerName && (
-        <p className="text-xs text-muted-foreground line-clamp-1">By {event.winemakerName}</p>
+      {winemakerName && (
+        <p className="text-xs text-muted-foreground line-clamp-1">By {winemakerName}</p>
       )}
 
       {alreadyRegistered ? registeredCta : registerCta}

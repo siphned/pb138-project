@@ -189,14 +189,7 @@ function SearchPage() {
           viewAllSearch={{ q: q || undefined }}
         >
           {eventsList.slice(0, 3).map((event) => (
-            <EventCard
-              event={{
-                ...event,
-                endDate: event.endTime,
-                startDate: event.startTime,
-              }}
-              key={event.id}
-            />
+            <EventCard event={event} key={event.id} />
           ))}
         </SearchSection>
       </>
