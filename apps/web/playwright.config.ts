@@ -16,6 +16,7 @@ const config = defineConfig({
   reporter: "html",
   retries: 0,
   testDir: "./src/__tests__/e2e",
+  workers: process.env.CI ? 1 : 2,
   use: {
     baseURL: "http://localhost:5173",
     trace: "on-first-retry",
