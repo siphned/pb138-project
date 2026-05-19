@@ -20,7 +20,7 @@ const config = defineConfig({
     baseURL: "http://localhost:5173",
     trace: "on-first-retry",
   },
-  webServer: [
+  webServer: process.env.SHARD ? undefined : [
     {
       command: `bun run --cwd "${root}" dev`,
       reuseExistingServer: true,
