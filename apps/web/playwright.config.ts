@@ -23,8 +23,8 @@ const config = defineConfig({
   webServer: [
     {
       command: `bun run --cwd "${root}" dev`,
-      reuseExistingServer: !process.env.CI,
-      timeout: 60_000,
+      reuseExistingServer: !!process.env.CI,
+      timeout: 120_000,
       url: "http://localhost:5173",
     },
   ],

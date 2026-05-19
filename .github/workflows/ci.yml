@@ -190,6 +190,24 @@ jobs:
     strategy:
       matrix:
         shard: [1, 2, 3]
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: winemarket
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+        ports:
+          - 5432:5432
+    env:
+      DATABASE_URL: postgresql://postgres:postgres@localhost:5432/winemarket
+      FRONTEND_URL: http://localhost:5173
+      CLERK_JWT_KEY: ${{ secrets.CLERK_JWT_KEY }}
     steps:
       - uses: actions/checkout@v4
       - name: Setup Bun
@@ -212,6 +230,10 @@ jobs:
         with:
           name: generated-code
           path: apps/web/src/generated/
+      - name: Migrate Database
+        run: |
+          cd apps/server
+          bunx drizzle-kit push
       - name: Install Playwright
         run: bunx playwright install --with-deps
       - name: Run E2E tests (shard ${{ matrix.shard }}/3)
