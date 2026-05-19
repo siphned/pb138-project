@@ -1,10 +1,10 @@
-import { Location01Icon } from "@hugeicons/core-free-icons";
+import { Location01Icon, UserGroupIcon } from "@hugeicons/core-free-icons";
 import { HugeiconsIcon } from "@hugeicons/react";
 import { Link } from "@tanstack/react-router";
 import type { MouseEvent } from "react";
+import { CatalogCard, catalogCardLinkClass } from "@/components/catalog/CatalogCard";
 import { EventImage } from "@/components/catalog/EventImage";
 import { Button } from "@/components/ui/button";
-import { Card } from "@/components/ui/card";
 import { usePostEventsByIdRegister } from "@/generated/hooks/usePostEventsByIdRegister";
 
 interface EventCardProps {
@@ -41,61 +41,73 @@ export function EventCard({ event }: EventCardProps) {
   const alreadyRegistered = mutation.isSuccess || is409(mutation.error);
 
   const handleRegister = (e: MouseEvent<HTMLButtonElement>) => {
-    // Don't trigger the stretched-link navigation to event detail.
+    // Stop the stretched title-link from navigating to the detail page.
     e.preventDefault();
     e.stopPropagation();
-    if (alreadyRegistered || mutation.isPending) return;
+    if (mutation.isPending) return;
     mutation.mutate({ id: event.id });
   };
 
-  let buttonLabel = "Register for event";
-  if (alreadyRegistered) buttonLabel = "Already registered";
-  else if (mutation.isPending) buttonLabel = "Registering...";
+  // When the user is already registered, the CTA navigates to the event detail
+  // instead of being an inert disabled control (so the button area isn't a
+  // dead zone covering the stretched title link).
+  const registeredCta = (
+    <Button
+      className="relative z-10 mt-1 w-full"
+      render={<Link params={{ id: event.id }} to="/events/$id" />}
+      size="sm"
+      variant="secondary"
+    >
+      Already registered — view details
+    </Button>
+  );
+
+  const registerCta = (
+    <Button
+      className="relative z-10 mt-1 w-full"
+      disabled={mutation.isPending}
+      onClick={handleRegister}
+      size="sm"
+      type="button"
+    >
+      {mutation.isPending ? "Registering..." : "Register for event"}
+    </Button>
+  );
 
   return (
-    <Card className="group relative" variant="polaroid">
-      <div className="aspect-3/4 w-full overflow-hidden rounded-lg bg-muted shadow-xs">
-        <EventImage alt={title} eventId={event.id} fallbackText={title} />
-      </div>
+    <CatalogCard
+      imageSlot={<EventImage alt={title} eventId={event.id} fallbackText={title} />}
+      titleLink={
+        <Link className={catalogCardLinkClass} params={{ id: event.id }} to="/events/$id">
+          {title}
+        </Link>
+      }
+    >
+      {formattedDate && (
+        <span className="inline-block rounded-md bg-primary/10 px-2 py-0.5 text-[10px] font-semibold tracking-wide text-primary">
+          {formattedDate}
+        </span>
+      )}
 
-      <div className="pt-4 text-center space-y-2">
-        <h3 className="font-heading text-base font-bold leading-tight line-clamp-2">
-          <Link
-            className="stretched-link transition-colors hover:text-primary focus:outline-none"
-            params={{ id: event.id }}
-            to="/events/$id"
-          >
-            {title}
-          </Link>
-        </h3>
+      {event.location && (
+        <div className="flex items-center justify-center gap-1.5 text-xs text-muted-foreground">
+          <HugeiconsIcon className="h-3 w-3" icon={Location01Icon} />
+          <span className="line-clamp-1">{event.location}</span>
+        </div>
+      )}
 
-        {formattedDate && (
-          <span className="inline-block rounded-md bg-primary/10 px-2 py-0.5 text-[10px] font-semibold tracking-wide text-primary">
-            {formattedDate}
-          </span>
-        )}
+      {event.winemakerName && (
+        <p className="text-xs text-muted-foreground line-clamp-1">By {event.winemakerName}</p>
+      )}
 
-        {event.location && (
-          <div className="flex items-center justify-center gap-1.5 text-xs text-muted-foreground">
-            <HugeiconsIcon className="h-3 w-3" icon={Location01Icon} />
-            <span className="line-clamp-1">{event.location}</span>
-          </div>
-        )}
+      {event.attendees !== undefined && (
+        <div className="flex items-center justify-center gap-1.5 text-xs text-muted-foreground">
+          <HugeiconsIcon className="h-3 w-3" icon={UserGroupIcon} />
+          <span>{event.attendees} attending</span>
+        </div>
+      )}
 
-        {event.winemakerName && (
-          <p className="text-xs text-muted-foreground line-clamp-1">By {event.winemakerName}</p>
-        )}
-
-        <Button
-          className="relative z-10 mt-3 w-full"
-          disabled={alreadyRegistered || mutation.isPending}
-          onClick={handleRegister}
-          size="sm"
-          type="button"
-        >
-          {buttonLabel}
-        </Button>
-      </div>
-    </Card>
+      {alreadyRegistered ? registeredCta : registerCta}
+    </CatalogCard>
   );
 }
