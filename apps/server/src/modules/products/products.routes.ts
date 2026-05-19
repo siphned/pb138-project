@@ -36,6 +36,23 @@ export const productsRoutes = new Elysia({ prefix: "/products" })
 export const shopProductsRoutes = new Elysia({ prefix: "/shops/:id" })
   .use(authPlugin)
 
+  .get(
+    "/products",
+    ({ params, query }) => productsService.listProducts(params.id, query.isBundle === "true"),
+    {
+      detail: {
+        description: "Returns all products belonging to a specific shop.",
+        summary: "List shop products",
+        tags: ["products"],
+      },
+      params: t.Object({ id: t.String() }),
+      query: t.Object({
+        isBundle: t.Optional(t.Union([t.Literal("true"), t.Literal("false")])),
+      }),
+      response: { 200: t.Array(t.Any()), 404: errorResponse },
+    }
+  )
+
   .post(
     "/products",
     async ({ params, dbUser, body }) =>

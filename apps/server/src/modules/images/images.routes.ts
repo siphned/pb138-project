@@ -5,7 +5,13 @@ import { errorResponse } from "../../utils/error-plugin";
 import type { AppRole } from "../auth";
 import { authPlugin } from "../auth";
 import type { EntityType } from "./images.repository";
-import { imageResponse, uploadImageBody, VALID_ENTITY_TYPES } from "./images.schema";
+import * as imagesRepo from "./images.repository";
+import {
+  entityTypeSchema,
+  imageResponse,
+  uploadImageBody,
+  VALID_ENTITY_TYPES,
+} from "./images.schema";
 import { imagesService } from "./images.service";
 
 const UPLOADS_DIR = fileURLToPath(new URL("../../../uploads", import.meta.url));
@@ -111,7 +117,7 @@ export const imagesRoutes = new Elysia()
     },
     {
       detail: { summary: "Serve uploaded image file", tags: ["images"] },
-      params: t.Object({ entityType: t.String(), filename: t.String() }),
+      params: t.Object({ entityType: entityTypeSchema, filename: t.String() }),
     }
   )
   .use(buildImageRoutes("wines", "wine"))
