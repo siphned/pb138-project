@@ -26,6 +26,7 @@ export default defineConfig({
         target: "http://localhost:3000",
       },
       "/profile": "http://localhost:3000",
+      "/uploads": "http://localhost:3000",
     },
   },
 });
