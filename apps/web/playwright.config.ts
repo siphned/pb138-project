@@ -22,7 +22,13 @@ const config = defineConfig({
   },
   webServer: process.env.SHARD ? undefined : [
     {
-      command: `bun run --cwd "${root}" dev`,
+      command: `bun run --cwd "${root}" dev:server`,
+      reuseExistingServer: true,
+      timeout: 120_000,
+      url: "http://localhost:3000/swagger/json",
+    },
+    {
+      command: `bun run --cwd "${root}" dev:web`,
       reuseExistingServer: true,
       timeout: 120_000,
       url: "http://localhost:5173",

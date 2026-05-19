@@ -57,7 +57,7 @@
     "generate": "kubb",
     "preview": "vite preview",
     "test": "vitest run",
-    "test:e2e": "concurrently --kill-others-on-exit 'bun run --cwd ../.. dev' 'sleep 5 && concurrently \"bun run test:e2e:shard:1\" \"bun run test:e2e:shard:2\" \"bun run test:e2e:shard:3\"'",
+    "test:e2e": "concurrently --kill-others-on-exit 'bun run --cwd ../.. dev:server' 'bun run --cwd ../.. dev:web' 'sleep 10 && concurrently \"bun run test:e2e:shard:1\" \"bun run test:e2e:shard:2\" \"bun run test:e2e:shard:3\"'",
     "test:e2e:sequential": "CI=true playwright test",
     "test:e2e:shard:1": "SHARD=1/3 CI=true playwright test",
     "test:e2e:shard:2": "SHARD=2/3 CI=true playwright test",
