@@ -1,7 +1,12 @@
 // ─────────────────────────────────────────────────────────────────────────────
 // Demo seed data file
-// DO NOT put logic here. Keys are symbolic — the seed script resolves them to IDs.
+// Keys are symbolic — the seed script resolves them to IDs.
 // ─────────────────────────────────────────────────────────────────────────────
+
+export type ReviewData = {
+  rating: number;
+  body: string;
+};
 
 export type WineData = {
   name: string;
@@ -17,6 +22,7 @@ export type WineData = {
   description: string;
   basePrice: number;
   imageUrl?: string;
+  demoReviews?: ReviewData[];
 };
 
 export type EventData = {
@@ -28,11 +34,12 @@ export type EventData = {
   capacity: number;
   visibility: "public" | "private";
   imageUrl?: string;
+  demoComments?: string[];
 };
 
 export type WinemakerData = {
   key: string;
-  ownerKey: "pavlov" | null;
+  ownerKey: "pavlov" | "test_user" | null;
   email: string;
   name: string;
   description: string;
@@ -42,6 +49,7 @@ export type WinemakerData = {
   imageUrl?: string;
   wines: WineData[];
   events: EventData[];
+  demoReviews?: ReviewData[];
 };
 
 export type BundleData = {
@@ -53,7 +61,7 @@ export type BundleData = {
 
 export type ShopData = {
   key: string;
-  ownerKey: "boutique" | null;
+  ownerKey: "boutique" | "test_user" | null;
   email: string;
   name: string;
   description: string;
@@ -63,38 +71,12 @@ export type ShopData = {
   bundles: BundleData[];
 };
 
-// ── Featured users (5 real Clerk accounts — set IDs in .env.local) ────────────
-// Required env vars: DEMO_ADMIN_CLERK_ID, DEMO_WINEMAKER_CLERK_ID,
-// DEMO_SHOP_OWNER_CLERK_ID, DEMO_CUSTOMER1_CLERK_ID, DEMO_CUSTOMER2_CLERK_ID
+// ── Featured users ───────────────────────────────────────────────────────────
 export const FEATURED_USERS = {
-  admin: {
-    email: "admin@winery.demo",
-    fname: "Adam",
-    lname: "Správce",
-    city: "Praha",
-  },
-  pavlov: {
-    email: "pavlov@winery.demo",
-    fname: "Jakub",
-    lname: "Vinař",
-    city: "Brno",
-  },
-  boutique: {
-    email: "boutique@winery.demo",
-    fname: "Pavel",
-    lname: "Obchodník",
-    city: "Brno",
-  },
-  jana: {
-    email: "jana@winery.demo",
-    fname: "Jana",
-    lname: "Zákazníková",
-    city: "Praha",
-  },
-  petr: {
-    email: "petr@winery.demo",
-    fname: "Petr",
-    lname: "Procházka",
+  test_user: {
+    email: "willy@winery.demo",
+    fname: "Willy",
+    lname: "the Kid",
     city: "Brno",
   },
 } as const;
@@ -133,7 +115,7 @@ export const SUPPORTING_CUSTOMERS: { fname: string; lname: string; email: string
 export const WINEMAKERS: WinemakerData[] = [
   {
     key: "lavicka",
-    ownerKey: null,
+    ownerKey: "test_user",
     email: "info@chateau-lavicka.cz",
     name: "Château de la Lavička",
     description:
@@ -142,6 +124,17 @@ export const WINEMAKERS: WinemakerData[] = [
     websiteUrl: "https://chateau-lavicka.cz",
     city: "Brno - Hlavní nádraží",
     imageUrl: "/uploads/winemaker/la_lavicka.webp",
+    demoReviews: [
+      {
+        rating: 5,
+        body: "Château de la Lavička je zjevení. Konečně vinařství pro nás normální lidi, kteří si nemohou dovolit utrácet tři stovky za jednu lahev.",
+      },
+      {
+        rating: 5,
+        body: "Pán za třetím nástupištěm je skutečný vizionář. Brno potřebuje více takových průkopníků.",
+      },
+      { rating: 5, body: "Pan majitel mi dovolil přespat v sudu. Velmi lidský přístup." },
+    ],
     wines: [
       {
         name: "Modrý Blesk 2024",
@@ -158,6 +151,18 @@ export const WINEMAKERS: WinemakerData[] = [
           "Zářivě neonově modrý ročník, který silně voní po umělém borůvkovém aroma a čistém přežití. Závěrečná agresivní kyselinka vyčistí nejen patro, ale i drobné skvrny od rzi. Nejlépe chutná přímo z plastové lahve při nočním sprintu na tramvaj číslo 1.",
         basePrice: 9,
         imageUrl: "/uploads/wine/modry_blesk.webp",
+        demoReviews: [
+          {
+            rating: 5,
+            body: "Ten neonový vzhled mě zaujal, ta chuť mě naprosto zničila v tom nejlepším slova smyslu. Vypila jsem celou dvoulitrovou lahev za pochodu k tramvaji a nikdy jsem se necítila tak svobodně.",
+          },
+          { rating: 5, body: "Ta modrá barva mi krásně ladí s modřinami z rozjezdu. 10/10." },
+          { rating: 4, body: "Chutná to jako dětství, když jsme olizovali baterie." },
+          {
+            rating: 5,
+            body: "Překvapivě pitelné! Skvěle to doplnilo studený kebab ve 4 ráno na České.",
+          },
+        ],
       },
       {
         name: "Hradní Svíce Black Label",
@@ -174,35 +179,39 @@ export const WINEMAKERS: WinemakerData[] = [
           "Naše prémiová nabídka s revoluční technologií plastového šroubovacího uzávěru, která vám ušetří peníze za vývrtku. Očekávejte těžké třísloviny, které připomínají žvýkání asfaltu na D1, s překvapivě sirupovým závěrem. Skvěle se páruje se suchým rohlíkem.",
         basePrice: 12,
         imageUrl: "/uploads/wine/hradni_svice.webp",
-      },
-      {
-        name: "Brněnský Drak (Falešný Krokodýl)",
-        color: "orange",
-        type: "still",
-        region: "Brněnská Nádražní Oblast",
-        vintageYear: 2023,
-        alcoholContent: "13.00",
-        volumeMl: 1500,
-        quantity: 420,
-        attribution: "Urban Legend",
-        composition: "100% Urban Legend",
-        description:
-          "Místní legenda praví, že tohle víno dokáže uspat i bájného krokodýla visícího na Staré radnici. Chutná neidentifikovatelně, ale spolehlivě a silně hřeje v žaludku. K dostání exkluzivně zpod pultu.",
-        basePrice: 14,
-        imageUrl: "/uploads/wine/drak.webp",
+        demoReviews: [
+          {
+            rating: 5,
+            body: "Ano, chuť je trochu jako žvýkat asfalt na D1, ale to dává charakter! Pro autentický brněnský zážitek není nad toto.",
+          },
+          {
+            rating: 4,
+            body: "Ten plastový uzávěr se okamžitě strhl, ale šroubovák to spravil. Solidní, robustní volba na páteční večery.",
+          },
+          {
+            rating: 5,
+            body: "Ta plastová flaška byla trochu zdeformovaná, asi od tepla z radiátoru, ale obsah byl vysoce efektivní.",
+          },
+        ],
       },
     ],
     events: [
       {
         name: "Půlnoční degustace pod Orlojem",
         description:
-          "Vysoce neformální, neautorizované setkání přímo u nechvalně známých černých hodin na Náměstí Svobody. Očekávejte syrovou, autentickou pouliční atmosféru, kde budeme ochutnávat ty nejlepší PET lahvové ročníky přímo od zdroje. Přineste si vlastní plastové kelímky a teplou bundu.",
+          "Vysoce neformální, neautorizované setkání přímo u nechvalně známých černých hodin na Náměstí Svobody. Očekávejte syrovou, autentickou pouliční atmosféru, kde budeme ochutnávat ty nejlepší PET lahvové ročníky přímo od zdroje.",
         isPast: false,
         daysOffset: 21,
         durationHours: 3,
         capacity: 35,
         visibility: "public",
         imageUrl: "/uploads/event/event_placeholder.webp",
+        demoComments: [
+          "Jdu na streetovou degustaci poprvé! Je zvykem si přinést vlastní skládací židličku, nebo se prostě sedí na obrubníku?",
+          "@Kamil vole musíme jít, slyšel jsem, že o půlnoci narážejí čerstvý plastový sud.",
+          "Konečně akce, kde se nemusím stydět za to, že piju z plastového kelímku.",
+          "Doufám, že tentokrát nebudou ty PET lahve vystavené přímému slunci déle než týden.",
+        ],
       },
     ],
   },
@@ -212,11 +221,18 @@ export const WINEMAKERS: WinemakerData[] = [
     email: "prestige@maisondego.cz",
     name: "Maison de l'Ego",
     description:
-      "Maison de l'Ego bylo založeno výhradně proto, aby si technologičtí miliardáři a startupisté měli co odepsat z daní. Neprodáváme víno, prodáváme nalahvovanou nadřazenost a tekutou aroganci. Pokud se musíte dívat na cenovku, je vám právně zakázáno s našimi produkty jakkoliv interagovat.",
+      "Maison de l'Ego bylo založeno výhradně proto, aby si technologičtí miliardáři a startupisté měli co odepsat z daní. Neprodáváme víno, prodáváme nalahvovanou nadřazenost a tekutou aroganci.",
     phone: "+420 900 346 000",
     websiteUrl: "https://maisondego.cz",
     city: "Brno - Titanium Nové Sady",
     imageUrl: "/uploads/winemaker/maison_de.webp",
+    demoReviews: [
+      {
+        rating: 5,
+        body: "Oceňuji tu čistou drzost účtovat si tolik peněz za zkvašený hroznový džus. Odvážný byznysový tah.",
+      },
+      { rating: 4, body: "Chuťový profil: 404 Not Found. Ale aspoň to má prestižní etiketu." },
+    ],
     wines: [
       {
         name: "Liquid Arrogance",
@@ -230,28 +246,26 @@ export const WINEMAKERS: WinemakerData[] = [
         attribution: "Grand Cru de l'Ego",
         composition: "100% Ego",
         description:
-          "Víno tak exkluzivní, že vás reálně soudí, když ho naléváte do sklenice. Ve vůni dominují bílé lanýže, kaviár a zřetelný náznak offshorových účtů. Vypití této lahve okamžitě zvyšuje váš kreditní skóre a prohlubuje vaše pohrdání pracující třídou.",
+          "Víno tak exkluzivní, že vás reálně soudí, když ho naléváte do sklenice. Ve vůni dominují bílé lanýže, kaviár a zřetelný náznak offshorových účtů.",
         basePrice: 45000,
         imageUrl: "/uploads/wine/arrogance.webp",
+        demoReviews: [
+          {
+            rating: 5,
+            body: "Absolutní mistrovské dílo moderních daňových úniků. Chuťový profil je komplexní, ale ta pravá radost přichází až s kapitálovými výnosy.",
+          },
+          {
+            rating: 5,
+            body: "Při každém doušku cítím, jak mi stoupá IQ a klesá zůstatek na účtu. Dokonalé.",
+          },
+          {
+            rating: 4,
+            body: "Čekal jsem víc zlata v dochuti, ale ta arogance je cítit už při otevírání.",
+          },
+        ],
       },
       {
-        name: "Tears of the Peasant 1984",
-        color: "white",
-        type: "still",
-        region: "Tax Haven",
-        vintageYear: 1984,
-        alcoholContent: "13.50",
-        volumeMl: 750,
-        quantity: 6,
-        attribution: "Grand Cru de l'Ego",
-        composition: "100% Exploitation",
-        description:
-          "Sklizeno během historické stávky dělníků na vinici. Toto víno zachycuje přesný okamžik, kdy byly jejich požadavky zamítnuty. Je perfektně vyvážené, řízné a zcela zbavené jakékoliv empatie. Výjimečně dobře se páruje s nepřátelským převzetím konkurence.",
-        basePrice: 125000,
-        imageUrl: "/uploads/wine/tears_of_peasant.webp",
-      },
-      {
-        name: "10x Developer Cuvée",
+        name: "10x Developer",
         color: "red",
         type: "still",
         region: "Tax Haven",
@@ -262,9 +276,23 @@ export const WINEMAKERS: WinemakerData[] = [
         attribution: "Single Vineyard",
         composition: "100% Arrogance",
         description:
-          "Navrženo pro lidi, kteří píší kód rovnou do produkce a nikdy nepoužívají komentáře. Má tak silné tělo, že k sobě nepotřebuje zbytek týmu. V dochuti jasně ucítíte nefalšované pohrdání juniorními programátory.",
+          "Navrženo pro lidi, kteří píší kód rovnou do produkce a nikdy nepoužívají komentáře.",
         basePrice: 8500,
         imageUrl: "/uploads/wine/10xdeveloper.webp",
+        demoReviews: [
+          {
+            rating: 5,
+            body: "Víno tak dobré, že mi po něm odpustili i ten incident s produkční databází.",
+          },
+          {
+            rating: 4,
+            body: "V dochuti jasně ucítíte nefalšované pohrdání ostatními programátory.",
+          },
+          {
+            rating: 5,
+            body: "Po třetí skleničce jsem začal vidět kód v binární soustavě. Matrix existuje.",
+          },
+        ],
       },
     ],
     events: [],
@@ -275,11 +303,17 @@ export const WINEMAKERS: WinemakerData[] = [
     email: "info@kolejni-vino.cz",
     name: "Koleje Vinařská Cellars",
     description:
-      "Zrozeno z čirého zoufalství během zkouškového období. Naše sudy jsou ukryté pod palandami a pečlivě zrají vedle ústředního topení pro dosažení toho správného kolejního tepelného profilu. Je to jediné víno, které vám zaručeně pomůže zapomenout na to, že jste právě nevyletěli z algoritmů, ale úplně ze školy.",
+      "Zrozeno z čirého zoufalství během zkouškového období. Naše sudy jsou ukryté pod palandami a pečlivě zrají vedle ústředního topení.",
     phone: "+420 603 565 353",
     websiteUrl: "https://kolejni-vino.cz",
     city: "Brno - Pisárky",
     imageUrl: "/uploads/winemaker/winery_placeholder.webp",
+    demoReviews: [
+      {
+        rating: 5,
+        body: "Tohle víno je jediný důvod, proč ještě bydlím na Vinařské a ne v Silicon Valley.",
+      },
+    ],
     wines: [
       {
         name: "Radiator Reserve 2023",
@@ -293,12 +327,19 @@ export const WINEMAKERS: WinemakerData[] = [
         attribution: "Radiator Selection",
         composition: "100% Dormitory Grapes",
         description:
-          "Zrálo přesně tři týdny za vařícím radiátorem na sdíleném pokoji na Vinařské. Tento urychlený termální proces stárnutí dodává vínu unikátní, lehce připálený chuťový profil. Důrazně doporučujeme nechat víno prodýchat, aby mohly uniknout výpary z rozpouštědel.",
+          "Zrálo přesně tři týdny za vařícím radiátorem na sdíleném pokoji na Vinařské. Tento urychlený termální proces stárnutí dodává vínu unikátní chuť.",
         basePrice: 22,
         imageUrl: "/uploads/wine/ranni_rozjezd.webp",
+        demoReviews: [
+          {
+            rating: 5,
+            body: "Zrálo přesně tři týdny za vařícím radiátorem. Ten dojezd je prostě božský.",
+          },
+          { rating: 4, body: "Oceňuji ten šroubovací uzávěr. Vývrtku jsem zastavil v zastavárně." },
+        ],
       },
       {
-        name: "Slzy Zkouškového Cuvée",
+        name: "Slzy Zkouškového",
         color: "white",
         type: "still",
         region: "Pisárecká Kolejní Oblast",
@@ -308,39 +349,41 @@ export const WINEMAKERS: WinemakerData[] = [
         quantity: 320,
         attribution: "Corridor Reserve",
         composition: "Hope + Despair",
-        description:
-          "Vytvořeno specificky pro studenty čelící blížícím se deadlinům. Vůně je komplexní směsí starého kafe, studeného potu a instantních nudlí. Poskytuje okamžitý pocit apatie, čímž skvěle doplňuje blížící se akademickou zkázu.",
+        description: "Vytvořeno specificky pro studenty čelící blížícím se deadlinům.",
         basePrice: 18,
         imageUrl: "/uploads/wine/skuskove.webp",
-      },
-      {
-        name: "Sdílená Koupelna Rosé",
-        color: "rosé",
-        type: "still",
-        region: "Pisárecká Kolejní Oblast",
-        vintageYear: 2024,
-        alcoholContent: "11.00",
-        volumeMl: 1500,
-        quantity: 210,
-        attribution: "Bathroom Blend",
-        composition: "Dormitory Blend",
-        description:
-          "Svou barvu získalo náhodným kontaktem s odloženým sprchovým gelem. Je překvapivě osvěžující, ale zanechává silný pocit, že byste si měli okamžitě umýt ruce. Klasika pátečních večerů na áčkách.",
-        basePrice: 15,
-        imageUrl: "/uploads/wine/wine_placeholder.webp",
+        demoReviews: [
+          {
+            rating: 5,
+            body: "Pomohlo mi přežít moje bakalářky, i když za cenu lehké amnézie na celý víkend.",
+          },
+          {
+            rating: 5,
+            body: "Konečně víno, které mi rozumí. Je smutné, levné a dostupné v suterénu.",
+          },
+          {
+            rating: 5,
+            body: "Koupil jsem to jako úplatek pro zkoušejícího. Nejenže jsem prošel, ale dostal jsem i jeho dceru za ženu.",
+          },
+        ],
       },
     ],
     events: [
       {
         name: "Kolaudačka na Vinařské 2025",
         description:
-          "Extrémně chaotická degustace konaná ve sdílené kuchyňce na kolejích Vinařská. Atmosféra byla hustá vlhkostí z vařených těstovin a unikátním aroma vín zrajících na radiátoru. Účastníci úspěšně zkonzumovali veškeré zásoby ještě předtím, než to přišel správce kolejí rozpustit.",
+          "Extrémně chaotická degustace konaná ve sdílené kuchyňce na kolejích Vinařská. Atmosféra byla hustá vlhkostí z vařených těstovin a aromatem vín zrajících na radiátoru.",
         isPast: true,
         daysOffset: -45,
         durationHours: 3,
         capacity: 40,
         visibility: "public",
         imageUrl: "/uploads/event/event_placeholder.webp",
+        demoComments: [
+          "Rezervuju si místo u radiátoru! Minule mi tam bylo nejlíp.",
+          "Když jsem se toho účastnil minule, vzbudil jsem se v jiném časovém pásmu.",
+          "Hledám doprovod na tuhle akci. Podmínka: vlastní otvírák a odolný žaludek.",
+        ],
       },
     ],
   },
@@ -350,14 +393,14 @@ export const WINEMAKERS: WinemakerData[] = [
     email: "dao@kryptonvineyards.io",
     name: "Krypton & Cayman Vineyards",
     description:
-      "Původně spuštěno jako blockchainový smart kontrakt. Produkce fyzického vína byla jen nehoda, kterou jsme se rozhodli agresivně monetizovat. Každá láhev vyžaduje k otevření sken sítnice a slouží jako proof of stake v naší DAO. Chuť je druhořadá, hlavní je investiční hodnota a exkluzivní přístup na náš firemní Discord.",
+      "Původně spuštěno jako blockchainový smart kontrakt. Produkce fyzického vína byla jen nehoda.",
     phone: "+420 900 278 966",
     websiteUrl: "https://kryptonvineyards.dao",
     city: "Brno - CEITEC Bohunice",
     imageUrl: "/uploads/winemaker/winery_placeholder.webp",
     wines: [
       {
-        name: "Parseq Bull Run 2025",
+        name: "Bull Run",
         color: "red",
         type: "still",
         region: "Blockchain Offshore Estate",
@@ -368,54 +411,34 @@ export const WINEMAKERS: WinemakerData[] = [
         attribution: "Blockchain Certified",
         composition: "100% Liquidated Assets",
         description:
-          "Vydáno speciálně k oslavě raketového růstu platformy pro analýzu akcií. Chutná jako evropské akciové trhy v zelených číslech a neomezený budget. Původně oceněno na dva bitcoiny, jeho cena divoce kolísá podle algoritmů na sociálních sítích.",
+          "Vydáno speciálně k oslavě raketového růstu akcií. Cena divoce kolísá podle algoritmů na sociálních sítích.",
         basePrice: 2800,
         imageUrl: "/uploads/wine/bull_run.webp",
-      },
-      {
-        name: "The 28th Regime Reserve",
-        color: "red",
-        type: "still",
-        region: "Blockchain Offshore Estate",
-        vintageYear: 2024,
-        alcoholContent: "13.00",
-        volumeMl: 750,
-        quantity: 50,
-        attribution: "Compliance Certified",
-        composition: "100% Bureaucracy",
-        description:
-          "Pečlivě inženýrsky navrženo tak, aby obešlo veškeré byrokratické překážky 28. evropského režimu a zůstalo legálně klasifikováno jako luxusní komodita. Je extrémně suché, vysoce komplexní a k jeho plnému pochopení potřebujete daňového poradce.",
-        basePrice: 950,
-        imageUrl: "/uploads/wine/regime.webp",
-      },
-      {
-        name: "Semiconductor Blanc",
-        color: "white",
-        type: "still",
-        region: "Blockchain Offshore Estate",
-        vintageYear: 2024,
-        alcoholContent: "13.50",
-        volumeMl: 750,
-        quantity: 33,
-        attribution: "Single Vineyard",
-        composition: "100% Silicon",
-        description:
-          "Víno reagující na globální nedostatek čipů. Extrémně vysoká přidaná hodnota, produkce limitována výhradně kapacitou litografických strojů. Vůně čistého křemíku, monopolního postavení a zelených čísel na burze.",
-        basePrice: 1500,
-        imageUrl: "/uploads/wine/semiconductor.webp",
+        demoReviews: [
+          {
+            rating: 5,
+            body: "Nejlepší investice od dob, co jsem koupil Bitcoin za 10 dolarů. A tohle se dá aspoň vypít.",
+          },
+          { rating: 4, body: "Můžu platit v dogecoinech? Ptám se pro kamaráda." },
+        ],
       },
     ],
     events: [
       {
         name: "Spielberk Tower Crypto-Gala",
         description:
-          "Koná se v nejvyšším patře kancelářského centra Spielberk s panoramatickým výhledem na město, které technicky vzato vlastníte. Tento networkingový event se zaměřuje na Web3 investice a nalévají se vína, která stojí více než byt 2+kk v Králově Poli. Smart casual a hardwarová krypto peněženka jsou povinné.",
+          "Tento networkingový event se zaměřuje na Web3 investice a nalévají se vína, která stojí více než byt 2+kk v Králově Poli.",
         isPast: false,
         daysOffset: 56,
         durationHours: 4,
         capacity: 60,
         visibility: "private",
         imageUrl: "/uploads/event/event_placeholder.webp",
+        demoComments: [
+          "Můžu platit v dogecoinech, nebo jedete jen v hotovosti pod pultem?",
+          "Dá se tam někde bezpečně odložit ego, nebo si ho musím vzít s sebou?",
+          "Můj osobní asistent mi tuhle akci doporučil jako 'vhodnou pro budování charakteru'.",
+        ],
       },
     ],
   },
@@ -425,14 +448,20 @@ export const WINEMAKERS: WinemakerData[] = [
     email: "root@fimuni.winery",
     name: "FI MUNI Basement Brewery",
     description:
-      "Udržováno skupinou vývojářů, kteří neviděli denní světlo od roku 2024. Proces fermentace je plně automatizován pomocí zrezivělého Raspberry Pi a mizerně napsaného Python skriptu. Výsledný produkt má vysoký obsah kofeinu a zřetelné podtóny teplovodivé pasty.",
+      "Udržováno skupinou vývojářů, kteří neviděli denní světlo od roku 2021. Proces fermentace je plně automatizován pomocí zrezivělého Raspberry Pi.",
     phone: "+420 549 494 212",
     websiteUrl: "https://fimuni.winery",
     city: "Brno - Botanická",
     imageUrl: "/uploads/winemaker/fi_muni_basement.webp",
+    demoReviews: [
+      {
+        rating: 4,
+        body: "Typická FI MUNI metodologie. Odvážný projekt, špatně zdokumentovaný, ale výsledek překvapivě použitelný.",
+      },
+    ],
     wines: [
       {
-        name: "Postgres Rollback 2024",
+        name: "Postgres Rollback 2019",
         color: "red",
         type: "still",
         region: "Botanická Serverová Oblast",
@@ -443,9 +472,19 @@ export const WINEMAKERS: WinemakerData[] = [
         attribution: "Debug Release",
         composition: "100% Panic",
         description:
-          "Těžké červené víno, které vzniklo chybou v Docker kontejneru během nasazování do produkce. Uzavřeno speciální zátkou z 3D tiskárny, která možná pouští trochu toxických látek, ale skvěle těsní. Chutná po probdělé noci a padajících databázích.",
+          "Těžké červené víno, které vzniklo chybou v Docker kontejneru během nasazování do produkce.",
         basePrice: 35,
         imageUrl: "/uploads/wine/postgress.webp",
+        demoReviews: [
+          {
+            rating: 4,
+            body: "Jako backend developer to musím ocenit na metaúrovni. Ta chuť databázové paniky je autentická.",
+          },
+          {
+            rating: 4,
+            body: "Oceňuji tu automatizaci přes Raspberry Pi, i když ten Python skript je opravdu mizerně napsaný.",
+          },
+        ],
       },
       {
         name: "Git Push --Force 2026",
@@ -459,38 +498,34 @@ export const WINEMAKERS: WinemakerData[] = [
         attribution: "Production Hotfix",
         composition: "100% Conflict",
         description:
-          "Extrémně těžké a agresivní víno. Vzniklo, když dva vývojáři omylem přepsali produkční databázi a museli pít, aby zapomněli. Chutná po zmaru a spálené kávě. Konzumujte pouze na vlastní nebezpečí, neexistuje žádný návrat zpět.",
+          "Vzniklo, když dva vývojáři omylem přepsali produkční databázi a museli pít, aby zapomněli.",
         basePrice: 55,
         imageUrl: "/uploads/wine/git_push.webp",
-      },
-      {
-        name: "Resin Vat Reserve",
-        color: "orange",
-        type: "still",
-        region: "Botanická Serverová Oblast",
-        vintageYear: 2024,
-        alcoholContent: "12.00",
-        volumeMl: 375,
-        quantity: 88,
-        attribution: "Experimental Build",
-        composition: "3D Printer Runoff",
-        description:
-          "Experimentální ročník zrající ve vyřazených vaničkách z SLA tiskáren. Obsahuje stopové prvky fotocitlivé pryskyřice, díky kterým na slunci jemně tuhne na patře. Ideální pro makers a DIY inženýry, kteří ocení technickou pachuť.",
-        basePrice: 28,
-        imageUrl: "/uploads/wine/resin.webp",
+        demoReviews: [
+          {
+            rating: 5,
+            body: "Chutná to jako pushování do masteru bez review. Adrenalin v každém doušku.",
+          },
+          { rating: 5, body: "Přijdu, jen pokud slíbíte, že se nebude mluvit o JavaScriptu." },
+        ],
       },
     ],
     events: [
       {
         name: "FI MUNI Debug & Drink",
         description:
-          "Pořádáno v suterénních labech na Botanické během vrcholu zkouškového období. Vystresovaní studenti informatiky párovali naše vysokokofeinová Server Room vína se studenou pizzou, zatímco se snažili opravit rozbité backend integrace. Noc čisté, nefalšované akademické paniky.",
+          "Vystresovaní studenti informatiky párovali naše vysokokofeinová Server Room vína se studenou pizzou.",
         isPast: true,
         daysOffset: -60,
         durationHours: 4,
         capacity: 50,
         visibility: "public",
         imageUrl: "/uploads/event/event_placeholder.webp",
+        demoComments: [
+          "Bude se degustovat i ten ročník, co zral vedle serveru v suterénu? Slyšel jsem, že má unikátní digitální dochuť.",
+          "Přijdu, jen pokud slíbíte, že se nebude mluvit o politice ani o JavaScriptu.",
+          "Za 35 korun jsem nečekal zázraky, ale tohle mi spolehlivě vymazalo paměť na celý víkend.",
+        ],
       },
     ],
   },
@@ -500,11 +535,21 @@ export const WINEMAKERS: WinemakerData[] = [
     email: "butler@baronvon.estate",
     name: "Baron von Oligarch Estates",
     description:
-      "Postaveno na staletích generačního bohatství a vysoce pochybných tržních monopolech. Naše réva je zalévána výhradně vodou z tajících ledovců a slzami našich zlikvidovaných konkurentů. Pití tohoto vína statisticky zvyšuje šanci, že si koupíte jachtu a spácháte sofistikovanou hospodářskou kriminalitu.",
+      "Postaveno na staletích generačního bohatství a vysoce pochybných tržních monopolech.",
     phone: "+420 900 000 000",
     websiteUrl: "https://baronvon.oligarch.estate",
     city: "Brno - Spielberk Tower",
     imageUrl: "/uploads/winemaker/winery_placeholder.webp",
+    demoReviews: [
+      {
+        rating: 5,
+        body: "Pití tohoto vína statisticky zvyšuje šanci, že si koupíte jachtu a spácháte hospodářskou kriminalitu.",
+      },
+      {
+        rating: 5,
+        body: "Vůně připomíná čerstvě vytištěné peníze a spálené naděje mých konkurentů. Miluju to.",
+      },
+    ],
     wines: [
       {
         name: "Diamond Infusion Cuvée",
@@ -518,38 +563,35 @@ export const WINEMAKERS: WinemakerData[] = [
         attribution: "Ultra Premium",
         composition: "100% Wealth",
         description:
-          "Fermentováno s reálným, nekonfliktním diamantovým prachem, aby každý doušek jemně provedl peeling vašeho trávicího traktu. Bublá s lehkostí čerstvě vytištěných peněz. Toto víno nepolykáte, vy do něj interně investujete.",
+          "Fermentováno s reálným diamantovým prachem, aby každý doušek jemně provedl peeling vašeho trávicího traktu.",
         basePrice: 75000,
         imageUrl: "/uploads/wine/diamond.webp",
-      },
-      {
-        name: "Hostile Takeover 2026",
-        color: "red",
-        type: "still",
-        region: "Exclusive Monopoly",
-        vintageYear: 2026,
-        alcoholContent: "15.50",
-        volumeMl: 750,
-        quantity: 15,
-        attribution: "Ultra Premium",
-        composition: "100% Majority Stake",
-        description:
-          "Temné a brutální víno, které nejprve pohltí všechny chutě ve vašich ústech a následně zlikviduje váš bankovní účet. Pije se výhradně ve chvíli, kdy v rámci optimalizace kupujete firmu svého nejlepšího kamaráda.",
-        basePrice: 38000,
-        imageUrl: "/uploads/wine/wine_placeholder.webp",
+        demoReviews: [
+          {
+            rating: 5,
+            body: "Láhev vypadá tak luxusně, že jsem ji musel pojistit dřív, než jsem ji otevřel.",
+          },
+          { rating: 5, body: "Toto víno nepolykáte, vy do něj interně investujete." },
+          { rating: 5, body: "Bublá s lehkostí čerstvě vytištěných peněz." },
+        ],
       },
     ],
     events: [
       {
         name: "Villa Tugendhat Elite Auction 2026",
         description:
-          "Striktně VIP událost pouze pro zvané, kde se funkcionalistická architektura setkává s neregulovaným kapitalismem. Účastníci budou usrkávat diamantové cuvée během diskuzí o agresivních firemních převzetích a daňových kličkách. Ochranka bude u vstupu vymáhat přísný dress code a minimální čisté jmění.",
+          "Striktně VIP událost pouze pro zvané, kde se funkcionalistická architektura setkává s neregulovaným kapitalismem.",
         isPast: false,
         daysOffset: 35,
         durationHours: 3,
         capacity: 30,
         visibility: "private",
         imageUrl: "/uploads/event/event_placeholder.webp",
+        demoComments: [
+          "Je poblíž místa konání hlídané parkoviště pro Maybach, nebo mám říct řidiči, ať krouží kolem bloku?",
+          "Rychlý dotaz na organizátory: je dress code striktně oblek a kravata, nebo projde i nechutně drahý rolák?",
+          "Můj osobní asistent mi tuhle akci doporučil jako 'vhodnou pro budování charakteru'.",
+        ],
       },
     ],
   },
@@ -558,220 +600,108 @@ export const WINEMAKERS: WinemakerData[] = [
 // ── Shops ─────────────────────────────────────────────────────────────────────
 export const SHOPS: ShopData[] = [
   {
-    key: "vecerka_jost",
-    ownerKey: "boutique",
-    email: "info@vecerkajost.cz",
-    name: "Večerka u Jošta",
+    key: "vecerka_posledna_zachrana",
+    ownerKey: "test_user",
+    email: "zachrana@vecerka.sk",
+    name: "Večerka Posledná Záchrana",
     description:
-      "Strategicky umístěná přímo v srdci Brna pod vysokýma nohama. Tato prodejna je majákem naděje o třetí ráno. Drží skladem celou naši streetovou kolekci hned vedle energeťáků a oschlého pečiva. Je to premiérová destinace pro panické nákupy před odjezdem na noční kolejní afterparty.",
+      "Posledný maják nádeje v oceáne brnianskej noci. Ponúkame exkluzívny výber vín a bagety, ktoré majú viac skúseností ako tvoj priemerný profesor na FI.",
     city: "Brno - Centrum",
     imageUrl: "/uploads/shop/vecerka_u_joska.webp",
     sourceWinemakerKeys: ["lavicka", "vinarska"],
     bundles: [
       {
-        name: "Noční Záchranná Sada",
+        name: "Nočná Záchranná Sada",
         description: "Kompletní výbava pro přežití brněnské noci. Tři PET lahve, žádné otázky.",
-        wineNames: [
-          "Modrý Blesk 2024",
-          "Hradní Svíce Black Label",
-          "Brněnský Drak (Falešný Krokodýl)",
-        ],
+        wineNames: ["Modrý Blesk 2024", "Hradní Svíce Black Label", "Brněnský Drak"],
         price: 29,
-      },
-      {
-        name: "Kolejní Survival Kit",
-        description: "Dvě lahve na přežití zkouškového. Doporučeno akademickým senátem.",
-        wineNames: ["Radiator Reserve 2023", "Slzy Zkouškového Cuvée"],
-        price: 38,
       },
     ],
   },
   {
-    key: "titanium_lounge",
+    key: "miliardarsky_bunker",
     ownerKey: null,
-    email: "executive@titaniumlounge.biz",
-    name: "Titanium Executive Lounge",
+    email: "bunker@miliardari.biz",
+    name: "Miliardársky Bunker",
     description:
-      "Ukryto za mléčným sklem v jedné z nejdražších brněnských kancelářských budov. Sem nemůžete jen tak vejít; potřebujete platinovou firemní kartu a sjednanou schůzku. Naskladňují výhradně vína investičního stupně, která se pravděpodobně nikdy neotevřou.",
+      "Miesto tak exkluzívne, že aj tvoj tieň potrebuje previerku od SIS. Naše vína sú tak drahé, že po ich kúpe ti zostane už len na suchý rohlík z vedľajšej Večerky.",
     city: "Brno - Nové Sady",
     imageUrl: "/uploads/shop/shop_placeholder.webp",
     sourceWinemakerKeys: ["ego", "oligarch"],
-    bundles: [
-      {
-        name: "Corporate Write-Off Collection",
-        description: "Tři lahve pro daňové odpisy a boardroom dominanci.",
-        wineNames: ["Liquid Arrogance", "10x Developer Cuvée", "Diamond Infusion Cuvée"],
-        price: 128500,
-      },
-    ],
-  },
-  {
-    key: "brnenska_nadrazka",
-    ownerKey: null,
-    email: "hospoda@brnenska-nadrazka.cz",
-    name: "Brněnská Nádražka",
-    description:
-      "Tento podnik nabízí nepřekonatelnou, drsnou atmosféru, která perfektně doplňuje naše PET lahvové ročníky. Podlaha je permanentně lepkavá a klientela sahá od ztracených turistů až po tvrdé lokální štamgasty. Skutečná kulturní památka jihomoravské metropole.",
-    city: "Brno - Hlavní nádraží",
-    imageUrl: "/uploads/shop/shop_placeholder.webp",
-    sourceWinemakerKeys: ["lavicka", "fimuni"],
-    bundles: [
-      {
-        name: "Developer & Degen Bundle",
-        description: "Pro ty, kteří zároveň pushuji na produkci i pijí z PET lahve.",
-        wineNames: ["Modrý Blesk 2024", "Postgres Rollback 2024"],
-        price: 42,
-      },
-    ],
-  },
-  {
-    key: "ceitec_nano",
-    ownerKey: null,
-    email: "nanocellar@ceitec.biz",
-    name: "CEITEC Nano-Cellar",
-    description:
-      "Nachází se v kampusu v Bohunicích. Tento obchod zachází s vínem jako s vysoce těkavou chemickou sloučeninou. Nákupy se řeší výhradně přes blockchain a láhve jsou uloženy v tlakových vitrínách plněných argonem. Je to maloobchod s vínem zcela zbavený radosti a lidského tepla.",
-    city: "Brno - Bohunice",
-    imageUrl: "/uploads/shop/shop_placeholder.webp",
-    sourceWinemakerKeys: ["cayman", "oligarch"],
     bundles: [],
-  },
-  {
-    key: "fimuni_bufet",
-    ownerKey: null,
-    email: "bufet@fimuni.cz",
-    name: "FI MUNI Suterénní Bufet",
-    description:
-      "Zářivkami osvětlená oáza přežití v suterénu fakulty informatiky. Voní slabě po starém kafi a tiskařském toneru. Nabízí ta nejlepší nízkonákladová vína s vysokým obsahem kofeinu, která vám pomohou pushnout ten poslední commit před ranním deadlinem.",
-    city: "Brno - Botanická",
-    imageUrl: "/uploads/shop/shop_placeholder.webp",
-    sourceWinemakerKeys: ["fimuni", "vinarska"],
-    bundles: [
-      {
-        name: "Zkouškový Emergency Pack",
-        description: "Kombinace kolejního a serverového. Slouží jako náhrada za spánek.",
-        wineNames: ["Slzy Zkouškového Cuvée", "Git Push --Force 2026"],
-        price: 68,
-      },
-    ],
   },
 ];
 
 // ── Curated story interactions ────────────────────────────────────────────────
 export const STORY = {
-  // Jana: Praha customer, buys from Večerka u Jošta, active reviewer
   jana: {
     orders: [
       {
-        shopKey: "vecerka_jost",
+        shopKey: "vecerka_posledna_zachrana",
         status: "delivered" as const,
         items: [
           { wineName: "Modrý Blesk 2024", winemakerId: "lavicka", quantity: 3 },
           { wineName: "Hradní Svíce Black Label", winemakerId: "lavicka", quantity: 1 },
         ],
       },
-      {
-        shopKey: "vecerka_jost",
-        status: "confirmed" as const,
-        items: [{ wineName: "Slzy Zkouškového Cuvée", winemakerId: "vinarska", quantity: 2 }],
-      },
     ],
     productReviews: [
       {
         wineName: "Modrý Blesk 2024",
         winemakerId: "lavicka",
-        shopKey: "vecerka_jost",
+        shopKey: "vecerka_posledna_zachrana",
         rating: 5,
-        body: "Přišla jsem sem úplně náhodou při nočním útěku z fitka a byl to osud. Ten neonový vzhled mě zaujal, ta chuť mě naprosto zničila v tom nejlepším slova smyslu. Vypila jsem celou dvoulitrovou lahev za pochodu k tramvaji a nikdy jsem se necítila tak svobodně. Absolutní klasika, kupuji pravidelně každý čtvrtek.",
-      },
-      {
-        wineName: "Hradní Svíce Black Label",
-        winemakerId: "lavicka",
-        shopKey: "vecerka_jost",
-        rating: 5,
-        body: "Koupila jsem to jako žert pro kamarádku k narozeninám, ale nakonec jsme ho celý vypily samy a byl to nejlepší večer roku. Ano, chuť je trochu jako žvýkat asfalt na D1, ale to dává charakter! Etiketa je navíc naprosto geniální. Pro autentický brněnský zážitek není nad toto.",
-      },
-      {
-        wineName: "Slzy Zkouškového Cuvée",
-        winemakerId: "vinarska",
-        shopKey: "vecerka_jost",
-        rating: 4,
-        body: "Pomohlo mi přežít moje bakalářky, i když za cenu lehké amnézie na celý víkend. Pít bych to normálně nedoporučovala, ale v době krize je to prostě zázrak. Kdyby nebylo té mírné pachuti po instantních nudlích, dala bych plných pět hvězd.",
+        body: "Absolutní klasika, kupuji pravidelně každý čtvrtek.",
       },
     ],
     winemakerReviews: [
       {
         winemakerId: "lavicka",
         rating: 5,
-        body: "Château de la Lavička je zjevení. Konečně vinařství pro nás normální lidi, kteří si nemohou dovolit utrácet tři stovky za jednu lahev. Pán za třetím nástupištěm je skutečný vizionář a ten neonový Modrý Blesk je jeho mistrovské dílo. Brno potřebuje více takových průkopníků.",
+        body: "Skvělý přístup a lidové ceny.",
       },
     ],
     eventRegistrations: ["vinarska-0", "lavicka-0"],
   },
-
-  // Petr: Brno customer, one order, measured developer tone
   petr: {
     orders: [
       {
-        shopKey: "brnenska_nadrazka",
+        shopKey: "vecerka_posledna_zachrana",
         status: "delivered" as const,
-        items: [
-          { wineName: "Postgres Rollback 2024", winemakerId: "fimuni", quantity: 2 },
-          { wineName: "Modrý Blesk 2024", winemakerId: "lavicka", quantity: 2 },
-        ],
+        items: [{ wineName: "Postgres Rollback 2019", winemakerId: "fimuni", quantity: 2 }],
       },
     ],
     productReviews: [
       {
-        wineName: "Postgres Rollback 2024",
+        wineName: "Postgres Rollback 2019",
         winemakerId: "fimuni",
-        shopKey: "brnenska_nadrazka",
+        shopKey: "vecerka_posledna_zachrana",
         rating: 4,
-        body: "Jako backend developer to musím ocenit na metaúrovni. Ten název, ta chuť databázové paniky, ten resin uzávěr, který mírně pouští toxické látky. Čtyři hvězdy, protože pátá patří řešení, které tento produkt nevyžaduje. Zkonzumoval jsem dvě lahve během posledního deploye na produkci.",
+        body: "Zkonzumoval jsem dvě lahve během posledního deploye na produkci.",
       },
     ],
     winemakerReviews: [
       {
         winemakerId: "fimuni",
         rating: 4,
-        body: "Odvážný projekt, špatně zdokumentovaný, nefungující testy, ale výsledek překvapivě použitelný. Typická FI MUNI metodologie. Oceňuji automatizaci fermentace přes Raspberry Pi, i když ten Python skript je opravdu mizerně napsaný. Čtyři hvězdy s tím, že doufám v refaktoring v další verzi.",
+        body: "Oceňuji technologický přístup.",
       },
     ],
     eventRegistrations: ["fimuni-0", "cayman-0"],
   },
 };
 
-// ── Review content for supporting customers ────────────────────────────────────
-export const REVIEW_BODIES = {
-  positive: [
-    "Absolutní mistrovské dílo moderních daňových úniků. Chuťový profil je komplexní, ale ta pravá radost přichází až s kapitálovými výnosy.",
-    "Za 35 korun jsem nečekal zázraky, ale tohle mi spolehlivě vymazalo paměť na celý víkend. Neskutečný poměr cena/výkon.",
-    "Perfektní balanc, elegantní závěr a lahev vypadá fantasticky na mém Instagram story. Všichni v našem co-workingovém spaceu závidí.",
-    "Ta plastová flaška byla trochu zdeformovaná, asi od tepla z radiátoru, ale obsah byl vysoce efektivní.",
-    "Překvapivě pitelné! Skvěle to doplnilo studený kebab ve 4 ráno na České.",
-    "Oceňuji tu čistou drzost účtovat si tolik peněz za zkvašený hroznový džus. Odvážný byznysový tah.",
-    "Upřímně, to nejlepší co potkalo Brno od dob nových linek rozjezdů. Nemůžu to přestat pít.",
-    "Ten plastový uzávěr se okamžitě strhl, ale šroubovák to spravil. Solidní, robustní volba na páteční večery.",
-  ],
-  neutral: [
-    "Je to ok. Chutná to přesně jako můj nenaplněný potenciál a blížící se krize středního věku.",
-    "Vypil jsem to. Neoslepl jsem. Považuji to za úspěšný nákup.",
-    "Předražené, přehypované a upřímně trochu nuda. Ale opil jsem se, takže tři hvězdy.",
-    "Popis sliboval tóny pouličního přežití, ale mně to chutnalo prostě jen jako špinavé drobné.",
-  ],
-  critical: [
-    "Přinesl jsem to na luxusní večeři a všichni se mnou přestali mluvit.",
-    "Absolutně odporné. Vylil jsem to do dřezu a ten dřez mě poprosil o sklenici vody.",
-  ],
-};
+// ── Fallback content for faker ────────────────────────────────────────────────
+export const FALLBACK_REVIEWS = [
+  "Překvapivě pitelné! Skvěle to doplnilo večer.",
+  "Neurazí, nenadchne, ale spolehlivě zanechá dobrou náladu.",
+  "Je to ok. Chutná to přesně jako úspěšný nákup.",
+  "Vypil jsem to. Neoslepl jsem. Doporučuji.",
+];
 
-export const EVENT_COMMENT_BODIES = [
-  "Nemůžu se dočkat! Nevíte někdo, jestli tam bude veganská varianta pro ty okoralé okraje od pizzy?",
-  "Je poblíž místa konání hlídané parkoviště pro Maybach, nebo mám říct řidiči, ať prostě krouží kolem bloku?",
-  "@Kamil vole musíme jít, slyšel jsem, že o půlnoci narážejí čerstvý plastový sud.",
-  "Bude se během degustace probírat i ten nový evropský 28. režim, nebo je to čistě networkingová akce?",
-  "Když jsem se toho účastnil minule, vzbudil jsem se v jiném časovém pásmu. Jdu do toho znova!",
-  "Rychlý dotaz na organizátory: je dress code striktně oblek a kravata, nebo projde i nechutně drahý rolák?",
-  "Jdu na streetovou degustaci poprvé! Je zvykem si přinést vlastní skládací židličku, nebo se prostě sedí na obrubníku?",
-  "Opravdu hrůzný zážitek. Miloval jsem každou vteřinu. Vidíme se příští měsíc.",
+export const FALLBACK_EVENT_COMMENTS = [
+  "Už se na tuhle akci moc těším!",
+  "Hledám doprovod, má někdo volno?",
+  "Bude se nalévat hned od začátku?",
+  "Doufám, že bude skvělá atmosféra jako minule.",
 ];
