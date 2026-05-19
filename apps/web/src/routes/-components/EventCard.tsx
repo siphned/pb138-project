@@ -1,9 +1,11 @@
 import { Location01Icon } from "@hugeicons/core-free-icons";
 import { HugeiconsIcon } from "@hugeicons/react";
 import { Link } from "@tanstack/react-router";
+import type { MouseEvent } from "react";
 import { EventImage } from "@/components/catalog/EventImage";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
+import { usePostEventsByIdRegister } from "@/generated/hooks/usePostEventsByIdRegister";
 
 interface EventCardProps {
   event: {
@@ -20,6 +22,12 @@ interface EventCardProps {
   };
 }
 
+function is409(error: unknown): boolean {
+  if (!error || typeof error !== "object") return false;
+  const maybe = error as { response?: { status?: number }; status?: number };
+  return maybe.response?.status === 409 || maybe.status === 409;
+}
+
 export function EventCard({ event }: EventCardProps) {
   const title = event.title || event.name || "Untitled Event";
   const startDate = event.startDate ? new Date(event.startDate) : null;
@@ -28,6 +36,21 @@ export function EventCard({ event }: EventCardProps) {
     month: "short",
     year: "numeric",
   });
+
+  const mutation = usePostEventsByIdRegister();
+  const alreadyRegistered = mutation.isSuccess || is409(mutation.error);
+
+  const handleRegister = (e: MouseEvent<HTMLButtonElement>) => {
+    // Don't trigger the stretched-link navigation to event detail.
+    e.preventDefault();
+    e.stopPropagation();
+    if (alreadyRegistered || mutation.isPending) return;
+    mutation.mutate({ id: event.id });
+  };
+
+  let buttonLabel = "Register for event";
+  if (alreadyRegistered) buttonLabel = "Already registered";
+  else if (mutation.isPending) buttonLabel = "Registering...";
 
   return (
     <Card className="group relative" variant="polaroid">
@@ -63,8 +86,14 @@ export function EventCard({ event }: EventCardProps) {
           <p className="text-xs text-muted-foreground line-clamp-1">By {event.winemakerName}</p>
         )}
 
-        <Button className="relative z-10 mt-3 w-full" size="sm">
-          Register for event
+        <Button
+          className="relative z-10 mt-3 w-full"
+          disabled={alreadyRegistered || mutation.isPending}
+          onClick={handleRegister}
+          size="sm"
+          type="button"
+        >
+          {buttonLabel}
         </Button>
       </div>
     </Card>
