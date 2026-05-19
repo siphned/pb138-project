@@ -193,12 +193,32 @@ export function Sidebar({ userRoles = [Role.customer], activeRole, onRoleChange 
 
             <Show when="signed-in">
               {currentActiveRole === Role.customer && (
-                <NavItem onClick={closeSheet} render={<Link to="/orders" />} variant="active">
-                  <Package className="h-4 w-4" /> Order History
-                </NavItem>
+                <>
+                  <NavItem onClick={closeSheet} render={<Link to="/orders" />} variant="active">
+                    <Package className="h-4 w-4" /> Order History
+                  </NavItem>
+                  <NavItem onClick={closeSheet} render={<Link to="/events" />} variant="active">
+                    <Calendar className="h-4 w-4" /> My Events
+                  </NavItem>
+                </>
               )}
 
-              {currentActiveRole !== Role.customer && (
+              {currentActiveRole === Role.winemaker && (
+                <>
+                  <NavItem
+                    onClick={closeSheet}
+                    render={<Link search={{ winemakerId: "me" }} to="/explore" />}
+                    variant="active"
+                  >
+                    <Wine className="h-4 w-4" /> My Wines
+                  </NavItem>
+                  <NavItem onClick={closeSheet} render={<Link to="/events" />} variant="active">
+                    <Calendar className="h-4 w-4" /> My Events
+                  </NavItem>
+                </>
+              )}
+
+              {(currentActiveRole === Role.shopOwner || currentActiveRole === Role.admin) && (
                 <>
                   <NavItem
                     onClick={closeSheet}
