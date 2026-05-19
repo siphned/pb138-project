@@ -19,6 +19,7 @@ interface EventCardProps {
     winemakerName?: string;
     winemakerId?: string;
     attendees?: number;
+    capacity?: number;
   };
 }
 
@@ -83,10 +84,22 @@ export function EventCard({ event }: EventCardProps) {
         </Link>
       }
     >
-      {formattedDate && (
-        <span className="inline-block rounded-md bg-primary/10 px-2 py-0.5 text-[10px] font-semibold tracking-wide text-primary">
-          {formattedDate}
-        </span>
+      {(formattedDate || event.attendees !== undefined) && (
+        <div className="flex flex-wrap items-center justify-center gap-2">
+          {formattedDate && (
+            <span className="rounded-md bg-primary/10 px-2 py-0.5 text-[10px] font-semibold tracking-wide text-primary">
+              {formattedDate}
+            </span>
+          )}
+          {event.attendees !== undefined && (
+            <span className="inline-flex items-center gap-1 rounded-md bg-muted px-2 py-0.5 text-[10px] font-semibold tracking-wide text-muted-foreground">
+              <HugeiconsIcon className="h-3 w-3" icon={UserGroupIcon} />
+              {event.capacity !== undefined
+                ? `${event.attendees}/${event.capacity}`
+                : `${event.attendees}`}
+            </span>
+          )}
+        </div>
       )}
 
       {event.location && (
@@ -98,13 +111,6 @@ export function EventCard({ event }: EventCardProps) {
 
       {event.winemakerName && (
         <p className="text-xs text-muted-foreground line-clamp-1">By {event.winemakerName}</p>
-      )}
-
-      {event.attendees !== undefined && (
-        <div className="flex items-center justify-center gap-1.5 text-xs text-muted-foreground">
-          <HugeiconsIcon className="h-3 w-3" icon={UserGroupIcon} />
-          <span>{event.attendees} attending</span>
-        </div>
       )}
 
       {alreadyRegistered ? registeredCta : registerCta}
