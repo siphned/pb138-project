@@ -31,7 +31,8 @@ export function EntityImage({
   className,
 }: EntityImageProps) {
   const { data, isLoading } = imagesQuery;
-  const first = !isLoading && Array.isArray(data) ? (data[0] as { url?: string } | undefined) : undefined;
+  const first =
+    !isLoading && Array.isArray(data) ? (data[0] as { url?: string } | undefined) : undefined;
   const url = first?.url;
 
   if (url) {

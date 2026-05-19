@@ -86,7 +86,7 @@ describe("ProductCard", () => {
 
   it("renders the first image URL when the images hook returns data", () => {
     setImages([
-      { id: "i1", entityId: "prod-1", entityType: "product", url: "https://example.com/p.jpg" },
+      { entityId: "prod-1", entityType: "product", id: "i1", url: "https://example.com/p.jpg" },
     ]);
     render(<ProductCard product={mockProduct} />);
     const img = screen.getByRole("img");

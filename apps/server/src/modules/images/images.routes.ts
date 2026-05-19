@@ -5,7 +5,6 @@ import { errorResponse } from "../../utils/error-plugin";
 import type { AppRole } from "../auth";
 import { authPlugin } from "../auth";
 import type { EntityType } from "./images.repository";
-import * as imagesRepo from "./images.repository";
 import {
   entityTypeSchema,
   imageResponse,
