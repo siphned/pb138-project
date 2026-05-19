@@ -11,6 +11,8 @@ interface SectionProps extends useRender.ComponentProps<"section"> {
 }
 
 export function Section({ heading, actions, className, children, render, ...props }: SectionProps) {
+  const showHeader = heading !== undefined || actions !== undefined;
+
   return useRender({
     defaultTagName: "section",
     props: mergeProps<"section">(
@@ -18,9 +20,9 @@ export function Section({ heading, actions, className, children, render, ...prop
       {
         children: (
           <>
-            {(heading != null || actions) && (
+            {showHeader && (
               <div className="flex items-center justify-between gap-4">
-                {heading ? <SectionLabel>{heading}</SectionLabel> : null}
+                {heading !== undefined && <SectionLabel>{heading}</SectionLabel>}
                 {actions}
               </div>
             )}

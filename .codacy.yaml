@@ -1,4 +1,8 @@
 ---
+engines:
+  eslint:
+    enabled: false
 exclude_paths:
   - "**/*.test.ts"
   - "**/*.test.tsx"
+  - "**/generated/**"

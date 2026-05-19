@@ -28,6 +28,8 @@ interface ShopManageMenuProps {
 
 export function ShopManageMenu({ shop }: ShopManageMenuProps) {
   const { id, ownerUserId } = shop;
+  const shopParams = { id };
+  const inventorySearch = { isBundle: undefined };
 
   return (
     <ShowOwner ownerUserId={ownerUserId}>
@@ -46,17 +48,17 @@ export function ShopManageMenu({ shop }: ShopManageMenuProps) {
           <DropdownMenuSeparator />
 
           <DropdownMenuGroup>
-            <DropdownMenuItem render={<Link params={{ id: id }} to="/shops/$id/edit" />}>
+            <DropdownMenuItem render={<Link params={shopParams} to="/shops/$id/edit" />}>
               <HugeiconsIcon className="mr-2 h-4 w-4" icon={Edit01Icon} />
               <span>Edit shop details</span>
             </DropdownMenuItem>
 
-            <DropdownMenuItem render={<Link params={{ id: id }} to="/shops/$id/images" />}>
+            <DropdownMenuItem render={<Link params={shopParams} to="/shops/$id/images" />}>
               <HugeiconsIcon className="mr-2 h-4 w-4" icon={Image01Icon} />
               <span>Manage images</span>
             </DropdownMenuItem>
 
-            <DropdownMenuItem render={<Link params={{ id }} to="/shops/$id/availability" />}>
+            <DropdownMenuItem render={<Link params={shopParams} to="/shops/$id/availability" />}>
               <HugeiconsIcon className="mr-2 h-4 w-4" icon={Calendar03Icon} />
               <span>Manage availability</span>
             </DropdownMenuItem>
@@ -67,19 +69,19 @@ export function ShopManageMenu({ shop }: ShopManageMenuProps) {
           <DropdownMenuGroup>
             <DropdownMenuItem
               render={
-                <Link params={{ id }} search={{ isBundle: undefined }} to="/shops/$id/inventory" />
+                <Link params={shopParams} search={inventorySearch} to="/shops/$id/inventory" />
               }
             >
               <HugeiconsIcon className="mr-2 h-4 w-4" icon={PackageIcon} />
               <span>Manage inventory</span>
             </DropdownMenuItem>
 
-            <DropdownMenuItem render={<Link params={{ id }} to="/shops/$id/orders" />}>
+            <DropdownMenuItem render={<Link params={shopParams} to="/shops/$id/orders" />}>
               <HugeiconsIcon className="mr-2 h-4 w-4" icon={ShoppingBasket01Icon} />
               <span>Incoming orders</span>
             </DropdownMenuItem>
 
-            <DropdownMenuItem render={<Link params={{ id }} to="/shops/$id/supply-browse" />}>
+            <DropdownMenuItem render={<Link params={shopParams} to="/shops/$id/supply-browse" />}>
               <HugeiconsIcon className="mr-2 h-4 w-4" icon={TruckIcon} />
               <span>Supply agreements</span>
             </DropdownMenuItem>
