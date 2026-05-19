@@ -213,7 +213,7 @@ jobs:
           name: generated-code
           path: apps/web/src/generated/
       - name: Install Playwright
-        run: bun exec playwright install --with-deps
+        run: bunx playwright install --with-deps
       - name: Run E2E tests (shard ${{ matrix.shard }}/3)
         env:
           SHARD: ${{ matrix.shard }}/3
