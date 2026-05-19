@@ -21,7 +21,7 @@ describe("AdminStatsSection", () => {
   it("renders the loading state while fetching", () => {
     mock(undefined, { isLoading: true });
     const { container } = render(<AdminStatsSection />);
-    expect(container.querySelector("[data-slot='loading-state']")).toBeInTheDocument();
+    expect(container.querySelector("[data-slot='stat-tiles-skeleton']")).toBeInTheDocument();
   });
 
   it("renders admin tiles populated from the API", () => {

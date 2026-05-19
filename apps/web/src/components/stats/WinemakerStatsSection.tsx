@@ -1,9 +1,8 @@
 import { DataGrid } from "@/components/primitives/data-grid";
-import { ErrorState } from "@/components/primitives/error-state";
-import { LoadingState } from "@/components/primitives/loading-state";
 import { Section } from "@/components/primitives/section";
 import { useGetStats } from "@/generated/hooks/useGetStats";
 import { StatTile } from "./StatTile";
+import { is403, StatsErrorState, StatTilesSkeleton } from "./StatsSectionScaffold";
 
 const toNumber = (n: unknown): number => {
   if (typeof n === "number") return n;
@@ -14,13 +13,15 @@ const toNumber = (n: unknown): number => {
   return 0;
 };
 
+const TILE_COUNT = 5;
+
 export function WinemakerStatsSection() {
-  const { data, isLoading, isError, refetch } = useGetStats({ role: "winemaker" });
+  const { data, isLoading, isError, error, refetch } = useGetStats({ role: "winemaker" });
 
   if (isLoading) {
     return (
       <Section heading="Winemaker performance">
-        <LoadingState variant="catalog" />
+        <StatTilesSkeleton count={TILE_COUNT} />
       </Section>
     );
   }
@@ -28,10 +29,10 @@ export function WinemakerStatsSection() {
   if (isError || !data || data.role !== "winemaker") {
     return (
       <Section heading="Winemaker performance">
-        <ErrorState
-          message="We couldn't load your winemaker stats."
+        <StatsErrorState
+          isForbidden={is403(error)}
           onRetry={() => refetch()}
-          title="Stats unavailable"
+          roleLabel="winemaker"
         />
       </Section>
     );

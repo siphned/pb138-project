@@ -1,9 +1,8 @@
 import { DataGrid } from "@/components/primitives/data-grid";
-import { ErrorState } from "@/components/primitives/error-state";
-import { LoadingState } from "@/components/primitives/loading-state";
 import { Section } from "@/components/primitives/section";
 import { useGetStats } from "@/generated/hooks/useGetStats";
 import { StatTile } from "./StatTile";
+import { is403, StatsErrorState, StatTilesSkeleton } from "./StatsSectionScaffold";
 
 const toNumber = (n: unknown): number => {
   if (typeof n === "number") return n;
@@ -17,13 +16,15 @@ const toNumber = (n: unknown): number => {
 const eur = (n: number) =>
   n.toLocaleString("en-IE", { currency: "EUR", maximumFractionDigits: 0, style: "currency" });
 
+const TILE_COUNT = 4;
+
 export function CustomerStatsSection() {
-  const { data, isLoading, isError, refetch } = useGetStats({ role: "customer" });
+  const { data, isLoading, isError, error, refetch } = useGetStats({ role: "customer" });
 
   if (isLoading) {
     return (
       <Section heading="My activity">
-        <LoadingState variant="catalog" />
+        <StatTilesSkeleton count={TILE_COUNT} />
       </Section>
     );
   }
@@ -31,10 +32,10 @@ export function CustomerStatsSection() {
   if (isError || !data || data.role !== "customer") {
     return (
       <Section heading="My activity">
-        <ErrorState
-          message="We couldn't load your customer stats."
+        <StatsErrorState
+          isForbidden={is403(error)}
           onRetry={() => refetch()}
-          title="Stats unavailable"
+          roleLabel="customer"
         />
       </Section>
     );

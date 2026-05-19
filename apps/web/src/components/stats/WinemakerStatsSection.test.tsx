@@ -21,7 +21,7 @@ describe("WinemakerStatsSection", () => {
   it("renders the loading state while fetching", () => {
     mock(undefined, { isLoading: true });
     const { container } = render(<WinemakerStatsSection />);
-    expect(container.querySelector("[data-slot='loading-state']")).toBeInTheDocument();
+    expect(container.querySelector("[data-slot='stat-tiles-skeleton']")).toBeInTheDocument();
   });
 
   it("renders winemaker tiles populated from the API", () => {

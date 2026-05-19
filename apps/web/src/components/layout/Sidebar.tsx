@@ -1,6 +1,7 @@
 import { Show, useAuth, useClerk, useUser as useClerkUser } from "@clerk/react";
 import { Link, useNavigate } from "@tanstack/react-router";
 import {
+  BarChart3,
   Calendar,
   LogOut,
   Menu,
@@ -209,6 +210,10 @@ export function Sidebar({ userRoles = [Role.customer], activeRole, onRoleChange 
                   </NavItem>
                 </>
               )}
+
+              <NavItem onClick={closeSheet} render={<Link to="/stats" />} variant="active">
+                <BarChart3 className="h-4 w-4" /> Statistics
+              </NavItem>
             </Show>
 
             <Show when="signed-in">

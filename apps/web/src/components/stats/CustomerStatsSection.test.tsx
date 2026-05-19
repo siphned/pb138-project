@@ -21,7 +21,7 @@ describe("CustomerStatsSection", () => {
   it("renders the loading state while fetching", () => {
     mock(undefined, { isLoading: true });
     const { container } = render(<CustomerStatsSection />);
-    expect(container.querySelector("[data-slot='loading-state']")).toBeInTheDocument();
+    expect(container.querySelector("[data-slot='stat-tiles-skeleton']")).toBeInTheDocument();
   });
 
   it("renders all four customer stat tiles with API values", () => {
