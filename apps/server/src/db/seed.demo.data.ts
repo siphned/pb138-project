@@ -299,7 +299,7 @@ export const WINEMAKERS: WinemakerData[] = [
   },
   {
     key: "vinarska",
-    ownerKey: "pavlov",
+    ownerKey: null,
     email: "info@kolejni-vino.cz",
     name: "Koleje Vinařská Cellars",
     description:
