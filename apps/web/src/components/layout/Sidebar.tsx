@@ -10,7 +10,9 @@ import {
   Search,
   Settings,
   ShoppingCart,
+  Store,
   User as UserIcon,
+  Users,
   Wine,
 } from "lucide-react";
 import { useState } from "react";
@@ -170,19 +172,23 @@ export function Sidebar({ userRoles = [Role.customer], activeRole, onRoleChange 
             </NavItem>
 
             <NavItem onClick={closeSheet} render={<Link to="/explore" />} variant="active">
-              <Wine className="h-4 w-4" /> Explore Wines
+              <Wine className="h-4 w-4" /> Wines
             </NavItem>
 
-            <NavItem
-              onClick={closeSheet}
-              render={<Link search={{ isBundle: true }} to="/products" />}
-              variant="active"
-            >
-              <Package className="h-4 w-4" /> Bundles
+            <NavItem onClick={closeSheet} render={<Link to="/products" />} variant="active">
+              <Package className="h-4 w-4" /> Products
+            </NavItem>
+
+            <NavItem onClick={closeSheet} render={<Link to="/winemakers" />} variant="active">
+              <Users className="h-4 w-4" /> Winemakers
             </NavItem>
 
             <NavItem onClick={closeSheet} render={<Link to="/events" />} variant="active">
               <Calendar className="h-4 w-4" /> Events
+            </NavItem>
+
+            <NavItem onClick={closeSheet} render={<Link to="/shops" />} variant="active">
+              <Store className="h-4 w-4" /> Shops
             </NavItem>
 
             <Show when="signed-in">
