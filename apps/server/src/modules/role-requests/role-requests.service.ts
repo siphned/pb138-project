@@ -1,6 +1,6 @@
 import { createClerkClient } from "@clerk/backend";
-import type { RoleRequest } from "@repo/shared/schemas";
 import { NotFoundError } from "@repo/shared";
+import type { RoleRequest } from "@repo/shared/schemas";
 import { db } from "../../db";
 import { logger } from "../../utils/logger";
 import { emailService } from "../email/email.service";

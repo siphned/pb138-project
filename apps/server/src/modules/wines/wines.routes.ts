@@ -1,6 +1,6 @@
 import { Elysia, status, t } from "elysia";
-import { errorResponse } from "../../utils/error-plugin";
 import { db } from "../../db";
+import { errorResponse } from "../../utils/error-plugin";
 import { authPlugin } from "../auth";
 import { verifyClerkToken } from "../auth/auth.utils";
 import { usersService } from "../users/users.service";

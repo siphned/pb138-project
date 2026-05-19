@@ -12,6 +12,7 @@ env:
 jobs:
   jira-status:
     runs-on: ubuntu-latest
+    continue-on-error: true
     steps:
       - name: Extract Jira issue from PR title
         id: extract
