@@ -14,7 +14,7 @@ export function ShopDetailsCard({ shop }: ShopDetailsCardProps) {
         <h2 className="text-xl font-bold font-heading">About Our Shop</h2>
         <div className="prose prose-sm dark:prose-invert">
           <p className="text-muted-foreground leading-relaxed">
-            {shop.description || "No description available."}
+            {shop.description ? shop.description : "No description available."}
           </p>
         </div>
       </div>

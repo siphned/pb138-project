@@ -33,7 +33,7 @@ export function ShopProductsRow({ shopId, isBundle }: ShopProductsRowProps) {
     );
   }
 
-  const items = (data || []).slice(0, 10);
+  const items = (data ?? []).slice(0, 10);
 
   if (items.length === 0) {
     return null; // Don't render the section if empty
