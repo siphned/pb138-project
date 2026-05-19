@@ -208,6 +208,7 @@ jobs:
       DATABASE_URL: postgresql://postgres:postgres@localhost:5432/winemarket
       FRONTEND_URL: http://localhost:5173
       CLERK_JWT_KEY: ${{ secrets.CLERK_JWT_KEY }}
+      CLERK_SECRET_KEY: ${{ secrets.CLERK_SECRET_KEY }}
     steps:
       - uses: actions/checkout@v4
       - name: Setup Bun
