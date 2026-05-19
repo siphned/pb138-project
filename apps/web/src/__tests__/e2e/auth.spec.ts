@@ -1,28 +1,28 @@
 import { expect, test } from "@playwright/test";
 
 test.describe("Auth guards", () => {
-  test("unauthenticated user visiting /dashboard is redirected to /login", async ({ page }) => {
+  test("unauthenticated user visiting /dashboard is redirected to /auth/login", async ({ page }) => {
     await page.goto("/dashboard");
-    await page.waitForURL("**/login", { timeout: 5000 });
-    expect(page.url()).toContain("/login");
+    await page.waitForURL("**/auth/login", { timeout: 5000 });
+    expect(page.url()).toContain("/auth/login");
   });
 
-  test("unauthenticated user visiting /settings is redirected to /login", async ({ page }) => {
-    await page.goto("/settings");
-    await page.waitForURL("**/login", { timeout: 5000 });
-    expect(page.url()).toContain("/login");
-  });
-
-  test("unauthenticated user visiting /orders is redirected to /login", async ({ page }) => {
+  test("unauthenticated user visiting /orders is redirected to /auth/login", async ({ page }) => {
     await page.goto("/orders");
-    await page.waitForURL("**/login", { timeout: 5000 });
-    expect(page.url()).toContain("/login");
+    await page.waitForURL("**/auth/login", { timeout: 5000 });
+    expect(page.url()).toContain("/auth/login");
   });
 
-  test("unauthenticated user visiting /admin/* is redirected to /login", async ({ page }) => {
+  test("unauthenticated user visiting /stats is redirected to /auth/login", async ({ page }) => {
+    await page.goto("/stats");
+    await page.waitForURL("**/auth/login", { timeout: 5000 });
+    expect(page.url()).toContain("/auth/login");
+  });
+
+  test("unauthenticated user visiting /admin/* is redirected to /auth/login", async ({ page }) => {
     await page.goto("/admin");
-    await page.waitForURL("**/login", { timeout: 5000 });
-    expect(page.url()).toContain("/login");
+    await page.waitForURL("**/auth/login", { timeout: 5000 });
+    expect(page.url()).toContain("/auth/login");
   });
 });
 
@@ -47,14 +47,14 @@ test.describe("Public routes & environment", () => {
     expect(page.url()).not.toContain("/login");
   });
 
-  test("/login renders Clerk SignIn widget", async ({ page }) => {
-    await page.goto("/login");
+  test("/auth/login renders Clerk SignIn widget", async ({ page }) => {
+    await page.goto("/auth/login");
     await page.waitForLoadState("networkidle");
     await expect(page.locator("body")).not.toContainText("Missing Publishable Key");
   });
 
-  test("/register renders Clerk SignUp widget", async ({ page }) => {
-    await page.goto("/register");
+  test("/auth/register renders Clerk SignUp widget", async ({ page }) => {
+    await page.goto("/auth/register");
     await page.waitForLoadState("networkidle");
     await expect(page.locator("body")).not.toContainText("Missing Publishable Key");
   });
