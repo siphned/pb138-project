@@ -17,12 +17,8 @@ const API_BASE_URL = "http://localhost:3000";
 test.describe("API Integration Tests", () => {
   let _testToken: string;
   let _testAdminToken: string;
-  let _testUserId: string;
   let _testWineId: string;
   let _testProductId: string;
-  let _testShopId: string;
-  let _testSessionId: string;
-  let _testOrderId: string;
 
   test.beforeAll(async () => {
     /**
@@ -248,7 +244,7 @@ test.describe("API Integration Tests", () => {
 
     test("should validate order response structure when orders exist", async ({ request }) => {
       // Create a guest cart first to have something to order
-      const _cartResponse = await request.post(`${API_BASE_URL}/carts/items`, {
+      await request.post(`${API_BASE_URL}/carts/items`, {
         data: {
           productId: "test-product-id",
           quantity: 1,
