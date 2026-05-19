@@ -13,7 +13,7 @@ interface WineCardProps {
 export function WineCard({ wine, minPrice }: WineCardProps) {
   return (
     <Card className="group relative" variant="polaroid">
-      <div className="aspect-[2/1] w-full overflow-hidden rounded-lg bg-muted shadow-xs">
+      <div className="aspect-3/4 w-full overflow-hidden rounded-lg bg-muted shadow-xs">
         <WineImage alt={wine.name} fallbackColor={wine.color} fallbackText={wine.name} wineId={wine.id} />
       </div>
 
