@@ -1,49 +1,61 @@
 import { render, screen } from "@testing-library/react";
 import { describe, expect, it, vi } from "vitest";
+import type { GetShops200Item } from "./ShopCard";
 import { ShopCard } from "./ShopCard";
 
-// Mock @tanstack/react-router
 vi.mock("@tanstack/react-router", () => ({
-  Link: ({ children, to, params }: any) => (
+  Link: ({
+    children,
+    to,
+    params,
+  }: {
+    children: React.ReactNode;
+    to: string;
+    params?: { id?: string };
+  }) => (
     <a data-params={JSON.stringify(params)} href={to}>
       {children}
     </a>
   ),
 }));
 
+vi.mock("@/generated/hooks/useGetShopsByIdImages", () => ({
+  useGetShopsByIdImages: vi.fn(() => ({ data: [], isLoading: false })),
+}));
+
+import { useGetShopsByIdImages } from "@/generated/hooks/useGetShopsByIdImages";
+
 const mockShop = {
-  address: {
-    city: "Brno",
-    country: "Czech Republic",
-  },
+  address: { city: "Brno", country: "Czech Republic" },
   id: "shop-1",
-  images: [{ url: "https://example.com/shop.jpg" }],
   name: "Test Wine Shop",
-};
+} as unknown as GetShops200Item;
 
 describe("ShopCard", () => {
   it("renders shop name and city", () => {
-    render(<ShopCard shop={mockShop as any} />);
-    expect(screen.getByText("Test Wine Shop")).toBeInTheDocument();
+    render(<ShopCard shop={mockShop} />);
+    expect(screen.getAllByText("Test Wine Shop").length).toBeGreaterThan(0);
     expect(screen.getByText("Brno, Czech Republic")).toBeInTheDocument();
   });
 
-  it("renders the shop image when provided", () => {
-    render(<ShopCard shop={mockShop as any} />);
+  it("renders the shop image when the images hook returns data", () => {
+    vi.mocked(useGetShopsByIdImages).mockReturnValueOnce({
+      data: [{ url: "https://example.com/shop.jpg" }],
+      isLoading: false,
+    } as unknown as ReturnType<typeof useGetShopsByIdImages>);
+    render(<ShopCard shop={mockShop} />);
     const img = screen.getByAltText("Test Wine Shop");
     expect(img).toHaveAttribute("src", "https://example.com/shop.jpg");
   });
 
-  it("renders placeholder when no image is provided", () => {
-    const shopWithoutImage = { ...mockShop, images: [] };
-    render(<ShopCard shop={shopWithoutImage as any} />);
+  it("renders placeholder when the images hook returns nothing", () => {
+    render(<ShopCard shop={mockShop} />);
     expect(screen.queryByAltText("Test Wine Shop")).not.toBeInTheDocument();
-    // CatalogPlaceholder and the Link both contain the shop name
-    expect(screen.getAllByText("Test Wine Shop")).toHaveLength(2);
+    expect(screen.getAllByText("Test Wine Shop").length).toBeGreaterThan(0);
   });
 
   it("links to the correct shop detail page", () => {
-    render(<ShopCard shop={mockShop as any} />);
+    render(<ShopCard shop={mockShop} />);
     const link = screen.getByRole("link", { name: "Test Wine Shop" });
     expect(link).toHaveAttribute("href", "/shops/$id");
     expect(link).toHaveAttribute("data-params", JSON.stringify({ id: "shop-1" }));

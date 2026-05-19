@@ -1,48 +1,27 @@
 import { Link } from "@tanstack/react-router";
-import { Card } from "@/components/ui/card";
+import { CatalogCard, catalogCardLinkClass } from "@/components/catalog/CatalogCard";
+import { ShopImage } from "@/components/catalog/ShopImage";
 import type { GetShops200 } from "@/generated/types/GetShops";
-import { CatalogPlaceholder } from "../catalog/CatalogPlaceholder";
 
-export type GetShops200Item = GetShops200[number] & {
-  images?: { url: string }[];
-};
+export type GetShops200Item = GetShops200[number];
 
 interface ShopCardProps {
   shop: GetShops200Item;
 }
 
 export function ShopCard({ shop }: ShopCardProps) {
-  const imageUrl = shop.images?.[0]?.url;
+  const location = [shop.address?.city, shop.address?.country].filter(Boolean).join(", ");
 
   return (
-    <Card className="group relative" variant="polaroid">
-      <div className="aspect-square w-full overflow-hidden rounded-lg bg-muted shadow-xs">
-        {imageUrl ? (
-          <img
-            alt={shop.name}
-            className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-105"
-            src={imageUrl}
-          />
-        ) : (
-          <CatalogPlaceholder text={shop.name} />
-        )}
-      </div>
-
-      <div className="pt-4 text-center">
-        <h3 className="font-heading text-base font-bold leading-tight">
-          <Link
-            className="stretched-link transition-colors hover:text-primary focus:outline-none"
-            params={{ id: shop.id }}
-            to="/shops/$id"
-          >
-            {shop.name}
-          </Link>
-        </h3>
-
-        <p className="text-xs text-muted-foreground mt-1">
-          {[shop.address?.city, shop.address?.country].filter(Boolean).join(", ")}
-        </p>
-      </div>
-    </Card>
+    <CatalogCard
+      imageSlot={<ShopImage alt={shop.name} fallbackText={shop.name} shopId={shop.id} />}
+      titleLink={
+        <Link className={catalogCardLinkClass} params={{ id: shop.id }} to="/shops/$id">
+          {shop.name}
+        </Link>
+      }
+    >
+      {location && <p className="text-xs text-muted-foreground">{location}</p>}
+    </CatalogCard>
   );
 }
