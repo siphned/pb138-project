@@ -1,5 +1,5 @@
-import type { SupplyAgreement } from "@repo/shared/schemas";
 import { ForbiddenError } from "@repo/shared";
+import type { SupplyAgreement } from "@repo/shared/schemas";
 import { db } from "../../db";
 import { ForbiddenShopActionError } from "../shops/shops.errors";
 import * as shopsRepo from "../shops/shops.repository";

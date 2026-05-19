@@ -1,6 +1,6 @@
 import { db } from "../../db";
-import { emailService } from "../email/email.service";
 import { logger } from "../../utils/logger";
+import { emailService } from "../email/email.service";
 import * as winemakersRepo from "../winemakers/winemakers.repository";
 import {
   AdminEventNotFoundError,
