@@ -43,8 +43,19 @@ describe("ProductCard", () => {
     expect(screen.queryByText("BUNDLE")).not.toBeInTheDocument();
   });
 
-  it("renders shop name", () => {
-    render(<ProductCard product={mockProduct} />);
+  it("renders shop name when showShopName is true", () => {
+    render(<ProductCard product={mockProduct} showShopName={true} />);
     expect(screen.getByText(/Vinotéka u Adama/)).toBeInTheDocument();
+  });
+
+  it("does NOT render shop name when showShopName is false", () => {
+    render(<ProductCard product={mockProduct} showShopName={false} />);
+    expect(screen.queryByText(/Vinotéka u Adama/)).not.toBeInTheDocument();
+  });
+
+  it("does NOT render shop name when product.shop is missing", () => {
+    const noShop = { ...mockProduct, shop: undefined };
+    render(<ProductCard product={noShop} />);
+    expect(screen.queryByText(/Vinotéka u Adama/)).not.toBeInTheDocument();
   });
 });

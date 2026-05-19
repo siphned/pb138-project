@@ -415,10 +415,10 @@ export interface FileRoutesByTo {
   '/winemakers/$id': typeof WinemakersIdRouteWithChildren
   '/wines/$id': typeof WinesIdRouteWithChildren
   '/wines/new': typeof WinesNewRoute
-  '/events': typeof AuthenticatedAdminEventsRoute
-  '/products': typeof AuthenticatedAdminProductsRoute
-  '/shops': typeof AuthenticatedAdminShopsRoute
-  '/winemakers': typeof AuthenticatedAdminWinemakersRoute
+  '/events': typeof EventsIndexRoute
+  '/products': typeof ProductsIndexRoute
+  '/shops': typeof ShopsIndexRoute
+  '/winemakers': typeof WinemakersIndexRoute
   '/wines': typeof WinesIndexRoute
   '/admin': typeof AuthenticatedAdminAdminRoute
   '/moderation': typeof AuthenticatedAdminModerationRoute
