@@ -58,8 +58,9 @@ jobs:
     env:
       DATABASE_URL: postgresql://postgres:postgres@localhost:5432/winemarket
       FRONTEND_URL: http://localhost:5173
-      # Clerk key only needed when verifyClerkToken is actually called (not during spec gen)
-      CLERK_JWT_KEY: ${{ secrets.CLERK_JWT_KEY }}
+      # Clerk keys only needed when auth is actually called (not during spec gen)
+      CLERK_JWT_KEY: ${{ secrets.CLERK_JWT_KEY || 'ci_placeholder' }}
+      CLERK_SECRET_KEY: ${{ secrets.CLERK_SECRET_KEY || 'ci_placeholder' }}
     steps:
       - uses: actions/checkout@v4
       - name: Setup Bun

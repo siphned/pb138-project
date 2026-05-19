@@ -1,5 +1,6 @@
 import { db } from "../../db";
 import { parsePagination } from "../../utils/pagination";
+import { AlreadyReviewedError, NotPurchasedError, ReviewNotFoundError } from "./reviews.errors";
 import type { ReviewWithUser } from "./reviews.repository";
 import * as reviewsRepo from "./reviews.repository";
 
@@ -16,12 +17,12 @@ export class ReviewsService {
       reviewsRepo.findUserReview(db, userId, productId, "product"),
     ]);
 
-    if (!hasPurchased) throw new Error("NOT_PURCHASED");
-    if (existing) throw new Error("ALREADY_REVIEWED");
+    if (!hasPurchased) throw new NotPurchasedError();
+    if (existing) throw new AlreadyReviewedError();
 
     const review = await reviewsRepo.insertReview(db, userId, productId, "product", data);
     const withUser = await reviewsRepo.findReviewWithUser(db, review.id);
-    if (!withUser) throw new Error("NOT_FOUND");
+    if (!withUser) throw new ReviewNotFoundError();
     return withUser;
   }
 
@@ -30,12 +31,17 @@ export class ReviewsService {
     winemakerId: string,
     data: { rating: number; body?: string }
   ): Promise<ReviewWithUser> {
-    const existing = await reviewsRepo.findUserReview(db, userId, winemakerId, "winemaker");
-    if (existing) throw new Error("ALREADY_REVIEWED");
+    const [hasPurchased, existing] = await Promise.all([
+      reviewsRepo.hasPurchasedFromWinemaker(db, userId, winemakerId),
+      reviewsRepo.findUserReview(db, userId, winemakerId, "winemaker"),
+    ]);
+
+    if (!hasPurchased) throw new NotPurchasedError();
+    if (existing) throw new AlreadyReviewedError();
 
     const review = await reviewsRepo.insertReview(db, userId, winemakerId, "winemaker", data);
     const withUser = await reviewsRepo.findReviewWithUser(db, review.id);
-    if (!withUser) throw new Error("NOT_FOUND");
+    if (!withUser) throw new ReviewNotFoundError();
     return withUser;
   }
 
@@ -49,12 +55,12 @@ export class ReviewsService {
       reviewsRepo.findUserReview(db, userId, wineId, "wine"),
     ]);
 
-    if (!hasPurchased) throw new Error("NOT_PURCHASED");
-    if (existing) throw new Error("ALREADY_REVIEWED");
+    if (!hasPurchased) throw new NotPurchasedError();
+    if (existing) throw new AlreadyReviewedError();
 
     const review = await reviewsRepo.insertReview(db, userId, wineId, "wine", data);
     const withUser = await reviewsRepo.findReviewWithUser(db, review.id);
-    if (!withUser) throw new Error("NOT_FOUND");
+    if (!withUser) throw new ReviewNotFoundError();
     return withUser;
   }
 
@@ -67,12 +73,11 @@ export class ReviewsService {
   ): Promise<void> {
     const review = await reviewsRepo.findUserReview(db, userId, entityId, entityType);
     if (!review || review.id !== reviewId) {
-      // Also check by ID if it's admin
       if (userRole === "admin") {
         const byId = await reviewsRepo.findById(db, reviewId);
-        if (!byId) throw new Error("NOT_FOUND");
+        if (!byId) throw new ReviewNotFoundError();
       } else {
-        throw new Error("NOT_FOUND");
+        throw new ReviewNotFoundError();
       }
     }
 

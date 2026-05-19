@@ -35,6 +35,7 @@ export const updateWineBody = createWineBody;
 
 export const wineFiltersQuery = t.Object({
   color: t.Optional(wineColor),
+  q: t.Optional(t.String({ maxLength: 255 })),
   region: t.Optional(t.String()),
   type: t.Optional(wineType),
   vintageYear: t.Optional(t.Numeric()),

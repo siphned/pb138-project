@@ -4,11 +4,17 @@ import { and, eq, isNull } from "drizzle-orm";
 import type { Database } from "../../db";
 
 export async function deleteException(db: Database, id: string): Promise<void> {
-  await db.delete(availabilityExceptions).where(eq(availabilityExceptions.id, id));
+  await db
+    .update(availabilityExceptions)
+    .set({ deletedAt: new Date() })
+    .where(eq(availabilityExceptions.id, id));
 }
 
 export async function deleteRegular(db: Database, id: string): Promise<void> {
-  await db.delete(availabilityRegular).where(eq(availabilityRegular.id, id));
+  await db
+    .update(availabilityRegular)
+    .set({ deletedAt: new Date() })
+    .where(eq(availabilityRegular.id, id));
 }
 
 export async function findExceptionById(
@@ -25,7 +31,7 @@ export async function findExceptionsByShopId(
   shopId: string
 ): Promise<AvailabilityException[]> {
   return db.query.availabilityExceptions.findMany({
-    where: eq(availabilityExceptions.shopId, shopId),
+    where: and(eq(availabilityExceptions.shopId, shopId), isNull(availabilityExceptions.deletedAt)),
   });
 }
 
@@ -43,7 +49,7 @@ export async function findRegularByShopId(
   shopId: string
 ): Promise<AvailabilityRegular[]> {
   return db.query.availabilityRegular.findMany({
-    where: eq(availabilityRegular.shopId, shopId),
+    where: and(eq(availabilityRegular.shopId, shopId), isNull(availabilityRegular.deletedAt)),
   });
 }
 

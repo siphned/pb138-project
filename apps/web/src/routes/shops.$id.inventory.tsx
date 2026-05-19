@@ -1,6 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { StubGet } from "@/components/dev/StubGet";
-import { useGetShopsByIdProducts } from "@/generated/hooks/useGetShopsByIdProducts";
+import { useGetProducts } from "@/generated/hooks/useGetProducts";
 
 function parseIsBundle(v: unknown): boolean | undefined {
   if (v === "true") return true;
@@ -18,13 +18,11 @@ export const Route = createFileRoute("/shops/$id/inventory")({
 function ShopsInventoryStub() {
   const { id } = Route.useParams();
   const { isBundle } = Route.useSearch();
-  const query = useGetShopsByIdProducts(id, {
-    isBundle: isBundle === undefined ? undefined : String(isBundle),
-  });
+  const query = useGetProducts({ isBundle, shopId: id });
   return (
     <StubGet
       actorRole="shop_owner (owner)"
-      hookName="useGetShopsByIdProducts"
+      hookName="useGetProducts"
       query={query}
       title={`Shop ${id} inventory`}
     />

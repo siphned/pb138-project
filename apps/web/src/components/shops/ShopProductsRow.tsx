@@ -6,7 +6,7 @@ import { ErrorState } from "@/components/primitives/error-state";
 import { LoadingState } from "@/components/primitives/loading-state";
 import { Section } from "@/components/primitives/section";
 import { Button } from "@/components/ui/button";
-import { useGetShopsByIdProducts } from "@/generated/hooks/useGetShopsByIdProducts";
+import { useGetProducts } from "@/generated/hooks/useGetProducts";
 
 interface ShopProductsRowProps {
   shopId: string;
@@ -14,10 +14,16 @@ interface ShopProductsRowProps {
 }
 
 export function ShopProductsRow({ shopId, isBundle }: ShopProductsRowProps) {
-  const { data, isLoading, isError, refetch } = useGetShopsByIdProducts(
+  const {
+    data: rawData,
+    isLoading,
+    isError,
+    refetch,
+  } = useGetProducts({
+    isBundle: isBundle ? isBundle : false,
     shopId,
-    isBundle !== undefined ? { isBundle: String(isBundle) } : undefined
-  );
+  });
+  const data = rawData?.data;
 
   if (isLoading) {
     return <LoadingState variant="catalog" />;

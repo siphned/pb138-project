@@ -4,7 +4,14 @@ import { join } from "node:path";
 import { fileURLToPath } from "node:url";
 import type { Image } from "@repo/shared/schemas";
 import { db } from "../../db";
+import { logger } from "../../utils/logger";
 import { ForbiddenWineActionError } from "../wines/wines.errors";
+import {
+  ImageLimitExceededError,
+  ImageNotFoundError,
+  PayloadTooLargeError,
+  UnsupportedMediaTypeError,
+} from "./images.errors";
 import type { EntityType } from "./images.repository";
 import * as imagesRepo from "./images.repository";
 
@@ -22,9 +29,13 @@ const IMAGE_LIMITS: Record<string, number> = {
 type Caller = { roles: string[]; userId: string };
 
 export class ImagesService {
+  existsByUrl(url: string): Promise<boolean> {
+    return imagesRepo.findByUrl(db, url).then(Boolean);
+  }
+
   async listImages(entityType: EntityType, entityId: string): Promise<Image[]> {
     const exists = await imagesRepo.entityExists(db, entityType, entityId);
-    if (!exists) throw new Error("NOT_FOUND");
+    if (!exists) throw new ImageNotFoundError();
     return imagesRepo.findByEntity(db, entityType, entityId);
   }
 
@@ -35,12 +46,12 @@ export class ImagesService {
     file: File
   ): Promise<Image> {
     if (!ALLOWED_MIME_TYPES.includes(file.type as (typeof ALLOWED_MIME_TYPES)[number])) {
-      throw new Error("UNSUPPORTED_MEDIA_TYPE");
+      throw new UnsupportedMediaTypeError();
     }
-    if (file.size > MAX_FILE_SIZE) throw new Error("PAYLOAD_TOO_LARGE");
+    if (file.size > MAX_FILE_SIZE) throw new PayloadTooLargeError();
 
     const exists = await imagesRepo.entityExists(db, entityType, entityId);
-    if (!exists) throw new Error("NOT_FOUND");
+    if (!exists) throw new ImageNotFoundError();
 
     if (!caller.roles.includes("admin")) {
       await this.verifyOwnership(caller.userId, entityType, entityId);
@@ -48,7 +59,7 @@ export class ImagesService {
 
     const limit = IMAGE_LIMITS[entityType] ?? 10;
     const currentCount = await imagesRepo.countByEntity(db, entityType, entityId);
-    if (currentCount >= limit) throw new Error("IMAGE_LIMIT_EXCEEDED");
+    if (currentCount >= limit) throw new ImageLimitExceededError();
 
     const mimeToExt: Record<string, string> = {
       "image/gif": "gif",
@@ -71,9 +82,12 @@ export class ImagesService {
         url: `/uploads/${entityType}/${filename}`,
       });
     } catch (e) {
-      await unlink(filePath).catch(() => {
-        /* Ignore cleanup errors */
-      });
+      await unlink(filePath).catch((unlinkErr) =>
+        logger.error(
+          { err: unlinkErr, filePath },
+          "Failed to clean up uploaded file after DB error"
+        )
+      );
       throw e;
     }
   }
@@ -86,7 +100,7 @@ export class ImagesService {
   ): Promise<void> {
     const image = await imagesRepo.findById(db, imageId);
     if (!image || image.entityType !== entityType || image.entityId !== entityId) {
-      throw new Error("NOT_FOUND");
+      throw new ImageNotFoundError();
     }
 
     if (!caller.roles.includes("admin")) {
@@ -102,7 +116,7 @@ export class ImagesService {
     entityId: string
   ): Promise<void> {
     const ownerUserId = await imagesRepo.findOwnerUserId(db, entityType, entityId);
-    if (ownerUserId === undefined) throw new Error("NOT_FOUND");
+    if (ownerUserId === undefined) throw new ImageNotFoundError();
     if (ownerUserId !== userId) throw new ForbiddenWineActionError();
   }
 }
