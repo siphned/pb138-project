@@ -70,7 +70,14 @@ export const adminRoutes = new Elysia({ prefix: "/admin" })
       },
       query: t.Object({
         page: t.Optional(t.Numeric()),
-        role: t.Optional(t.String()),
+        role: t.Optional(
+          t.Union([
+            t.Literal("customer"),
+            t.Literal("winemaker"),
+            t.Literal("shop_owner"),
+            t.Literal("admin"),
+          ])
+        ),
         status: t.Optional(
           t.Union([t.Literal("active"), t.Literal("suspended"), t.Literal("banned")])
         ),
