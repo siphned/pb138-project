@@ -234,13 +234,11 @@ test.describe("API Integration Tests", () => {
       expect([401, 400]).toContain(response.status());
     });
 
-    test("should return empty array for authenticated user with no orders", async ({
-      request,
-    }) => {
+    test("should return empty array for authenticated user with no orders", async ({ request }) => {
       // Make request without token - guest checkout creates guest orders
       const response = await request.get(`${API_BASE_URL}/orders`, {
         headers: {
-          Authorization: `Bearer invalid-token`,
+          Authorization: "Bearer invalid-token",
         },
       });
 
@@ -248,9 +246,7 @@ test.describe("API Integration Tests", () => {
       expect([401]).toContain(response.status());
     });
 
-    test("should validate order response structure when orders exist", async ({
-      request,
-    }) => {
+    test("should validate order response structure when orders exist", async ({ request }) => {
       // Create a guest cart first to have something to order
       const _cartResponse = await request.post(`${API_BASE_URL}/carts/items`, {
         data: {
@@ -614,9 +610,7 @@ test.describe("API Integration Tests", () => {
     });
 
     test("should reject invalid status filter", async ({ request }) => {
-      const response = await request.get(
-        `${API_BASE_URL}/admin/events?status=invalid-status`
-      );
+      const response = await request.get(`${API_BASE_URL}/admin/events?status=invalid-status`);
 
       // Should be rejected for invalid status
       expect([400, 401, 403]).toContain(response.status());
@@ -677,9 +671,7 @@ test.describe("API Integration Tests", () => {
     test("should handle concurrent requests to same endpoint", async ({ request }) => {
       const promises = Array(5)
         .fill(null)
-        .map(() =>
-          request.get(`${API_BASE_URL}/wines?region=Moravia`)
-        );
+        .map(() => request.get(`${API_BASE_URL}/wines?region=Moravia`));
 
       const responses = await Promise.all(promises);
 

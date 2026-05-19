@@ -4,7 +4,7 @@ import { defineConfig, devices } from "@playwright/test";
 
 const root = path.resolve(fileURLToPath(import.meta.url), "../../..");
 
-export default defineConfig({
+const config = defineConfig({
   forbidOnly: !!process.env.CI,
   fullyParallel: true,
   projects: [
@@ -28,5 +28,15 @@ export default defineConfig({
       url: "http://localhost:5173",
     },
   ],
-  workers: undefined,
+  workers: process.env.CI ? 1 : undefined,
 });
+
+// Enable test sharding via SHARD environment variable (e.g., SHARD=1/3 for shard 1 of 3)
+if (process.env.SHARD) {
+  const [shardIndex, shardTotal] = process.env.SHARD.split("/").map(Number);
+  if (!Number.isNaN(shardIndex) && !Number.isNaN(shardTotal)) {
+    config.shard = { index: shardIndex, total: shardTotal };
+  }
+}
+
+export default config;

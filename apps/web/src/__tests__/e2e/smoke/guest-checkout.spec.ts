@@ -74,9 +74,9 @@ test.describe("Guest Checkout Flow: Add to Cart → Proceed to Checkout", () => 
     await page.waitForLoadState("networkidle");
 
     // Look for checkout button or link
-    const checkoutBtn = page.locator(
-      'button:has-text("Checkout"), button:has-text("checkout"), a[href*="/checkout"]'
-    ).first();
+    const checkoutBtn = page
+      .locator('button:has-text("Checkout"), button:has-text("checkout"), a[href*="/checkout"]')
+      .first();
 
     if (await checkoutBtn.isVisible()) {
       await checkoutBtn.click();

@@ -45,7 +45,9 @@ test.describe("Shop Owner Flow: Login → View Inventory & Orders", () => {
     await expect(page.locator("body")).not.toContainText("Missing Publishable Key");
   });
 
-  test("authenticated pages are protected from shop owner access without role", async ({ page }) => {
+  test("authenticated pages are protected from shop owner access without role", async ({
+    page,
+  }) => {
     // All shop owner routes should redirect to login if not authenticated
     const shopOwnerRoutes = [
       "/manage/shops",

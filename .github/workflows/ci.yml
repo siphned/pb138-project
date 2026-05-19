@@ -183,6 +183,57 @@ jobs:
             apps/server/dist/
             apps/web/dist/
 
+  e2e:
+    needs: [build]
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    strategy:
+      matrix:
+        shard: [1, 2, 3]
+    steps:
+      - uses: actions/checkout@v4
+      - name: Setup Bun
+        uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: 1.3.11
+      - name: Restore cache
+        uses: actions/cache@v4
+        with:
+          path: |
+            .bun-cache
+            node_modules
+            apps/server/node_modules
+            apps/web/node_modules
+            packages/*/node_modules
+          key: ${{ runner.os }}-bun-${{ hashFiles('**/bun.lock') }}
+          fail-on-cache-miss: true
+      - name: Download generated code
+        uses: actions/download-artifact@v4
+        with:
+          name: generated-code
+          path: apps/web/src/generated/
+      - name: Install Playwright
+        run: bun exec playwright install --with-deps
+      - name: Run E2E tests (shard ${{ matrix.shard }}/3)
+        env:
+          SHARD: ${{ matrix.shard }}/3
+        run: bun run test:e2e
+        timeout-minutes: 25
+      - name: Upload Playwright Report
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: playwright-report-shard-${{ matrix.shard }}
+          path: apps/web/playwright-report/
+          retention-days: 30
+      - name: Upload test results
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: e2e-test-results-shard-${{ matrix.shard }}
+          path: apps/web/test-results/
+          retention-days: 30
+
   test:
     needs: [install, generate]
     runs-on: ubuntu-latest

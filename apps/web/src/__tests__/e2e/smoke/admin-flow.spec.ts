@@ -40,12 +40,7 @@ test.describe("Admin Flow: Login → Moderation & Admin Panel", () => {
   });
 
   test("all admin routes require authentication", async ({ page }) => {
-    const adminRoutes = [
-      "/admin",
-      "/admin/moderation",
-      "/admin/users",
-      "/admin/role-requests",
-    ];
+    const adminRoutes = ["/admin", "/admin/moderation", "/admin/users", "/admin/role-requests"];
 
     for (const route of adminRoutes) {
       await page.goto(route);

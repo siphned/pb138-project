@@ -96,10 +96,7 @@ test.describe("Winemaker Flow: Login → Manage Wines → List & Create Wine", (
 
   test("cannot access protected winemaker sections without role", async ({ page }) => {
     // Attempt to access all protected winemaker routes
-    const protectedRoutes = [
-      "/manage-wines",
-      "/supply",
-    ];
+    const protectedRoutes = ["/manage-wines", "/supply"];
 
     for (const route of protectedRoutes) {
       await page.goto(route);
