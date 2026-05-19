@@ -25,6 +25,14 @@ vi.mock("@tanstack/react-router", () => ({
   useNavigate: () => mockNavigate,
 }));
 
+vi.mock("@/generated/hooks/useGetWinemakersMe", () => ({
+  useGetWinemakersMe: vi.fn(() => ({ data: undefined, isLoading: false })),
+}));
+
+vi.mock("@/generated/hooks/useGetShopsMe", () => ({
+  useGetShopsMe: vi.fn(() => ({ data: undefined, isLoading: false })),
+}));
+
 // Stub shadcn components so sidebar content is always visible
 vi.mock("@/components/ui/sheet", () => ({
   Sheet: ({ children }: { children: React.ReactNode }) => <div>{children}</div>,
@@ -106,7 +114,7 @@ describe("Sidebar", () => {
 
     it("shows Explore Wines link", () => {
       render(<Sidebar />);
-      expect(screen.getByText("Explore Wines")).toBeInTheDocument();
+      expect(screen.getByText("Wines")).toBeInTheDocument();
     });
 
     it("shows Log out button", () => {
@@ -311,13 +319,13 @@ describe("Sidebar", () => {
   describe("Navigation Links", () => {
     it("renders Explore Wines link with correct href", () => {
       render(<Sidebar />);
-      const link = screen.getByText("Explore Wines");
+      const link = screen.getByText("Wines");
       expect(link.closest("a")).toHaveAttribute("href", "/explore");
     });
 
     it("renders correct links for customer role", () => {
       render(<Sidebar userRoles={[Role.customer]} />);
-      expect(screen.getByText("Explore Wines")).toBeInTheDocument();
+      expect(screen.getByText("Wines")).toBeInTheDocument();
       // Shopping cart or order links would be visible
     });
 
@@ -326,9 +334,9 @@ describe("Sidebar", () => {
       expect(screen.getByText("Log out")).toBeInTheDocument();
     });
 
-    it("shows Bundles link pointing to /products with isBundle filter", () => {
+    it("shows Products link pointing to /products", () => {
       render(<Sidebar />);
-      const bundlesLink = screen.getByText("Bundles").closest("a");
+      const bundlesLink = screen.getByText("Products").closest("a");
       expect(bundlesLink).toHaveAttribute("href", "/products");
     });
 
@@ -359,7 +367,7 @@ describe("Sidebar", () => {
     it("uses semantic navigation structure", () => {
       render(<Sidebar />);
       // Navigation should be semantic
-      expect(screen.getByText("Explore Wines")).toBeInTheDocument();
+      expect(screen.getByText("Wines")).toBeInTheDocument();
     });
 
     it("Log out is a button not a navigation link", () => {
@@ -386,13 +394,13 @@ describe("Sidebar", () => {
   describe("Navigation Links", () => {
     it("renders Explore Wines link with correct href", () => {
       render(<Sidebar />);
-      const link = screen.getByText("Explore Wines");
+      const link = screen.getByText("Wines");
       expect(link.closest("a")).toHaveAttribute("href", "/explore");
     });
 
     it("renders correct links for customer role", () => {
       render(<Sidebar userRoles={[Role.customer]} />);
-      expect(screen.getByText("Explore Wines")).toBeInTheDocument();
+      expect(screen.getByText("Wines")).toBeInTheDocument();
       // Shopping cart or order links would be visible
     });
 
@@ -401,9 +409,9 @@ describe("Sidebar", () => {
       expect(screen.getByText("Log out")).toBeInTheDocument();
     });
 
-    it("shows Bundles link pointing to /products with isBundle filter", () => {
+    it("shows Products link pointing to /products", () => {
       render(<Sidebar />);
-      const bundlesLink = screen.getByText("Bundles").closest("a");
+      const bundlesLink = screen.getByText("Products").closest("a");
       expect(bundlesLink).toHaveAttribute("href", "/products");
     });
 
@@ -434,7 +442,7 @@ describe("Sidebar", () => {
     it("uses semantic navigation structure", () => {
       render(<Sidebar />);
       // Navigation should be semantic
-      expect(screen.getByText("Explore Wines")).toBeInTheDocument();
+      expect(screen.getByText("Wines")).toBeInTheDocument();
     });
 
     it("Log out is a button not a navigation link", () => {
