@@ -7,9 +7,10 @@ export type GetProducts200Item = GetProducts200["data"][number];
 
 interface ProductCardProps {
   product: GetProducts200Item;
+  showShopName?: boolean;
 }
 
-export function ProductCard({ product }: ProductCardProps) {
+export function ProductCard({ product, showShopName = true }: ProductCardProps) {
   const price = Number(product.price).toLocaleString("en-IE", {
     currency: "EUR",
     style: "currency",
@@ -45,7 +46,9 @@ export function ProductCard({ product }: ProductCardProps) {
         </Link>
       }
     >
-      <p className="text-xs text-muted-foreground">{product.shop.name}</p>
+      {showShopName && product.shop && (
+        <p className="text-xs text-muted-foreground">{product.shop.name}</p>
+      )}
       <div className="text-lg font-bold text-foreground">{price}</div>
     </CatalogCard>
   );

@@ -1,7 +1,7 @@
 import { Link } from "@tanstack/react-router";
+import { CatalogCard, catalogCardLinkClass } from "@/components/catalog/CatalogCard";
+import { ShopImage } from "@/components/catalog/ShopImage";
 import type { GetShops200 } from "@/generated/types/GetShops";
-import { CatalogCard, catalogCardLinkClass } from "./CatalogCard";
-import { ShopImage } from "./ShopImage";
 
 export type GetShops200Item = GetShops200[number];
 

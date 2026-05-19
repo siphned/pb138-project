@@ -65,10 +65,23 @@ describe("ProductCard", () => {
     expect(screen.queryByText("BUNDLE")).not.toBeInTheDocument();
   });
 
-  it("renders shop name", () => {
+  it("renders shop name by default", () => {
     setImages([]);
     render(<ProductCard product={mockProduct} />);
     expect(screen.getByText(/Vinotéka u Adama/)).toBeInTheDocument();
+  });
+
+  it("does NOT render shop name when showShopName is false", () => {
+    setImages([]);
+    render(<ProductCard product={mockProduct} showShopName={false} />);
+    expect(screen.queryByText(/Vinotéka u Adama/)).not.toBeInTheDocument();
+  });
+
+  it("does NOT render shop name when product.shop is missing", () => {
+    setImages([]);
+    const noShop = { ...mockProduct, shop: undefined } as unknown as GetProducts200Item;
+    render(<ProductCard product={noShop} />);
+    expect(screen.queryByText(/Vinotéka u Adama/)).not.toBeInTheDocument();
   });
 
   it("renders the first image URL when the images hook returns data", () => {
