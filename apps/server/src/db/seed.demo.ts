@@ -924,24 +924,24 @@ async function main() {
   logger.info(`Inserted ${reqPool.length} role requests`);
 
   // ── Images ───────────────────────────────────────────────────────────────────
-  // Custom URLs from data file take priority; picsum is the fallback.
+  // Custom URLs from data file take priority; placeholder is the fallback.
   logger.info("Inserting images...");
   const imageInputs: ImageInput[] = [
     ...allWineImages.map(({ id, url }) => ({
       entityType: "wine", entityId: id,
-      url: url ?? `https://picsum.photos/seed/${id}/800/600`,
+      url: url ?? "/uploads/wine/wine_placeholder.webp",
     })),
     ...allEventImages.map(({ id, url }) => ({
       entityType: "event", entityId: id,
-      url: url ?? `https://picsum.photos/seed/${id}/1200/600`,
+      url: url ?? "/uploads/event/event_placeholder.webp",
     })),
     ...allWinemakerImages.map(({ id, url }) => ({
       entityType: "winemaker", entityId: id,
-      url: url ?? `https://picsum.photos/seed/${id}/1200/400`,
+      url: url ?? "/uploads/winemaker/winery_placeholder.webp",
     })),
     ...allShopImages.map(({ id, url }) => ({
       entityType: "shop", entityId: id,
-      url: url ?? `https://picsum.photos/seed/${id}/800/400`,
+      url: url ?? "/uploads/shop/shop_placeholder.webp",
     })),
   ];
   await insertImages(imageInputs);
