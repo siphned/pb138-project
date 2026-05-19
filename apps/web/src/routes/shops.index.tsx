@@ -1,6 +1,7 @@
 import { FilterIcon } from "@hugeicons/core-free-icons";
 import { HugeiconsIcon } from "@hugeicons/react";
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
+import { useMemo } from "react";
 import { CatalogFilters } from "@/components/catalog/CatalogFilters";
 import { CatalogResults } from "@/components/catalog/CatalogResults";
 import { CatalogState } from "@/components/catalog/CatalogState";
@@ -32,24 +33,23 @@ function ShopsPage() {
   const shops = query.data || [];
 
   // Client-side filtering until BE supports it
-  const filteredShops = shops.filter((s) => {
-    if (search.q) {
-      const lowQ = search.q.toLowerCase();
-      if (!s.name.toLowerCase().includes(lowQ) && !s.address.city.toLowerCase().includes(lowQ)) {
+  const filteredShops = useMemo(() => {
+    const cityFilter = search.city?.toLowerCase();
+    const qFilter = search.q?.toLowerCase();
+    return shops.filter((s) => {
+      const city = s.address?.city?.toLowerCase() ?? "";
+      if (qFilter && !s.name.toLowerCase().includes(qFilter) && !city.includes(qFilter)) {
         return false;
       }
-    }
-    if (search.city) {
-      const lowCity = search.city.toLowerCase();
-      if (!s.address.city.toLowerCase().includes(lowCity)) {
+      if (cityFilter && !city.includes(cityFilter)) {
         return false;
       }
-    }
-    if (search.ownerUserId && s.ownerUserId !== search.ownerUserId) {
-      return false;
-    }
-    return true;
-  });
+      if (search.ownerUserId && s.ownerUserId !== search.ownerUserId) {
+        return false;
+      }
+      return true;
+    });
+  }, [shops, search.city, search.ownerUserId, search.q]);
 
   // TODO(WINE-XXX): cap at 20 until BE adds pagination
   const displayedShops = filteredShops.slice(0, 20);

@@ -26,8 +26,14 @@ interface HourGroup {
 
 const DOW_NAMES = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
 
-const formatTime = (dateString: string) => {
-  return new Date(dateString).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
+const formatTime = (timeString: string) => {
+  if (!timeString) return "";
+  const date = timeString.includes("T")
+    ? new Date(timeString)
+    : new Date(`1970-01-01T${timeString}`);
+  return Number.isNaN(date.getTime())
+    ? timeString
+    : date.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
 };
 
 const getAdjustedDow = (dow: number) => (dow === 0 ? 7 : dow);
