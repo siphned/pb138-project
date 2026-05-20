@@ -73,7 +73,6 @@ docs/figma/
 # Git Worktrees
 .worktrees/
 .claude/worktrees/
-conductor/
 
 # local image uploads
 apps/server/uploads/*
