@@ -6,6 +6,9 @@
       "inputs": ["$TURBO_DEFAULT$", ".env*"],
       "outputs": ["dist/**", "build/**"]
     },
+    "check": {
+      "cache": true
+    },
     "check-types": {
       "dependsOn": ["^check-types"]
     },
@@ -35,6 +38,9 @@
       "cache": false,
       "dependsOn": ["^generate"],
       "outputs": ["openapi.json", "src/generated/**"]
+    },
+    "lint": {
+      "cache": true
     },
     "test": {
       "cache": false,

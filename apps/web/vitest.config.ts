@@ -8,6 +8,11 @@ export default defineConfig({
       "@repo/shared": fileURLToPath(new URL("../../packages/shared/src/index.ts", import.meta.url)),
     },
   },
+  poolOptions: {
+    threads: {
+      singleThread: true,
+    },
+  },
   test: {
     coverage: {
       exclude: ["src/gen/**"],

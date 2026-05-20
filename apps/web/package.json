@@ -55,6 +55,8 @@
     "check-types": "tsc --noEmit -p tsconfig.app.json && tsc --noEmit -p tsconfig.node.json",
     "dev": "vite",
     "generate": "kubb",
+    "lint": "biome lint .",
+    "check": "biome check --write .",
     "preview": "vite preview",
     "test": "vitest run",
     "test:e2e": "concurrently --kill-others-on-exit 'bun run --cwd ../.. dev:server' 'bun run --cwd ../.. dev:web' 'sleep 10 && concurrently \"bun run test:e2e:shard:1\" \"bun run test:e2e:shard:2\" \"bun run test:e2e:shard:3\"'",
