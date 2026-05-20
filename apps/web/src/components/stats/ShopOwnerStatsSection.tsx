@@ -1,8 +1,8 @@
 import { DataGrid } from "@/components/primitives/data-grid";
 import { Section } from "@/components/primitives/section";
 import { useGetStats } from "@/generated/hooks/useGetStats";
-import { StatTile } from "./StatTile";
 import { is403, StatsErrorState, StatTilesSkeleton } from "./StatsSectionScaffold";
+import { StatTile } from "./StatTile";
 
 const toNumber = (n: unknown): number => {
   if (typeof n === "number") return n;

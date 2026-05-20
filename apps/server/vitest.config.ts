@@ -15,5 +15,10 @@ export default defineConfig({
     },
     environment: "node",
     globals: true,
+    server: {
+      deps: {
+        inline: ["@vitest/spy"],
+      },
+    },
   },
 });

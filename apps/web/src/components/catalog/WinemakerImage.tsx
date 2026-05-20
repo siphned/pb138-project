@@ -9,12 +9,7 @@ interface WinemakerImageProps {
 }
 
 /** Thin wrapper around `<EntityImage>` for winemaker images. */
-export function WinemakerImage({
-  winemakerId,
-  alt,
-  fallbackText,
-  className,
-}: WinemakerImageProps) {
+export function WinemakerImage({ winemakerId, alt, fallbackText, className }: WinemakerImageProps) {
   const imagesQuery = useGetWinemakersByIdImages(winemakerId);
   return (
     <EntityImage

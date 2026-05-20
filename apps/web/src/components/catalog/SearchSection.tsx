@@ -4,13 +4,7 @@ import React from "react";
 import { DataGrid } from "@/components/primitives/data-grid";
 import { Section } from "@/components/primitives/section";
 import { Button } from "@/components/ui/button";
-import type {
-  EventSearch,
-  ProductSearch,
-  ShopSearch,
-  WinemakerSearch,
-  WineSearch,
-} from "./types";
+import type { EventSearch, ProductSearch, ShopSearch, WinemakerSearch, WineSearch } from "./types";
 
 type ViewAllProps =
   | { viewAllHref: "/explore"; viewAllSearch?: WineSearch }

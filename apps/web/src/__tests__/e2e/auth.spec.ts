@@ -1,7 +1,9 @@
 import { expect, test } from "@playwright/test";
 
 test.describe("Auth guards", () => {
-  test("unauthenticated user visiting /dashboard is redirected to /auth/login", async ({ page }) => {
+  test("unauthenticated user visiting /dashboard is redirected to /auth/login", async ({
+    page,
+  }) => {
     await page.goto("/dashboard");
     await page.waitForURL("**/auth/login", { timeout: 5000 });
     expect(page.url()).toContain("/auth/login");

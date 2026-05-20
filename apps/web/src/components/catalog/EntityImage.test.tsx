@@ -15,9 +15,7 @@ describe("EntityImage", () => {
   });
 
   it("renders the placeholder while loading", () => {
-    render(
-      <EntityImage alt="Foo" fallbackText="Foo Item" imagesQuery={{ isLoading: true }} />
-    );
+    render(<EntityImage alt="Foo" fallbackText="Foo Item" imagesQuery={{ isLoading: true }} />);
     expect(screen.queryByAltText("Foo")).not.toBeInTheDocument();
     expect(screen.getByText("Foo Item")).toBeInTheDocument();
   });

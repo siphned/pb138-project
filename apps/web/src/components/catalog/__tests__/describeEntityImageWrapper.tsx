@@ -1,4 +1,5 @@
 import { render, screen } from "@testing-library/react";
+import "@testing-library/jest-dom/vitest";
 import type { ReactElement } from "react";
 import { describe, expect, it, type Mock } from "vitest";
 

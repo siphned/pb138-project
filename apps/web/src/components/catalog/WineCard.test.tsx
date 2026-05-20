@@ -31,9 +31,11 @@ const mockWine = {
 } as unknown as GetWines200Item;
 
 const setImages = (data: unknown) =>
-  vi.mocked(useGetWinesByIdImages).mockReturnValue({ data, isLoading: false } as unknown as ReturnType<
-    typeof useGetWinesByIdImages
-  >);
+  vi
+    .mocked(useGetWinesByIdImages)
+    .mockReturnValue({ data, isLoading: false } as unknown as ReturnType<
+      typeof useGetWinesByIdImages
+    >);
 
 describe("WineCard", () => {
   it("renders wine name and region", () => {
@@ -67,7 +69,9 @@ describe("WineCard", () => {
   });
 
   it("renders the first image URL when the hook returns images", () => {
-    setImages([{ id: "i1", entityId: "wine-1", entityType: "wine", url: "https://example.com/wine.jpg" }]);
+    setImages([
+      { entityId: "wine-1", entityType: "wine", id: "i1", url: "https://example.com/wine.jpg" },
+    ]);
     render(<WineCard wine={mockWine} />);
     const img = screen.getByRole("img");
     expect(img).toHaveAttribute("src", "https://example.com/wine.jpg");

@@ -24,11 +24,11 @@ import { useGetProducts } from "@/generated/hooks/useGetProducts";
 import { useGetShops } from "@/generated/hooks/useGetShops";
 import { useGetWinemakers } from "@/generated/hooks/useGetWinemakers";
 import { useGetWines } from "@/generated/hooks/useGetWines";
-import { EventCard } from "@/routes/-components/EventCard";
 import {
   type GetWinesQueryParamsColorEnumKey,
   getWinesQueryParamsColorEnum,
 } from "@/generated/types/GetWines";
+import { EventCard } from "@/routes/-components/EventCard";
 
 const COLOR_VALUES = Object.values(getWinesQueryParamsColorEnum) as readonly string[];
 const isColor = (v: unknown): v is GetWinesQueryParamsColorEnumKey =>
@@ -118,8 +118,13 @@ function SearchPage() {
     winemakerName?: string;
     winemakerId?: string;
   };
-  const eventsRaw = eventsQuery.data as EventLike[] | { data?: EventLike[]; total?: number } | undefined;
-  const eventsList = (Array.isArray(eventsRaw) ? eventsRaw : (eventsRaw?.data ?? [])) as EventLike[];
+  const eventsRaw = eventsQuery.data as
+    | EventLike[]
+    | { data?: EventLike[]; total?: number }
+    | undefined;
+  const eventsList = (
+    Array.isArray(eventsRaw) ? eventsRaw : (eventsRaw?.data ?? [])
+  ) as EventLike[];
 
   const wineCount = filteredWines.length;
   const products = productsQuery.data?.data || [];
