@@ -1,11 +1,6 @@
 import { defineConfig } from "vitest/config";
 
 export default defineConfig({
-  poolOptions: {
-    forks: {
-      singleFork: true,
-    },
-  },
   test: {
     coverage: {
       exclude: ["src/**/*.test.ts", "src/db/migrations/**", "scripts/**"],
