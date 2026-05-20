@@ -93,6 +93,41 @@ describe("reviewsService", () => {
         rating: 5,
       });
     });
+
+    it("throws NOT_PURCHASED if user hasn't purchased the product", async () => {
+      vi.mocked(reviewsRepo.hasPurchasedProduct).mockResolvedValue(false);
+
+      await expect(
+        reviewsService.createProductReview(userId, productId, { rating: 5 })
+      ).rejects.toThrow("NOT_PURCHASED");
+    });
+
+    it("throws ALREADY_REVIEWED if user already has a review", async () => {
+      vi.mocked(reviewsRepo.hasPurchasedProduct).mockResolvedValue(true);
+      vi.mocked(reviewsRepo.findUserReview).mockResolvedValue({ id: "existing-review" } as any);
+
+      await expect(
+        reviewsService.createProductReview(userId, productId, { rating: 5 })
+      ).rejects.toThrow("ALREADY_REVIEWED");
+    });
+
+    it("allows review with optional body text", async () => {
+      vi.mocked(reviewsRepo.hasPurchasedProduct).mockResolvedValue(true);
+      vi.mocked(reviewsRepo.findUserReview).mockResolvedValue(undefined);
+      vi.mocked(reviewsRepo.insertReview).mockResolvedValue({ id: reviewId } as any);
+      vi.mocked(reviewsRepo.findReviewWithUser).mockResolvedValue({ id: reviewId } as any);
+
+      const result = await reviewsService.createProductReview(userId, productId, {
+        body: "Great wine!",
+        rating: 4,
+      });
+
+      expect(result.id).toBe(reviewId);
+      expect(reviewsRepo.insertReview).toHaveBeenCalledWith(db, userId, productId, "product", {
+        body: "Great wine!",
+        rating: 4,
+      });
+    });
   });
 
   describe("createWinemakerReview", () => {
@@ -129,6 +164,41 @@ describe("reviewsService", () => {
     });
   });
 
+  describe("createWineReview", () => {
+    const wineId = "wine-1";
+
+    it("creates review for verified wine purchaser", async () => {
+      vi.mocked(reviewsRepo.hasPurchasedWine).mockResolvedValue(true);
+      vi.mocked(reviewsRepo.findUserReview).mockResolvedValue(undefined);
+      vi.mocked(reviewsRepo.insertReview).mockResolvedValue({ id: reviewId } as any);
+      vi.mocked(reviewsRepo.findReviewWithUser).mockResolvedValue({ id: reviewId } as any);
+
+      const result = await reviewsService.createWineReview(userId, wineId, { rating: 5 });
+
+      expect(result.id).toBe(reviewId);
+      expect(reviewsRepo.insertReview).toHaveBeenCalledWith(db, userId, wineId, "wine", {
+        rating: 5,
+      });
+    });
+
+    it("throws NOT_PURCHASED if user hasn't purchased the wine", async () => {
+      vi.mocked(reviewsRepo.hasPurchasedWine).mockResolvedValue(false);
+
+      await expect(reviewsService.createWineReview(userId, wineId, { rating: 5 })).rejects.toThrow(
+        "NOT_PURCHASED"
+      );
+    });
+
+    it("throws ALREADY_REVIEWED if user already reviewed the wine", async () => {
+      vi.mocked(reviewsRepo.hasPurchasedWine).mockResolvedValue(true);
+      vi.mocked(reviewsRepo.findUserReview).mockResolvedValue({ id: "existing-review" } as any);
+
+      await expect(reviewsService.createWineReview(userId, wineId, { rating: 5 })).rejects.toThrow(
+        "ALREADY_REVIEWED"
+      );
+    });
+  });
+
   describe("deleteReview", () => {
     it("allows owner to delete their own review", async () => {
       vi.mocked(reviewsRepo.findUserReview).mockResolvedValue({ id: reviewId } as any);
@@ -136,6 +206,88 @@ describe("reviewsService", () => {
       await reviewsService.deleteReview(reviewId, userId, "user", productId, "product");
 
       expect(reviewsRepo.softDelete).toHaveBeenCalledWith(db, reviewId);
+    });
+
+    it("throws NOT_FOUND if review doesn't exist", async () => {
+      vi.mocked(reviewsRepo.findUserReview).mockResolvedValue(undefined);
+
+      await expect(
+        reviewsService.deleteReview(reviewId, userId, "user", productId, "product")
+      ).rejects.toThrow("NOT_FOUND");
+    });
+
+    it("allows admin to delete any review", async () => {
+      vi.mocked(reviewsRepo.findUserReview).mockResolvedValue(undefined);
+      vi.mocked(reviewsRepo.findById).mockResolvedValue({ id: reviewId } as any);
+
+      await reviewsService.deleteReview(reviewId, "other-user", "admin", productId, "product");
+
+      expect(reviewsRepo.softDelete).toHaveBeenCalledWith(db, reviewId);
+    });
+  });
+
+  describe("listWineReviews", () => {
+    const wineId = "wine-1";
+
+    it("returns reviews with pagination and sorting", async () => {
+      const mockReviews = [{ id: "r1" }];
+      vi.mocked(reviewsRepo.findReviews).mockResolvedValue(mockReviews as any);
+      vi.mocked(reviewsRepo.averageRating).mockResolvedValue(4.2);
+      vi.mocked(reviewsRepo.countReviews).mockResolvedValue(15);
+
+      const result = await reviewsService.listWineReviews(wineId, {
+        limit: 10,
+        page: 1,
+        sort: "newest",
+      });
+
+      expect(result.reviews).toBe(mockReviews);
+      expect(result.averageRating).toBe(4.2);
+      expect(result.totalCount).toBe(15);
+      expect(reviewsRepo.findReviews).toHaveBeenCalledWith(db, wineId, "wine", {
+        limit: 10,
+        offset: 0,
+        sort: "newest",
+      });
+    });
+
+    it("supports highest rated sorting", async () => {
+      const mockReviews = [{ id: "r1", rating: 5 }];
+      vi.mocked(reviewsRepo.findReviews).mockResolvedValue(mockReviews as any);
+      vi.mocked(reviewsRepo.averageRating).mockResolvedValue(4.8);
+      vi.mocked(reviewsRepo.countReviews).mockResolvedValue(8);
+
+      const result = await reviewsService.listWineReviews(wineId, {
+        limit: 10,
+        page: 1,
+        sort: "highest",
+      });
+
+      expect(result.reviews).toBe(mockReviews);
+      expect(reviewsRepo.findReviews).toHaveBeenCalledWith(db, wineId, "wine", {
+        limit: 10,
+        offset: 0,
+        sort: "highest",
+      });
+    });
+
+    it("supports lowest rated sorting", async () => {
+      const mockReviews = [{ id: "r1", rating: 1 }];
+      vi.mocked(reviewsRepo.findReviews).mockResolvedValue(mockReviews as any);
+      vi.mocked(reviewsRepo.averageRating).mockResolvedValue(2.5);
+      vi.mocked(reviewsRepo.countReviews).mockResolvedValue(5);
+
+      await reviewsService.listWineReviews(wineId, {
+        limit: 10,
+        page: 2,
+        sort: "lowest",
+      });
+
+      expect(reviewsRepo.findReviews).toHaveBeenCalledWith(db, wineId, "wine", {
+        limit: 10,
+        offset: 10,
+        sort: "lowest",
+      });
     });
   });
 });
