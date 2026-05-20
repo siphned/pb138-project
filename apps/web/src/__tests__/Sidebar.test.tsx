@@ -112,7 +112,6 @@ describe("Sidebar", () => {
   describe("Rendering", () => {
     it("renders menu trigger button", () => {
       render(<Sidebar />);
-      // Our stub doesn't render the trigger, but check other elements
       expect(screen.getByText(/Explore Wines/i)).toBeInTheDocument();
     });
 
@@ -226,12 +225,17 @@ describe("Sidebar", () => {
 
     it("shows Products link pointing to /products", () => {
       render(<Sidebar />);
-      expect(screen.getByText(/Bundles/i).closest("a")).toHaveAttribute("href", "/products");
+      expect(screen.getByText(/Products/i).closest("a")).toHaveAttribute("href", "/products");
     });
 
     it("shows Events link", () => {
       render(<Sidebar />);
-      expect(screen.getByText(/Events/i)).toBeInTheDocument();
+      expect(screen.getAllByText(/Events/i).length).toBeGreaterThan(0);
+    });
+
+    it("shows Statistics link when authenticated", () => {
+      render(<Sidebar />);
+      expect(screen.getByText(/Statistics/i)).toBeInTheDocument();
     });
   });
 
