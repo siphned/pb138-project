@@ -75,6 +75,7 @@ jobs:
       - name: Start backend server
         run: bun run apps/server/src/index.ts &
       - name: Wait for server to be ready
+        timeout-minutes: 1
         run: until curl -sf http://localhost:3000/swagger/json > /dev/null; do sleep 1; done
       - name: Generate Kubb client
         run: bun run generate
