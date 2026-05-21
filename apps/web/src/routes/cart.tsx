@@ -1,10 +1,10 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { useState } from "react";
 import { AlertTriangle, Loader2 } from "lucide-react";
+import { useState } from "react";
+import { Button } from "@/components/ui/button";
 import { useGetCarts } from "@/generated/hooks/useGetCarts";
 import { CartSection } from "./-components/cart/CartSection";
 import { CheckoutSection } from "./-components/cart/CheckoutSection";
-import { Button } from "@/components/ui/button";
 
 export const Route = createFileRoute("/cart")({
   component: CartPage,
@@ -13,9 +13,7 @@ export const Route = createFileRoute("/cart")({
 function CartPage() {
   const { data: cart, isLoading, isError, error } = useGetCarts();
   const cartData = cart ?? null;
-  const [deliveryType, setDeliveryType] = useState<"pickup" | "shipping">(
-    "shipping",
-  );
+  const [deliveryType, setDeliveryType] = useState<"pickup" | "shipping">("shipping");
 
   if (isLoading) {
     return (
@@ -41,10 +39,7 @@ function CartPage() {
               ? error
               : "An unexpected error occurred while loading your cart. Please try again."}
           </p>
-          <Button
-            variant="outline"
-            onClick={() => window.location.reload()}
-          >
+          <Button onClick={() => window.location.reload()} variant="outline">
             Try again
           </Button>
         </div>

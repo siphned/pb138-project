@@ -1,14 +1,14 @@
+import { useQueryClient } from "@tanstack/react-query";
 import { useNavigate } from "@tanstack/react-router";
 import { useMemo, useRef } from "react";
-import { useQueryClient } from "@tanstack/react-query";
-import { getCartsQueryKey } from "@/generated/hooks/useGetCarts";
-import { useGetUsersMeAddresses } from "@/generated/hooks/useGetUsersMeAddresses";
-import { usePostOrdersCheckout } from "@/generated/hooks/usePostOrdersCheckout";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { useUser } from "@/context/UserContext";
+import { getCartsQueryKey } from "@/generated/hooks/useGetCarts";
+import { useGetUsersMeAddresses } from "@/generated/hooks/useGetUsersMeAddresses";
+import { usePostOrdersCheckout } from "@/generated/hooks/usePostOrdersCheckout";
 import type { GetCarts200 } from "@/generated/types/GetCarts";
-import { type AddressFormValues, AddressForm } from "./AddressForm";
+import { AddressForm, type AddressFormValues } from "./AddressForm";
 import { CartSummary } from "./CartSummary";
 
 interface CheckoutSectionProps {
@@ -83,7 +83,7 @@ export function CheckoutSection({
     });
 
     queryClient.invalidateQueries({ queryKey: getCartsQueryKey() });
-    navigate({ to: `/checkout/confirmed`, search: { orderId: result.id } });
+    navigate({ search: { orderId: result.id }, to: "/checkout/confirmed" });
   };
 
   const isCartEmpty = !cart || cart.items.length === 0;
@@ -95,14 +95,14 @@ export function CheckoutSection({
       </CardHeader>
       <CardContent className="space-y-4">
         <AddressForm
-          ref={formRef}
           defaultValues={defaultAddressValues}
           isSubmitting={checkout.isPending}
-          showGuestFields={!user}
-          onSubmit={handleSubmit}
           onDeliveryTypeChange={onDeliveryTypeChange}
+          onSubmit={handleSubmit}
+          ref={formRef}
+          showGuestFields={!user}
         />
-        {!isCartEmpty && <CartSummary items={cart.items} deliveryType={deliveryType} />}
+        {!isCartEmpty && <CartSummary deliveryType={deliveryType} items={cart.items} />}
       </CardContent>
       <CardFooter className="flex-col gap-2">
         <Button
@@ -110,9 +110,7 @@ export function CheckoutSection({
           disabled={isCartEmpty || checkout.isPending}
           onClick={() => formRef.current?.requestSubmit()}
         >
-          {checkout.isPending
-            ? "Processing..."
-            : `Confirm Order — €${total.toFixed(2)}`}
+          {checkout.isPending ? "Processing..." : `Confirm Order — €${total.toFixed(2)}`}
         </Button>
         <p className="text-xs text-center text-muted-foreground">
           By purchasing you agree to our Terms of Service and Privacy Policy.

@@ -1,5 +1,5 @@
-import { useState } from "react";
 import { AlertTriangle, Loader2, ShoppingBag } from "lucide-react";
+import { useState } from "react";
 import { Badge } from "@/components/ui/badge";
 import {
   Select,
@@ -36,9 +36,7 @@ export function CustomerOrderHistory() {
       <div className="flex flex-col items-center justify-center py-12 text-destructive gap-2">
         <AlertTriangle className="h-8 w-8" />
         <p className="font-medium">Failed to load orders</p>
-        <p className="text-sm text-muted-foreground">
-          Please try again later.
-        </p>
+        <p className="text-sm text-muted-foreground">Please try again later.</p>
       </div>
     );
   }
@@ -50,9 +48,7 @@ export function CustomerOrderHistory() {
         <div className="flex flex-col items-center justify-center py-16 text-center">
           <ShoppingBag className="h-12 w-12 text-muted-foreground mb-4" />
           <h3 className="text-xl font-semibold mb-2">No orders yet</h3>
-          <p className="text-muted-foreground">
-            Your order history will appear here.
-          </p>
+          <p className="text-muted-foreground">Your order history will appear here.</p>
         </div>
       </>
     );
@@ -86,7 +82,7 @@ export function CustomerOrderHistory() {
     <>
       <div className="flex items-center justify-between mb-4">
         <h3 className="text-lg font-semibold">Past Orders</h3>
-        <Select value={timeframe} onValueChange={setTimeframe}>
+        <Select onValueChange={setTimeframe} value={timeframe}>
           <SelectTrigger className="w-[160px]">
             <SelectValue placeholder="Timeframe" />
           </SelectTrigger>
@@ -113,34 +109,23 @@ export function CustomerOrderHistory() {
           <TableBody>
             {filteredOrders.length === 0 ? (
               <TableRow>
-                <TableCell
-                  className="text-center text-muted-foreground py-8"
-                  colSpan={4}
-                >
+                <TableCell className="text-center text-muted-foreground py-8" colSpan={4}>
                   No orders found for this timeframe.
                 </TableCell>
               </TableRow>
             ) : (
               filteredOrders.map((order) => (
                 <TableRow key={order.id}>
-                  <TableCell className="font-mono text-sm">
-                    #{order.id.slice(0, 8)}
+                  <TableCell className="font-mono text-sm">#{order.id.slice(0, 8)}</TableCell>
+                  <TableCell>
+                    {new Date(order.createdAt as string).toLocaleDateString("en-US", {
+                      day: "numeric",
+                      month: "long",
+                      year: "numeric",
+                    })}
                   </TableCell>
                   <TableCell>
-                    {new Date(order.createdAt as string).toLocaleDateString(
-                      "en-US",
-                      {
-                        day: "numeric",
-                        month: "long",
-                        year: "numeric",
-                      },
-                    )}
-                  </TableCell>
-                  <TableCell>
-                    <Badge
-                      className={getStatusBadge(order.status)}
-                      variant="outline"
-                    >
+                    <Badge className={getStatusBadge(order.status)} variant="outline">
                       {order.status}
                     </Badge>
                   </TableCell>
@@ -162,25 +147,15 @@ export function CustomerOrderHistory() {
           </p>
         ) : (
           filteredOrders.map((order) => (
-            <div
-              key={order.id}
-              className="rounded-lg border p-4 space-y-2"
-            >
+            <div className="rounded-lg border p-4 space-y-2" key={order.id}>
               <div className="flex items-center justify-between">
-                <span className="font-mono text-sm">
-                  #{order.id.slice(0, 8)}
-                </span>
-                <Badge
-                  className={getStatusBadge(order.status)}
-                  variant="outline"
-                >
+                <span className="font-mono text-sm">#{order.id.slice(0, 8)}</span>
+                <Badge className={getStatusBadge(order.status)} variant="outline">
                   {order.status}
                 </Badge>
               </div>
               <div className="flex items-center justify-between text-sm text-muted-foreground">
-                <span>
-                  {new Date(order.createdAt as string).toLocaleDateString()}
-                </span>
+                <span>{new Date(order.createdAt as string).toLocaleDateString()}</span>
                 <span className="font-semibold text-foreground">
                   €{Number(order.totalPrice).toFixed(2)}
                 </span>

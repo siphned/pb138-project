@@ -1,12 +1,10 @@
 import { createFileRoute, Outlet, redirect } from "@tanstack/react-router";
 import { AlertTriangle, Loader2, ShieldX } from "lucide-react";
+import { Button } from "@/components/ui/button";
 import { useUser } from "@/context/UserContext";
 import { useGetShopsById } from "@/generated/hooks/useGetShopsById";
-import { Button } from "@/components/ui/button";
 
-export const Route = createFileRoute(
-  "/_authenticated/_shop_owner/manage/shops/$id",
-)({
+export const Route = createFileRoute("/_authenticated/_shop_owner/manage/shops/$id")({
   component: ShopOwnerLayout,
 });
 
@@ -33,7 +31,7 @@ function ShopOwnerLayout() {
         <p className="text-muted-foreground">
           The shop you are looking for does not exist or has been removed.
         </p>
-        <Button variant="outline" onClick={() => window.history.back()}>
+        <Button onClick={() => window.history.back()} variant="outline">
           Go back
         </Button>
       </div>
@@ -46,10 +44,10 @@ function ShopOwnerLayout() {
         <ShieldX className="h-12 w-12 text-destructive" />
         <h2 className="text-xl font-semibold">Access denied</h2>
         <p className="text-muted-foreground text-center max-w-md">
-          You do not have permission to manage this shop. Only the shop owner
-          can access management features.
+          You do not have permission to manage this shop. Only the shop owner can access management
+          features.
         </p>
-        <Button variant="outline" onClick={() => window.history.back()}>
+        <Button onClick={() => window.history.back()} variant="outline">
           Go back
         </Button>
       </div>

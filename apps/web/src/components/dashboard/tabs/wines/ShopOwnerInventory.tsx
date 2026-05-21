@@ -1,5 +1,5 @@
-import { useState } from "react";
 import { AlertTriangle, Loader2, MoreHorizontal, Plus, Wine } from "lucide-react";
+import { useState } from "react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
@@ -17,28 +17,21 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { useGetShopsMe } from "@/generated/hooks/useGetShopsMe";
 import { useGetProducts } from "@/generated/hooks/useGetProducts";
+import { useGetShopsMe } from "@/generated/hooks/useGetShopsMe";
 import { getStockStatus } from "@/utils/stock";
 
 export function ShopOwnerInventory() {
   const [statusFilter, setStatusFilter] = useState("all");
 
-  const {
-    data: shops,
-    isLoading: shopsLoading,
-    isError: shopsError,
-  } = useGetShopsMe();
+  const { data: shops, isLoading: shopsLoading, isError: shopsError } = useGetShopsMe();
   const shopId = shops?.[0]?.id;
 
   const {
     data: products,
     isLoading: productsLoading,
     isError: productsError,
-  } = useGetProducts(
-    { shopId: shopId ?? "" },
-    { enabled: !!shopId },
-  );
+  } = useGetProducts({ shopId: shopId ?? "" }, { enabled: !!shopId });
 
   const isLoading = shopsLoading || (!!shopId && productsLoading);
   const isError = shopsError || productsError;
@@ -57,9 +50,7 @@ export function ShopOwnerInventory() {
       <div className="flex flex-col items-center justify-center py-12 text-destructive gap-2">
         <AlertTriangle className="h-8 w-8" />
         <p className="font-medium">Failed to load inventory</p>
-        <p className="text-sm text-muted-foreground">
-          Please try again later.
-        </p>
+        <p className="text-sm text-muted-foreground">Please try again later.</p>
       </div>
     );
   }
@@ -71,9 +62,7 @@ export function ShopOwnerInventory() {
         <div className="flex flex-col items-center justify-center py-16 text-center">
           <Wine className="h-12 w-12 text-muted-foreground mb-4" />
           <h3 className="text-xl font-semibold mb-2">No shop yet</h3>
-          <p className="text-muted-foreground">
-            Create a shop to manage your inventory.
-          </p>
+          <p className="text-muted-foreground">Create a shop to manage your inventory.</p>
         </div>
       </>
     );
@@ -85,24 +74,20 @@ export function ShopOwnerInventory() {
     if (statusFilter === "all") return true;
     const status = getStockStatus(Number(product.quantity)).label;
     if (statusFilter === "active") return status === "In Stock";
-    return (
-      status.toLowerCase().replace(/\s+/g, "") === statusFilter.toLowerCase()
-    );
+    return status.toLowerCase().replace(/\s+/g, "") === statusFilter.toLowerCase();
   });
 
-  const productWinery = (wines: typeof items[number]["wines"]) =>
+  const productWinery = (wines: (typeof items)[number]["wines"]) =>
     wines[0]?.winemaker?.name ?? "—";
-  const productWine = (wines: typeof items[number]["wines"]) =>
-    wines[0]?.name ?? "—";
-  const productVintage = (wines: typeof items[number]["wines"]) =>
-    wines[0]?.vintageYear ?? "—";
+  const productWine = (wines: (typeof items)[number]["wines"]) => wines[0]?.name ?? "—";
+  const productVintage = (wines: (typeof items)[number]["wines"]) => wines[0]?.vintageYear ?? "—";
 
   return (
     <>
       <div className="flex items-center justify-between mb-4">
         <h3 className="text-lg font-semibold">Shop Inventory</h3>
         <div className="flex items-center gap-2">
-          <Select value={statusFilter} onValueChange={setStatusFilter}>
+          <Select onValueChange={setStatusFilter} value={statusFilter}>
             <SelectTrigger className="w-[140px]">
               <SelectValue placeholder="All Status" />
             </SelectTrigger>
@@ -135,10 +120,7 @@ export function ShopOwnerInventory() {
           <TableBody>
             {filteredItems.length === 0 ? (
               <TableRow>
-                <TableCell
-                  className="text-center text-muted-foreground py-8"
-                  colSpan={6}
-                >
+                <TableCell className="text-center text-muted-foreground py-8" colSpan={6}>
                   No wines found in this category.
                 </TableCell>
               </TableRow>
@@ -148,9 +130,7 @@ export function ShopOwnerInventory() {
                 const stock = getStockStatus(qty);
                 return (
                   <TableRow key={product.id}>
-                    <TableCell className="font-medium">
-                      {product.name}
-                    </TableCell>
+                    <TableCell className="font-medium">{product.name}</TableCell>
                     <TableCell>{productWinery(product.wines)}</TableCell>
                     <TableCell>{productVintage(product.wines)}</TableCell>
                     <TableCell className="text-right">{qty}</TableCell>
@@ -175,18 +155,13 @@ export function ShopOwnerInventory() {
       {/* Mobile Cards */}
       <div className="md:hidden space-y-3">
         {filteredItems.length === 0 ? (
-          <p className="text-center text-muted-foreground py-8">
-            No wines found in this category.
-          </p>
+          <p className="text-center text-muted-foreground py-8">No wines found in this category.</p>
         ) : (
           filteredItems.map((product) => {
             const qty = Number(product.quantity);
             const stock = getStockStatus(qty);
             return (
-              <div
-                key={product.id}
-                className="rounded-lg border p-4 space-y-2"
-              >
+              <div className="rounded-lg border p-4 space-y-2" key={product.id}>
                 <div className="flex items-center justify-between">
                   <span className="font-medium">{product.name}</span>
                   <Badge className={stock.classes} variant="outline">
@@ -195,8 +170,7 @@ export function ShopOwnerInventory() {
                 </div>
                 <div className="flex items-center justify-between text-sm text-muted-foreground">
                   <span>
-                    {productWinery(product.wines)} ·{" "}
-                    {productVintage(product.wines)}
+                    {productWinery(product.wines)} · {productVintage(product.wines)}
                   </span>
                   <span>Qty: {qty}</span>
                 </div>
