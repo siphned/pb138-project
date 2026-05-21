@@ -41,6 +41,20 @@ jobs:
   generate:
     needs: install
     runs-on: self-hosted
+    services:
+      postgres:
+        image: postgres:16-alpine
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: winemarket
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+        ports:
+          - 5432:5432
     env:
       DATABASE_URL: postgresql://postgres:postgres@localhost:5432/winemarket
       FRONTEND_URL: http://localhost:5173
@@ -185,6 +199,20 @@ jobs:
   test:
     needs: [install, generate]
     runs-on: self-hosted
+    services:
+      postgres:
+        image: postgres:16-alpine
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: winemarket
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+        ports:
+          - 5432:5432
     env:
       DATABASE_URL: postgresql://postgres:postgres@localhost:5432/winemarket
     steps:
@@ -243,6 +271,20 @@ jobs:
   e2e:
     needs: [install, generate]
     runs-on: self-hosted
+    services:
+      postgres:
+        image: postgres:16-alpine
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: winemarket
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+        ports:
+          - 5432:5432
     env:
       DATABASE_URL: postgresql://postgres:postgres@localhost:5432/winemarket
       FRONTEND_URL: http://localhost:5173
