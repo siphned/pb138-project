@@ -47,11 +47,10 @@ export interface AddressFormProps {
   onDeliveryTypeChange?: (value: "pickup" | "shipping") => void;
 }
 
-export const AddressForm = forwardRef<HTMLFormElement, AddressFormProps>(
-  function AddressForm(
-    { defaultValues, isSubmitting, onSubmit, showGuestFields, onDeliveryTypeChange },
-    ref
-  ) {
+export const AddressForm = forwardRef<HTMLFormElement, AddressFormProps>(function AddressForm(
+  { defaultValues, onSubmit, showGuestFields, onDeliveryTypeChange },
+  ref
+) {
   const {
     register,
     handleSubmit,

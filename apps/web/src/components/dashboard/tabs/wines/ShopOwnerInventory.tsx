@@ -31,7 +31,7 @@ export function ShopOwnerInventory() {
     data: products,
     isLoading: productsLoading,
     isError: productsError,
-  } = useGetProducts({ shopId: shopId ?? "" }, { enabled: !!shopId });
+  } = useGetProducts({ shopId: shopId ?? "" }, { query: { enabled: !!shopId } });
 
   const isLoading = shopsLoading || (!!shopId && productsLoading);
   const isError = shopsError || productsError;
@@ -79,7 +79,6 @@ export function ShopOwnerInventory() {
 
   const productWinery = (wines: (typeof items)[number]["wines"]) =>
     wines[0]?.winemaker?.name ?? "—";
-  const _productWine = (wines: (typeof items)[number]["wines"]) => wines[0]?.name ?? "—";
   const productVintage = (wines: (typeof items)[number]["wines"]) => wines[0]?.vintageYear ?? "—";
 
   return (
@@ -87,7 +86,7 @@ export function ShopOwnerInventory() {
       <div className="flex items-center justify-between mb-4">
         <h3 className="text-lg font-semibold">Shop Inventory</h3>
         <div className="flex items-center gap-2">
-          <Select onValueChange={setStatusFilter} value={statusFilter}>
+          <Select onValueChange={(val) => val && setStatusFilter(val)} value={statusFilter}>
             <SelectTrigger className="w-[140px]">
               <SelectValue placeholder="All Status" />
             </SelectTrigger>

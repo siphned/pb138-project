@@ -81,7 +81,7 @@ export function WinemakerBundles() {
       <div className="flex items-center justify-between mb-4">
         <h3 className="text-lg font-semibold">My Bundles</h3>
         <div className="flex items-center gap-2">
-          <Select onValueChange={setStatusFilter} value={statusFilter}>
+          <Select onValueChange={(val) => val && setStatusFilter(val)} value={statusFilter}>
             <SelectTrigger className="w-[140px]">
               <SelectValue placeholder="All Status" />
             </SelectTrigger>

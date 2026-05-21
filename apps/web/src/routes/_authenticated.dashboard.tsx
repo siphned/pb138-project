@@ -9,6 +9,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useUser } from "@/context/UserContext";
 import { useGetStats } from "@/generated/hooks/useGetStats";
+import type { GetStatsQueryResponse } from "@/generated/types/GetStats";
 import { Role } from "@/types/roles";
 
 export const Route = createFileRoute("/_authenticated/dashboard")({
@@ -169,7 +170,7 @@ function StatCard({
   );
 }
 
-function renderStats(stats: NonNullable<ReturnType<typeof useGetStats>["data"]>) {
+function renderStats(stats: GetStatsQueryResponse) {
   switch (stats.role) {
     case "customer": {
       const c = stats as Extract<typeof stats, { ordersCount: unknown }>;

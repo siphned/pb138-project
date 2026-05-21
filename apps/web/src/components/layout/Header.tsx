@@ -4,15 +4,14 @@ import { ShoppingCart, User } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { useUser } from "@/context/UserContext";
-import { useRoles } from "@/hooks/useRoles";
 import { HeaderSearch } from "./HeaderSearch";
 import { Sidebar } from "./Sidebar";
 
 export function Header() {
   const { user: clerkUser } = useClerk();
   const initials = clerkUser ? (clerkUser.fullName || "User").substring(0, 2).toUpperCase() : "GU";
-  const { activeRole, setActiveRole } = useUser();
-  const roles = useRoles();
+  const { user, activeRole, setActiveRole } = useUser();
+  const roles = user?.roles ?? [];
 
   return (
     <header className="h-16 border-b bg-background flex items-center justify-between px-6 lg:px-12">

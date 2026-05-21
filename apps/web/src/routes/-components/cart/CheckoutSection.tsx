@@ -43,7 +43,7 @@ export function CheckoutSection({
   }, [cart, deliveryType]);
 
   const defaultAddressValues = useMemo(() => {
-    const shipping = addresses?.[0];
+    const shipping = addresses?.shipping;
     if (!shipping) return {};
     return {
       city: shipping.city,

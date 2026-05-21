@@ -31,7 +31,7 @@ export function ShopOwnerBundles() {
     data: products,
     isLoading: productsLoading,
     isError: productsError,
-  } = useGetProducts({ isBundle: true, shopId: shopId ?? "" }, { enabled: !!shopId });
+  } = useGetProducts({ isBundle: true, shopId: shopId ?? "" }, { query: { enabled: !!shopId } });
 
   const isLoading = shopsLoading || (!!shopId && productsLoading);
   const isError = shopsError || productsError;
@@ -87,7 +87,7 @@ export function ShopOwnerBundles() {
     <>
       <div className="flex items-center justify-between mb-4">
         <h3 className="text-lg font-semibold">Shop Bundles</h3>
-        <Select onValueChange={setStatusFilter} value={statusFilter}>
+        <Select onValueChange={(val) => val && setStatusFilter(val)} value={statusFilter}>
           <SelectTrigger className="w-[140px]">
             <SelectValue placeholder="All Status" />
           </SelectTrigger>
