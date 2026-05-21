@@ -173,7 +173,7 @@ jobs:
       - name: Install license-checker
         run: bun add -g license-checker
       - name: Check licenses
-        run: license-checker --onlyAllow "MIT;ISC;Apache-2.0;BSD-2-Clause;BSD-3-Clause;0BSD;CC0-1.0;Unlicense;WTFPL;Zlib"
+        run: license-checker --onlyAllow "MIT;ISC;Apache-2.0;BSD-2-Clause;BSD-3-Clause;0BSD;CC0-1.0;Unlicense;WTFPL;Zlib;OFL-1.1"
 
   build:
     needs: [lint, typecheck, generate]
