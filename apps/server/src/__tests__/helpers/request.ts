@@ -54,6 +54,10 @@ export function patch(path: string, opts?: RequestOpts) {
   return buildRequest("PATCH", path, opts);
 }
 
+export function put(path: string, opts?: RequestOpts) {
+  return buildRequest("PUT", path, opts);
+}
+
 export function del(path: string, opts?: RequestOpts) {
   return buildRequest("DELETE", path, opts);
 }
