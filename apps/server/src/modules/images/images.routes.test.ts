@@ -1,7 +1,7 @@
 import { afterEach, describe, expect, it, vi } from "vitest";
-import { app } from "../../app";
 import { resetAuth } from "../../__tests__/helpers/auth";
-import { get, del } from "../../__tests__/helpers/request";
+import { del, get } from "../../__tests__/helpers/request";
+import { app } from "../../app";
 
 vi.mock("./images.service", () => ({
   imagesService: {
