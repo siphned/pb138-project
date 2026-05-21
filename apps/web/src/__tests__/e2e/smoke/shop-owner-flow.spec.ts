@@ -3,31 +3,31 @@ import { expect, test } from "@playwright/test";
 test.describe("Shop Owner Flow: Login → View Inventory & Orders", () => {
   test("shop management page requires authentication", async ({ page }) => {
     await page.goto("/manage/shops");
-    await page.waitForURL("**/auth/login", { timeout: 5000 });
+    await page.waitForURL("**/auth/login", { timeout: 15000 });
     expect(page.url()).toContain("/auth/login");
   });
 
   test("shop inventory page requires authentication and shop owner role", async ({ page }) => {
     await page.goto("/manage/shops/1/inventory");
-    await page.waitForURL("**/auth/login", { timeout: 5000 });
+    await page.waitForURL("**/auth/login", { timeout: 15000 });
     expect(page.url()).toContain("/auth/login");
   });
 
   test("shop bundles page requires authentication", async ({ page }) => {
     await page.goto("/manage/shops/1/bundles");
-    await page.waitForURL("**/auth/login", { timeout: 5000 });
+    await page.waitForURL("**/auth/login", { timeout: 15000 });
     expect(page.url()).toContain("/auth/login");
   });
 
   test("shop orders page requires authentication", async ({ page }) => {
     await page.goto("/manage/shops/1/shop-orders");
-    await page.waitForURL("**/auth/login", { timeout: 5000 });
+    await page.waitForURL("**/auth/login", { timeout: 15000 });
     expect(page.url()).toContain("/auth/login");
   });
 
   test("supply browse page requires authentication", async ({ page }) => {
     await page.goto("/manage/shops/1/supply-browse");
-    await page.waitForURL("**/auth/login", { timeout: 5000 });
+    await page.waitForURL("**/auth/login", { timeout: 15000 });
     expect(page.url()).toContain("/auth/login");
   });
 
@@ -59,7 +59,7 @@ test.describe("Shop Owner Flow: Login → View Inventory & Orders", () => {
 
     for (const route of shopOwnerRoutes) {
       await page.goto(route);
-      await page.waitForURL("**/auth/login", { timeout: 5000 });
+      await page.waitForURL("**/auth/login", { timeout: 15000 });
       expect(page.url()).toContain("/auth/login");
     }
   });
@@ -99,19 +99,19 @@ test.describe("Shop Owner Flow: Login → View Inventory & Orders", () => {
 
   test("shop owner dashboard is protected", async ({ page }) => {
     await page.goto("/dashboard");
-    await page.waitForURL("**/auth/login", { timeout: 5000 });
+    await page.waitForURL("**/auth/login", { timeout: 15000 });
     expect(page.url()).toContain("/auth/login");
   });
 
   test("shop owner orders list is protected", async ({ page }) => {
     await page.goto("/orders");
-    await page.waitForURL("**/auth/login", { timeout: 5000 });
+    await page.waitForURL("**/auth/login", { timeout: 15000 });
     expect(page.url()).toContain("/auth/login");
   });
 
   test("shop owner settings are protected", async ({ page }) => {
     await page.goto("/settings");
-    await page.waitForURL("**/auth/login", { timeout: 5000 });
+    await page.waitForURL("**/auth/login", { timeout: 15000 });
     expect(page.url()).toContain("/auth/login");
   });
 

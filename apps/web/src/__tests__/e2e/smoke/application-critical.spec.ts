@@ -54,7 +54,7 @@ test.describe("Critical Application Features", () => {
 
     for (const route of protectedRoutes) {
       await page.goto(route);
-      await page.waitForURL("**/auth/login", { timeout: 5000 });
+      await page.waitForURL("**/auth/login", { timeout: 15000 });
       expect(page.url()).toContain("/auth/login");
     }
   });

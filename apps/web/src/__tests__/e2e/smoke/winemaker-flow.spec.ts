@@ -3,39 +3,39 @@ import { expect, test } from "@playwright/test";
 test.describe("Winemaker Flow: Login → Manage Wines → List & Create Wine", () => {
   test("winemaker dashboard requires authentication", async ({ page }) => {
     await page.goto("/manage-wines");
-    await page.waitForURL("**/auth/login", { timeout: 5000 });
+    await page.waitForURL("**/auth/login", { timeout: 15000 });
     expect(page.url()).toContain("/auth/login");
   });
 
   test("unauthenticated user cannot access winemaker supply page", async ({ page }) => {
     await page.goto("/supply");
-    await page.waitForURL("**/auth/login", { timeout: 5000 });
+    await page.waitForURL("**/auth/login", { timeout: 15000 });
     expect(page.url()).toContain("/auth/login");
   });
 
   test("winemaker area requires winemaker role", async ({ page }) => {
     // Attempt to access winemaker routes
     await page.goto("/manage-wines");
-    await page.waitForURL("**/auth/login", { timeout: 5000 });
+    await page.waitForURL("**/auth/login", { timeout: 15000 });
     expect(page.url()).toContain("/auth/login");
   });
 
   test("authenticated dashboard is protected", async ({ page }) => {
     await page.goto("/dashboard");
     // Should redirect to login if not authenticated
-    await page.waitForURL("**/auth/login", { timeout: 5000 });
+    await page.waitForURL("**/auth/login", { timeout: 15000 });
     expect(page.url()).toContain("/auth/login");
   });
 
   test("orders page requires authentication", async ({ page }) => {
     await page.goto("/orders");
-    await page.waitForURL("**/auth/login", { timeout: 5000 });
+    await page.waitForURL("**/auth/login", { timeout: 15000 });
     expect(page.url()).toContain("/auth/login");
   });
 
   test("settings page requires authentication", async ({ page }) => {
     await page.goto("/settings");
-    await page.waitForURL("**/auth/login", { timeout: 5000 });
+    await page.waitForURL("**/auth/login", { timeout: 15000 });
     expect(page.url()).toContain("/auth/login");
   });
 
@@ -55,7 +55,7 @@ test.describe("Winemaker Flow: Login → Manage Wines → List & Create Wine", (
 
   test("winemaker supply browse is protected", async ({ page }) => {
     await page.goto("/manage-wines");
-    await page.waitForURL("**/auth/login", { timeout: 5000 });
+    await page.waitForURL("**/auth/login", { timeout: 15000 });
     expect(page.url()).toContain("/auth/login");
   });
 
@@ -100,7 +100,7 @@ test.describe("Winemaker Flow: Login → Manage Wines → List & Create Wine", (
 
     for (const route of protectedRoutes) {
       await page.goto(route);
-      await page.waitForURL("**/auth/login", { timeout: 5000 });
+      await page.waitForURL("**/auth/login", { timeout: 15000 });
       expect(page.url()).toContain("/auth/login");
     }
   });

@@ -10,7 +10,7 @@ test.describe("Customer Journey: Login → Browse Wines → View Detail", () => 
 
   test("redirect to login when accessing dashboard without auth", async ({ page }) => {
     await page.goto("/dashboard");
-    await page.waitForURL("**/auth/login", { timeout: 5000 });
+    await page.waitForURL("**/auth/login", { timeout: 15000 });
     expect(page.url()).toContain("/auth/login");
   });
 

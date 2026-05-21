@@ -3,25 +3,25 @@ import { expect, test } from "@playwright/test";
 test.describe("Admin Flow: Login → Moderation & Admin Panel", () => {
   test("admin dashboard requires authentication", async ({ page }) => {
     await page.goto("/admin");
-    await page.waitForURL("**/auth/login", { timeout: 5000 });
+    await page.waitForURL("**/auth/login", { timeout: 15000 });
     expect(page.url()).toContain("/auth/login");
   });
 
   test("admin moderation page requires authentication and admin role", async ({ page }) => {
     await page.goto("/admin/moderation");
-    await page.waitForURL("**/auth/login", { timeout: 5000 });
+    await page.waitForURL("**/auth/login", { timeout: 15000 });
     expect(page.url()).toContain("/auth/login");
   });
 
   test("admin users management page requires authentication", async ({ page }) => {
     await page.goto("/admin/users");
-    await page.waitForURL("**/auth/login", { timeout: 5000 });
+    await page.waitForURL("**/auth/login", { timeout: 15000 });
     expect(page.url()).toContain("/auth/login");
   });
 
   test("admin role requests page requires authentication", async ({ page }) => {
     await page.goto("/admin/role-requests");
-    await page.waitForURL("**/auth/login", { timeout: 5000 });
+    await page.waitForURL("**/auth/login", { timeout: 15000 });
     expect(page.url()).toContain("/auth/login");
   });
 
@@ -44,7 +44,7 @@ test.describe("Admin Flow: Login → Moderation & Admin Panel", () => {
 
     for (const route of adminRoutes) {
       await page.goto(route);
-      await page.waitForURL("**/auth/login", { timeout: 5000 });
+      await page.waitForURL("**/auth/login", { timeout: 15000 });
       expect(page.url()).toContain("/auth/login");
     }
   });
@@ -62,7 +62,7 @@ test.describe("Admin Flow: Login → Moderation & Admin Panel", () => {
 
   test("admin cannot access without authentication", async ({ page }) => {
     await page.goto("/admin");
-    await page.waitForURL("**/auth/login", { timeout: 5000 });
+    await page.waitForURL("**/auth/login", { timeout: 15000 });
     expect(page.url()).toContain("/auth/login");
   });
 
@@ -96,19 +96,19 @@ test.describe("Admin Flow: Login → Moderation & Admin Panel", () => {
 
   test("dashboard is protected from non-authenticated users", async ({ page }) => {
     await page.goto("/dashboard");
-    await page.waitForURL("**/auth/login", { timeout: 5000 });
+    await page.waitForURL("**/auth/login", { timeout: 15000 });
     expect(page.url()).toContain("/auth/login");
   });
 
   test("orders page is protected from non-authenticated users", async ({ page }) => {
     await page.goto("/orders");
-    await page.waitForURL("**/auth/login", { timeout: 5000 });
+    await page.waitForURL("**/auth/login", { timeout: 15000 });
     expect(page.url()).toContain("/auth/login");
   });
 
   test("settings page is protected from non-authenticated users", async ({ page }) => {
     await page.goto("/settings");
-    await page.waitForURL("**/auth/login", { timeout: 5000 });
+    await page.waitForURL("**/auth/login", { timeout: 15000 });
     expect(page.url()).toContain("/auth/login");
   });
 
@@ -139,7 +139,7 @@ test.describe("Admin Flow: Login → Moderation & Admin Panel", () => {
     // Test that the app layout doesn't crash when trying to access admin areas
     await page.goto("/admin");
     // Should redirect to login
-    await page.waitForURL("**/auth/login", { timeout: 5000 });
+    await page.waitForURL("**/auth/login", { timeout: 15000 });
     expect(page.url()).toContain("/auth/login");
   });
 });

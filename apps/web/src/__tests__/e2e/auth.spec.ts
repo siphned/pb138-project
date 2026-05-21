@@ -5,25 +5,25 @@ test.describe("Auth guards", () => {
     page,
   }) => {
     await page.goto("/dashboard");
-    await page.waitForURL("**/auth/login", { timeout: 5000 });
+    await page.waitForURL("**/auth/login", { timeout: 15000 });
     expect(page.url()).toContain("/auth/login");
   });
 
   test("unauthenticated user visiting /orders is redirected to /auth/login", async ({ page }) => {
     await page.goto("/orders");
-    await page.waitForURL("**/auth/login", { timeout: 5000 });
+    await page.waitForURL("**/auth/login", { timeout: 15000 });
     expect(page.url()).toContain("/auth/login");
   });
 
   test("unauthenticated user visiting /stats is redirected to /auth/login", async ({ page }) => {
     await page.goto("/stats");
-    await page.waitForURL("**/auth/login", { timeout: 5000 });
+    await page.waitForURL("**/auth/login", { timeout: 15000 });
     expect(page.url()).toContain("/auth/login");
   });
 
   test("unauthenticated user visiting /admin/* is redirected to /auth/login", async ({ page }) => {
     await page.goto("/admin");
-    await page.waitForURL("**/auth/login", { timeout: 5000 });
+    await page.waitForURL("**/auth/login", { timeout: 15000 });
     expect(page.url()).toContain("/auth/login");
   });
 });

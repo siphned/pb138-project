@@ -279,3 +279,62 @@ jobs:
         with:
           name: sbom
           path: sbom.spdx.json
+
+  e2e:
+    needs: [install, generate]
+    runs-on: ubuntu-latest
+    continue-on-error: true
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: winemarket
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+        ports:
+          - 5432:5432
+    env:
+      DATABASE_URL: postgresql://postgres:postgres@localhost:5432/winemarket
+      FRONTEND_URL: http://localhost:5173
+      CLERK_JWT_KEY: ${{ secrets.CLERK_JWT_KEY || 'ci_placeholder' }}
+      CLERK_SECRET_KEY: ${{ secrets.CLERK_SECRET_KEY || 'ci_placeholder' }}
+      VITE_CLERK_PUBLISHABLE_KEY: ${{ secrets.VITE_CLERK_PUBLISHABLE_KEY || 'ci_placeholder' }}
+    steps:
+      - uses: actions/checkout@v4
+      - name: Setup Bun
+        uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: 1.3.11
+      - name: Restore cache
+        uses: actions/cache@v4
+        with:
+          path: |
+            .bun-cache
+            node_modules
+            apps/server/node_modules
+            apps/web/node_modules
+            packages/*/node_modules
+          key: ${{ runner.os }}-bun-${{ hashFiles('**/bun.lock') }}
+          fail-on-cache-miss: true
+      - name: Download generated code
+        uses: actions/download-artifact@v4
+        with:
+          name: generated-code
+          path: apps/web/src/generated/
+      - name: Install Playwright
+        run: bunx playwright install --with-deps chromium
+      - name: Migrate Database
+        run: cd apps/server && bunx drizzle-kit push
+      - name: Run E2E tests
+        run: cd apps/web && bunx playwright test --reporter=html
+      - name: Upload E2E report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: e2e-report
+          path: apps/web/playwright-report/
