@@ -79,7 +79,7 @@ export function ShopOwnerInventory() {
 
   const productWinery = (wines: (typeof items)[number]["wines"]) =>
     wines[0]?.winemaker?.name ?? "—";
-  const productWine = (wines: (typeof items)[number]["wines"]) => wines[0]?.name ?? "—";
+  const _productWine = (wines: (typeof items)[number]["wines"]) => wines[0]?.name ?? "—";
   const productVintage = (wines: (typeof items)[number]["wines"]) => wines[0]?.vintageYear ?? "—";
 
   return (

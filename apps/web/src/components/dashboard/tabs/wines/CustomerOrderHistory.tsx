@@ -54,7 +54,7 @@ export function CustomerOrderHistory() {
     );
   }
 
-  const now = new Date();
+  const _now = new Date();
   const filteredOrders = orders.filter((order) => {
     const orderDate = new Date(order.createdAt as string);
     if (timeframe === "6months") {
