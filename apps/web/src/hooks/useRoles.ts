@@ -4,10 +4,8 @@ import type { AppRole } from "@/types/roles";
 export function useRoles(): AppRole[] {
   const { sessionClaims } = useAuth();
   if (!sessionClaims) return [];
-  const roles = (
-    sessionClaims.public_metadata?.roles ??
-    sessionClaims.roles ??
-    []
-  ) as AppRole[];
+  const claims = sessionClaims as Record<string, unknown>;
+  const metadata = claims.public_metadata as Record<string, unknown> | undefined;
+  const roles = (metadata?.roles ?? claims.roles ?? []) as AppRole[];
   return roles;
 }
