@@ -34,7 +34,7 @@ jobs:
             apps/server/node_modules
             apps/web/node_modules
             packages/*/node_modules
-          key: ${{ runner.os }}-bun-${{ hashFiles('**/bun.lock') }}-v2
+          key: ${{ runner.os }}-bun-${{ hashFiles('**/bun.lock') }}-v3
       - name: Install dependencies
         run: bun install --frozen-lockfile
 
@@ -61,7 +61,7 @@ jobs:
             apps/server/node_modules
             apps/web/node_modules
             packages/*/node_modules
-          key: ${{ runner.os }}-bun-${{ hashFiles('**/bun.lock') }}-v2
+          key: ${{ runner.os }}-bun-${{ hashFiles('**/bun.lock') }}-v3
           fail-on-cache-miss: false
       - name: Migrate Database
         run: |
@@ -100,7 +100,7 @@ jobs:
             apps/server/node_modules
             apps/web/node_modules
             packages/*/node_modules
-          key: ${{ runner.os }}-bun-${{ hashFiles('**/bun.lock') }}-v2
+          key: ${{ runner.os }}-bun-${{ hashFiles('**/bun.lock') }}-v3
           fail-on-cache-miss: false
       - name: Run biome lint
         run: bun run lint
@@ -123,7 +123,7 @@ jobs:
             apps/server/node_modules
             apps/web/node_modules
             packages/*/node_modules
-          key: ${{ runner.os }}-bun-${{ hashFiles('**/bun.lock') }}-v2
+          key: ${{ runner.os }}-bun-${{ hashFiles('**/bun.lock') }}-v3
           fail-on-cache-miss: false
       - name: Download generated code
         uses: actions/download-artifact@v4
@@ -151,12 +151,10 @@ jobs:
             apps/server/node_modules
             apps/web/node_modules
             packages/*/node_modules
-          key: ${{ runner.os }}-bun-${{ hashFiles('**/bun.lock') }}-v2
+          key: ${{ runner.os }}-bun-${{ hashFiles('**/bun.lock') }}-v3
           fail-on-cache-miss: false
       - name: Run bun audit
         run: bun audit --json || true
-      - name: Install license-checker
-        run: bun add -g license-checker
       - name: Check licenses
         run: bun x license-checker --onlyAllow "MIT;ISC;Apache-2.0;BSD-2-Clause;BSD-3-Clause;0BSD;CC0-1.0;Unlicense;WTFPL;Zlib;OFL-1.1"
 
@@ -178,7 +176,7 @@ jobs:
             apps/server/node_modules
             apps/web/node_modules
             packages/*/node_modules
-          key: ${{ runner.os }}-bun-${{ hashFiles('**/bun.lock') }}-v2
+          key: ${{ runner.os }}-bun-${{ hashFiles('**/bun.lock') }}-v3
           fail-on-cache-miss: false
       - name: Download generated code
         uses: actions/download-artifact@v4
@@ -215,7 +213,7 @@ jobs:
             apps/server/node_modules
             apps/web/node_modules
             packages/*/node_modules
-          key: ${{ runner.os }}-bun-${{ hashFiles('**/bun.lock') }}-v2
+          key: ${{ runner.os }}-bun-${{ hashFiles('**/bun.lock') }}-v3
           fail-on-cache-miss: false
       - name: Download generated code
         uses: actions/download-artifact@v4
@@ -276,7 +274,7 @@ jobs:
             apps/server/node_modules
             apps/web/node_modules
             packages/*/node_modules
-          key: ${{ runner.os }}-bun-${{ hashFiles('**/bun.lock') }}-v2
+          key: ${{ runner.os }}-bun-${{ hashFiles('**/bun.lock') }}-v3
           fail-on-cache-miss: false
       - name: Download generated code
         uses: actions/download-artifact@v4
