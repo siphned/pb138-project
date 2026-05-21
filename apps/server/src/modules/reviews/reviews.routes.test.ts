@@ -1,80 +1,94 @@
-import { Elysia } from "elysia";
-import { beforeEach, describe, expect, it, vi } from "vitest";
+import { afterEach, describe, expect, it, vi } from "vitest";
+import { resetAuth } from "../../__tests__/helpers/auth";
+import { del, get, post } from "../../__tests__/helpers/request";
+import { app } from "../../app";
 
-// Mock the service
 vi.mock("./reviews.service", () => ({
   reviewsService: {
-    createProductReview: vi.fn(),
-    createWinemakerReview: vi.fn(),
-    deleteReview: vi.fn(),
-    listProductReviews: vi.fn(),
-    listWinemakerReviews: vi.fn(),
+    createProductReview: vi.fn().mockResolvedValue({ id: "r1" }),
+    createWinemakerReview: vi.fn().mockResolvedValue({ id: "r3" }),
+    createWineReview: vi.fn().mockResolvedValue({ id: "r2" }),
+    deleteReview: vi.fn().mockResolvedValue(undefined),
+    listProductReviews: vi
+      .fn()
+      .mockResolvedValue({ averageRating: 4.5, reviews: [], totalCount: 0 }),
+    listWinemakerReviews: vi
+      .fn()
+      .mockResolvedValue({ averageRating: 4.2, reviews: [], totalCount: 0 }),
+    listWineReviews: vi.fn().mockResolvedValue({ averageRating: 4.0, reviews: [], totalCount: 0 }),
   },
 }));
 
-const mockUserState = {
-  clerkId: "clerk-u1",
-  clerkPayload: { roles: ["customer"], sub: "clerk-u1" },
-  dbUser: { id: "u1", role: "customer" },
-};
-
-// Mock the auth module BEFORE importing reviewsRoutes
-vi.mock("../auth", () => ({
-  authPlugin: new (require("elysia").Elysia)({ name: "auth" }).macro({
-    requireAuth: {
-      resolve: () => mockUserState,
-    },
-    requireCapability: () => ({
-      resolve: () => mockUserState,
-    }),
-    requireRoles: () => ({
-      resolve: () => mockUserState,
-    }),
-  }),
+vi.mock("../users/users.service", () => ({
+  usersService: { lazyGetOrCreate: vi.fn().mockResolvedValue({ id: "u1" }) },
 }));
 
-import { reviewsRoutes } from "./reviews.routes";
-import { reviewsService } from "./reviews.service";
+vi.mock("../auth/auth.utils", () => ({
+  verifyClerkToken: vi.fn().mockResolvedValue(null),
+}));
 
-describe("reviews.routes integration", () => {
-  const app = new Elysia().use(reviewsRoutes);
+vi.mock("../../utils/logger", () => ({
+  logger: { debug: vi.fn(), error: vi.fn(), info: vi.fn(), warn: vi.fn() },
+}));
 
-  beforeEach(() => {
-    vi.clearAllMocks();
+vi.mock("../carts/carts.service", () => ({
+  cartsService: { mergeOnLogin: vi.fn().mockResolvedValue(undefined) },
+}));
+
+describe("reviews routes", () => {
+  afterEach(() => resetAuth());
+
+  describe("GET /products/:id/reviews", () => {
+    it("returns 200 with review list (public)", async () => {
+      const response = await app.handle(get("/products/p1/reviews"));
+      expect(response.status).toBe(200);
+    });
   });
 
-  it("GET /products/:id/reviews returns 200", async () => {
-    vi.mocked(reviewsService.listProductReviews).mockResolvedValue({
-      averageRating: 4.5,
-      reviews: [],
-      totalCount: 0,
+  describe("POST /products/:id/reviews", () => {
+    it("returns 401 when no auth token", async () => {
+      const response = await app.handle(post("/products/p1/reviews", { body: { rating: 5 } }));
+      expect(response.status).toBe(401);
     });
 
-    const res = await app.handle(new Request("http://localhost/products/p1/reviews"));
-    expect(res.status).toBe(200);
+    it("returns 200 when authenticated", async () => {
+      const response = await app.handle(
+        post("/products/p1/reviews", { auth: { roles: ["customer"] }, body: { rating: 5 } })
+      );
+      expect(response.status).toBe(200);
+    });
   });
 
-  it("POST /products/:id/reviews returns 200", async () => {
-    vi.mocked(reviewsService.createProductReview).mockResolvedValue({ id: "r1" } as any);
-
-    const res = await app.handle(
-      new Request("http://localhost/products/p1/reviews", {
-        body: JSON.stringify({ body: "test", rating: 5 }),
-        headers: { "Content-Type": "application/json" },
-        method: "POST",
-      })
-    );
-    expect(res.status).toBe(200);
+  describe("GET /wines/:id/reviews", () => {
+    it("returns 200 with review list (public)", async () => {
+      const response = await app.handle(get("/wines/w1/reviews"));
+      expect(response.status).toBe(200);
+    });
   });
 
-  it("DELETE /reviews/:id returns 200", async () => {
-    vi.mocked(reviewsService.deleteReview).mockResolvedValue(undefined);
+  describe("GET /winemakers/:id/reviews", () => {
+    it("returns 200 with review list (public)", async () => {
+      const response = await app.handle(get("/winemakers/wm1/reviews"));
+      expect(response.status).toBe(200);
+    });
+  });
 
-    const res = await app.handle(
-      new Request("http://localhost/reviews/r1?entityId=p1&entityType=product", {
-        method: "DELETE",
-      })
-    );
-    expect(res.status).toBe(200);
+  describe("DELETE /reviews/:id", () => {
+    it("returns 401 when no auth token", async () => {
+      const response = await app.handle(
+        del("/reviews/r1", { query: { entityId: "p1", entityType: "product" } })
+      );
+      expect(response.status).toBe(401);
+    });
+
+    it("returns 200 when authenticated", async () => {
+      const response = await app.handle(
+        del("/reviews/r1", {
+          auth: { roles: ["customer"] },
+          query: { entityId: "p1", entityType: "product" },
+        })
+      );
+      expect(response.status).toBe(200);
+    });
   });
 });
