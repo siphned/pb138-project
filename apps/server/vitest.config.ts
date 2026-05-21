@@ -4,7 +4,7 @@ export default defineConfig({
   test: {
     coverage: {
       enabled: false,
-      exclude: ["src/**/*.test.ts", "src/db/migrations/**", "scripts/**"],
+      exclude: ["src/**/*.test.ts", "src/db/migrations/**", "scripts/**", "src/__tests__/**"],
       provider: "v8",
       reporter: ["text", "json", "html", "lcov"],
       thresholds: {
@@ -24,6 +24,7 @@ export default defineConfig({
         inline: ["@vitest/spy"],
       },
     },
+    setupFiles: ["./src/__tests__/setup.ts"],
     testTimeout: 30_000,
   },
 });
