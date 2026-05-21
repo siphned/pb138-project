@@ -280,10 +280,10 @@ jobs:
           name: sbom
           path: sbom.spdx.json
 
+  # E2E tests — required CI gate. Failure blocks PR merge.
   e2e:
     needs: [install, generate]
     runs-on: ubuntu-latest
-    continue-on-error: true
     services:
       postgres:
         image: postgres:16
