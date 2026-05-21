@@ -34,11 +34,11 @@ jobs:
             apps/server/node_modules
             apps/web/node_modules
             packages/*/node_modules
-          key: ${{ runner.os }}-bun-${{ hashFiles('**/bun.lock') }}-v5
+          key: ${{ runner.os }}-bun-${{ hashFiles('**/bun.lock') }}-v6
       - name: Clear bun cache
         run: rm -rf .bun-cache node_modules apps/*/node_modules packages/*/node_modules 2>/dev/null || true
       - name: Install dependencies
-        run: bun install --frozen-lockfile
+        run: bun install --frozen-lockfile --backend=copyfile
 
   generate:
     needs: install
@@ -77,7 +77,7 @@ jobs:
             apps/server/node_modules
             apps/web/node_modules
             packages/*/node_modules
-          key: ${{ runner.os }}-bun-${{ hashFiles('**/bun.lock') }}-v5
+          key: ${{ runner.os }}-bun-${{ hashFiles('**/bun.lock') }}-v6
           fail-on-cache-miss: false
       - name: Migrate Database
         run: cd apps/server && bun drizzle-kit push || true
@@ -109,7 +109,7 @@ jobs:
             apps/server/node_modules
             apps/web/node_modules
             packages/*/node_modules
-          key: ${{ runner.os }}-bun-${{ hashFiles('**/bun.lock') }}-v5
+          key: ${{ runner.os }}-bun-${{ hashFiles('**/bun.lock') }}-v6
           fail-on-cache-miss: false
       - name: Run biome lint
         run: bun run lint
@@ -132,7 +132,7 @@ jobs:
             apps/server/node_modules
             apps/web/node_modules
             packages/*/node_modules
-          key: ${{ runner.os }}-bun-${{ hashFiles('**/bun.lock') }}-v5
+          key: ${{ runner.os }}-bun-${{ hashFiles('**/bun.lock') }}-v6
           fail-on-cache-miss: false
       - name: Download generated code
         uses: actions/download-artifact@v4
@@ -160,7 +160,7 @@ jobs:
             apps/server/node_modules
             apps/web/node_modules
             packages/*/node_modules
-          key: ${{ runner.os }}-bun-${{ hashFiles('**/bun.lock') }}-v5
+          key: ${{ runner.os }}-bun-${{ hashFiles('**/bun.lock') }}-v6
           fail-on-cache-miss: false
       - name: Run bun audit
         run: bun audit --json || true
@@ -183,7 +183,7 @@ jobs:
             apps/server/node_modules
             apps/web/node_modules
             packages/*/node_modules
-          key: ${{ runner.os }}-bun-${{ hashFiles('**/bun.lock') }}-v5
+          key: ${{ runner.os }}-bun-${{ hashFiles('**/bun.lock') }}-v6
           fail-on-cache-miss: false
       - name: Download generated code
         uses: actions/download-artifact@v4
@@ -234,7 +234,7 @@ jobs:
             apps/server/node_modules
             apps/web/node_modules
             packages/*/node_modules
-          key: ${{ runner.os }}-bun-${{ hashFiles('**/bun.lock') }}-v5
+          key: ${{ runner.os }}-bun-${{ hashFiles('**/bun.lock') }}-v6
           fail-on-cache-miss: false
       - name: Download generated code
         uses: actions/download-artifact@v4
@@ -310,7 +310,7 @@ jobs:
             apps/server/node_modules
             apps/web/node_modules
             packages/*/node_modules
-          key: ${{ runner.os }}-bun-${{ hashFiles('**/bun.lock') }}-v5
+          key: ${{ runner.os }}-bun-${{ hashFiles('**/bun.lock') }}-v6
           fail-on-cache-miss: false
       - name: Download generated code
         uses: actions/download-artifact@v4
