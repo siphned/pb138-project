@@ -16,29 +16,21 @@ concurrency:
 jobs:
   install:
     runs-on: self-hosted
-    outputs:
-      cache-hit: ${{ steps.cache.outputs.cache-hit }}
     steps:
       - uses: actions/checkout@v4
       - name: Setup Bun
         uses: oven-sh/setup-bun@v2
         with:
           bun-version: latest
-      - name: Cache bun and node_modules
-        id: cache
+      - name: Cache bun registry (tarballs only)
         uses: actions/cache@v4
         with:
-          path: |
-            .bun-cache
-            node_modules
-            apps/server/node_modules
-            apps/web/node_modules
-            packages/*/node_modules
-          key: ${{ runner.os }}-bun-${{ hashFiles('**/bun.lock') }}-v7
-      - name: Clear bun cache
-        run: rm -rf .bun-cache node_modules apps/*/node_modules packages/*/node_modules 2>/dev/null || true
+          path: .bun-cache
+          key: ${{ runner.os }}-bun-registry-${{ hashFiles('**/bun.lock') }}-v1
+          restore-keys: |
+            ${{ runner.os }}-bun-registry-
       - name: Install dependencies
-        run: bun install --frozen-lockfile --backend=copyfile
+        run: BUN_INSTALL_CACHE_DIR=.bun-cache bun install --frozen-lockfile --backend=copyfile
 
   generate:
     needs: install
@@ -68,17 +60,15 @@ jobs:
         uses: oven-sh/setup-bun@v2
         with:
           bun-version: latest
-      - name: Restore cache
+      - name: Restore bun registry cache
         uses: actions/cache@v4
         with:
-          path: |
-            .bun-cache
-            node_modules
-            apps/server/node_modules
-            apps/web/node_modules
-            packages/*/node_modules
-          key: ${{ runner.os }}-bun-${{ hashFiles('**/bun.lock') }}-v7
-          fail-on-cache-miss: false
+          path: .bun-cache
+          key: ${{ runner.os }}-bun-registry-${{ hashFiles('**/bun.lock') }}-v1
+          restore-keys: |
+            ${{ runner.os }}-bun-registry-
+      - name: Install dependencies
+        run: BUN_INSTALL_CACHE_DIR=.bun-cache bun install --frozen-lockfile --backend=copyfile
       - name: Migrate Database
         run: cd apps/server && bun drizzle-kit push || true
       - name: Generate OpenAPI spec
@@ -100,17 +90,15 @@ jobs:
         uses: oven-sh/setup-bun@v2
         with:
           bun-version: latest
-      - name: Restore cache
+      - name: Restore bun registry cache
         uses: actions/cache@v4
         with:
-          path: |
-            .bun-cache
-            node_modules
-            apps/server/node_modules
-            apps/web/node_modules
-            packages/*/node_modules
-          key: ${{ runner.os }}-bun-${{ hashFiles('**/bun.lock') }}-v7
-          fail-on-cache-miss: false
+          path: .bun-cache
+          key: ${{ runner.os }}-bun-registry-${{ hashFiles('**/bun.lock') }}-v1
+          restore-keys: |
+            ${{ runner.os }}-bun-registry-
+      - name: Install dependencies
+        run: BUN_INSTALL_CACHE_DIR=.bun-cache bun install --frozen-lockfile --backend=copyfile
       - name: Run biome lint
         run: bun run lint
 
@@ -123,17 +111,15 @@ jobs:
         uses: oven-sh/setup-bun@v2
         with:
           bun-version: latest
-      - name: Restore cache
+      - name: Restore bun registry cache
         uses: actions/cache@v4
         with:
-          path: |
-            .bun-cache
-            node_modules
-            apps/server/node_modules
-            apps/web/node_modules
-            packages/*/node_modules
-          key: ${{ runner.os }}-bun-${{ hashFiles('**/bun.lock') }}-v7
-          fail-on-cache-miss: false
+          path: .bun-cache
+          key: ${{ runner.os }}-bun-registry-${{ hashFiles('**/bun.lock') }}-v1
+          restore-keys: |
+            ${{ runner.os }}-bun-registry-
+      - name: Install dependencies
+        run: BUN_INSTALL_CACHE_DIR=.bun-cache bun install --frozen-lockfile --backend=copyfile
       - name: Download generated code
         uses: actions/download-artifact@v4
         with:
@@ -151,17 +137,15 @@ jobs:
         uses: oven-sh/setup-bun@v2
         with:
           bun-version: latest
-      - name: Restore cache
+      - name: Restore bun registry cache
         uses: actions/cache@v4
         with:
-          path: |
-            .bun-cache
-            node_modules
-            apps/server/node_modules
-            apps/web/node_modules
-            packages/*/node_modules
-          key: ${{ runner.os }}-bun-${{ hashFiles('**/bun.lock') }}-v7
-          fail-on-cache-miss: false
+          path: .bun-cache
+          key: ${{ runner.os }}-bun-registry-${{ hashFiles('**/bun.lock') }}-v1
+          restore-keys: |
+            ${{ runner.os }}-bun-registry-
+      - name: Install dependencies
+        run: BUN_INSTALL_CACHE_DIR=.bun-cache bun install --frozen-lockfile --backend=copyfile
       - name: Run bun audit
         run: bun audit --json || true
 
@@ -174,17 +158,15 @@ jobs:
         uses: oven-sh/setup-bun@v2
         with:
           bun-version: latest
-      - name: Restore cache
+      - name: Restore bun registry cache
         uses: actions/cache@v4
         with:
-          path: |
-            .bun-cache
-            node_modules
-            apps/server/node_modules
-            apps/web/node_modules
-            packages/*/node_modules
-          key: ${{ runner.os }}-bun-${{ hashFiles('**/bun.lock') }}-v7
-          fail-on-cache-miss: false
+          path: .bun-cache
+          key: ${{ runner.os }}-bun-registry-${{ hashFiles('**/bun.lock') }}-v1
+          restore-keys: |
+            ${{ runner.os }}-bun-registry-
+      - name: Install dependencies
+        run: BUN_INSTALL_CACHE_DIR=.bun-cache bun install --frozen-lockfile --backend=copyfile
       - name: Download generated code
         uses: actions/download-artifact@v4
         with:
@@ -225,27 +207,22 @@ jobs:
         uses: oven-sh/setup-bun@v2
         with:
           bun-version: latest
-      - name: Restore cache
+      - name: Restore bun registry cache
         uses: actions/cache@v4
         with:
-          path: |
-            .bun-cache
-            node_modules
-            apps/server/node_modules
-            apps/web/node_modules
-            packages/*/node_modules
-          key: ${{ runner.os }}-bun-${{ hashFiles('**/bun.lock') }}-v7
-          fail-on-cache-miss: false
+          path: .bun-cache
+          key: ${{ runner.os }}-bun-registry-${{ hashFiles('**/bun.lock') }}-v1
+          restore-keys: |
+            ${{ runner.os }}-bun-registry-
+      - name: Install dependencies
+        run: BUN_INSTALL_CACHE_DIR=.bun-cache bun install --frozen-lockfile --backend=copyfile
       - name: Download generated code
         uses: actions/download-artifact@v4
         with:
           name: generated-code
           path: apps/web/src/generated/
       - name: Migrate Database
-        run: |
-          cd apps/server
-          bun install --frozen-lockfile
-          bun drizzle-kit push || true
+        run: cd apps/server && bun drizzle-kit push || true
       - name: Run unit tests
         run: bun run test
       - name: Upload junit results
@@ -301,17 +278,15 @@ jobs:
         uses: oven-sh/setup-bun@v2
         with:
           bun-version: latest
-      - name: Restore cache
+      - name: Restore bun registry cache
         uses: actions/cache@v4
         with:
-          path: |
-            .bun-cache
-            node_modules
-            apps/server/node_modules
-            apps/web/node_modules
-            packages/*/node_modules
-          key: ${{ runner.os }}-bun-${{ hashFiles('**/bun.lock') }}-v7
-          fail-on-cache-miss: false
+          path: .bun-cache
+          key: ${{ runner.os }}-bun-registry-${{ hashFiles('**/bun.lock') }}-v1
+          restore-keys: |
+            ${{ runner.os }}-bun-registry-
+      - name: Install dependencies
+        run: BUN_INSTALL_CACHE_DIR=.bun-cache bun install --frozen-lockfile --backend=copyfile
       - name: Download generated code
         uses: actions/download-artifact@v4
         with:
@@ -320,7 +295,7 @@ jobs:
       - name: Install Playwright
         run: bunx playwright install --with-deps chromium
       - name: Migrate Database
-        run: cd apps/server && bun install --frozen-lockfile && bun drizzle-kit push
+        run: cd apps/server && bun drizzle-kit push || true
       - name: Run E2E tests
         run: cd apps/web && bunx playwright test --reporter=html
       - name: Upload E2E report
