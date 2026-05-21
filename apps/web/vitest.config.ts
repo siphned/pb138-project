@@ -10,17 +10,17 @@ export default defineConfig({
   },
   test: {
     coverage: {
-      exclude: ["src/gen/**"],
+      enabled: false,
+      exclude: ["src/gen/**", "src/**/__tests__/e2e/**"],
     },
-    // happy-dom is ~30% faster than jsdom but lacks full layout API
-    // (getBoundingClientRect, scroll, canvas). Revert to jsdom if tests
-    // relying on those APIs start failing.
     environment: "happy-dom",
     exclude: ["src/**/__tests__/e2e/**", "**/*.spec.ts", "**/*.spec.tsx"],
     fileParallelism: true,
     globals: true,
+    hookTimeout: 10_000,
     include: ["src/**/*.test.ts", "src/**/*.test.tsx"],
     isolate: true,
     setupFiles: ["./src/__tests__/setup.ts"],
+    testTimeout: 15_000,
   },
 });

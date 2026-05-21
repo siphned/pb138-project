@@ -11,7 +11,7 @@ env:
 
 jobs:
   jira-status:
-    runs-on: ubuntu-latest
+    runs-on: self-hosted
     continue-on-error: true
     steps:
       - name: Extract Jira issue from PR title

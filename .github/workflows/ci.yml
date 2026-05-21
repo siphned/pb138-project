@@ -15,7 +15,7 @@ concurrency:
 
 jobs:
   install:
-    runs-on: ubuntu-latest
+    runs-on: self-hosted
     outputs:
       cache-hit: ${{ steps.cache.outputs.cache-hit }}
     steps:
