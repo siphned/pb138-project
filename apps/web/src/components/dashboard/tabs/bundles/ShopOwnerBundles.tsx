@@ -1,5 +1,5 @@
-import { useState } from "react";
 import { AlertTriangle, Loader2, MoreHorizontal, Package } from "lucide-react";
+import { useState } from "react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
@@ -17,28 +17,21 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { useGetShopsMe } from "@/generated/hooks/useGetShopsMe";
 import { useGetProducts } from "@/generated/hooks/useGetProducts";
+import { useGetShopsMe } from "@/generated/hooks/useGetShopsMe";
 import { getStockStatus } from "@/utils/stock";
 
 export function ShopOwnerBundles() {
   const [statusFilter, setStatusFilter] = useState("all");
 
-  const {
-    data: shops,
-    isLoading: shopsLoading,
-    isError: shopsError,
-  } = useGetShopsMe();
+  const { data: shops, isLoading: shopsLoading, isError: shopsError } = useGetShopsMe();
   const shopId = shops?.[0]?.id;
 
   const {
     data: products,
     isLoading: productsLoading,
     isError: productsError,
-  } = useGetProducts(
-    { isBundle: true, shopId: shopId ?? "" },
-    { enabled: !!shopId },
-  );
+  } = useGetProducts({ isBundle: true, shopId: shopId ?? "" }, { enabled: !!shopId });
 
   const isLoading = shopsLoading || (!!shopId && productsLoading);
   const isError = shopsError || productsError;
@@ -57,9 +50,7 @@ export function ShopOwnerBundles() {
       <div className="flex flex-col items-center justify-center py-12 text-destructive gap-2">
         <AlertTriangle className="h-8 w-8" />
         <p className="font-medium">Failed to load bundles</p>
-        <p className="text-sm text-muted-foreground">
-          Please try again later.
-        </p>
+        <p className="text-sm text-muted-foreground">Please try again later.</p>
       </div>
     );
   }
@@ -71,9 +62,7 @@ export function ShopOwnerBundles() {
         <div className="flex flex-col items-center justify-center py-16 text-center">
           <Package className="h-12 w-12 text-muted-foreground mb-4" />
           <h3 className="text-xl font-semibold mb-2">No shop yet</h3>
-          <p className="text-muted-foreground">
-            Create a shop to manage bundles.
-          </p>
+          <p className="text-muted-foreground">Create a shop to manage bundles.</p>
         </div>
       </>
     );
@@ -86,21 +75,19 @@ export function ShopOwnerBundles() {
     const qty = Number(bundle.quantity);
     const status = getStockStatus(qty).label;
     if (statusFilter === "active") return status === "In Stock";
-    return (
-      status.toLowerCase().replace(/\s+/g, "") === statusFilter.toLowerCase()
-    );
+    return status.toLowerCase().replace(/\s+/g, "") === statusFilter.toLowerCase();
   });
 
-  const bundleWinery = (wines: typeof bundles[number]["wines"]) =>
+  const bundleWinery = (wines: (typeof bundles)[number]["wines"]) =>
     wines[0]?.winemaker?.name ?? "—";
-  const bundleWines = (wines: typeof bundles[number]["wines"]) =>
+  const bundleWines = (wines: (typeof bundles)[number]["wines"]) =>
     wines.map((w) => w.name).join(", ");
 
   return (
     <>
       <div className="flex items-center justify-between mb-4">
         <h3 className="text-lg font-semibold">Shop Bundles</h3>
-        <Select value={statusFilter} onValueChange={setStatusFilter}>
+        <Select onValueChange={setStatusFilter} value={statusFilter}>
           <SelectTrigger className="w-[140px]">
             <SelectValue placeholder="All Status" />
           </SelectTrigger>
@@ -130,10 +117,7 @@ export function ShopOwnerBundles() {
           <TableBody>
             {filteredBundles.length === 0 ? (
               <TableRow>
-                <TableCell
-                  className="text-center text-muted-foreground py-8"
-                  colSpan={7}
-                >
+                <TableCell className="text-center text-muted-foreground py-8" colSpan={7}>
                   No bundles found in this category.
                 </TableCell>
               </TableRow>
@@ -143,9 +127,7 @@ export function ShopOwnerBundles() {
                 const stock = getStockStatus(qty);
                 return (
                   <TableRow key={bundle.id}>
-                    <TableCell className="font-medium">
-                      {bundle.name}
-                    </TableCell>
+                    <TableCell className="font-medium">{bundle.name}</TableCell>
                     <TableCell>{bundleWinery(bundle.wines)}</TableCell>
                     <TableCell className="text-sm text-muted-foreground max-w-[200px] truncate">
                       {bundleWines(bundle.wines)}
@@ -183,29 +165,20 @@ export function ShopOwnerBundles() {
             const qty = Number(bundle.quantity);
             const stock = getStockStatus(qty);
             return (
-              <div
-                key={bundle.id}
-                className="rounded-lg border p-4 space-y-2"
-              >
+              <div className="rounded-lg border p-4 space-y-2" key={bundle.id}>
                 <div className="flex items-center justify-between">
                   <span className="font-medium">{bundle.name}</span>
                   <Badge className={stock.classes} variant="outline">
                     {stock.label}
                   </Badge>
                 </div>
-                <p className="text-sm text-muted-foreground">
-                  {bundleWinery(bundle.wines)}
-                </p>
+                <p className="text-sm text-muted-foreground">{bundleWinery(bundle.wines)}</p>
                 <p className="text-sm text-muted-foreground truncate">
                   {bundleWines(bundle.wines)}
                 </p>
                 <div className="flex items-center justify-between text-sm">
-                  <span className="text-muted-foreground">
-                    Qty: {qty}
-                  </span>
-                  <span className="font-semibold">
-                    €{Number(bundle.price).toFixed(2)}
-                  </span>
+                  <span className="text-muted-foreground">Qty: {qty}</span>
+                  <span className="font-semibold">€{Number(bundle.price).toFixed(2)}</span>
                 </div>
               </div>
             );

@@ -10,9 +10,7 @@ import { Sidebar } from "./Sidebar";
 
 export function Header() {
   const { user: clerkUser } = useClerk();
-  const initials = clerkUser
-    ? (clerkUser.fullName || "User").substring(0, 2).toUpperCase()
-    : "GU";
+  const initials = clerkUser ? (clerkUser.fullName || "User").substring(0, 2).toUpperCase() : "GU";
   const { activeRole, setActiveRole } = useUser();
   const roles = useRoles();
 
@@ -43,10 +41,7 @@ export function Header() {
         <Show when="signed-in">
           <Link to="/dashboard">
             <Avatar className="h-8 w-8">
-              <AvatarImage
-                alt={clerkUser?.fullName || "User"}
-                src={clerkUser?.imageUrl}
-              />
+              <AvatarImage alt={clerkUser?.fullName || "User"} src={clerkUser?.imageUrl} />
               <AvatarFallback className="bg-primary text-primary-foreground font-heading text-xs">
                 {initials}
               </AvatarFallback>
@@ -54,11 +49,7 @@ export function Header() {
           </Link>
         </Show>
 
-        <Sidebar
-          activeRole={activeRole}
-          onRoleChange={setActiveRole}
-          userRoles={roles}
-        />
+        <Sidebar activeRole={activeRole} onRoleChange={setActiveRole} userRoles={roles} />
       </div>
     </header>
   );
