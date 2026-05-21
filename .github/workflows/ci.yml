@@ -41,24 +41,9 @@ jobs:
   generate:
     needs: install
     runs-on: self-hosted
-    services:
-      postgres:
-        image: postgres:16
-        env:
-          POSTGRES_USER: postgres
-          POSTGRES_PASSWORD: postgres
-          POSTGRES_DB: winemarket
-        options: >-
-          --health-cmd pg_isready
-          --health-interval 10s
-          --health-timeout 5s
-          --health-retries 5
-        ports:
-          - 5432:5432
     env:
       DATABASE_URL: postgresql://postgres:postgres@localhost:5432/winemarket
       FRONTEND_URL: http://localhost:5173
-      # Clerk keys only needed when auth is actually called (not during spec gen)
       CLERK_JWT_KEY: ${{ secrets.CLERK_JWT_KEY || 'ci_placeholder' }}
       CLERK_SECRET_KEY: ${{ secrets.CLERK_SECRET_KEY || 'ci_placeholder' }}
     steps:
@@ -173,7 +158,9 @@ jobs:
       - name: Install license-checker
         run: bun add -g license-checker
       - name: Check licenses
-        run: license-checker --onlyAllow "MIT;ISC;Apache-2.0;BSD-2-Clause;BSD-3-Clause;0BSD;CC0-1.0;Unlicense;WTFPL;Zlib;OFL-1.1"
+        run: |
+          export PATH="$HOME/.bun/bin:$PATH"
+          license-checker --onlyAllow "MIT;ISC;Apache-2.0;BSD-2-Clause;BSD-3-Clause;0BSD;CC0-1.0;Unlicense;WTFPL;Zlib;OFL-1.1"
 
   build:
     needs: [lint, typecheck, generate]
@@ -213,20 +200,6 @@ jobs:
   test:
     needs: [install, generate]
     runs-on: self-hosted
-    services:
-      postgres:
-        image: postgres:16
-        env:
-          POSTGRES_USER: postgres
-          POSTGRES_PASSWORD: postgres
-          POSTGRES_DB: winemarket
-        options: >-
-          --health-cmd pg_isready
-          --health-interval 10s
-          --health-timeout 5s
-          --health-retries 5
-        ports:
-          - 5432:5432
     env:
       DATABASE_URL: postgresql://postgres:postgres@localhost:5432/winemarket
     steps:
@@ -284,20 +257,6 @@ jobs:
   e2e:
     needs: [install, generate]
     runs-on: self-hosted
-    services:
-      postgres:
-        image: postgres:16
-        env:
-          POSTGRES_USER: postgres
-          POSTGRES_PASSWORD: postgres
-          POSTGRES_DB: winemarket
-        options: >-
-          --health-cmd pg_isready
-          --health-interval 10s
-          --health-timeout 5s
-          --health-retries 5
-        ports:
-          - 5432:5432
     env:
       DATABASE_URL: postgresql://postgres:postgres@localhost:5432/winemarket
       FRONTEND_URL: http://localhost:5173
