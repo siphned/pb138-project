@@ -1,6 +1,5 @@
 import { afterEach, describe, expect, it, vi } from "vitest";
 import { resetAuth } from "../../__tests__/helpers/auth";
-import { get } from "../../__tests__/helpers/request";
 import { app } from "../../app";
 
 vi.mock("./guest-sessions.service", () => ({

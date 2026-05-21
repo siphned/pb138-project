@@ -1,6 +1,6 @@
 import { afterEach, describe, expect, it, vi } from "vitest";
 import { resetAuth } from "../../__tests__/helpers/auth";
-import { del, get, patch, post } from "../../__tests__/helpers/request";
+import { del, post } from "../../__tests__/helpers/request";
 import { app } from "../../app";
 
 const { defaultProduct } = vi.hoisted(() => ({
