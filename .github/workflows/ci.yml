@@ -79,8 +79,6 @@ jobs:
             packages/*/node_modules
           key: ${{ runner.os }}-bun-${{ hashFiles('**/bun.lock') }}-v5
           fail-on-cache-miss: false
-      - name: Install dependencies
-        run: bun install --frozen-lockfile
       - name: Migrate Database
         run: cd apps/server && bun drizzle-kit push || true
       - name: Generate OpenAPI spec
