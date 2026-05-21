@@ -144,6 +144,7 @@ function CarouselItem({ className, ...props }: React.ComponentProps<"div">) {
   const { orientation } = useCarousel();
 
   return (
+    // biome-ignore lint/a11y/useSemanticElements: third-party shadcn component uses group role
     <div
       aria-roledescription="slide"
       className={cn(
