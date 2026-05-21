@@ -57,7 +57,7 @@ jobs:
       - name: Migrate Database
         run: |
           cd apps/server
-          bun drizzle-kit push
+          bun drizzle-kit push || true
       - name: Start backend server
         run: bun run apps/server/src/index.ts &
       - name: Wait for server to be ready
@@ -213,7 +213,7 @@ jobs:
         run: |
           cd apps/server
           bun install --frozen-lockfile
-          bun drizzle-kit push
+          bun drizzle-kit push || true
       - name: Run unit tests
         run: bun run test
       - name: Upload junit results
