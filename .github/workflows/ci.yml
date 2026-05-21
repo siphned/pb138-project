@@ -66,7 +66,7 @@ jobs:
       - name: Migrate Database
         run: |
           cd apps/server
-          bunx drizzle-kit push
+          bun drizzle-kit push
       - name: Start backend server
         run: bun run apps/server/src/index.ts &
       - name: Wait for server to be ready
@@ -227,7 +227,7 @@ jobs:
       - name: Migrate Database
         run: |
           cd apps/server
-          bunx drizzle-kit push
+          bun drizzle-kit push
       - name: Run unit tests
         run: bun run test
       - name: Upload junit results
