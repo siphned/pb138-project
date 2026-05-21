@@ -66,6 +66,7 @@ jobs:
       - name: Migrate Database
         run: |
           cd apps/server
+          bun install --frozen-lockfile
           bun drizzle-kit push
       - name: Start backend server
         run: bun run apps/server/src/index.ts &
@@ -155,6 +156,8 @@ jobs:
           fail-on-cache-miss: false
       - name: Run bun audit
         run: bun audit --json || true
+      - name: Install deps for license check
+        run: bun install --frozen-lockfile
       - name: Check licenses
         run: bun x license-checker --onlyAllow "MIT;ISC;Apache-2.0;BSD-2-Clause;BSD-3-Clause;0BSD;CC0-1.0;Unlicense;WTFPL;Zlib;OFL-1.1"
 
@@ -223,6 +226,7 @@ jobs:
       - name: Migrate Database
         run: |
           cd apps/server
+          bun install --frozen-lockfile
           bun drizzle-kit push
       - name: Run unit tests
         run: bun run test
@@ -284,7 +288,7 @@ jobs:
       - name: Install Playwright
         run: bunx playwright install --with-deps chromium
       - name: Migrate Database
-        run: cd apps/server && bunx drizzle-kit push
+        run: cd apps/server && bun install --frozen-lockfile && bun drizzle-kit push
       - name: Run E2E tests
         run: cd apps/web && bunx playwright test --reporter=html
       - name: Upload E2E report
