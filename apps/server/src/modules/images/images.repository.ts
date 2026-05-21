@@ -23,39 +23,39 @@ export async function countByEntity(db: Database, entityType: EntityType, entity
 export async function entityExists(db: Database, entityType: EntityType, entityId: string) {
   switch (entityType) {
     case "event": {
-      const r = await db.query.events.findFirst({
+      const event = await db.query.events.findFirst({
         columns: { id: true },
         where: and(eq(events.id, entityId), isNull(events.deletedAt)),
       });
-      return !!r;
+      return !!event;
     }
     case "product": {
-      const r = await db.query.products.findFirst({
+      const product = await db.query.products.findFirst({
         columns: { id: true },
         where: and(eq(products.id, entityId), isNull(products.deletedAt)),
       });
-      return !!r;
+      return !!product;
     }
     case "shop": {
-      const r = await db.query.shops.findFirst({
+      const shop = await db.query.shops.findFirst({
         columns: { id: true },
         where: and(eq(shops.id, entityId), isNull(shops.deletedAt)),
       });
-      return !!r;
+      return !!shop;
     }
     case "wine": {
-      const r = await db.query.wines.findFirst({
+      const wine = await db.query.wines.findFirst({
         columns: { id: true },
         where: and(eq(wines.id, entityId), isNull(wines.deletedAt)),
       });
-      return !!r;
+      return !!wine;
     }
     case "winemaker": {
-      const r = await db.query.winemakers.findFirst({
+      const winemaker = await db.query.winemakers.findFirst({
         columns: { id: true },
         where: and(eq(winemakers.id, entityId), isNull(winemakers.deletedAt)),
       });
-      return !!r;
+      return !!winemaker;
     }
   }
 }

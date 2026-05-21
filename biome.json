@@ -1,5 +1,5 @@
 {
-  "$schema": "https://biomejs.dev/schemas/2.0.6/schema.json",
+  "$schema": "https://biomejs.dev/schemas/2.4.15/schema.json",
   "assist": {
     "actions": {
       "source": {
@@ -56,7 +56,8 @@
       "!**/tsconfig*.json",
       "!**/src/generated",
       "!**/routeTree.gen.ts",
-      "!openapi.json"
+      "!openapi.json",
+      "!conductor/**/*"
     ]
   },
   "formatter": {
@@ -92,7 +93,7 @@
   "css": {
     "linter": { "enabled": true },
     "formatter": { "enabled": true, "indentStyle": "space", "lineWidth": 100 },
-    "parser": { "allowWrongLineComments": true, "cssModules": true }
+    "parser": { "allowWrongLineComments": true, "cssModules": true, "tailwindDirectives": true }
   },
   "html": {
     "formatter": { "enabled": true, "selfCloseVoidElements": "always" }

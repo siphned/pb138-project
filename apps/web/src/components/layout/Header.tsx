@@ -16,10 +16,7 @@ export function Header() {
     <header className="h-16 border-b bg-background flex items-center justify-between px-6 lg:px-12">
       {/* Left: Logo Area */}
       <Link to="/">
-        <div className="flex items-center gap-2 font-heading font-bold text-xl">
-          <img alt="Wine Enjoyers Logo" className="h-8 w-8 rounded-full" src="/logo.png" />
-          Wine Enjoyers
-        </div>
+        <img alt="Wine Enjoyers" className="h-10 w-auto" src="/logo.png" />
       </Link>
 
       {/* Right: Icons & Menus */}

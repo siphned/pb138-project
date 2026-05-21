@@ -65,13 +65,14 @@ CLAUDE.md
 GEMINI.md
 .claude/settings.local.json
 apps/server/src/db/seed.ts
+apps/server/src/db/seed.demo.ts
+
 docs/plans/
 docs/figma/
 
 # Git Worktrees
 .worktrees/
 .claude/worktrees/
-conductor/
 
 # local image uploads
 apps/server/uploads/*
@@ -80,3 +81,7 @@ apps/server/uploads/*
 # UI Audit (local/temporary)
 docs/UI_AUDIT_hooks.txt
 docs/UI_AUDIT.md
+
+
+#Ignore vscode AI rules
+.github\instructions\codacy.instructions.md

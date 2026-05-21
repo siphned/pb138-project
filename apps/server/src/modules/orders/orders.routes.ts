@@ -58,10 +58,51 @@ export const ordersRoutes = new Elysia({ prefix: "/orders", tags: ["orders"] })
         await cartsService.mergeOnLogin(dbUser.id, guestSessionId);
         guest_session_id?.remove();
       }
-      return { sessionId: undefined as string | undefined, user: dbUser };
+      return {
+        clerkPayload: payload,
+        isAdmin: payload.roles?.includes("admin") ?? false,
+        sessionId: undefined as string | undefined,
+        user: dbUser,
+      };
     }
-    return { sessionId: guest_session_id?.value as string | undefined, user: undefined };
+    return {
+      clerkPayload: null as Awaited<ReturnType<typeof verifyClerkToken>>,
+      isAdmin: false,
+      sessionId: guest_session_id?.value as string | undefined,
+      user: undefined,
+    };
   })
+
+  .get(
+    "/",
+    async ({ user, clerkPayload, query }) => {
+      if (!user) return status(401, "Auth required");
+      if (!query.shopId) return ordersService.listForUser(user.id);
+
+      const roles = clerkPayload?.roles ?? [];
+      const isAdmin = roles.includes("admin");
+      if (!isAdmin && !roles.includes("shop_owner")) return status(403, "Forbidden");
+
+      try {
+        return await ordersService.listForShop(query.shopId, user.id, isAdmin);
+      } catch (e: unknown) {
+        if (e instanceof Error) {
+          if (e.message === "NOT_FOUND") return status(404, "Not found");
+          if (e.message === "FORBIDDEN") return status(403, "Forbidden");
+        }
+        throw e;
+      }
+    },
+    {
+      detail: {
+        description:
+          "Without shopId: returns the authenticated customer's order history. With shopId: returns all orders for that shop (shop_owner or admin only).",
+        summary: "List orders",
+      },
+      query: t.Object({ shopId: t.Optional(t.String()) }),
+      response: { 200: t.Array(orderResponse), 401: t.String(), 403: t.String(), 404: t.String() },
+    }
+  )
 
   .post(
     "/checkout",
@@ -97,10 +138,10 @@ export const ordersRoutes = new Elysia({ prefix: "/orders", tags: ["orders"] })
 
   .get(
     "/:id",
-    async ({ user, params }) => {
+    async ({ user, params, isAdmin }) => {
       if (!user) return status(401, "Auth required");
       try {
-        return await ordersService.getOrder(params.id, user.id);
+        return await ordersService.getOrder(params.id, user.id, isAdmin);
       } catch (e: unknown) {
         if (e instanceof Error) {
           if (e.message === "NOT_FOUND") return status(404, "Not found");
@@ -111,10 +152,52 @@ export const ordersRoutes = new Elysia({ prefix: "/orders", tags: ["orders"] })
     },
     {
       detail: {
-        description: "Returns an order by ID. Only the owning user can access it.",
+        description: "Returns an order by ID. The owning user or an admin can access it.",
         summary: "Get order by ID",
       },
       params: t.Object({ id: t.String() }),
       response: { 200: orderResponse, 401: t.String(), 403: t.String(), 404: t.String() },
+    }
+  )
+
+  .patch(
+    "/:id/status",
+    async ({ dbUser, clerkPayload, params, body }) => {
+      const isAdmin = clerkPayload.roles?.includes("admin") ?? false;
+      try {
+        return await ordersService.updateStatus(params.id, dbUser.id, body.status, isAdmin);
+      } catch (e: unknown) {
+        if (e instanceof Error) {
+          if (e.message === "NOT_FOUND") return status(404, "Not found");
+          if (e.message === "FORBIDDEN") return status(403, "Forbidden");
+          if (e.message === "INVALID_TRANSITION") return status(422, e.message);
+        }
+        throw e;
+      }
+    },
+    {
+      body: t.Object({
+        status: t.Union([
+          t.Literal("pending"),
+          t.Literal("confirmed"),
+          t.Literal("shipped"),
+          t.Literal("delivered"),
+          t.Literal("cancelled"),
+        ]),
+      }),
+      detail: {
+        description:
+          "Advance an order's status. Shop owners may only update orders containing items from their shops. Valid transitions: pending→confirmed, confirmed→shipped, shipped→delivered, any→cancelled.",
+        security: [{ bearerAuth: [] }],
+        summary: "Update order status",
+      },
+      params: t.Object({ id: t.String() }),
+      requireRoles: ["shop_owner", "admin"],
+      response: {
+        200: orderResponse,
+        403: t.String(),
+        404: t.String(),
+        422: t.String(),
+      },
     }
   );

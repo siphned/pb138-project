@@ -1,0 +1,6 @@
+$ CI=true playwright test
+[2m[WebServer] [22m[0m[2m[35m$[0m [2m[1mturbo run dev --filter=server[0m
+
+Running 167 tests using 1 worker
+········FF···FFFFFF·FFF····F·······F·FFF···F··F···FF················F·······F···
+···············································FFFFF··F·······F····FFF··F··[2m[WebServer] [22m[0m[31merror[0m[2m:[0m script [1m"dev:server"[0m exited with code 1[0m

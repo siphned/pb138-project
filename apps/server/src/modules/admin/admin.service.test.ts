@@ -70,7 +70,7 @@ describe("adminService", () => {
 
     it("throws NOT_FOUND if user not found", async () => {
       vi.mocked(adminRepo.findUserById).mockResolvedValue(undefined);
-      await expect(adminService.setUserStatus(userId, "active")).rejects.toThrow("NOT_FOUND");
+      await expect(adminService.setUserStatus(userId, "active")).rejects.toThrow("User not found");
     });
   });
 

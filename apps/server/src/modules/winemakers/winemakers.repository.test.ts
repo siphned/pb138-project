@@ -36,8 +36,14 @@ describe("winemakersRepository", () => {
     it("delegates to db.query.findMany", async () => {
       const mockList = [{ address: { deletedAt: null, id: "a1" }, id: "wm1" }];
       vi.mocked(db.query.winemakers.findMany).mockResolvedValue(mockList as any);
-      const result = await winemakersRepository.findAll(db);
+      const result = await winemakersRepository.findAll(db, {});
       expect(result).toStrictEqual(mockList);
+    });
+
+    it("accepts q filter for name search", async () => {
+      vi.mocked(db.query.winemakers.findMany).mockResolvedValue([]);
+      await winemakersRepository.findAll(db, { q: "chateau" });
+      expect(db.query.winemakers.findMany).toHaveBeenCalled();
     });
   });
 

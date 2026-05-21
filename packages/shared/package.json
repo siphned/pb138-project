@@ -2,12 +2,12 @@
   "dependencies": {
     "drizzle-orm": "^0.45.1",
     "drizzle-zod": "^0.8.3",
-    "zod": "4.4.3"
+    "zod": "^3.23.8"
   },
   "description": "Shared types, schemas, and utilities",
   "devDependencies": {
     "typescript": "5.9.2",
-    "zod": "4.4.3"
+    "zod": "^3.23.8"
   },
   "exports": {
     ".": "./src/index.ts",
@@ -16,6 +16,9 @@
   "main": "src/index.ts",
   "name": "@repo/shared",
   "scripts": {
+    "check": "biome check --write .",
+    "check-types": "tsc --noEmit",
+    "lint": "biome lint .",
     "type-check": "tsc --noEmit"
   },
   "types": "src/index.ts",
