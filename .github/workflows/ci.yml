@@ -54,16 +54,14 @@ jobs:
           --health-timeout 5s
           --health-retries 5
         ports:
-          - 5432:5432
+          - 5433:5432
     env:
-      DATABASE_URL: postgresql://postgres:postgres@localhost:5432/winemarket
+      DATABASE_URL: postgresql://postgres:postgres@localhost:5433/winemarket
       FRONTEND_URL: http://localhost:5173
       CLERK_JWT_KEY: ${{ secrets.CLERK_JWT_KEY || 'ci_placeholder' }}
       CLERK_SECRET_KEY: ${{ secrets.CLERK_SECRET_KEY || 'ci_placeholder' }}
     steps:
       - uses: actions/checkout@v4
-      - name: Kill existing postgres
-        run: pkill -f "postgres" || true
       - name: Setup Bun
         uses: oven-sh/setup-bun@v2
         with:
@@ -214,13 +212,11 @@ jobs:
           --health-timeout 5s
           --health-retries 5
         ports:
-          - 5432:5432
+          - 5433:5432
     env:
-      DATABASE_URL: postgresql://postgres:postgres@localhost:5432/winemarket
+      DATABASE_URL: postgresql://postgres:postgres@localhost:5433/winemarket
     steps:
       - uses: actions/checkout@v4
-      - name: Kill existing postgres
-        run: pkill -f "postgres" || true
       - name: Setup Bun
         uses: oven-sh/setup-bun@v2
         with:
@@ -288,9 +284,9 @@ jobs:
           --health-timeout 5s
           --health-retries 5
         ports:
-          - 5432:5432
+          - 5433:5432
     env:
-      DATABASE_URL: postgresql://postgres:postgres@localhost:5432/winemarket
+      DATABASE_URL: postgresql://postgres:postgres@localhost:5433/winemarket
       FRONTEND_URL: http://localhost:5173
       CLERK_JWT_KEY: ${{ secrets.CLERK_JWT_KEY || 'ci_placeholder' }}
       CLERK_SECRET_KEY: ${{ secrets.CLERK_SECRET_KEY || 'ci_placeholder' }}
