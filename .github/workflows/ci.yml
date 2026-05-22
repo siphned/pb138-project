@@ -101,7 +101,11 @@ jobs:
       - name: Install dependencies
         run: BUN_INSTALL_CACHE_DIR=.bun-cache bun install --frozen-lockfile --backend=copyfile
       - name: Run biome lint
-        run: HOME=$(mktemp -d) bunx biome lint --config-path ./biome.json .
+        env:
+          HOME: /tmp/ci-biome-nohome
+          XDG_CONFIG_HOME: /tmp/ci-biome-nohome
+          XDG_CONFIG_DIRS: /tmp/ci-biome-nohome
+        run: mkdir -p /tmp/ci-biome-nohome && bunx biome lint --config-path ./biome.json .
 
   typecheck:
     needs: generate
@@ -305,8 +309,31 @@ jobs:
         run: cd apps/server && bun drizzle-kit push || true
       - name: Remove .env.local to prevent bun from overriding CI env
         run: rm -f apps/server/.env.local
+      - name: Start backend server
+        run: |
+          cd apps/server
+          bun run src/index.ts > /tmp/ci-server.log 2>&1 &
+          for i in $(seq 1 30); do
+            curl -sf http://localhost:3000/swagger/json && echo "Server ready" && break || sleep 2
+          done
+          curl -sf http://localhost:3000/swagger/json || { echo "=== Server startup log ==="; cat /tmp/ci-server.log; exit 1; }
+      - name: Start frontend
+        run: |
+          cd apps/web
+          bun run dev > /tmp/ci-web.log 2>&1 &
+          for i in $(seq 1 30); do
+            curl -sf http://localhost:5173 && echo "Frontend ready" && break || sleep 2
+          done
+          curl -sf http://localhost:5173 || { echo "=== Frontend startup log ==="; cat /tmp/ci-web.log; exit 1; }
       - name: Run E2E tests
+        env:
+          SHARD: ci-bypass-webserver
         run: cd apps/web && bunx playwright test --reporter=html
+      - name: Stop server and frontend
+        if: always()
+        run: |
+          pkill -f "bun run src/index.ts" 2>/dev/null || true
+          pkill -f "vite" 2>/dev/null || true
       - name: Upload E2E report
         if: always()
         uses: actions/upload-artifact@v4
