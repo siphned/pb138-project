@@ -35,20 +35,6 @@ jobs:
   generate:
     needs: install
     runs-on: self-hosted
-    services:
-      postgres:
-        image: postgres:16-alpine
-        env:
-          POSTGRES_USER: postgres
-          POSTGRES_PASSWORD: postgres
-          POSTGRES_DB: winemarket
-        options: >-
-          --health-cmd pg_isready
-          --health-interval 10s
-          --health-timeout 5s
-          --health-retries 5
-        ports:
-          - 5433:5432
     env:
       DATABASE_URL: postgresql://postgres:postgres@localhost:5433/winemarket
       FRONTEND_URL: http://localhost:5173
@@ -69,6 +55,18 @@ jobs:
             ${{ runner.os }}-bun-registry-
       - name: Install dependencies
         run: BUN_INSTALL_CACHE_DIR=.bun-cache bun install --frozen-lockfile --backend=copyfile
+      - name: Start postgres
+        run: |
+          docker rm -f postgres-winery-ci 2>/dev/null || true
+          docker run -d --name postgres-winery-ci \
+            -e POSTGRES_USER=postgres \
+            -e POSTGRES_PASSWORD=postgres \
+            -e POSTGRES_DB=winemarket \
+            -p 5433:5432 \
+            postgres:16-alpine
+          for i in $(seq 1 30); do
+            docker exec postgres-winery-ci pg_isready -U postgres && break || sleep 2
+          done
       - name: Migrate Database
         run: cd apps/server && bun drizzle-kit push || true
       - name: Generate OpenAPI spec
@@ -80,6 +78,9 @@ jobs:
         with:
           name: generated-code
           path: apps/web/src/generated/
+      - name: Stop postgres
+        if: always()
+        run: docker rm -f postgres-winery-ci 2>/dev/null || true
 
   lint:
     needs: install
@@ -99,6 +100,10 @@ jobs:
             ${{ runner.os }}-bun-registry-
       - name: Install dependencies
         run: BUN_INSTALL_CACHE_DIR=.bun-cache bun install --frozen-lockfile --backend=copyfile
+      - name: Prepare biome global config override
+        run: |
+          mkdir -p /tmp/ci-empty-config/biome
+          printf '{"$schema":"https://biomejs.dev/schemas/2.4.15/schema.json"}' > /tmp/ci-empty-config/biome/biome.json
       - name: Run biome lint
         env:
           XDG_CONFIG_HOME: /tmp/ci-empty-config
@@ -187,20 +192,6 @@ jobs:
   test:
     needs: [install, generate]
     runs-on: self-hosted
-    services:
-      postgres:
-        image: postgres:16-alpine
-        env:
-          POSTGRES_USER: postgres
-          POSTGRES_PASSWORD: postgres
-          POSTGRES_DB: winemarket
-        options: >-
-          --health-cmd pg_isready
-          --health-interval 10s
-          --health-timeout 5s
-          --health-retries 5
-        ports:
-          - 5433:5432
     env:
       DATABASE_URL: postgresql://postgres:postgres@localhost:5433/winemarket
     steps:
@@ -223,6 +214,18 @@ jobs:
         with:
           name: generated-code
           path: apps/web/src/generated/
+      - name: Start postgres
+        run: |
+          docker rm -f postgres-winery-ci 2>/dev/null || true
+          docker run -d --name postgres-winery-ci \
+            -e POSTGRES_USER=postgres \
+            -e POSTGRES_PASSWORD=postgres \
+            -e POSTGRES_DB=winemarket \
+            -p 5433:5432 \
+            postgres:16-alpine
+          for i in $(seq 1 30); do
+            docker exec postgres-winery-ci pg_isready -U postgres && break || sleep 2
+          done
       - name: Migrate Database
         run: cd apps/server && bun drizzle-kit push || true
       - name: Run unit tests
@@ -233,6 +236,9 @@ jobs:
         with:
           name: junit-results
           path: apps/*/test-results.xml
+      - name: Stop postgres
+        if: always()
+        run: docker rm -f postgres-winery-ci 2>/dev/null || true
 
   compliance:
     needs: install
@@ -254,20 +260,6 @@ jobs:
   e2e:
     needs: [install, generate]
     runs-on: self-hosted
-    services:
-      postgres:
-        image: postgres:16-alpine
-        env:
-          POSTGRES_USER: postgres
-          POSTGRES_PASSWORD: postgres
-          POSTGRES_DB: winemarket
-        options: >-
-          --health-cmd pg_isready
-          --health-interval 10s
-          --health-timeout 5s
-          --health-retries 5
-        ports:
-          - 5433:5432
     env:
       DATABASE_URL: postgresql://postgres:postgres@localhost:5433/winemarket
       FRONTEND_URL: http://localhost:5173
@@ -296,6 +288,18 @@ jobs:
           path: apps/web/src/generated/
       - name: Install Playwright
         run: bunx playwright install --with-deps chromium
+      - name: Start postgres
+        run: |
+          docker rm -f postgres-winery-ci 2>/dev/null || true
+          docker run -d --name postgres-winery-ci \
+            -e POSTGRES_USER=postgres \
+            -e POSTGRES_PASSWORD=postgres \
+            -e POSTGRES_DB=winemarket \
+            -p 5433:5432 \
+            postgres:16-alpine
+          for i in $(seq 1 30); do
+            docker exec postgres-winery-ci pg_isready -U postgres && break || sleep 2
+          done
       - name: Migrate Database
         run: cd apps/server && bun drizzle-kit push || true
       - name: Run E2E tests
@@ -306,4 +310,7 @@ jobs:
         with:
           name: e2e-report
           path: apps/web/playwright-report/
+      - name: Stop postgres
+        if: always()
+        run: docker rm -f postgres-winery-ci 2>/dev/null || true
 # trigger
