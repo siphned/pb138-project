@@ -280,15 +280,8 @@ jobs:
         with:
           name: generated-code
           path: apps/web/src/generated/
-      - name: Cache Playwright browsers
-        uses: actions/cache@v4
-        with:
-          path: ~/.cache/ms-playwright
-          key: ${{ runner.os }}-playwright-chromium-${{ hashFiles('**/package.json') }}
-          restore-keys: |
-            ${{ runner.os }}-playwright-chromium-
       - name: Install Playwright
-        run: bunx playwright install chromium
+        run: bunx playwright install chromium --with-deps
       - name: Start postgres
         run: |
           docker rm -f postgres-winery-ci 2>/dev/null || true
