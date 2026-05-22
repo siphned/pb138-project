@@ -100,9 +100,9 @@ jobs:
             ${{ runner.os }}-bun-registry-
       - name: Install dependencies
         run: BUN_INSTALL_CACHE_DIR=.bun-cache bun install --frozen-lockfile --backend=copyfile
+      - name: Remove runner global biome config
+        run: rm -f "$HOME/.config/biome/biome.json"
       - name: Run biome lint
-        env:
-          HOME: /tmp/ci-nohome
         run: bunx biome lint --config-path ./biome.json .
 
   typecheck:
@@ -298,6 +298,8 @@ jobs:
           done
       - name: Migrate Database
         run: cd apps/server && bun drizzle-kit push || true
+      - name: Remove .env.local to prevent bun from overriding CI env
+        run: rm -f apps/server/.env.local
       - name: Run E2E tests
         run: cd apps/web && bunx playwright test --reporter=html
       - name: Upload E2E report
