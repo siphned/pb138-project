@@ -293,7 +293,7 @@ jobs:
           name: generated-code
           path: apps/web/src/generated/
       - name: Install Playwright
-        run: bunx playwright install --with-deps chromium
+        run: bunx playwright install chromium
       - name: Migrate Database
         run: cd apps/server && bun drizzle-kit push || true
       - name: Run E2E tests
