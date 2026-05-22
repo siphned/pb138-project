@@ -100,15 +100,8 @@ jobs:
             ${{ runner.os }}-bun-registry-
       - name: Install dependencies
         run: BUN_INSTALL_CACHE_DIR=.bun-cache bun install --frozen-lockfile --backend=copyfile
-      - name: Remove all global biome configs
-        run: |
-          echo "XDG_CONFIG_HOME=$XDG_CONFIG_HOME"
-          echo "XDG_CONFIG_DIRS=$XDG_CONFIG_DIRS"
-          rm -f "$HOME/.config/biome/biome.json" 2>/dev/null || true
-          rm -f "/mnt/d/.gemini/extensions/socraticode/biome.json" 2>/dev/null || true
-          find /mnt /tmp /home -name "biome.json" -not -path "*/_work/*" -not -path "*/node_modules/*" 2>/dev/null | xargs rm -f 2>/dev/null || true
       - name: Run biome lint
-        run: bunx biome lint --config-path ./biome.json .
+        run: HOME=$(mktemp -d) ./node_modules/.bin/biome lint --config-path ./biome.json .
 
   typecheck:
     needs: generate
@@ -287,8 +280,15 @@ jobs:
         with:
           name: generated-code
           path: apps/web/src/generated/
+      - name: Cache Playwright browsers
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/ms-playwright
+          key: ${{ runner.os }}-playwright-chromium-${{ hashFiles('**/package.json') }}
+          restore-keys: |
+            ${{ runner.os }}-playwright-chromium-
       - name: Install Playwright
-        run: bunx playwright install --with-deps chromium
+        run: bunx playwright install chromium
       - name: Start postgres
         run: |
           docker rm -f postgres-winery-ci 2>/dev/null || true
