@@ -100,10 +100,13 @@ jobs:
             ${{ runner.os }}-bun-registry-
       - name: Install dependencies
         run: BUN_INSTALL_CACHE_DIR=.bun-cache bun install --frozen-lockfile --backend=copyfile
-      - name: Find all biome.json files on runner
-        run: find / -name "biome.json" -not -path "*/_work/*" -not -path "*/node_modules/*" 2>/dev/null || true
-      - name: Remove runner global biome config
-        run: rm -f "$HOME/.config/biome/biome.json"
+      - name: Remove all global biome configs
+        run: |
+          echo "XDG_CONFIG_HOME=$XDG_CONFIG_HOME"
+          echo "XDG_CONFIG_DIRS=$XDG_CONFIG_DIRS"
+          rm -f "$HOME/.config/biome/biome.json" 2>/dev/null || true
+          rm -f "/mnt/d/.gemini/extensions/socraticode/biome.json" 2>/dev/null || true
+          find /mnt /tmp /home -name "biome.json" -not -path "*/_work/*" -not -path "*/node_modules/*" 2>/dev/null | xargs rm -f 2>/dev/null || true
       - name: Run biome lint
         run: bunx biome lint --config-path ./biome.json .
 
