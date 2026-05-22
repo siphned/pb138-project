@@ -1,5 +1,4 @@
 import { Elysia } from "elysia";
-import { Webhook } from "svix";
 import { logger } from "../../utils/logger";
 import { usersService } from "../users/users.service";
 
@@ -22,6 +21,7 @@ export const webhooksRoutes = new Elysia({ prefix: "/api/webhooks" }).post(
     }
 
     const payload = await request.text();
+    const { Webhook } = await import("svix");
     const wh = new Webhook(secret);
 
     try {

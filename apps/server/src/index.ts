@@ -1,4 +1,4 @@
-import { z } from "zod";
+import z from "zod";
 import { app } from "./app";
 import { logger } from "./utils/logger";
 

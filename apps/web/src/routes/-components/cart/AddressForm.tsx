@@ -28,7 +28,7 @@ export const addressFormSchema = z
     street: z.string().min(1, "Street is required"),
   })
   .refine(
-    (data) => {
+    (_data) => {
       // guestEmail and guestName are optional in the schema but required for guest checkout.
       // Validation is enforced via the showGuestFields prop — when true, the fields become required
       // through native HTML required + form-level validation.
@@ -48,7 +48,7 @@ export interface AddressFormProps {
 }
 
 export const AddressForm = forwardRef<HTMLFormElement, AddressFormProps>(function AddressForm(
-  { defaultValues, isSubmitting, onSubmit, showGuestFields, onDeliveryTypeChange },
+  { defaultValues, onSubmit, showGuestFields, onDeliveryTypeChange },
   ref
 ) {
   const {
