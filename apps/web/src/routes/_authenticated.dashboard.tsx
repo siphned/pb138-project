@@ -1,5 +1,5 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { AlertTriangle, BarChart3, Loader2, ShoppingBag, Users, Wine } from "lucide-react";
+import { AlertTriangle, BarChart3, ShoppingBag, Users, Wine } from "lucide-react";
 import { useState } from "react";
 import { EventsTab } from "@/components/dashboard/tabs/EventsTab";
 import { MyBundlesTab } from "@/components/dashboard/tabs/MyBundlesTab";
@@ -9,6 +9,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useUser } from "@/context/UserContext";
 import { useGetStats } from "@/generated/hooks/useGetStats";
+import type { GetStatsQueryResponse } from "@/generated/types/GetStats";
 import { Role } from "@/types/roles";
 
 export const Route = createFileRoute("/_authenticated/dashboard")({
@@ -36,14 +37,13 @@ function DashboardPage() {
   const roles = user?.roles ?? [];
   const displayRole = activeRole || Role.customer;
 
+  const roleMap: Record<string, "admin" | "winemaker" | "shop_owner" | "customer"> = {
+    [Role.admin]: "admin",
+    [Role.winemaker]: "winemaker",
+    [Role.shopOwner]: "shop_owner",
+  };
   const statsRole: "admin" | "winemaker" | "shop_owner" | "customer" =
-    activeRole === Role.admin
-      ? "admin"
-      : activeRole === Role.winemaker
-        ? "winemaker"
-        : activeRole === Role.shopOwner
-          ? "shop_owner"
-          : "customer";
+    (activeRole && roleMap[activeRole]) || "customer";
 
   const {
     data: stats,
@@ -69,7 +69,7 @@ function DashboardPage() {
 
       {/* Stats Section */}
       <div className="grid grid-cols-2 gap-4 md:grid-cols-4">
-        {statsLoading ? (
+        {statsLoading &&
           Array.from({ length: 4 }).map((_, i) => (
             <Card key={i}>
               <CardHeader className="pb-2">
@@ -79,17 +79,16 @@ function DashboardPage() {
                 <div className="h-8 w-16 animate-pulse rounded bg-muted" />
               </CardContent>
             </Card>
-          ))
-        ) : statsError || !stats ? (
+          ))}
+        {(statsError || !stats) && (
           <Card className="col-span-full">
             <CardContent className="flex items-center gap-2 py-4 text-destructive">
               <AlertTriangle className="h-5 w-5" />
               <span>Failed to load statistics</span>
             </CardContent>
           </Card>
-        ) : (
-          renderStats(stats)
         )}
+        {!statsLoading && !statsError && stats && renderStats(stats)}
       </div>
 
       {/* Tabs */}
@@ -171,7 +170,7 @@ function StatCard({
   );
 }
 
-function renderStats(stats: NonNullable<ReturnType<typeof useGetStats>["data"]>) {
+function renderStats(stats: GetStatsQueryResponse) {
   switch (stats.role) {
     case "customer": {
       const c = stats as Extract<typeof stats, { ordersCount: unknown }>;

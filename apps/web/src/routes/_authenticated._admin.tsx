@@ -15,7 +15,9 @@ function AdminLayout() {
 
   useEffect(() => {
     if (isLoaded && !hasAccess) {
-      navigate({ to: "/dashboard" }).catch(() => {});
+      navigate({ to: "/dashboard" }).catch(() => {
+        // Suppress navigation errors, already redirecting
+      });
     }
   }, [isLoaded, hasAccess, navigate]);
 

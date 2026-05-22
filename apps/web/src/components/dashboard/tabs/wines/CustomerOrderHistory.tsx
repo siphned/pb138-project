@@ -54,7 +54,6 @@ export function CustomerOrderHistory() {
     );
   }
 
-  const now = new Date();
   const filteredOrders = orders.filter((order) => {
     const orderDate = new Date(order.createdAt as string);
     if (timeframe === "6months") {
@@ -82,7 +81,7 @@ export function CustomerOrderHistory() {
     <>
       <div className="flex items-center justify-between mb-4">
         <h3 className="text-lg font-semibold">Past Orders</h3>
-        <Select onValueChange={setTimeframe} value={timeframe}>
+        <Select onValueChange={(val) => val && setTimeframe(val)} value={timeframe}>
           <SelectTrigger className="w-[160px]">
             <SelectValue placeholder="Timeframe" />
           </SelectTrigger>

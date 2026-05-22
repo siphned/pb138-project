@@ -1,5 +1,5 @@
 import { t } from "elysia";
-import { z } from "zod";
+import z from "zod";
 
 export const customerStatsSchema = z.object({
   eventsAttended: z.number().int().nonnegative(),
