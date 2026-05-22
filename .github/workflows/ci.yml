@@ -36,7 +36,7 @@ jobs:
     needs: install
     runs-on: self-hosted
     env:
-      DATABASE_URL: postgresql://postgres:postgres@localhost:5433/winemarket
+      DATABASE_URL: postgresql://postgres:postgres@localhost:15432/winemarket
       FRONTEND_URL: http://localhost:5173
       CLERK_JWT_KEY: ${{ secrets.CLERK_JWT_KEY || 'ci_placeholder' }}
       CLERK_SECRET_KEY: ${{ secrets.CLERK_SECRET_KEY || 'ci_placeholder' }}
@@ -62,7 +62,7 @@ jobs:
             -e POSTGRES_USER=postgres \
             -e POSTGRES_PASSWORD=postgres \
             -e POSTGRES_DB=winemarket \
-            -p 5433:5432 \
+            -p 15432:5432 \
             postgres:16-alpine
           for i in $(seq 1 30); do
             docker exec postgres-winery-ci pg_isready -U postgres && break || sleep 2
@@ -100,13 +100,9 @@ jobs:
             ${{ runner.os }}-bun-registry-
       - name: Install dependencies
         run: BUN_INSTALL_CACHE_DIR=.bun-cache bun install --frozen-lockfile --backend=copyfile
-      - name: Prepare biome global config override
-        run: |
-          mkdir -p /tmp/ci-empty-config/biome
-          printf '{"$schema":"https://biomejs.dev/schemas/2.4.15/schema.json"}' > /tmp/ci-empty-config/biome/biome.json
       - name: Run biome lint
         env:
-          XDG_CONFIG_HOME: /tmp/ci-empty-config
+          HOME: /tmp/ci-nohome
         run: bunx biome lint --config-path ./biome.json .
 
   typecheck:
@@ -193,7 +189,7 @@ jobs:
     needs: [install, generate]
     runs-on: self-hosted
     env:
-      DATABASE_URL: postgresql://postgres:postgres@localhost:5433/winemarket
+      DATABASE_URL: postgresql://postgres:postgres@localhost:15432/winemarket
     steps:
       - uses: actions/checkout@v4
       - name: Setup Bun
@@ -221,7 +217,7 @@ jobs:
             -e POSTGRES_USER=postgres \
             -e POSTGRES_PASSWORD=postgres \
             -e POSTGRES_DB=winemarket \
-            -p 5433:5432 \
+            -p 15432:5432 \
             postgres:16-alpine
           for i in $(seq 1 30); do
             docker exec postgres-winery-ci pg_isready -U postgres && break || sleep 2
@@ -261,7 +257,7 @@ jobs:
     needs: [install, generate]
     runs-on: self-hosted
     env:
-      DATABASE_URL: postgresql://postgres:postgres@localhost:5433/winemarket
+      DATABASE_URL: postgresql://postgres:postgres@localhost:15432/winemarket
       FRONTEND_URL: http://localhost:5173
       CLERK_JWT_KEY: ${{ secrets.CLERK_JWT_KEY || 'ci_placeholder' }}
       CLERK_SECRET_KEY: ${{ secrets.CLERK_SECRET_KEY || 'ci_placeholder' }}
@@ -295,7 +291,7 @@ jobs:
             -e POSTGRES_USER=postgres \
             -e POSTGRES_PASSWORD=postgres \
             -e POSTGRES_DB=winemarket \
-            -p 5433:5432 \
+            -p 15432:5432 \
             postgres:16-alpine
           for i in $(seq 1 30); do
             docker exec postgres-winery-ci pg_isready -U postgres && break || sleep 2
