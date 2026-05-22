@@ -100,7 +100,7 @@ jobs:
       - name: Install dependencies
         run: BUN_INSTALL_CACHE_DIR=.bun-cache bun install --frozen-lockfile --backend=copyfile
       - name: Run biome lint
-        run: node_modules/.bin/biome lint --config-path ./biome.json .
+        run: bunx biome lint --config-path ./biome.json .
 
   typecheck:
     needs: generate
