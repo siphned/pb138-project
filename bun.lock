@@ -9,7 +9,7 @@
         "@fontsource-variable/playfair-display": "^5.2.8",
         "@fontsource-variable/source-sans-3": "^5.2.9",
         "@stablelib/base64": "^1.0.1",
-        "playwright": "^1.59.1",
+        "playwright": "1.60.0",
         "react": "^19.2.4",
         "zod": "^3.23.8",
       },
