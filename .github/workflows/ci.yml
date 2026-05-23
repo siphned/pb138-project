@@ -68,7 +68,7 @@ jobs:
       - name: Migrate Database
         run: |
           cd apps/server
-          bunx --bun drizzle-kit push
+          bun run db:push
       - name: Start backend server
         run: bun run apps/server/src/index.ts &
       - name: Wait for server to be ready
@@ -227,7 +227,7 @@ jobs:
       - name: Migrate Database
         run: |
           cd apps/server
-          bunx --bun drizzle-kit push
+          bun run db:push
       - name: Run unit tests
         run: bun run test
       - name: Upload junit results
@@ -288,7 +288,7 @@ jobs:
       - name: Install Playwright
         run: bunx playwright install --with-deps chromium
       - name: Migrate Database
-        run: cd apps/server && bunx drizzle-kit push
+        run: cd apps/server && bun run db:push
       - name: Run E2E tests
         run: cd apps/web && bunx playwright test --reporter=html
       - name: Upload E2E report
