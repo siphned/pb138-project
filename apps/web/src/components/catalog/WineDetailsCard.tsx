@@ -15,7 +15,7 @@ export function WineDetailsCard({ wine }: WineDetailsCardProps) {
   useEffect(() => {
     // @ts-expect-error - checking for BE gap mentioned in plan §8
     if (import.meta.env.DEV && wine.winemaker && !wine.winemaker.userId && !wine.winemaker.id) {
-      // biome-ignore lint/suspicious/noConsole: intentional warning for BE gap mentioned in plan §8
+      // biome-ignore lint/suspicious/noConsole: intentional development diagnostic for BE gap in plan §8
       console.warn(
         "WineDetailsCard: winemaker object missing both userId and id. Owner gating may fail."
       );

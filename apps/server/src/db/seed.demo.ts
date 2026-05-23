@@ -837,8 +837,14 @@ async function main() {
     const shippingFee = pick(["0.00", "4.90", "9.90"] as const);
     const itemsTotal = items.reduce((sum, it) => sum + it.quantity * Number.parseFloat(it.unitPriceAtPurchase), 0);
     const totalPrice = (itemsTotal + Number.parseFloat(shippingFee)).toFixed(2);
-    const paymentStatus: "pending" | "captured" | "cancelled" =
-      status === "cancelled" ? "cancelled" : status === "pending" ? "pending" : "captured";
+    let paymentStatus: "pending" | "captured" | "cancelled";
+    if (status === "cancelled") {
+      paymentStatus = "cancelled";
+    } else if (status === "pending") {
+      paymentStatus = "pending";
+    } else {
+      paymentStatus = "captured";
+    }
     return {
       input: {
         userId,
@@ -895,7 +901,14 @@ async function main() {
       unitPriceAtPurchase: prod.price,
     }));
     const roll = Math.random();
-    const status = roll < 0.15 ? "pending" : roll < 0.22 ? "cancelled" : pick(["confirmed", "shipped", "delivered"] as const);
+    let status: string;
+    if (roll < 0.15) {
+      status = "pending";
+    } else if (roll < 0.22) {
+      status = "cancelled";
+    } else {
+      status = pick(["confirmed", "shipped", "delivered"] as const);
+    }
     allPending.push(buildOrder(customer.id, status, items));
   }
 

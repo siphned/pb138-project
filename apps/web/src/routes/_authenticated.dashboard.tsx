@@ -170,82 +170,95 @@ function StatCard({
   );
 }
 
+type CustomerStats = Extract<GetStatsQueryResponse, { ordersCount: unknown }>;
+type WinemakerStats = Extract<GetStatsQueryResponse, { wineCount: unknown }>;
+type ShopOwnerStats = Extract<GetStatsQueryResponse, { shopsCount: unknown }>;
+type AdminStats = Extract<GetStatsQueryResponse, { usersByRole: unknown }>;
+
+function renderCustomerStats(stats: CustomerStats) {
+  return (
+    <>
+      <StatCard icon={ShoppingBag} label="Orders" value={toNumber(stats.ordersCount)} />
+      <StatCard
+        icon={BarChart3}
+        label="Total spent"
+        value={eur(toNumber(stats.totalSpent as number))}
+      />
+      <StatCard icon={Users} label="Events attended" value={toNumber(stats.eventsAttended)} />
+      <StatCard icon={BarChart3} label="Reviews written" value={toNumber(stats.reviewsWritten)} />
+    </>
+  );
+}
+
+function renderWinemakerStats(stats: WinemakerStats) {
+  const avg = stats.avgReviewScore;
+  return (
+    <>
+      <StatCard icon={Wine} label="Wines in catalog" value={toNumber(stats.wineCount)} />
+      <StatCard icon={BarChart3} label="Total stock" value={toNumber(stats.totalStock)} />
+      <StatCard
+        icon={Users}
+        label="Approved events"
+        value={toNumber(stats.eventsByStatus?.approved)}
+      />
+      <StatCard
+        icon={BarChart3}
+        label="Avg review score"
+        value={avg === null ? "—" : (avg as number).toFixed(1)}
+      />
+    </>
+  );
+}
+
+function renderShopOwnerStats(stats: ShopOwnerStats) {
+  return (
+    <>
+      <StatCard icon={BarChart3} label="Shops" value={toNumber(stats.shopsCount)} />
+      <StatCard icon={Wine} label="Products" value={toNumber(stats.productsByType?.standard)} />
+      <StatCard
+        icon={ShoppingBag}
+        label="Orders processed"
+        value={toNumber(stats.orderItemsProcessed)}
+      />
+      <StatCard icon={BarChart3} label="Revenue" value={eur(toNumber(stats.revenue))} />
+    </>
+  );
+}
+
+function renderAdminStats(stats: AdminStats) {
+  return (
+    <>
+      <StatCard
+        icon={Users}
+        label="Total users"
+        value={
+          toNumber(stats.usersByRole?.customer) +
+          toNumber(stats.usersByRole?.winemaker) +
+          toNumber(stats.usersByRole?.shop_owner) +
+          toNumber(stats.usersByRole?.admin)
+        }
+      />
+      <StatCard icon={Wine} label="Total products" value={toNumber(stats.totalProducts)} />
+      <StatCard icon={BarChart3} label="Total revenue" value={eur(toNumber(stats.totalRevenue))} />
+      <StatCard
+        icon={AlertTriangle}
+        label="Pending requests"
+        value={toNumber(stats.pendingRoleRequests) + toNumber(stats.pendingEvents)}
+      />
+    </>
+  );
+}
+
 function renderStats(stats: GetStatsQueryResponse) {
   switch (stats.role) {
-    case "customer": {
-      const c = stats as Extract<typeof stats, { ordersCount: unknown }>;
-      return (
-        <>
-          <StatCard icon={ShoppingBag} label="Orders" value={toNumber(c.ordersCount)} />
-          <StatCard
-            icon={BarChart3}
-            label="Total spent"
-            value={eur(toNumber(c.totalSpent as number))}
-          />
-          <StatCard icon={Users} label="Events attended" value={toNumber(c.eventsAttended)} />
-          <StatCard icon={BarChart3} label="Reviews written" value={toNumber(c.reviewsWritten)} />
-        </>
-      );
-    }
-    case "winemaker": {
-      const w = stats as Extract<typeof stats, { wineCount: unknown }>;
-      const avg = w.avgReviewScore;
-      return (
-        <>
-          <StatCard icon={Wine} label="Wines in catalog" value={toNumber(w.wineCount)} />
-          <StatCard icon={BarChart3} label="Total stock" value={toNumber(w.totalStock)} />
-          <StatCard
-            icon={Users}
-            label="Approved events"
-            value={toNumber(w.eventsByStatus?.approved)}
-          />
-          <StatCard
-            icon={BarChart3}
-            label="Avg review score"
-            value={avg === null ? "—" : (avg as number).toFixed(1)}
-          />
-        </>
-      );
-    }
-    case "shop_owner": {
-      const s = stats as Extract<typeof stats, { shopsCount: unknown }>;
-      return (
-        <>
-          <StatCard icon={BarChart3} label="Shops" value={toNumber(s.shopsCount)} />
-          <StatCard icon={Wine} label="Products" value={toNumber(s.productsByType?.standard)} />
-          <StatCard
-            icon={ShoppingBag}
-            label="Orders processed"
-            value={toNumber(s.orderItemsProcessed)}
-          />
-          <StatCard icon={BarChart3} label="Revenue" value={eur(toNumber(s.revenue))} />
-        </>
-      );
-    }
-    case "admin": {
-      const a = stats as Extract<typeof stats, { usersByRole: unknown }>;
-      return (
-        <>
-          <StatCard
-            icon={Users}
-            label="Total users"
-            value={
-              toNumber(a.usersByRole?.customer) +
-              toNumber(a.usersByRole?.winemaker) +
-              toNumber(a.usersByRole?.shop_owner) +
-              toNumber(a.usersByRole?.admin)
-            }
-          />
-          <StatCard icon={Wine} label="Total products" value={toNumber(a.totalProducts)} />
-          <StatCard icon={BarChart3} label="Total revenue" value={eur(toNumber(a.totalRevenue))} />
-          <StatCard
-            icon={AlertTriangle}
-            label="Pending requests"
-            value={toNumber(a.pendingRoleRequests) + toNumber(a.pendingEvents)}
-          />
-        </>
-      );
-    }
+    case "customer":
+      return renderCustomerStats(stats as CustomerStats);
+    case "winemaker":
+      return renderWinemakerStats(stats as WinemakerStats);
+    case "shop_owner":
+      return renderShopOwnerStats(stats as ShopOwnerStats);
+    case "admin":
+      return renderAdminStats(stats as AdminStats);
     default:
       return null;
   }
