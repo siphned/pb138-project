@@ -114,7 +114,7 @@ export const cartsRoutes = new Elysia({ prefix: "/carts", tags: ["carts"] })
     "/items/:productId",
     async ({ user, sessionId, params }) => {
       await cartsService.removeItem({ sessionId, userId: user?.id }, params.productId);
-      return status(204, null);
+      return status(204, "");
     },
     {
       detail: {

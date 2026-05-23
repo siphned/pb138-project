@@ -4,9 +4,9 @@ import { fileURLToPath } from "node:url";
 import { faker } from "@faker-js/faker";
 import { logger } from "../utils/logger";
 import {
-  EVENT_COMMENT_BODIES,
+  FALLBACK_EVENT_COMMENTS,
+  FALLBACK_REVIEWS,
   FEATURED_USERS,
-  REVIEW_BODIES,
   SHOPS,
   STORY,
   SUPPORTING_CUSTOMERS,
@@ -182,11 +182,7 @@ async function main() {
 
   // ── Resolve real Clerk IDs ───────────────────────────────────────────────────
   const CLERK = {
-    admin:    requireEnv("DEMO_ADMIN_CLERK_ID"),
-    pavlov:   requireEnv("DEMO_WINEMAKER_CLERK_ID"),
-    boutique: requireEnv("DEMO_SHOP_OWNER_CLERK_ID"),
-    jana:     requireEnv("DEMO_CUSTOMER1_CLERK_ID"),
-    petr:     requireEnv("DEMO_CUSTOMER2_CLERK_ID"),
+    test_user: requireEnv("TEST_USER_CLERK_ID"),
   };
 
   // ── ID resolution maps ───────────────────────────────────────────────────────
@@ -234,10 +230,13 @@ async function main() {
   insertedSupport.forEach((u, i) => userIdMap.set(`support-${i}`, u.id));
   logger.info(`Inserted ${insertedSupport.length} supporting customers`);
 
+  const userAddrMap = new Map<string, string>();
+  insertedFeatured.forEach((u, i) => userAddrMap.set(u.id, featuredAddrRows[i]!.id));
+  insertedSupport.forEach((u, i) => userAddrMap.set(u.id, supportAddrRows[i]!.id));
+
   // All customer IDs (for random interactions)
   const allCustomerIds = [
-    userIdMap.get("jana")!,
-    userIdMap.get("petr")!,
+    userIdMap.get("test_user")!,
     ...insertedSupport.map((u) => u.id),
   ];
 
@@ -248,6 +247,10 @@ async function main() {
   const allEventImages: ImageEntry[] = [];
   const allWinemakerImages: ImageEntry[] = [];
   const allShopImages: ImageEntry[] = [];
+
+  const winemakerReviewsToInsert: { winemakerId: string; rating: number; body: string; userId: string }[] = [];
+  const wineReviewsToInsert: { wineId: string; rating: number; body: string; userId: string }[] = [];
+  const eventCommentsToInsert: { eventId: string; body: string; userId: string }[] = [];
 
   for (const wm of WINEMAKERS) {
     // Create owner user if fake
@@ -280,12 +283,18 @@ async function main() {
       websiteUrl: wm.websiteUrl,
     };
     const [wmRow] = await insertWinemakers([winemakerInput]);
-    wmIdMap.set(wm.key, wmRow!.id);
-    allWinemakerImages.push({ id: wmRow!.id, url: wm.imageUrl });
+    const wmId = wmRow!.id;
+    wmIdMap.set(wm.key, wmId);
+    allWinemakerImages.push({ id: wmId, url: wm.imageUrl });
+
+    // Winemaker Demo Reviews
+    for (const r of wm.demoReviews ?? []) {
+      winemakerReviewsToInsert.push({ winemakerId: wmId, rating: r.rating, body: r.body, userId: pick(allCustomerIds) });
+    }
 
     // Wines
     const wineInputs: WineInput[] = wm.wines.map((w) => ({
-      winemakerId: wmRow!.id,
+      winemakerId: wmId,
       name: w.name,
       color: w.color,
       type: w.type,
@@ -300,8 +309,14 @@ async function main() {
     }));
     const insertedWines = await insertWines(wineInputs);
     insertedWines.forEach((row, i) => {
-      wineIdMap.set(`${wm.key}::${wm.wines[i]!.name}`, row.id);
-      allWineImages.push({ id: row.id, url: wm.wines[i]!.imageUrl });
+      const wineData = wm.wines[i]!;
+      wineIdMap.set(`${wm.key}::${wineData.name}`, row.id);
+      allWineImages.push({ id: row.id, url: wineData.imageUrl });
+
+      // Wine Demo Reviews
+      for (const r of wineData.demoReviews ?? []) {
+        wineReviewsToInsert.push({ wineId: row.id, rating: r.rating, body: r.body, userId: pick(allCustomerIds) });
+      }
     });
 
     // Events
@@ -310,7 +325,7 @@ async function main() {
     const eventInputs: EventInput[] = wm.events.map((ev, i) => {
       const startTime = new Date(now + ev.daysOffset * 86_400_000);
       return {
-        winemakerId: wmRow!.id,
+        winemakerId: wmId,
         addressId: eventAddrRows[i]!.id,
         name: ev.name,
         description: ev.description,
@@ -324,8 +339,14 @@ async function main() {
     });
     const insertedEvents = await insertEvents(eventInputs);
     insertedEvents.forEach((row, i) => {
+      const eventData = wm.events[i]!;
       eventIdMap.set(`${wm.key}-${i}`, row.id);
-      allEventImages.push({ id: row.id, url: wm.events[i]!.imageUrl });
+      allEventImages.push({ id: row.id, url: eventData.imageUrl });
+
+      // Event Demo Comments
+      for (const body of eventData.demoComments ?? []) {
+        eventCommentsToInsert.push({ eventId: row.id, body, userId: pick(allCustomerIds) });
+      }
     });
   }
   logger.info(`Inserted ${wmIdMap.size} custom winemakers, ${allWineImages.length} wines, ${allEventImages.length} events`);
@@ -596,28 +617,35 @@ async function main() {
 
   // ── User roles ───────────────────────────────────────────────────────────────
   logger.info("Inserting user roles...");
-  const userRoleEntries: { userId: string; role: string }[] = [
-    { userId: userIdMap.get("admin")!, role: "admin" },
-  ];
+  const roleSet = new Set<string>(); // "userId::role"
+  const addRole = (userId: string, role: string) => roleSet.add(`${userId}::${role}`);
+
+  addRole(userIdMap.get("test_user")!, "admin"); // test_user is admin
+
   for (const wm of WINEMAKERS) {
     const ownerId = wm.ownerKey
       ? userIdMap.get(wm.ownerKey)!
       : userIdMap.get(`wm-owner-${wm.key}`)!;
-    if (!userRoleEntries.some((r) => r.userId === ownerId && r.role === "winemaker")) {
-      userRoleEntries.push({ userId: ownerId, role: "winemaker" });
-    }
+    addRole(ownerId, "winemaker");
   }
   for (const shop of SHOPS) {
     const ownerId = shop.ownerKey
       ? userIdMap.get(shop.ownerKey)!
       : userIdMap.get(`shop-owner-${shop.key}`)!;
-    if (!userRoleEntries.some((r) => r.userId === ownerId && r.role === "shop_owner")) {
-      userRoleEntries.push({ userId: ownerId, role: "shop_owner" });
-    }
+    addRole(ownerId, "shop_owner");
   }
+
+  for (const r of fakerOwnerRoles) {
+    addRole(r.userId, r.role);
+  }
+
+  const userRoleEntries = [...roleSet].map((s) => {
+    const [userId, role] = s.split("::");
+    return { userId: userId!, role: role! };
+  });
+
   await insertUserRoles(userRoleEntries);
-  await insertUserRoles(fakerOwnerRoles);
-  logger.info(`Inserted ${userRoleEntries.length + fakerOwnerRoles.length} user roles`);
+  logger.info(`Inserted ${userRoleEntries.length} user roles`);
 
   // ── Supply agreements ────────────────────────────────────────────────────────
   logger.info("Inserting supply agreements...");
@@ -685,11 +713,11 @@ async function main() {
   // Story registrations
   for (const evKey of STORY.jana.eventRegistrations) {
     const evId = eventIdMap.get(evKey);
-    if (evId) addReg(evId, userIdMap.get("jana")!);
+    if (evId) addReg(evId, userIdMap.get("test_user")!);
   }
   for (const evKey of STORY.petr.eventRegistrations) {
     const evId = eventIdMap.get(evKey);
-    if (evId) addReg(evId, userIdMap.get("petr")!);
+    if (evId) addReg(evId, userIdMap.get("test_user")!);
   }
 
   // Random supporting customers at events
@@ -703,16 +731,23 @@ async function main() {
 
   // ── Event comments ───────────────────────────────────────────────────────────
   logger.info("Inserting event comments...");
-  const eventCommentInputs: EventCommentInput[] = eventIdList.flatMap((evId) => {
-    const count = faker.number.int({ min: 2, max: 5 });
-    return Array.from({ length: count }, () => ({
-      eventId: evId,
-      userId: pick(allCustomerIds),
-      body: pick(EVENT_COMMENT_BODIES),
-    }));
-  });
-  await insertEventComments(eventCommentInputs);
-  logger.info(`Inserted ${eventCommentInputs.length} event comments`);
+  const finalEventCommentInputs: EventCommentInput[] = [...eventCommentsToInsert];
+
+  // Add random ones to fill up
+  for (const evId of eventIdList) {
+    const currentCount = finalEventCommentInputs.filter(c => c.eventId === evId).length;
+    const target = faker.number.int({ min: 8, max: 12 });
+    for (let i = currentCount; i < target; i++) {
+      finalEventCommentInputs.push({
+        eventId: evId,
+        userId: pick(allCustomerIds),
+        body: pick(FALLBACK_EVENT_COMMENTS),
+      });
+    }
+  }
+
+  await insertEventComments(finalEventCommentInputs);
+  logger.info(`Inserted ${finalEventCommentInputs.length} event comments`);
 
   // ── Reviews ──────────────────────────────────────────────────────────────────
   logger.info("Inserting reviews...");
@@ -726,46 +761,42 @@ async function main() {
     reviewInputs.push({ userId, entityType, entityId, rating, body });
   };
 
-  // Jana's story reviews
+  // Insert Demo Reviews
+  for (const r of winemakerReviewsToInsert) {
+    addReview(r.userId, "winemaker", r.winemakerId, r.rating, r.body);
+  }
+  for (const r of wineReviewsToInsert) {
+    addReview(r.userId, "product", r.wineId, r.rating, r.body);
+  }
+
+  // Story reviews (Willy)
   for (const r of STORY.jana.productReviews) {
     const prodKey = `${r.shopKey}::${r.winemakerId}::${r.wineName}`;
     const prod = productMap.get(prodKey);
-    if (prod) addReview(userIdMap.get("jana")!, "product", prod.id, r.rating, r.body);
+    if (prod) addReview(userIdMap.get("test_user")!, "product", prod.id, r.rating, r.body);
   }
   for (const r of STORY.jana.winemakerReviews) {
     const wmId = wmIdMap.get(r.winemakerId);
-    if (wmId) addReview(userIdMap.get("jana")!, "winemaker", wmId, r.rating, r.body);
+    if (wmId) addReview(userIdMap.get("test_user")!, "winemaker", wmId, r.rating, r.body);
   }
-
-  // Petr's story reviews
   for (const r of STORY.petr.productReviews) {
     const prodKey = `${r.shopKey}::${r.winemakerId}::${r.wineName}`;
     const prod = productMap.get(prodKey);
-    if (prod) addReview(userIdMap.get("petr")!, "product", prod.id, r.rating, r.body);
+    if (prod) addReview(userIdMap.get("test_user")!, "product", prod.id, r.rating, r.body);
   }
   for (const r of STORY.petr.winemakerReviews) {
     const wmId = wmIdMap.get(r.winemakerId);
-    if (wmId) addReview(userIdMap.get("petr")!, "winemaker", wmId, r.rating, r.body);
+    if (wmId) addReview(userIdMap.get("test_user")!, "winemaker", wmId, r.rating, r.body);
   }
 
-  // Supporting customer reviews (random products + winemakers)
-  const allProductArr = [...productMap.values()];
+  // Bulk reviews for Faker Winemakers
   const wmIdArr = [...wmIdMap.values()];
-  const reviewers = faker.helpers.arrayElements(insertedSupport, Math.floor(insertedSupport.length * 0.8));
-  for (const user of reviewers) {
-    const ratingRoll = Math.random();
-    const rating = ratingRoll < 0.6 ? faker.number.int({ min: 4, max: 5 }) :
-                   ratingRoll < 0.85 ? faker.number.int({ min: 3, max: 3 }) :
-                   faker.number.int({ min: 1, max: 2 });
-    const body = rating >= 4 ? pick(REVIEW_BODIES.positive) :
-                 rating === 3 ? pick(REVIEW_BODIES.neutral) :
-                 pick(REVIEW_BODIES.critical);
-
-    if (Math.random() < 0.7 && allProductArr.length > 0) {
-      const prod = pick(allProductArr);
-      addReview(user.id, "product", prod.id, rating, body);
-    } else {
-      addReview(user.id, "winemaker", pick(wmIdArr), rating, body);
+  for (const wmId of wmIdArr) {
+    const existing = reviewInputs.filter(r => r.entityId === wmId && r.entityType === "winemaker").length;
+    if (existing < 3) {
+      for (let i = existing; i < 3; i++) {
+        addReview(pick(insertedSupport).id, "winemaker", wmId, pick([4, 5]), pick(FALLBACK_REVIEWS));
+      }
     }
   }
 
@@ -801,24 +832,25 @@ async function main() {
   }
   const shopEntries = [...shopProductMap.entries()];
 
-  const buildOrder = async (
-    userId: string,
-    status: "pending" | "confirmed" | "shipped" | "delivered" | "cancelled",
-    items: PendingItem[],
-  ): Promise<PendingOrder> => {
-    const shippingFee = pick(["0.00", "5.00", "10.00"] as const);
+  const buildOrder = (userId: string, status: string, items: PendingItem[]): PendingOrder => {
+    const addressId = userAddrMap.get(userId) ?? featuredAddrRows[0]!.id;
+    const shippingFee = pick(["0.00", "4.90", "9.90"] as const);
     const itemsTotal = items.reduce((sum, it) => sum + it.quantity * Number.parseFloat(it.unitPriceAtPurchase), 0);
     const totalPrice = (itemsTotal + Number.parseFloat(shippingFee)).toFixed(2);
-    const paymentStatus = status === "cancelled" ? "cancelled" as const
-      : status === "pending" ? "pending" as const : "captured" as const;
-
-    const addrRows = await insertAddresses([czechAddress(pick(["Praha", "Brno", "Ostrava", "Olomouc"])), czechAddress(pick(["Praha", "Brno"]))]);
+    let paymentStatus: "pending" | "captured" | "cancelled";
+    if (status === "cancelled") {
+      paymentStatus = "cancelled";
+    } else if (status === "pending") {
+      paymentStatus = "pending";
+    } else {
+      paymentStatus = "captured";
+    }
     return {
       input: {
         userId,
-        shippingAddressId: addrRows[0]!.id,
-        billingAddressId: addrRows[1]!.id,
-        status,
+        shippingAddressId: addressId,
+        billingAddressId: addressId,
+        status: status as any,
         deliveryType: pick(["pickup", "shipping"] as const),
         paymentMethod: pick(["card", "bank_transfer", "cash_on_delivery"] as const),
         paymentStatus,
@@ -830,12 +862,11 @@ async function main() {
     };
   };
 
-  const resolveStoryItems = (
-    storyItems: { wineName: string; winemakerId: string; quantity: number }[],
-    shopKey: string,
-  ): PendingItem[] => {
-    const shopId = shopIdMap.get(shopKey)!;
-    return storyItems.flatMap((it) => {
+  const resolveStoryItems = (items: { wineName: string; winemakerId: string; quantity: number }[], shopKey: string): PendingItem[] => {
+    return items.flatMap((it) => {
+      const shop = SHOPS.find((s) => s.key === shopKey);
+      if (!shop) return [];
+      const shopId = shopIdMap.get(shopKey)!;
       const prod = productMap.get(`${shopKey}::${it.winemakerId}::${it.wineName}`);
       if (!prod) return [];
       return [{ productId: prod.id, shopId, quantity: it.quantity, unitPriceAtPurchase: prod.price }];
@@ -844,16 +875,16 @@ async function main() {
 
   const allPending: PendingOrder[] = [];
 
-  // Story orders — Jana
+  // Story orders — Jana (mapped to test_user)
   for (const order of STORY.jana.orders) {
     const items = resolveStoryItems(order.items, order.shopKey);
-    if (items.length > 0) allPending.push(await buildOrder(userIdMap.get("jana")!, order.status, items));
+    if (items.length > 0) allPending.push(buildOrder(userIdMap.get("test_user")!, order.status, items));
   }
 
-  // Story orders — Petr
+  // Story orders — Petr (mapped to test_user)
   for (const order of STORY.petr.orders) {
     const items = resolveStoryItems(order.items, order.shopKey);
-    if (items.length > 0) allPending.push(await buildOrder(userIdMap.get("petr")!, order.status, items));
+    if (items.length > 0) allPending.push(buildOrder(userIdMap.get("test_user")!, order.status, items));
   }
 
   // Random orders from supporting customers
@@ -870,8 +901,15 @@ async function main() {
       unitPriceAtPurchase: prod.price,
     }));
     const roll = Math.random();
-    const status = roll < 0.15 ? "pending" : roll < 0.22 ? "cancelled" : pick(["confirmed", "shipped", "delivered"] as const);
-    allPending.push(await buildOrder(customer.id, status, items));
+    let status: string;
+    if (roll < 0.15) {
+      status = "pending";
+    } else if (roll < 0.22) {
+      status = "cancelled";
+    } else {
+      status = pick(["confirmed", "shipped", "delivered"] as const);
+    }
+    allPending.push(buildOrder(customer.id, status, items));
   }
 
   const insertedOrders = await insertOrders(allPending.map((p) => p.input));
@@ -899,24 +937,24 @@ async function main() {
   logger.info(`Inserted ${reqPool.length} role requests`);
 
   // ── Images ───────────────────────────────────────────────────────────────────
-  // Custom URLs from data file take priority; picsum is the fallback.
+  // Custom URLs from data file take priority; placeholder is the fallback.
   logger.info("Inserting images...");
   const imageInputs: ImageInput[] = [
     ...allWineImages.map(({ id, url }) => ({
       entityType: "wine", entityId: id,
-      url: url ?? `https://picsum.photos/seed/${id}/800/600`,
+      url: url ?? "/uploads/wine/wine_placeholder.webp",
     })),
     ...allEventImages.map(({ id, url }) => ({
       entityType: "event", entityId: id,
-      url: url ?? `https://picsum.photos/seed/${id}/1200/600`,
+      url: url ?? "/uploads/event/event_placeholder.webp",
     })),
     ...allWinemakerImages.map(({ id, url }) => ({
       entityType: "winemaker", entityId: id,
-      url: url ?? `https://picsum.photos/seed/${id}/1200/400`,
+      url: url ?? "/uploads/winemaker/winery_placeholder.webp",
     })),
     ...allShopImages.map(({ id, url }) => ({
       entityType: "shop", entityId: id,
-      url: url ?? `https://picsum.photos/seed/${id}/800/400`,
+      url: url ?? "/uploads/shop/shop_placeholder.webp",
     })),
   ];
   await insertImages(imageInputs);
@@ -924,12 +962,9 @@ async function main() {
 
   logger.info("Demo seeding complete!");
   logger.info("─────────────────────────────────────────────────────────────────");
-  logger.info("Demo accounts (log in via Clerk):");
-  logger.info("  Admin:      admin@winery.demo");
-  logger.info("  Winemaker:  pavlov@winery.demo   (Vinné sklepy Pavlov)");
-  logger.info("  Shop owner: boutique@winery.demo  (Praha Wine Boutique)");
-  logger.info("  Customer 1: jana@winery.demo      (active buyer + reviewer)");
-  logger.info("  Customer 2: petr@winery.demo      (buyer, Brno)");
+  logger.info("Demo account (log in via Clerk):");
+  logger.info("  Willy the Kid: willy@winery.demo");
+  logger.info("  (Controls: Lavicka winery, Vecerka Posledná Záchrana shop, Admin access)");
   logger.info("─────────────────────────────────────────────────────────────────");
 }
 

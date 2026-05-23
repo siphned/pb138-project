@@ -14,6 +14,28 @@ const addressSchema = t.Object({
   street: t.String(),
 });
 
+const addressWithIdSchema = t.Object({
+  city: t.String(),
+  country: t.String(),
+  houseNumber: t.String(),
+  id: t.String(),
+  postalCode: t.String(),
+  street: t.String(),
+});
+
+const orderItemSchema = t.Object({
+  id: t.String(),
+  orderId: t.String(),
+  product: t.Object({
+    id: t.String(),
+    name: t.String(),
+  }),
+  productId: t.String(),
+  quantity: t.Number(),
+  shopId: t.String(),
+  unitPriceAtPurchase: t.String(),
+});
+
 const orderResponse = t.Object({
   billingAddressId: t.String(),
   createdAt: t.Date(),
@@ -26,6 +48,29 @@ const orderResponse = t.Object({
   id: t.String(),
   paymentMethod: t.String(),
   paymentStatus: t.String(),
+  shippingAddressId: t.String(),
+  shippingFee: t.String(),
+  status: t.String(),
+  totalPrice: t.String(),
+  updatedAt: t.Union([t.Date(), t.Null()]),
+  userId: t.Union([t.String(), t.Null()]),
+});
+
+const orderDetailedResponse = t.Object({
+  billingAddress: addressWithIdSchema,
+  billingAddressId: t.String(),
+  createdAt: t.Date(),
+  deletedAt: t.Union([t.Date(), t.Null()]),
+  deliveryType: t.String(),
+  discount: t.String(),
+  guestEmail: t.Union([t.String(), t.Null()]),
+  guestName: t.Union([t.String(), t.Null()]),
+  guestSessionId: t.Union([t.String(), t.Null()]),
+  id: t.String(),
+  items: t.Array(orderItemSchema),
+  paymentMethod: t.String(),
+  paymentStatus: t.String(),
+  shippingAddress: addressWithIdSchema,
   shippingAddressId: t.String(),
   shippingFee: t.String(),
   status: t.String(),
@@ -152,11 +197,12 @@ export const ordersRoutes = new Elysia({ prefix: "/orders", tags: ["orders"] })
     },
     {
       detail: {
-        description: "Returns an order by ID. The owning user or an admin can access it.",
+        description:
+          "Returns an order by ID with items and addresses. The owning user or an admin can access it.",
         summary: "Get order by ID",
       },
       params: t.Object({ id: t.String() }),
-      response: { 200: orderResponse, 401: t.String(), 403: t.String(), 404: t.String() },
+      response: { 200: orderDetailedResponse, 401: t.String(), 403: t.String(), 404: t.String() },
     }
   )
 

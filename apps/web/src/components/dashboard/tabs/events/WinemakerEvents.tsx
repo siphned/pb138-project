@@ -49,7 +49,7 @@ export function WinemakerEvents() {
     if (status === "Approved") {
       return (
         <Badge
-          className="border-[#A7F3D0] bg-[#ECFDF5] text-[#059669] hover:bg-[#ECFDF5] px-2 py-0.5 text-[10px] font-medium rounded"
+          className="border-emerald-200 bg-emerald-50 text-emerald-600 hover:bg-emerald-50 px-2 py-0.5 text-[10px] font-medium rounded"
           variant="outline"
         >
           <CheckCircle2 className="w-3 h-3 mr-1" /> Approved
@@ -58,7 +58,7 @@ export function WinemakerEvents() {
     }
     return (
       <Badge
-        className="border-[#FDE68A] bg-[#FFFBEB] text-[#D97706] hover:bg-[#FFFBEB] px-2 py-0.5 text-[10px] font-medium rounded"
+        className="border-amber-200 bg-amber-50 text-amber-600 hover:bg-amber-50 px-2 py-0.5 text-[10px] font-medium rounded"
         variant="outline"
       >
         <Clock4 className="w-3 h-3 mr-1" /> Pending Approval
@@ -73,23 +73,23 @@ export function WinemakerEvents() {
         <div className="flex items-center gap-2 font-heading text-xl font-semibold text-primary">
           <Calendar className="h-5 w-5" /> Tasting Events
         </div>
-        <Button className="w-full sm:w-auto bg-[#8B2E3D] hover:bg-[#8B2E3D]/90 text-white rounded-lg h-10 px-5">
+        <Button className="w-full sm:w-auto bg-primary hover:bg-primary/90 text-white rounded-lg h-10 px-5">
           <Plus className="h-4 w-4 mr-2" /> Schedule Event
         </Button>
       </div>
 
       {/* Upcoming Events Card */}
-      <Card className="bg-[#EFEAE8]/50 border-none shadow-none rounded-[24px] overflow-hidden">
+      <Card className="bg-secondary/50 border-none shadow-none rounded-[24px] overflow-hidden">
         <CardContent className="p-0">
-          <div className="px-6 py-5 md:px-8 md:py-6 border-b border-[#E5DFDD] flex items-center gap-2 font-medium text-primary">
-            <div className="w-2 h-2 rounded-full bg-[#10B981]" />
+          <div className="px-6 py-5 md:px-8 md:py-6 border-b border-border flex items-center gap-2 font-medium text-primary">
+            <div className="w-2 h-2 rounded-full bg-emerald-500" />
             Upcoming Events ({upcomingEvents.length})
           </div>
 
           <div className="flex flex-col">
             {upcomingEvents.map((event) => (
               <div
-                className="p-6 md:p-8 border-b border-[#E5DFDD] last:border-0 flex justify-between items-start gap-4"
+                className="p-6 md:p-8 border-b border-border last:border-0 flex justify-between items-start gap-4"
                 key={event.id}
               >
                 <div className="flex flex-col gap-3 w-full pr-4">
@@ -133,7 +133,7 @@ export function WinemakerEvents() {
       </Card>
 
       {/* Past Events Card */}
-      <Card className="bg-[#EFEAE8]/30 border-none shadow-none rounded-[24px] overflow-hidden mt-6">
+      <Card className="bg-secondary/30 border-none shadow-none rounded-[24px] overflow-hidden mt-6">
         <CardContent className="p-0">
           <div className="px-6 py-5 md:px-8 md:py-6 text-muted-foreground font-medium text-[15px]">
             Past Events ({pastEvents.length})

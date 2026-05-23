@@ -92,7 +92,7 @@ export const shopProductsRoutes = new Elysia({ prefix: "/shops/:id" })
     "/products/:productId",
     async ({ params, dbUser }) => {
       await productsService.deleteProductOrBundle(params.id, params.productId, dbUser.id);
-      return status(204, null);
+      return status(204, "");
     },
     {
       detail: {

@@ -84,7 +84,7 @@ function buildImageRoutes(entityPlural: string, entityType: EntityType) {
           params.id,
           params.imageId
         );
-        return status(204, null);
+        return status(204, "");
       },
       {
         detail: {

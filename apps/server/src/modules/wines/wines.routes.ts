@@ -81,7 +81,7 @@ export const winesRoutes = new Elysia()
     "/wines/:id",
     async ({ params, dbUser, clerkPayload }) => {
       await winesService.deleteWine(params.id, dbUser.id, clerkPayload.roles ?? []);
-      return status(204, null);
+      return status(204, "");
     },
     {
       detail: {
