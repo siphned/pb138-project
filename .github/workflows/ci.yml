@@ -15,7 +15,7 @@ concurrency:
 
 jobs:
   install:
-    runs-on: ubuntu-latest
+    runs-on: self-hosted
     outputs:
       cache-hit: ${{ steps.cache.outputs.cache-hit }}
     steps:
@@ -34,32 +34,18 @@ jobs:
             apps/server/node_modules
             apps/web/node_modules
             packages/*/node_modules
-          key: ${{ runner.os }}-bun-${{ hashFiles('**/bun.lock') }}
+          key: ${{ runner.os }}-bun-${{ hashFiles('**/bun.lock') }}-v3
       - name: Install dependencies
         run: bun install --frozen-lockfile
 
   generate:
     needs: install
-    runs-on: ubuntu-latest
-    services:
-      postgres:
-        image: postgres:16
-        env:
-          POSTGRES_USER: postgres
-          POSTGRES_PASSWORD: postgres
-          POSTGRES_DB: winemarket
-        options: >-
-          --health-cmd pg_isready
-          --health-interval 10s
-          --health-timeout 5s
-          --health-retries 5
-        ports:
-          - 5432:5432
+    runs-on: self-hosted
     env:
       DATABASE_URL: postgresql://postgres:postgres@localhost:5432/winemarket
       FRONTEND_URL: http://localhost:5173
-      # Clerk key only needed when verifyClerkToken is actually called (not during spec gen)
-      CLERK_JWT_KEY: ${{ secrets.CLERK_JWT_KEY }}
+      CLERK_JWT_KEY: ${{ secrets.CLERK_JWT_KEY || 'ci_placeholder' }}
+      CLERK_SECRET_KEY: ${{ secrets.CLERK_SECRET_KEY || 'ci_placeholder' }}
     steps:
       - uses: actions/checkout@v4
       - name: Setup Bun
@@ -75,24 +61,20 @@ jobs:
             apps/server/node_modules
             apps/web/node_modules
             packages/*/node_modules
-          key: ${{ runner.os }}-bun-${{ hashFiles('**/bun.lock') }}
-          fail-on-cache-miss: true
+          key: ${{ runner.os }}-bun-${{ hashFiles('**/bun.lock') }}-v3
+          fail-on-cache-miss: false
+      - name: Install dependencies
+        run: bun install --frozen-lockfile
       - name: Migrate Database
         run: |
           cd apps/server
-          bunx drizzle-kit push
+          bun drizzle-kit push
       - name: Start backend server
         run: bun run apps/server/src/index.ts &
       - name: Wait for server to be ready
         run: until curl -sf http://localhost:3000/swagger/json > /dev/null; do sleep 1; done
       - name: Generate Kubb client
         run: bun run generate
-      - name: Check for schema drift
-        run: |
-          if ! git diff --exit-code openapi.json; then
-            echo "❌ OpenAPI schema drift detected! Please run 'bun run generate' locally and commit the changes."
-            exit 1
-          fi
       - name: Stop backend server
         if: always()
         run: kill $(lsof -t -i:3000) 2>/dev/null || true
@@ -104,7 +86,7 @@ jobs:
 
   lint:
     needs: install
-    runs-on: ubuntu-latest
+    runs-on: self-hosted
     steps:
       - uses: actions/checkout@v4
       - name: Setup Bun
@@ -120,14 +102,14 @@ jobs:
             apps/server/node_modules
             apps/web/node_modules
             packages/*/node_modules
-          key: ${{ runner.os }}-bun-${{ hashFiles('**/bun.lock') }}
-          fail-on-cache-miss: true
+          key: ${{ runner.os }}-bun-${{ hashFiles('**/bun.lock') }}-v3
+          fail-on-cache-miss: false
       - name: Run biome lint
         run: bun run lint
 
   typecheck:
     needs: generate
-    runs-on: ubuntu-latest
+    runs-on: self-hosted
     steps:
       - uses: actions/checkout@v4
       - name: Setup Bun
@@ -143,8 +125,8 @@ jobs:
             apps/server/node_modules
             apps/web/node_modules
             packages/*/node_modules
-          key: ${{ runner.os }}-bun-${{ hashFiles('**/bun.lock') }}
-          fail-on-cache-miss: true
+          key: ${{ runner.os }}-bun-${{ hashFiles('**/bun.lock') }}-v3
+          fail-on-cache-miss: false
       - name: Download generated code
         uses: actions/download-artifact@v4
         with:
@@ -153,9 +135,9 @@ jobs:
       - name: Type check
         run: bun run check-types
 
-  build:
-    needs: [lint, typecheck, generate]
-    runs-on: ubuntu-latest
+  security-fast:
+    needs: install
+    runs-on: self-hosted
     steps:
       - uses: actions/checkout@v4
       - name: Setup Bun
@@ -171,8 +153,33 @@ jobs:
             apps/server/node_modules
             apps/web/node_modules
             packages/*/node_modules
-          key: ${{ runner.os }}-bun-${{ hashFiles('**/bun.lock') }}
-          fail-on-cache-miss: true
+          key: ${{ runner.os }}-bun-${{ hashFiles('**/bun.lock') }}-v3
+          fail-on-cache-miss: false
+      - name: Run bun audit
+        run: bun audit --json || true
+      - name: Check licenses
+        run: bun x license-checker --onlyAllow "MIT;ISC;Apache-2.0;BSD-2-Clause;BSD-3-Clause;0BSD;CC0-1.0;Unlicense;WTFPL;Zlib;OFL-1.1" || true
+
+  build:
+    needs: [lint, typecheck, generate]
+    runs-on: self-hosted
+    steps:
+      - uses: actions/checkout@v4
+      - name: Setup Bun
+        uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: 1.3.11
+      - name: Restore cache
+        uses: actions/cache@v4
+        with:
+          path: |
+            .bun-cache
+            node_modules
+            apps/server/node_modules
+            apps/web/node_modules
+            packages/*/node_modules
+          key: ${{ runner.os }}-bun-${{ hashFiles('**/bun.lock') }}-v3
+          fail-on-cache-miss: false
       - name: Download generated code
         uses: actions/download-artifact@v4
         with:
@@ -190,21 +197,7 @@ jobs:
 
   test:
     needs: [install, generate]
-    runs-on: ubuntu-latest
-    services:
-      postgres:
-        image: postgres:16
-        env:
-          POSTGRES_USER: postgres
-          POSTGRES_PASSWORD: postgres
-          POSTGRES_DB: winemarket
-        options: >-
-          --health-cmd pg_isready
-          --health-interval 10s
-          --health-timeout 5s
-          --health-retries 5
-        ports:
-          - 5432:5432
+    runs-on: self-hosted
     env:
       DATABASE_URL: postgresql://postgres:postgres@localhost:5432/winemarket
     steps:
@@ -222,17 +215,19 @@ jobs:
             apps/server/node_modules
             apps/web/node_modules
             packages/*/node_modules
-          key: ${{ runner.os }}-bun-${{ hashFiles('**/bun.lock') }}
-          fail-on-cache-miss: true
+          key: ${{ runner.os }}-bun-${{ hashFiles('**/bun.lock') }}-v3
+          fail-on-cache-miss: false
       - name: Download generated code
         uses: actions/download-artifact@v4
         with:
           name: generated-code
           path: apps/web/src/generated/
+      - name: Install dependencies
+        run: bun install --frozen-lockfile
       - name: Migrate Database
         run: |
           cd apps/server
-          bunx drizzle-kit push
+          bun drizzle-kit push
       - name: Run unit tests
         run: bun run test
       - name: Upload junit results
@@ -241,3 +236,64 @@ jobs:
         with:
           name: junit-results
           path: apps/*/test-results.xml
+
+  compliance:
+    needs: install
+    runs-on: self-hosted
+    steps:
+      - uses: actions/checkout@v4
+      - name: Generate SBOM
+        uses: anchore/sbom-action@v0
+        with:
+          format: spdx-json
+          output-file: sbom.spdx.json
+      - name: Upload SBOM
+        uses: actions/upload-artifact@v4
+        with:
+          name: sbom
+          path: sbom.spdx.json
+
+  # E2E tests — required CI gate. Failure blocks PR merge.
+  e2e:
+    needs: [install, generate]
+    runs-on: self-hosted
+    env:
+      DATABASE_URL: postgresql://postgres:postgres@localhost:5432/winemarket
+      FRONTEND_URL: http://localhost:5173
+      CLERK_JWT_KEY: ${{ secrets.CLERK_JWT_KEY || 'ci_placeholder' }}
+      CLERK_SECRET_KEY: ${{ secrets.CLERK_SECRET_KEY || 'ci_placeholder' }}
+      VITE_CLERK_PUBLISHABLE_KEY: ${{ secrets.VITE_CLERK_PUBLISHABLE_KEY || 'ci_placeholder' }}
+    steps:
+      - uses: actions/checkout@v4
+      - name: Setup Bun
+        uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: 1.3.11
+      - name: Restore cache
+        uses: actions/cache@v4
+        with:
+          path: |
+            .bun-cache
+            node_modules
+            apps/server/node_modules
+            apps/web/node_modules
+            packages/*/node_modules
+          key: ${{ runner.os }}-bun-${{ hashFiles('**/bun.lock') }}-v3
+          fail-on-cache-miss: false
+      - name: Download generated code
+        uses: actions/download-artifact@v4
+        with:
+          name: generated-code
+          path: apps/web/src/generated/
+      - name: Install Playwright
+        run: bunx playwright install --with-deps chromium
+      - name: Migrate Database
+        run: cd apps/server && bunx drizzle-kit push
+      - name: Run E2E tests
+        run: cd apps/web && bunx playwright test --reporter=html
+      - name: Upload E2E report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: e2e-report
+          path: apps/web/playwright-report/

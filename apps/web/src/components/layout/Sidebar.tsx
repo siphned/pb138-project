@@ -1,17 +1,21 @@
 import { Show, useAuth, useClerk, useUser as useClerkUser } from "@clerk/react";
-import { Link, useNavigate } from "@tanstack/react-router";
 import {
-  Calendar,
-  LogOut,
-  Menu,
-  Moon,
-  Package,
-  Search,
-  Settings,
-  ShoppingCart,
-  User as UserIcon,
-  Wine,
-} from "lucide-react";
+  Calendar01Icon,
+  ChartBarLineIcon,
+  LogoutSquare02Icon,
+  Menu01Icon,
+  Moon01Icon,
+  Package01Icon,
+  Search01Icon,
+  ShoppingCart01Icon,
+  Store01Icon,
+  Sun01Icon,
+  User02Icon,
+  UserGroupIcon,
+} from "@hugeicons/core-free-icons";
+import { HugeiconsIcon } from "@hugeicons/react";
+import { Link, useNavigate } from "@tanstack/react-router";
+import { Wine } from "lucide-react";
 import { useState } from "react";
 import { NavItem } from "@/components/primitives/nav-item";
 import {
@@ -23,7 +27,9 @@ import {
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
-import { useUser } from "@/context/UserContext";
+import { useTheme, useUser } from "@/context";
+import { useGetShopsMe } from "@/generated/hooks/useGetShopsMe";
+import { useGetWinemakersMe } from "@/generated/hooks/useGetWinemakersMe";
 
 import { Role } from "@/types/roles";
 
@@ -37,11 +43,27 @@ export function Sidebar({ userRoles = [Role.customer], activeRole, onRoleChange 
   const { user } = useUser();
   const { user: clerkUser } = useClerkUser();
   const { isSignedIn } = useAuth();
-  const { signOut, openUserProfile } = useClerk();
+  const { signOut } = useClerk();
   const navigate = useNavigate();
+  const { theme, toggleTheme } = useTheme();
 
   const currentActiveRole = activeRole || userRoles[0];
   const [accordionState, setAccordionState] = useState<string[]>([]);
+  const [open, setOpen] = useState(false);
+  const closeSheet = () => setOpen(false);
+
+  // Fetch the user's winemaker / shop profile so "My Wines" / "My Bundles" /
+  // "My Events" links can carry the real ids instead of a magic `"me"` string.
+  // Each hook is gated by the active role so we don't 404 non-winemakers etc.
+  const winemakerProfile = useGetWinemakersMe({
+    query: { enabled: isSignedIn === true && currentActiveRole === Role.winemaker },
+  });
+  const shopOwnerProfile = useGetShopsMe({
+    query: { enabled: isSignedIn === true && currentActiveRole === Role.shopOwner },
+  });
+  const winemakerId = winemakerProfile.data?.id;
+  const winemakerName = winemakerProfile.data?.name;
+  const firstShopId = shopOwnerProfile.data?.[0]?.id;
 
   const displayUserName = isSignedIn ? clerkUser?.fullName || "User" : "Guest";
   const fullName = user ? `${user.fname || ""} ${user.lname || ""}`.trim() : "Guest";
@@ -49,21 +71,21 @@ export function Sidebar({ userRoles = [Role.customer], activeRole, onRoleChange 
   const hasMultipleRoles = userRoles.length > 1;
 
   const handleLogout = async () => {
+    closeSheet();
     try {
       await signOut({ redirectUrl: "/" });
     } catch (_error) {
-      // TODO: User notification (toast)
-      // console.error("Sign out error:", error);
+      /* sign-out navigation is optimistic; error here is non-critical */
     }
     navigate({ to: "/" });
   };
 
   return (
-    <Sheet>
+    <Sheet onOpenChange={setOpen} open={open}>
       <SheetTrigger
         render={
           <Button size="icon" variant="ghost">
-            <Menu className="h-6 w-6" />
+            <HugeiconsIcon icon={Menu01Icon} />
           </Button>
         }
       />
@@ -93,7 +115,7 @@ export function Sidebar({ userRoles = [Role.customer], activeRole, onRoleChange 
             <p className="text-sm text-muted-foreground">
               Sign in to manage your wines and orders.
             </p>
-            <Link className="mt-4 block" to="/auth/login">
+            <Link className="mt-4 block" onClick={closeSheet} to="/auth/login">
               <Button className="w-full">Sign In</Button>
             </Link>
           </div>
@@ -111,7 +133,7 @@ export function Sidebar({ userRoles = [Role.customer], activeRole, onRoleChange 
                   <AccordionItem className="border-none" value="user-roles">
                     <AccordionTrigger className="flex items-center gap-3 px-3 py-3 rounded-md bg-secondary hover:bg-secondary/80 transition-colors text-sm font-medium hover:no-underline text-primary">
                       <div className="flex items-center gap-3">
-                        <UserIcon className="h-4 w-4" />
+                        <HugeiconsIcon icon={User02Icon} />
                         {currentActiveRole}
                       </div>
                     </AccordionTrigger>
@@ -140,61 +162,74 @@ export function Sidebar({ userRoles = [Role.customer], activeRole, onRoleChange 
                 </Accordion>
               ) : (
                 <NavItem render={<div />} variant="active">
-                  <UserIcon className="h-4 w-4" />
+                  <HugeiconsIcon icon={User02Icon} />
                   {currentActiveRole}
                 </NavItem>
               )}
             </Show>
 
             {/* SHARED PUBLIC LINKS */}
-            <NavItem className="sm:hidden" render={<Link to="/search" />} variant="active">
-              <Search className="h-4 w-4" /> Search
+            <NavItem
+              className="sm:hidden"
+              onClick={closeSheet}
+              render={<Link to="/search" />}
+              variant="active"
+            >
+              <HugeiconsIcon icon={Search01Icon} /> Search
             </NavItem>
 
-            <NavItem className="sm:hidden" render={<Link to="/cart" />} variant="active">
-              <ShoppingCart className="h-4 w-4" /> Shopping cart
+            <NavItem
+              className="sm:hidden"
+              onClick={closeSheet}
+              render={<Link to="/cart" />}
+              variant="active"
+            >
+              <HugeiconsIcon icon={ShoppingCart01Icon} /> Shopping cart
             </NavItem>
 
-            <NavItem render={<Link to="/explore" />} variant="active">
+            <NavItem onClick={closeSheet} render={<Link to="/explore" />} variant="active">
               <Wine className="h-4 w-4" /> Explore Wines
             </NavItem>
 
-            <NavItem render={<Link search={{ isBundle: true }} to="/products" />} variant="active">
-              <Package className="h-4 w-4" /> Bundles
+            <NavItem onClick={closeSheet} render={<Link to="/products" />} variant="active">
+              <HugeiconsIcon icon={Package01Icon} /> Products
             </NavItem>
 
-            <NavItem render={<Link to="/events" />} variant="active">
-              <Calendar className="h-4 w-4" /> Events
+            <NavItem onClick={closeSheet} render={<Link to="/winemakers" />} variant="active">
+              <HugeiconsIcon icon={UserGroupIcon} /> Winemakers
+            </NavItem>
+
+            <NavItem onClick={closeSheet} render={<Link to="/events" />} variant="active">
+              <HugeiconsIcon icon={Calendar01Icon} /> Events
+            </NavItem>
+
+            <NavItem onClick={closeSheet} render={<Link to="/shops" />} variant="active">
+              <HugeiconsIcon icon={Store01Icon} /> Shops
             </NavItem>
 
             <Show when="signed-in">
-              {currentActiveRole === Role.customer && (
-                <NavItem render={<Link to="/orders" />} variant="active">
-                  <Package className="h-4 w-4" /> Order History
-                </NavItem>
-              )}
+              <RoleNavItems
+                closeSheet={closeSheet}
+                firstShopId={firstShopId}
+                role={currentActiveRole}
+                userId={user?.id}
+                winemakerId={winemakerId}
+                winemakerName={winemakerName}
+              />
 
-              {currentActiveRole !== Role.customer && (
-                <>
-                  <NavItem
-                    render={<Link search={{ winemakerId: "me" }} to="/explore" />}
-                    variant="active"
-                  >
-                    <Wine className="h-4 w-4" /> My Wines
-                  </NavItem>
-                  <NavItem
-                    render={<Link search={{ isBundle: true }} to="/products" />}
-                    variant="active"
-                  >
-                    <Package className="h-4 w-4" /> My Bundles
-                  </NavItem>
-                </>
-              )}
+              <NavItem onClick={closeSheet} render={<Link to="/stats" />} variant="active">
+                <HugeiconsIcon icon={ChartBarLineIcon} /> Statistics
+              </NavItem>
             </Show>
 
             <Show when="signed-in">
-              <NavItem className="mt-2" onClick={() => openUserProfile()} variant="muted">
-                <Settings className="h-4 w-4" /> Settings
+              <NavItem
+                className="mt-2"
+                onClick={closeSheet}
+                render={<Link to="/dashboard" />}
+                variant="muted"
+              >
+                <HugeiconsIcon icon={User02Icon} /> Profile Settings
               </NavItem>
             </Show>
           </nav>
@@ -203,19 +238,98 @@ export function Sidebar({ userRoles = [Role.customer], activeRole, onRoleChange 
         <div className="flex-none border-t pt-4 pb-6 px-6 flex flex-col gap-1 bg-background z-10">
           <Button
             className="flex items-center justify-between px-3 py-2 rounded-md text-sm font-medium text-muted-foreground w-full"
+            onClick={toggleTheme}
+            title={`Switch to ${theme === "light" ? "dark" : "light"} mode`}
             variant="ghost"
           >
             Theme
-            <Moon className="h-4 w-4" />
+            <HugeiconsIcon icon={theme === "light" ? Moon01Icon : Sun01Icon} />
           </Button>
 
           <Show when="signed-in">
             <NavItem className="mt-2 w-full text-left" onClick={handleLogout} variant="destructive">
-              <LogOut className="h-4 w-4" /> Log out
+              <HugeiconsIcon icon={LogoutSquare02Icon} /> Log out
             </NavItem>
           </Show>
         </div>
       </SheetContent>
     </Sheet>
   );
+}
+
+interface RoleNavItemsProps {
+  role: Role;
+  closeSheet: () => void;
+  userId?: string;
+  winemakerId?: string;
+  winemakerName?: string;
+  firstShopId?: string;
+}
+
+function RoleNavItems({
+  role,
+  closeSheet,
+  userId,
+  winemakerId,
+  winemakerName,
+  firstShopId,
+}: RoleNavItemsProps) {
+  if (role === Role.customer) {
+    return (
+      <>
+        <NavItem onClick={closeSheet} render={<Link to="/orders" />} variant="active">
+          <HugeiconsIcon icon={Package01Icon} /> Order History
+        </NavItem>
+        <NavItem onClick={closeSheet} render={<Link to="/events" />} variant="active">
+          <HugeiconsIcon icon={Calendar01Icon} /> My Events
+        </NavItem>
+      </>
+    );
+  }
+
+  if (role === Role.winemaker) {
+    return (
+      <>
+        <NavItem
+          onClick={closeSheet}
+          render={<Link search={winemakerId ? { winemakerId } : undefined} to="/explore" />}
+          variant="active"
+        >
+          <Wine className="h-4 w-4" /> My Wines
+        </NavItem>
+        <NavItem
+          onClick={closeSheet}
+          render={<Link search={winemakerName ? { winemakerName } : undefined} to="/events" />}
+          variant="active"
+        >
+          <HugeiconsIcon icon={Calendar01Icon} /> My Events
+        </NavItem>
+      </>
+    );
+  }
+
+  if (role === Role.shopOwner) {
+    return (
+      <>
+        <NavItem
+          onClick={closeSheet}
+          render={<Link search={userId ? { ownerUserId: userId } : undefined} to="/shops" />}
+          variant="active"
+        >
+          <HugeiconsIcon icon={Store01Icon} /> My Shops
+        </NavItem>
+        <NavItem
+          onClick={closeSheet}
+          render={
+            <Link search={firstShopId ? { shopId: firstShopId } : undefined} to="/products" />
+          }
+          variant="active"
+        >
+          <HugeiconsIcon icon={Package01Icon} /> My Products
+        </NavItem>
+      </>
+    );
+  }
+
+  return null;
 }

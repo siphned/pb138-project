@@ -1,12 +1,10 @@
 import { t } from "elysia";
-import { z } from "zod";
+import z from "zod";
 
 /**
  * Request/response schemas for events module.
  * Zod for shared types, TypeBox for Elysia route validation.
  */
-
-// ─── Zod Schemas ──────────────────────────────────────────────────────────
 
 const addressBodySchema = z.object({
   city: z.string().min(1).max(255),
@@ -39,7 +37,9 @@ export const listEventsQuerySchema = z.object({
   from: z.string().datetime().optional(),
   limit: z.number().min(1).max(100).optional(),
   page: z.number().min(1).optional(),
+  q: z.string().max(255).optional(),
   to: z.string().datetime().optional(),
+  winemakerId: z.string().optional(),
   winemakerName: z.string().max(255).optional(),
 });
 
@@ -118,10 +118,6 @@ export const paginatedCommentsResponseSchema = z.object({
   total: z.number(),
 });
 
-// ─── TypeBox Schemas ──────────────────────────────────────────────────────
-
-// ─── Shared sub-schemas ───────────────────────────────────────────────────────
-
 const addressBody = t.Object({
   city: t.String({ maxLength: 255, minLength: 1 }),
   country: t.String({ maxLength: 50, minLength: 1 }),
@@ -129,8 +125,6 @@ const addressBody = t.Object({
   postalCode: t.String({ maxLength: 20, minLength: 1 }),
   street: t.String({ maxLength: 255, minLength: 1 }),
 });
-
-// ─── Request schemas ──────────────────────────────────────────────────────────
 
 export const createEventBody = t.Object({
   address: addressBody,
@@ -155,7 +149,9 @@ export const listEventsQuery = t.Object({
   from: t.Optional(t.String({ format: "date-time" })),
   limit: t.Optional(t.Number({ maximum: 100, minimum: 1 })),
   page: t.Optional(t.Number({ minimum: 1 })),
+  q: t.Optional(t.String({ maxLength: 255 })),
   to: t.Optional(t.String({ format: "date-time" })),
+  winemakerId: t.Optional(t.String()),
   winemakerName: t.Optional(t.String({ maxLength: 255 })),
 });
 
@@ -169,8 +165,6 @@ export const createCommentBody = t.Object({
 });
 
 export const eventParams = t.Object({ id: t.String() });
-
-// ─── Response schemas ─────────────────────────────────────────────────────────
 
 export const eventResponse = t.Object({
   address: t.Nullable(
@@ -234,4 +228,15 @@ export const paginatedCommentsResponse = t.Object({
   limit: t.Number(),
   page: t.Number(),
   total: t.Number(),
+});
+
+export const invitationResponse = t.Object({
+  createdAt: t.Date(),
+  deletedAt: t.Nullable(t.Date()),
+  email: t.String(),
+  eventId: t.String(),
+  expiresAt: t.Date(),
+  id: t.String(),
+  token: t.String(),
+  updatedAt: t.Nullable(t.Date()),
 });

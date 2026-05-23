@@ -7,7 +7,31 @@
       "Bash(git add *)",
       "Bash(git commit *)",
       "Bash(git *)",
-      "Bash(bun x *)"
+      "Bash(bun x *)",
+      "Bash(awk '{print $2}')",
+      "Bash(xargs '-I{}' sh -c 'lines=$\\(git diff HEAD -- \"{}\" 2>/dev/null | grep -c \"^[+-]\"\\); echo \"$lines  {}\"')",
+      "Bash(bunx tsc *)",
+      "Bash(awk -F'\\(' '{print $1}')",
+      "Bash(xargs '-I{}' sh -c 'd=$\\(git diff HEAD -- \"{}\" 2>/dev/null | grep -c \"^[+-]\"\\); if [ \"$d\" -gt 0 ]; then echo \"$d {}\"; fi')",
+      "Bash(grep -E 'search\\\\.tsx|button\\\\.tsx|winemakers\\\\.\\\\$id')",
+      "Bash(bun install *)",
+      "Bash(xargs '-I{}' sh -c 'd=$\\(git diff HEAD -- \"{}\" 2>/dev/null | grep -c \"^[+-]\"\\); s=$\\(git diff --cached HEAD -- \"{}\" 2>/dev/null | grep -c \"^[+-]\"\\); if [ \"$d\" -gt 0 ] || [ \"$s\" -gt 0 ]; then echo \"$\\(\\(d+s\\)\\) {}\"; fi')",
+      "Bash(grep -E 'button\\\\.tsx|SearchSection|WineDetailsCard|WinemakerDetailsCard|ProductDetailsCard|ShopProductsSection|search\\\\.tsx|winemakers\\\\.\\\\$id')",
+      "Bash(awk -F'lint/' '{print $2}')",
+      "Bash(awk '{print $1}')",
+      "Bash(awk -F'[\\(\\):]' '{print $1}')",
+      "Bash(bun -e 'import\\(\"zod\"\\).then\\(m => console.log\\(\"zod loaded:\", Object.keys\\(m\\).slice\\(0,5\\)\\)\\)')",
+      "Bash(bun -e 'import\\(\"zod\"\\).then\\(m => console.log\\(\"z type:\", typeof m.z, \"z.object:\", typeof m.z?.object, \"z.enum:\", typeof m.z?.enum\\)\\)')",
+      "Bash(bun -e 'const m = await import\\(\"zod\"\\); console.log\\(\"keys:\", Object.keys\\(m\\).filter\\(k => k === \"z\" || k === \"object\" || k === \"enum\"\\).join\\(\",\"\\)\\)')",
+      "Bash(awk -F\"vitest@\" '{print $2}')",
+      "Bash(awk -F\"+\" '{print $1}')",
+      "Bash(bun pm *)",
+      "Bash(bunx vitest *)",
+      "Bash(bun -e 'import z from \"zod\"; console.log\\(\"default works:\", typeof z?.object\\)')",
+      "Bash(timeout 15 bunx vite --port 5179)",
+      "Bash(find ../../node_modules/.bun/@tanstack+router-generator* -name \"package.json\")",
+      "Bash(xargs dirname)",
+      "Bash(find node_modules/.bun/@tanstack+router-plugin@1.168.2* -name \"router-generator\")"
     ]
   }
 }

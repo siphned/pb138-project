@@ -1,9 +1,10 @@
+import { ArrowRight02Icon } from "@hugeicons/core-free-icons";
+import { HugeiconsIcon } from "@hugeicons/react";
 import { Link } from "@tanstack/react-router";
-import { ArrowRight } from "lucide-react";
 import { BundleCard } from "@/components/catalog/BundleCard";
+import { ProductCard } from "@/components/catalog/ProductCard";
 import { buttonVariants } from "@/components/ui/button";
 import { useGetProducts } from "@/generated/hooks/useGetProducts";
-import { WineCard } from "./WineCard";
 
 interface ExploreSectionProps {
   mode: "wines" | "bundles";
@@ -16,8 +17,13 @@ export function ExploreSection({ mode }: ExploreSectionProps) {
     .slice(0, 8);
 
   const title = mode === "bundles" ? "Featured Bundles" : "Featured Wines";
-  const linkTo = mode === "bundles" ? "/bundles" : "/wines";
+  const linkTo = "/products" as const;
   const linkLabel = mode === "bundles" ? "See all bundles" : "See all wines";
+  const linkSearch = {
+    page: 1,
+    sort: "newest" as const,
+    ...(mode === "bundles" ? ({ isBundle: true } as const) : {}),
+  };
 
   if (isLoading) {
     return (
@@ -39,7 +45,7 @@ export function ExploreSection({ mode }: ExploreSectionProps) {
     return (
       <section aria-label={title} className="space-y-4">
         <h2 className="font-heading text-2xl font-bold">{title}</h2>
-        <p className="text-sm text-muted-foreground italic">
+        <p className="italic text-muted-foreground text-sm">
           No {mode} available to feature right now.
         </p>
       </section>
@@ -52,10 +58,10 @@ export function ExploreSection({ mode }: ExploreSectionProps) {
         <h2 className="font-heading text-2xl font-bold">{title}</h2>
         <Link
           className={buttonVariants({ size: "sm", variant: "ghost" })}
-          search={{ page: 1, sort: "newest" }}
+          search={linkSearch}
           to={linkTo}
         >
-          {linkLabel} <ArrowRight className="ml-1 h-4 w-4" />
+          {linkLabel} <HugeiconsIcon className="ml-1 h-4 w-4" icon={ArrowRight02Icon} />
         </Link>
       </div>
       <div className="flex gap-4 overflow-x-auto p-2 [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
@@ -66,7 +72,7 @@ export function ExploreSection({ mode }: ExploreSectionProps) {
             </div>
           ) : (
             <div className="w-70 shrink-0" key={product.id}>
-              <WineCard product={product} />
+              <ProductCard product={product} />
             </div>
           )
         )}

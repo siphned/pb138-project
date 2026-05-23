@@ -39,10 +39,18 @@ const makeFile = (type = "image/jpeg") => new File(["content"], "test.jpg", { ty
 
 beforeEach(() => {
   vi.clearAllMocks();
-  vi.stubGlobal("Bun", { write: vi.fn().mockResolvedValue(0) });
+  // In the Bun runtime `Bun` is a non-configurable global so vi.stubGlobal
+  // throws; spy directly. In Node (vitest environment: "node") `Bun` doesn't
+  // exist at all, so stub the global instead.
+  if (typeof Bun !== "undefined") {
+    vi.spyOn(Bun, "write").mockResolvedValue(0);
+  } else {
+    vi.stubGlobal("Bun", { write: vi.fn().mockResolvedValue(0) });
+  }
 });
 
 afterEach(() => {
+  vi.restoreAllMocks();
   vi.unstubAllGlobals();
 });
 

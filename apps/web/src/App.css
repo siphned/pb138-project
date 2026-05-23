@@ -84,6 +84,7 @@
   border-radius: 5px;
   transition: border-color 0.3s;
 
+  /* biome-ignore lint/style/noDescendingSpecificity: specificity reorder would break nesting */
   &:hover {
     border-color: var(--accent-border);
   }

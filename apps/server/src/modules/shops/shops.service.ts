@@ -51,8 +51,17 @@ export class ShopsService {
     return shopsRepo.findAllByOwnerUserId(db, ownerUserId) as Promise<ShopWithAddress[]>;
   }
 
-  listShops(): Promise<ShopWithAddress[]> {
-    return shopsRepo.findAll(db);
+  listShops(
+    filters: { q?: string; city?: string; ownerUserId?: string } = {}
+  ): Promise<ShopWithAddress[]> {
+    return shopsRepo.findAll(db, filters);
+  }
+
+  async deleteShop(shopId: string, requesterId: string): Promise<void> {
+    const shop = await shopsRepo.findById(db, shopId);
+    if (!shop) throw new ShopNotFoundError(shopId);
+    if (shop.ownerUserId !== requesterId) throw new ForbiddenShopActionError();
+    await shopsRepo.softDeleteById(db, shopId);
   }
 
   async updateShop(

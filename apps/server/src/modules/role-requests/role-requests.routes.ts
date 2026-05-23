@@ -1,4 +1,5 @@
 import { Elysia, status, t } from "elysia";
+import { errorResponse } from "../../utils/error-plugin";
 import { authPlugin } from "../auth";
 import { roleRequestsService } from "./role-requests.service";
 
@@ -26,22 +27,14 @@ export const roleRequestsRoutes = new Elysia({
 
   .post(
     "/",
-    // biome-ignore lint/suspicious/noExplicitAny: complex elysia type inference
-    async ({ dbUser, body }: { dbUser: { id: string }; body: any }) => {
-      try {
-        const result = await roleRequestsService.submitRequest(
-          dbUser.id,
-          body.type,
-          body.businessName,
-          body.details
-        );
-        return status(201, result);
-      } catch (e: unknown) {
-        if (e instanceof Error && e.message === "ALREADY_HAS_PENDING_REQUEST") {
-          return status(409, "You already have a pending request for this role");
-        }
-        throw e;
-      }
+    async ({ dbUser, body }) => {
+      const result = await roleRequestsService.submitRequest(
+        dbUser.id,
+        body.type,
+        body.businessName,
+        body.details
+      );
+      return status(201, result);
     },
     {
       body: roleRequestBody,
@@ -51,38 +44,44 @@ export const roleRequestsRoutes = new Elysia({
         summary: "Submit a role request",
       },
       requireAuth: true,
-      response: { 201: roleRequestResponse, 409: t.String() },
+      response: { 201: roleRequestResponse, 409: errorResponse },
     }
   )
 
+  .get("/", () => roleRequestsService.listPending(), {
+    detail: {
+      security: [{ bearerAuth: [] }],
+      summary: "List pending role requests",
+    },
+    requireRoles: ["admin"],
+    response: { 200: t.Array(roleRequestResponse) },
+  })
+
   .get(
-    "/",
-    async () => {
-      return await roleRequestsService.listPending();
+    "/:id",
+    async ({ params }) => {
+      try {
+        return await roleRequestsService.getById(params.id);
+      } catch (e: unknown) {
+        if (e instanceof Error && e.message === "NOT_FOUND")
+          return status(404, "Request not found");
+        throw e;
+      }
     },
     {
       detail: {
         security: [{ bearerAuth: [] }],
-        summary: "List pending role requests",
+        summary: "Get a role request by ID",
       },
+      params: t.Object({ id: t.String() }),
       requireRoles: ["admin"],
-      response: { 200: t.Array(roleRequestResponse) },
+      response: { 200: roleRequestResponse, 404: t.String() },
     }
   )
 
   .patch(
     "/:id/approve",
-    async ({ dbUser, params }: { dbUser: { id: string }; params: { id: string } }) => {
-      try {
-        return await roleRequestsService.approve(params.id, dbUser.id);
-      } catch (e: unknown) {
-        if (e instanceof Error) {
-          if (e.message === "NOT_FOUND") return status(404, "Request not found");
-          if (e.message === "ALREADY_RESPONDED") return status(400, "Request already processed");
-        }
-        throw e;
-      }
-    },
+    ({ dbUser, params }) => roleRequestsService.approve(params.id, dbUser.id),
     {
       detail: {
         security: [{ bearerAuth: [] }],
@@ -90,30 +89,16 @@ export const roleRequestsRoutes = new Elysia({
       },
       params: t.Object({ id: t.String() }),
       requireRoles: ["admin"],
-      response: { 200: roleRequestResponse, 400: t.String(), 404: t.String() },
+      response: { 200: roleRequestResponse, 404: errorResponse, 409: errorResponse },
     }
   )
 
-  .patch(
-    "/:id/reject",
-    async ({ dbUser, params }: { dbUser: { id: string }; params: { id: string } }) => {
-      try {
-        return await roleRequestsService.reject(params.id, dbUser.id);
-      } catch (e: unknown) {
-        if (e instanceof Error) {
-          if (e.message === "NOT_FOUND") return status(404, "Request not found");
-          if (e.message === "ALREADY_RESPONDED") return status(400, "Request already processed");
-        }
-        throw e;
-      }
+  .patch("/:id/reject", ({ dbUser, params }) => roleRequestsService.reject(params.id, dbUser.id), {
+    detail: {
+      security: [{ bearerAuth: [] }],
+      summary: "Reject a role request",
     },
-    {
-      detail: {
-        security: [{ bearerAuth: [] }],
-        summary: "Reject a role request",
-      },
-      params: t.Object({ id: t.String() }),
-      requireRoles: ["admin"],
-      response: { 200: roleRequestResponse, 400: t.String(), 404: t.String() },
-    }
-  );
+    params: t.Object({ id: t.String() }),
+    requireRoles: ["admin"],
+    response: { 200: roleRequestResponse, 404: errorResponse, 409: errorResponse },
+  });

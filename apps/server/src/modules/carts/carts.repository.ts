@@ -91,22 +91,16 @@ export async function removeItem(db: Database, cartId: string, productId: string
     .where(and(eq(cartItems.cartId, cartId), eq(cartItems.productId, productId)));
 }
 
-export async function updateItemQuantity(
+export async function setItemQuantity(
   db: Database,
   cartId: string,
   productId: string,
   quantity: number
 ): Promise<void> {
-  if (quantity <= 0) {
-    await db
-      .delete(cartItems)
-      .where(and(eq(cartItems.cartId, cartId), eq(cartItems.productId, productId)));
-  } else {
-    await db
-      .update(cartItems)
-      .set({ quantity, updatedAt: new Date() })
-      .where(and(eq(cartItems.cartId, cartId), eq(cartItems.productId, productId)));
-  }
+  await db
+    .update(cartItems)
+    .set({ quantity, updatedAt: new Date() })
+    .where(and(eq(cartItems.cartId, cartId), eq(cartItems.productId, productId)));
 }
 
 export async function getCartItems(db: Database, cartId: string) {

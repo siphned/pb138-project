@@ -1,5 +1,7 @@
+import { ArrowUpRight01Icon } from "@hugeicons/core-free-icons";
+import { HugeiconsIcon } from "@hugeicons/react";
 import { useQuery } from "@tanstack/react-query";
-import { ExternalLink } from "lucide-react";
+import { Skeleton } from "@/components/ui/skeleton";
 import type { GetShopsById200 } from "@/generated/types/GetShopsById";
 
 interface ShopMapEmbedProps {
@@ -40,7 +42,7 @@ export function ShopMapEmbed({ address }: ShopMapEmbedProps) {
           rel="noopener noreferrer"
           target="_blank"
         >
-          <ExternalLink className="h-4 w-4" />
+          <HugeiconsIcon className="h-4 w-4" icon={ArrowUpRight01Icon} />
           View location on OpenStreetMap
         </a>
       </div>
@@ -48,7 +50,7 @@ export function ShopMapEmbed({ address }: ShopMapEmbedProps) {
   }
 
   if (!coords) {
-    return <div className="h-64 w-full animate-pulse rounded-2xl bg-secondary/20" />;
+    return <Skeleton className="h-64 w-full rounded-2xl" />;
   }
 
   const delta = 0.01;

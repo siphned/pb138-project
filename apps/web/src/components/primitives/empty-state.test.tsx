@@ -3,14 +3,14 @@ import { describe, expect, it } from "vitest";
 import { EmptyState } from "./empty-state";
 
 describe("EmptyState", () => {
-  it("renders default title and message", () => {
+  it("renders default title and description", () => {
     render(<EmptyState />);
     expect(screen.getByText("Nothing here yet")).toBeInTheDocument();
     expect(screen.getByText("There's nothing to show.")).toBeInTheDocument();
   });
 
-  it("renders custom title and message", () => {
-    render(<EmptyState message="Add one to get started" title="No wines" />);
+  it("renders custom title and description", () => {
+    render(<EmptyState description="Add one to get started" title="No wines" />);
     expect(screen.getByText("No wines")).toBeInTheDocument();
     expect(screen.getByText("Add one to get started")).toBeInTheDocument();
   });

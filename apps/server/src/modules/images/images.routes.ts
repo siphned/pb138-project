@@ -1,13 +1,16 @@
 import { basename } from "node:path";
 import { fileURLToPath } from "node:url";
 import { Elysia, status, t } from "elysia";
-import { db } from "../../db";
 import { errorResponse } from "../../utils/error-plugin";
 import type { AppRole } from "../auth";
 import { authPlugin } from "../auth";
 import type { EntityType } from "./images.repository";
-import * as imagesRepo from "./images.repository";
-import { imageResponse, uploadImageBody, VALID_ENTITY_TYPES } from "./images.schema";
+import {
+  entityTypeSchema,
+  imageResponse,
+  uploadImageBody,
+  VALID_ENTITY_TYPES,
+} from "./images.schema";
 import { imagesService } from "./images.service";
 
 const UPLOADS_DIR = fileURLToPath(new URL("../../../uploads", import.meta.url));
@@ -81,7 +84,7 @@ function buildImageRoutes(entityPlural: string, entityType: EntityType) {
           params.id,
           params.imageId
         );
-        return status(204, null);
+        return status(204, "");
       },
       {
         detail: {
@@ -106,15 +109,14 @@ export const imagesRoutes = new Elysia()
       }
       const safeName = basename(params.filename);
       const url = `/uploads/${params.entityType}/${safeName}`;
-      const record = await imagesRepo.findByUrl(db, url);
-      if (!record) return status(404, "Not found");
+      if (!(await imagesService.existsByUrl(url))) return status(404, "Not found");
       const file = Bun.file(`${UPLOADS_DIR}/${params.entityType}/${safeName}`);
       if (!(await file.exists())) return status(404, "Not found");
       return file;
     },
     {
       detail: { summary: "Serve uploaded image file", tags: ["images"] },
-      params: t.Object({ entityType: t.String(), filename: t.String() }),
+      params: t.Object({ entityType: entityTypeSchema, filename: t.String() }),
     }
   )
   .use(buildImageRoutes("wines", "wine"))

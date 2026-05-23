@@ -1,6 +1,6 @@
 import { createClerkClient } from "@clerk/backend";
 import type { Address, User } from "@repo/shared/schemas";
-import { z } from "zod";
+import z from "zod";
 import { db } from "../../db";
 import { logger } from "../../utils/logger";
 import * as userRolesRepo from "./user-roles.repository";
@@ -51,6 +51,13 @@ export class UsersService {
     return usersRepo.findById(db, id);
   }
 
+  async getUserWithRoles(userId: string): Promise<User & { roles: string[] }> {
+    const user = await usersRepo.findById(db, userId);
+    if (!user) throw new UserNotFoundError(userId);
+    const roles = await userRolesRepo.findByUserId(db, userId);
+    return { ...user, roles };
+  }
+
   /**
    * Returns user with their current roles from DB.
    * Lazily syncs with Clerk if user doesn't exist locally.
@@ -69,10 +76,8 @@ export class UsersService {
     const existing = await usersRepo.findByClerkId(db, clerkId);
     if (existing) return existing;
 
-    // 1. Fetch external profile
     const profile = await this.fetchExternalProfile(clerkId);
 
-    // 2. Persist local user record
     const user = await usersRepo.upsert(db, {
       clerkId,
       email: profile.email,
@@ -80,7 +85,6 @@ export class UsersService {
       lname: profile.lname,
     });
 
-    // 3. Sync roles to DB
     await this.syncRolesToDatabase(user.id, profile.roles);
 
     return user;
@@ -135,8 +139,7 @@ export class UsersService {
   async deleteUserFromWebhook(clerkId: string): Promise<void> {
     const user = await usersRepo.findByClerkId(db, clerkId);
     if (!user) return;
-    // biome-ignore lint/suspicious/noExplicitAny: Temporary cast for monorepo sync
-    await usersRepo.updateById(db, user.id, { deletedAt: new Date(), status: "deleted" } as any);
+    await usersRepo.updateById(db, user.id, { deletedAt: new Date(), status: "deleted" });
   }
 
   updateProfileById(userId: string, data: { fname?: string; lname?: string }): Promise<User> {

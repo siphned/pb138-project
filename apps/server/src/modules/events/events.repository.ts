@@ -1,7 +1,13 @@
-import type { Event, EventComment, EventRegistration } from "@repo/shared/schemas";
+import type {
+  Event,
+  EventComment,
+  EventInvitationModel,
+  EventRegistration,
+} from "@repo/shared/schemas";
 import {
   addresses,
   eventComments,
+  eventInvitations,
   eventRegistrations,
   events,
   winemakers,
@@ -27,6 +33,7 @@ export type CommentWithUser = EventComment & {
 type RepoFilters = {
   status: "pending" | "approved" | "rejected";
   from?: Date;
+  q?: string;
   to?: Date;
   winemakerIds?: string[];
 };
@@ -48,12 +55,14 @@ export async function countComments(db: Database, eventId: string): Promise<numb
 }
 
 export async function countMany(db: Database, filters: RepoFilters): Promise<number> {
+  const qCond = filters.q ? ilike(events.name, `%${filters.q}%`) : undefined;
   const conditions = [
     isNull(events.deletedAt),
     eq(events.status, filters.status),
     filters.from ? gte(events.startTime, filters.from) : undefined,
     filters.to ? lte(events.startTime, filters.to) : undefined,
     filters.winemakerIds ? inArray(events.winemakerId, filters.winemakerIds) : undefined,
+    qCond,
   ].filter((c): c is NonNullable<typeof c> => c !== undefined);
 
   const [result] = await db
@@ -190,12 +199,14 @@ export async function findMany(
   filters: RepoFilters,
   pagination: { limit: number; offset: number }
 ): Promise<EventWithDetails[]> {
+  const qCond = filters.q ? ilike(events.name, `%${filters.q}%`) : undefined;
   const conditions = [
     isNull(events.deletedAt),
     eq(events.status, filters.status),
     filters.from ? gte(events.startTime, filters.from) : undefined,
     filters.to ? lte(events.startTime, filters.to) : undefined,
     filters.winemakerIds ? inArray(events.winemakerId, filters.winemakerIds) : undefined,
+    qCond,
   ].filter((c): c is NonNullable<typeof c> => c !== undefined);
 
   const rows = await db.query.events.findMany({
@@ -235,6 +246,15 @@ export async function resolveWinemakerIdsByName(db: Database, name: string): Pro
     where: and(ilike(winemakers.name, `%${name}%`), isNull(winemakers.deletedAt)),
   });
   return rows.map((r) => r.id);
+}
+
+export async function findInvitationsByEventId(
+  db: Database,
+  eventId: string
+): Promise<EventInvitationModel[]> {
+  return db.query.eventInvitations.findMany({
+    where: and(eq(eventInvitations.eventId, eventId), isNull(eventInvitations.deletedAt)),
+  });
 }
 
 export async function softDelete(db: Database, id: string): Promise<void> {

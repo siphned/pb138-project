@@ -1,6 +1,6 @@
 import type { Address, NewAddress, NewUser, User } from "@repo/shared/schemas";
 import { addresses, users } from "@repo/shared/schemas";
-import { eq } from "drizzle-orm";
+import { and, eq, isNull } from "drizzle-orm";
 import type { Database } from "../../db";
 
 export async function create(db: Database, data: NewUser): Promise<User> {
@@ -17,19 +17,19 @@ export async function createAddress(db: Database, data: NewAddress): Promise<Add
 
 export async function findAddressById(db: Database, id: string): Promise<Address | undefined> {
   return await db.query.addresses.findFirst({
-    where: eq(addresses.id, id),
+    where: and(eq(addresses.id, id), isNull(addresses.deletedAt)),
   });
 }
 
 export async function findByClerkId(db: Database, clerkId: string): Promise<User | undefined> {
   return await db.query.users.findFirst({
-    where: eq(users.clerkId, clerkId),
+    where: and(eq(users.clerkId, clerkId), isNull(users.deletedAt)),
   });
 }
 
 export async function findById(db: Database, id: string): Promise<User | undefined> {
   return await db.query.users.findFirst({
-    where: eq(users.id, id),
+    where: and(eq(users.id, id), isNull(users.deletedAt)),
   });
 }
 
