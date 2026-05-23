@@ -67,11 +67,11 @@ export function CustomerOrderHistory() {
   const getStatusBadge = (status: string) => {
     switch (status.toLowerCase()) {
       case "delivered":
-        return "bg-[#E8F5E9] text-[#2E7D32] hover:bg-[#E8F5E9]";
+        return "bg-green-50 text-green-800 hover:bg-green-50";
       case "processing":
-        return "bg-[#FFF3E0] text-[#EF6C00] hover:bg-[#FFF3E0]";
+        return "bg-orange-50 text-orange-600 hover:bg-orange-50";
       case "cancelled":
-        return "bg-[#FFEBEE] text-[#C62828] hover:bg-[#FFEBEE]";
+        return "bg-red-50 text-red-700 hover:bg-red-50";
       default:
         return "bg-muted text-muted-foreground";
     }

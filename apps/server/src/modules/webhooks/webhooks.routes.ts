@@ -34,8 +34,7 @@ export const webhooksRoutes = new Elysia({ prefix: "/api/webhooks" }).post(
       const eventType = evt.type;
 
       if (eventType === "user.created" || eventType === "user.updated") {
-        // biome-ignore lint/suspicious/noExplicitAny: Clerk webhook data is dynamic
-        await usersService.syncUserFromWebhook(evt.data as any);
+        await usersService.syncUserFromWebhook(evt.data);
       } else if (eventType === "user.deleted") {
         await usersService.deleteUserFromWebhook(evt.data.id);
       }

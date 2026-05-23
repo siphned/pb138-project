@@ -41,7 +41,7 @@ createRoot(document.getElementById("root")!).render(
           <UserProvider>
             <AppErrorBoundary
               fallback={
-                <div className="flex flex-col items-center justify-center min-h-screen p-8 text-center bg-background">
+                <div className="flex flex-col items-center justify-center min-h-dvh p-8 text-center bg-background">
                   <h1 className="text-2xl font-bold text-foreground mb-4">Something went wrong</h1>
                   <p className="text-muted-foreground mb-8">
                     An unexpected error occurred. Please try reloading the application.
