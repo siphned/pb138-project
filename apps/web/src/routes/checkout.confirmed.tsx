@@ -5,10 +5,11 @@ import { ErrorState } from "@/components/primitives/error-state";
 import { LoadingState } from "@/components/primitives/loading-state";
 import { Section } from "@/components/primitives/section";
 import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
+import { buttonVariants } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
 import { useGetOrdersById } from "@/generated/hooks/useGetOrdersById";
+import { cn } from "@/lib/utils";
 
 export const Route = createFileRoute("/checkout/confirmed")({
   component: CheckoutConfirmedPage,
@@ -54,9 +55,9 @@ function CheckoutConfirmedPage() {
           onRetry={() => refetch()}
           title="Order not found"
         />
-        <Button asChild className="w-full" variant="outline">
-          <Link to="/explore">Back to shopping</Link>
-        </Button>
+        <Link className={cn(buttonVariants({ variant: "outline" }), "w-full")} to="/explore">
+          Back to shopping
+        </Link>
       </div>
     );
   }
@@ -175,14 +176,16 @@ function CheckoutConfirmedPage() {
       </Section>
 
       <div className="flex flex-col gap-3 sm:flex-row">
-        <Button asChild className="flex-1" variant="outline">
-          <Link params={{ id: orderId }} to="/orders/$id">
-            View order
-          </Link>
-        </Button>
-        <Button asChild className="flex-1">
-          <Link to="/explore">Back to shopping</Link>
-        </Button>
+        <Link
+          className={cn(buttonVariants({ variant: "outline" }), "flex-1")}
+          params={{ id: orderId }}
+          to="/orders/$id"
+        >
+          View order
+        </Link>
+        <Link className={cn(buttonVariants(), "flex-1")} to="/explore">
+          Back to shopping
+        </Link>
       </div>
     </div>
   );
