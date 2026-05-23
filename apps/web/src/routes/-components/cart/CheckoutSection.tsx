@@ -8,7 +8,7 @@ import { getCartsQueryKey } from "@/generated/hooks/useGetCarts";
 import { useGetUsersMeAddresses } from "@/generated/hooks/useGetUsersMeAddresses";
 import { usePostOrdersCheckout } from "@/generated/hooks/usePostOrdersCheckout";
 import type { GetCarts200 } from "@/generated/types/GetCarts";
-import { AddressForm, type AddressFormValues } from "./AddressForm";
+import { AddressForm, type AddressFormValues } from "@/components/forms/AddressForm";
 import { CartSummary } from "./CartSummary";
 
 interface CheckoutSectionProps {

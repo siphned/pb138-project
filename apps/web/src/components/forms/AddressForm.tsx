@@ -12,7 +12,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { DeliveryMethodToggle } from "./DeliveryMethodToggle";
+import { DeliveryMethodToggle } from "@/routes/-components/cart/DeliveryMethodToggle";
 
 export const addressFormSchema = z
   .object({
