@@ -1,14 +1,23 @@
 import type { Order } from "@repo/shared/schemas";
 import { addresses } from "@repo/shared/schemas";
-import { sql } from "drizzle-orm";
 import { type Database, db } from "../../db";
 import { logger } from "../../utils/logger";
+import type { CartWithItems } from "../carts/carts.repository";
 import { cartsService } from "../carts/carts.service";
 import { emailService } from "../email/email.service";
 import * as productsRepo from "../products/products.repository";
+import * as shopsRepo from "../shops/shops.repository";
 import * as usersRepo from "../users/users.repository";
 import type { CreateOrderItem, OrderWithItems } from "./orders.repository";
 import * as ordersRepo from "./orders.repository";
+
+const VALID_TRANSITIONS: Record<string, string[]> = {
+  cancelled: [],
+  confirmed: ["shipped", "cancelled"],
+  delivered: [],
+  pending: ["confirmed", "cancelled"],
+  shipped: ["delivered", "cancelled"],
+};
 
 export interface CheckoutData {
   guestEmail?: string;
@@ -94,8 +103,7 @@ export class OrdersService {
     { userId, sessionId }: { userId?: string; sessionId?: string },
     data: CheckoutData
   ): Promise<Order> {
-    // biome-ignore lint/suspicious/noExplicitAny: complex cart type
-    let cart: any = null;
+    let cart: CartWithItems | undefined;
     if (userId) {
       cart = await cartsService.getCartForUser(userId);
     } else if (sessionId) {
@@ -154,18 +162,47 @@ export class OrdersService {
     return order;
   }
 
-  async getOrder(id: string, userId: string): Promise<OrderWithItems> {
+  async getOrder(id: string, userId: string, isAdmin = false): Promise<OrderWithItems> {
     const order = await ordersRepo.findById(db, id);
     if (!order) throw new Error("NOT_FOUND");
-    if (order.userId !== userId) throw new Error("FORBIDDEN");
+    if (!isAdmin && order.userId !== userId) throw new Error("FORBIDDEN");
     return order;
   }
 
-  async updateStatus(orderId: string, _userId: string, status: Order["status"]): Promise<Order> {
+  async listForUser(userId: string): Promise<Order[]> {
+    return ordersRepo.listForUser(db, userId);
+  }
+
+  async listForShop(shopId: string, requesterId: string, isAdmin: boolean): Promise<Order[]> {
+    if (!isAdmin) {
+      const shop = await shopsRepo.findById(db, shopId);
+      if (!shop) throw new Error("NOT_FOUND");
+      if (shop.ownerUserId !== requesterId) throw new Error("FORBIDDEN");
+    }
+    const rows = await ordersRepo.listForShop(db, shopId);
+    return rows.map((r) => r.order);
+  }
+
+  async updateStatus(
+    orderId: string,
+    userId: string,
+    newStatus: Order["status"],
+    isAdmin: boolean
+  ): Promise<Order> {
     const order = await ordersRepo.findById(db, orderId);
     if (!order) throw new Error("NOT_FOUND");
 
-    const updated = await ordersRepo.updateStatus(db, orderId, status);
+    const allowed = VALID_TRANSITIONS[order.status] ?? [];
+    if (!allowed.includes(newStatus)) throw new Error("INVALID_TRANSITION");
+
+    if (!isAdmin) {
+      const userShops = await shopsRepo.findAllByOwnerUserId(db, userId);
+      const userShopIds = new Set(userShops.map((s) => s.id));
+      const ownsItem = order.items.some((item) => userShopIds.has(item.shopId));
+      if (!ownsItem) throw new Error("FORBIDDEN");
+    }
+
+    const updated = await ordersRepo.updateStatus(db, orderId, newStatus);
 
     if (order.userId) {
       const user = await usersRepo.findById(db, order.userId);
@@ -193,8 +230,7 @@ export class OrdersService {
     return updated;
   }
 
-  // biome-ignore lint/suspicious/noExplicitAny: complex cart type
-  private validateAndProcessCart(cart: any) {
+  private validateAndProcessCart(cart: CartWithItems) {
     const items: CreateOrderItem[] = [];
     let subtotal = 0;
 
@@ -235,11 +271,7 @@ export class OrdersService {
         if (currentWineQty === undefined || currentWineQty < totalWineNeeded) {
           throw new Error("INSUFFICIENT_STOCK");
         }
-        await productsRepo.updateWineQuantity(
-          tx,
-          pw.wineId,
-          sql`${sql.raw("quantity")} - ${totalWineNeeded}`
-        );
+        await productsRepo.updateWineQuantity(tx, pw.wineId, -totalWineNeeded);
       }
     }
   }

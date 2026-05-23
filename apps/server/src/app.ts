@@ -12,6 +12,7 @@ import { productsRoutes, shopProductsRoutes } from "./modules/products";
 import { reviewsRoutes } from "./modules/reviews";
 import { roleRequestsRoutes } from "./modules/role-requests";
 import { shopsRoutes } from "./modules/shops";
+import { statsRoutes } from "./modules/stats";
 import { supplyAgreementsRoutes } from "./modules/supply-agreements";
 import { usersRoutes } from "./modules/users";
 import { webhooksRoutes } from "./modules/webhooks";
@@ -57,6 +58,7 @@ export const app = new Elysia()
           { description: "Shopping cart management for guests and users", name: "carts" },
           { description: "Order placement and history", name: "orders" },
           { description: "Product and winemaker reviews and ratings", name: "reviews" },
+          { description: "Role-scoped aggregate statistics", name: "stats" },
           { description: "Platform administration and moderation", name: "admin" },
           { description: "Anonymous session management", name: "guest-sessions" },
           { description: "B2B supply relationship management", name: "supply-agreements" },
@@ -82,5 +84,6 @@ export const app = new Elysia()
   .use(guestSessionsRoutes)
   .use(supplyAgreementsRoutes)
   .use(reviewsRoutes)
+  .use(statsRoutes)
   .use(adminRoutes)
   .use(imagesRoutes);

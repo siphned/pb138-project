@@ -1,8 +1,14 @@
+import { ForbiddenError } from "@repo/shared";
 import type { SupplyAgreement } from "@repo/shared/schemas";
 import { db } from "../../db";
 import { ForbiddenShopActionError } from "../shops/shops.errors";
 import * as shopsRepo from "../shops/shops.repository";
 import * as winemakersRepo from "../winemakers/winemakers.repository";
+import {
+  AlreadyRespondedError,
+  NotAWinemakerError,
+  SupplyAgreementNotFoundError,
+} from "./supply-agreements.errors";
 import * as supplyAgreementsRepo from "./supply-agreements.repository";
 
 export class SupplyAgreementsService {
@@ -35,9 +41,7 @@ export class SupplyAgreementsService {
 
   async listForWinemaker(userId: string): Promise<SupplyAgreement[]> {
     const winemaker = await winemakersRepo.findByUserId(db, userId);
-    if (!winemaker) {
-      throw new Error("NOT_A_WINEMAKER");
-    }
+    if (!winemaker) throw new NotAWinemakerError();
 
     return supplyAgreementsRepo.listForWinemaker(db, winemaker.id);
   }
@@ -48,19 +52,15 @@ export class SupplyAgreementsService {
     status: "approved" | "rejected"
   ): Promise<SupplyAgreement> {
     const agreement = await supplyAgreementsRepo.findById(db, agreementId);
-    if (!agreement) throw new Error("NOT_FOUND");
+    if (!agreement) throw new SupplyAgreementNotFoundError();
 
     const winemaker = await winemakersRepo.findById(db, agreement.winemakerId);
-    if (!winemaker || winemaker.userId !== userId) {
-      throw new Error("FORBIDDEN");
-    }
+    if (!winemaker || winemaker.userId !== userId) throw new ForbiddenError();
 
-    if (agreement.status !== "pending") {
-      throw new Error("ALREADY_RESPONDED");
-    }
+    if (agreement.status !== "pending") throw new AlreadyRespondedError();
 
     const updated = await supplyAgreementsRepo.updateStatus(db, agreementId, status);
-    if (!updated) throw new Error("NOT_FOUND");
+    if (!updated) throw new SupplyAgreementNotFoundError();
 
     return updated;
   }

@@ -6,8 +6,6 @@ import z from "zod";
  * Zod for shared types, TypeBox for Elysia route validation.
  */
 
-// ─── Zod Schemas (for shared types + OpenAPI) ───────────────────────────────
-
 export const addRegularBodySchema = z.object({
   dow: z.number().int().min(0).max(6),
   endTime: z.string().regex(/^([01]\d|2[0-3]):[0-5]\d$/),
@@ -53,8 +51,6 @@ export const getAvailabilityResponseSchema = z.object({
   exceptions: z.array(exceptionResponseSchema),
   regular: z.array(regularResponseSchema),
 });
-
-// ─── TypeBox Schemas (for Elysia routes) ──────────────────────────────────
 
 export const addRegularBody = t.Object({
   dow: t.Integer({ maximum: 6, minimum: 0 }),

@@ -1,19 +1,17 @@
 {
   "dependencies": {
-    "@clerk/tanstack-react-start": "^1.1.5",
-    "@fontsource-variable/playfair-display": "^5.2.8",
-    "@fontsource-variable/source-sans-3": "^5.2.9",
-    "playwright": "^1.59.1",
+    "@stablelib/base64": "^1.0.1",
     "react": "^19.2.4",
-    "zod": "4.4.3"
+    "zod": "^3.23.8"
   },
   "devDependencies": {
-    "@biomejs/biome": "2.0.6",
+    "@biomejs/biome": "2.4.15",
+    "@types/node": "25.8.0",
     "@vitest/coverage-v8": "^4.1.5",
-    "happy-dom": "^20.9.0",
+    "@vitest/ui": "4.1.6",
     "turbo": "^2.9.12",
-    "typescript": "5.9.2",
-    "vitest": "^4.1.4"
+    "typescript": "6.0.3",
+    "vitest": "4.1.6"
   },
   "engines": {
     "node": ">=18"
@@ -35,6 +33,7 @@
     "db:migrate": "turbo run db:migrate --filter=server",
     "db:push": "turbo run db:push --filter=server",
     "db:seed": "turbo run db:seed --filter=server",
+    "db:seed:demo": "turbo run db:seed:demo --filter=server",
     "db:studio": "turbo run db:studio --filter=server",
     "test": "turbo run test -- --run",
     "test:e2e": "turbo run test:e2e",

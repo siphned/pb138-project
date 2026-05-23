@@ -1,4 +1,4 @@
-﻿import { Show, useClerk } from "@clerk/react";
+import { Show, useClerk } from "@clerk/react";
 import { Link } from "@tanstack/react-router";
 import { ShoppingCart, User } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
@@ -10,16 +10,14 @@ import { Sidebar } from "./Sidebar";
 export function Header() {
   const { user: clerkUser } = useClerk();
   const initials = clerkUser ? (clerkUser.fullName || "User").substring(0, 2).toUpperCase() : "GU";
-  const { activeRole, setActiveRole, user } = useUser();
+  const { user, activeRole, setActiveRole } = useUser();
+  const roles = user?.roles ?? [];
 
   return (
     <header className="h-16 border-b bg-background flex items-center justify-between px-6 lg:px-12">
       {/* Left: Logo Area */}
       <Link to="/">
-        <div className="flex items-center gap-2 font-heading font-bold text-xl">
-          <img alt="Wine Enjoyers Logo" className="h-8 w-8 rounded-full" src="/logo.png" />
-          Wine Enjoyers
-        </div>
+        <img alt="Wine Enjoyers" className="h-10 w-auto" src="/logo.png" />
       </Link>
 
       {/* Right: Icons & Menus */}
@@ -50,7 +48,7 @@ export function Header() {
           </Link>
         </Show>
 
-        <Sidebar activeRole={activeRole} onRoleChange={setActiveRole} userRoles={user?.roles} />
+        <Sidebar activeRole={activeRole} onRoleChange={setActiveRole} userRoles={roles} />
       </div>
     </header>
   );

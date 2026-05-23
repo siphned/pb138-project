@@ -28,8 +28,16 @@ export class WinemakersService {
     return winemakersRepo.findWinesByWinemakerId(db, id);
   }
 
-  listWinemakers(): Promise<WinemakerListItem[]> {
-    return winemakersRepo.findAll(db);
+  listWinemakers(filters: { q?: string } = {}): Promise<WinemakerListItem[]> {
+    return winemakersRepo.findAll(db, filters);
+  }
+
+  async getMyProfile(userId: string): Promise<WinemakerListItem> {
+    const winemaker = await winemakersRepo.findByUserId(db, userId);
+    if (!winemaker) throw new WinemakerNotFoundError();
+    const profile = await winemakersRepo.findByIdWithAddress(db, winemaker.id);
+    if (!profile) throw new WinemakerNotFoundError();
+    return profile;
   }
 
   async updateMyProfile(userId: string, data: UpdateWinemakerData): Promise<WinemakerListItem> {

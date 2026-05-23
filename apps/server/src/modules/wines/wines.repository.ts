@@ -1,6 +1,6 @@
 import type { Wine, Winemaker } from "@repo/shared/schemas";
 import { winemakers, wines } from "@repo/shared/schemas";
-import { and, eq, isNull } from "drizzle-orm";
+import { and, eq, ilike, isNull } from "drizzle-orm";
 import type { Database } from "../../db";
 
 export type WineWithWinemaker = Wine & {
@@ -22,15 +22,17 @@ export type WineData = {
 };
 
 export type WineFilters = {
+  color?: string;
+  q?: string;
   region?: string;
   type?: string;
-  color?: string;
   vintageYear?: number;
   winemakerId?: string;
 };
 
 export async function findAll(db: Database, filters: WineFilters): Promise<WineWithWinemaker[]> {
   const conditions = [isNull(wines.deletedAt)];
+  if (filters.q) conditions.push(ilike(wines.name, `%${filters.q}%`));
   if (filters.region) conditions.push(eq(wines.region, filters.region));
   if (filters.type) conditions.push(eq(wines.type, filters.type as WineData["type"]));
   if (filters.color) conditions.push(eq(wines.color, filters.color as WineData["color"]));

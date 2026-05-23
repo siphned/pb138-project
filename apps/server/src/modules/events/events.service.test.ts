@@ -15,6 +15,7 @@ vi.mock("./events.repository", async (importOriginal) => {
     findActiveRegistration: vi.fn(),
     findById: vi.fn(),
     findComments: vi.fn(),
+    findInvitationsByEventId: vi.fn(),
     findMany: vi.fn(),
     findRegistration: vi.fn(),
     findWinemakerByUserId: vi.fn(),
@@ -144,6 +145,60 @@ describe("listEvents", () => {
       expect.objectContaining({ status: "approved" }),
       expect.any(Object)
     );
+  });
+
+  it("passes winemakerId directly when provided", async () => {
+    vi.mocked(eventsRepo.findMany).mockResolvedValue([]);
+    vi.mocked(eventsRepo.countMany).mockResolvedValue(0);
+
+    await eventsService.listEvents({ winemakerId: winemakerId }, { limit: 20, page: 1 });
+
+    expect(eventsRepo.findMany).toHaveBeenCalledWith(
+      expect.anything(),
+      expect.objectContaining({ winemakerIds: [winemakerId] }),
+      expect.any(Object)
+    );
+  });
+
+  it("passes q filter when provided", async () => {
+    vi.mocked(eventsRepo.findMany).mockResolvedValue([]);
+    vi.mocked(eventsRepo.countMany).mockResolvedValue(0);
+
+    await eventsService.listEvents({ q: "harvest" }, { limit: 20, page: 1 });
+
+    expect(eventsRepo.findMany).toHaveBeenCalledWith(
+      expect.anything(),
+      expect.objectContaining({ q: "harvest" }),
+      expect.any(Object)
+    );
+  });
+});
+
+describe("listInvitations", () => {
+  it("returns invitations for own event", async () => {
+    vi.mocked(eventsRepo.findById).mockResolvedValue({ ...mockApprovedEvent, winemakerId });
+    vi.mocked(eventsRepo.findWinemakerByUserId).mockResolvedValue(mockWinemaker as any);
+    vi.mocked(eventsRepo.findInvitationsByEventId).mockResolvedValue([{ id: "inv1" }] as any);
+
+    const result = await eventsService.listInvitations(eventId, userId);
+
+    expect(result).toHaveLength(1);
+  });
+
+  it("throws NOT_FOUND when event does not exist", async () => {
+    vi.mocked(eventsRepo.findById).mockResolvedValue(undefined);
+
+    await expect(eventsService.listInvitations(eventId, userId)).rejects.toThrow("NOT_FOUND");
+  });
+
+  it("throws FORBIDDEN when requester does not own the event", async () => {
+    vi.mocked(eventsRepo.findById).mockResolvedValue({
+      ...mockApprovedEvent,
+      winemakerId: "other",
+    });
+    vi.mocked(eventsRepo.findWinemakerByUserId).mockResolvedValue(mockWinemaker as any);
+
+    await expect(eventsService.listInvitations(eventId, userId)).rejects.toThrow("FORBIDDEN");
   });
 });
 

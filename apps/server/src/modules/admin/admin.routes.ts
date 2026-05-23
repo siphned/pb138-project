@@ -1,5 +1,5 @@
-import { Elysia, t } from "elysia";
-import { errorResponse } from "../../utils/error-plugin";
+import { Elysia, status, t } from "elysia";
+import { parsePagination } from "../../utils/pagination";
 import { authPlugin } from "../auth";
 import { adminService } from "./admin.service";
 
@@ -9,8 +9,8 @@ export const adminRoutes = new Elysia({ prefix: "/admin" })
   .get(
     "/events",
     async ({ query }) => {
-      const { page = 1, status = "pending" } = query;
-      return adminService.listEvents({ status }, { offset: (page - 1) * 20 });
+      const { page, status = "pending" } = query;
+      return adminService.listEvents({ status }, parsePagination({ page }));
     },
     {
       detail: {
@@ -26,7 +26,6 @@ export const adminRoutes = new Elysia({ prefix: "/admin" })
         ),
       }),
       requireRoles: ["admin"],
-      response: { 200: t.Any() },
     }
   )
 
@@ -39,7 +38,6 @@ export const adminRoutes = new Elysia({ prefix: "/admin" })
     },
     params: t.Object({ id: t.String() }),
     requireRoles: ["admin"],
-    response: { 200: t.Any(), 404: errorResponse },
   })
 
   .post("/events/:id/reject", ({ params }) => adminService.rejectEvent(params.id), {
@@ -51,14 +49,13 @@ export const adminRoutes = new Elysia({ prefix: "/admin" })
     },
     params: t.Object({ id: t.String() }),
     requireRoles: ["admin"],
-    response: { 200: t.Any(), 404: errorResponse },
   })
 
   .get(
     "/users",
     async ({ query }) => {
-      const { page = 1, status, role } = query;
-      return adminService.listUsers({ role, status }, { offset: (page - 1) * 20 });
+      const { page, status, role } = query;
+      return adminService.listUsers({ role, status }, parsePagination({ page }));
     },
     {
       detail: {
@@ -69,13 +66,41 @@ export const adminRoutes = new Elysia({ prefix: "/admin" })
       },
       query: t.Object({
         page: t.Optional(t.Numeric()),
-        role: t.Optional(t.String()),
+        role: t.Optional(
+          t.Union([
+            t.Literal("customer"),
+            t.Literal("winemaker"),
+            t.Literal("shop_owner"),
+            t.Literal("admin"),
+          ])
+        ),
         status: t.Optional(
           t.Union([t.Literal("active"), t.Literal("suspended"), t.Literal("banned")])
         ),
       }),
       requireRoles: ["admin"],
-      response: { 200: t.Any() },
+    }
+  )
+
+  .get(
+    "/users/:id",
+    async ({ params }) => {
+      try {
+        return await adminService.getUser(params.id);
+      } catch (e: unknown) {
+        if (e instanceof Error && e.message === "NOT_FOUND") return status(404, "User not found");
+        throw e;
+      }
+    },
+    {
+      detail: {
+        description: "Get a single user by ID.",
+        security: [{ bearerAuth: [] }],
+        summary: "Get user by ID (admin)",
+        tags: ["admin"],
+      },
+      params: t.Object({ id: t.String() }),
+      requireRoles: ["admin"],
     }
   )
 
@@ -94,15 +119,14 @@ export const adminRoutes = new Elysia({ prefix: "/admin" })
       },
       params: t.Object({ id: t.String() }),
       requireRoles: ["admin"],
-      response: { 200: t.Any(), 404: errorResponse },
     }
   )
 
   .get(
     "/reviews",
     async ({ query }) => {
-      const { page = 1 } = query;
-      return adminService.listAllReviews({ offset: (page - 1) * 20 });
+      const { page } = query;
+      return adminService.listAllReviews(parsePagination({ page }));
     },
     {
       detail: {
@@ -113,7 +137,6 @@ export const adminRoutes = new Elysia({ prefix: "/admin" })
       },
       query: t.Object({ page: t.Optional(t.Numeric()) }),
       requireRoles: ["admin"],
-      response: { 200: t.Any() },
     }
   )
 
@@ -132,6 +155,5 @@ export const adminRoutes = new Elysia({ prefix: "/admin" })
       },
       params: t.Object({ id: t.String() }),
       requireRoles: ["admin"],
-      response: { 200: t.Any(), 404: errorResponse },
     }
   );

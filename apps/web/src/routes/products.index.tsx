@@ -47,9 +47,9 @@ export const Route = createFileRoute("/products/")({
     maxPrice: asNumOrStr(raw.maxPrice),
     minPrice: asNumOrStr(raw.minPrice),
     page: asNumOrStr(raw.page),
+    q: asString(raw.q),
     rating: asNumOrStr(raw.rating),
     region: asString(raw.region),
-    search: asString(raw.search),
     shopId: asString(raw.shopId),
     sort: isSort(raw.sort) ? raw.sort : undefined,
     type: isProductType(raw.type) ? raw.type : undefined,
@@ -61,10 +61,7 @@ function ProductsPage() {
   const search = Route.useSearch();
   const navigate = useNavigate({ from: Route.fullPath });
 
-  // isBundle and shopId are UI-only filters until BE adds them to the
-  // products list endpoint in OpenAPI (see types.ts).
-  const { isBundle: _isBundle, shopId: _shopId, ...apiSearchParams } = search;
-  const query = useGetProducts(apiSearchParams);
+  const query = useGetProducts(search);
 
   const handleSearchChange = (next: ProductSearch) => {
     navigate({ replace: true, search: next });

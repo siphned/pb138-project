@@ -1,16 +1,7 @@
-import { Elysia, status, t } from "elysia";
+import { Elysia, t } from "elysia";
+import { errorResponse } from "../../utils/error-plugin";
 import { authPlugin } from "../auth";
 import { supplyAgreementsService } from "./supply-agreements.service";
-
-function handleError(e: unknown) {
-  if (e instanceof Error) {
-    if (e.message === "NOT_FOUND") return status(404, "Not found");
-    if (e.message === "FORBIDDEN") return status(403, "Forbidden");
-    if (e.message === "ALREADY_RESPONDED") return status(422, "Already responded to this request");
-    if (e.message === "NOT_A_WINEMAKER") return status(403, "User is not a winemaker");
-  }
-  throw e;
-}
 
 const agreementResponse = t.Object({
   createdAt: t.Date(),
@@ -21,12 +12,6 @@ const agreementResponse = t.Object({
   winemakerId: t.String(),
 });
 
-const errorResponse = {
-  403: t.String(),
-  404: t.String(),
-  422: t.String(),
-};
-
 export const supplyAgreementsRoutes = new Elysia({
   prefix: "/supply-agreements",
   tags: ["supply-agreements"],
@@ -35,17 +20,8 @@ export const supplyAgreementsRoutes = new Elysia({
 
   .post(
     "/",
-    async ({ dbUser, body }) => {
-      try {
-        return await supplyAgreementsService.createRequest(
-          dbUser.id,
-          body.winemakerId,
-          body.shopId
-        );
-      } catch (e) {
-        return handleError(e);
-      }
-    },
+    ({ dbUser, body }) =>
+      supplyAgreementsService.createRequest(dbUser.id, body.winemakerId, body.shopId),
     {
       body: t.Object({
         shopId: t.String(),
@@ -57,19 +33,14 @@ export const supplyAgreementsRoutes = new Elysia({
         summary: "Create a supply agreement request",
       },
       requireRoles: ["shop_owner"],
-      response: { 200: agreementResponse, ...errorResponse },
+      response: { 200: agreementResponse, 403: errorResponse, 404: errorResponse },
     }
   )
 
   .patch(
     "/:id",
-    async ({ dbUser, params, body }) => {
-      try {
-        return await supplyAgreementsService.respondToRequest(dbUser.id, params.id, body.status);
-      } catch (e) {
-        return handleError(e);
-      }
-    },
+    ({ dbUser, params, body }) =>
+      supplyAgreementsService.respondToRequest(dbUser.id, params.id, body.status),
     {
       body: t.Object({
         status: t.Union([t.Literal("approved"), t.Literal("rejected")]),
@@ -81,19 +52,18 @@ export const supplyAgreementsRoutes = new Elysia({
       },
       params: t.Object({ id: t.String() }),
       requireRoles: ["winemaker"],
-      response: { 200: agreementResponse, ...errorResponse },
+      response: {
+        200: agreementResponse,
+        403: errorResponse,
+        404: errorResponse,
+        409: errorResponse,
+      },
     }
   )
 
   .get(
     "/shop/:shopId",
-    async ({ dbUser, params }) => {
-      try {
-        return await supplyAgreementsService.listForShop(dbUser.id, params.shopId);
-      } catch (e) {
-        return handleError(e);
-      }
-    },
+    ({ dbUser, params }) => supplyAgreementsService.listForShop(dbUser.id, params.shopId),
     {
       detail: {
         security: [{ bearerAuth: [] }],
@@ -101,25 +71,15 @@ export const supplyAgreementsRoutes = new Elysia({
       },
       params: t.Object({ shopId: t.String() }),
       requireRoles: ["shop_owner"],
-      response: { 200: t.Array(agreementResponse), ...errorResponse },
+      response: { 200: t.Array(agreementResponse), 403: errorResponse },
     }
   )
 
-  .get(
-    "/winemaker",
-    async ({ dbUser }) => {
-      try {
-        return await supplyAgreementsService.listForWinemaker(dbUser.id);
-      } catch (e) {
-        return handleError(e);
-      }
+  .get("/winemaker", ({ dbUser }) => supplyAgreementsService.listForWinemaker(dbUser.id), {
+    detail: {
+      security: [{ bearerAuth: [] }],
+      summary: "List supply agreements for the authenticated winemaker",
     },
-    {
-      detail: {
-        security: [{ bearerAuth: [] }],
-        summary: "List supply agreements for the authenticated winemaker",
-      },
-      requireRoles: ["winemaker"],
-      response: { 200: t.Array(agreementResponse), ...errorResponse },
-    }
-  );
+    requireRoles: ["winemaker"],
+    response: { 200: t.Array(agreementResponse), 403: errorResponse },
+  });

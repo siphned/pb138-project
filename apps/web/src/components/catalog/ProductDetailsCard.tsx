@@ -10,7 +10,18 @@ import { ShowOwner } from "@/components/primitives/show-owner";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import type { GetProductsById200 } from "@/generated/types/GetProductsById";
+import type { GetWines200Item } from "./WineCard";
 import { WineCard } from "./WineCard";
+
+interface ProductWineEntry {
+  wine: {
+    id: string;
+    name: string;
+    color?: string;
+    region?: string;
+    vintageYear?: string | number;
+  };
+}
 
 interface ProductDetailsCardProps {
   product: GetProductsById200;
@@ -25,7 +36,7 @@ export function ProductDetailsCard({
 }: ProductDetailsCardProps) {
   useEffect(() => {
     if (import.meta.env.DEV && product.shop && !product.shop.ownerUserId) {
-      // biome-ignore lint/suspicious/noConsole: intentional warning for BE gap mentioned in plan §8
+      // biome-ignore lint/suspicious/noConsole: intentional development diagnostic for BE gap in plan §8
       console.warn("ProductDetailsCard: shop object missing ownerUserId. Owner gating may fail.");
     }
   }, [product.shop]);
@@ -71,19 +82,15 @@ export function ProductDetailsCard({
           {product.productWines && product.productWines.length > 0 && (
             <Section heading="Wines in this product">
               <DataGrid variant="catalog">
-                {
-                  // biome-ignore lint/suspicious/noExplicitAny: GetProductsById200 is `any` in OpenAPI; pw shape lost
-                  product.productWines.map((pw: any) => {
-                    const wineWithFallbacks = {
-                      color: "unknown",
-                      region: "",
-                      vintageYear: "",
-                      ...pw.wine,
-                      // biome-ignore lint/suspicious/noExplicitAny: productWines.wine in OpenAPI is narrower than GetWines200Item (BE follow-up)
-                    } as any;
-                    return <WineCard key={pw.wine.id} wine={wineWithFallbacks} />;
-                  })
-                }
+                {product.productWines.map((pw: ProductWineEntry) => {
+                  const wineWithFallbacks = {
+                    color: "unknown",
+                    region: "",
+                    vintageYear: "",
+                    ...pw.wine,
+                  } as GetWines200Item;
+                  return <WineCard key={pw.wine.id} wine={wineWithFallbacks} />;
+                })}
               </DataGrid>
             </Section>
           )}

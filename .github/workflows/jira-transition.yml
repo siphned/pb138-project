@@ -14,6 +14,7 @@ on:
 jobs:
   transition:
     runs-on: ubuntu-latest
+    continue-on-error: true
     permissions: {}
     env:
       JIRA_BASE_URL: ${{ vars.JIRA_BASE_URL }}

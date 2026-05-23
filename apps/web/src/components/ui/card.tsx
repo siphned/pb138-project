@@ -110,6 +110,6 @@ export {
   CardDescription,
   CardFooter,
   CardHeader,
-  cardVariants,
   CardTitle,
+  cardVariants,
 };

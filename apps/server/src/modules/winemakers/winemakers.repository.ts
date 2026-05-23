@@ -1,6 +1,6 @@
 import type { Address, Wine, Winemaker } from "@repo/shared/schemas";
 import { events, winemakers, wines } from "@repo/shared/schemas";
-import { and, eq, isNull } from "drizzle-orm";
+import { and, eq, ilike, isNull } from "drizzle-orm";
 import type { Database } from "../../db";
 
 export type EventRow = {
@@ -30,9 +30,12 @@ export type UpdateWinemakerData = {
   phone?: string;
 };
 
-export async function findAll(db: Database): Promise<WinemakerListItem[]> {
+export async function findAll(db: Database, filters: { q?: string }): Promise<WinemakerListItem[]> {
+  const conditions = [isNull(winemakers.deletedAt)];
+  if (filters.q) conditions.push(ilike(winemakers.name, `%${filters.q}%`));
+
   const results = await db.query.winemakers.findMany({
-    where: isNull(winemakers.deletedAt),
+    where: and(...conditions),
     with: {
       address: true,
     },

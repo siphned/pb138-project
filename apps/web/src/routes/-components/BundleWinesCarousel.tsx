@@ -1,5 +1,6 @@
+import type { GetProducts200Item } from "@/components/catalog/ProductCard";
 import { ProductCard } from "@/components/catalog/ProductCard";
-import { useGetShopsByIdProducts } from "@/generated/hooks/useGetShopsByIdProducts";
+import { useGetProducts } from "@/generated/hooks/useGetProducts";
 
 type ShopProductRaw = {
   id: string;
@@ -41,8 +42,8 @@ interface BundleWinesCarouselProps {
 }
 
 export function BundleWinesCarousel({ shopId, wineIds }: BundleWinesCarouselProps) {
-  const { data, isLoading } = useGetShopsByIdProducts(shopId, { isBundle: "false" });
-  const allProducts = data as ShopProductRaw[] | undefined;
+  const { data: rawData, isLoading } = useGetProducts({ isBundle: false, shopId });
+  const allProducts = rawData?.data as ShopProductRaw[] | undefined;
 
   const products =
     allProducts?.filter((p) => {
@@ -99,8 +100,8 @@ export function BundleWinesCarousel({ shopId, wineIds }: BundleWinesCarouselProp
                   },
                 ]
               : [],
-            // biome-ignore lint/suspicious/noExplicitAny: shop-by-id product shape doesn't line up with GetProducts200 item; will narrow once BE unifies the two endpoints
-          } as any;
+            // shop-by-id product shape doesn't fully match GetProducts200Item; will narrow once BE unifies endpoints
+          } as GetProducts200Item;
 
           return (
             <div className="w-60 shrink-0" key={p.id}>

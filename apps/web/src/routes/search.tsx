@@ -5,7 +5,6 @@ import type React from "react";
 import { ProductCard } from "@/components/catalog/ProductCard";
 import { SearchPageFilters } from "@/components/catalog/SearchPageFilters";
 import { SearchSection } from "@/components/catalog/SearchSection";
-import { ShopCard } from "@/components/catalog/ShopCard";
 import {
   asNumOrStr,
   asString,
@@ -17,8 +16,10 @@ import { WinemakerCard } from "@/components/catalog/WinemakerCard";
 import { EmptyState } from "@/components/primitives/empty-state";
 import { LoadingState } from "@/components/primitives/loading-state";
 import { PageHeader } from "@/components/primitives/page-header";
+import { ShopCard } from "@/components/shops/ShopCard";
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
+import { useGetEvents } from "@/generated/hooks/useGetEvents";
 import { useGetProducts } from "@/generated/hooks/useGetProducts";
 import { useGetShops } from "@/generated/hooks/useGetShops";
 import { useGetWinemakers } from "@/generated/hooks/useGetWinemakers";
@@ -27,6 +28,7 @@ import {
   type GetWinesQueryParamsColorEnumKey,
   getWinesQueryParamsColorEnum,
 } from "@/generated/types/GetWines";
+import { EventCard } from "@/routes/-components/EventCard";
 
 const COLOR_VALUES = Object.values(getWinesQueryParamsColorEnum) as readonly string[];
 const isColor = (v: unknown): v is GetWinesQueryParamsColorEnumKey =>
@@ -76,13 +78,16 @@ function SearchPage() {
     color: search.color,
     maxPrice: search.maxPrice,
     minPrice: search.minPrice,
+    q: q || undefined,
     region: search.region,
-    search: q || undefined,
   });
 
   // Note: Winemakers and Shops don't support query params in current BE
   const winemakersQuery = useGetWinemakers();
   const shopsQuery = useGetShops();
+
+  // BE supports `q` against event.name; everything else stays default.
+  const eventsQuery = useGetEvents({ q: q || undefined });
 
   const handleSearchChange = (next: WineSearch) => {
     navigate({ replace: true, search: next });
@@ -92,20 +97,43 @@ function SearchPage() {
     winesQuery.isLoading ||
     productsQuery.isLoading ||
     winemakersQuery.isLoading ||
-    shopsQuery.isLoading;
+    shopsQuery.isLoading ||
+    eventsQuery.isLoading;
 
   // Client-side filtering for entities without BE search support
   const filteredWines = matchesByName(winesQuery.data, q);
   const filteredWinemakers = matchesByName(winemakersQuery.data, q);
   const filteredShops = matchesShop(shopsQuery.data, q);
 
+  // GetEvents200 is typed `any` in the spec, and may be a raw array or a
+  // paginated envelope `{ data, total }`. Normalise here and shape for EventCard.
+  type EventLike = {
+    id: string;
+    name?: string;
+    title?: string;
+    description?: string | null;
+    startTime?: string;
+    endTime?: string;
+    location?: string;
+    winemakerName?: string;
+    winemakerId?: string;
+  };
+  const eventsRaw = eventsQuery.data as
+    | EventLike[]
+    | { data?: EventLike[]; total?: number }
+    | undefined;
+  const eventsList = (
+    Array.isArray(eventsRaw) ? eventsRaw : (eventsRaw?.data ?? [])
+  ) as EventLike[];
+
   const wineCount = filteredWines.length;
   const products = productsQuery.data?.data || [];
   const productCount = Number(productsQuery.data?.total || 0);
   const winemakerCount = filteredWinemakers.length;
   const shopCount = filteredShops.length;
+  const eventCount = eventsList.length;
 
-  const hasResults = wineCount + productCount + winemakerCount + shopCount > 0;
+  const hasResults = wineCount + productCount + winemakerCount + shopCount + eventCount > 0;
 
   let content: React.ReactNode;
   if (isLoading) {
@@ -135,7 +163,7 @@ function SearchPage() {
           count={productCount}
           heading="Products"
           viewAllHref="/products"
-          viewAllSearch={{ ...search, search: q || undefined }}
+          viewAllSearch={{ ...search, q: q || undefined }}
         >
           {products.slice(0, 3).map((product) => (
             <ProductCard key={product.id} product={product} />
@@ -156,6 +184,17 @@ function SearchPage() {
         <SearchSection count={shopCount} heading="Shops" viewAllHref="/shops" viewAllSearch={{ q }}>
           {filteredShops.slice(0, 3).map((shop) => (
             <ShopCard key={shop.id} shop={shop} />
+          ))}
+        </SearchSection>
+
+        <SearchSection
+          count={eventCount}
+          heading="Events"
+          viewAllHref="/events"
+          viewAllSearch={{ q: q || undefined }}
+        >
+          {eventsList.slice(0, 3).map((event) => (
+            <EventCard event={event} key={event.id} />
           ))}
         </SearchSection>
       </>

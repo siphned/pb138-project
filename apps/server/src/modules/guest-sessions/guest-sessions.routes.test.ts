@@ -1,55 +1,50 @@
-import { Elysia } from "elysia";
-import { beforeEach, describe, expect, it, vi } from "vitest";
+import { afterEach, describe, expect, it, vi } from "vitest";
+import { resetAuth } from "../../__tests__/helpers/auth";
+import { app } from "../../app";
 
-// Mock Repo
-vi.mock("./guest-sessions.repository", () => ({
-  findById: vi.fn(),
-}));
-
-// Mock Service
 vi.mock("./guest-sessions.service", () => ({
   guestSessionsService: {
-    getOrCreateSession: vi.fn(),
-    validateSession: vi.fn(),
+    getOrCreateSession: vi.fn().mockResolvedValue({
+      createdAt: new Date(),
+      expiresAt: new Date(),
+      id: "s1",
+    }),
+    validateSession: vi.fn().mockResolvedValue({
+      createdAt: new Date(),
+      expiresAt: new Date(),
+      id: "s1",
+    }),
   },
 }));
 
-// Mock Auth
-vi.mock("../auth", () => ({
-  authPlugin: new (require("elysia").Elysia)({ name: "auth" }),
+vi.mock("../auth/auth.utils", () => ({
+  verifyClerkToken: vi.fn().mockResolvedValue(null),
 }));
 
-import * as guestSessionsRepo from "./guest-sessions.repository";
-import { guestSessionsRoutes } from "./guest-sessions.routes";
-import { guestSessionsService } from "./guest-sessions.service";
+vi.mock("../../utils/logger", () => ({
+  logger: { debug: vi.fn(), error: vi.fn(), info: vi.fn(), warn: vi.fn() },
+}));
 
 describe("guest-sessions routes", () => {
-  const app = new Elysia().use(guestSessionsRoutes);
+  afterEach(() => resetAuth());
 
-  beforeEach(() => {
-    vi.clearAllMocks();
-  });
-
-  it("POST /guest-sessions creates a session", async () => {
-    const mockSession = { createdAt: new Date(), expiresAt: new Date(), id: "test-id" };
-    vi.mocked(guestSessionsService.getOrCreateSession).mockResolvedValue(mockSession as any);
-
+  it("POST /guest-sessions returns 201 with session", async () => {
     const response = await app.handle(
       new Request("http://localhost/guest-sessions", { method: "POST" })
     );
-
     expect(response.status).toBe(201);
   });
 
-  it("GET /guest-sessions/:id returns session", async () => {
-    const futureDate = new Date();
-    futureDate.setFullYear(futureDate.getFullYear() + 1);
-    const mockSession = { createdAt: new Date(), expiresAt: futureDate, id: "test-id" };
-
-    vi.mocked(guestSessionsRepo.findById).mockResolvedValue(mockSession as any);
-
-    const response = await app.handle(new Request("http://localhost/guest-sessions/test-id"));
-
+  it("GET /guest-sessions/:id returns 200 with valid session", async () => {
+    const response = await app.handle(new Request("http://localhost/guest-sessions/s1"));
     expect(response.status).toBe(200);
+  });
+
+  it("GET /guest-sessions/:id returns 404 when session not found", async () => {
+    const { guestSessionsService } = await import("./guest-sessions.service");
+    vi.mocked(guestSessionsService.validateSession).mockResolvedValueOnce(null as never);
+
+    const response = await app.handle(new Request("http://localhost/guest-sessions/s1"));
+    expect(response.status).toBe(404);
   });
 });
