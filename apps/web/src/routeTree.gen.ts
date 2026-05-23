@@ -63,6 +63,7 @@ import { Route as ShopsIdInventoryNewRouteImport } from './routes/shops.$id.inve
 import { Route as AuthenticatedAdminUsersIdRouteImport } from './routes/_authenticated._admin.users.$id'
 import { Route as AuthenticatedAdminRoleRequestsIdRouteImport } from './routes/_authenticated._admin.role-requests.$id'
 import { Route as ShopsIdInventoryProductIdEditRouteImport } from './routes/shops.$id.inventory.$productId.edit'
+import { Route as AuthenticatedShop_ownerManageShopsIdRouteImport } from './routes/_authenticated._shop_owner.manage.shops.$id'
 
 const SearchRoute = SearchRouteImport.update({
   id: '/search',
@@ -340,6 +341,12 @@ const ShopsIdInventoryProductIdEditRoute =
     path: '/$productId/edit',
     getParentRoute: () => ShopsIdInventoryRoute,
   } as any)
+const AuthenticatedShop_ownerManageShopsIdRoute =
+  AuthenticatedShop_ownerManageShopsIdRouteImport.update({
+    id: '/_shop_owner/manage/shops/$id',
+    path: '/manage/shops/$id',
+    getParentRoute: () => AuthenticatedRoute,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -393,6 +400,7 @@ export interface FileRoutesByFullPath {
   '/role-requests/$id': typeof AuthenticatedAdminRoleRequestsIdRoute
   '/users/$id': typeof AuthenticatedAdminUsersIdRoute
   '/shops/$id/inventory/new': typeof ShopsIdInventoryNewRoute
+  '/manage/shops/$id': typeof AuthenticatedShop_ownerManageShopsIdRoute
   '/shops/$id/inventory/$productId/edit': typeof ShopsIdInventoryProductIdEditRoute
 }
 export interface FileRoutesByTo {
@@ -443,6 +451,7 @@ export interface FileRoutesByTo {
   '/role-requests/$id': typeof AuthenticatedAdminRoleRequestsIdRoute
   '/users/$id': typeof AuthenticatedAdminUsersIdRoute
   '/shops/$id/inventory/new': typeof ShopsIdInventoryNewRoute
+  '/manage/shops/$id': typeof AuthenticatedShop_ownerManageShopsIdRoute
   '/shops/$id/inventory/$productId/edit': typeof ShopsIdInventoryProductIdEditRoute
 }
 export interface FileRoutesById {
@@ -500,6 +509,7 @@ export interface FileRoutesById {
   '/_authenticated/_admin/role-requests/$id': typeof AuthenticatedAdminRoleRequestsIdRoute
   '/_authenticated/_admin/users/$id': typeof AuthenticatedAdminUsersIdRoute
   '/shops/$id/inventory/new': typeof ShopsIdInventoryNewRoute
+  '/_authenticated/_shop_owner/manage/shops/$id': typeof AuthenticatedShop_ownerManageShopsIdRoute
   '/shops/$id/inventory/$productId/edit': typeof ShopsIdInventoryProductIdEditRoute
 }
 export interface FileRouteTypes {
@@ -556,6 +566,7 @@ export interface FileRouteTypes {
     | '/role-requests/$id'
     | '/users/$id'
     | '/shops/$id/inventory/new'
+    | '/manage/shops/$id'
     | '/shops/$id/inventory/$productId/edit'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -606,6 +617,7 @@ export interface FileRouteTypes {
     | '/role-requests/$id'
     | '/users/$id'
     | '/shops/$id/inventory/new'
+    | '/manage/shops/$id'
     | '/shops/$id/inventory/$productId/edit'
   id:
     | '__root__'
@@ -662,6 +674,7 @@ export interface FileRouteTypes {
     | '/_authenticated/_admin/role-requests/$id'
     | '/_authenticated/_admin/users/$id'
     | '/shops/$id/inventory/new'
+    | '/_authenticated/_shop_owner/manage/shops/$id'
     | '/shops/$id/inventory/$productId/edit'
   fileRoutesById: FileRoutesById
 }
@@ -1070,6 +1083,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ShopsIdInventoryProductIdEditRouteImport
       parentRoute: typeof ShopsIdInventoryRoute
     }
+    '/_authenticated/_shop_owner/manage/shops/$id': {
+      id: '/_authenticated/_shop_owner/manage/shops/$id'
+      path: '/manage/shops/$id'
+      fullPath: '/manage/shops/$id'
+      preLoaderRoute: typeof AuthenticatedShop_ownerManageShopsIdRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
   }
 }
 
@@ -1144,6 +1164,7 @@ interface AuthenticatedRouteChildren {
   AuthenticatedDashboardRoute: typeof AuthenticatedDashboardRoute
   AuthenticatedOrdersRoute: typeof AuthenticatedOrdersRouteWithChildren
   AuthenticatedStatsRoute: typeof AuthenticatedStatsRoute
+  AuthenticatedShop_ownerManageShopsIdRoute: typeof AuthenticatedShop_ownerManageShopsIdRoute
 }
 
 const AuthenticatedRouteChildren: AuthenticatedRouteChildren = {
@@ -1151,6 +1172,8 @@ const AuthenticatedRouteChildren: AuthenticatedRouteChildren = {
   AuthenticatedDashboardRoute: AuthenticatedDashboardRoute,
   AuthenticatedOrdersRoute: AuthenticatedOrdersRouteWithChildren,
   AuthenticatedStatsRoute: AuthenticatedStatsRoute,
+  AuthenticatedShop_ownerManageShopsIdRoute:
+    AuthenticatedShop_ownerManageShopsIdRoute,
 }
 
 const AuthenticatedRouteWithChildren = AuthenticatedRoute._addFileChildren(
