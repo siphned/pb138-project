@@ -1,5 +1,4 @@
 import { Elysia, status, t } from "elysia";
-import { errorResponse } from "../../utils/error-plugin";
 import { parsePagination } from "../../utils/pagination";
 import { authPlugin } from "../auth";
 import { adminService } from "./admin.service";
@@ -27,7 +26,6 @@ export const adminRoutes = new Elysia({ prefix: "/admin" })
         ),
       }),
       requireRoles: ["admin"],
-      response: { 200: t.Any() },
     }
   )
 
@@ -40,7 +38,6 @@ export const adminRoutes = new Elysia({ prefix: "/admin" })
     },
     params: t.Object({ id: t.String() }),
     requireRoles: ["admin"],
-    response: { 200: t.Any(), 404: errorResponse },
   })
 
   .post("/events/:id/reject", ({ params }) => adminService.rejectEvent(params.id), {
@@ -52,7 +49,6 @@ export const adminRoutes = new Elysia({ prefix: "/admin" })
     },
     params: t.Object({ id: t.String() }),
     requireRoles: ["admin"],
-    response: { 200: t.Any(), 404: errorResponse },
   })
 
   .get(
@@ -83,7 +79,6 @@ export const adminRoutes = new Elysia({ prefix: "/admin" })
         ),
       }),
       requireRoles: ["admin"],
-      response: { 200: t.Any() },
     }
   )
 
@@ -106,7 +101,6 @@ export const adminRoutes = new Elysia({ prefix: "/admin" })
       },
       params: t.Object({ id: t.String() }),
       requireRoles: ["admin"],
-      response: { 200: t.Any(), 404: t.String() },
     }
   )
 
@@ -125,7 +119,6 @@ export const adminRoutes = new Elysia({ prefix: "/admin" })
       },
       params: t.Object({ id: t.String() }),
       requireRoles: ["admin"],
-      response: { 200: t.Any(), 404: errorResponse },
     }
   )
 
@@ -144,7 +137,6 @@ export const adminRoutes = new Elysia({ prefix: "/admin" })
       },
       query: t.Object({ page: t.Optional(t.Numeric()) }),
       requireRoles: ["admin"],
-      response: { 200: t.Any() },
     }
   )
 
@@ -163,6 +155,5 @@ export const adminRoutes = new Elysia({ prefix: "/admin" })
       },
       params: t.Object({ id: t.String() }),
       requireRoles: ["admin"],
-      response: { 200: t.Any(), 404: errorResponse },
     }
   );
