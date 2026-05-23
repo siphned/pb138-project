@@ -7,7 +7,6 @@ import {
   Moon01Icon,
   Package01Icon,
   Search01Icon,
-  Settings01Icon,
   ShoppingCart01Icon,
   Store01Icon,
   Sun01Icon,
@@ -44,7 +43,7 @@ export function Sidebar({ userRoles = [Role.customer], activeRole, onRoleChange 
   const { user } = useUser();
   const { user: clerkUser } = useClerkUser();
   const { isSignedIn } = useAuth();
-  const { signOut, openUserProfile } = useClerk();
+  const { signOut } = useClerk();
   const navigate = useNavigate();
   const { theme, toggleTheme } = useTheme();
 
@@ -76,8 +75,7 @@ export function Sidebar({ userRoles = [Role.customer], activeRole, onRoleChange 
     try {
       await signOut({ redirectUrl: "/" });
     } catch (_error) {
-      // TODO: User notification (toast)
-      // console.error("Sign out error:", error);
+      /* sign-out navigation is optimistic; error here is non-critical */
     }
     navigate({ to: "/" });
   };
@@ -227,13 +225,11 @@ export function Sidebar({ userRoles = [Role.customer], activeRole, onRoleChange 
             <Show when="signed-in">
               <NavItem
                 className="mt-2"
-                onClick={() => {
-                  closeSheet();
-                  openUserProfile();
-                }}
+                onClick={closeSheet}
+                render={<Link to="/dashboard" />}
                 variant="muted"
               >
-                <HugeiconsIcon icon={Settings01Icon} /> Settings
+                <HugeiconsIcon icon={User02Icon} /> Profile Settings
               </NavItem>
             </Show>
           </nav>

@@ -13,7 +13,7 @@ export function AuthenticatedLayout() {
   useEffect(() => {
     if (isLoaded && !isSignedIn) {
       navigate({ to: "/auth/login" }).catch(() => {
-        // redirect errors are intentionally swallowed; Clerk will re-check on next render
+        /* redirect errors intentionally swallowed; Clerk re-checks on next render */
       });
     }
   }, [isLoaded, isSignedIn, navigate]);
