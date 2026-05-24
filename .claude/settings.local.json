@@ -33,7 +33,11 @@
       "Bash(xargs dirname)",
       "Bash(find node_modules/.bun/@tanstack+router-plugin@1.168.2* -name \"router-generator\")",
       "Bash(xargs grep *)",
-      "Bash(python /tmp/take_head.py apps/web/src/components/shops/AvailabilityExceptionForm.tsx apps/web/src/components/shops/AvailabilityRegularForm.tsx apps/web/src/components/shops/InventoryEditForm.tsx apps/web/src/components/shops/InventoryForm.tsx)"
+      "Bash(python /tmp/take_head.py apps/web/src/components/shops/AvailabilityExceptionForm.tsx apps/web/src/components/shops/AvailabilityRegularForm.tsx apps/web/src/components/shops/InventoryEditForm.tsx apps/web/src/components/shops/InventoryForm.tsx)",
+      "Bash(sed -i 's|<ArrowLeft02Icon size={16} />|<HugeiconsIcon className=\"h-4 w-4\" icon={ArrowLeft02Icon} />|g' 'apps/web/src/routes/_authenticated._admin.role-requests.$id.tsx')",
+      "Read(//c/Users/adamk/Documents/Muni/6.semester/web_project/pb138-project/apps/web/src/routes/**)",
+      "Bash(sed -i 's|<ArrowLeft02Icon className=\"mr-2 h-4 w-4\" />|<HugeiconsIcon className=\"mr-2 h-4 w-4\" icon={ArrowLeft02Icon} />|g' 'apps/web/src/routes/_authenticated._admin.users.$id.tsx')",
+      "Bash(sed -i 's|<Alert01Icon className=\"mt-0.5 h-5 w-5 text-yellow-600 dark:text-yellow-400\" />|<HugeiconsIcon className=\"mt-0.5 h-5 w-5 text-yellow-600 dark:text-yellow-400\" icon={Alert01Icon} />|g' 'apps/web/src/routes/_authenticated._admin.users.$id.tsx')"
     ]
   }
 }

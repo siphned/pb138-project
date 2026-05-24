@@ -50,7 +50,7 @@ describe("DashboardQuickLinks", () => {
     render(<DashboardQuickLinks />);
     const hrefs = screen.getAllByTestId("link").map((el) => el.getAttribute("href"));
     expect(hrefs).toContain("/events/new");
-    expect(hrefs).toContain("/explore");
+    expect(hrefs).toContain("/wines");
   });
 
   it("renders shop-owner links when activeRole is Shop Owner", () => {

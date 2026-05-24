@@ -20,7 +20,7 @@ export function HomeHero() {
         the couch.
       </p>
       <div className="mt-10 flex flex-wrap items-center justify-center gap-4">
-        <Button render={<Link to="/explore" />} size="lg">
+        <Button render={<Link to="/wines" />} size="lg">
           Explore wines
           <HugeiconsIcon className="ml-2 h-4 w-4" icon={ArrowRight01Icon} />
         </Button>

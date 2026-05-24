@@ -24,19 +24,19 @@ const LINKS_BY_ROLE: Record<string, QuickLink[]> = {
   Customer: [
     { icon: ShoppingBasket01Icon, label: "My orders", to: "/orders" },
     { icon: ShoppingCart01Icon, label: "My cart", to: "/cart" },
-    { icon: Search01Icon, label: "Explore wines", to: "/explore" },
+    { icon: Search01Icon, label: "Explore wines", to: "/wines" },
     { icon: Calendar03Icon, label: "Upcoming events", to: "/events" },
   ],
   Winemaker: [
     { icon: Calendar03Icon, label: "Host an event", to: "/events/new" },
-    { icon: Search01Icon, label: "Browse the catalog", to: "/explore" },
+    { icon: Search01Icon, label: "Browse the catalog", to: "/wines" },
     { icon: Store01Icon, label: "Find retail partners", to: "/shops" },
     { icon: Setting07Icon, label: "Account settings", to: "/dashboard" },
   ],
   "Shop Owner": [
     { icon: Store01Icon, label: "My shops", to: "/shops" },
     { icon: Store01Icon, label: "Open a new shop", to: "/shops/new" },
-    { icon: PackageIcon, label: "Browse supply", to: "/explore" },
+    { icon: PackageIcon, label: "Browse supply", to: "/wines" },
     { icon: Calendar03Icon, label: "Upcoming events", to: "/events" },
   ],
   Admin: [

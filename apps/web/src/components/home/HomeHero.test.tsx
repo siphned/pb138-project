@@ -21,9 +21,9 @@ describe("HomeHero", () => {
     expect(container.querySelector("[data-slot='home-hero-tagline']")).toBeInTheDocument();
   });
 
-  it("renders a CTA linking to /explore", () => {
+  it("renders a CTA linking to /wines", () => {
     render(<HomeHero />);
-    const link = screen.getAllByTestId("link").find((el) => el.getAttribute("href") === "/explore");
+    const link = screen.getAllByTestId("link").find((el) => el.getAttribute("href") === "/wines");
     expect(link).toBeDefined();
   });
 

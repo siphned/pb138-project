@@ -191,7 +191,7 @@ export function Sidebar({ userRoles = [Role.customer], activeRole, onRoleChange 
               <HugeiconsIcon icon={ShoppingCart02Icon} /> Shopping cart
             </NavItem>
 
-            <NavItem onClick={closeSheet} render={<Link to="/explore" />} variant="active">
+            <NavItem onClick={closeSheet} render={<Link to="/wines" />} variant="active">
               <Wine className="h-5 w-5" /> Explore Wines
             </NavItem>
 
@@ -296,7 +296,7 @@ function RoleNavItems({
       <>
         <NavItem
           onClick={closeSheet}
-          render={<Link search={winemakerId ? { winemakerId } : undefined} to="/explore" />}
+          render={<Link search={winemakerId ? { winemakerId } : undefined} to="/wines" />}
           variant="active"
         >
           <Wine className="h-4 w-4" /> My Wines
