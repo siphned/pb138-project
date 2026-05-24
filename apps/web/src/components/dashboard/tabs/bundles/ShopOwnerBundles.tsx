@@ -1,4 +1,4 @@
-import { AlertTriangle, Loader2, MoreHorizontal, Package } from "lucide-react";
+import { Alert01Icon, Loading01Icon, MoreHorizontalIcon, Package01Icon } from "hugeicons-react";
 import { useState } from "react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -39,7 +39,7 @@ export function ShopOwnerBundles() {
   if (isLoading) {
     return (
       <div className="flex items-center justify-center py-12 gap-2">
-        <Loader2 className="h-5 w-5 animate-spin text-muted-foreground" />
+        <Loading01Icon className="h-5 w-5 animate-spin text-muted-foreground" />
         <span className="text-muted-foreground">Loading bundles...</span>
       </div>
     );
@@ -48,7 +48,7 @@ export function ShopOwnerBundles() {
   if (isError) {
     return (
       <div className="flex flex-col items-center justify-center py-12 text-destructive gap-2">
-        <AlertTriangle className="h-8 w-8" />
+        <Alert01Icon className="h-8 w-8" />
         <p className="font-medium">Failed to load bundles</p>
         <p className="text-sm text-muted-foreground">Please try again later.</p>
       </div>
@@ -60,7 +60,7 @@ export function ShopOwnerBundles() {
       <>
         <h3 className="text-lg font-semibold mb-4">Shop Bundles</h3>
         <div className="flex flex-col items-center justify-center py-16 text-center">
-          <Package className="h-12 w-12 text-muted-foreground mb-4" />
+          <Package01Icon className="h-12 w-12 text-muted-foreground mb-4" />
           <h3 className="text-xl font-semibold mb-2">No shop yet</h3>
           <p className="text-muted-foreground">Create a shop to manage bundles.</p>
         </div>
@@ -143,7 +143,7 @@ export function ShopOwnerBundles() {
                     </TableCell>
                     <TableCell>
                       <Button size="icon" variant="ghost">
-                        <MoreHorizontal className="h-4 w-4" />
+                        <MoreHorizontalIcon className="h-4 w-4" />
                       </Button>
                     </TableCell>
                   </TableRow>
