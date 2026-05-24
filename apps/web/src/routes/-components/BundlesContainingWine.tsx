@@ -1,4 +1,7 @@
 import { BundleCard } from "@/components/catalog/BundleCard";
+import { DataGrid } from "@/components/primitives/data-grid";
+import { Section } from "@/components/primitives/section";
+import { Skeleton } from "@/components/ui/skeleton";
 import { useGetShopsByIdProducts } from "@/generated/hooks/useGetShopsByIdProducts";
 
 type RawBundle = {
@@ -28,32 +31,25 @@ export function BundlesContainingWine({ shopId, wineId }: BundlesContainingWineP
 
   if (isLoading) {
     return (
-      <div className="space-y-4">
-        <h2 className="font-heading text-2xl font-bold">Also Available in Bundles</h2>
-        <div className="flex gap-4">
+      <Section heading="Also available in bundles">
+        <DataGrid variant="catalog">
           {[1, 2, 3].map((i) => (
-            <div
-              className="h-[280px] w-[200px] shrink-0 animate-pulse rounded-2xl bg-secondary/20"
-              key={i}
-            />
+            <Skeleton className="aspect-square rounded-2xl" key={i} />
           ))}
-        </div>
-      </div>
+        </DataGrid>
+      </Section>
     );
   }
 
   if (bundles.length === 0) return null;
 
   return (
-    <div className="space-y-4">
-      <h2 className="font-heading text-2xl font-bold">Also Available in Bundles</h2>
-      <div className="flex gap-4 overflow-x-auto p-2 [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+    <Section heading="Also available in bundles">
+      <DataGrid variant="catalog">
         {bundles.map((b) => (
-          <div className="w-60 shrink-0" key={b.id}>
-            <BundleCard key={b.id} product={b} />
-          </div>
+          <BundleCard key={b.id} product={b} />
         ))}
-      </div>
-    </div>
+      </DataGrid>
+    </Section>
   );
 }
