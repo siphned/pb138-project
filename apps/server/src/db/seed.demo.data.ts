@@ -688,6 +688,22 @@ export const FALLBACK_REVIEWS = [
   "Neurazí, nenadchne, ale spolehlivě zanechá dobrou náladu.",
   "Je to ok. Chutná to přesně jako úspěšný nákup.",
   "Vypil jsem to. Neoslepl jsem. Doporučuji.",
+  "Naprostá špička v této cenové kategorii. Budu kupovat pravidelně.",
+  "Zajímavý buket s nádechem nostalgie a levného benzínu. 10/10.",
+  "Skvělé na spláchnutí stresu po celodenním kódování v Javascriptu.",
+  "Páruji to s pizzou z mrazáku a musím říct, že je to gastronomický zážitek.",
+  "Design etikety je sice pochybný, ale obsah je překvapivě sofistikovaný.",
+  "Cena odpovídá kvalitě, možná ji i trochu převyšuje. Příjemné překvapení.",
+  "Moje játra sice protestují, ale chuťové pohárky jsou v sedmém nebi.",
+  "Ideální dárek pro někoho, koho nemáte moc rádi, ale chcete vypadat štědře.",
+  "Chutná to jako léto na Moravě, i když jsem zrovna v suterénu na FI.",
+  "Dostal jsem na to doporučení od náhodného kolemjdoucího a nelituji.",
+  "Po první skleničce jsem zapomněl na všechny své deadliny. Magické.",
+  "Dostatečně agresivní kyselinka, která vám připomene, že jste stále naživu.",
+  "Solidní základ pro domácí svařák, ale pít se to dá i za studena.",
+  "Nečekal jsem zázraky, ale tohle mi reálně zlepšilo den.",
+  "Konečně víno, které se na nic nehraje. Prostě víno.",
+  "Příjemně ovocné s dochutí čirého optimismu.",
 ];
 
 export const FALLBACK_EVENT_COMMENTS = [
