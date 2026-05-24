@@ -92,15 +92,9 @@ test.describe("Critical flows", () => {
       await page.goto("/cart");
       await page.waitForLoadState("networkidle");
 
-      // Check for either items list or empty message
-      const emptyMessage = page.locator("[class*='empty'], text=/empty|no items/i").first();
-      const itemsList = page.locator("[class*='item'], [role='list']").first();
-
-      if (await emptyMessage.isVisible()) {
-        expect(emptyMessage).toBeDefined();
-      } else if (await itemsList.isVisible()) {
-        expect(itemsList).toBeDefined();
-      }
+      // Check that cart page loaded and displays some content
+      const cartHeading = page.locator("h1, h2").first();
+      expect(await cartHeading.isVisible()).toBe(true);
     });
 
     test("can navigate back from checkout", async ({ page }) => {
