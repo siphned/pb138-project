@@ -7,7 +7,6 @@ import { LoadingState } from "@/components/primitives/loading-state";
 import { PageHeader } from "@/components/primitives/page-header";
 import { Separator } from "@/components/ui/separator";
 import { useGetWinesById } from "@/generated/hooks/useGetWinesById";
-import { EntityReviewsSection } from "./-components/EntityReviewsSection";
 import { WinesAvailableInShops } from "./-components/WinesAvailableInShops";
 
 export const Route = createFileRoute("/wines/$id")({
@@ -56,10 +55,6 @@ function WineDetailPage() {
         <Separator />
 
         <WinesAvailableInShops wineId={id} />
-
-        <Separator />
-
-        <EntityReviewsSection entityId={id} entityType="wine" />
       </div>
     </div>
   );
