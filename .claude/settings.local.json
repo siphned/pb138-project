@@ -31,7 +31,8 @@
       "Bash(timeout 15 bunx vite --port 5179)",
       "Bash(find ../../node_modules/.bun/@tanstack+router-generator* -name \"package.json\")",
       "Bash(xargs dirname)",
-      "Bash(find node_modules/.bun/@tanstack+router-plugin@1.168.2* -name \"router-generator\")"
+      "Bash(find node_modules/.bun/@tanstack+router-plugin@1.168.2* -name \"router-generator\")",
+      "Bash(xargs grep -l \"<form \")"
     ]
   }
 }
