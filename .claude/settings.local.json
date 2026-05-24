@@ -2,6 +2,7 @@
   "permissions": {
     "allow": [
       "Bash(git merge *)",
+<<<<<<< HEAD
       "Bash(git fetch *)",
       "Bash(bun run *)",
       "Bash(git add *)",

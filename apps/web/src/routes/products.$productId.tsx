@@ -87,5 +87,96 @@ function ProductDetailPage() {
         </aside>
       </div>
     </div>
+=======
+  const { data, isLoading, isError, refetch } = useGetProductsById(productId);
+  const { data: reviewData, isLoading: reviewsLoading } = useGetReviewsProductById(productId);
+
+  if (isLoading) return <ProductPageSkeleton />;
+
+  if (isError || !data) {
+    return (
+      <PublicLayout>
+        <div className="container mx-auto flex flex-col items-center py-24 text-center">
+          <p className="font-bold text-destructive">Failed to load product details.</p>
+          <Button onClick={() => refetch()} variant="link">
+            Retry
+          </Button>
+        </div>
+      </PublicLayout>
+    );
+  }
+
+  const product = toProductDetail(data);
+
+  return (
+    <PublicLayout>
+      <div className="container mx-auto px-6 py-8 lg:px-12 space-y-8">
+        <Link
+          className="flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground"
+          search={{ page: 1, sort: "newest" }}
+          to="/wines"
+        >
+          <ArrowLeft className="h-4 w-4" />
+          Back to catalog
+        </Link>
+
+        <div className="grid grid-cols-1 gap-8 lg:grid-cols-2">
+          <ProductGallery productName={product.name} />
+
+          <div className="space-y-6">
+            <div className="space-y-6">
+              <ProductInfo
+                isBundle={product.isBundle}
+                name={product.name}
+                rating={reviewData?.averageRating ?? undefined}
+                reviewCount={reviewData?.reviews?.length}
+                wines={product.wines}
+              />
+
+              {product.description && (
+                <ProductDescriptionCard
+                  description={product.description}
+                  isBundle={product.isBundle}
+                />
+              )}
+            </div>
+
+            <div className="space-y-4">
+              <div className="lg:sticky lg:top-8 space-y-4">
+                <ProductPriceRow
+                  price={product.price}
+                  productId={product.id}
+                  quantity={product.quantity}
+                />
+
+                {product.shopId && (
+                  <ProductSoldAtCard shopId={product.shopId} shopName={product.shop?.name} />
+                )}
+
+                {!product.isBundle && product.wines[0]?.winemaker?.id && (
+                  <ProductWinemakerCard
+                    winemakerId={product.wines[0].winemaker.id}
+                    winemakerName={product.wines[0].winemaker.name}
+                  />
+                )}
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <Separator />
+
+        <ProductRelatedSection
+          isBundle={product.isBundle}
+          shopId={product.shopId}
+          wines={product.wines}
+        />
+
+        <Separator />
+
+        <ProductReviewsSection isLoading={reviewsLoading} reviewData={reviewData} />
+      </div>
+    </PublicLayout>
+>>>>>>> origin/main
   );
 }

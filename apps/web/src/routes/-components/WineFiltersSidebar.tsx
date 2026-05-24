@@ -1,0 +1,92 @@
+import { useNavigate } from "@tanstack/react-router";
+import type { FilterSection } from "@/components/catalog/FilterSidebar";
+import { FilterSidebar } from "@/components/catalog/FilterSidebar";
+
+const WINE_FILTERS: FilterSection[] = [
+  {
+    key: "color",
+    label: "Wine Color",
+    options: [
+      { id: "red", label: "Red" },
+      { id: "white", label: "White" },
+      { id: "rosé", label: "Rosé" },
+      { id: "orange", label: "Orange" },
+    ],
+    type: "checkbox",
+  },
+  {
+    key: "type",
+    label: "Wine Type",
+    options: [
+      { id: "still", label: "Still Wine" },
+      { id: "sparkling", label: "Sparkling" },
+      { id: "fortified", label: "Fortified" },
+      { id: "dessert", label: "Dessert Wine" },
+    ],
+    type: "checkbox",
+  },
+  {
+    label: "Price Range",
+    maxKey: "maxPrice",
+    minKey: "minPrice",
+    type: "price-range",
+  },
+  {
+    key: "rating",
+    label: "Rating",
+    type: "rating",
+  },
+  {
+    key: "region",
+    label: "Region",
+    options: [
+      { id: "France", label: "France" },
+      { id: "Italy", label: "Italy" },
+      { id: "Spain", label: "Spain" },
+      { id: "Moravia", label: "Moravia" },
+      { id: "Austria", label: "Austria" },
+    ],
+    type: "checkbox",
+  },
+];
+
+interface WineFiltersSidebarProps {
+  search: {
+    color?: string[];
+    maxPrice?: number;
+    minPrice?: number;
+    page?: number;
+    rating?: number;
+    region?: string[];
+    search?: string;
+    sort?: string;
+    type?: string[];
+  };
+}
+
+export function WineFiltersSidebar({ search }: WineFiltersSidebarProps) {
+  const navigate = useNavigate();
+
+  const handleChange = (key: string, value: unknown) => {
+    navigate({
+      search: (prev) => {
+        const next = { ...prev, [key]: value, page: 1 };
+        return { ...next, sort: next.sort ?? "newest" };
+      },
+      to: "/wines",
+    });
+  };
+
+  const handleClear = () => {
+    navigate({ search: { page: 1, sort: "newest" }, to: "/wines" });
+  };
+
+  return (
+    <FilterSidebar
+      onChange={handleChange}
+      onClear={handleClear}
+      sections={WINE_FILTERS}
+      values={search as Record<string, unknown>}
+    />
+  );
+}

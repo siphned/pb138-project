@@ -15,8 +15,10 @@ export function EventImage({ eventId, alt, fallbackText, className }: EventImage
     <EntityImage
       alt={alt}
       className={className}
+      entityType="event"
       fallbackText={fallbackText}
       imagesQuery={imagesQuery}
     />
   );
 }
+

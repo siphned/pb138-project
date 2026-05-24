@@ -6,6 +6,9 @@ import { PageHeader } from "@/components/primitives/page-header";
 import { useGetCarts } from "@/generated/hooks/useGetCarts";
 import { CartSection } from "./-components/cart/CartSection";
 import { CheckoutSection } from "./-components/cart/CheckoutSection";
+=======
+import { RouteStub } from "./-components/RouteStub";
+>>>>>>> origin/main
 
 export const Route = createFileRoute("/cart")({
   component: CartPage,
@@ -44,4 +47,7 @@ function CartPage() {
       )}
     </div>
   );
+=======
+  return <RouteStub title="Shopping Cart" />;
+>>>>>>> origin/main
 }
