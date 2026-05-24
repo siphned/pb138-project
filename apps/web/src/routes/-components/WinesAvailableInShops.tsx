@@ -1,3 +1,6 @@
+import { ErrorState } from "@/components/primitives/error-state";
+import { Section } from "@/components/primitives/section";
+import { Card, CardContent } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useGetProducts } from "@/generated/hooks/useGetProducts";
 import { ProductPriceRow } from "./ProductPriceRow";
@@ -7,54 +10,70 @@ interface WinesAvailableInShopsProps {
   wineId: string;
 }
 
+function parseQuantity(raw: unknown): number {
+  const n = Number.parseInt(String(raw ?? "0"), 10);
+  return Number.isFinite(n) && n >= 0 ? n : 0;
+}
+
 export function WinesAvailableInShops({ wineId }: WinesAvailableInShopsProps) {
-  const { data: productsData, isLoading, isError } = useGetProducts({ wineId });
+  const { data: productsData, isLoading, isError, refetch } = useGetProducts({ wineId });
 
   if (isLoading) {
     return (
-      <div className="space-y-4">
-        <h3 className="font-heading text-xl font-bold">Available in shops</h3>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+      <Section heading="Available in shops">
+        <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
           <Skeleton className="h-40 rounded-2xl" />
           <Skeleton className="h-40 rounded-2xl" />
         </div>
-      </div>
+      </Section>
     );
   }
 
-  if (isError || !productsData || productsData.data.length === 0) {
+  if (isError) {
     return (
-      <div className="space-y-4">
-        <h3 className="font-heading text-xl font-bold">Available in shops</h3>
-        <p className="text-muted-foreground italic">
+      <Section heading="Available in shops">
+        <ErrorState
+          message="Couldn't load shops selling this wine."
+          onRetry={() => refetch()}
+          title="Failed to load"
+        />
+      </Section>
+    );
+  }
+
+  const products = productsData?.data ?? [];
+
+  if (products.length === 0) {
+    return (
+      <Section heading="Available in shops">
+        <p className="italic text-muted-foreground">
           This wine is not currently available in any shops.
         </p>
-      </div>
+      </Section>
     );
   }
 
   return (
-    <div className="space-y-6">
-      <h3 className="font-heading text-xl font-bold">Available in shops</h3>
+    <Section heading="Available in shops">
       <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
-        {productsData.data.map((product) => (
-          <div className="space-y-4 rounded-2xl border bg-card p-6 shadow-xs" key={product.id}>
-            <div className="flex items-start justify-between">
+        {products.map((product) => (
+          <Card key={product.id} variant="default">
+            <CardContent className="space-y-4">
               <div>
                 <h4 className="font-heading text-lg font-bold">{product.name}</h4>
                 <div className="mt-2">
                   <ProductSoldAtCard shopId={product.shop.id} shopName={product.shop.name} />
                 </div>
               </div>
-            </div>
-            <ProductPriceRow
-              price={product.price}
-              productId={product.id}
-              quantity={Number(product.quantity)}
-            />
-          </div>
+              <ProductPriceRow
+                price={product.price}
+                productId={product.id}
+                quantity={parseQuantity(product.quantity)}
+              />
+            </CardContent>
+          </Card>
         ))}
       </div>
-    </div>
+    </Section>
   );
 }

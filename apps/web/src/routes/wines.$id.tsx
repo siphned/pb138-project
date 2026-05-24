@@ -4,6 +4,7 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { WineDetailsCard } from "@/components/catalog/WineDetailsCard";
 import { ErrorState } from "@/components/primitives/error-state";
 import { LoadingState } from "@/components/primitives/loading-state";
+import { PageHeader } from "@/components/primitives/page-header";
 import { Separator } from "@/components/ui/separator";
 import { useGetWinesById } from "@/generated/hooks/useGetWinesById";
 import { EntityReviewsSection } from "./-components/EntityReviewsSection";
@@ -33,15 +34,21 @@ function WineDetailPage() {
     );
   }
 
+  const subtitle = wine.winemaker?.name
+    ? `${wine.winemaker.name} · ${wine.vintageYear}`
+    : String(wine.vintageYear);
+
   return (
-    <div className="container mx-auto space-y-12 px-6 py-8 lg:px-12">
+    <div className="container mx-auto space-y-8 px-6 py-8 lg:px-12">
       <Link
         className="inline-flex items-center gap-2 text-sm text-muted-foreground transition-colors hover:text-foreground"
         to="/explore"
       >
         <HugeiconsIcon className="h-4 w-4" icon={ArrowLeft02Icon} />
-        Back to explore
+        All wines
       </Link>
+
+      <PageHeader description={subtitle} title={wine.name} />
 
       <div className="grid grid-cols-1 gap-12 lg:grid-cols-[1fr_400px]">
         <div className="space-y-12">
