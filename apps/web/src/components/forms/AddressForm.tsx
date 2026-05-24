@@ -1,6 +1,5 @@
-import { zodResolver } from "@hookform/resolvers/zod";
 import { type ReactNode, useMemo } from "react";
-import { type SubmitHandler, useForm } from "react-hook-form";
+import { type Resolver, type SubmitHandler, useForm } from "react-hook-form";
 import { z } from "zod";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
@@ -130,6 +129,24 @@ export function AddressForm({
 }: AddressFormProps) {
   const schema = useMemo(() => buildSchema(showGuestFields), [showGuestFields]);
 
+  const resolver = useMemo<Resolver<AddressFormValues>>(
+    () => async (values) => {
+      const result = await schema.safeParseAsync(values);
+      if (result.success) {
+        return { values: result.data as AddressFormValues, errors: {} };
+      }
+      const fieldErrors: Record<string, { type: string; message: string }> = {};
+      for (const issue of result.error.issues) {
+        const key = issue.path.map(String).join(".");
+        if (key && !fieldErrors[key]) {
+          fieldErrors[key] = { type: issue.code, message: issue.message };
+        }
+      }
+      return { values: {} as AddressFormValues, errors: fieldErrors as never };
+    },
+    [schema]
+  );
+
   const {
     register,
     handleSubmit,
@@ -155,7 +172,7 @@ export function AddressForm({
       billingStreet: "",
       ...defaultValues,
     },
-    resolver: zodResolver(schema as never),
+    resolver,
   });
 
   const deliveryType = watch("deliveryType");
