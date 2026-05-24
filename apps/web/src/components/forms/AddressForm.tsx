@@ -1,5 +1,11 @@
 import { type ReactNode, useMemo } from "react";
-import { type Resolver, type SubmitHandler, useForm } from "react-hook-form";
+import {
+  type Resolver,
+  type SubmitHandler,
+  type UseFormRegister,
+  type UseFormReturn,
+  useForm,
+} from "react-hook-form";
 import { z } from "zod";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
@@ -19,99 +25,78 @@ const requiredString = (label: string) => z.string().min(1, `${label} is require
 const POSTAL_CODE_REGEX = /^[\d\s-]{3,10}$/;
 const COUNTRY_REGEX = /^[\p{L}\s'-]+$/u;
 const HOUSE_NUMBER_REGEX = /^\d+[a-zA-Z]?(\/\d+)?$/;
+const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+const POSTAL_CODE_MESSAGE = "Postal code must be 3-10 digits (e.g., 60200 or 602 00)";
+const COUNTRY_MESSAGE = "Country must contain only letters";
+const HOUSE_NUMBER_MESSAGE = "House number must be digits, optionally with one letter (e.g., 68A)";
 
 const baseAddressFormSchema = z.object({
   billingAddressSameAsShipping: z.boolean(),
-  city: requiredString("City"),
-  country: requiredString("Country").regex(COUNTRY_REGEX, "Country must contain only letters"),
-  deliveryType: z.enum(["pickup", "shipping"]),
-  guestEmail: z.string().optional().or(z.literal("")),
-  guestName: z.string().optional().or(z.literal("")),
-  houseNumber: requiredString("House number").regex(
-    HOUSE_NUMBER_REGEX,
-    "House number must be digits, optionally with one letter (e.g., 68A)"
-  ),
-  paymentMethod: z.enum(["card", "bank_transfer", "cash_on_delivery"]),
-  postalCode: requiredString("Postal code").regex(
-    POSTAL_CODE_REGEX,
-    "Postal code must be 3-10 digits (e.g., 60200 or 602 00)"
-  ),
-  street: requiredString("Street"),
 
   billingCity: z.string().optional().default(""),
   billingCountry: z.string().optional().default(""),
   billingHouseNumber: z.string().optional().default(""),
   billingPostalCode: z.string().optional().default(""),
   billingStreet: z.string().optional().default(""),
+  city: requiredString("City"),
+  country: requiredString("Country").regex(COUNTRY_REGEX, COUNTRY_MESSAGE),
+  deliveryType: z.enum(["pickup", "shipping"]),
+  guestEmail: z.string().optional().or(z.literal("")),
+  guestName: z.string().optional().or(z.literal("")),
+  houseNumber: requiredString("House number").regex(HOUSE_NUMBER_REGEX, HOUSE_NUMBER_MESSAGE),
+  paymentMethod: z.enum(["card", "bank_transfer", "cash_on_delivery"]),
+  postalCode: requiredString("Postal code").regex(POSTAL_CODE_REGEX, POSTAL_CODE_MESSAGE),
+  street: requiredString("Street"),
 });
 
 export type AddressFormValues = z.infer<typeof baseAddressFormSchema>;
 
+type RefineCtx = z.RefinementCtx;
+
+const BILLING_REQUIRED_FIELDS = [
+  { field: "billingStreet" as const, label: "Street" },
+  { field: "billingHouseNumber" as const, label: "House number" },
+  { field: "billingCity" as const, label: "City" },
+  { field: "billingPostalCode" as const, label: "Postal code" },
+  { field: "billingCountry" as const, label: "Country" },
+];
+
+function addIssue(ctx: RefineCtx, path: keyof AddressFormValues, message: string) {
+  ctx.addIssue({ code: z.ZodIssueCode.custom, message, path: [path] });
+}
+
+function validateBillingFields(data: AddressFormValues, ctx: RefineCtx) {
+  for (const { field, label } of BILLING_REQUIRED_FIELDS) {
+    if (!data[field]) addIssue(ctx, field, `${label} is required`);
+  }
+  if (data.billingCountry && !COUNTRY_REGEX.test(data.billingCountry)) {
+    addIssue(ctx, "billingCountry", COUNTRY_MESSAGE);
+  }
+  if (data.billingPostalCode && !POSTAL_CODE_REGEX.test(data.billingPostalCode)) {
+    addIssue(ctx, "billingPostalCode", POSTAL_CODE_MESSAGE);
+  }
+  if (data.billingHouseNumber && !HOUSE_NUMBER_REGEX.test(data.billingHouseNumber)) {
+    addIssue(ctx, "billingHouseNumber", HOUSE_NUMBER_MESSAGE);
+  }
+}
+
+function validateGuestFields(data: AddressFormValues, ctx: RefineCtx) {
+  const name = data.guestName?.trim() ?? "";
+  if (!name) addIssue(ctx, "guestName", "Name is required");
+
+  const email = data.guestEmail?.trim() ?? "";
+  if (!email) {
+    addIssue(ctx, "guestEmail", "Email is required");
+  } else if (!EMAIL_REGEX.test(email)) {
+    addIssue(ctx, "guestEmail", "Invalid email");
+  }
+}
+
 function buildSchema(showGuestFields: boolean) {
   return baseAddressFormSchema.superRefine((data, ctx) => {
-    if (!data.billingAddressSameAsShipping) {
-      const billing = [
-        { field: "billingStreet" as const, label: "Street" },
-        { field: "billingHouseNumber" as const, label: "House number" },
-        { field: "billingCity" as const, label: "City" },
-        { field: "billingPostalCode" as const, label: "Postal code" },
-        { field: "billingCountry" as const, label: "Country" },
-      ];
-      for (const { field, label } of billing) {
-        if (!data[field]) {
-          ctx.addIssue({
-            code: z.ZodIssueCode.custom,
-            path: [field],
-            message: `${label} is required`,
-          });
-        }
-      }
-
-      if (data.billingCountry && !COUNTRY_REGEX.test(data.billingCountry)) {
-        ctx.addIssue({
-          code: z.ZodIssueCode.custom,
-          path: ["billingCountry"],
-          message: "Country must contain only letters",
-        });
-      }
-      if (data.billingPostalCode && !POSTAL_CODE_REGEX.test(data.billingPostalCode)) {
-        ctx.addIssue({
-          code: z.ZodIssueCode.custom,
-          path: ["billingPostalCode"],
-          message: "Postal code must be 3-10 digits (e.g., 60200 or 602 00)",
-        });
-      }
-      if (data.billingHouseNumber && !HOUSE_NUMBER_REGEX.test(data.billingHouseNumber)) {
-        ctx.addIssue({
-          code: z.ZodIssueCode.custom,
-          path: ["billingHouseNumber"],
-          message: "House number must be digits, optionally with one letter (e.g., 68A)",
-        });
-      }
-    }
-
-    if (showGuestFields) {
-      if (!data.guestName || data.guestName.trim().length === 0) {
-        ctx.addIssue({
-          code: z.ZodIssueCode.custom,
-          path: ["guestName"],
-          message: "Name is required",
-        });
-      }
-      if (!data.guestEmail || data.guestEmail.trim().length === 0) {
-        ctx.addIssue({
-          code: z.ZodIssueCode.custom,
-          path: ["guestEmail"],
-          message: "Email is required",
-        });
-      } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(data.guestEmail)) {
-        ctx.addIssue({
-          code: z.ZodIssueCode.custom,
-          path: ["guestEmail"],
-          message: "Invalid email",
-        });
-      }
-    }
+    if (!data.billingAddressSameAsShipping) validateBillingFields(data, ctx);
+    if (showGuestFields) validateGuestFields(data, ctx);
   });
 }
 
@@ -134,21 +119,160 @@ export interface AddressFormProps {
   footer?: ReactNode;
 }
 
-const SHIPPING_FIELDS = [
-  "street",
-  "houseNumber",
-  "city",
-  "postalCode",
-  "country",
-] as const satisfies ReadonlyArray<keyof AddressFormValues>;
+type AddressFieldKey = "street" | "houseNumber" | "city" | "postalCode" | "country";
 
-const BILLING_FIELDS = [
-  "billingStreet",
-  "billingHouseNumber",
-  "billingCity",
-  "billingPostalCode",
-  "billingCountry",
-] as const satisfies ReadonlyArray<keyof AddressFormValues>;
+type AddressFieldGroupKeys = {
+  street: keyof AddressFormValues;
+  houseNumber: keyof AddressFormValues;
+  city: keyof AddressFormValues;
+  postalCode: keyof AddressFormValues;
+  country: keyof AddressFormValues;
+};
+
+const SHIPPING_KEYS: AddressFieldGroupKeys = {
+  city: "city",
+  country: "country",
+  houseNumber: "houseNumber",
+  postalCode: "postalCode",
+  street: "street",
+};
+
+const BILLING_KEYS: AddressFieldGroupKeys = {
+  city: "billingCity",
+  country: "billingCountry",
+  houseNumber: "billingHouseNumber",
+  postalCode: "billingPostalCode",
+  street: "billingStreet",
+};
+
+function buildResolver(schema: ReturnType<typeof buildSchema>): Resolver<AddressFormValues> {
+  return async (values) => {
+    const result = await schema.safeParseAsync(values);
+    if (result.success) {
+      return { errors: {}, values: result.data as AddressFormValues };
+    }
+    const fieldErrors: Record<string, { type: string; message: string }> = {};
+    for (const issue of result.error.issues) {
+      const key = issue.path.map(String).join(".");
+      if (key && !fieldErrors[key]) {
+        fieldErrors[key] = { message: issue.message, type: issue.code };
+      }
+    }
+    return { errors: fieldErrors as never, values: {} as AddressFormValues };
+  };
+}
+
+type FormErrors = UseFormReturn<AddressFormValues>["formState"]["errors"];
+
+function FieldError({ message }: { message?: string }) {
+  if (!message) return null;
+  return <p className="mt-1 text-xs text-destructive">{message}</p>;
+}
+
+function AddressFields({
+  keys,
+  register,
+  errors,
+}: {
+  keys: AddressFieldGroupKeys;
+  register: UseFormRegister<AddressFormValues>;
+  errors: FormErrors;
+}) {
+  const errFor = (k: AddressFieldKey) => errors[keys[k]]?.message as string | undefined;
+  return (
+    <>
+      <div>
+        <Label htmlFor={keys.country}>Country</Label>
+        <Input id={keys.country} {...register(keys.country)} placeholder="Czech Republic" />
+        <FieldError message={errFor("country")} />
+      </div>
+      <div className="grid grid-cols-2 gap-4">
+        <div>
+          <Label htmlFor={keys.city}>City</Label>
+          <Input id={keys.city} {...register(keys.city)} placeholder="Brno" />
+          <FieldError message={errFor("city")} />
+        </div>
+        <div>
+          <Label htmlFor={keys.postalCode}>Postal Code</Label>
+          <Input id={keys.postalCode} {...register(keys.postalCode)} placeholder="602 00" />
+          <FieldError message={errFor("postalCode")} />
+        </div>
+      </div>
+      <div className="grid grid-cols-2 gap-4">
+        <div>
+          <Label htmlFor={keys.street}>Street</Label>
+          <Input id={keys.street} {...register(keys.street)} placeholder="Botanická" />
+          <FieldError message={errFor("street")} />
+        </div>
+        <div>
+          <Label htmlFor={keys.houseNumber}>House No.</Label>
+          <Input id={keys.houseNumber} {...register(keys.houseNumber)} placeholder="68A" />
+          <FieldError message={errFor("houseNumber")} />
+        </div>
+      </div>
+    </>
+  );
+}
+
+function GuestFields({
+  register,
+  errors,
+}: {
+  register: UseFormRegister<AddressFormValues>;
+  errors: FormErrors;
+}) {
+  return (
+    <div className="space-y-4 rounded-md border border-border p-4">
+      <p className="text-sm font-medium">Guest Information</p>
+      <div>
+        <Label htmlFor="guestName">
+          Full Name <span className="text-destructive">*</span>
+        </Label>
+        <Input id="guestName" {...register("guestName")} placeholder="John Doe" />
+        <FieldError message={errors.guestName?.message as string | undefined} />
+      </div>
+      <div>
+        <Label htmlFor="guestEmail">
+          Email <span className="text-destructive">*</span>
+        </Label>
+        <Input
+          id="guestEmail"
+          type="email"
+          {...register("guestEmail")}
+          placeholder="john@example.com"
+        />
+        <FieldError message={errors.guestEmail?.message as string | undefined} />
+      </div>
+    </div>
+  );
+}
+
+function SectionHeader({ title, onUseSaved }: { title: string; onUseSaved?: () => void }) {
+  return (
+    <div className="flex items-center justify-between gap-2">
+      <p className="text-sm font-medium">{title}</p>
+      {onUseSaved && (
+        <Button onClick={onUseSaved} size="sm" type="button" variant="outline">
+          Use saved address
+        </Button>
+      )}
+    </div>
+  );
+}
+
+function ErrorBanner({ count }: { count: number }) {
+  if (count === 0) return null;
+  return (
+    <div
+      aria-live="polite"
+      className="rounded-md border border-destructive/40 bg-destructive/10 px-4 py-3 text-sm text-destructive"
+    >
+      {count === 1
+        ? "Please fix the error below before confirming your order."
+        : `Please fix the ${count} errors below before confirming your order.`}
+    </div>
+  );
+}
 
 export function AddressForm({
   defaultValues,
@@ -160,24 +284,7 @@ export function AddressForm({
   footer,
 }: AddressFormProps) {
   const schema = useMemo(() => buildSchema(showGuestFields), [showGuestFields]);
-
-  const resolver = useMemo<Resolver<AddressFormValues>>(
-    () => async (values) => {
-      const result = await schema.safeParseAsync(values);
-      if (result.success) {
-        return { values: result.data as AddressFormValues, errors: {} };
-      }
-      const fieldErrors: Record<string, { type: string; message: string }> = {};
-      for (const issue of result.error.issues) {
-        const key = issue.path.map(String).join(".");
-        if (key && !fieldErrors[key]) {
-          fieldErrors[key] = { type: issue.code, message: issue.message };
-        }
-      }
-      return { values: {} as AddressFormValues, errors: fieldErrors as never };
-    },
-    [schema]
-  );
+  const resolver = useMemo(() => buildResolver(schema), [schema]);
 
   const {
     register,
@@ -188,6 +295,11 @@ export function AddressForm({
   } = useForm<AddressFormValues>({
     defaultValues: {
       billingAddressSameAsShipping: true,
+      billingCity: "",
+      billingCountry: "",
+      billingHouseNumber: "",
+      billingPostalCode: "",
+      billingStreet: "",
       city: "",
       country: "",
       deliveryType: "shipping",
@@ -197,11 +309,6 @@ export function AddressForm({
       paymentMethod: "card",
       postalCode: "",
       street: "",
-      billingCity: "",
-      billingCountry: "",
-      billingHouseNumber: "",
-      billingPostalCode: "",
-      billingStreet: "",
       ...defaultValues,
     },
     resolver,
@@ -211,72 +318,23 @@ export function AddressForm({
   const paymentMethod = watch("paymentMethod");
   const billingSameAsShipping = watch("billingAddressSameAsShipping");
   const errorCount = Object.keys(errors).length;
-  const showErrorBanner = errorCount > 0;
 
-  const applySavedAddress = (
-    saved: SavedAddress,
-    fields: typeof SHIPPING_FIELDS | typeof BILLING_FIELDS,
-    prefix: "" | "billing"
-  ) => {
-    const map = {
-      street: saved.street,
-      houseNumber: saved.houseNumber,
-      city: saved.city,
-      postalCode: saved.postalCode,
-      country: saved.country,
-    } as const;
-    for (const field of fields) {
-      const baseKey = (prefix
-        ? (field.replace(prefix, "").charAt(0).toLowerCase() +
-            field.replace(prefix, "").slice(1))
-        : field) as keyof typeof map;
-      setValue(field, map[baseKey], { shouldDirty: true, shouldValidate: true });
-    }
+  const applySavedAddress = (saved: SavedAddress, keys: AddressFieldGroupKeys) => {
+    setValue(keys.street, saved.street, { shouldDirty: true, shouldValidate: true });
+    setValue(keys.houseNumber, saved.houseNumber, { shouldDirty: true, shouldValidate: true });
+    setValue(keys.city, saved.city, { shouldDirty: true, shouldValidate: true });
+    setValue(keys.postalCode, saved.postalCode, { shouldDirty: true, shouldValidate: true });
+    setValue(keys.country, saved.country, { shouldDirty: true, shouldValidate: true });
   };
 
-  const addressSectionTitle = deliveryType === "pickup" ? "Contact Address" : "Shipping Address";
+  const addressTitle = deliveryType === "pickup" ? "Contact Address" : "Shipping Address";
+  const billingSameLabel = deliveryType === "pickup" ? "contact" : "shipping";
 
   return (
     <form className="space-y-6" noValidate onSubmit={handleSubmit(onSubmit)}>
-      {showErrorBanner && (
-        <div
-          aria-live="polite"
-          className="rounded-md border border-destructive/40 bg-destructive/10 px-4 py-3 text-sm text-destructive"
-        >
-          {errorCount === 1
-            ? "Please fix the error below before confirming your order."
-            : `Please fix the ${errorCount} errors below before confirming your order.`}
-        </div>
-      )}
+      <ErrorBanner count={errorCount} />
 
-      {showGuestFields && (
-        <div className="space-y-4 rounded-md border border-border p-4">
-          <p className="text-sm font-medium">Guest Information</p>
-          <div>
-            <Label htmlFor="guestName">
-              Full Name <span className="text-destructive">*</span>
-            </Label>
-            <Input id="guestName" {...register("guestName")} placeholder="John Doe" />
-            {errors.guestName && (
-              <p className="mt-1 text-xs text-destructive">{errors.guestName.message}</p>
-            )}
-          </div>
-          <div>
-            <Label htmlFor="guestEmail">
-              Email <span className="text-destructive">*</span>
-            </Label>
-            <Input
-              id="guestEmail"
-              type="email"
-              {...register("guestEmail")}
-              placeholder="john@example.com"
-            />
-            {errors.guestEmail && (
-              <p className="mt-1 text-xs text-destructive">{errors.guestEmail.message}</p>
-            )}
-          </div>
-        </div>
-      )}
+      {showGuestFields && <GuestFields errors={errors} register={register} />}
 
       <div>
         <Label className="mb-2 block">Delivery Method</Label>
@@ -290,56 +348,13 @@ export function AddressForm({
       </div>
 
       <div className="space-y-4">
-        <div className="flex items-center justify-between gap-2">
-          <p className="text-sm font-medium">{addressSectionTitle}</p>
-          {savedShipping && (
-            <Button
-              onClick={() => applySavedAddress(savedShipping, SHIPPING_FIELDS, "")}
-              size="sm"
-              type="button"
-              variant="outline"
-            >
-              Use saved address
-            </Button>
-          )}
-        </div>
-        <div>
-          <Label htmlFor="country">Country</Label>
-          <Input id="country" {...register("country")} placeholder="Czech Republic" />
-          {errors.country && (
-            <p className="mt-1 text-xs text-destructive">{errors.country.message}</p>
-          )}
-        </div>
-        <div className="grid grid-cols-2 gap-4">
-          <div>
-            <Label htmlFor="city">City</Label>
-            <Input id="city" {...register("city")} placeholder="Brno" />
-            {errors.city && <p className="mt-1 text-xs text-destructive">{errors.city.message}</p>}
-          </div>
-          <div>
-            <Label htmlFor="postalCode">Postal Code</Label>
-            <Input id="postalCode" {...register("postalCode")} placeholder="602 00" />
-            {errors.postalCode && (
-              <p className="mt-1 text-xs text-destructive">{errors.postalCode.message}</p>
-            )}
-          </div>
-        </div>
-        <div className="grid grid-cols-2 gap-4">
-          <div>
-            <Label htmlFor="street">Street</Label>
-            <Input id="street" {...register("street")} placeholder="Botanická" />
-            {errors.street && (
-              <p className="mt-1 text-xs text-destructive">{errors.street.message}</p>
-            )}
-          </div>
-          <div>
-            <Label htmlFor="houseNumber">House No.</Label>
-            <Input id="houseNumber" {...register("houseNumber")} placeholder="68A" />
-            {errors.houseNumber && (
-              <p className="mt-1 text-xs text-destructive">{errors.houseNumber.message}</p>
-            )}
-          </div>
-        </div>
+        <SectionHeader
+          onUseSaved={
+            savedShipping ? () => applySavedAddress(savedShipping, SHIPPING_KEYS) : undefined
+          }
+          title={addressTitle}
+        />
+        <AddressFields errors={errors} keys={SHIPPING_KEYS} register={register} />
       </div>
 
       <div>
@@ -368,77 +383,19 @@ export function AddressForm({
           onCheckedChange={(checked) => setValue("billingAddressSameAsShipping", checked === true)}
         />
         <Label htmlFor="billingAddressSameAsShipping">
-          Billing address is the same as {deliveryType === "pickup" ? "contact" : "shipping"}{" "}
-          address
+          Billing address is the same as {billingSameLabel} address
         </Label>
       </div>
 
       {!billingSameAsShipping && (
         <div className="space-y-4">
-          <div className="flex items-center justify-between gap-2">
-            <p className="text-sm font-medium">Billing Address</p>
-            {savedBilling && (
-              <Button
-                onClick={() => applySavedAddress(savedBilling, BILLING_FIELDS, "billing")}
-                size="sm"
-                type="button"
-                variant="outline"
-              >
-                Use saved address
-              </Button>
-            )}
-          </div>
-          <div>
-            <Label htmlFor="billingCountry">Country</Label>
-            <Input
-              id="billingCountry"
-              {...register("billingCountry")}
-              placeholder="Czech Republic"
-            />
-            {errors.billingCountry && (
-              <p className="mt-1 text-xs text-destructive">{errors.billingCountry.message}</p>
-            )}
-          </div>
-          <div className="grid grid-cols-2 gap-4">
-            <div>
-              <Label htmlFor="billingCity">City</Label>
-              <Input id="billingCity" {...register("billingCity")} placeholder="Brno" />
-              {errors.billingCity && (
-                <p className="mt-1 text-xs text-destructive">{errors.billingCity.message}</p>
-              )}
-            </div>
-            <div>
-              <Label htmlFor="billingPostalCode">Postal Code</Label>
-              <Input
-                id="billingPostalCode"
-                {...register("billingPostalCode")}
-                placeholder="602 00"
-              />
-              {errors.billingPostalCode && (
-                <p className="mt-1 text-xs text-destructive">{errors.billingPostalCode.message}</p>
-              )}
-            </div>
-          </div>
-          <div className="grid grid-cols-2 gap-4">
-            <div>
-              <Label htmlFor="billingStreet">Street</Label>
-              <Input id="billingStreet" {...register("billingStreet")} placeholder="Botanická" />
-              {errors.billingStreet && (
-                <p className="mt-1 text-xs text-destructive">{errors.billingStreet.message}</p>
-              )}
-            </div>
-            <div>
-              <Label htmlFor="billingHouseNumber">House No.</Label>
-              <Input
-                id="billingHouseNumber"
-                {...register("billingHouseNumber")}
-                placeholder="68A"
-              />
-              {errors.billingHouseNumber && (
-                <p className="mt-1 text-xs text-destructive">{errors.billingHouseNumber.message}</p>
-              )}
-            </div>
-          </div>
+          <SectionHeader
+            onUseSaved={
+              savedBilling ? () => applySavedAddress(savedBilling, BILLING_KEYS) : undefined
+            }
+            title="Billing Address"
+          />
+          <AddressFields errors={errors} keys={BILLING_KEYS} register={register} />
         </div>
       )}
 

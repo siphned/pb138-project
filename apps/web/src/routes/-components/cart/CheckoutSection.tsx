@@ -12,6 +12,12 @@ import type { GetCarts200 } from "@/generated/types/GetCarts";
 import { cn } from "@/lib/utils";
 import { CartSummary } from "./CartSummary";
 
+function toErrorMessage(err: unknown): string {
+  if (err instanceof Error) return err.message;
+  if (typeof err === "string") return err;
+  return "Checkout failed. Please try again.";
+}
+
 interface CheckoutSectionProps {
   cart: GetCarts200 | null;
   deliveryType: "pickup" | "shipping";
@@ -105,13 +111,7 @@ export function CheckoutSection({
       await navigate({ search: { orderId: result.id }, to: "/checkout/confirmed" });
       queryClient.invalidateQueries({ queryKey: getCartsQueryKey() });
     } catch (err) {
-      const message =
-        err instanceof Error
-          ? err.message
-          : typeof err === "string"
-            ? err
-            : "Checkout failed. Please try again.";
-      setCheckoutError(message);
+      setCheckoutError(toErrorMessage(err));
     }
   };
 

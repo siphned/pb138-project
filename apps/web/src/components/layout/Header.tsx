@@ -1,5 +1,5 @@
 import { Show, useClerk } from "@clerk/react";
-import { ShoppingCart01Icon, User02Icon } from "@hugeicons/core-free-icons";
+import { ShoppingCart02Icon, User02Icon } from "@hugeicons/core-free-icons";
 import { HugeiconsIcon } from "@hugeicons/react";
 import { Link } from "@tanstack/react-router";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
@@ -17,8 +17,7 @@ export function Header() {
   const roles = user?.roles ?? [];
 
   const { data: cart } = useGetCarts();
-  const cartCount =
-    cart?.items.reduce((acc, item) => acc + Number(item.quantity || 0), 0) ?? 0;
+  const cartCount = cart?.items.reduce((acc, item) => acc + Number(item.quantity || 0), 0) ?? 0;
 
   return (
     <header className="h-16 border-b bg-background flex items-center justify-between px-6 lg:px-12">
@@ -31,10 +30,13 @@ export function Header() {
 
         <Link
           aria-label={cartCount > 0 ? `Shopping cart (${cartCount} items)` : "Shopping cart"}
-          className={cn(buttonVariants({ size: "icon", variant: "ghost" }), "relative hidden sm:flex")}
+          className={cn(
+            buttonVariants({ size: "icon", variant: "ghost" }),
+            "relative hidden sm:flex"
+          )}
           to="/cart"
         >
-          <HugeiconsIcon className="h-5 w-5" icon={ShoppingCart01Icon} />
+          <HugeiconsIcon className="h-5 w-5" icon={ShoppingCart02Icon} strokeWidth={2} />
           {cartCount > 0 && (
             <span className="absolute -right-1 -top-1 flex h-5 min-w-5 items-center justify-center rounded-full bg-primary px-1 text-xs font-semibold text-primary-foreground">
               {cartCount > 99 ? "99+" : cartCount}

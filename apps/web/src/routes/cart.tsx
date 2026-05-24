@@ -24,7 +24,9 @@ function CartPage() {
 
       {isError && (
         <ErrorState
-          message={typeof error === "string" ? error : "Could not load your cart. Please try again."}
+          message={
+            typeof error === "string" ? error : "Could not load your cart. Please try again."
+          }
           onRetry={() => refetch()}
           title="Failed to load cart"
         />

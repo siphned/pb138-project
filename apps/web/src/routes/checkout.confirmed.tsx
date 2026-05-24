@@ -41,13 +41,7 @@ export const Route = createFileRoute("/checkout/confirmed")({
 
 function CheckoutConfirmedPage() {
   const { orderId } = Route.useSearch();
-  const {
-    data,
-    isLoading,
-    isError,
-    error,
-    refetch,
-  } = useGetOrdersById(orderId || undefined);
+  const { data, isLoading, isError, error, refetch } = useGetOrdersById(orderId || undefined);
   const order = data as OrderDetail | undefined;
 
   if (!orderId) {

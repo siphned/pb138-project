@@ -7,7 +7,7 @@ import {
   Moon01Icon,
   Package01Icon,
   Search01Icon,
-  ShoppingCart01Icon,
+  ShoppingCart02Icon,
   Store01Icon,
   Sun01Icon,
   User02Icon,
@@ -56,10 +56,14 @@ export function Sidebar({ userRoles = [Role.customer], activeRole, onRoleChange 
   // "My Events" links can carry the real ids instead of a magic `"me"` string.
   // Each hook is gated by the active role so we don't 404 non-winemakers etc.
   const winemakerProfile = useGetWinemakersMe({
-    query: { enabled: isSignedIn === true && currentActiveRole === Role.winemaker },
+    query: {
+      enabled: isSignedIn === true && currentActiveRole === Role.winemaker,
+    },
   });
   const shopOwnerProfile = useGetShopsMe({
-    query: { enabled: isSignedIn === true && currentActiveRole === Role.shopOwner },
+    query: {
+      enabled: isSignedIn === true && currentActiveRole === Role.shopOwner,
+    },
   });
   const winemakerId = winemakerProfile.data?.id;
   const winemakerName = winemakerProfile.data?.name;
@@ -184,11 +188,11 @@ export function Sidebar({ userRoles = [Role.customer], activeRole, onRoleChange 
               render={<Link to="/cart" />}
               variant="active"
             >
-              <HugeiconsIcon icon={ShoppingCart01Icon} /> Shopping cart
+              <HugeiconsIcon icon={ShoppingCart02Icon} /> Shopping cart
             </NavItem>
 
             <NavItem onClick={closeSheet} render={<Link to="/explore" />} variant="active">
-              <Wine className="h-4 w-4" /> Explore Wines
+              <Wine className="h-5 w-5" /> Explore Wines
             </NavItem>
 
             <NavItem onClick={closeSheet} render={<Link to="/products" />} variant="active">
