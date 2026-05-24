@@ -168,8 +168,8 @@ export function Sidebar({ userRoles = [Role.customer], activeRole, onRoleChange 
               <ShoppingCart className="h-4 w-4" /> Shopping cart
             </NavItem>
 
-            <NavItem onClick={closeSheet} render={<Link to="/explore" />} variant="active">
-              <Wine className="h-4 w-4" /> Explore Wines
+            <NavItem onClick={closeSheet} render={<Link to="/wines" />} variant="active">
+              <Wine className="h-4 w-4" /> All Wines
             </NavItem>
 
             <NavItem
@@ -195,7 +195,7 @@ export function Sidebar({ userRoles = [Role.customer], activeRole, onRoleChange 
                 <>
                   <NavItem
                     onClick={closeSheet}
-                    render={<Link search={{ winemakerId: "me" }} to="/explore" />}
+                    render={<Link search={{ winemakerId: "me" }} to="/wines" />}
                     variant="active"
                   >
                     <Wine className="h-4 w-4" /> My Wines

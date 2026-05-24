@@ -59,7 +59,7 @@ function DashboardStub() {
           <Link
             className="block text-primary hover:underline"
             search={{ winemakerId: "me" }}
-            to="/explore"
+            to="/wines"
           >
             My wines
           </Link>

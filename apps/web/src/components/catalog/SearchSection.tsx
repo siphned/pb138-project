@@ -7,7 +7,7 @@ import { Button } from "@/components/ui/button";
 import type { ProductSearch, ShopSearch, WinemakerSearch, WineSearch } from "./types";
 
 type ViewAllProps =
-  | { viewAllHref: "/explore"; viewAllSearch?: WineSearch }
+  | { viewAllHref: "/wines"; viewAllSearch?: WineSearch }
   | { viewAllHref: "/products"; viewAllSearch?: ProductSearch }
   | { viewAllHref: "/winemakers"; viewAllSearch?: WinemakerSearch }
   | { viewAllHref: "/shops"; viewAllSearch?: ShopSearch };

@@ -16,14 +16,15 @@ interface BundlesContainingWineProps {
 
 export function BundlesContainingWine({ shopId, wineId }: BundlesContainingWineProps) {
   const { data, isLoading } = useGetShopsByIdProducts(shopId, { isBundle: "true" });
-  const allBundles = data as RawBundle[] | undefined;
+  const allBundles: RawBundle[] = Array.isArray(data)
+    ? (data as RawBundle[])
+    : ((data as { data?: RawBundle[] } | undefined)?.data ?? []);
 
-  const bundles =
-    allBundles?.filter((b) => {
-      if (Array.isArray(b.wines)) return b.wines.some((w) => w.id === wineId);
-      if (Array.isArray(b.productWines)) return b.productWines.some((pw) => pw.wine?.id === wineId);
-      return false;
-    }) ?? [];
+  const bundles = allBundles.filter((b) => {
+    if (Array.isArray(b.wines)) return b.wines.some((w) => w.id === wineId);
+    if (Array.isArray(b.productWines)) return b.productWines.some((pw) => pw.wine?.id === wineId);
+    return false;
+  });
 
   if (isLoading) {
     return (

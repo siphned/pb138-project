@@ -123,7 +123,7 @@ function SearchPage() {
         <SearchSection
           count={wineCount}
           heading="Wines"
-          viewAllHref="/explore"
+          viewAllHref="/wines"
           viewAllSearch={{ ...search }}
         >
           {filteredWines.slice(0, 3).map((wine) => (

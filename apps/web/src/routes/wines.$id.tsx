@@ -42,7 +42,7 @@ function WineDetailPage() {
     <div className="container mx-auto space-y-8 px-6 py-8 lg:px-12">
       <Link
         className="inline-flex items-center gap-2 text-sm text-muted-foreground transition-colors hover:text-foreground"
-        to="/explore"
+        to="/wines"
       >
         <HugeiconsIcon className="h-4 w-4" icon={ArrowLeft02Icon} />
         All wines
@@ -50,18 +50,16 @@ function WineDetailPage() {
 
       <PageHeader description={subtitle} title={wine.name} />
 
-      <div className="grid grid-cols-1 gap-12 lg:grid-cols-[1fr_400px]">
-        <div className="space-y-12">
-          <WineDetailsCard wine={wine} />
+      <div className="space-y-12">
+        <WineDetailsCard wine={wine} />
 
-          <Separator />
+        <Separator />
 
-          <WinesAvailableInShops wineId={id} />
-        </div>
+        <WinesAvailableInShops wineId={id} />
 
-        <aside className="space-y-12">
-          <EntityReviewsSection entityId={id} entityType="wine" />
-        </aside>
+        <Separator />
+
+        <EntityReviewsSection entityId={id} entityType="wine" />
       </div>
     </div>
   );
