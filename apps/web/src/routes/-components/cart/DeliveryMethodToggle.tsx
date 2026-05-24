@@ -1,4 +1,5 @@
-import { MapPinIcon, TruckIcon } from "hugeicons-react";
+import { MapPinIcon, ShippingTruck01Icon } from "@hugeicons/core-free-icons";
+import { HugeiconsIcon } from "@hugeicons/react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 
@@ -7,35 +8,33 @@ type DeliveryMethodToggleProps = {
   onChange: (value: "pickup" | "shipping") => void;
 };
 
+const optionClasses = (active: boolean) =>
+  cn(
+    "flex items-center justify-center gap-2 border-2 p-8",
+    active
+      ? "border-primary bg-primary/5 text-primary"
+      : "border-border bg-muted text-muted-foreground"
+  );
+
 export function DeliveryMethodToggle({ value, onChange }: DeliveryMethodToggleProps) {
   return (
     <div className="grid grid-cols-2 gap-2">
       <Button
-        className={cn(
-          "flex p-8 items-center justify-center gap-2 border-2",
-          value === "pickup"
-            ? "border-primary bg-primary/5 text-primary"
-            : "border-secondary bg-secondary/20 text-secondary-foreground"
-        )}
+        className={optionClasses(value === "pickup")}
         onClick={() => onChange("pickup")}
         type="button"
         variant="ghost"
       >
-        <MapPinIcon className="h-6 w-6" />
+        <HugeiconsIcon className="h-6 w-6" icon={MapPinIcon} />
         <span className="text-xs font-semibold">Personal Pickup</span>
       </Button>
       <Button
-        className={cn(
-          "flex p-8 items-center justify-center gap-2 border-2",
-          value === "shipping"
-            ? "border-primary bg-primary/5 text-primary"
-            : "border-secondary bg-secondary/20 text-secondary-foreground"
-        )}
+        className={optionClasses(value === "shipping")}
         onClick={() => onChange("shipping")}
         type="button"
         variant="ghost"
       >
-        <TruckIcon className="h-6 w-6" />
+        <HugeiconsIcon className="h-6 w-6" icon={ShippingTruck01Icon} />
         <span className="text-xs font-semibold">Home Delivery</span>
       </Button>
     </div>
