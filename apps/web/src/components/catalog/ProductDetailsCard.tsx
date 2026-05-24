@@ -1,7 +1,7 @@
 import {
   MinusSignIcon,
   PlusSignIcon,
-  ShoppingCart01Icon,
+  ShoppingCart02Icon,
 } from "@hugeicons/core-free-icons";
 import { HugeiconsIcon } from "@hugeicons/react";
 import { Link } from "@tanstack/react-router";
@@ -154,23 +154,26 @@ export function ProductDetailsCard({
             <div className="flex flex-wrap items-center gap-2">
               {product.isBundle && <Badge variant="secondary">Bundle</Badge>}
               <Badge variant={stock.variant}>{stock.label}</Badge>
-              {product.shop?.id && product.shop?.name && (
-                <Link params={{ id: product.shop.id }} to="/shops/$id">
-                  <Badge
-                    className="cursor-pointer hover:bg-accent hover:text-accent-foreground"
-                    variant="outline"
-                  >
-                    Sold by {product.shop.name}
-                  </Badge>
-                </Link>
-              )}
             </div>
 
             <h1 className="font-heading text-3xl font-bold leading-tight tracking-tight text-foreground sm:text-4xl">
               {product.name}
             </h1>
 
-            <p className="font-heading text-3xl font-bold text-foreground">{price}</p>
+            <div className="space-y-1">
+              <p className="font-heading text-3xl font-bold text-foreground">{price}</p>
+              {product.shop?.id && product.shop?.name && (
+                <p className="text-sm">
+                  <Link
+                    className="text-muted-foreground transition-colors hover:text-primary hover:underline"
+                    params={{ id: product.shop.id }}
+                    to="/shops/$id"
+                  >
+                    Sold by {product.shop.name}
+                  </Link>
+                </p>
+              )}
+            </div>
 
             {product.description && (
               <>
@@ -200,8 +203,8 @@ export function ProductDetailsCard({
                 disabled={isAddingToCart || outOfStock}
                 onClick={() => onAddToCart(clampedQuantity)}
               >
-                <HugeiconsIcon className="mr-2 h-4 w-4" icon={ShoppingCart01Icon} />
-                {isAddingToCart ? "Adding..." : `Add ${clampedQuantity} to cart`}
+                <HugeiconsIcon className="mr-2 h-4 w-4" icon={ShoppingCart02Icon} />
+                {isAddingToCart ? "Adding..." : "Add to cart"}
               </Button>
             </div>
           </div>
