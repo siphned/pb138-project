@@ -2,6 +2,7 @@ import { Show, useAuth, useClerk, useUser as useClerkUser } from "@clerk/react";
 import {
   Calendar01Icon,
   ChartBarLineIcon,
+  DrinkIcon,
   LogoutSquare02Icon,
   Menu01Icon,
   Moon01Icon,
@@ -15,7 +16,6 @@ import {
 } from "@hugeicons/core-free-icons";
 import { HugeiconsIcon } from "@hugeicons/react";
 import { Link, useNavigate } from "@tanstack/react-router";
-import { Wine } from "lucide-react";
 import { useState } from "react";
 import { NavItem } from "@/components/primitives/nav-item";
 import {
@@ -192,7 +192,7 @@ export function Sidebar({ userRoles = [Role.customer], activeRole, onRoleChange 
             </NavItem>
 
             <NavItem onClick={closeSheet} render={<Link to="/explore" />} variant="active">
-              <Wine className="h-5 w-5" /> Explore Wines
+              <HugeiconsIcon className="h-5 w-5" icon={DrinkIcon} /> Explore Wines
             </NavItem>
 
             <NavItem onClick={closeSheet} render={<Link to="/products" />} variant="active">
@@ -299,7 +299,7 @@ function RoleNavItems({
           render={<Link search={winemakerId ? { winemakerId } : undefined} to="/explore" />}
           variant="active"
         >
-          <Wine className="h-4 w-4" /> My Wines
+          <HugeiconsIcon className="h-4 w-4" icon={DrinkIcon} /> My Wines
         </NavItem>
         <NavItem
           onClick={closeSheet}
