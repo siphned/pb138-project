@@ -48,7 +48,11 @@ export const cartsRoutes = new Elysia({ prefix: "/carts", tags: ["carts"] })
   .derive(async ({ headers, cookie: { guest_session_id } }) => {
     const payload = await verifyClerkToken(headers.authorization);
     if (payload) {
+<<<<<<< HEAD
       const dbUser = await usersService.lazyGetOrCreate(payload.sub);
+=======
+      const dbUser = await usersService.lazyGetOrCreate(payload.sub, payload);
+>>>>>>> origin/main
       const guestSessionId = guest_session_id?.value;
       if (typeof guestSessionId === "string") {
         await cartsService.mergeOnLogin(dbUser.id, guestSessionId);
@@ -78,15 +82,31 @@ export const cartsRoutes = new Elysia({ prefix: "/carts", tags: ["carts"] })
   .post(
     "/items",
     async ({ user, sessionId, body }) => {
+<<<<<<< HEAD
       await cartsService.addItem({ sessionId, userId: user?.id }, body.productId, body.quantity);
       return status(201, "Item added");
+=======
+      try {
+        await cartsService.addItem({ sessionId, userId: user?.id }, body.productId, body.quantity);
+        return status(201, "Item added");
+      } catch (e: unknown) {
+        if (e instanceof Error && e.message === "PRODUCT_DELETED") {
+          return status(410, "Product is no longer available");
+        }
+        throw e;
+      }
+>>>>>>> origin/main
     },
     {
       body: cartItemSchema,
       detail: {
         summary: "Add item to cart",
       },
+<<<<<<< HEAD
       response: { 201: t.String() },
+=======
+      response: { 201: t.String(), 410: t.String() },
+>>>>>>> origin/main
     }
   )
 
@@ -114,7 +134,11 @@ export const cartsRoutes = new Elysia({ prefix: "/carts", tags: ["carts"] })
     "/items/:productId",
     async ({ user, sessionId, params }) => {
       await cartsService.removeItem({ sessionId, userId: user?.id }, params.productId);
+<<<<<<< HEAD
       return status(204, "");
+=======
+      return status(204, null);
+>>>>>>> origin/main
     },
     {
       detail: {

@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 import { useAuth, useUser as useClerkUser } from "@clerk/react";
 import { render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
@@ -10,10 +11,19 @@ import { Role } from "../types/roles";
 const mockSignOut = vi.fn();
 const mockNavigate = vi.fn();
 const mockOpenUserProfile = vi.fn();
+=======
+import { render, screen } from "@testing-library/react";
+import userEvent from "@testing-library/user-event";
+import { describe, expect, it, vi } from "vitest";
+
+const mockSignOut = vi.fn();
+const mockNavigate = vi.fn();
+>>>>>>> origin/main
 
 vi.mock("@clerk/react", () => ({
   Show: ({ children, when }: { children: React.ReactNode; when: string }) =>
     when === "signed-in" ? children : null,
+<<<<<<< HEAD
   useAuth: vi.fn(),
   useClerk: () => ({ openUserProfile: mockOpenUserProfile, signOut: mockSignOut }),
   useUser: vi.fn(),
@@ -29,10 +39,25 @@ vi.mock("@tanstack/react-router", () => ({
     <a className={className} href={to} onClick={onClick}>
       {children}
     </a>
+=======
+  useAuth: () => ({ isLoaded: true, isSignedIn: true }),
+  useClerk: () => ({ openUserProfile: vi.fn(), signOut: mockSignOut }),
+  useUser: () => ({ user: { fullName: "Test User", imageUrl: undefined } }),
+}));
+
+vi.mock("@/context/UserContext", () => ({
+  useUser: () => ({ isLoading: false, user: { fname: "Test", lname: "User", roles: [] } }),
+}));
+
+vi.mock("@tanstack/react-router", () => ({
+  Link: ({ to, children }: { to: string; children: React.ReactNode }) => (
+    <a href={to}>{children}</a>
+>>>>>>> origin/main
   ),
   useNavigate: () => mockNavigate,
 }));
 
+<<<<<<< HEAD
 vi.mock("@/generated/hooks/useGetWinemakersMe", () => ({
   useGetWinemakersMe: vi.fn(() => ({ data: undefined, isLoading: false })),
 }));
@@ -42,6 +67,9 @@ vi.mock("@/generated/hooks/useGetShopsMe", () => ({
 }));
 
 // Stub shadcn components so sidebar content is always visible
+=======
+// Stub shadcn Sheet so the sidebar content is always visible
+>>>>>>> origin/main
 vi.mock("@/components/ui/sheet", () => ({
   Sheet: ({ children }: { children: React.ReactNode }) => <div>{children}</div>,
   SheetContent: ({ children }: { children: React.ReactNode }) => <div>{children}</div>,
@@ -62,17 +90,27 @@ vi.mock("@/components/ui/accordion", () => ({
 vi.mock("@/components/ui/avatar", () => ({
   Avatar: ({ children }: { children: React.ReactNode }) => <div>{children}</div>,
   AvatarFallback: ({ children }: { children: React.ReactNode }) => <span>{children}</span>,
+<<<<<<< HEAD
   AvatarImage: ({ alt }: { alt: string }) => <img alt={alt} />,
 }));
 
 vi.mock("@/components/ui/button", () => ({
   Button: ({ children, onClick, className }: any) => (
     <button className={className} onClick={onClick} type="button">
+=======
+  AvatarImage: () => null,
+}));
+
+vi.mock("@/components/ui/button", () => ({
+  Button: ({ children, onClick }: { children: React.ReactNode; onClick?: () => void }) => (
+    <button onClick={onClick} type="button">
+>>>>>>> origin/main
       {children}
     </button>
   ),
 }));
 
+<<<<<<< HEAD
 vi.mock("@/components/primitives/nav-item", () => ({
   NavItem: ({ children, onClick, render: renderProp }: any) => {
     if (React.isValidElement(renderProp)) {
@@ -267,5 +305,50 @@ describe("Sidebar", () => {
       rerender(<Sidebar />);
       expect(screen.getByText("Jane Smith")).toBeInTheDocument();
     });
+=======
+import { Sidebar } from "../components/layout/Sidebar";
+import { Role } from "../types/roles";
+
+describe("Sidebar", () => {
+  it("shows Log out button", () => {
+    render(<Sidebar />);
+    expect(screen.getByText("Log out")).toBeInTheDocument();
+  });
+
+  it("calls signOut and navigates to / when Log out is clicked", async () => {
+    const user = userEvent.setup();
+    mockSignOut.mockResolvedValue(undefined);
+    mockNavigate.mockReturnValue(undefined);
+    render(<Sidebar />);
+    await user.click(screen.getByText("Log out"));
+    expect(mockSignOut).toHaveBeenCalled();
+  });
+
+  it("shows Explore Wines link", () => {
+    render(<Sidebar />);
+    expect(screen.getByText("Explore Wines")).toBeInTheDocument();
+  });
+
+  it("shows Bundles link pointing to /bundles", () => {
+    render(<Sidebar />);
+    const bundlesLink = screen.getByText("Bundles").closest("a");
+    expect(bundlesLink).toHaveAttribute("href", "/bundles");
+  });
+
+  it("shows Events link", () => {
+    render(<Sidebar />);
+    expect(screen.getByText("Events")).toBeInTheDocument();
+  });
+
+  it("shows active role for single-role user", () => {
+    render(<Sidebar activeRole={Role.customer} userRoles={[Role.customer]} />);
+    expect(screen.getByText(Role.customer)).toBeInTheDocument();
+  });
+
+  it("Log out is a button not a navigation link", () => {
+    render(<Sidebar />);
+    const logoutEl = screen.getByText("Log out");
+    expect(logoutEl.tagName).toBe("BUTTON");
+>>>>>>> origin/main
   });
 });

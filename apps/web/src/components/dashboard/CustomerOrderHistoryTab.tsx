@@ -1,4 +1,4 @@
-import { ArrowUpRight, ShoppingBag } from "lucide-react";
+import { ArrowUpRight02Icon, ShoppingBag01Icon } from "hugeicons-react";
 import { Badge } from "@/components/ui/badge";
 import {
   Select,
@@ -41,7 +41,7 @@ export function CustomerOrderHistoryTab() {
     <>
       <div className="flex flex-col md:flex-row items-start md:items-center justify-between mb-8 gap-4">
         <div className="flex items-center gap-2 font-heading text-xl font-semibold text-primary">
-          <ShoppingBag className="h-5 w-5" /> Past Orders
+          <ShoppingBag01Icon className="h-5 w-5" /> Past Orders
         </div>
         <div className="flex w-full md:w-auto">
           <Select defaultValue="6months">
@@ -75,7 +75,7 @@ export function CustomerOrderHistoryTab() {
             {orderData.map((order) => (
               <TableRow className="border-border/50 border-b" key={order.id}>
                 <TableCell className="font-medium text-primary flex items-center gap-1 hover:underline cursor-pointer text-sm">
-                  {order.orderId} <ArrowUpRight className="h-3 w-3" />
+                  {order.orderId} <ArrowUpRight02Icon className="h-3 w-3" />
                 </TableCell>
                 <TableCell className="text-muted-foreground text-sm">{order.date}</TableCell>
                 <TableCell className="text-center font-medium text-sm">{order.items}</TableCell>
@@ -100,7 +100,7 @@ export function CustomerOrderHistoryTab() {
           >
             <div className="flex flex-col gap-1.5">
               <span className="font-heading font-semibold text-sm text-primary flex items-center gap-1">
-                {order.orderId} <ArrowUpRight className="h-3 w-3" />
+                {order.orderId} <ArrowUpRight02Icon className="h-3 w-3" />
               </span>
               <span className="text-xs text-muted-foreground font-medium">
                 {order.date} <span className="mx-1">|</span> {order.items}

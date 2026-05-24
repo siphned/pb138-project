@@ -1,7 +1,12 @@
+<<<<<<< HEAD
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { app } from "../../app";
 import { verifyClerkToken } from "../auth/auth.utils";
 import { usersService } from "../users/users.service";
+=======
+import { describe, expect, it, vi } from "vitest";
+import { app } from "../../app";
+>>>>>>> origin/main
 
 const { mockOrder } = vi.hoisted(() => ({
   mockOrder: {
@@ -29,6 +34,7 @@ vi.mock("./orders.service", () => ({
   ordersService: {
     createOrder: vi.fn().mockResolvedValue(mockOrder),
     getOrder: vi.fn().mockResolvedValue(mockOrder),
+<<<<<<< HEAD
     listForShop: vi.fn().mockResolvedValue([mockOrder]),
     listForUser: vi.fn().mockResolvedValue([mockOrder]),
     updateStatus: vi.fn().mockResolvedValue({ ...mockOrder, status: "confirmed" }),
@@ -38,6 +44,8 @@ vi.mock("./orders.service", () => ({
 vi.mock("../users/users.service", () => ({
   usersService: {
     lazyGetOrCreate: vi.fn().mockResolvedValue({ id: "u1" }),
+=======
+>>>>>>> origin/main
   },
 }));
 
@@ -45,6 +53,7 @@ vi.mock("../auth/auth.utils", () => ({
   verifyClerkToken: vi.fn().mockResolvedValue(null),
 }));
 
+<<<<<<< HEAD
 vi.mock("../../utils/logger", () => ({
   logger: {
     debug: vi.fn(),
@@ -54,6 +63,8 @@ vi.mock("../../utils/logger", () => ({
   },
 }));
 
+=======
+>>>>>>> origin/main
 describe("orders routes", () => {
   it("POST /orders/checkout performs guest checkout", async () => {
     const response = await app.handle(
@@ -83,6 +94,7 @@ describe("orders routes", () => {
     expect(data.id).toBe("o1");
   });
 
+<<<<<<< HEAD
   describe("GET /orders", () => {
     it("returns 401 when no auth token provided", async () => {
       const response = await app.handle(new Request("http://localhost/orders", { method: "GET" }));
@@ -253,6 +265,8 @@ describe("orders routes", () => {
     });
   });
 
+=======
+>>>>>>> origin/main
   it("POST /orders/checkout returns 400 if guest email missing", async () => {
     const response = await app.handle(
       new Request("http://localhost/orders/checkout", {
@@ -277,6 +291,7 @@ describe("orders routes", () => {
 
     expect(response.status).toBe(400);
   });
+<<<<<<< HEAD
 
   describe("GET /orders/:id", () => {
     beforeEach(() => {
@@ -379,4 +394,6 @@ describe("orders routes", () => {
       expect(response.status).toBe(404);
     });
   });
+=======
+>>>>>>> origin/main
 });

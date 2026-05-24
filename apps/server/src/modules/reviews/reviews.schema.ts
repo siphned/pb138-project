@@ -5,12 +5,15 @@ export const createReviewBody = t.Object({
   rating: t.Integer({ maximum: 5, minimum: 1 }),
 });
 
+<<<<<<< HEAD
 export const listReviewsQuery = t.Object({
   limit: t.Optional(t.Integer({ maximum: 100, minimum: 1 })),
   page: t.Optional(t.Integer({ minimum: 1 })),
   sort: t.Optional(t.Union([t.Literal("newest"), t.Literal("highest"), t.Literal("lowest")])),
 });
 
+=======
+>>>>>>> origin/main
 const reviewUserInfo = t.Object({
   fname: t.String(),
   id: t.String(),
@@ -29,5 +32,8 @@ export const reviewResponse = t.Object({
 export const reviewListResponse = t.Object({
   averageRating: t.Nullable(t.Number()),
   reviews: t.Array(reviewResponse),
+<<<<<<< HEAD
   totalCount: t.Integer(),
+=======
+>>>>>>> origin/main
 });

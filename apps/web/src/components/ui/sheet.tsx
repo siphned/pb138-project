@@ -113,6 +113,7 @@ function SheetDescription({ className, ...props }: SheetPrimitive.Description.Pr
 
 export {
   Sheet,
+<<<<<<< HEAD
   SheetClose,
   SheetContent,
   SheetDescription,
@@ -120,4 +121,13 @@ export {
   SheetHeader,
   SheetTitle,
   SheetTrigger,
+=======
+  SheetTrigger,
+  SheetClose,
+  SheetContent,
+  SheetHeader,
+  SheetFooter,
+  SheetTitle,
+  SheetDescription,
+>>>>>>> origin/main
 };

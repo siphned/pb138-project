@@ -1,4 +1,5 @@
 import { t } from "elysia";
+<<<<<<< HEAD
 import z from "zod";
 
 /**
@@ -51,6 +52,8 @@ export const mergeBodySchema = z.object({
     )
     .min(1),
 });
+=======
+>>>>>>> origin/main
 
 const cartProductResponse = t.Object({
   id: t.String(),

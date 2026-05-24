@@ -9,6 +9,7 @@ export default defineConfig({
     },
   },
   test: {
+<<<<<<< HEAD
     coverage: {
       enabled: true,
       exclude: ["src/gen/**", "src/**/__tests__/e2e/**"],
@@ -30,5 +31,12 @@ export default defineConfig({
     isolate: true,
     setupFiles: ["./src/__tests__/setup.ts"],
     testTimeout: 15_000,
+=======
+    environment: "jsdom",
+    exclude: ["src/__tests__/e2e/**"],
+    globals: true,
+    include: ["src/**/*.test.{ts,tsx}"],
+    setupFiles: ["./src/__tests__/setup.ts"],
+>>>>>>> origin/main
   },
 });

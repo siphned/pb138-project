@@ -1,6 +1,11 @@
+<<<<<<< HEAD
 import type { GetProducts200Item } from "@/components/catalog/ProductCard";
 import { ProductCard } from "@/components/catalog/ProductCard";
 import { useGetProducts } from "@/generated/hooks/useGetProducts";
+=======
+import { useGetShopsByIdProducts } from "@/generated/hooks/useGetShopsByIdProducts";
+import { WineCard } from "./WineCard";
+>>>>>>> origin/main
 
 type ShopProductRaw = {
   id: string;
@@ -42,8 +47,13 @@ interface BundleWinesCarouselProps {
 }
 
 export function BundleWinesCarousel({ shopId, wineIds }: BundleWinesCarouselProps) {
+<<<<<<< HEAD
   const { data: rawData, isLoading } = useGetProducts({ isBundle: false, shopId });
   const allProducts = rawData?.data as ShopProductRaw[] | undefined;
+=======
+  const { data, isLoading } = useGetShopsByIdProducts(shopId, { isBundle: "false" });
+  const allProducts = data as ShopProductRaw[] | undefined;
+>>>>>>> origin/main
 
   const products =
     allProducts?.filter((p) => {
@@ -75,6 +85,7 @@ export function BundleWinesCarousel({ shopId, wineIds }: BundleWinesCarouselProp
         {products.map((p) => {
           const wine = Array.isArray(p.wines) ? p.wines[0] : p.productWines?.[0]?.wine;
 
+<<<<<<< HEAD
           const productForCard = {
             createdAt: p.createdAt ?? "",
             description: p.description ?? null,
@@ -106,6 +117,38 @@ export function BundleWinesCarousel({ shopId, wineIds }: BundleWinesCarouselProp
           return (
             <div className="w-60 shrink-0" key={p.id}>
               <ProductCard product={productForCard} />
+=======
+          return (
+            <div className="w-60 shrink-0" key={p.id}>
+              <WineCard
+                product={{
+                  createdAt: p.createdAt ?? "",
+                  description: p.description ?? null,
+                  id: p.id,
+                  isBundle: false,
+                  name: p.name,
+                  price: p.price,
+                  quantity: Number(p.quantity ?? 0),
+                  rating: Number(p.rating ?? 0),
+                  reviewCount: Number(p.reviewCount ?? 0),
+                  shopId: p.shopId ?? shopId,
+                  updatedAt: p.updatedAt ?? null,
+                  wines: wine
+                    ? [
+                        {
+                          color: wine.color,
+                          id: wine.id,
+                          name: wine.name,
+                          region: wine.region ?? "",
+                          type: wine.type,
+                          vintageYear: wine.vintageYear,
+                          winemaker: wine.winemaker ?? { id: "", name: "" },
+                        },
+                      ]
+                    : [],
+                }}
+              />
+>>>>>>> origin/main
             </div>
           );
         })}

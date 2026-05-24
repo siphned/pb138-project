@@ -1,4 +1,5 @@
 import { t } from "elysia";
+<<<<<<< HEAD
 import z from "zod";
 
 /**
@@ -117,6 +118,10 @@ export const paginatedCommentsResponseSchema = z.object({
   page: z.number(),
   total: z.number(),
 });
+=======
+
+// ─── Shared sub-schemas ───────────────────────────────────────────────────────
+>>>>>>> origin/main
 
 const addressBody = t.Object({
   city: t.String({ maxLength: 255, minLength: 1 }),
@@ -126,6 +131,11 @@ const addressBody = t.Object({
   street: t.String({ maxLength: 255, minLength: 1 }),
 });
 
+<<<<<<< HEAD
+=======
+// ─── Request schemas ──────────────────────────────────────────────────────────
+
+>>>>>>> origin/main
 export const createEventBody = t.Object({
   address: addressBody,
   capacity: t.Integer({ maximum: 32767, minimum: 1 }),
@@ -149,9 +159,13 @@ export const listEventsQuery = t.Object({
   from: t.Optional(t.String({ format: "date-time" })),
   limit: t.Optional(t.Number({ maximum: 100, minimum: 1 })),
   page: t.Optional(t.Number({ minimum: 1 })),
+<<<<<<< HEAD
   q: t.Optional(t.String({ maxLength: 255 })),
   to: t.Optional(t.String({ format: "date-time" })),
   winemakerId: t.Optional(t.String()),
+=======
+  to: t.Optional(t.String({ format: "date-time" })),
+>>>>>>> origin/main
   winemakerName: t.Optional(t.String({ maxLength: 255 })),
 });
 
@@ -166,6 +180,11 @@ export const createCommentBody = t.Object({
 
 export const eventParams = t.Object({ id: t.String() });
 
+<<<<<<< HEAD
+=======
+// ─── Response schemas ─────────────────────────────────────────────────────────
+
+>>>>>>> origin/main
 export const eventResponse = t.Object({
   address: t.Nullable(
     t.Object({
@@ -229,6 +248,7 @@ export const paginatedCommentsResponse = t.Object({
   page: t.Number(),
   total: t.Number(),
 });
+<<<<<<< HEAD
 
 export const invitationResponse = t.Object({
   createdAt: t.Date(),
@@ -240,3 +260,5 @@ export const invitationResponse = t.Object({
   token: t.String(),
   updatedAt: t.Nullable(t.Date()),
 });
+=======
+>>>>>>> origin/main

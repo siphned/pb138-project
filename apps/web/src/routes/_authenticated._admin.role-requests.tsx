@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { Skeleton } from "@/components/ui/skeleton";
 import {
@@ -9,11 +10,16 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { useGetRoleRequests } from "@/generated/hooks/useGetRoleRequests";
+=======
+import { createFileRoute } from "@tanstack/react-router";
+import { RouteStub } from "./-components/RouteStub";
+>>>>>>> origin/main
 
 export const Route = createFileRoute("/_authenticated/_admin/role-requests")({
   component: RoleRequestsPage,
 });
 
+<<<<<<< HEAD
 function getStatusBadgeClass(status: string): string {
   if (status === "approved") {
     return "bg-green-100/30 text-green-700 dark:text-green-400";
@@ -112,4 +118,8 @@ function RoleRequestsPage() {
       )}
     </main>
   );
+=======
+function RoleRequestsPage() {
+  return <RouteStub title="Role Requests" />;
+>>>>>>> origin/main
 }

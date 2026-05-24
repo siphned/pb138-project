@@ -1,5 +1,12 @@
+<<<<<<< HEAD
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { AlertTriangle, BarChart3, ShoppingBag, Users, Wine } from "lucide-react";
+import {
+  AlertCircleIcon,
+  BarChartIcon,
+  DrinkIcon,
+  ShoppingBag01Icon,
+  UserGroupIcon,
+} from "hugeicons-react";
 import { useState } from "react";
 import { EventsTab } from "@/components/dashboard/tabs/EventsTab";
 import { MyBundlesTab } from "@/components/dashboard/tabs/MyBundlesTab";
@@ -10,12 +17,25 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useUser } from "@/context/UserContext";
 import { useGetStats } from "@/generated/hooks/useGetStats";
 import type { GetStatsQueryResponse } from "@/generated/types/GetStats";
+=======
+import { createFileRoute } from "@tanstack/react-router";
+import { Calendar, DollarSign, ShoppingBag, TrendingUp, Wine } from "lucide-react";
+import { useState } from "react";
+import { DashboardTabs } from "@/components/dashboard/DashboardTabs";
+import { ProfileEditForm } from "@/components/dashboard/ProfileEditForm";
+import { UserInfoCard } from "@/components/dashboard/UserInfoCard";
+import { AuthLayout } from "@/components/layout/AuthLayout";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { useUser } from "@/context/UserContext";
+import { useRoles } from "@/hooks/useRoles";
+>>>>>>> origin/main
 import { Role } from "@/types/roles";
 
 export const Route = createFileRoute("/_authenticated/dashboard")({
   component: DashboardPage,
 });
 
+<<<<<<< HEAD
 const toNumber = (n: unknown): number => {
   if (typeof n === "number") return n;
   if (typeof n === "string") {
@@ -83,7 +103,7 @@ function DashboardPage() {
         {(statsError || !stats) && (
           <Card className="col-span-full">
             <CardContent className="flex items-center gap-2 py-4 text-destructive">
-              <AlertTriangle className="h-5 w-5" />
+              <AlertCircleIcon className="h-5 w-5" />
               <span>Failed to load statistics</span>
             </CardContent>
           </Card>
@@ -178,14 +198,22 @@ type AdminStats = Extract<GetStatsQueryResponse, { usersByRole: unknown }>;
 function renderCustomerStats(stats: CustomerStats) {
   return (
     <>
-      <StatCard icon={ShoppingBag} label="Orders" value={toNumber(stats.ordersCount)} />
+      <StatCard icon={ShoppingBag01Icon} label="Orders" value={toNumber(stats.ordersCount)} />
       <StatCard
-        icon={BarChart3}
+        icon={BarChartIcon}
         label="Total spent"
         value={eur(toNumber(stats.totalSpent as number))}
       />
-      <StatCard icon={Users} label="Events attended" value={toNumber(stats.eventsAttended)} />
-      <StatCard icon={BarChart3} label="Reviews written" value={toNumber(stats.reviewsWritten)} />
+      <StatCard
+        icon={UserGroupIcon}
+        label="Events attended"
+        value={toNumber(stats.eventsAttended)}
+      />
+      <StatCard
+        icon={BarChartIcon}
+        label="Reviews written"
+        value={toNumber(stats.reviewsWritten)}
+      />
     </>
   );
 }
@@ -194,15 +222,15 @@ function renderWinemakerStats(stats: WinemakerStats) {
   const avg = stats.avgReviewScore;
   return (
     <>
-      <StatCard icon={Wine} label="Wines in catalog" value={toNumber(stats.wineCount)} />
-      <StatCard icon={BarChart3} label="Total stock" value={toNumber(stats.totalStock)} />
+      <StatCard icon={DrinkIcon} label="Wines in catalog" value={toNumber(stats.wineCount)} />
+      <StatCard icon={BarChartIcon} label="Total stock" value={toNumber(stats.totalStock)} />
       <StatCard
-        icon={Users}
+        icon={UserGroupIcon}
         label="Approved events"
         value={toNumber(stats.eventsByStatus?.approved)}
       />
       <StatCard
-        icon={BarChart3}
+        icon={BarChartIcon}
         label="Avg review score"
         value={avg === null ? "—" : (avg as number).toFixed(1)}
       />
@@ -213,14 +241,18 @@ function renderWinemakerStats(stats: WinemakerStats) {
 function renderShopOwnerStats(stats: ShopOwnerStats) {
   return (
     <>
-      <StatCard icon={BarChart3} label="Shops" value={toNumber(stats.shopsCount)} />
-      <StatCard icon={Wine} label="Products" value={toNumber(stats.productsByType?.standard)} />
+      <StatCard icon={BarChartIcon} label="Shops" value={toNumber(stats.shopsCount)} />
       <StatCard
-        icon={ShoppingBag}
+        icon={DrinkIcon}
+        label="Products"
+        value={toNumber(stats.productsByType?.standard)}
+      />
+      <StatCard
+        icon={ShoppingBag01Icon}
         label="Orders processed"
         value={toNumber(stats.orderItemsProcessed)}
       />
-      <StatCard icon={BarChart3} label="Revenue" value={eur(toNumber(stats.revenue))} />
+      <StatCard icon={BarChartIcon} label="Revenue" value={eur(toNumber(stats.revenue))} />
     </>
   );
 }
@@ -229,7 +261,7 @@ function renderAdminStats(stats: AdminStats) {
   return (
     <>
       <StatCard
-        icon={Users}
+        icon={UserGroupIcon}
         label="Total users"
         value={
           toNumber(stats.usersByRole?.customer) +
@@ -238,10 +270,14 @@ function renderAdminStats(stats: AdminStats) {
           toNumber(stats.usersByRole?.admin)
         }
       />
-      <StatCard icon={Wine} label="Total products" value={toNumber(stats.totalProducts)} />
-      <StatCard icon={BarChart3} label="Total revenue" value={eur(toNumber(stats.totalRevenue))} />
+      <StatCard icon={DrinkIcon} label="Total products" value={toNumber(stats.totalProducts)} />
       <StatCard
-        icon={AlertTriangle}
+        icon={BarChartIcon}
+        label="Total revenue"
+        value={eur(toNumber(stats.totalRevenue))}
+      />
+      <StatCard
+        icon={AlertCircleIcon}
         label="Pending requests"
         value={toNumber(stats.pendingRoleRequests) + toNumber(stats.pendingEvents)}
       />
@@ -263,3 +299,117 @@ function renderStats(stats: GetStatsQueryResponse) {
       return null;
   }
 }
+=======
+function appRoleToDisplayRole(appRoles: ReturnType<typeof useRoles>): Role {
+  if (appRoles.includes("winemaker")) return Role.winemaker;
+  if (appRoles.includes("shop_owner")) return Role.shopOwner;
+  return Role.customer;
+}
+
+function availableRoles(appRoles: ReturnType<typeof useRoles>): Role[] {
+  const roles: Role[] = [];
+  if (appRoles.includes("winemaker") || appRoles.includes("admin")) roles.push(Role.winemaker);
+  if (appRoles.includes("shop_owner") || appRoles.includes("admin")) roles.push(Role.shopOwner);
+  roles.push(Role.customer);
+  return roles;
+}
+
+function DashboardPage() {
+  const { isLoading } = useUser();
+  const appRoles = useRoles();
+  const [currentRole, setCurrentRole] = useState<Role>(() => appRoleToDisplayRole(appRoles));
+  const [isEditing, setIsEditing] = useState(false);
+
+  const allowedRoles = availableRoles(appRoles);
+
+  const getStatsForRole = (role: Role) => {
+    switch (role) {
+      case Role.customer:
+        return [
+          { icon: ShoppingBag, title: "Total Orders", trend: "5 new this month", value: "15" },
+          { icon: Calendar, title: "Events Attended", trend: "Next: May 12", value: "4" },
+        ];
+      case Role.shopOwner:
+        return [
+          {
+            icon: DollarSign,
+            title: "Total Revenue",
+            trend: "+12% vs last month",
+            value: "$12,450",
+          },
+          { icon: ShoppingBag, title: "Total Orders", trend: "24 pending", value: "156" },
+        ];
+      default:
+        return [
+          { icon: Wine, title: "My Wines", trend: "+2 this month", value: "24" },
+          {
+            icon: TrendingUp,
+            title: "Total Wine Sales",
+            trend: "Best seller: Merlot",
+            value: "842",
+          },
+          { icon: Calendar, title: "Events Participated", trend: "Next: Jun 05", value: "3" },
+        ];
+    }
+  };
+
+  const stats = getStatsForRole(currentRole);
+
+  if (isLoading) {
+    return (
+      <div className="flex h-screen w-full items-center justify-center bg-background">
+        <div className="flex flex-col items-center gap-4">
+          <div className="h-12 w-12 animate-spin rounded-full border-4 border-primary border-t-transparent" />
+          <p className="text-muted-foreground animate-pulse font-heading">
+            Loading your dashboard...
+          </p>
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <AuthLayout
+      activeRole={currentRole}
+      onRoleChange={(newRole) => {
+        if (allowedRoles.includes(newRole)) setCurrentRole(newRole);
+      }}
+    >
+      <div className="space-y-8 pb-12">
+        {isEditing ? (
+          <ProfileEditForm
+            onCancel={() => setIsEditing(false)}
+            onSuccess={() => setIsEditing(false)}
+          />
+        ) : (
+          <>
+            <UserInfoCard onEdit={() => setIsEditing(true)} />
+
+            <div className="grid gap-4 grid-cols-1 lg:grid-flow-col lg:auto-cols-fr">
+              {stats.map((stat) => (
+                <Card
+                  className="border-none shadow-sm bg-secondary/20 rounded-2xl"
+                  key={stat.title}
+                >
+                  <CardHeader className="flex flex-row items-center justify-between pb-2 space-y-0">
+                    <CardTitle className="text-sm font-medium text-muted-foreground">
+                      {stat.title}
+                    </CardTitle>
+                    <stat.icon className="w-4 h-4 text-primary" />
+                  </CardHeader>
+                  <CardContent>
+                    <div className="text-2xl font-bold">{stat.value}</div>
+                    <p className="text-xs text-muted-foreground mt-1">{stat.trend}</p>
+                  </CardContent>
+                </Card>
+              ))}
+            </div>
+
+            <DashboardTabs role={currentRole} />
+          </>
+        )}
+      </div>
+    </AuthLayout>
+  );
+}
+>>>>>>> origin/main

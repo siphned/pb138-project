@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 import z from "zod";
 import { app } from "./app";
 import { logger } from "./utils/logger";
@@ -29,3 +30,12 @@ logger.info(
   `OpenAPI spec available at http://localhost:${port}/openapi and http://localhost:${port}/swagger/json`
 );
 app.listen(port);
+=======
+import { app } from "./app";
+
+// biome-ignore lint/suspicious/noConsole: entry point
+console.log("Starting server at http://localhost:3000");
+// biome-ignore lint/suspicious/noConsole: entry point
+console.log("OpenAPI spec available at http://localhost:3000/swagger/json");
+app.listen(3000);
+>>>>>>> origin/main

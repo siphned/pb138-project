@@ -4,6 +4,7 @@ import { createRouter, RouterProvider } from "@tanstack/react-router";
 import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
 import "./index.css";
+<<<<<<< HEAD
 import { AppErrorBoundary } from "./components/AppErrorBoundary";
 import { Button } from "./components/ui/button";
 import { ThemeProvider, UserProvider } from "./context";
@@ -18,6 +19,12 @@ const queryClient = new QueryClient({
   },
 });
 
+=======
+import { UserProvider } from "./context/UserContext.tsx";
+import { routeTree } from "./routeTree.gen.ts";
+
+const queryClient = new QueryClient();
+>>>>>>> origin/main
 const router = createRouter({ routeTree });
 
 declare module "@tanstack/react-router" {
@@ -35,6 +42,7 @@ if (!PUBLISHABLE_KEY) {
 // biome-ignore lint/style/noNonNullAssertion: root element is guaranteed to exist in index.html
 createRoot(document.getElementById("root")!).render(
   <StrictMode>
+<<<<<<< HEAD
     <ThemeProvider>
       <ClerkProvider afterSignOutUrl="/" publishableKey={PUBLISHABLE_KEY}>
         <QueryClientProvider client={queryClient}>
@@ -58,5 +66,14 @@ createRoot(document.getElementById("root")!).render(
         </QueryClientProvider>
       </ClerkProvider>
     </ThemeProvider>
+=======
+    <ClerkProvider afterSignOutUrl="/" publishableKey={PUBLISHABLE_KEY}>
+      <QueryClientProvider client={queryClient}>
+        <UserProvider>
+          <RouterProvider router={router} />
+        </UserProvider>
+      </QueryClientProvider>
+    </ClerkProvider>
+>>>>>>> origin/main
   </StrictMode>
 );

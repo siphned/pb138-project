@@ -72,7 +72,11 @@
     "public.user_status": {
       "name": "user_status",
       "schema": "public",
+<<<<<<< HEAD
       "values": ["active", "suspended", "banned", "deleted"]
+=======
+      "values": ["active", "suspended", "banned"]
+>>>>>>> origin/main
     },
     "public.wine_color": {
       "name": "wine_color",
@@ -85,9 +89,15 @@
       "values": ["still", "sparkling", "fortified", "dessert"]
     }
   },
+<<<<<<< HEAD
   "id": "26d50b58-3b88-4e2a-80af-3d7e349675fb",
   "policies": {},
   "prevId": "503eb6e0-c246-44f7-b472-9941f900d908",
+=======
+  "id": "93550d04-387e-4aa8-865f-6e83d7e24a52",
+  "policies": {},
+  "prevId": "00f11374-1558-43a0-b7a7-94b6a5a01bf5",
+>>>>>>> origin/main
   "roles": {},
   "schemas": {},
   "sequences": {},
@@ -1872,6 +1882,7 @@
       "name": "user_roles",
       "policies": {},
       "schema": "",
+<<<<<<< HEAD
       "uniqueConstraints": {
         "user_roles_user_id_role_unique": {
           "columns": ["user_id", "role"],
@@ -1879,6 +1890,9 @@
           "nullsNotDistinct": false
         }
       }
+=======
+      "uniqueConstraints": {}
+>>>>>>> origin/main
     },
     "public.users": {
       "checkConstraints": {},
@@ -2044,7 +2058,11 @@
           "name": "phone",
           "notNull": false,
           "primaryKey": false,
+<<<<<<< HEAD
           "type": "varchar(50)"
+=======
+          "type": "varchar(20)"
+>>>>>>> origin/main
         },
         "updated_at": {
           "name": "updated_at",

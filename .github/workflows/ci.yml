@@ -39,6 +39,69 @@ jobs:
         run: bun install --frozen-lockfile
 
   generate:
+<<<<<<< HEAD
+=======
+    needs: install
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: winemarket
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+        ports:
+          - 5432:5432
+    env:
+      DATABASE_URL: postgresql://postgres:postgres@localhost:5432/winemarket
+      FRONTEND_URL: http://localhost:5173
+      # Clerk key only needed when verifyClerkToken is actually called (not during spec gen)
+      CLERK_JWT_KEY: ${{ secrets.CLERK_JWT_KEY }}
+    steps:
+      - uses: actions/checkout@v4
+      - name: Setup Bun
+        uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: 1.3.11
+      - name: Restore cache
+        uses: actions/cache@v4
+        with:
+          path: |
+            .bun-cache
+            node_modules
+            apps/server/node_modules
+            apps/web/node_modules
+            packages/*/node_modules
+          key: ${{ runner.os }}-bun-${{ hashFiles('**/bun.lock') }}
+          fail-on-cache-miss: true
+      - name: Start backend server
+        run: bun run apps/server/src/index.ts &
+      - name: Wait for server to be ready
+        run: until curl -sf http://localhost:3000/swagger/json > /dev/null; do sleep 1; done
+      - name: Generate Kubb client
+        run: bun run generate
+      - name: Check for schema drift
+        run: |
+          if ! git diff --exit-code openapi.json; then
+            echo "❌ OpenAPI schema drift detected! Please run 'bun run generate' locally and commit the changes."
+            exit 1
+          fi
+      - name: Stop backend server
+        if: always()
+        run: kill $(lsof -t -i:3000) 2>/dev/null || true
+      - name: Upload generated code
+        uses: actions/upload-artifact@v4
+        with:
+          name: generated-code
+          path: apps/web/src/generated/
+
+  lint:
+>>>>>>> origin/main
     needs: install
     runs-on: self-hosted
     env:
@@ -61,6 +124,7 @@ jobs:
             apps/server/node_modules
             apps/web/node_modules
             packages/*/node_modules
+<<<<<<< HEAD
           key: ${{ runner.os }}-bun-${{ hashFiles('**/bun.lock') }}-v4
           fail-on-cache-miss: false
       - name: Install dependencies
@@ -104,12 +168,20 @@ jobs:
             packages/*/node_modules
           key: ${{ runner.os }}-bun-${{ hashFiles('**/bun.lock') }}-v4
           fail-on-cache-miss: false
+=======
+          key: ${{ runner.os }}-bun-${{ hashFiles('**/bun.lock') }}
+          fail-on-cache-miss: true
+>>>>>>> origin/main
       - name: Run biome lint
         run: bun run lint
 
   typecheck:
     needs: generate
+<<<<<<< HEAD
     runs-on: self-hosted
+=======
+    runs-on: ubuntu-latest
+>>>>>>> origin/main
     steps:
       - uses: actions/checkout@v4
       - name: Setup Bun
@@ -125,8 +197,13 @@ jobs:
             apps/server/node_modules
             apps/web/node_modules
             packages/*/node_modules
+<<<<<<< HEAD
           key: ${{ runner.os }}-bun-${{ hashFiles('**/bun.lock') }}-v4
           fail-on-cache-miss: false
+=======
+          key: ${{ runner.os }}-bun-${{ hashFiles('**/bun.lock') }}
+          fail-on-cache-miss: true
+>>>>>>> origin/main
       - name: Download generated code
         uses: actions/download-artifact@v4
         with:
@@ -135,9 +212,16 @@ jobs:
       - name: Type check
         run: bun run check-types
 
+<<<<<<< HEAD
   security-fast:
     needs: install
     runs-on: self-hosted
+=======
+  build:
+    if: github.event_name == 'push'
+    needs: [lint, typecheck, generate]
+    runs-on: ubuntu-latest
+>>>>>>> origin/main
     steps:
       - uses: actions/checkout@v4
       - name: Setup Bun
@@ -153,6 +237,7 @@ jobs:
             apps/server/node_modules
             apps/web/node_modules
             packages/*/node_modules
+<<<<<<< HEAD
           key: ${{ runner.os }}-bun-${{ hashFiles('**/bun.lock') }}-v4
           fail-on-cache-miss: false
       - name: Run bun audit
@@ -180,6 +265,10 @@ jobs:
             packages/*/node_modules
           key: ${{ runner.os }}-bun-${{ hashFiles('**/bun.lock') }}-v4
           fail-on-cache-miss: false
+=======
+          key: ${{ runner.os }}-bun-${{ hashFiles('**/bun.lock') }}
+          fail-on-cache-miss: true
+>>>>>>> origin/main
       - name: Download generated code
         uses: actions/download-artifact@v4
         with:
@@ -196,10 +285,16 @@ jobs:
             apps/web/dist/
 
   test:
+<<<<<<< HEAD
     needs: [install, generate]
     runs-on: self-hosted
     env:
       DATABASE_URL: postgresql://postgres:postgres@localhost:5432/winemarket
+=======
+    if: github.event_name == 'push'
+    needs: install
+    runs-on: ubuntu-latest
+>>>>>>> origin/main
     steps:
       - uses: actions/checkout@v4
       - name: Setup Bun
@@ -215,6 +310,7 @@ jobs:
             apps/server/node_modules
             apps/web/node_modules
             packages/*/node_modules
+<<<<<<< HEAD
           key: ${{ runner.os }}-bun-${{ hashFiles('**/bun.lock') }}-v4
           fail-on-cache-miss: false
       - name: Download generated code
@@ -228,14 +324,21 @@ jobs:
         run: |
           cd apps/server
           bun run db:push
+      - name: Run unit tests with coverage enforcement
+        run: bun run test:coverage
+=======
+          key: ${{ runner.os }}-bun-${{ hashFiles('**/bun.lock') }}
+          fail-on-cache-miss: true
       - name: Run unit tests
         run: bun run test
+>>>>>>> origin/main
       - name: Upload junit results
         if: always()
         uses: actions/upload-artifact@v4
         with:
           name: junit-results
           path: apps/*/test-results.xml
+<<<<<<< HEAD
       - name: Upload coverage reports
         if: always()
         uses: actions/upload-artifact@v4
@@ -305,3 +408,5 @@ jobs:
         with:
           name: e2e-report
           path: apps/web/playwright-report/
+=======
+>>>>>>> origin/main

@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 import { FilterIcon } from "@hugeicons/core-free-icons";
 import { HugeiconsIcon } from "@hugeicons/react";
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
@@ -231,4 +232,15 @@ function SearchPage() {
       </div>
     </div>
   );
+=======
+import { createFileRoute } from "@tanstack/react-router";
+import { RouteStub } from "./-components/RouteStub";
+
+export const Route = createFileRoute("/search")({
+  component: SearchPage,
+});
+
+function SearchPage() {
+  return <RouteStub title="Search" />;
+>>>>>>> origin/main
 }

@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { Skeleton } from "@/components/ui/skeleton";
 import {
@@ -9,11 +10,16 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { useGetAdminUsers } from "@/generated/hooks/useGetAdminUsers";
+=======
+import { createFileRoute } from "@tanstack/react-router";
+import { RouteStub } from "./-components/RouteStub";
+>>>>>>> origin/main
 
 export const Route = createFileRoute("/_authenticated/_admin/users")({
   component: AdminUsersPage,
 });
 
+<<<<<<< HEAD
 function getStatusBadgeClass(status: string): string {
   if (status === "active") {
     return "bg-green-100/30 text-green-700 dark:text-green-400";
@@ -108,4 +114,8 @@ function AdminUsersPage() {
       )}
     </main>
   );
+=======
+function AdminUsersPage() {
+  return <RouteStub title="User Management" />;
+>>>>>>> origin/main
 }

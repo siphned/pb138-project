@@ -1,4 +1,4 @@
-import { Calendar, MoreHorizontal, Plus } from "lucide-react";
+import { Calendar01Icon, MoreVerticalIcon, PlusSignIcon } from "hugeicons-react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
@@ -35,10 +35,10 @@ export function EventsListTab() {
     <>
       <div className="flex flex-col md:flex-row items-start md:items-center justify-between mb-8 gap-4">
         <div className="flex items-center gap-2 font-heading text-xl font-semibold text-primary">
-          <Calendar className="h-5 w-5" /> Hosted Events
+          <Calendar01Icon className="h-5 w-5" /> Hosted Events
         </div>
         <Button className="w-full sm:w-auto bg-primary hover:bg-primary/90 text-primary-foreground rounded-lg h-10 px-5">
-          <Plus className="h-4 w-4 mr-2" /> Schedule Event
+          <PlusSignIcon className="h-4 w-4 mr-2" /> Schedule Event
         </Button>
       </div>
 
@@ -77,7 +77,7 @@ export function EventsListTab() {
                 </TableCell>
                 <TableCell className="text-right">
                   <Button className="h-8 w-8 text-muted-foreground" size="icon" variant="ghost">
-                    <MoreHorizontal className="h-4 w-4" />
+                    <MoreVerticalIcon className="h-4 w-4" />
                   </Button>
                 </TableCell>
               </TableRow>
@@ -108,7 +108,7 @@ export function EventsListTab() {
               </div>
             </div>
             <Button className="h-8 w-8 -mr-2 text-muted-foreground" size="icon" variant="ghost">
-              <MoreHorizontal className="h-5 w-5" />
+              <MoreVerticalIcon className="h-5 w-5" />
             </Button>
           </div>
         ))}
