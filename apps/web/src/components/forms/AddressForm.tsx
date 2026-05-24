@@ -2,6 +2,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { forwardRef } from "react";
 import { type SubmitHandler, useForm } from "react-hook-form";
 import { z } from "zod";
+import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -14,30 +15,57 @@ import {
 } from "@/components/ui/select";
 import { DeliveryMethodToggle } from "@/routes/-components/cart/DeliveryMethodToggle";
 
+const requiredString = (label: string) => z.string().min(1, `${label} is required`);
+
 export const addressFormSchema = z
   .object({
     billingAddressSameAsShipping: z.boolean(),
-    city: z.string().min(1, "City is required"),
-    country: z.string().min(1, "Country is required"),
+    city: requiredString("City"),
+    country: requiredString("Country"),
     deliveryType: z.enum(["pickup", "shipping"]),
     guestEmail: z.string().email("Invalid email").optional().or(z.literal("")),
     guestName: z.string().optional().or(z.literal("")),
-    houseNumber: z.string().min(1, "House number is required"),
+    houseNumber: requiredString("House number"),
     paymentMethod: z.enum(["card", "bank_transfer", "cash_on_delivery"]),
-    postalCode: z.string().min(1, "Postal code is required"),
-    street: z.string().min(1, "Street is required"),
+    postalCode: requiredString("Postal code"),
+    street: requiredString("Street"),
+
+    billingCity: z.string().optional().default(""),
+    billingCountry: z.string().optional().default(""),
+    billingHouseNumber: z.string().optional().default(""),
+    billingPostalCode: z.string().optional().default(""),
+    billingStreet: z.string().optional().default(""),
   })
-  .refine(
-    (_data) => {
-      // guestEmail and guestName are optional in the schema but required for guest checkout.
-      // Validation is enforced via the showGuestFields prop — when true, the fields become required
-      // through native HTML required + form-level validation.
-      return true;
-    },
-    { message: "", path: ["guestEmail"] }
-  );
+  .superRefine((data, ctx) => {
+    if (!data.billingAddressSameAsShipping) {
+      const billing = [
+        { field: "billingStreet" as const, label: "Street" },
+        { field: "billingHouseNumber" as const, label: "House number" },
+        { field: "billingCity" as const, label: "City" },
+        { field: "billingPostalCode" as const, label: "Postal code" },
+        { field: "billingCountry" as const, label: "Country" },
+      ];
+      for (const { field, label } of billing) {
+        if (!data[field]) {
+          ctx.addIssue({
+            code: z.ZodIssueCode.custom,
+            path: [field],
+            message: `${label} is required`,
+          });
+        }
+      }
+    }
+  });
 
 export type AddressFormValues = z.infer<typeof addressFormSchema>;
+
+export type SavedAddress = {
+  street: string;
+  houseNumber: string;
+  city: string;
+  postalCode: string;
+  country: string;
+};
 
 export interface AddressFormProps {
   defaultValues: Partial<AddressFormValues>;
@@ -45,10 +73,35 @@ export interface AddressFormProps {
   onSubmit: SubmitHandler<AddressFormValues>;
   showGuestFields: boolean;
   onDeliveryTypeChange?: (value: "pickup" | "shipping") => void;
+  savedShipping?: SavedAddress | null;
+  savedBilling?: SavedAddress | null;
 }
 
+const SHIPPING_FIELDS = [
+  "street",
+  "houseNumber",
+  "city",
+  "postalCode",
+  "country",
+] as const satisfies ReadonlyArray<keyof AddressFormValues>;
+
+const BILLING_FIELDS = [
+  "billingStreet",
+  "billingHouseNumber",
+  "billingCity",
+  "billingPostalCode",
+  "billingCountry",
+] as const satisfies ReadonlyArray<keyof AddressFormValues>;
+
 export const AddressForm = forwardRef<HTMLFormElement, AddressFormProps>(function AddressForm(
-  { defaultValues, onSubmit, showGuestFields, onDeliveryTypeChange },
+  {
+    defaultValues,
+    onSubmit,
+    showGuestFields,
+    onDeliveryTypeChange,
+    savedShipping,
+    savedBilling,
+  },
   ref
 ) {
   const {
@@ -69,6 +122,11 @@ export const AddressForm = forwardRef<HTMLFormElement, AddressFormProps>(functio
       paymentMethod: "card",
       postalCode: "",
       street: "",
+      billingCity: "",
+      billingCountry: "",
+      billingHouseNumber: "",
+      billingPostalCode: "",
+      billingStreet: "",
       ...defaultValues,
     },
     resolver: zodResolver(addressFormSchema as never),
@@ -77,10 +135,39 @@ export const AddressForm = forwardRef<HTMLFormElement, AddressFormProps>(functio
   const deliveryType = watch("deliveryType");
   const paymentMethod = watch("paymentMethod");
   const billingSameAsShipping = watch("billingAddressSameAsShipping");
+  const hasErrors = Object.keys(errors).length > 0;
+
+  const applySavedAddress = (
+    saved: SavedAddress,
+    fields: typeof SHIPPING_FIELDS | typeof BILLING_FIELDS,
+    prefix: "" | "billing"
+  ) => {
+    const map = {
+      street: saved.street,
+      houseNumber: saved.houseNumber,
+      city: saved.city,
+      postalCode: saved.postalCode,
+      country: saved.country,
+    } as const;
+    for (const field of fields) {
+      const baseKey = (prefix
+        ? (field.replace(prefix, "").charAt(0).toLowerCase() +
+            field.replace(prefix, "").slice(1))
+        : field) as keyof typeof map;
+      setValue(field, map[baseKey], { shouldDirty: true, shouldValidate: true });
+    }
+  };
+
+  const addressSectionTitle = deliveryType === "pickup" ? "Contact Address" : "Shipping Address";
 
   return (
     <form className="space-y-6" onSubmit={handleSubmit(onSubmit)} ref={ref}>
-      {/* Guest fields */}
+      {hasErrors && (
+        <div className="rounded-md border border-destructive/40 bg-destructive/10 px-4 py-3 text-sm text-destructive">
+          Please fix the errors below before confirming your order.
+        </div>
+      )}
+
       {showGuestFields && (
         <div className="space-y-4 rounded-md border border-border p-4">
           <p className="text-sm font-medium">Guest Information</p>
@@ -108,13 +195,14 @@ export const AddressForm = forwardRef<HTMLFormElement, AddressFormProps>(functio
               placeholder="john@example.com"
             />
             {errors.guestEmail && (
-              <p className="mt-1 text-xs text-destructive">Email is required for guest checkout</p>
+              <p className="mt-1 text-xs text-destructive">
+                {errors.guestEmail.message || "Email is required for guest checkout"}
+              </p>
             )}
           </div>
         </div>
       )}
 
-      {/* Delivery Method */}
       <div>
         <Label className="mb-2 block">Delivery Method</Label>
         <DeliveryMethodToggle
@@ -126,53 +214,59 @@ export const AddressForm = forwardRef<HTMLFormElement, AddressFormProps>(functio
         />
       </div>
 
-      {/* Shipping Address */}
-      {deliveryType === "shipping" && (
-        <div className="space-y-4">
-          <p className="text-sm font-medium">Shipping Address</p>
+      <div className="space-y-4">
+        <div className="flex items-center justify-between gap-2">
+          <p className="text-sm font-medium">{addressSectionTitle}</p>
+          {savedShipping && (
+            <Button
+              onClick={() => applySavedAddress(savedShipping, SHIPPING_FIELDS, "")}
+              size="sm"
+              type="button"
+              variant="outline"
+            >
+              Use saved address
+            </Button>
+          )}
+        </div>
+        <div>
+          <Label htmlFor="country">Country</Label>
+          <Input id="country" {...register("country")} placeholder="Czech Republic" />
+          {errors.country && (
+            <p className="mt-1 text-xs text-destructive">{errors.country.message}</p>
+          )}
+        </div>
+        <div className="grid grid-cols-2 gap-4">
           <div>
-            <Label htmlFor="country">Country</Label>
-            <Input id="country" {...register("country")} placeholder="Czech Republic" />
-            {errors.country && (
-              <p className="mt-1 text-xs text-destructive">{errors.country.message}</p>
+            <Label htmlFor="city">City</Label>
+            <Input id="city" {...register("city")} placeholder="Brno" />
+            {errors.city && <p className="mt-1 text-xs text-destructive">{errors.city.message}</p>}
+          </div>
+          <div>
+            <Label htmlFor="postalCode">Postal Code</Label>
+            <Input id="postalCode" {...register("postalCode")} placeholder="602 00" />
+            {errors.postalCode && (
+              <p className="mt-1 text-xs text-destructive">{errors.postalCode.message}</p>
             )}
           </div>
-          <div className="grid grid-cols-2 gap-4">
-            <div>
-              <Label htmlFor="city">City</Label>
-              <Input id="city" {...register("city")} placeholder="Brno" />
-              {errors.city && (
-                <p className="mt-1 text-xs text-destructive">{errors.city.message}</p>
-              )}
-            </div>
-            <div>
-              <Label htmlFor="postalCode">Postal Code</Label>
-              <Input id="postalCode" {...register("postalCode")} placeholder="602 00" />
-              {errors.postalCode && (
-                <p className="mt-1 text-xs text-destructive">{errors.postalCode.message}</p>
-              )}
-            </div>
+        </div>
+        <div className="grid grid-cols-2 gap-4">
+          <div>
+            <Label htmlFor="street">Street</Label>
+            <Input id="street" {...register("street")} placeholder="Botanická" />
+            {errors.street && (
+              <p className="mt-1 text-xs text-destructive">{errors.street.message}</p>
+            )}
           </div>
-          <div className="grid grid-cols-2 gap-4">
-            <div>
-              <Label htmlFor="street">Street</Label>
-              <Input id="street" {...register("street")} placeholder="Botanická" />
-              {errors.street && (
-                <p className="mt-1 text-xs text-destructive">{errors.street.message}</p>
-              )}
-            </div>
-            <div>
-              <Label htmlFor="houseNumber">House No.</Label>
-              <Input id="houseNumber" {...register("houseNumber")} placeholder="68A" />
-              {errors.houseNumber && (
-                <p className="mt-1 text-xs text-destructive">{errors.houseNumber.message}</p>
-              )}
-            </div>
+          <div>
+            <Label htmlFor="houseNumber">House No.</Label>
+            <Input id="houseNumber" {...register("houseNumber")} placeholder="68A" />
+            {errors.houseNumber && (
+              <p className="mt-1 text-xs text-destructive">{errors.houseNumber.message}</p>
+            )}
           </div>
         </div>
-      )}
+      </div>
 
-      {/* Payment Method */}
       <div>
         <Label htmlFor="paymentMethod">Payment Method</Label>
         <Select
@@ -192,7 +286,6 @@ export const AddressForm = forwardRef<HTMLFormElement, AddressFormProps>(functio
         </Select>
       </div>
 
-      {/* Billing address same as shipping */}
       <div className="flex items-center gap-2">
         <Checkbox
           checked={billingSameAsShipping}
@@ -200,9 +293,79 @@ export const AddressForm = forwardRef<HTMLFormElement, AddressFormProps>(functio
           onCheckedChange={(checked) => setValue("billingAddressSameAsShipping", checked === true)}
         />
         <Label htmlFor="billingAddressSameAsShipping">
-          Billing address is the same as shipping
+          Billing address is the same as {deliveryType === "pickup" ? "contact" : "shipping"}{" "}
+          address
         </Label>
       </div>
+
+      {!billingSameAsShipping && (
+        <div className="space-y-4">
+          <div className="flex items-center justify-between gap-2">
+            <p className="text-sm font-medium">Billing Address</p>
+            {savedBilling && (
+              <Button
+                onClick={() => applySavedAddress(savedBilling, BILLING_FIELDS, "billing")}
+                size="sm"
+                type="button"
+                variant="outline"
+              >
+                Use saved address
+              </Button>
+            )}
+          </div>
+          <div>
+            <Label htmlFor="billingCountry">Country</Label>
+            <Input
+              id="billingCountry"
+              {...register("billingCountry")}
+              placeholder="Czech Republic"
+            />
+            {errors.billingCountry && (
+              <p className="mt-1 text-xs text-destructive">{errors.billingCountry.message}</p>
+            )}
+          </div>
+          <div className="grid grid-cols-2 gap-4">
+            <div>
+              <Label htmlFor="billingCity">City</Label>
+              <Input id="billingCity" {...register("billingCity")} placeholder="Brno" />
+              {errors.billingCity && (
+                <p className="mt-1 text-xs text-destructive">{errors.billingCity.message}</p>
+              )}
+            </div>
+            <div>
+              <Label htmlFor="billingPostalCode">Postal Code</Label>
+              <Input
+                id="billingPostalCode"
+                {...register("billingPostalCode")}
+                placeholder="602 00"
+              />
+              {errors.billingPostalCode && (
+                <p className="mt-1 text-xs text-destructive">{errors.billingPostalCode.message}</p>
+              )}
+            </div>
+          </div>
+          <div className="grid grid-cols-2 gap-4">
+            <div>
+              <Label htmlFor="billingStreet">Street</Label>
+              <Input id="billingStreet" {...register("billingStreet")} placeholder="Botanická" />
+              {errors.billingStreet && (
+                <p className="mt-1 text-xs text-destructive">{errors.billingStreet.message}</p>
+              )}
+            </div>
+            <div>
+              <Label htmlFor="billingHouseNumber">House No.</Label>
+              <Input
+                id="billingHouseNumber"
+                {...register("billingHouseNumber")}
+                placeholder="68A"
+              />
+              {errors.billingHouseNumber && (
+                <p className="mt-1 text-xs text-destructive">{errors.billingHouseNumber.message}</p>
+              )}
+            </div>
+          </div>
+        </div>
+      )}
     </form>
   );
 });

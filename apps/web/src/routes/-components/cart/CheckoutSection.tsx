@@ -1,6 +1,7 @@
 import { useQueryClient } from "@tanstack/react-query";
 import { useNavigate } from "@tanstack/react-router";
-import { useMemo, useRef } from "react";
+import { useMemo, useRef, useState } from "react";
+import { AddressForm, type AddressFormValues } from "@/components/forms/AddressForm";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { useUser } from "@/context/UserContext";
@@ -8,7 +9,6 @@ import { getCartsQueryKey } from "@/generated/hooks/useGetCarts";
 import { useGetUsersMeAddresses } from "@/generated/hooks/useGetUsersMeAddresses";
 import { usePostOrdersCheckout } from "@/generated/hooks/usePostOrdersCheckout";
 import type { GetCarts200 } from "@/generated/types/GetCarts";
-import { AddressForm, type AddressFormValues } from "@/components/forms/AddressForm";
 import { CartSummary } from "./CartSummary";
 
 interface CheckoutSectionProps {
@@ -27,7 +27,8 @@ export function CheckoutSection({
   const { user } = useUser();
   const formRef = useRef<HTMLFormElement>(null);
 
-  const checkout = usePostOrdersCheckout();
+  const checkout = usePostOrdersCheckout<unknown>();
+  const [checkoutError, setCheckoutError] = useState<string | null>(null);
 
   const { data: addresses } = useGetUsersMeAddresses();
 
@@ -42,48 +43,76 @@ export function CheckoutSection({
     return subtotal + deliveryCost;
   }, [cart, deliveryType]);
 
-  const defaultAddressValues = useMemo(() => {
-    const shipping = addresses?.shipping;
-    if (!shipping) return {};
+  const savedShipping = useMemo(() => {
+    const s = addresses?.shipping;
+    if (!s) return null;
     return {
-      city: shipping.city,
-      country: shipping.country,
-      houseNumber: shipping.houseNumber,
-      postalCode: shipping.postalCode,
-      street: shipping.street,
+      city: s.city,
+      country: s.country,
+      houseNumber: s.houseNumber,
+      postalCode: s.postalCode,
+      street: s.street,
     };
   }, [addresses]);
 
+  const savedBilling = useMemo(() => {
+    const b = addresses?.billing;
+    if (!b) return null;
+    return {
+      city: b.city,
+      country: b.country,
+      houseNumber: b.houseNumber,
+      postalCode: b.postalCode,
+      street: b.street,
+    };
+  }, [addresses]);
+
+  const defaultAddressValues = useMemo(
+    () => (savedShipping ? { ...savedShipping } : {}),
+    [savedShipping]
+  );
+
   const handleSubmit = async (data: AddressFormValues) => {
+    setCheckoutError(null);
     const billingAddress = data.billingAddressSameAsShipping
       ? undefined
       : {
-          city: data.city,
-          country: data.country,
-          houseNumber: data.houseNumber,
-          postalCode: data.postalCode,
-          street: data.street,
+          city: data.billingCity,
+          country: data.billingCountry,
+          houseNumber: data.billingHouseNumber,
+          postalCode: data.billingPostalCode,
+          street: data.billingStreet,
         };
 
-    const result = await checkout.mutateAsync({
-      data: {
-        billingAddress,
-        deliveryType: data.deliveryType,
-        guestEmail: data.guestEmail || undefined,
-        guestName: data.guestName || undefined,
-        paymentMethod: data.paymentMethod,
-        shippingAddress: {
-          city: data.city,
-          country: data.country,
-          houseNumber: data.houseNumber,
-          postalCode: data.postalCode,
-          street: data.street,
+    try {
+      const result = await checkout.mutateAsync({
+        data: {
+          billingAddress,
+          deliveryType: data.deliveryType,
+          guestEmail: data.guestEmail || undefined,
+          guestName: data.guestName || undefined,
+          paymentMethod: data.paymentMethod,
+          shippingAddress: {
+            city: data.city,
+            country: data.country,
+            houseNumber: data.houseNumber,
+            postalCode: data.postalCode,
+            street: data.street,
+          },
         },
-      },
-    });
+      });
 
-    queryClient.invalidateQueries({ queryKey: getCartsQueryKey() });
-    navigate({ search: { orderId: result.id }, to: "/checkout/confirmed" });
+      queryClient.invalidateQueries({ queryKey: getCartsQueryKey() });
+      navigate({ search: { orderId: result.id }, to: "/checkout/confirmed" });
+    } catch (err) {
+      const message =
+        err instanceof Error
+          ? err.message
+          : typeof err === "string"
+            ? err
+            : "Checkout failed. Please try again.";
+      setCheckoutError(message);
+    }
   };
 
   const isCartEmpty = !cart || cart.items.length === 0;
@@ -100,9 +129,16 @@ export function CheckoutSection({
           onDeliveryTypeChange={onDeliveryTypeChange}
           onSubmit={handleSubmit}
           ref={formRef}
+          savedBilling={savedBilling}
+          savedShipping={savedShipping}
           showGuestFields={!user}
         />
         {!isCartEmpty && <CartSummary deliveryType={deliveryType} items={cart.items} />}
+        {checkoutError && (
+          <div className="rounded-md border border-destructive/40 bg-destructive/10 px-4 py-3 text-sm text-destructive">
+            {checkoutError}
+          </div>
+        )}
       </CardContent>
       <CardFooter className="flex-col gap-2">
         <Button

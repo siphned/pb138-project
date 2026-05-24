@@ -1,5 +1,5 @@
 import { Show, useClerk } from "@clerk/react";
-import { ShoppingCart01Icon, User01Icon } from "@hugeicons/core-free-icons";
+import { ShoppingCart01Icon, User02Icon } from "@hugeicons/core-free-icons";
 import { HugeiconsIcon } from "@hugeicons/react";
 import { Link } from "@tanstack/react-router";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
@@ -48,7 +48,7 @@ export function Header() {
             className={cn(buttonVariants({ size: "icon", variant: "ghost" }), "rounded-full")}
             to="/auth/login"
           >
-            <HugeiconsIcon className="h-5 w-5" icon={User01Icon} />
+            <HugeiconsIcon className="h-5 w-5" icon={User02Icon} />
           </Link>
         </Show>
 
