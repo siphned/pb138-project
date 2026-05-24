@@ -45,8 +45,8 @@ export function InventoryEditForm({ shopId, product, onSuccess }: InventoryEditF
         productId: product.id,
       });
       onSuccess();
-    } catch (error) {
-      console.error("Failed to update product:", error);
+    } catch {
+      // Error already handled by mutation state
     } finally {
       setIsSubmitting(false);
     }
