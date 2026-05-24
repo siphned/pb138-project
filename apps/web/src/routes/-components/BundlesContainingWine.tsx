@@ -2,8 +2,7 @@ import { BundleCard } from "@/components/catalog/BundleCard";
 import { Section } from "@/components/primitives/section";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useGetShopsByIdProducts } from "@/generated/hooks/useGetShopsByIdProducts";
-
-const CARD_GRID = "grid grid-cols-2 gap-6 md:grid-cols-3 lg:grid-cols-4";
+import { DETAIL_CARD_GRID, DETAIL_CARD_ITEM } from "@/lib/detail-card-grid";
 
 type RawBundle = {
   id: string;
@@ -33,9 +32,9 @@ export function BundlesContainingWine({ shopId, wineId }: BundlesContainingWineP
   if (isLoading) {
     return (
       <Section heading="Also available in bundles">
-        <div className={CARD_GRID}>
+        <div className={DETAIL_CARD_GRID}>
           {[1, 2, 3, 4].map((i) => (
-            <Skeleton className="aspect-square rounded-2xl" key={i} />
+            <Skeleton className={`aspect-square rounded-2xl ${DETAIL_CARD_ITEM}`} key={i} />
           ))}
         </div>
       </Section>
@@ -46,9 +45,11 @@ export function BundlesContainingWine({ shopId, wineId }: BundlesContainingWineP
 
   return (
     <Section heading="Also available in bundles">
-      <div className={CARD_GRID}>
+      <div className={DETAIL_CARD_GRID}>
         {bundles.map((b) => (
-          <BundleCard key={b.id} product={b} />
+          <div className={DETAIL_CARD_ITEM} key={b.id}>
+            <BundleCard product={b} />
+          </div>
         ))}
       </div>
     </Section>

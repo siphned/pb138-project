@@ -3,6 +3,7 @@ import { Section } from "@/components/primitives/section";
 import { ProductCard } from "@/components/catalog/ProductCard";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useGetProducts } from "@/generated/hooks/useGetProducts";
+import { DETAIL_CARD_GRID, DETAIL_CARD_ITEM } from "@/lib/detail-card-grid";
 
 interface WinesAvailableInShopsProps {
   wineId: string;
@@ -14,9 +15,9 @@ export function WinesAvailableInShops({ wineId }: WinesAvailableInShopsProps) {
   if (isLoading) {
     return (
       <Section heading="Available in shops">
-        <div className="grid grid-cols-2 gap-6 md:grid-cols-3 lg:grid-cols-4">
+        <div className={DETAIL_CARD_GRID}>
           {[1, 2, 3, 4].map((i) => (
-            <Skeleton className="aspect-square rounded-2xl" key={i} />
+            <Skeleton className={`aspect-square rounded-2xl ${DETAIL_CARD_ITEM}`} key={i} />
           ))}
         </div>
       </Section>
@@ -49,9 +50,11 @@ export function WinesAvailableInShops({ wineId }: WinesAvailableInShopsProps) {
 
   return (
     <Section heading="Available in shops">
-      <div className="grid grid-cols-2 gap-6 md:grid-cols-3 lg:grid-cols-4">
+      <div className={DETAIL_CARD_GRID}>
         {products.map((product) => (
-          <ProductCard key={product.id} product={product} />
+          <div className={DETAIL_CARD_ITEM} key={product.id}>
+            <ProductCard product={product} />
+          </div>
         ))}
       </div>
     </Section>

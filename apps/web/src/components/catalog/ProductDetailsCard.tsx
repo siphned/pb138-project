@@ -18,6 +18,7 @@ import { Separator } from "@/components/ui/separator";
 import { useGetProductsByIdImages } from "@/generated/hooks/useGetProductsByIdImages";
 import { useGetShopsById } from "@/generated/hooks/useGetShopsById";
 import type { GetProductsById200 } from "@/generated/types/GetProductsById";
+import { DETAIL_CARD_GRID, DETAIL_CARD_ITEM } from "@/lib/detail-card-grid";
 import { CatalogPlaceholder } from "./CatalogPlaceholder";
 import { WineCard } from "./WineCard";
 
@@ -216,7 +217,7 @@ export function ProductDetailsCard({
 
       {product.isBundle && product.productWines && product.productWines.length > 0 && (
         <Section heading="Wines in this product">
-          <div className="grid grid-cols-2 gap-6 md:grid-cols-3 lg:grid-cols-4">
+          <div className={DETAIL_CARD_GRID}>
             {
               // biome-ignore lint/suspicious/noExplicitAny: GetProductsById200 is `any` in OpenAPI; pw shape lost
               product.productWines.map((pw: any) => {
@@ -227,7 +228,11 @@ export function ProductDetailsCard({
                   ...pw.wine,
                   // biome-ignore lint/suspicious/noExplicitAny: productWines.wine in OpenAPI is narrower than GetWines200Item (BE follow-up)
                 } as any;
-                return <WineCard key={pw.wine.id} wine={wineWithFallbacks} />;
+                return (
+                  <div className={DETAIL_CARD_ITEM} key={pw.wine.id}>
+                    <WineCard wine={wineWithFallbacks} />
+                  </div>
+                );
               })
             }
           </div>
