@@ -1,5 +1,5 @@
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useMemo } from "react";
+import { type ReactNode, useMemo } from "react";
 import { type SubmitHandler, useForm } from "react-hook-form";
 import { z } from "zod";
 import { Button } from "@/components/ui/button";
@@ -92,8 +92,6 @@ export type SavedAddress = {
   country: string;
 };
 
-export const ADDRESS_FORM_ID = "checkout-address-form";
-
 export interface AddressFormProps {
   defaultValues: Partial<AddressFormValues>;
   isSubmitting: boolean;
@@ -102,6 +100,7 @@ export interface AddressFormProps {
   onDeliveryTypeChange?: (value: "pickup" | "shipping") => void;
   savedShipping?: SavedAddress | null;
   savedBilling?: SavedAddress | null;
+  footer?: ReactNode;
 }
 
 const SHIPPING_FIELDS = [
@@ -127,6 +126,7 @@ export function AddressForm({
   onDeliveryTypeChange,
   savedShipping,
   savedBilling,
+  footer,
 }: AddressFormProps) {
   const schema = useMemo(() => buildSchema(showGuestFields), [showGuestFields]);
 
@@ -188,12 +188,7 @@ export function AddressForm({
   const addressSectionTitle = deliveryType === "pickup" ? "Contact Address" : "Shipping Address";
 
   return (
-    <form
-      className="space-y-6"
-      id={ADDRESS_FORM_ID}
-      noValidate
-      onSubmit={handleSubmit(onSubmit)}
-    >
+    <form className="space-y-6" noValidate onSubmit={handleSubmit(onSubmit)}>
       {showErrorBanner && (
         <div
           aria-live="polite"
@@ -397,6 +392,8 @@ export function AddressForm({
           </div>
         </div>
       )}
+
+      {footer}
     </form>
   );
 }

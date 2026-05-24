@@ -1,13 +1,9 @@
 import { useQueryClient } from "@tanstack/react-query";
 import { useNavigate } from "@tanstack/react-router";
 import { useMemo, useState } from "react";
-import {
-  ADDRESS_FORM_ID,
-  AddressForm,
-  type AddressFormValues,
-} from "@/components/forms/AddressForm";
+import { AddressForm, type AddressFormValues } from "@/components/forms/AddressForm";
 import { buttonVariants } from "@/components/ui/button";
-import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useUser } from "@/context/UserContext";
 import { getCartsQueryKey } from "@/generated/hooks/useGetCarts";
 import { useGetUsersMeAddresses } from "@/generated/hooks/useGetUsersMeAddresses";
@@ -121,14 +117,39 @@ export function CheckoutSection({
 
   const isCartEmpty = !cart || cart.items.length === 0;
 
+  const formFooter = (
+    <div className="space-y-4 border-t border-border pt-4">
+      {!isCartEmpty && <CartSummary deliveryType={deliveryType} items={cart.items} />}
+      {checkoutError && (
+        <div
+          aria-live="polite"
+          className="rounded-md border border-destructive/40 bg-destructive/10 px-4 py-3 text-sm text-destructive"
+        >
+          {checkoutError}
+        </div>
+      )}
+      <button
+        className={cn(buttonVariants(), "w-full")}
+        disabled={isCartEmpty || checkout.isPending}
+        type="submit"
+      >
+        {checkout.isPending ? "Processing..." : `Confirm Order — €${total.toFixed(2)}`}
+      </button>
+      <p className="text-xs text-center text-muted-foreground">
+        By purchasing you agree to our Terms of Service and Privacy Policy.
+      </p>
+    </div>
+  );
+
   return (
     <Card>
       <CardHeader>
         <CardTitle>Checkout</CardTitle>
       </CardHeader>
-      <CardContent className="space-y-4">
+      <CardContent>
         <AddressForm
           defaultValues={defaultAddressValues}
+          footer={formFooter}
           isSubmitting={checkout.isPending}
           onDeliveryTypeChange={onDeliveryTypeChange}
           onSubmit={handleSubmit}
@@ -136,29 +157,7 @@ export function CheckoutSection({
           savedShipping={savedShipping}
           showGuestFields={!user}
         />
-        {!isCartEmpty && <CartSummary deliveryType={deliveryType} items={cart.items} />}
-        {checkoutError && (
-          <div
-            aria-live="polite"
-            className="rounded-md border border-destructive/40 bg-destructive/10 px-4 py-3 text-sm text-destructive"
-          >
-            {checkoutError}
-          </div>
-        )}
       </CardContent>
-      <CardFooter className="flex-col gap-2">
-        <button
-          className={cn(buttonVariants(), "w-full")}
-          disabled={isCartEmpty || checkout.isPending}
-          form={ADDRESS_FORM_ID}
-          type="submit"
-        >
-          {checkout.isPending ? "Processing..." : `Confirm Order — €${total.toFixed(2)}`}
-        </button>
-        <p className="text-xs text-center text-muted-foreground">
-          By purchasing you agree to our Terms of Service and Privacy Policy.
-        </p>
-      </CardFooter>
     </Card>
   );
 }
