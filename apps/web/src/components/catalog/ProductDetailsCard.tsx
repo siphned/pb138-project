@@ -1,8 +1,4 @@
-import {
-  MinusSignIcon,
-  PlusSignIcon,
-  ShoppingCart02Icon,
-} from "@hugeicons/core-free-icons";
+import { MinusSignIcon, PlusSignIcon, ShoppingCart02Icon } from "@hugeicons/core-free-icons";
 import { HugeiconsIcon } from "@hugeicons/react";
 import { Link } from "@tanstack/react-router";
 import { useState } from "react";
@@ -20,6 +16,7 @@ import {
 } from "@/components/ui/carousel";
 import { Separator } from "@/components/ui/separator";
 import { useGetProductsByIdImages } from "@/generated/hooks/useGetProductsByIdImages";
+import { useGetShopsById } from "@/generated/hooks/useGetShopsById";
 import type { GetProductsById200 } from "@/generated/types/GetProductsById";
 import { CatalogPlaceholder } from "./CatalogPlaceholder";
 import { WineCard } from "./WineCard";
@@ -130,6 +127,14 @@ export function ProductDetailsCard({
 }: ProductDetailsCardProps) {
   const [quantity, setQuantity] = useState(1);
 
+  const shopId: string | undefined = product.shop?.id ?? product.shopId;
+  const { data: fetchedShop } = useGetShopsById(shopId ?? "", {
+    query: { enabled: !!shopId && !product.shop?.name },
+  });
+  const shopName: string | undefined = product.shop?.name ?? fetchedShop?.name;
+  const shopOwnerUserId: string | undefined =
+    product.shop?.ownerUserId ?? fetchedShop?.ownerUserId;
+
   const price = Number(product.price).toLocaleString("en-IE", {
     currency: "EUR",
     style: "currency",
@@ -162,14 +167,14 @@ export function ProductDetailsCard({
 
             <div className="space-y-1">
               <p className="font-heading text-3xl font-bold text-foreground">{price}</p>
-              {product.shop?.id && product.shop?.name && (
+              {shopId && shopName && (
                 <p className="text-sm">
                   <Link
                     className="text-muted-foreground transition-colors hover:text-primary hover:underline"
-                    params={{ id: product.shop.id }}
+                    params={{ id: shopId }}
                     to="/shops/$id"
                   >
-                    Sold by {product.shop.name}
+                    Sold by {shopName}
                   </Link>
                 </p>
               )}
@@ -182,9 +187,7 @@ export function ProductDetailsCard({
                   <p className="text-xs font-bold uppercase tracking-widest text-muted-foreground">
                     Description
                   </p>
-                  <p className="text-sm leading-relaxed text-foreground">
-                    {product.description}
-                  </p>
+                  <p className="text-sm leading-relaxed text-foreground">{product.description}</p>
                 </div>
               </>
             )}
@@ -231,7 +234,7 @@ export function ProductDetailsCard({
         </Section>
       )}
 
-      <ShowOwner ownerUserId={product.shop?.ownerUserId}>
+      <ShowOwner ownerUserId={shopOwnerUserId}>
         <div className="flex flex-wrap gap-4">
           <Button
             render={<Link params={{ productId: product.id }} to="/products/$productId/edit" />}
