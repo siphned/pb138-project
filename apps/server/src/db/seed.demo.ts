@@ -247,9 +247,6 @@ async function main() {
   const allEventImages: ImageEntry[] = [];
   const allWinemakerImages: ImageEntry[] = [];
   const allShopImages: ImageEntry[] = [];
-  const allProductImages: ImageEntry[] = [];
-
-  const wineToProductIdsMap = new Map<string, string[]>(); // wineId -> productId[]
 
   const winemakerReviewsToInsert: { winemakerId: string; rating: number; body: string; userId: string }[] = [];
   const wineReviewsToInsert: { wineId: string; rating: number; body: string; userId: string }[] = [];
@@ -502,19 +499,9 @@ async function main() {
         })),
       );
       insertedProducts.forEach((p, i) => {
-        const wineData = wm.wines[i]!;
-        const wineId = wineIdMap.get(`${wmKey}::${wineData.name}`)!;
-        const key = `${shop.key}::${wmKey}::${wineData.name}`;
-
-        const existingProds = wineToProductIdsMap.get(wineId) ?? [];
-        existingProds.push(p.id);
-        wineToProductIdsMap.set(wineId, existingProds);
-
+        const key = `${shop.key}::${wmKey}::${wm.wines[i]!.name}`;
         productMap.set(key, { id: p.id, price: p.price, shopId: shopRow!.id });
         allProductIds.push(p.id);
-        if (wineData.imageUrl) {
-          allProductImages.push({ id: p.id, url: wineData.imageUrl });
-        }
       });
     }
 
@@ -611,13 +598,7 @@ async function main() {
         })),
       );
       insertedProducts.forEach((p, idx) => {
-        const wineId = wmWineEntries[idx]![1];
         const wineName = wmWineEntries[idx]![0].split("::")[1]!;
-
-        const existingProds = wineToProductIdsMap.get(wineId) ?? [];
-        existingProds.push(p.id);
-        wineToProductIdsMap.set(wineId, existingProds);
-
         productMap.set(`${shopKey}::${wmKey}::${wineName}`, { id: p.id, price: p.price, shopId: shopRow!.id });
         allProductIds.push(p.id);
       });
@@ -785,12 +766,7 @@ async function main() {
     addReview(r.userId, "winemaker", r.winemakerId, r.rating, r.body);
   }
   for (const r of wineReviewsToInsert) {
-    // Map wine review to the wine itself AND all products selling this wine
-    addReview(r.userId, "wine", r.wineId, r.rating, r.body);
-    const relatedProductIds = wineToProductIdsMap.get(r.wineId) ?? [];
-    for (const pId of relatedProductIds) {
-      addReview(pick(allCustomerIds), "product", pId, r.rating, r.body);
-    }
+    addReview(r.userId, "product", r.wineId, r.rating, r.body);
   }
 
   // Story reviews (Willy)
@@ -813,30 +789,14 @@ async function main() {
     if (wmId) addReview(userIdMap.get("test_user")!, "winemaker", wmId, r.rating, r.body);
   }
 
-  // Bulk reviews for Winemakers (reach 5-8 reviews)
+  // Bulk reviews for Faker Winemakers
   const wmIdArr = [...wmIdMap.values()];
   for (const wmId of wmIdArr) {
-    const target = faker.number.int({ min: 5, max: 8 });
-    const existing = reviewInputs.filter((r) => r.entityId === wmId && r.entityType === "winemaker")
-      .length;
-    for (let i = existing; i < target; i++) {
-      addReview(
-        pick(insertedSupport).id,
-        "winemaker",
-        wmId,
-        pick([4, 5, 5, 5]),
-        pick(FALLBACK_REVIEWS)
-      );
-    }
-  }
-
-  // Bulk reviews for Products (reach 6-12 reviews)
-  for (const pId of allProductIds) {
-    const target = faker.number.int({ min: 6, max: 12 });
-    const existing = reviewInputs.filter((r) => r.entityId === pId && r.entityType === "product")
-      .length;
-    for (let i = existing; i < target; i++) {
-      addReview(pick(insertedSupport).id, "product", pId, pick([3, 4, 5, 5, 5]), pick(FALLBACK_REVIEWS));
+    const existing = reviewInputs.filter(r => r.entityId === wmId && r.entityType === "winemaker").length;
+    if (existing < 3) {
+      for (let i = existing; i < 3; i++) {
+        addReview(pick(insertedSupport).id, "winemaker", wmId, pick([4, 5]), pick(FALLBACK_REVIEWS));
+      }
     }
   }
 
@@ -977,45 +937,25 @@ async function main() {
   logger.info(`Inserted ${reqPool.length} role requests`);
 
   // ── Images ───────────────────────────────────────────────────────────────────
-  // Custom URLs from data file take priority. No global placeholders inserted;
-  // frontend handles fallbacks via local assets.
+  // Custom URLs from data file take priority; placeholder is the fallback.
   logger.info("Inserting images...");
   const imageInputs: ImageInput[] = [
-    ...allWineImages
-      .filter((img) => !!img.url)
-      .map(({ id, url }) => ({
-        entityType: "wine",
-        entityId: id,
-        url: url!,
-      })),
-    ...allEventImages
-      .filter((img) => !!img.url)
-      .map(({ id, url }) => ({
-        entityType: "event",
-        entityId: id,
-        url: url!,
-      })),
-    ...allWinemakerImages
-      .filter((img) => !!img.url)
-      .map(({ id, url }) => ({
-        entityType: "winemaker",
-        entityId: id,
-        url: url!,
-      })),
-    ...allShopImages
-      .filter((img) => !!img.url)
-      .map(({ id, url }) => ({
-        entityType: "shop",
-        entityId: id,
-        url: url!,
-      })),
-    ...allProductImages
-      .filter((img) => !!img.url)
-      .map(({ id, url }) => ({
-        entityType: "product",
-        entityId: id,
-        url: url!,
-      })),
+    ...allWineImages.map(({ id, url }) => ({
+      entityType: "wine", entityId: id,
+      url: url ?? "/uploads/wine/wine_placeholder.webp",
+    })),
+    ...allEventImages.map(({ id, url }) => ({
+      entityType: "event", entityId: id,
+      url: url ?? "/uploads/event/event_placeholder.webp",
+    })),
+    ...allWinemakerImages.map(({ id, url }) => ({
+      entityType: "winemaker", entityId: id,
+      url: url ?? "/uploads/winemaker/winery_placeholder.webp",
+    })),
+    ...allShopImages.map(({ id, url }) => ({
+      entityType: "shop", entityId: id,
+      url: url ?? "/uploads/shop/shop_placeholder.webp",
+    })),
   ];
   await insertImages(imageInputs);
   logger.info(`Inserted ${imageInputs.length} images`);

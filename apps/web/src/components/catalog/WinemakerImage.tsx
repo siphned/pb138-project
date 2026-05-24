@@ -15,7 +15,6 @@ export function WinemakerImage({ winemakerId, alt, fallbackText, className }: Wi
     <EntityImage
       alt={alt}
       className={className}
-      entityType="winery"
       fallbackText={fallbackText}
       imagesQuery={imagesQuery}
     />

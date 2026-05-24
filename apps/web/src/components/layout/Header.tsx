@@ -14,7 +14,6 @@ export function Header() {
   const { user: clerkUser } = useClerk();
   const initials = clerkUser ? (clerkUser.fullName || "User").substring(0, 2).toUpperCase() : "GU";
   const { user, activeRole, setActiveRole } = useUser();
-  const { theme } = useTheme();
   const roles = user?.roles ?? [];
 
   const { data: cart } = useGetCarts();
@@ -23,11 +22,7 @@ export function Header() {
   return (
     <header className="h-16 border-b bg-background flex items-center justify-between px-6 lg:px-12">
       <Link to="/">
-        <img
-          alt="Wine Enjoyers"
-          className="h-10 w-auto"
-          src={theme === "dark" ? "/logo_dark.webp" : "/logo.png"}
-        />
+        <img alt="Wine Enjoyers" className="h-10 w-auto" src="/logo.png" />
       </Link>
 
       <div className="flex items-center gap-4">

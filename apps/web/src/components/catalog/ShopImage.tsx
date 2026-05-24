@@ -15,7 +15,6 @@ export function ShopImage({ shopId, alt, fallbackText, className }: ShopImagePro
     <EntityImage
       alt={alt}
       className={className}
-      entityType="shop"
       fallbackText={fallbackText}
       imagesQuery={imagesQuery}
     />

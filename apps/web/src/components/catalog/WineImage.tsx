@@ -5,17 +5,18 @@ interface WineImageProps {
   wineId: string;
   alt: string;
   fallbackText: string;
+  fallbackColor?: string;
   className?: string;
 }
 
 /** Thin wrapper around `<EntityImage>` for wine images. */
-export function WineImage({ wineId, alt, fallbackText, className }: WineImageProps) {
+export function WineImage({ wineId, alt, fallbackText, fallbackColor, className }: WineImageProps) {
   const imagesQuery = useGetWinesByIdImages(wineId);
   return (
     <EntityImage
       alt={alt}
       className={className}
-      entityType="wine"
+      fallbackColor={fallbackColor}
       fallbackText={fallbackText}
       imagesQuery={imagesQuery}
     />

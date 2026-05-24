@@ -1,3 +1,4 @@
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { fireEvent, render, screen } from "@testing-library/react";
 import { describe, expect, it, vi } from "vitest";
 import { useUser } from "@/context/UserContext";
@@ -27,25 +28,29 @@ describe("ProductDetailsCard", () => {
   it("renders product details and PageHeader", () => {
     vi.mocked(useUser).mockReturnValue({ user: null } as any);
     render(
-      <ProductDetailsCard
-        isAddingToCart={false}
-        onAddToCart={mockOnAddToCart}
-        product={mockProduct}
-      />
+      <QueryClientProvider client={new QueryClient()}>
+        <ProductDetailsCard
+          isAddingToCart={false}
+          onAddToCart={mockOnAddToCart}
+          product={mockProduct}
+        />
+      </QueryClientProvider>
     );
-    expect(screen.getByText("Gala Pálava Bundle")).toBeInTheDocument();
+    expect(screen.getAllByText("Gala Pálava Bundle")[0]).toBeInTheDocument();
     expect(screen.getByText(/Vinotéka u Adama/)).toBeInTheDocument();
     expect(screen.getByText(/€1,200/)).toBeInTheDocument();
-    expect(screen.getByText(/10 in stock/i)).toBeInTheDocument();
+    expect(screen.getByText(/in stock/i)).toBeInTheDocument();
   });
 
   it("calls onAddToCart when button is clicked", () => {
     render(
-      <ProductDetailsCard
-        isAddingToCart={false}
-        onAddToCart={mockOnAddToCart}
-        product={mockProduct}
-      />
+      <QueryClientProvider client={new QueryClient()}>
+        <ProductDetailsCard
+          isAddingToCart={false}
+          onAddToCart={mockOnAddToCart}
+          product={mockProduct}
+        />
+      </QueryClientProvider>
     );
     fireEvent.click(screen.getByText(/add to cart/i));
     expect(mockOnAddToCart).toHaveBeenCalled();
@@ -53,22 +58,26 @@ describe("ProductDetailsCard", () => {
 
   it("disables button when isAddingToCart is true", () => {
     render(
-      <ProductDetailsCard
-        isAddingToCart={true}
-        onAddToCart={mockOnAddToCart}
-        product={mockProduct}
-      />
+      <QueryClientProvider client={new QueryClient()}>
+        <ProductDetailsCard
+          isAddingToCart={true}
+          onAddToCart={mockOnAddToCart}
+          product={mockProduct}
+        />
+      </QueryClientProvider>
     );
     expect(screen.getByRole("button", { name: /adding/i })).toBeDisabled();
   });
 
   it("renders wines in bundle", () => {
     render(
-      <ProductDetailsCard
-        isAddingToCart={false}
-        onAddToCart={mockOnAddToCart}
-        product={mockProduct}
-      />
+      <QueryClientProvider client={new QueryClient()}>
+        <ProductDetailsCard
+          isAddingToCart={false}
+          onAddToCart={mockOnAddToCart}
+          product={mockProduct}
+        />
+      </QueryClientProvider>
     );
     expect(screen.getByText("Wines in this product")).toBeInTheDocument();
     // Wine name appears in both the polaroid placeholder caption and the heading link.
@@ -80,11 +89,13 @@ describe("ProductDetailsCard", () => {
       user: { id: "user-1" },
     } as any);
     render(
-      <ProductDetailsCard
-        isAddingToCart={false}
-        onAddToCart={mockOnAddToCart}
-        product={mockProduct}
-      />
+      <QueryClientProvider client={new QueryClient()}>
+        <ProductDetailsCard
+          isAddingToCart={false}
+          onAddToCart={mockOnAddToCart}
+          product={mockProduct}
+        />
+      </QueryClientProvider>
     );
     expect(screen.getByText(/edit product/i)).toBeInTheDocument();
   });

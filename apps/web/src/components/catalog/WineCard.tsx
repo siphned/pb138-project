@@ -34,6 +34,7 @@ export function WineCard({ wine, minPrice }: WineCardProps) {
           <Link
             className="stretched-link transition-colors hover:text-primary focus:outline-none"
             params={{ id: wine.id }}
+            search={{ page: 1, sort: "name" }}
             to="/wines/$id"
           >
             {wine.name}

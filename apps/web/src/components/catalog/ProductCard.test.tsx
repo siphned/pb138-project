@@ -28,7 +28,7 @@ describe("ProductCard", () => {
 
   it("renders link to correct URL", () => {
     render(<ProductCard product={mockProduct} />);
-    const link = screen.getByRole("link");
+    const link = screen.getAllByRole("link")[0];
     expect(link).toHaveAttribute("href", "/products/$productId/prod-1");
   });
 

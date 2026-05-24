@@ -4,12 +4,10 @@ import type { ReactElement } from "react";
 import { describe, expect, it, type Mock } from "vitest";
 
 /**
- * Shared describe block for the five entity image wrappers
+ * Shared describe block for the four entity image wrappers
  * (`WineImage`, `ProductImage`, `WinemakerImage`, `ShopImage`,
- * `EventImage`). Each wrapper has the same rendering logic:
- * 1. Loading         → <Skeleton> (no alt-text element, no fallback text)
- * 2. Image present   → <img> with the real URL
- * 3. No image        → <img> webp placeholder (alt present, src ≠ sampleUrl)
+ * `EventImage`). Each wrapper has the same 3-state behavior:
+ * render the first image, fall back while loading, fall back when empty.
  *
  * `mockHook` must be the `vi.mocked(useGetXByIdImages)` reference from the
  * caller file (vi.mock is hoisted and must stay in the caller).
@@ -20,6 +18,7 @@ export function describeEntityImageWrapper({
   mockHook,
   renderWrapper,
   alt,
+  fallbackText,
   sampleUrl,
 }: {
   name: string;
@@ -39,19 +38,18 @@ export function describeEntityImageWrapper({
       expect(screen.getByAltText(alt)).toHaveAttribute("src", sampleUrl);
     });
 
-    it("shows a skeleton while the hook is loading", () => {
+    it("renders the placeholder while the hook is loading", () => {
       setQuery(undefined, true);
       render(renderWrapper());
       expect(screen.queryByAltText(alt)).not.toBeInTheDocument();
-      expect(document.querySelector('[data-slot="skeleton"]')).toBeInTheDocument();
+      expect(screen.getByText(fallbackText)).toBeInTheDocument();
     });
 
-    it("shows the webp placeholder when no images are attached", () => {
+    it("renders the placeholder when no images are attached", () => {
       setQuery([]);
       render(renderWrapper());
-      const img = screen.getByAltText(alt);
-      expect(img).toBeInTheDocument();
-      expect(img).not.toHaveAttribute("src", sampleUrl);
+      expect(screen.queryByAltText(alt)).not.toBeInTheDocument();
+      expect(screen.getByText(fallbackText)).toBeInTheDocument();
     });
   });
 }

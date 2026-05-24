@@ -82,92 +82,102 @@ export function OrdersTab({ shopId }: OrdersTabProps) {
         </CardHeader>
 
         <CardContent>
-          {isLoading ? (
-            <div className="space-y-2">
-              {Array.from({ length: 5 }).map((_, i) => (
-                <Skeleton className="h-12 w-full" key={i} />
-              ))}
-            </div>
-          ) : orders.length === 0 ? (
-            <div className="text-center py-8">
-              <p className="text-muted-foreground">No orders yet</p>
-            </div>
-          ) : (
-            <div className="space-y-4">
-              <div className="rounded-md border border-border overflow-hidden">
-                <Table>
-                  <TableHeader>
-                    <TableRow>
-                      <TableHead className="w-[50px]" />
-                      <TableHead>Order ID</TableHead>
-                      <TableHead>Customer</TableHead>
-                      <TableHead>Items</TableHead>
-                      <TableHead>Total</TableHead>
-                      <TableHead>Status</TableHead>
-                      <TableHead>Date</TableHead>
-                    </TableRow>
-                  </TableHeader>
-                  <TableBody>
-                    {orders.map((order) => {
-                      const isExpanded = expandedOrder === order.id;
-                      const status = (order.status || "pending").toLowerCase() as OrderStatus;
-                      const customerName = order.guestName || order.userId || "Unknown";
-
-                      return (
-                        <TableRow className="hover:bg-muted/50" key={order.id}>
-                          <TableCell>
-                            <Button
-                              className="h-8 w-8 p-0"
-                              onClick={() => setExpandedOrder(isExpanded ? null : order.id)}
-                              size="sm"
-                              variant="ghost"
-                            >
-                              {isExpanded ? (
-                                <HugeiconsIcon icon={ArrowUp01Icon} strokeWidth={2} />
-                              ) : (
-                                <HugeiconsIcon icon={ArrowDown01Icon} strokeWidth={2} />
-                              )}
-                            </Button>
-                          </TableCell>
-                          <TableCell className="font-mono text-sm">
-                            {order.id.slice(0, 8)}...
-                          </TableCell>
-                          <TableCell className="text-sm">{customerName}</TableCell>
-                          <TableCell className="text-sm">{order.itemCount || "—"} items</TableCell>
-                          <TableCell className="font-semibold">${order.totalPrice}</TableCell>
-                          <TableCell>
-                            <span
-                              className={`inline-flex rounded-full px-2 py-1 text-xs font-semibold ${
-                                statusColors[status] || statusColors.pending
-                              }`}
-                            >
-                              {status}
-                            </span>
-                          </TableCell>
-                          <TableCell className="text-sm text-muted-foreground">
-                            {new Date(order.createdAt).toLocaleDateString()}
-                          </TableCell>
-                        </TableRow>
-                      );
-                    })}
-                  </TableBody>
-                </Table>
-              </div>
-
-              {/* Expanded Order Details */}
-              {expandedOrder && (
-                <div className="rounded-md border border-border p-4 bg-muted/30">
-                  {orders.find((o) => o.id === expandedOrder) && (
-                    <ExpandedOrderDetails
-                      isUpdating={statusMutation.isPending}
-                      onStatusChange={handleStatusChange}
-                      order={orders.find((o) => o.id === expandedOrder)}
-                    />
-                  )}
+          {(() => {
+            if (isLoading) {
+              return (
+                <div className="space-y-2">
+                  {Array.from({ length: 5 }).map((_, i) => (
+                    <Skeleton className="h-12 w-full" key={i} />
+                  ))}
                 </div>
-              )}
-            </div>
-          )}
+              );
+            }
+            if (orders.length === 0) {
+              return (
+                <div className="text-center py-8">
+                  <p className="text-muted-foreground">No orders yet</p>
+                </div>
+              );
+            }
+            return (
+              <div className="space-y-4">
+                <div className="rounded-md border border-border overflow-hidden">
+                  <Table>
+                    <TableHeader>
+                      <TableRow>
+                        <TableHead className="w-[50px]" />
+                        <TableHead>Order ID</TableHead>
+                        <TableHead>Customer</TableHead>
+                        <TableHead>Items</TableHead>
+                        <TableHead>Total</TableHead>
+                        <TableHead>Status</TableHead>
+                        <TableHead>Date</TableHead>
+                      </TableRow>
+                    </TableHeader>
+                    <TableBody>
+                      {orders.map((order) => {
+                        const isExpanded = expandedOrder === order.id;
+                        const status = (order.status || "pending").toLowerCase() as OrderStatus;
+                        const customerName = order.guestName || order.userId || "Unknown";
+
+                        return (
+                          <TableRow className="hover:bg-muted/50" key={order.id}>
+                            <TableCell>
+                              <Button
+                                className="h-8 w-8 p-0"
+                                onClick={() => setExpandedOrder(isExpanded ? null : order.id)}
+                                size="sm"
+                                variant="ghost"
+                              >
+                                {isExpanded ? (
+                                  <HugeiconsIcon icon={ArrowUp01Icon} strokeWidth={2} />
+                                ) : (
+                                  <HugeiconsIcon icon={ArrowDown01Icon} strokeWidth={2} />
+                                )}
+                              </Button>
+                            </TableCell>
+                            <TableCell className="font-mono text-sm">
+                              {order.id.slice(0, 8)}...
+                            </TableCell>
+                            <TableCell className="text-sm">{customerName}</TableCell>
+                            <TableCell className="text-sm">
+                              {order.itemCount || "—"} items
+                            </TableCell>
+                            <TableCell className="font-semibold">${order.totalPrice}</TableCell>
+                            <TableCell>
+                              <span
+                                className={`inline-flex rounded-full px-2 py-1 text-xs font-semibold ${
+                                  statusColors[status] || statusColors.pending
+                                }`}
+                              >
+                                {status}
+                              </span>
+                            </TableCell>
+                            <TableCell className="text-sm text-muted-foreground">
+                              {new Date(order.createdAt).toLocaleDateString()}
+                            </TableCell>
+                          </TableRow>
+                        );
+                      })}
+                    </TableBody>
+                  </Table>
+                </div>
+
+                {/* Expanded Order Details */}
+                {expandedOrder && (
+                  <div className="rounded-md border border-border p-4 bg-muted/30">
+                    {orders.find((o) => o.id === expandedOrder) && (
+                      <ExpandedOrderDetails
+                        isUpdating={statusMutation.isPending}
+                        onStatusChange={handleStatusChange}
+                        order={orders.find((o) => o.id === expandedOrder)}
+                      />
+                    )}
+                  </div>
+                )}
+              </div>
+            );
+          })()}
         </CardContent>
       </Card>
     </div>
