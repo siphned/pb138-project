@@ -1,8 +1,9 @@
 import { BundleCard } from "@/components/catalog/BundleCard";
-import { DataGrid } from "@/components/primitives/data-grid";
 import { Section } from "@/components/primitives/section";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useGetShopsByIdProducts } from "@/generated/hooks/useGetShopsByIdProducts";
+
+const CARD_GRID = "grid grid-cols-2 gap-6 md:grid-cols-3 lg:grid-cols-4";
 
 type RawBundle = {
   id: string;
@@ -32,11 +33,11 @@ export function BundlesContainingWine({ shopId, wineId }: BundlesContainingWineP
   if (isLoading) {
     return (
       <Section heading="Also available in bundles">
-        <DataGrid variant="catalog">
-          {[1, 2, 3].map((i) => (
+        <div className={CARD_GRID}>
+          {[1, 2, 3, 4].map((i) => (
             <Skeleton className="aspect-square rounded-2xl" key={i} />
           ))}
-        </DataGrid>
+        </div>
       </Section>
     );
   }
@@ -45,11 +46,11 @@ export function BundlesContainingWine({ shopId, wineId }: BundlesContainingWineP
 
   return (
     <Section heading="Also available in bundles">
-      <DataGrid variant="catalog">
+      <div className={CARD_GRID}>
         {bundles.map((b) => (
           <BundleCard key={b.id} product={b} />
         ))}
-      </DataGrid>
+      </div>
     </Section>
   );
 }

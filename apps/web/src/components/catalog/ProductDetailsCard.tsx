@@ -6,7 +6,6 @@ import {
 import { HugeiconsIcon } from "@hugeicons/react";
 import { Link } from "@tanstack/react-router";
 import { useState } from "react";
-import { DataGrid } from "@/components/primitives/data-grid";
 import { Section } from "@/components/primitives/section";
 import { ShowOwner } from "@/components/primitives/show-owner";
 import { Badge } from "@/components/ui/badge";
@@ -155,25 +154,21 @@ export function ProductDetailsCard({
             <div className="flex flex-wrap items-center gap-2">
               {product.isBundle && <Badge variant="secondary">Bundle</Badge>}
               <Badge variant={stock.variant}>{stock.label}</Badge>
-            </div>
-
-            <div className="space-y-1">
-              <h1 className="font-heading text-3xl font-bold leading-tight tracking-tight text-foreground sm:text-4xl">
-                {product.name}
-              </h1>
-              {product.shop && (
-                <p className="text-sm text-muted-foreground">
-                  Sold by{" "}
-                  <Link
-                    className="font-semibold text-primary underline-offset-2 transition-colors hover:underline"
-                    params={{ id: product.shop.id }}
-                    to="/shops/$id"
+              {product.shop?.id && product.shop?.name && (
+                <Link params={{ id: product.shop.id }} to="/shops/$id">
+                  <Badge
+                    className="cursor-pointer hover:bg-accent hover:text-accent-foreground"
+                    variant="outline"
                   >
-                    {product.shop.name}
-                  </Link>
-                </p>
+                    Sold by {product.shop.name}
+                  </Badge>
+                </Link>
               )}
             </div>
+
+            <h1 className="font-heading text-3xl font-bold leading-tight tracking-tight text-foreground sm:text-4xl">
+              {product.name}
+            </h1>
 
             <p className="font-heading text-3xl font-bold text-foreground">{price}</p>
 
@@ -215,7 +210,7 @@ export function ProductDetailsCard({
 
       {product.isBundle && product.productWines && product.productWines.length > 0 && (
         <Section heading="Wines in this product">
-          <DataGrid variant="catalog">
+          <div className="grid grid-cols-2 gap-6 md:grid-cols-3 lg:grid-cols-4">
             {
               // biome-ignore lint/suspicious/noExplicitAny: GetProductsById200 is `any` in OpenAPI; pw shape lost
               product.productWines.map((pw: any) => {
@@ -229,7 +224,7 @@ export function ProductDetailsCard({
                 return <WineCard key={pw.wine.id} wine={wineWithFallbacks} />;
               })
             }
-          </DataGrid>
+          </div>
         </Section>
       )}
 
