@@ -1,5 +1,8 @@
 import { pgTable, smallint, text, uuid, varchar } from "drizzle-orm/pg-core";
+<<<<<<< HEAD
 import { createInsertSchema, createSelectSchema } from "drizzle-zod";
+=======
+>>>>>>> origin/main
 import { timestamptz } from "./helpers";
 import { users } from "./users";
 
@@ -30,6 +33,7 @@ export const comments = pgTable("comments", {
     .notNull()
     .references(() => users.id),
 });
+<<<<<<< HEAD
 
 export const reviewSelectSchema = createSelectSchema(reviews);
 export const reviewInsertSchema = createInsertSchema(reviews);
@@ -38,3 +42,5 @@ export type ReviewModel = typeof reviews.$inferSelect;
 export const commentSelectSchema = createSelectSchema(comments);
 export const commentInsertSchema = createInsertSchema(comments);
 export type CommentModel = typeof comments.$inferSelect;
+=======
+>>>>>>> origin/main

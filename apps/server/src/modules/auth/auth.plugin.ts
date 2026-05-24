@@ -12,7 +12,11 @@ export const authPlugin = new Elysia({ name: "auth" }).macro({
       const payload = await verifyClerkToken(headers.authorization);
       if (!payload) return status(401);
 
+<<<<<<< HEAD
       const dbUser = await usersService.lazyGetOrCreate(payload.sub);
+=======
+      const dbUser = await usersService.lazyGetOrCreate(payload.sub, payload);
+>>>>>>> origin/main
 
       const sessionId = guestSessionId?.value;
       if (typeof sessionId === "string") {
@@ -36,7 +40,11 @@ export const authPlugin = new Elysia({ name: "auth" }).macro({
       const hasCapability = payload.roles?.includes(capability);
       if (!hasCapability) return status(403);
 
+<<<<<<< HEAD
       const dbUser = await usersService.lazyGetOrCreate(payload.sub);
+=======
+      const dbUser = await usersService.lazyGetOrCreate(payload.sub, payload);
+>>>>>>> origin/main
 
       const sessionId = guestSessionId?.value;
       if (typeof sessionId === "string") {
@@ -60,7 +68,11 @@ export const authPlugin = new Elysia({ name: "auth" }).macro({
       const hasRole = roles.some((role) => payload.roles?.includes(role));
       if (!hasRole) return status(403);
 
+<<<<<<< HEAD
       const dbUser = await usersService.lazyGetOrCreate(payload.sub);
+=======
+      const dbUser = await usersService.lazyGetOrCreate(payload.sub, payload);
+>>>>>>> origin/main
 
       const sessionId = guestSessionId?.value;
       if (typeof sessionId === "string") {

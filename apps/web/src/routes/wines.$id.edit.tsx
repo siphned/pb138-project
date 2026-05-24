@@ -65,16 +65,17 @@ function StatusMessage({ type, message }: { type: "success" | "error"; message: 
   return (
     <div
       className={cn(
-        "rounded-md p-4",
+        "rounded-md border p-4",
         type === "success"
-          ? "border border-green-200 bg-green-50 text-green-800 dark:border-green-900 dark:bg-green-950 dark:text-green-200"
-          : "border border-red-200 bg-red-50 text-red-800 dark:border-red-900 dark:bg-red-950 dark:text-red-200"
+          ? "border-success/20 bg-success/5 text-success"
+          : "border-destructive/20 bg-destructive/5 text-destructive"
       )}
     >
       {message}
     </div>
   );
 }
+// biome-ignore lint/complexity/noExcessiveCognitiveComplexity: Form setup with hooks requires multiple conditional branches
 function WineEditContent({ id }: { id: string }) {
   const navigate = useNavigate();
   const [statusMessage, setStatusMessage] = useState<{

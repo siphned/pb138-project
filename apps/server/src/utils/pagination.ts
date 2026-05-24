@@ -1,6 +1,10 @@
 export function parsePagination(query: { page?: number; limit?: number }) {
   const page = Math.max(1, query.page ?? 1);
+<<<<<<< HEAD
   const limit = Math.min(100, Math.max(1, query.limit ?? 24));
+=======
+  const limit = Math.min(100, Math.max(1, query.limit ?? 20));
+>>>>>>> origin/main
   return { limit, offset: (page - 1) * limit };
 }
 

@@ -1,4 +1,5 @@
 import { createRootRoute, Outlet } from "@tanstack/react-router";
+<<<<<<< HEAD
 import { PublicLayout } from "@/components/layout/PublicLayout";
 
 export const Route = createRootRoute({
@@ -7,4 +8,9 @@ export const Route = createRootRoute({
       <Outlet />
     </PublicLayout>
   ),
+=======
+
+export const Route = createRootRoute({
+  component: () => <Outlet />,
+>>>>>>> origin/main
 });

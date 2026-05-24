@@ -1,4 +1,5 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
+<<<<<<< HEAD
 import { db } from "../../db";
 import * as reviewsRepo from "./reviews.repository";
 import { reviewsService } from "./reviews.service";
@@ -9,10 +10,17 @@ vi.mock("./reviews.repository", async (importOriginal) => {
     ...actual,
     averageRating: vi.fn(),
     countReviews: vi.fn(),
+=======
+
+vi.mock("./reviews.repository", () => ({
+  reviewsRepository: {
+    averageRating: vi.fn(),
+>>>>>>> origin/main
     findById: vi.fn(),
     findReviews: vi.fn(),
     findReviewWithUser: vi.fn(),
     findUserReview: vi.fn(),
+<<<<<<< HEAD
     hasPurchasedFromWinemaker: vi.fn(),
     hasPurchasedProduct: vi.fn(),
     hasPurchasedWine: vi.fn(),
@@ -20,6 +28,16 @@ vi.mock("./reviews.repository", async (importOriginal) => {
     softDelete: vi.fn(),
   };
 });
+=======
+    hasPurchasedProduct: vi.fn(),
+    insertReview: vi.fn(),
+    softDelete: vi.fn(),
+  },
+}));
+
+import { reviewsRepository } from "./reviews.repository";
+import { reviewsService } from "./reviews.service";
+>>>>>>> origin/main
 
 describe("reviewsService", () => {
   beforeEach(() => {
@@ -28,6 +46,7 @@ describe("reviewsService", () => {
 
   const userId = "u1";
   const productId = "p1";
+<<<<<<< HEAD
   const winemakerId = "w1";
   const reviewId = "r1";
 
@@ -76,31 +95,63 @@ describe("reviewsService", () => {
         offset: 5,
         sort: "highest",
       });
+=======
+  const reviewId = "r1";
+
+  describe("listProductReviews", () => {
+    it("returns reviews and averageRating together", async () => {
+      const mockReviews = [{ id: "r1" }];
+      vi.mocked(reviewsRepository.findReviews).mockResolvedValue(mockReviews as never);
+      vi.mocked(reviewsRepository.averageRating).mockResolvedValue(4.5);
+
+      const result = await reviewsService.listProductReviews(productId);
+
+      expect(result.reviews).toBe(mockReviews);
+      expect(result.averageRating).toBe(4.5);
+      expect(reviewsRepository.findReviews).toHaveBeenCalledWith(productId, "product");
+>>>>>>> origin/main
     });
   });
 
   describe("createProductReview", () => {
     it("creates review for verified purchaser with no prior review", async () => {
+<<<<<<< HEAD
       vi.mocked(reviewsRepo.hasPurchasedProduct).mockResolvedValue(true);
       vi.mocked(reviewsRepo.findUserReview).mockResolvedValue(undefined);
       vi.mocked(reviewsRepo.insertReview).mockResolvedValue({ id: reviewId } as any);
       vi.mocked(reviewsRepo.findReviewWithUser).mockResolvedValue({ id: reviewId } as any);
+=======
+      vi.mocked(reviewsRepository.hasPurchasedProduct).mockResolvedValue(true);
+      vi.mocked(reviewsRepository.findUserReview).mockResolvedValue(undefined);
+      vi.mocked(reviewsRepository.insertReview).mockResolvedValue({ id: reviewId } as never);
+      vi.mocked(reviewsRepository.findReviewWithUser).mockResolvedValue({ id: reviewId } as never);
+>>>>>>> origin/main
 
       const result = await reviewsService.createProductReview(userId, productId, { rating: 5 });
 
       expect(result.id).toBe(reviewId);
+<<<<<<< HEAD
       expect(reviewsRepo.insertReview).toHaveBeenCalledWith(db, userId, productId, "product", {
+=======
+      expect(reviewsRepository.insertReview).toHaveBeenCalledWith(userId, productId, "product", {
+>>>>>>> origin/main
         rating: 5,
       });
     });
 
+<<<<<<< HEAD
     it("throws NOT_PURCHASED if user hasn't purchased the product", async () => {
       vi.mocked(reviewsRepo.hasPurchasedProduct).mockResolvedValue(false);
+=======
+    it("throws NOT_PURCHASED if no order found", async () => {
+      vi.mocked(reviewsRepository.hasPurchasedProduct).mockResolvedValue(false);
+>>>>>>> origin/main
 
       await expect(
         reviewsService.createProductReview(userId, productId, { rating: 5 })
       ).rejects.toThrow("NOT_PURCHASED");
     });
+<<<<<<< HEAD
 
     it("throws ALREADY_REVIEWED if user already has a review", async () => {
       vi.mocked(reviewsRepo.hasPurchasedProduct).mockResolvedValue(true);
@@ -197,10 +248,13 @@ describe("reviewsService", () => {
         "ALREADY_REVIEWED"
       );
     });
+=======
+>>>>>>> origin/main
   });
 
   describe("deleteReview", () => {
     it("allows owner to delete their own review", async () => {
+<<<<<<< HEAD
       vi.mocked(reviewsRepo.findUserReview).mockResolvedValue({ id: reviewId } as any);
 
       await reviewsService.deleteReview(reviewId, userId, "user", productId, "product");
@@ -288,6 +342,22 @@ describe("reviewsService", () => {
         offset: 10,
         sort: "lowest",
       });
+=======
+      vi.mocked(reviewsRepository.findUserReview).mockResolvedValue({ id: reviewId } as never);
+
+      await reviewsService.deleteReview(reviewId, userId, "user", productId, "product");
+
+      expect(reviewsRepository.softDelete).toHaveBeenCalledWith(reviewId);
+    });
+
+    it("allows admin to delete any review", async () => {
+      vi.mocked(reviewsRepository.findUserReview).mockResolvedValue(undefined);
+      vi.mocked(reviewsRepository.findById).mockResolvedValue({ id: reviewId } as never);
+
+      await reviewsService.deleteReview(reviewId, userId, "admin", productId, "product");
+
+      expect(reviewsRepository.softDelete).toHaveBeenCalledWith(reviewId);
+>>>>>>> origin/main
     });
   });
 });

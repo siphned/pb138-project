@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 import { createClerkClient } from "@clerk/backend";
 import type { Address, User } from "@repo/shared/schemas";
 import z from "zod";
@@ -6,6 +7,14 @@ import { logger } from "../../utils/logger";
 import * as userRolesRepo from "./user-roles.repository";
 import { UserNotFoundError } from "./users.errors";
 import * as usersRepo from "./users.repository";
+=======
+import { type User as ClerkUser, createClerkClient } from "@clerk/backend";
+import type { Address, User } from "@repo/shared/schemas";
+import { z } from "zod";
+import type { ClerkPayload } from "../auth/auth.utils";
+import { type IUserRolesRepository, userRolesRepository } from "./user-roles.repository";
+import { type IUsersRepository, usersRepository } from "./users.repository";
+>>>>>>> origin/main
 
 // Lazy-load Clerk client to prevent import-time errors if env vars are missing
 let _clerkClient: ReturnType<typeof createClerkClient> | null = null;
@@ -27,18 +36,35 @@ const AddressSchema = z.object({
 });
 
 export class UsersService {
+<<<<<<< HEAD
+=======
+  constructor(
+    private usersRepo: IUsersRepository,
+    private userRolesRepo: IUserRolesRepository
+  ) {}
+
+>>>>>>> origin/main
   /**
    * Get shipping and billing addresses for a user.
    */
   async getAddresses(
     userId: string
   ): Promise<{ shipping: Address | null; billing: Address | null }> {
+<<<<<<< HEAD
     const user = await usersRepo.findById(db, userId);
     if (!user) throw new UserNotFoundError(userId);
 
     const [shipping, billing] = await Promise.all([
       user.shippingAddressId ? usersRepo.findAddressById(db, user.shippingAddressId) : null,
       user.billingAddressId ? usersRepo.findAddressById(db, user.billingAddressId) : null,
+=======
+    const user = await this.usersRepo.findById(userId);
+    if (!user) throw new Error("User not found");
+
+    const [shipping, billing] = await Promise.all([
+      user.shippingAddressId ? this.usersRepo.findAddressById(user.shippingAddressId) : null,
+      user.billingAddressId ? this.usersRepo.findAddressById(user.billingAddressId) : null,
+>>>>>>> origin/main
     ]);
 
     return {
@@ -48,6 +74,7 @@ export class UsersService {
   }
 
   getById(id: string): Promise<User | undefined> {
+<<<<<<< HEAD
     return usersRepo.findById(db, id);
   }
 
@@ -55,10 +82,22 @@ export class UsersService {
     const user = await usersRepo.findById(db, userId);
     if (!user) throw new UserNotFoundError(userId);
     const roles = await userRolesRepo.findByUserId(db, userId);
+=======
+    return this.usersRepo.findById(id);
+  }
+
+  async getProfileWithRoles(
+    clerkId: string,
+    payload: ClerkPayload
+  ): Promise<User & { roles: string[] }> {
+    const user = await this.lazyGetOrCreate(clerkId, payload);
+    const roles = await this.userRolesRepo.findByUserId(user.id);
+>>>>>>> origin/main
     return { ...user, roles };
   }
 
   /**
+<<<<<<< HEAD
    * Returns user with their current roles from DB.
    * Lazily syncs with Clerk if user doesn't exist locally.
    */
@@ -86,14 +125,55 @@ export class UsersService {
     });
 
     await this.syncRolesToDatabase(user.id, profile.roles);
+=======
+   * Ensures a local user exists and is synced with Clerk metadata.
+   */
+  async lazyGetOrCreate(clerkId: string, _payload: ClerkPayload): Promise<User> {
+    const existing = await this.usersRepo.findByClerkId(clerkId);
+    if (existing) return existing;
+
+    const clerk = getClerkClient();
+    const clerkUser = await clerk.users.getUser(clerkId);
+
+    const email = clerkUser.emailAddresses[0]?.emailAddress;
+    if (!email) throw new Error("Clerk user has no email address");
+
+    // 1. Sync Clerk Metadata if needed
+    await this.ensureClerkMetadata(clerkId, clerkUser);
+
+    // 2. Create Local User
+    const user = await this.usersRepo.upsert({
+      clerkId,
+      email,
+      fname: clerkUser.firstName ?? "",
+      lname: clerkUser.lastName ?? "",
+    });
+
+    // 3. Sync Roles
+    const roles = (clerkUser.publicMetadata?.roles as string[]) || ["customer"];
+    await this.syncRolesToDatabase(user.id, roles);
+>>>>>>> origin/main
 
     return user;
   }
 
+<<<<<<< HEAD
+=======
+  private async ensureClerkMetadata(clerkId: string, clerkUser: ClerkUser): Promise<void> {
+    if (!clerkUser.publicMetadata?.roles) {
+      const clerk = getClerkClient();
+      await clerk.users.updateUser(clerkId, {
+        publicMetadata: { ...clerkUser.publicMetadata, roles: ["customer"] },
+      });
+    }
+  }
+
+>>>>>>> origin/main
   /**
    * Batched role synchronization to prevent N+1 queries.
    */
   async syncRolesToDatabase(userId: string, clerkRoles: string[]): Promise<void> {
+<<<<<<< HEAD
     const existingRoles = await userRolesRepo.findByUserId(db, userId);
 
     const rolesToAdd = clerkRoles.filter((r: string) => !existingRoles.includes(r));
@@ -144,6 +224,21 @@ export class UsersService {
 
   updateProfileById(userId: string, data: { fname?: string; lname?: string }): Promise<User> {
     return usersRepo.updateById(db, userId, data);
+=======
+    const existingRoles = await this.userRolesRepo.findByUserId(userId);
+
+    const rolesToAdd = clerkRoles.filter((r) => !existingRoles.includes(r));
+    const rolesToRemove = existingRoles.filter((r) => !clerkRoles.includes(r));
+
+    await Promise.all([
+      this.userRolesRepo.addRoles(userId, rolesToAdd),
+      this.userRolesRepo.removeRoles(userId, rolesToRemove),
+    ]);
+  }
+
+  updateProfileById(userId: string, data: { fname?: string; lname?: string }): Promise<User> {
+    return this.usersRepo.updateById(userId, data);
+>>>>>>> origin/main
   }
 
   async upsertAddress(
@@ -152,6 +247,7 @@ export class UsersService {
     addressData: unknown
   ): Promise<Address> {
     const validated = AddressSchema.parse(addressData);
+<<<<<<< HEAD
     const address = await usersRepo.createAddress(db, validated);
 
     const field = type === "shipping" ? "shippingAddressId" : "billingAddressId";
@@ -209,3 +305,15 @@ export class UsersService {
 }
 
 export const usersService = new UsersService();
+=======
+    const address = await this.usersRepo.createAddress(validated);
+
+    const field = type === "shipping" ? "shippingAddressId" : "billingAddressId";
+    await this.usersRepo.updateById(userId, { [field]: address.id });
+
+    return address;
+  }
+}
+
+export const usersService = new UsersService(usersRepository, userRolesRepository);
+>>>>>>> origin/main

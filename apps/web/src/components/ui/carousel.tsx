@@ -144,7 +144,10 @@ function CarouselItem({ className, ...props }: React.ComponentProps<"div">) {
   const { orientation } = useCarousel();
 
   return (
+<<<<<<< HEAD
     // biome-ignore lint/a11y/useSemanticElements: third-party shadcn component uses group role
+=======
+>>>>>>> origin/main
     <div
       aria-roledescription="slide"
       className={cn(
@@ -220,11 +223,20 @@ function CarouselNext({
 }
 
 export {
+<<<<<<< HEAD
   Carousel,
   type CarouselApi,
   CarouselContent,
   CarouselItem,
   CarouselNext,
   CarouselPrevious,
+=======
+  type CarouselApi,
+  Carousel,
+  CarouselContent,
+  CarouselItem,
+  CarouselPrevious,
+  CarouselNext,
+>>>>>>> origin/main
   useCarousel,
 };

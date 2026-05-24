@@ -140,6 +140,7 @@ export function roleRequestRejectedTemplate(data: RoleRequestData): string {
     <p>If you have questions, please contact our support team.</p>
   `);
 }
+<<<<<<< HEAD
 
 export type WelcomeEmailData = {
   fname: string;
@@ -162,3 +163,5 @@ export function welcomeEmailTemplate(data: WelcomeEmailData): string {
     <p>Cheers,<br>The WineMarket Team</p>
   `);
 }
+=======
+>>>>>>> origin/main

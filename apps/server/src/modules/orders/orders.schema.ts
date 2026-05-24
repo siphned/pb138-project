@@ -1,4 +1,5 @@
 import { t } from "elysia";
+<<<<<<< HEAD
 import z from "zod";
 
 /**
@@ -57,6 +58,8 @@ export const orderResponseSchema = z.object({
 export const updateItemStatusBodySchema = z.object({
   status: z.enum(["confirmed", "shipped", "delivered", "cancelled"]),
 });
+=======
+>>>>>>> origin/main
 
 const addressInput = t.Object({
   city: t.String({ minLength: 1 }),

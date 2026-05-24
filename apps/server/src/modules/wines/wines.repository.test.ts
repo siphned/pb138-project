@@ -1,7 +1,11 @@
 import { wines } from "@repo/shared/schemas";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { db } from "../../db";
+<<<<<<< HEAD
 import * as winesRepo from "./wines.repository";
+=======
+import { winesRepository } from "./wines.repository";
+>>>>>>> origin/main
 
 interface MockChained {
   returning: () => Promise<unknown[]>;
@@ -56,6 +60,7 @@ describe("winesRepository", () => {
     it("applies filters correctly", async () => {
       vi.mocked(db.query.wines.findMany).mockResolvedValue([]);
 
+<<<<<<< HEAD
       await winesRepo.findAll(db, { region: "Bordeaux", type: "still" });
 
       expect(db.query.wines.findMany).toHaveBeenCalled();
@@ -65,6 +70,9 @@ describe("winesRepository", () => {
       vi.mocked(db.query.wines.findMany).mockResolvedValue([]);
 
       await winesRepo.findAll(db, { q: "merlot" });
+=======
+      await winesRepository.findAll({ region: "Bordeaux", type: "still" });
+>>>>>>> origin/main
 
       expect(db.query.wines.findMany).toHaveBeenCalled();
     });
@@ -76,7 +84,11 @@ describe("winesRepository", () => {
       ];
       vi.mocked(db.query.wines.findMany).mockResolvedValue(mockRows as never);
 
+<<<<<<< HEAD
       const result = await winesRepo.findAll(db, {});
+=======
+      const result = await winesRepository.findAll({});
+>>>>>>> origin/main
 
       expect(result).toHaveLength(1);
       expect(result[0]?.id).toBe("w1");
@@ -87,14 +99,22 @@ describe("winesRepository", () => {
     it("delegates to db.query and filters deleted winemaker", async () => {
       const mockWine = { id: "w1", winemaker: { deletedAt: null, id: "wm1" } };
       vi.mocked(db.query.wines.findFirst).mockResolvedValue(mockWine as never);
+<<<<<<< HEAD
       const result = await winesRepo.findById(db, "w1");
+=======
+      const result = await winesRepository.findById("w1");
+>>>>>>> origin/main
       expect(result?.id).toBe("w1");
     });
 
     it("returns undefined if winemaker is deleted", async () => {
       const mockWine = { id: "w1", winemaker: { deletedAt: new Date(), id: "wm1" } };
       vi.mocked(db.query.wines.findFirst).mockResolvedValue(mockWine as never);
+<<<<<<< HEAD
       const result = await winesRepo.findById(db, "w1");
+=======
+      const result = await winesRepository.findById("w1");
+>>>>>>> origin/main
       expect(result).toBeUndefined();
     });
   });
@@ -104,7 +124,11 @@ describe("winesRepository", () => {
       const mockWine = { id: "new-w" };
       vi.mocked(mockDb.returning).mockResolvedValueOnce([mockWine]);
 
+<<<<<<< HEAD
       const result = await winesRepo.insert(db, "wm1", {
+=======
+      const result = await winesRepository.insert("wm1", {
+>>>>>>> origin/main
         alcoholContent: "13.5",
         attribution: "Attr",
         color: "red",
@@ -127,7 +151,11 @@ describe("winesRepository", () => {
     it("updates wine record", async () => {
       vi.mocked(mockDb.returning).mockResolvedValueOnce([{ id: "w1" }]);
 
+<<<<<<< HEAD
       await winesRepo.updateById(db, "w1", { name: "Updated" } as never);
+=======
+      await winesRepository.updateById("w1", { name: "Updated" } as never);
+>>>>>>> origin/main
 
       expect(db.update).toHaveBeenCalledWith(wines);
     });
@@ -135,7 +163,11 @@ describe("winesRepository", () => {
 
   describe("softDelete", () => {
     it("sets deletedAt for the record", async () => {
+<<<<<<< HEAD
       await winesRepo.softDelete(db, "w1");
+=======
+      await winesRepository.softDelete("w1");
+>>>>>>> origin/main
       expect(db.update).toHaveBeenCalledWith(wines);
     });
   });

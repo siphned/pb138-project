@@ -14,6 +14,7 @@ const addressSchema = t.Object({
   street: t.String(),
 });
 
+<<<<<<< HEAD
 const addressWithIdSchema = t.Object({
   city: t.String(),
   country: t.String(),
@@ -36,6 +37,8 @@ const orderItemSchema = t.Object({
   unitPriceAtPurchase: t.String(),
 });
 
+=======
+>>>>>>> origin/main
 const orderResponse = t.Object({
   billingAddressId: t.String(),
   createdAt: t.Date(),
@@ -56,6 +59,7 @@ const orderResponse = t.Object({
   userId: t.Union([t.String(), t.Null()]),
 });
 
+<<<<<<< HEAD
 const orderDetailedResponse = t.Object({
   billingAddress: addressWithIdSchema,
   billingAddressId: t.String(),
@@ -79,6 +83,8 @@ const orderDetailedResponse = t.Object({
   userId: t.Union([t.String(), t.Null()]),
 });
 
+=======
+>>>>>>> origin/main
 const checkoutBody = t.Object({
   billingAddress: t.Optional(addressSchema),
   deliveryType: t.Union([t.Literal("pickup"), t.Literal("shipping")]),
@@ -97,12 +103,17 @@ export const ordersRoutes = new Elysia({ prefix: "/orders", tags: ["orders"] })
   .derive(async ({ headers, cookie: { guest_session_id } }) => {
     const payload = await verifyClerkToken(headers.authorization);
     if (payload) {
+<<<<<<< HEAD
       const dbUser = await usersService.lazyGetOrCreate(payload.sub);
+=======
+      const dbUser = await usersService.lazyGetOrCreate(payload.sub, payload);
+>>>>>>> origin/main
       const guestSessionId = guest_session_id?.value;
       if (typeof guestSessionId === "string") {
         await cartsService.mergeOnLogin(dbUser.id, guestSessionId);
         guest_session_id?.remove();
       }
+<<<<<<< HEAD
       return {
         clerkPayload: payload,
         isAdmin: payload.roles?.includes("admin") ?? false,
@@ -149,6 +160,13 @@ export const ordersRoutes = new Elysia({ prefix: "/orders", tags: ["orders"] })
     }
   )
 
+=======
+      return { sessionId: undefined as string | undefined, user: dbUser };
+    }
+    return { sessionId: guest_session_id?.value as string | undefined, user: undefined };
+  })
+
+>>>>>>> origin/main
   .post(
     "/checkout",
     async ({ user, sessionId, body }) => {
@@ -183,10 +201,17 @@ export const ordersRoutes = new Elysia({ prefix: "/orders", tags: ["orders"] })
 
   .get(
     "/:id",
+<<<<<<< HEAD
     async ({ user, params, isAdmin }) => {
       if (!user) return status(401, "Auth required");
       try {
         return await ordersService.getOrder(params.id, user.id, isAdmin);
+=======
+    async ({ user, params }) => {
+      if (!user) return status(401, "Auth required");
+      try {
+        return await ordersService.getOrder(params.id, user.id);
+>>>>>>> origin/main
       } catch (e: unknown) {
         if (e instanceof Error) {
           if (e.message === "NOT_FOUND") return status(404, "Not found");
@@ -197,6 +222,7 @@ export const ordersRoutes = new Elysia({ prefix: "/orders", tags: ["orders"] })
     },
     {
       detail: {
+<<<<<<< HEAD
         description:
           "Returns an order by ID with items and addresses. The owning user or an admin can access it.",
         summary: "Get order by ID",
@@ -245,5 +271,12 @@ export const ordersRoutes = new Elysia({ prefix: "/orders", tags: ["orders"] })
         404: t.String(),
         422: t.String(),
       },
+=======
+        description: "Returns an order by ID. Only the owning user can access it.",
+        summary: "Get order by ID",
+      },
+      params: t.Object({ id: t.String() }),
+      response: { 200: orderResponse, 401: t.String(), 403: t.String(), 404: t.String() },
+>>>>>>> origin/main
     }
   );

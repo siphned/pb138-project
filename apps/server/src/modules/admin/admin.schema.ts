@@ -1,4 +1,5 @@
 import { t } from "elysia";
+<<<<<<< HEAD
 import z from "zod";
 
 /**
@@ -116,12 +117,17 @@ const adminUserZod = z.object({
 const adminUser = t.Object({
   billingAddressId: t.Union([t.String(), t.Null()]),
   clerkId: t.String(),
+=======
+
+export const adminUserResponse = t.Object({
+>>>>>>> origin/main
   createdAt: t.Date(),
   deletedAt: t.Union([t.Date(), t.Null()]),
   email: t.String(),
   fname: t.String(),
   id: t.String(),
   lname: t.String(),
+<<<<<<< HEAD
   roles: t.Array(adminUserRole),
   shippingAddressId: t.Union([t.String(), t.Null()]),
   status: t.Union([t.Literal("active"), t.Literal("suspended"), t.Literal("banned")]),
@@ -169,10 +175,45 @@ const adminReview = t.Object({
   body: t.Union([t.String(), t.Null()]),
   createdAt: t.Date(),
   deletedAt: t.Union([t.Date(), t.Null()]),
+=======
+  role: t.String(),
+  status: t.String(),
+});
+
+export const adminEventResponse = t.Object({
+  address: t.Nullable(
+    t.Object({
+      city: t.String(),
+      country: t.String(),
+      houseNumber: t.String(),
+      postalCode: t.String(),
+      street: t.String(),
+    })
+  ),
+  addressId: t.String(),
+  endTime: t.Date(),
+  id: t.String(),
+  name: t.String(),
+  startTime: t.Date(),
+  status: t.String(),
+  winemaker: t.Nullable(
+    t.Object({
+      id: t.String(),
+      name: t.String(),
+    })
+  ),
+  winemakerId: t.String(),
+});
+
+export const adminReviewResponse = t.Object({
+  body: t.Nullable(t.String()),
+  createdAt: t.Date(),
+>>>>>>> origin/main
   entityId: t.String(),
   entityType: t.String(),
   id: t.String(),
   rating: t.Number(),
+<<<<<<< HEAD
   updatedAt: t.Union([t.Date(), t.Null()]),
   user: t.Union([adminReviewUser, t.Null()]),
   userId: t.String(),
@@ -220,3 +261,20 @@ export {
   adminUserRoleZod,
   adminUserZod,
 };
+=======
+  user: t.Nullable(
+    t.Object({
+      fname: t.String(),
+      id: t.String(),
+      lname: t.String(),
+    })
+  ),
+  userId: t.String(),
+});
+
+export const adminStatsResponse = t.Object({
+  events: t.Number(),
+  reviews: t.Number(),
+  users: t.Number(),
+});
+>>>>>>> origin/main

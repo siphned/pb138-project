@@ -1,6 +1,6 @@
 import { Show, useClerk } from "@clerk/react";
 import { Link } from "@tanstack/react-router";
-import { ShoppingCart, User } from "lucide-react";
+import { ShoppingBag01Icon, UserIcon } from "hugeicons-react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { useTheme, useUser } from "@/context";
@@ -30,14 +30,14 @@ export function Header() {
         <HeaderSearch />
         <Button className="hidden sm:flex" size="icon" variant="ghost">
           <Link to="/cart">
-            <ShoppingCart className="h-5 w-5" />
+            <ShoppingBag01Icon className="h-5 w-5" />
           </Link>
         </Button>
 
         <Show when="signed-out">
           <Link to="/auth/login">
             <Button className="rounded-full" size="icon" variant="ghost">
-              <User className="h-5 w-5" />
+              <UserIcon className="h-5 w-5" />
             </Button>
           </Link>
         </Show>

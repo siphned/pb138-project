@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 import { BadRequestError } from "@repo/shared";
 import type { Product, ProductWine } from "@repo/shared/schemas";
 import { type Database, db } from "../../db";
@@ -14,6 +15,18 @@ import {
 } from "./products.errors";
 import type { ProductCatalogFilters, ProductWithWines } from "./products.repository";
 import * as productsRepo from "./products.repository";
+=======
+import type { Product } from "@repo/shared/schemas";
+import type { PaginatedResult } from "../../utils/pagination";
+import { parsePagination } from "../../utils/pagination";
+import { type IShopsRepository, shopsRepository } from "../shops/shops.repository";
+import {
+  type IProductsRepository,
+  type ProductCatalogFilters,
+  type ProductWithWines,
+  productsRepository,
+} from "./products.repository";
+>>>>>>> origin/main
 
 type CatalogProductItem = {
   id: string;
@@ -36,6 +49,7 @@ type CatalogProductItem = {
 };
 
 export class ProductsService {
+<<<<<<< HEAD
   private async assertShopOwnership(shopId: string, requesterId: string): Promise<void> {
     const shop = await shopsRepo.findById(db, shopId);
     if (!shop) throw new ShopNotFoundError(shopId);
@@ -66,6 +80,72 @@ export class ProductsService {
     for (const pw of product.productWines) {
       await productsRepo.updateWineQuantity(tx, pw.wineId, pw.quantity * product.quantity);
     }
+=======
+  constructor(
+    private productsRepo: IProductsRepository,
+    private shopsRepo: IShopsRepository
+  ) {}
+
+  private async assertShopOwnership(shopId: string, requesterId: string): Promise<void> {
+    const shop = await this.shopsRepo.findById(shopId);
+    if (!shop) throw new Error("NOT_FOUND");
+    if (shop.ownerUserId !== requesterId) throw new Error("FORBIDDEN");
+  }
+
+  async createBundle(
+    shopId: string,
+    requesterId: string,
+    data: {
+      name: string;
+      description?: string;
+      price: string;
+      quantity: number;
+      wines: { wineId: string; quantity: number }[];
+    }
+  ): Promise<Product> {
+    await this.assertShopOwnership(shopId, requesterId);
+
+    if (data.wines.length < 2) throw new Error("BUNDLE_MIN_WINES");
+
+    const wineIds = data.wines.map((w) => w.wineId);
+    if (new Set(wineIds).size !== wineIds.length) throw new Error("DUPLICATE_WINE");
+
+    const winesExist = await this.productsRepo.winesExist(wineIds);
+    if (!winesExist) throw new Error("INVALID_WINE");
+
+    return this.productsRepo.createBundleWithWines(shopId, data, data.wines);
+  }
+
+  async createProduct(
+    shopId: string,
+    requesterId: string,
+    data: { name: string; description?: string; price: string; quantity: number; wineId: string }
+  ): Promise<Product> {
+    await this.assertShopOwnership(shopId, requesterId);
+
+    const winesExist = await this.productsRepo.winesExist([data.wineId]);
+    if (!winesExist) throw new Error("INVALID_WINE");
+
+    return this.productsRepo.createProductWithWine(shopId, data, data.wineId);
+  }
+
+  async deleteBundle(shopId: string, bundleId: string, requesterId: string): Promise<void> {
+    await this.assertShopOwnership(shopId, requesterId);
+
+    const product = await this.productsRepo.findById(bundleId);
+    if (!product || product.shopId !== shopId || !product.isBundle) throw new Error("NOT_FOUND");
+
+    await this.productsRepo.softDelete(bundleId);
+  }
+
+  async deleteProduct(shopId: string, productId: string, requesterId: string): Promise<void> {
+    await this.assertShopOwnership(shopId, requesterId);
+
+    const product = await this.productsRepo.findById(productId);
+    if (!product || product.shopId !== shopId || product.isBundle) throw new Error("NOT_FOUND");
+
+    await this.productsRepo.softDelete(productId);
+>>>>>>> origin/main
   }
 
   async getAllProducts(
@@ -74,16 +154,24 @@ export class ProductsService {
     const { page = 1, ...filters } = query;
     const { limit, offset } = parsePagination({ page });
 
+<<<<<<< HEAD
     const { rows, total } = await productsRepo.findAll(db, filters, { limit, offset });
+=======
+    const { rows, total } = await this.productsRepo.findAll(filters, { limit, offset });
+>>>>>>> origin/main
 
     if (rows.length === 0) {
       return { data: [], limit, page, total };
     }
 
+<<<<<<< HEAD
     const enriched = await productsRepo.findByIds(
       db,
       rows.map((r) => r.id)
     );
+=======
+    const enriched = await this.productsRepo.findByIds(rows.map((r) => r.id));
+>>>>>>> origin/main
     const winesMap = new Map(enriched.map((p) => [p.id, p.productWines]));
 
     const data: CatalogProductItem[] = rows.map((row) => ({
@@ -110,6 +198,7 @@ export class ProductsService {
   }
 
   async getProduct(id: string): Promise<ProductWithWines> {
+<<<<<<< HEAD
     const product = await productsRepo.findById(db, id);
     if (!product) throw new ProductNotFoundError(id);
     return product;
@@ -214,6 +303,23 @@ export class ProductsService {
     tx: Database,
     productId: string,
     product: ProductWithWines,
+=======
+    const product = await this.productsRepo.findById(id);
+    if (!product) throw new Error("NOT_FOUND");
+    return product;
+  }
+
+  async listProducts(shopId: string, isBundle?: boolean): Promise<ProductWithWines[]> {
+    const shop = await this.shopsRepo.findById(shopId);
+    if (!shop) throw new Error("NOT_FOUND");
+    return this.productsRepo.findByShopId(shopId, isBundle);
+  }
+
+  async updateBundle(
+    shopId: string,
+    bundleId: string,
+    requesterId: string,
+>>>>>>> origin/main
     data: {
       name?: string;
       description?: string | null;
@@ -222,6 +328,7 @@ export class ProductsService {
       wines?: { wineId: string; quantity: number }[];
     }
   ): Promise<Product> {
+<<<<<<< HEAD
     await this.revertBundleAllocations(tx, product);
 
     const targetWines =
@@ -297,6 +404,26 @@ export class ProductsService {
   }
 
   async updateProductOrBundle(
+=======
+    await this.assertShopOwnership(shopId, requesterId);
+
+    const product = await this.productsRepo.findById(bundleId);
+    if (!product || product.shopId !== shopId || !product.isBundle) throw new Error("NOT_FOUND");
+
+    if (data.wines !== undefined) {
+      if (data.wines.length < 2) throw new Error("BUNDLE_MIN_WINES");
+      const wineIds = data.wines.map((w) => w.wineId);
+      if (new Set(wineIds).size !== wineIds.length) throw new Error("DUPLICATE_WINE");
+      const winesExist = await this.productsRepo.winesExist(wineIds);
+      if (!winesExist) throw new Error("INVALID_WINE");
+    }
+
+    const { wines, ...fields } = data;
+    return this.productsRepo.updateBundle(bundleId, fields, wines);
+  }
+
+  async updateProduct(
+>>>>>>> origin/main
     shopId: string,
     productId: string,
     requesterId: string,
@@ -306,6 +433,7 @@ export class ProductsService {
       price?: string;
       quantity?: number;
       wineId?: string;
+<<<<<<< HEAD
       wines?: { wineId: string; quantity: number }[];
     }
   ): Promise<Product> {
@@ -347,3 +475,23 @@ export class ProductsService {
 }
 
 export const productsService = new ProductsService();
+=======
+    }
+  ): Promise<Product> {
+    await this.assertShopOwnership(shopId, requesterId);
+
+    const product = await this.productsRepo.findById(productId);
+    if (!product || product.shopId !== shopId || product.isBundle) throw new Error("NOT_FOUND");
+
+    if (data.wineId !== undefined) {
+      const winesExist = await this.productsRepo.winesExist([data.wineId]);
+      if (!winesExist) throw new Error("INVALID_WINE");
+    }
+
+    const { wineId, ...fields } = data;
+    return this.productsRepo.updateProduct(productId, fields, wineId);
+  }
+}
+
+export const productsService = new ProductsService(productsRepository, shopsRepository);
+>>>>>>> origin/main

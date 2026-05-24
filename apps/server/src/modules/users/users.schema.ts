@@ -1,4 +1,5 @@
 import { t } from "elysia";
+<<<<<<< HEAD
 import z from "zod";
 
 /**
@@ -46,6 +47,8 @@ export const addressesResponseSchemaZod = z.object({
   billing: z.union([addressResponseSchemaZod, z.null()]),
   shipping: z.union([addressResponseSchemaZod, z.null()]),
 });
+=======
+>>>>>>> origin/main
 
 export const userResponseSchema = t.Object({
   billingAddressId: t.Union([t.String(), t.Null()]),
