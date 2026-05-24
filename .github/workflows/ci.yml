@@ -236,6 +236,14 @@ jobs:
         with:
           name: junit-results
           path: apps/*/test-results.xml
+      - name: Upload coverage reports
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: coverage-reports
+          path: |
+            apps/server/coverage/
+            apps/web/coverage/
 
   compliance:
     needs: install

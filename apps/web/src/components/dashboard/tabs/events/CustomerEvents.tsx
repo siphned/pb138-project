@@ -1,10 +1,4 @@
-import {
-  Calendar,
-  Clock,
-  MapPin,
-  MoreHorizontal,
-  Search,
-} from "lucide-react";
+import { Calendar, Clock, MapPin, MoreHorizontal, Search } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 

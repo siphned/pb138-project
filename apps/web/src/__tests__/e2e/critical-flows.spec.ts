@@ -36,6 +36,7 @@ test.describe("Critical flows", () => {
       await page.goto("/checkout");
       await page.waitForLoadState("networkidle");
 
+      // Verify checkout page loaded
       const checkoutHeader = page.getByRole("heading", { name: /checkout|order|review/i }).first();
       if (await checkoutHeader.isVisible()) {
         expect(checkoutHeader).toBeDefined();
@@ -46,6 +47,7 @@ test.describe("Critical flows", () => {
       await page.goto("/checkout");
       await page.waitForLoadState("networkidle");
 
+      // Look for order summary or items list
       const itemsList = page.locator("[class*='item'], [class*='product'], [role='list']").first();
       if (await itemsList.isVisible()) {
         expect(itemsList).toBeDefined();
@@ -56,6 +58,7 @@ test.describe("Critical flows", () => {
       await page.goto("/checkout");
       await page.waitForLoadState("networkidle");
 
+      // Look for address-related fields
       const addressForm = page.locator("form, [class*='address'], [class*='shipping']").first();
       if (await addressForm.isVisible()) {
         expect(addressForm).toBeDefined();
@@ -66,6 +69,7 @@ test.describe("Critical flows", () => {
       await page.goto("/checkout");
       await page.waitForLoadState("networkidle");
 
+      // Look for total price display
       const totalDisplay = page.locator("[class*='total'], [class*='price']").first();
       if (await totalDisplay.isVisible()) {
         expect(totalDisplay).toBeDefined();
@@ -76,6 +80,7 @@ test.describe("Critical flows", () => {
       await page.goto("/checkout");
       await page.waitForLoadState("networkidle");
 
+      // Look for submit/order button
       const submitBtn = page.getByRole("button", { name: /place order|submit|pay/i }).first();
       if (await submitBtn.isVisible()) {
         expect(submitBtn).toBeDefined();
@@ -83,9 +88,11 @@ test.describe("Critical flows", () => {
     });
 
     test("cart page shows empty cart message when no items", async ({ page }) => {
+      // Navigate to cart
       await page.goto("/cart");
       await page.waitForLoadState("networkidle");
 
+      // Check for either items list or empty message
       const emptyMessage = page.locator("[class*='empty'], text=/empty|no items/i").first();
       const itemsList = page.locator("[class*='item'], [role='list']").first();
 
@@ -100,6 +107,7 @@ test.describe("Critical flows", () => {
       await page.goto("/checkout");
       await page.waitForLoadState("networkidle");
 
+      // Look for back button or continue shopping link
       const backButton = page
         .locator(
           "button:has-text('Back'), a:has-text('Continue Shopping'), button:has-text('Continue')"
@@ -108,6 +116,7 @@ test.describe("Critical flows", () => {
       if (await backButton.isVisible()) {
         await backButton.click();
         await page.waitForLoadState("networkidle");
+        // Should navigate away from checkout
         expect(page.url()).not.toContain("/checkout");
       }
     });
@@ -118,6 +127,7 @@ test.describe("Critical flows", () => {
       await page.goto("/explore");
       await page.waitForLoadState("networkidle");
 
+      // Look for product list or grid
       const productGrid = page
         .locator("[class*='grid'], [class*='product'], [role='list']")
         .first();
@@ -130,6 +140,7 @@ test.describe("Critical flows", () => {
       await page.goto("/explore");
       await page.waitForLoadState("networkidle");
 
+      // Click on first product link
       const productLink = page.locator("a[href*='/products/']").first();
       if (await productLink.isVisible()) {
         await productLink.click();
@@ -142,6 +153,7 @@ test.describe("Critical flows", () => {
       await page.goto("/products/1");
       await page.waitForLoadState("networkidle");
 
+      // Look for product name, description, or price
       const productInfo = page
         .locator("[class*='product'], [class*='detail'], [class*='description']")
         .first();
@@ -154,6 +166,7 @@ test.describe("Critical flows", () => {
       await page.goto("/products/1");
       await page.waitForLoadState("networkidle");
 
+      // Look for add to cart button
       const addToCartBtn = page.getByRole("button", { name: /add to cart|add|cart/i }).first();
       if (await addToCartBtn.isVisible()) {
         expect(addToCartBtn).toBeDefined();
