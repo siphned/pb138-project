@@ -1,6 +1,11 @@
-import { ShoppingCart01Icon } from "@hugeicons/core-free-icons";
+import {
+  MinusSignIcon,
+  PlusSignIcon,
+  ShoppingCart01Icon,
+} from "@hugeicons/core-free-icons";
 import { HugeiconsIcon } from "@hugeicons/react";
 import { Link } from "@tanstack/react-router";
+import { useState } from "react";
 import { DataGrid } from "@/components/primitives/data-grid";
 import { DescriptionList, PropertyRow } from "@/components/primitives/description-list";
 import { Section } from "@/components/primitives/section";
@@ -14,6 +19,7 @@ import {
   CarouselNext,
   CarouselPrevious,
 } from "@/components/ui/carousel";
+import { Separator } from "@/components/ui/separator";
 import { useGetProductsByIdImages } from "@/generated/hooks/useGetProductsByIdImages";
 import type { GetProductsById200 } from "@/generated/types/GetProductsById";
 import { CatalogPlaceholder } from "./CatalogPlaceholder";
@@ -21,7 +27,7 @@ import { WineCard } from "./WineCard";
 
 interface ProductDetailsCardProps {
   product: GetProductsById200;
-  onAddToCart: () => void;
+  onAddToCart: (quantity: number) => void;
   isAddingToCart: boolean;
 }
 
@@ -74,11 +80,51 @@ function ProductImageCarousel({
   );
 }
 
+function QuantityStepper({
+  value,
+  max,
+  onChange,
+  disabled,
+}: {
+  value: number;
+  max: number;
+  onChange: (next: number) => void;
+  disabled?: boolean;
+}) {
+  return (
+    <div className="flex items-center gap-2">
+      <Button
+        className="h-9 w-9 rounded-full"
+        disabled={disabled || value <= 1}
+        onClick={() => onChange(Math.max(1, value - 1))}
+        size="icon"
+        variant="outline"
+      >
+        <HugeiconsIcon className="h-4 w-4" icon={MinusSignIcon} />
+        <span className="sr-only">Decrease quantity</span>
+      </Button>
+      <span className="min-w-10 text-center text-sm font-semibold tabular-nums">{value}</span>
+      <Button
+        className="h-9 w-9 rounded-full"
+        disabled={disabled || value >= max}
+        onClick={() => onChange(Math.min(max, value + 1))}
+        size="icon"
+        variant="outline"
+      >
+        <HugeiconsIcon className="h-4 w-4" icon={PlusSignIcon} />
+        <span className="sr-only">Increase quantity</span>
+      </Button>
+    </div>
+  );
+}
+
 export function ProductDetailsCard({
   product,
   onAddToCart,
   isAddingToCart,
 }: ProductDetailsCardProps) {
+  const [quantity, setQuantity] = useState(1);
+
   const price = Number(product.price).toLocaleString("en-IE", {
     currency: "EUR",
     style: "currency",
@@ -86,6 +132,7 @@ export function ProductDetailsCard({
 
   // biome-ignore lint/suspicious/noExplicitAny: GetProductsById200 is `any` in OpenAPI (BE follow-up)
   const firstWineColor = (product.productWines as any)?.[0]?.wine?.color;
+  const outOfStock = product.quantity === 0;
 
   return (
     <div className="space-y-8">
@@ -102,7 +149,7 @@ export function ProductDetailsCard({
                 <PropertyRow label="Price" value={price} />
                 <PropertyRow
                   label="Availability"
-                  value={product.quantity > 0 ? `${product.quantity} in stock` : "Out of stock"}
+                  value={outOfStock ? "Out of stock" : `${product.quantity} in stock`}
                 />
                 <PropertyRow
                   label="Type"
@@ -111,19 +158,37 @@ export function ProductDetailsCard({
               </DescriptionList>
 
               {product.description && (
-                <p className="text-sm leading-relaxed text-muted-foreground">
-                  {product.description}
-                </p>
+                <>
+                  <Separator />
+                  <div className="space-y-2">
+                    <p className="text-xs font-bold uppercase tracking-widest text-muted-foreground">
+                      Description
+                    </p>
+                    <p className="text-sm leading-relaxed text-foreground">
+                      {product.description}
+                    </p>
+                  </div>
+                </>
               )}
 
-              <Button
-                className="w-full sm:w-auto"
-                disabled={isAddingToCart || product.quantity === 0}
-                onClick={onAddToCart}
-              >
-                <HugeiconsIcon className="mr-2 h-4 w-4" icon={ShoppingCart01Icon} />
-                {isAddingToCart ? "Adding..." : "Add to cart"}
-              </Button>
+              <Separator />
+
+              <div className="flex flex-wrap items-center gap-4">
+                <QuantityStepper
+                  disabled={outOfStock || isAddingToCart}
+                  max={product.quantity}
+                  onChange={setQuantity}
+                  value={Math.min(quantity, Math.max(1, product.quantity))}
+                />
+                <Button
+                  className="flex-1 sm:flex-none"
+                  disabled={isAddingToCart || outOfStock}
+                  onClick={() => onAddToCart(quantity)}
+                >
+                  <HugeiconsIcon className="mr-2 h-4 w-4" icon={ShoppingCart01Icon} />
+                  {isAddingToCart ? "Adding..." : `Add ${quantity} to cart`}
+                </Button>
+              </div>
             </div>
           </CardContent>
         </Card>

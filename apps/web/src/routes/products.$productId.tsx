@@ -6,6 +6,7 @@ import { ProductDetailsCard } from "@/components/catalog/ProductDetailsCard";
 import { ErrorState } from "@/components/primitives/error-state";
 import { LoadingState } from "@/components/primitives/loading-state";
 import { PageHeader } from "@/components/primitives/page-header";
+import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 import { getCartsQueryKey } from "@/generated/hooks/useGetCarts";
 import { useGetProductsById } from "@/generated/hooks/useGetProductsById";
@@ -17,15 +18,21 @@ export const Route = createFileRoute("/products/$productId")({
   component: ProductDetailPage,
 });
 
+function stockBadge(quantity: number) {
+  if (quantity === 0) return { label: "Out of stock", variant: "destructive" as const };
+  if (quantity <= 5) return { label: `Only ${quantity} left`, variant: "warning" as const };
+  return { label: "In stock", variant: "success" as const };
+}
+
 function ProductDetailPage() {
   const { productId } = Route.useParams();
   const queryClient = useQueryClient();
   const { data: product, isLoading, isError, refetch } = useGetProductsById(productId);
   const addToCartMutation = usePostCartsItems();
 
-  const handleAddToCart = () => {
+  const handleAddToCart = (quantity: number) => {
     addToCartMutation.mutate(
-      { data: { productId, quantity: 1 } },
+      { data: { productId, quantity } },
       {
         onSuccess: () => {
           queryClient.invalidateQueries({ queryKey: getCartsQueryKey() });
@@ -50,6 +57,8 @@ function ProductDetailPage() {
     );
   }
 
+  const stock = stockBadge(product.quantity);
+
   return (
     <div className="container mx-auto space-y-8 px-6 py-8 lg:px-12">
       <Link
@@ -60,7 +69,26 @@ function ProductDetailPage() {
         All products
       </Link>
 
-      <PageHeader description={product.shop?.name} title={product.name} />
+      <div className="space-y-3">
+        <PageHeader title={product.name} />
+        <div className="flex flex-wrap items-center gap-3 text-sm text-muted-foreground">
+          {product.shop && (
+            <>
+              <span>Sold by</span>
+              <Link
+                className="font-medium text-foreground transition-colors hover:text-primary"
+                params={{ id: product.shop.id }}
+                to="/shops/$id"
+              >
+                {product.shop.name}
+              </Link>
+            </>
+          )}
+          <span className="text-muted-foreground/40">·</span>
+          <Badge variant={stock.variant}>{stock.label}</Badge>
+          {product.isBundle && <Badge variant="secondary">Bundle</Badge>}
+        </div>
+      </div>
 
       <div className="space-y-12">
         <ProductDetailsCard
@@ -69,14 +97,17 @@ function ProductDetailPage() {
           product={product}
         />
 
-        <Separator />
-
-        <ProductRelatedSection
-          isBundle={!!product.isBundle}
-          shopId={product.shopId}
-          // biome-ignore lint/suspicious/noExplicitAny: productWines.wine shape is too narrow in OpenAPI (track in BE follow-up)
-          wines={product.productWines?.map((pw: any) => pw.wine) || []}
-        />
+        {!product.isBundle && (
+          <>
+            <Separator />
+            <ProductRelatedSection
+              isBundle={false}
+              shopId={product.shopId}
+              // biome-ignore lint/suspicious/noExplicitAny: productWines.wine shape is too narrow in OpenAPI (track in BE follow-up)
+              wines={product.productWines?.map((pw: any) => pw.wine) || []}
+            />
+          </>
+        )}
 
         <Separator />
 
