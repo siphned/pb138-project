@@ -1,4 +1,5 @@
 import { cn } from "@/lib/utils";
+import { Skeleton } from "@/components/ui/skeleton";
 import { CatalogPlaceholder } from "./CatalogPlaceholder";
 
 interface ImagesQueryLike {
@@ -17,9 +18,11 @@ interface EntityImageProps {
 }
 
 /**
- * Shared rendering for entity image slots: render the first image URL from
- * the hook result, or fall back to a placeholder image/component while loading
- * or when no image is attached.
+ * Shared rendering for entity image slots:
+ * 1. While loading  → animated skeleton placeholder.
+ * 2. First image URL present → real image with hover zoom.
+ * 3. No image, entityType given → static webp placeholder.
+ * 4. No image, no entityType → colored CatalogPlaceholder component.
  *
  * The thin per-entity wrappers (`WineImage`, `ProductImage`, etc.) call the
  * right `useGet<Entity>ByIdImages` hook and pass the result here.
@@ -33,8 +36,12 @@ export function EntityImage({
   entityType,
 }: EntityImageProps) {
   const { data, isLoading } = imagesQuery;
-  const first =
-    !isLoading && Array.isArray(data) ? (data[0] as { url?: string } | undefined) : undefined;
+
+  if (isLoading) {
+    return <Skeleton className={cn("h-full w-full", className)} />;
+  }
+
+  const first = Array.isArray(data) ? (data[0] as { url?: string } | undefined) : undefined;
   const url = first?.url;
 
   if (url) {

@@ -14,10 +14,11 @@ describe("EntityImage", () => {
     expect(screen.getByAltText("Foo")).toHaveAttribute("src", "/uploads/x/foo.webp");
   });
 
-  it("renders the placeholder while loading", () => {
+  it("shows a skeleton while loading", () => {
     render(<EntityImage alt="Foo" fallbackText="Foo Item" imagesQuery={{ isLoading: true }} />);
     expect(screen.queryByAltText("Foo")).not.toBeInTheDocument();
-    expect(screen.getByText("Foo Item")).toBeInTheDocument();
+    expect(screen.queryByText("Foo Item")).not.toBeInTheDocument();
+    expect(document.querySelector('[data-slot="skeleton"]')).toBeInTheDocument();
   });
 
   it("renders the placeholder when no images are attached", () => {

@@ -5,25 +5,17 @@ interface ProductImageProps {
   productId: string;
   alt: string;
   fallbackText: string;
-  fallbackColor?: string;
   className?: string;
 }
 
 /** Thin wrapper around `<EntityImage>` for product images. */
-export function ProductImage({
-  productId,
-  alt,
-  fallbackText,
-  fallbackColor,
-  className,
-}: ProductImageProps) {
+export function ProductImage({ productId, alt, fallbackText, className }: ProductImageProps) {
   const imagesQuery = useGetProductsByIdImages(productId);
   return (
     <EntityImage
       alt={alt}
       className={className}
       entityType="product"
-      fallbackColor={fallbackColor}
       fallbackText={fallbackText}
       imagesQuery={imagesQuery}
     />

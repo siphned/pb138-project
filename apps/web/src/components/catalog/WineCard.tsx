@@ -18,7 +18,6 @@ export function WineCard({ wine, minPrice }: WineCardProps) {
       imageSlot={
         <WineImage
           alt={wine.name}
-          fallbackColor={wine.color}
           fallbackText={wine.name}
           wineId={wine.id}
         />

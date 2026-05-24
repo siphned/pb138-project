@@ -15,7 +15,6 @@ export function ProductCard({ product, showShopName = true }: ProductCardProps) 
     currency: "EUR",
     style: "currency",
   });
-  const firstWineColor = product.wines?.[0]?.color;
 
   return (
     <CatalogCard
@@ -31,7 +30,6 @@ export function ProductCard({ product, showShopName = true }: ProductCardProps) 
       imageSlot={
         <ProductImage
           alt={product.name}
-          fallbackColor={firstWineColor}
           fallbackText={product.name}
           productId={product.id}
         />
