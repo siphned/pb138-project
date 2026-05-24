@@ -98,7 +98,10 @@ function WinemakerProfilePage() {
                   <EventCard
                     event={{
                       ...event,
-                      winemaker: { id, name: winemaker.name },
+                      endDate: event.endTime,
+                      startDate: event.startTime,
+                      winemakerId: id,
+                      winemakerName: winemaker.name,
                     }}
                     key={event.id}
                   />

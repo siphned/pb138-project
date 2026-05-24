@@ -11,14 +11,6 @@ vi.mock("@tanstack/react-router", () => ({
   Link: ({ children, to }: any) => <a href={to}>{children}</a>,
 }));
 
-vi.mock("@/generated/hooks/useGetWinesByIdImages", () => ({
-  useGetWinesByIdImages: vi.fn(() => ({ data: [], isLoading: false })),
-}));
-
-vi.mock("@/generated/hooks/useGetProductsByIdImages", () => ({
-  useGetProductsByIdImages: vi.fn(() => ({ data: [], isLoading: false })),
-}));
-
 const mockProduct = {
   id: "prod-1",
   isBundle: true,

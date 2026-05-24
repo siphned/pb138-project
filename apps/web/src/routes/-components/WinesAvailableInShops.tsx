@@ -1,60 +1,62 @@
+import { ErrorState } from "@/components/primitives/error-state";
+import { Section } from "@/components/primitives/section";
+import { ProductCard } from "@/components/catalog/ProductCard";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useGetProducts } from "@/generated/hooks/useGetProducts";
-import { ProductPriceRow } from "./ProductPriceRow";
-import { ProductSoldAtCard } from "./ProductSoldAtCard";
+import { DETAIL_CARD_GRID, DETAIL_CARD_ITEM } from "@/lib/detail-card-grid";
 
 interface WinesAvailableInShopsProps {
   wineId: string;
 }
 
 export function WinesAvailableInShops({ wineId }: WinesAvailableInShopsProps) {
-  const { data: productsData, isLoading, isError } = useGetProducts({ wineId });
+  const { data: productsData, isLoading, isError, refetch } = useGetProducts({ wineId });
 
   if (isLoading) {
     return (
-      <div className="space-y-4">
-        <h3 className="font-heading text-xl font-bold">Available in shops</h3>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <Skeleton className="h-40 rounded-2xl" />
-          <Skeleton className="h-40 rounded-2xl" />
+      <Section heading="Available in shops">
+        <div className={DETAIL_CARD_GRID}>
+          {[1, 2, 3, 4].map((i) => (
+            <Skeleton className={`aspect-square rounded-2xl ${DETAIL_CARD_ITEM}`} key={i} />
+          ))}
         </div>
-      </div>
+      </Section>
     );
   }
 
-  if (isError || !productsData || productsData.data.length === 0) {
+  if (isError) {
     return (
-      <div className="space-y-4">
-        <h3 className="font-heading text-xl font-bold">Available in shops</h3>
-        <p className="text-muted-foreground italic">
+      <Section heading="Available in shops">
+        <ErrorState
+          message="Couldn't load shops selling this wine."
+          onRetry={() => refetch()}
+          title="Failed to load"
+        />
+      </Section>
+    );
+  }
+
+  const products = productsData?.data ?? [];
+
+  if (products.length === 0) {
+    return (
+      <Section heading="Available in shops">
+        <p className="italic text-muted-foreground">
           This wine is not currently available in any shops.
         </p>
-      </div>
+      </Section>
     );
   }
 
   return (
-    <div className="space-y-6">
-      <h3 className="font-heading text-xl font-bold">Available in shops</h3>
-      <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
-        {productsData.data.map((product) => (
-          <div className="space-y-4 rounded-2xl border bg-card p-6 shadow-xs" key={product.id}>
-            <div className="flex items-start justify-between">
-              <div>
-                <h4 className="font-heading text-lg font-bold">{product.name}</h4>
-                <div className="mt-2">
-                  <ProductSoldAtCard shopId={product.shop.id} shopName={product.shop.name} />
-                </div>
-              </div>
-            </div>
-            <ProductPriceRow
-              price={product.price}
-              productId={product.id}
-              quantity={Number(product.quantity)}
-            />
+    <Section heading="Available in shops">
+      <div className={DETAIL_CARD_GRID}>
+        {products.map((product) => (
+          <div className={DETAIL_CARD_ITEM} key={product.id}>
+            <ProductCard product={product} />
           </div>
         ))}
       </div>
-    </div>
+    </Section>
   );
 }

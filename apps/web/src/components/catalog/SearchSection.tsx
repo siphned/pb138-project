@@ -4,14 +4,13 @@ import React from "react";
 import { DataGrid } from "@/components/primitives/data-grid";
 import { Section } from "@/components/primitives/section";
 import { Button } from "@/components/ui/button";
-import type { EventSearch, ProductSearch, ShopSearch, WinemakerSearch, WineSearch } from "./types";
+import type { ProductSearch, ShopSearch, WinemakerSearch, WineSearch } from "./types";
 
 type ViewAllProps =
-  | { viewAllHref: "/explore"; viewAllSearch?: WineSearch }
+  | { viewAllHref: "/wines"; viewAllSearch?: WineSearch }
   | { viewAllHref: "/products"; viewAllSearch?: ProductSearch }
   | { viewAllHref: "/winemakers"; viewAllSearch?: WinemakerSearch }
-  | { viewAllHref: "/shops"; viewAllSearch?: ShopSearch }
-  | { viewAllHref: "/events"; viewAllSearch?: EventSearch };
+  | { viewAllHref: "/shops"; viewAllSearch?: ShopSearch };
 
 type SearchSectionProps = {
   heading: string;

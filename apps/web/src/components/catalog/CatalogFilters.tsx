@@ -11,7 +11,6 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Slider } from "@/components/ui/slider";
-import { useUser } from "@/context/UserContext";
 import type {
   GetWinesQueryParamsColorEnumKey,
   GetWinesQueryParamsTypeEnumKey,
@@ -61,19 +60,10 @@ export function CatalogFilters<E extends EntityKind>({ entity, search, onSearchC
     );
   }
 
-  if (entity === "shops") {
-    return (
-      <ShopFilters
-        onSearchChange={onSearchChange as (next: ShopSearch) => void}
-        search={search as ShopSearch}
-      />
-    );
-  }
-
   return (
     <GenericFilters
-      onSearchChange={onSearchChange as (next: WinemakerSearch) => void}
-      search={search as WinemakerSearch}
+      onSearchChange={onSearchChange as (next: WinemakerSearch | ShopSearch) => void}
+      search={search as WinemakerSearch | ShopSearch}
     />
   );
 }
@@ -246,13 +236,13 @@ function ProductFilters({
   }, [search.minPrice, search.maxPrice]);
 
   const handleSearchChange = useCallback(
-    (s: string) => onSearchChange({ ...search, q: s || undefined }),
+    (s: string) => onSearchChange({ ...search, search: s || undefined }),
     [onSearchChange, search]
   );
 
   return (
     <div className="space-y-8">
-      <SearchInput isProduct={true} onChange={handleSearchChange} value={search.q || ""} />
+      <SearchInput isProduct={true} onChange={handleSearchChange} value={search.search || ""} />
 
       <div className="space-y-6">
         <ColorFilter
@@ -327,61 +317,12 @@ function EventFilters({
   );
 }
 
-function ShopFilters({
-  search,
-  onSearchChange,
-}: {
-  search: ShopSearch;
-  onSearchChange: (next: ShopSearch) => void;
-}) {
-  const { user } = useUser();
-  const handleSearchChange = useCallback(
-    (q: string) => onSearchChange({ ...search, q: q || undefined }),
-    [onSearchChange, search]
-  );
-
-  return (
-    <div className="space-y-8">
-      <SearchInput isProduct={false} onChange={handleSearchChange} value={search.q || ""} />
-
-      <div className="space-y-6">
-        <div className="space-y-3">
-          <SectionLabel>City</SectionLabel>
-          <Input
-            onChange={(e) => onSearchChange({ ...search, city: e.target.value || undefined })}
-            placeholder="Filter by city..."
-            value={search.city || ""}
-          />
-        </div>
-
-        {user && (
-          <div className="flex items-center space-x-2">
-            <Checkbox
-              checked={search.ownerUserId === user.id}
-              id="myShops"
-              onCheckedChange={(checked) =>
-                onSearchChange({
-                  ...search,
-                  ownerUserId: checked ? user.id : undefined,
-                })
-              }
-            />
-            <Label className="cursor-pointer" htmlFor="myShops">
-              My shops only
-            </Label>
-          </div>
-        )}
-      </div>
-    </div>
-  );
-}
-
 function GenericFilters({
   search,
   onSearchChange,
 }: {
-  search: WinemakerSearch;
-  onSearchChange: (next: WinemakerSearch) => void;
+  search: WinemakerSearch | ShopSearch;
+  onSearchChange: (next: WinemakerSearch | ShopSearch) => void;
 }) {
   const handleSearchChange = useCallback(
     (q: string) => onSearchChange({ ...search, q: q || undefined }),

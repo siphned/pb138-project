@@ -13,7 +13,7 @@ export function CartEmpty() {
       <p className="mb-8 text-muted-foreground">
         Looks like you haven&apos;t added any wines to your cart yet.
       </p>
-      <Link className={cn(buttonVariants({ variant: "outline" }))} to="/explore">
+      <Link className={cn(buttonVariants({ variant: "outline" }))} to="/wines">
         Browse wines
       </Link>
     </div>

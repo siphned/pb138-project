@@ -70,7 +70,9 @@ describe("CatalogFilters", () => {
 
     await waitFor(
       () => {
-        expect(mockOnSearchChange).toHaveBeenCalledWith(expect.objectContaining({ q: "riesling" }));
+        expect(mockOnSearchChange).toHaveBeenCalledWith(
+          expect.objectContaining({ search: "riesling" })
+        );
       },
       { timeout: 1000 }
     );
