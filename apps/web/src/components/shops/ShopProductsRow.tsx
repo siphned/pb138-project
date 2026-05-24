@@ -52,7 +52,7 @@ export function ShopProductsRow({ shopId, isBundle }: ShopProductsRowProps) {
       <div className="flex gap-6 overflow-x-auto pb-8 snap-x snap-mandatory [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
         {items.map((product) => (
           <div className="w-[280px] shrink-0 snap-start" key={product.id}>
-            <ProductCard product={product} showShopName={false} />
+            <ProductCard product={product} />
           </div>
         ))}
       </div>

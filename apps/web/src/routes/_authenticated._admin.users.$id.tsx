@@ -1,5 +1,6 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
-import { Alert01Icon, ArrowLeft02Icon } from "hugeicons-react";
+import { Alert01Icon, ArrowLeft02Icon } from "@hugeicons/core-free-icons";
+import { HugeiconsIcon } from "@hugeicons/react";
 import { useState } from "react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -103,7 +104,7 @@ function ErrorCard({ id }: { id: string }) {
   return (
     <main className="mx-auto max-w-4xl space-y-4 p-6">
       <Button className="mb-4" onClick={() => navigate({ to: "/users" })} size="sm" variant="ghost">
-        <ArrowLeft02Icon className="mr-2 h-4 w-4" />
+        <HugeiconsIcon className="mr-2 h-4 w-4" icon={ArrowLeft02Icon} />
         Back to Users
       </Button>
 
@@ -129,7 +130,7 @@ function LoadingCard() {
     <main className="mx-auto max-w-4xl space-y-6 p-6">
       <div className="flex items-center gap-4">
         <Button onClick={() => navigate({ to: "/users" })} size="sm" variant="ghost">
-          <ArrowLeft02Icon className="mr-2 h-4 w-4" />
+          <HugeiconsIcon className="mr-2 h-4 w-4" icon={ArrowLeft02Icon} />
           Back
         </Button>
         <h1 className="text-3xl font-semibold">User Details</h1>
@@ -234,7 +235,7 @@ function ActionButtons({ isUpdating, onOpenDialog, user }: ActionButtonsProps) {
   return (
     <div className="space-y-4">
       <div className="flex items-start gap-3 rounded-md bg-yellow-50 p-4 dark:bg-yellow-950/20">
-        <Alert01Icon className="mt-0.5 h-5 w-5 text-yellow-600 dark:text-yellow-400" />
+        <HugeiconsIcon className="mt-0.5 h-5 w-5 text-yellow-600 dark:text-yellow-400" icon={Alert01Icon} />
         <div className="space-y-1">
           <p className="text-sm font-semibold text-yellow-900 dark:text-yellow-200">
             Account is {getStatusLabel(user.status as "suspended" | "banned")}
@@ -376,7 +377,7 @@ function AdminUserDetail() {
     <main className="mx-auto max-w-4xl space-y-6 p-6">
       <div className="flex items-center gap-4">
         <Button onClick={() => navigate({ to: "/users" })} size="sm" variant="ghost">
-          <ArrowLeft02Icon className="mr-2 h-4 w-4" />
+          <HugeiconsIcon className="mr-2 h-4 w-4" icon={ArrowLeft02Icon} />
           Back
         </Button>
         <h1 className="text-3xl font-semibold">User Details</h1>

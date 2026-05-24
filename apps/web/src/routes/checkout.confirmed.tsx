@@ -71,7 +71,7 @@ function CheckoutConfirmedPage() {
           onRetry={() => refetch()}
           title="Order not found"
         />
-        <Link className={cn(buttonVariants({ variant: "outline" }), "w-full")} to="/explore">
+        <Link className={cn(buttonVariants({ variant: "outline" }), "w-full")} to="/wines">
           Back to shopping
         </Link>
       </div>
@@ -199,7 +199,7 @@ function CheckoutConfirmedPage() {
         >
           View order
         </Link>
-        <Link className={cn(buttonVariants(), "flex-1")} to="/explore">
+        <Link className={cn(buttonVariants(), "flex-1")} to="/wines">
           Back to shopping
         </Link>
       </div>

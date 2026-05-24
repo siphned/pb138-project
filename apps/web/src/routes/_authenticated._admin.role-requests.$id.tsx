@@ -1,5 +1,6 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
-import { ArrowLeft02Icon } from "hugeicons-react";
+import { ArrowLeft02Icon } from "@hugeicons/core-free-icons";
+import { HugeiconsIcon } from "@hugeicons/react";
 import { useState } from "react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -33,7 +34,7 @@ function AdminRoleRequestDetail() {
           onClick={() => navigate({ to: "/role-requests" })}
           type="button"
         >
-          <ArrowLeft02Icon size={16} />
+          <HugeiconsIcon className="h-4 w-4" icon={ArrowLeft02Icon} />
           Back to Requests
         </button>
         <div className="rounded-md bg-destructive/10 p-4 text-destructive">
@@ -63,7 +64,7 @@ function AdminRoleRequestDetail() {
         onClick={() => navigate({ to: "/role-requests" })}
         type="button"
       >
-        <ArrowLeft02Icon size={16} />
+        <HugeiconsIcon className="h-4 w-4" icon={ArrowLeft02Icon} />
         Back to Requests
       </button>
 

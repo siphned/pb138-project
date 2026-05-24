@@ -59,7 +59,7 @@ export function CartSection({ cart, deliveryType }: CartSectionProps) {
       {isEmpty ? (
         <EmptyState
           action={
-            <Link className={cn(buttonVariants({ variant: "outline" }))} to="/explore">
+            <Link className={cn(buttonVariants({ variant: "outline" }))} to="/wines">
               Browse wines
             </Link>
           }
