@@ -39,17 +39,17 @@ const formatDate = (date: unknown): string => {
 const getStatusBadgeClass = (status: string): string => {
   switch (status) {
     case "pending":
-      return "bg-yellow-100/30 text-yellow-700 dark:text-yellow-400";
+      return "bg-warning-bg text-warning";
     case "confirmed":
-      return "bg-blue-100/30 text-blue-700 dark:text-blue-400";
+      return "bg-secondary text-secondary-foreground";
     case "shipped":
-      return "bg-purple-100/30 text-purple-700 dark:text-purple-400";
+      return "bg-secondary text-secondary-foreground";
     case "delivered":
-      return "bg-green-100/30 text-green-700 dark:text-green-400";
+      return "bg-success-bg text-success";
     case "cancelled":
-      return "bg-red-100/30 text-red-700 dark:text-red-400";
+      return "bg-destructive/10 text-destructive";
     default:
-      return "bg-gray-100/30 text-gray-700 dark:text-gray-400";
+      return "bg-muted/30 text-muted-foreground";
   }
 };
 
@@ -227,9 +227,7 @@ function OrderDetailPage() {
           {Number.parseFloat(order.discount) > 0 && (
             <div className="flex justify-between text-sm">
               <span className="text-muted-foreground">Discount</span>
-              <span className="text-green-600 dark:text-green-400">
-                -{formatPrice(order.discount)}
-              </span>
+              <span className="text-success">-{formatPrice(order.discount)}</span>
             </div>
           )}
           <div className="border-t border-border pt-3 flex justify-between font-semibold">
