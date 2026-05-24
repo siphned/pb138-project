@@ -247,6 +247,7 @@ async function main() {
   const allEventImages: ImageEntry[] = [];
   const allWinemakerImages: ImageEntry[] = [];
   const allShopImages: ImageEntry[] = [];
+  const allProductImages: ImageEntry[] = [];
 
   const winemakerReviewsToInsert: { winemakerId: string; rating: number; body: string; userId: string }[] = [];
   const wineReviewsToInsert: { wineId: string; rating: number; body: string; userId: string }[] = [];
@@ -499,9 +500,13 @@ async function main() {
         })),
       );
       insertedProducts.forEach((p, i) => {
-        const key = `${shop.key}::${wmKey}::${wm.wines[i]!.name}`;
+        const wineData = wm.wines[i]!;
+        const key = `${shop.key}::${wmKey}::${wineData.name}`;
         productMap.set(key, { id: p.id, price: p.price, shopId: shopRow!.id });
         allProductIds.push(p.id);
+        if (wineData.imageUrl) {
+          allProductImages.push({ id: p.id, url: wineData.imageUrl });
+        }
       });
     }
 
@@ -966,6 +971,13 @@ async function main() {
       .filter((img) => !!img.url)
       .map(({ id, url }) => ({
         entityType: "shop",
+        entityId: id,
+        url: url!,
+      })),
+    ...allProductImages
+      .filter((img) => !!img.url)
+      .map(({ id, url }) => ({
+        entityType: "product",
         entityId: id,
         url: url!,
       })),
