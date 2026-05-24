@@ -1,18 +1,19 @@
 import { useQueryClient } from "@tanstack/react-query";
 import { useNavigate } from "@tanstack/react-router";
-import { useMemo, useRef, useState } from "react";
+import { useMemo, useState } from "react";
 import {
+  ADDRESS_FORM_ID,
   AddressForm,
-  type AddressFormHandle,
   type AddressFormValues,
 } from "@/components/forms/AddressForm";
-import { Button } from "@/components/ui/button";
+import { buttonVariants } from "@/components/ui/button";
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { useUser } from "@/context/UserContext";
 import { getCartsQueryKey } from "@/generated/hooks/useGetCarts";
 import { useGetUsersMeAddresses } from "@/generated/hooks/useGetUsersMeAddresses";
 import { usePostOrdersCheckout } from "@/generated/hooks/usePostOrdersCheckout";
 import type { GetCarts200 } from "@/generated/types/GetCarts";
+import { cn } from "@/lib/utils";
 import { CartSummary } from "./CartSummary";
 
 interface CheckoutSectionProps {
@@ -29,7 +30,6 @@ export function CheckoutSection({
   const navigate = useNavigate();
   const queryClient = useQueryClient();
   const { user } = useUser();
-  const formRef = useRef<AddressFormHandle>(null);
 
   const checkout = usePostOrdersCheckout<unknown>();
   const [checkoutError, setCheckoutError] = useState<string | null>(null);
@@ -132,26 +132,29 @@ export function CheckoutSection({
           isSubmitting={checkout.isPending}
           onDeliveryTypeChange={onDeliveryTypeChange}
           onSubmit={handleSubmit}
-          ref={formRef}
           savedBilling={savedBilling}
           savedShipping={savedShipping}
           showGuestFields={!user}
         />
         {!isCartEmpty && <CartSummary deliveryType={deliveryType} items={cart.items} />}
         {checkoutError && (
-          <div className="rounded-md border border-destructive/40 bg-destructive/10 px-4 py-3 text-sm text-destructive">
+          <div
+            aria-live="polite"
+            className="rounded-md border border-destructive/40 bg-destructive/10 px-4 py-3 text-sm text-destructive"
+          >
             {checkoutError}
           </div>
         )}
       </CardContent>
       <CardFooter className="flex-col gap-2">
-        <Button
-          className="w-full"
+        <button
+          className={cn(buttonVariants(), "w-full")}
           disabled={isCartEmpty || checkout.isPending}
-          onClick={() => formRef.current?.submit()}
+          form={ADDRESS_FORM_ID}
+          type="submit"
         >
           {checkout.isPending ? "Processing..." : `Confirm Order — €${total.toFixed(2)}`}
-        </Button>
+        </button>
         <p className="text-xs text-center text-muted-foreground">
           By purchasing you agree to our Terms of Service and Privacy Policy.
         </p>

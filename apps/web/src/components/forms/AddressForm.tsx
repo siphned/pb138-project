@@ -1,5 +1,5 @@
 import { zodResolver } from "@hookform/resolvers/zod";
-import { forwardRef, useImperativeHandle, useMemo, useRef } from "react";
+import { useMemo } from "react";
 import { type SubmitHandler, useForm } from "react-hook-form";
 import { z } from "zod";
 import { Button } from "@/components/ui/button";
@@ -92,9 +92,7 @@ export type SavedAddress = {
   country: string;
 };
 
-export interface AddressFormHandle {
-  submit: () => void;
-}
+export const ADDRESS_FORM_ID = "checkout-address-form";
 
 export interface AddressFormProps {
   defaultValues: Partial<AddressFormValues>;
@@ -122,26 +120,22 @@ const BILLING_FIELDS = [
   "billingCountry",
 ] as const satisfies ReadonlyArray<keyof AddressFormValues>;
 
-export const AddressForm = forwardRef<AddressFormHandle, AddressFormProps>(function AddressForm(
-  {
-    defaultValues,
-    onSubmit,
-    showGuestFields,
-    onDeliveryTypeChange,
-    savedShipping,
-    savedBilling,
-  },
-  ref
-) {
+export function AddressForm({
+  defaultValues,
+  onSubmit,
+  showGuestFields,
+  onDeliveryTypeChange,
+  savedShipping,
+  savedBilling,
+}: AddressFormProps) {
   const schema = useMemo(() => buildSchema(showGuestFields), [showGuestFields]);
-  const formElRef = useRef<HTMLFormElement>(null);
 
   const {
     register,
     handleSubmit,
     setValue,
     watch,
-    formState: { errors, isSubmitted },
+    formState: { errors },
   } = useForm<AddressFormValues>({
     defaultValues: {
       billingAddressSameAsShipping: true,
@@ -164,21 +158,11 @@ export const AddressForm = forwardRef<AddressFormHandle, AddressFormProps>(funct
     resolver: zodResolver(schema as never),
   });
 
-  useImperativeHandle(
-    ref,
-    () => ({
-      submit: () => {
-        void handleSubmit(onSubmit)();
-      },
-    }),
-    [handleSubmit, onSubmit]
-  );
-
   const deliveryType = watch("deliveryType");
   const paymentMethod = watch("paymentMethod");
   const billingSameAsShipping = watch("billingAddressSameAsShipping");
   const errorCount = Object.keys(errors).length;
-  const showErrorBanner = errorCount > 0 && isSubmitted;
+  const showErrorBanner = errorCount > 0;
 
   const applySavedAddress = (
     saved: SavedAddress,
@@ -204,7 +188,12 @@ export const AddressForm = forwardRef<AddressFormHandle, AddressFormProps>(funct
   const addressSectionTitle = deliveryType === "pickup" ? "Contact Address" : "Shipping Address";
 
   return (
-    <form className="space-y-6" onSubmit={handleSubmit(onSubmit)} ref={formElRef}>
+    <form
+      className="space-y-6"
+      id={ADDRESS_FORM_ID}
+      noValidate
+      onSubmit={handleSubmit(onSubmit)}
+    >
       {showErrorBanner && (
         <div
           aria-live="polite"
@@ -410,4 +399,4 @@ export const AddressForm = forwardRef<AddressFormHandle, AddressFormProps>(funct
       )}
     </form>
   );
-});
+}
