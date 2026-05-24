@@ -52,8 +52,8 @@ export function AvailabilityRegularForm({ shopId, onSuccess }: AvailabilityRegul
         id: shopId,
       });
       onSuccess();
-    } catch (_error) {
-      // Error handling is delegated to the mutation hook's error state
+    } catch {
+      // Error already handled by mutation state
     } finally {
       setIsSubmitting(false);
     }
