@@ -16,8 +16,8 @@ import { usePostRoleRequests } from "@/generated/hooks/usePostRoleRequests";
 type RequestType = "winemaker" | "shop_owner";
 
 const TYPE_OPTIONS: { value: RequestType; label: string }[] = [
-  { value: "winemaker", label: "Winemaker" },
-  { value: "shop_owner", label: "Shop owner" },
+  { label: "Winemaker", value: "winemaker" },
+  { label: "Shop owner", value: "shop_owner" },
 ];
 
 function is409Error(error: unknown): boolean {

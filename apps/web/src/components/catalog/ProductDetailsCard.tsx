@@ -133,8 +133,7 @@ export function ProductDetailsCard({
     query: { enabled: !!shopId && !product.shop?.name },
   });
   const shopName: string | undefined = product.shop?.name ?? fetchedShop?.name;
-  const shopOwnerUserId: string | undefined =
-    product.shop?.ownerUserId ?? fetchedShop?.ownerUserId;
+  const shopOwnerUserId: string | undefined = product.shop?.ownerUserId ?? fetchedShop?.ownerUserId;
 
   const price = Number(product.price).toLocaleString("en-IE", {
     currency: "EUR",

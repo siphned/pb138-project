@@ -66,8 +66,7 @@ export function EntityReviewsSection({
     | undefined;
   const reviewData = initialReviewData ?? remoteData ?? null;
   const isLoading =
-    initialIsLoading ??
-    (wineQuery.isLoading || productQuery.isLoading || winemakerQuery.isLoading);
+    initialIsLoading ?? (wineQuery.isLoading || productQuery.isLoading || winemakerQuery.isLoading);
 
   const reviews = (reviewData?.reviews ?? []).map((r) => ({
     authorName: authorName(r.user),

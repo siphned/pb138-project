@@ -18,19 +18,19 @@ import { useUser } from "@/context/UserContext";
 
 const baseUser = {
   activeRole: "Customer",
-  setActiveRole: vi.fn(),
   isLoading: false,
+  setActiveRole: vi.fn(),
   updateUser: vi.fn(),
 };
 
 const mockUser = (roles: string[]) => ({
   ...baseUser,
   user: {
-    id: "u1",
-    fname: "Adam",
-    lname: "M",
-    email: "a@b.com",
     clerkId: "clerk_1",
+    email: "a@b.com",
+    fname: "Adam",
+    id: "u1",
+    lname: "M",
     roles,
   },
 });

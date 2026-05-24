@@ -17,12 +17,8 @@ import { Label } from "@/components/ui/label";
 import { useUser } from "@/context/UserContext";
 
 const profileFormSchema = z.object({
-  fname: z
-    .string()
-    .refine((v) => v.trim().length > 0, { message: "First name is required" }),
-  lname: z
-    .string()
-    .refine((v) => v.trim().length > 0, { message: "Last name is required" }),
+  fname: z.string().refine((v) => v.trim().length > 0, { message: "First name is required" }),
+  lname: z.string().refine((v) => v.trim().length > 0, { message: "Last name is required" }),
 });
 
 type ProfileFormValues = z.infer<typeof profileFormSchema>;
@@ -108,9 +104,7 @@ export function ProfileEditForm({ onSuccess, onCancel }: ProfileEditFormProps) {
               </Label>
               <Input
                 aria-invalid={!!errors.fname || undefined}
-                className={
-                  errors.fname ? "border-destructive focus-visible:ring-destructive" : ""
-                }
+                className={errors.fname ? "border-destructive focus-visible:ring-destructive" : ""}
                 id="fname"
                 placeholder="John"
                 {...register("fname", { onChange: clearFieldErrorOnChange("fname") })}
@@ -126,9 +120,7 @@ export function ProfileEditForm({ onSuccess, onCancel }: ProfileEditFormProps) {
               </Label>
               <Input
                 aria-invalid={!!errors.lname || undefined}
-                className={
-                  errors.lname ? "border-destructive focus-visible:ring-destructive" : ""
-                }
+                className={errors.lname ? "border-destructive focus-visible:ring-destructive" : ""}
                 id="lname"
                 placeholder="Doe"
                 {...register("lname", { onChange: clearFieldErrorOnChange("lname") })}

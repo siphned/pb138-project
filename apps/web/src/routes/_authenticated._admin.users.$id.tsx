@@ -1,6 +1,6 @@
-import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { Alert01Icon, ArrowLeft02Icon } from "@hugeicons/core-free-icons";
 import { HugeiconsIcon } from "@hugeicons/react";
+import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useState } from "react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -235,7 +235,10 @@ function ActionButtons({ isUpdating, onOpenDialog, user }: ActionButtonsProps) {
   return (
     <div className="space-y-4">
       <div className="flex items-start gap-3 rounded-md bg-yellow-50 p-4 dark:bg-yellow-950/20">
-        <HugeiconsIcon className="mt-0.5 h-5 w-5 text-yellow-600 dark:text-yellow-400" icon={Alert01Icon} />
+        <HugeiconsIcon
+          className="mt-0.5 h-5 w-5 text-yellow-600 dark:text-yellow-400"
+          icon={Alert01Icon}
+        />
         <div className="space-y-1">
           <p className="text-sm font-semibold text-yellow-900 dark:text-yellow-200">
             Account is {getStatusLabel(user.status as "suspended" | "banned")}

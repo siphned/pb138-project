@@ -1,6 +1,6 @@
+import { ProductCard } from "@/components/catalog/ProductCard";
 import { ErrorState } from "@/components/primitives/error-state";
 import { Section } from "@/components/primitives/section";
-import { ProductCard } from "@/components/catalog/ProductCard";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useGetProducts } from "@/generated/hooks/useGetProducts";
 import { DETAIL_CARD_GRID, DETAIL_CARD_ITEM } from "@/lib/detail-card-grid";

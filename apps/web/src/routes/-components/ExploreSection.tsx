@@ -59,12 +59,6 @@ export function ExploreSection({ mode }: ExploreSectionProps) {
           to={linkTo as any}
         >
           {linkLabel} <HugeiconsIcon className="ml-1 h-4 w-4" icon={ArrowRight02Icon} />
-=======
-          search={{ page: 1, sort: "newest" }}
-          to={linkTo}
-        >
-          {linkLabel} <ArrowRight className="ml-1 h-4 w-4" />
->>>>>>> origin/main
         </Link>
       </div>
       <div className="flex gap-4 overflow-x-auto p-2 [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">

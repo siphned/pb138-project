@@ -21,4 +21,3 @@ export function EventImage({ eventId, alt, fallbackText, className }: EventImage
     />
   );
 }
-

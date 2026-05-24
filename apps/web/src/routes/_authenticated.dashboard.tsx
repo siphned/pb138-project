@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { StubGet } from "@/components/dev/StubGet";
 import { StubMutation } from "@/components/dev/StubMutation";

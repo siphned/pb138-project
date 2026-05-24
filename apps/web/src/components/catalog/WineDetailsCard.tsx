@@ -86,14 +86,10 @@ export function WineDetailsCard({ wine }: WineDetailsCardProps) {
                 <PropertyRow label="Region" value={wine.region} />
                 <PropertyRow label="Vintage" value={wine.vintageYear} />
                 <PropertyRow label="Alcohol" value={`${wine.alcoholContent}%`} />
-                {wine.composition && (
-                  <PropertyRow label="Composition" value={wine.composition} />
-                )}
+                {wine.composition && <PropertyRow label="Composition" value={wine.composition} />}
               </DescriptionList>
               {wine.description && (
-                <p className="text-sm leading-relaxed text-muted-foreground">
-                  {wine.description}
-                </p>
+                <p className="text-sm leading-relaxed text-muted-foreground">{wine.description}</p>
               )}
             </div>
           </CardContent>
