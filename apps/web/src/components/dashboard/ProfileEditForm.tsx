@@ -1,9 +1,8 @@
-<<<<<<< HEAD
-import { UserIcon } from "hugeicons-react";
-=======
-import { User } from "lucide-react";
->>>>>>> origin/main
-import { type ChangeEvent, type FormEvent, useEffect, useState } from "react";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { UserIcon } from "@hugeicons/core-free-icons";
+import { HugeiconsIcon } from "@hugeicons/react";
+import { type SubmitHandler, useForm } from "react-hook-form";
+import { z } from "zod";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -17,60 +16,44 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useUser } from "@/context/UserContext";
 
+const profileSchema = z.object({
+  fname: z.string().min(1, "First name is required"),
+  lname: z.string().min(1, "Last name is required"),
+});
+
+type ProfileFormValues = z.infer<typeof profileSchema>;
+
 interface ProfileEditFormProps {
   onSuccess?: () => void;
   onCancel?: () => void;
 }
 
-interface FormData {
-  fname: string;
-  lname: string;
-}
-
 export function ProfileEditForm({ onSuccess, onCancel }: ProfileEditFormProps) {
   const { user, updateUser } = useUser();
-  const [formData, setFormData] = useState<FormData>({ fname: "", lname: "" });
-  const [errors, setErrors] = useState<Partial<Record<keyof FormData, string>>>({});
-  const [isSaving, setIsSaving] = useState(false);
 
-  useEffect(() => {
-    if (user) {
-      setFormData({ fname: user.fname, lname: user.lname });
-    }
-  }, [user]);
+  const {
+    register,
+    handleSubmit,
+    formState: { errors, isSubmitting },
+    setError,
+  } = useForm<ProfileFormValues>({
+    defaultValues: {
+      fname: user?.fname ?? "",
+      lname: user?.lname ?? "",
+    },
+    resolver: zodResolver(profileSchema),
+    values: {
+      fname: user?.fname ?? "",
+      lname: user?.lname ?? "",
+    },
+  });
 
-  const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
-    const { name, value } = e.target;
-    setFormData((prev) => ({ ...prev, [name as keyof FormData]: value }));
-
-    // Clear error when user starts typing
-    if (errors[name as keyof FormData]) {
-      setErrors((prev) => ({ ...prev, [name as keyof FormData]: undefined }));
-    }
-  };
-
-  const handleSubmit = async (e: FormEvent) => {
-    e.preventDefault();
-    setIsSaving(true);
-    setErrors({});
-
-    const newErrors: Partial<Record<keyof FormData, string>> = {};
-    if (!formData.fname.trim()) newErrors.fname = "First name is required";
-    if (!formData.lname.trim()) newErrors.lname = "Last name is required";
-
-    if (Object.keys(newErrors).length > 0) {
-      setErrors(newErrors);
-      setIsSaving(false);
-      return;
-    }
-
+  const onSubmit: SubmitHandler<ProfileFormValues> = async (data) => {
     try {
-      await updateUser(formData);
-      if (onSuccess) onSuccess();
+      await updateUser(data);
+      onSuccess?.();
     } catch {
-      // Error is handled by the form error state
-    } finally {
-      setIsSaving(false);
+      setError("root", { message: "Failed to update profile. Please try again." });
     }
   };
 
@@ -80,54 +63,47 @@ export function ProfileEditForm({ onSuccess, onCancel }: ProfileEditFormProps) {
         <CardTitle className="font-heading text-2xl">Edit Profile</CardTitle>
         <CardDescription>Update your name information.</CardDescription>
       </CardHeader>
-      <form onSubmit={handleSubmit}>
+      <form onSubmit={handleSubmit(onSubmit)}>
         <CardContent className="px-6 space-y-6">
+          {errors.root && (
+            <div className="rounded-md border border-destructive/40 bg-destructive/10 px-4 py-3 text-sm text-destructive">
+              {errors.root.message}
+            </div>
+          )}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div className="space-y-2">
               <Label className="flex items-center gap-2" htmlFor="fname">
-<<<<<<< HEAD
-                <UserIcon className="h-4 w-4" /> First Name
-=======
-                <User className="h-4 w-4" /> First Name
->>>>>>> origin/main
+                <HugeiconsIcon className="h-4 w-4" icon={UserIcon} /> First Name
               </Label>
               <Input
                 className={errors.fname ? "border-destructive focus-visible:ring-destructive" : ""}
                 id="fname"
-                name="fname"
-                onChange={handleChange}
                 placeholder="John"
-                value={formData.fname}
+                {...register("fname")}
               />
-              {errors.fname && <p className="text-xs text-destructive mt-1">{errors.fname}</p>}
+              {errors.fname && <p className="text-xs text-destructive mt-1">{errors.fname.message}</p>}
             </div>
 
             <div className="space-y-2">
               <Label className="flex items-center gap-2" htmlFor="lname">
-<<<<<<< HEAD
-                <UserIcon className="h-4 w-4" /> Last Name
-=======
-                <User className="h-4 w-4" /> Last Name
->>>>>>> origin/main
+                <HugeiconsIcon className="h-4 w-4" icon={UserIcon} /> Last Name
               </Label>
               <Input
                 className={errors.lname ? "border-destructive focus-visible:ring-destructive" : ""}
                 id="lname"
-                name="lname"
-                onChange={handleChange}
                 placeholder="Doe"
-                value={formData.lname}
+                {...register("lname")}
               />
-              {errors.lname && <p className="text-xs text-destructive mt-1">{errors.lname}</p>}
+              {errors.lname && <p className="text-xs text-destructive mt-1">{errors.lname.message}</p>}
             </div>
           </div>
         </CardContent>
         <CardFooter className="px-6 py-8 flex justify-end gap-3 border-t">
-          <Button disabled={isSaving} onClick={onCancel} type="button" variant="outline">
+          <Button disabled={isSubmitting} onClick={onCancel} type="button" variant="outline">
             Cancel
           </Button>
-          <Button disabled={isSaving} type="submit">
-            {isSaving ? "Saving..." : "Save Changes"}
+          <Button disabled={isSubmitting} type="submit">
+            {isSubmitting ? "Saving..." : "Save Changes"}
           </Button>
         </CardFooter>
       </form>

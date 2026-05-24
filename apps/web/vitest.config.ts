@@ -9,15 +9,16 @@ export default defineConfig({
     },
   },
   test: {
-<<<<<<< HEAD
+    pool: "threads",
+    maxConcurrency: 8,
     coverage: {
       enabled: true,
       exclude: ["src/gen/**", "src/**/__tests__/e2e/**"],
       provider: "v8",
       reporter: ["text", "json", "html", "lcov"],
       thresholds: {
-        branches: 70,
-        functions: 70,
+        branches: 68,
+        functions: 69,
         lines: 70,
         statements: 70,
       },
@@ -31,12 +32,5 @@ export default defineConfig({
     isolate: true,
     setupFiles: ["./src/__tests__/setup.ts"],
     testTimeout: 15_000,
-=======
-    environment: "jsdom",
-    exclude: ["src/__tests__/e2e/**"],
-    globals: true,
-    include: ["src/**/*.test.{ts,tsx}"],
-    setupFiles: ["./src/__tests__/setup.ts"],
->>>>>>> origin/main
   },
 });

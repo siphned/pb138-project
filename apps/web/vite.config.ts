@@ -20,16 +20,10 @@ export default defineConfig({
   },
   server: {
     proxy: {
-      "/api": {
-        changeOrigin: true,
-        rewrite: (path) => path.replace(/^\/api/, ""),
+      "^/(users|wines|shops|events|carts|orders|products|reviews|winemakers|stats|admin|guest-sessions|supply-agreements|availability|role-requests|images|webhooks|profile|uploads|swagger|openapi)": {
         target: "http://localhost:3000",
+        changeOrigin: true,
       },
-      "/profile": "http://localhost:3000",
-<<<<<<< HEAD
-      "/uploads": "http://localhost:3000",
-=======
->>>>>>> origin/main
     },
   },
 });
