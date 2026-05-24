@@ -1,4 +1,5 @@
 import { t } from "elysia";
+<<<<<<< HEAD
 import z from "zod";
 
 /**
@@ -51,6 +52,8 @@ export const getAvailabilityResponseSchema = z.object({
   exceptions: z.array(exceptionResponseSchema),
   regular: z.array(regularResponseSchema),
 });
+=======
+>>>>>>> origin/main
 
 export const addRegularBody = t.Object({
   dow: t.Integer({ maximum: 6, minimum: 0 }),
@@ -68,6 +71,10 @@ export const addExceptionBody = t.Object({
   startsAt: t.String({ format: "date-time" }),
 });
 
+<<<<<<< HEAD
+=======
+// Response schemas
+>>>>>>> origin/main
 export const regularResponse = t.Object({
   dow: t.Integer(),
   endTime: t.Date(),

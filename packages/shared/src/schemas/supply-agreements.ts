@@ -1,5 +1,8 @@
 import { pgTable, uuid } from "drizzle-orm/pg-core";
+<<<<<<< HEAD
 import { createInsertSchema, createSelectSchema } from "drizzle-zod";
+=======
+>>>>>>> origin/main
 import { supplyAgreementStatusEnum } from "./enums";
 import { timestamptz } from "./helpers";
 import { shops, winemakers } from "./sellers";
@@ -18,7 +21,10 @@ export const supplyAgreements = pgTable("supply_agreements", {
     .notNull()
     .references(() => winemakers.id),
 });
+<<<<<<< HEAD
 
 export const supplyAgreementSelectSchema = createSelectSchema(supplyAgreements);
 export const supplyAgreementInsertSchema = createInsertSchema(supplyAgreements);
 export type SupplyAgreementModel = typeof supplyAgreements.$inferSelect;
+=======
+>>>>>>> origin/main

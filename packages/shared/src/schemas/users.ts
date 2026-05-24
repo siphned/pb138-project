@@ -1,6 +1,11 @@
+<<<<<<< HEAD
 import { pgTable, text, unique, uuid, varchar } from "drizzle-orm/pg-core";
 import { createInsertSchema, createSelectSchema } from "drizzle-zod";
 import z from "zod";
+=======
+import { pgTable, text, uuid, varchar } from "drizzle-orm/pg-core";
+import { createInsertSchema, createSelectSchema } from "drizzle-zod";
+>>>>>>> origin/main
 import { addresses } from "./addresses";
 import { userStatusEnum } from "./enums";
 import { timestamptz } from "./helpers";
@@ -22,6 +27,7 @@ export const users = pgTable("users", {
 export const insertUserSchema = createInsertSchema(users);
 export const selectUserSchema = createSelectSchema(users);
 
+<<<<<<< HEAD
 export const userRoles = pgTable(
   "user_roles",
   {
@@ -36,10 +42,23 @@ export const userRoles = pgTable(
   },
   (t) => [unique("user_roles_user_id_role_unique").on(t.userId, t.role)]
 );
+=======
+export const userRoles = pgTable("user_roles", {
+  createdAt: timestamptz("created_at").notNull().defaultNow(),
+  deletedAt: timestamptz("deleted_at"),
+  id: uuid("id").primaryKey().defaultRandom(),
+  role: varchar("role", { length: 50 }).notNull(),
+  updatedAt: timestamptz("updated_at"),
+  userId: uuid("user_id")
+    .notNull()
+    .references(() => users.id, { onDelete: "cascade" }),
+});
+>>>>>>> origin/main
 
 export const insertUserRoleSchema = createInsertSchema(userRoles);
 export const selectUserRoleSchema = createSelectSchema(userRoles);
 
+<<<<<<< HEAD
 export type UserModel = typeof users.$inferSelect;
 export type UserRole = typeof userRoles.$inferSelect;
 
@@ -58,3 +77,6 @@ export const profileUpdateSchema = z.object({
 });
 
 export type ProfileUpdate = z.infer<typeof profileUpdateSchema>;
+=======
+export type UserRole = typeof userRoles.$inferSelect;
+>>>>>>> origin/main

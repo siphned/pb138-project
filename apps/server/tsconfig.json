@@ -22,6 +22,10 @@
     "noImplicitOverride": true,
 
     // Path aliases
+<<<<<<< HEAD
+=======
+    "baseUrl": ".",
+>>>>>>> origin/main
     "paths": {
       "@repo/shared/*": ["../../../packages/shared/src/*"]
     },

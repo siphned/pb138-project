@@ -1,8 +1,13 @@
+<<<<<<< HEAD
 import type { Shop } from "@repo/shared/schemas";
 import { db } from "../../db";
 import { ForbiddenShopActionError, ShopNotFoundError } from "./shops.errors";
 import type { ShopWithAddress } from "./shops.repository";
 import * as shopsRepo from "./shops.repository";
+=======
+import type { IShopsRepository, ShopWithAddress } from "./shops.repository";
+import { shopsRepository } from "./shops.repository";
+>>>>>>> origin/main
 
 type AddressData = {
   country: string;
@@ -25,6 +30,7 @@ type UpdateShopData = {
 };
 
 export class ShopsService {
+<<<<<<< HEAD
   async createShop(ownerUserId: string, data: CreateShopData): Promise<ShopWithAddress> {
     const shop: Shop = await db.transaction(async (tx) => {
       const address = await shopsRepo.insertAddress(tx, data.address);
@@ -38,16 +44,33 @@ export class ShopsService {
 
     const created = await shopsRepo.findById(db, shop.id);
     if (!created) throw new ShopNotFoundError(shop.id);
+=======
+  constructor(private shopsRepo: IShopsRepository) {}
+
+  async createShop(ownerUserId: string, data: CreateShopData): Promise<ShopWithAddress> {
+    const shop = await this.shopsRepo.createShopWithAddress(
+      { description: data.description, name: data.name, ownerUserId },
+      data.address
+    );
+    const created = await this.shopsRepo.findById(shop.id);
+    if (!created) throw new Error("NOT_FOUND");
+>>>>>>> origin/main
     return created;
   }
 
   async getShop(id: string): Promise<ShopWithAddress> {
+<<<<<<< HEAD
     const shop = await shopsRepo.findById(db, id);
     if (!shop) throw new ShopNotFoundError(id);
+=======
+    const shop = await this.shopsRepo.findById(id);
+    if (!shop) throw new Error("NOT_FOUND");
+>>>>>>> origin/main
     return shop;
   }
 
   listMyShops(ownerUserId: string): Promise<ShopWithAddress[]> {
+<<<<<<< HEAD
     return shopsRepo.findAllByOwnerUserId(db, ownerUserId) as Promise<ShopWithAddress[]>;
   }
 
@@ -62,6 +85,13 @@ export class ShopsService {
     if (!shop) throw new ShopNotFoundError(shopId);
     if (shop.ownerUserId !== requesterId) throw new ForbiddenShopActionError();
     await shopsRepo.softDeleteById(db, shopId);
+=======
+    return this.shopsRepo.findAllByOwnerUserId(ownerUserId) as Promise<ShopWithAddress[]>;
+  }
+
+  listShops(): Promise<ShopWithAddress[]> {
+    return this.shopsRepo.findAll();
+>>>>>>> origin/main
   }
 
   async updateShop(
@@ -69,9 +99,15 @@ export class ShopsService {
     requesterId: string,
     data: UpdateShopData
   ): Promise<ShopWithAddress> {
+<<<<<<< HEAD
     const shop = await shopsRepo.findById(db, shopId);
     if (!shop) throw new ShopNotFoundError(shopId);
     if (shop.ownerUserId !== requesterId) throw new ForbiddenShopActionError();
+=======
+    const shop = await this.shopsRepo.findById(shopId);
+    if (!shop) throw new Error("NOT_FOUND");
+    if (shop.ownerUserId !== requesterId) throw new Error("FORBIDDEN");
+>>>>>>> origin/main
 
     const updates: { name?: string; description?: string; addressId?: string } = {};
 
@@ -87,6 +123,7 @@ export class ShopsService {
         postalCode: data.address.postalCode ?? currentAddress.postalCode,
         street: data.address.street ?? currentAddress.street,
       };
+<<<<<<< HEAD
       const newAddress = await shopsRepo.insertAddress(db, mergedAddress);
       updates.addressId = newAddress.id;
     }
@@ -94,8 +131,21 @@ export class ShopsService {
     await shopsRepo.updateById(db, shopId, updates);
     const updated = await shopsRepo.findById(db, shopId);
     if (!updated) throw new ShopNotFoundError(shopId);
+=======
+      const newAddress = await this.shopsRepo.insertAddress(mergedAddress);
+      updates.addressId = newAddress.id;
+    }
+
+    await this.shopsRepo.updateById(shopId, updates);
+    const updated = await this.shopsRepo.findById(shopId);
+    if (!updated) throw new Error("NOT_FOUND");
+>>>>>>> origin/main
     return updated;
   }
 }
 
+<<<<<<< HEAD
 export const shopsService = new ShopsService();
+=======
+export const shopsService = new ShopsService(shopsRepository);
+>>>>>>> origin/main

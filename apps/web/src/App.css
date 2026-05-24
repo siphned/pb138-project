@@ -1,7 +1,12 @@
 #next-steps {
   display: flex;
+<<<<<<< HEAD
   text-align: left;
   border-top: 1px solid var(--border);
+=======
+  border-top: 1px solid var(--border);
+  text-align: left;
+>>>>>>> origin/main
 
   & > div {
     flex: 1 1 0;
@@ -12,9 +17,15 @@
   }
 
   .icon {
+<<<<<<< HEAD
     width: 22px;
     height: 22px;
     margin-bottom: 16px;
+=======
+    margin-bottom: 16px;
+    width: 22px;
+    height: 22px;
+>>>>>>> origin/main
   }
 
   @media (max-width: 1024px) {
@@ -24,17 +35,26 @@
 }
 
 #next-steps ul {
+<<<<<<< HEAD
   display: flex;
   gap: 8px;
   padding: 0;
   margin: 32px 0 0;
   list-style: none;
+=======
+  list-style: none;
+  padding: 0;
+  display: flex;
+  gap: 8px;
+  margin: 32px 0 0;
+>>>>>>> origin/main
 
   .logo {
     height: 18px;
   }
 
   a {
+<<<<<<< HEAD
     display: flex;
     gap: 8px;
     align-items: center;
@@ -44,21 +64,43 @@
     text-decoration: none;
     background: var(--social-bg);
     border-radius: 6px;
+=======
+    color: var(--text-h);
+    font-size: 16px;
+    border-radius: 6px;
+    background: var(--social-bg);
+    display: flex;
+    padding: 6px 12px;
+    align-items: center;
+    gap: 8px;
+    text-decoration: none;
+>>>>>>> origin/main
     transition: box-shadow 0.3s;
 
     &:hover {
       box-shadow: var(--shadow);
     }
     .button-icon {
+<<<<<<< HEAD
       width: 18px;
       height: 18px;
+=======
+      height: 18px;
+      width: 18px;
+>>>>>>> origin/main
     }
   }
 
   @media (max-width: 1024px) {
+<<<<<<< HEAD
     flex-wrap: wrap;
     justify-content: center;
     margin-top: 20px;
+=======
+    margin-top: 20px;
+    flex-wrap: wrap;
+    justify-content: center;
+>>>>>>> origin/main
 
     li {
       flex: 1 1 calc(50% - 8px);
@@ -68,9 +110,15 @@
 
 @media (max-width: 1024px) {
   #next-steps ul a {
+<<<<<<< HEAD
     box-sizing: border-box;
     justify-content: center;
     width: 100%;
+=======
+    width: 100%;
+    justify-content: center;
+    box-sizing: border-box;
+>>>>>>> origin/main
   }
 }
 
@@ -141,7 +189,10 @@
 
   @media (max-width: 1024px) {
     gap: 18px;
+<<<<<<< HEAD
     padding: 32px 20px 24px;
+=======
+>>>>>>> origin/main
   }
 }
 

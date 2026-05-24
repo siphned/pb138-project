@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 import { useQueryClient } from "@tanstack/react-query";
 import { createFileRoute } from "@tanstack/react-router";
 import { useState } from "react";
@@ -13,12 +14,17 @@ import {
 import { Skeleton } from "@/components/ui/skeleton";
 import { useDeleteAdminReviewsById } from "@/generated/hooks/useDeleteAdminReviewsById";
 import { useGetAdminReviews } from "@/generated/hooks/useGetAdminReviews";
+=======
+import { createFileRoute } from "@tanstack/react-router";
+import { RouteStub } from "./-components/RouteStub";
+>>>>>>> origin/main
 
 export const Route = createFileRoute("/_authenticated/_admin/moderation")({
   component: ModerationPage,
 });
 
 function ModerationPage() {
+<<<<<<< HEAD
   const { data, isLoading, error } = useGetAdminReviews();
   const queryClient = useQueryClient();
   const { mutate: deleteReview, isPending: isDeleting } = useDeleteAdminReviewsById();
@@ -156,4 +162,7 @@ function ModerationPage() {
       </Dialog>
     </main>
   );
+=======
+  return <RouteStub title="Content Moderation" />;
+>>>>>>> origin/main
 }

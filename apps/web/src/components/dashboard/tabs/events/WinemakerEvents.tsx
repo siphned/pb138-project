@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 import {
   Calendar01Icon,
   CheckmarkCircle02Icon,
@@ -7,6 +8,9 @@ import {
   PlusSignIcon,
   UserGroupIcon,
 } from "hugeicons-react";
+=======
+import { Calendar, CheckCircle2, Clock, Clock4, MoreVertical, Plus, Users } from "lucide-react";
+>>>>>>> origin/main
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
@@ -57,19 +61,33 @@ export function WinemakerEvents() {
     if (status === "Approved") {
       return (
         <Badge
+<<<<<<< HEAD
           className="border-emerald-200 bg-emerald-50 text-emerald-600 hover:bg-emerald-50 px-2 py-0.5 text-[10px] font-medium rounded"
           variant="outline"
         >
           <CheckmarkCircle02Icon className="w-3 h-3 mr-1" /> Approved
+=======
+          className="border-[#A7F3D0] bg-[#ECFDF5] text-[#059669] hover:bg-[#ECFDF5] px-2 py-0.5 text-[10px] font-medium rounded"
+          variant="outline"
+        >
+          <CheckCircle2 className="w-3 h-3 mr-1" /> Approved
+>>>>>>> origin/main
         </Badge>
       );
     }
     return (
       <Badge
+<<<<<<< HEAD
         className="border-amber-200 bg-amber-50 text-amber-600 hover:bg-amber-50 px-2 py-0.5 text-[10px] font-medium rounded"
         variant="outline"
       >
         <Clock04Icon className="w-3 h-3 mr-1" /> Pending Approval
+=======
+        className="border-[#FDE68A] bg-[#FFFBEB] text-[#D97706] hover:bg-[#FFFBEB] px-2 py-0.5 text-[10px] font-medium rounded"
+        variant="outline"
+      >
+        <Clock4 className="w-3 h-3 mr-1" /> Pending Approval
+>>>>>>> origin/main
       </Badge>
     );
   };
@@ -79,25 +97,43 @@ export function WinemakerEvents() {
       {/* Header */}
       <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-2">
         <div className="flex items-center gap-2 font-heading text-xl font-semibold text-primary">
+<<<<<<< HEAD
           <Calendar01Icon className="h-5 w-5" /> Tasting Events
         </div>
         <Button className="w-full sm:w-auto bg-primary hover:bg-primary/90 text-white rounded-lg h-10 px-5">
           <PlusSignIcon className="h-4 w-4 mr-2" /> Schedule Event
+=======
+          <Calendar className="h-5 w-5" /> Tasting Events
+        </div>
+        <Button className="w-full sm:w-auto bg-[#8B2E3D] hover:bg-[#8B2E3D]/90 text-white rounded-lg h-10 px-5">
+          <Plus className="h-4 w-4 mr-2" /> Schedule Event
+>>>>>>> origin/main
         </Button>
       </div>
 
       {/* Upcoming Events Card */}
+<<<<<<< HEAD
       <Card className="bg-secondary/50 border-none shadow-none rounded-[24px] overflow-hidden">
         <CardContent className="p-0">
           <div className="px-6 py-5 md:px-8 md:py-6 border-b border-border flex items-center gap-2 font-medium text-primary">
             <div className="w-2 h-2 rounded-full bg-emerald-500" />
+=======
+      <Card className="bg-[#EFEAE8]/50 border-none shadow-none rounded-[24px] overflow-hidden">
+        <CardContent className="p-0">
+          <div className="px-6 py-5 md:px-8 md:py-6 border-b border-[#E5DFDD] flex items-center gap-2 font-medium text-primary">
+            <div className="w-2 h-2 rounded-full bg-[#10B981]" />
+>>>>>>> origin/main
             Upcoming Events ({upcomingEvents.length})
           </div>
 
           <div className="flex flex-col">
             {upcomingEvents.map((event) => (
               <div
+<<<<<<< HEAD
                 className="p-6 md:p-8 border-b border-border last:border-0 flex justify-between items-start gap-4"
+=======
+                className="p-6 md:p-8 border-b border-[#E5DFDD] last:border-0 flex justify-between items-start gap-4"
+>>>>>>> origin/main
                 key={event.id}
               >
                 <div className="flex flex-col gap-3 w-full pr-4">
@@ -112,6 +148,7 @@ export function WinemakerEvents() {
                   {/* Meta Information Row */}
                   <div className="flex flex-wrap items-center gap-x-5 gap-y-2 text-[12px] text-muted-foreground font-medium">
                     <span className="flex items-center gap-1.5 shrink-0">
+<<<<<<< HEAD
                       <Calendar01Icon className="h-3.5 w-3.5" /> {event.date}
                     </span>
                     <span className="flex items-center gap-1.5 shrink-0">
@@ -119,6 +156,15 @@ export function WinemakerEvents() {
                     </span>
                     <span className="flex items-center gap-1.5 shrink-0 w-full sm:w-auto mt-1 sm:mt-0">
                       <UserGroupIcon className="h-3.5 w-3.5" /> {event.capacity}
+=======
+                      <Calendar className="h-3.5 w-3.5" /> {event.date}
+                    </span>
+                    <span className="flex items-center gap-1.5 shrink-0">
+                      <Clock className="h-3.5 w-3.5" /> {event.time}
+                    </span>
+                    <span className="flex items-center gap-1.5 shrink-0 w-full sm:w-auto mt-1 sm:mt-0">
+                      <Users className="h-3.5 w-3.5" /> {event.capacity}
+>>>>>>> origin/main
                     </span>
                   </div>
 
@@ -132,7 +178,11 @@ export function WinemakerEvents() {
                   size="icon"
                   variant="ghost"
                 >
+<<<<<<< HEAD
                   <MoreVerticalIcon className="h-5 w-5" />
+=======
+                  <MoreVertical className="h-5 w-5" />
+>>>>>>> origin/main
                 </Button>
               </div>
             ))}
@@ -141,7 +191,11 @@ export function WinemakerEvents() {
       </Card>
 
       {/* Past Events Card */}
+<<<<<<< HEAD
       <Card className="bg-secondary/30 border-none shadow-none rounded-[24px] overflow-hidden mt-6">
+=======
+      <Card className="bg-[#EFEAE8]/30 border-none shadow-none rounded-[24px] overflow-hidden mt-6">
+>>>>>>> origin/main
         <CardContent className="p-0">
           <div className="px-6 py-5 md:px-8 md:py-6 text-muted-foreground font-medium text-[15px]">
             Past Events ({pastEvents.length})
@@ -157,6 +211,7 @@ export function WinemakerEvents() {
 
                   <div className="flex flex-wrap items-center gap-x-5 gap-y-2 text-[12px] text-muted-foreground/70">
                     <span className="flex items-center gap-1.5 shrink-0">
+<<<<<<< HEAD
                       <Calendar01Icon className="h-3.5 w-3.5" /> {event.date}
                     </span>
                     <span className="flex items-center gap-1.5 shrink-0">
@@ -164,6 +219,15 @@ export function WinemakerEvents() {
                     </span>
                     <span className="flex items-center gap-1.5 shrink-0 w-full sm:w-auto mt-1 sm:mt-0">
                       <UserGroupIcon className="h-3.5 w-3.5" /> {event.capacity}
+=======
+                      <Calendar className="h-3.5 w-3.5" /> {event.date}
+                    </span>
+                    <span className="flex items-center gap-1.5 shrink-0">
+                      <Clock className="h-3.5 w-3.5" /> {event.time}
+                    </span>
+                    <span className="flex items-center gap-1.5 shrink-0 w-full sm:w-auto mt-1 sm:mt-0">
+                      <Users className="h-3.5 w-3.5" /> {event.capacity}
+>>>>>>> origin/main
                     </span>
                   </div>
                 </div>

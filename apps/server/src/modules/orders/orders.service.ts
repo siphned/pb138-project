@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 import type { Order } from "@repo/shared/schemas";
 import { addresses } from "@repo/shared/schemas";
 import { type Database, db } from "../../db";
@@ -18,6 +19,20 @@ const VALID_TRANSITIONS: Record<string, string[]> = {
   pending: ["confirmed", "cancelled"],
   shipped: ["delivered", "cancelled"],
 };
+=======
+import type { Order, orders } from "@repo/shared/schemas";
+import type { CartWithItems } from "../carts/carts.repository";
+import { type CartsService, cartsService } from "../carts/carts.service";
+import { emailService, type IEmailService } from "../email/email.service";
+import { type IUsersRepository, usersRepository } from "../users/users.repository";
+import {
+  type CreateOrderData,
+  type CreateOrderItem,
+  type IOrdersRepository,
+  type OrderWithItems,
+  ordersRepository,
+} from "./orders.repository";
+>>>>>>> origin/main
 
 export interface CheckoutData {
   guestEmail?: string;
@@ -41,13 +56,27 @@ export interface CheckoutData {
 }
 
 export class OrdersService {
+<<<<<<< HEAD
+=======
+  constructor(
+    private ordersRepo: IOrdersRepository,
+    private cartsService: CartsService,
+    private emailService: IEmailService,
+    private usersRepo: IUsersRepository
+  ) {}
+
+>>>>>>> origin/main
   async afterCheckout(
     order: Order,
     _items: CreateOrderItem[],
     userId?: string,
     data?: CheckoutData
   ) {
+<<<<<<< HEAD
     const orderWithItems = await ordersRepo.findById(db, order.id);
+=======
+    const orderWithItems = await this.ordersRepo.findById(order.id);
+>>>>>>> origin/main
     if (orderWithItems) {
       const emailData = {
         customerName: userId ? "" : data?.guestName || "Guest",
@@ -61,6 +90,7 @@ export class OrdersService {
       };
 
       if (userId) {
+<<<<<<< HEAD
         const user = await usersRepo.findById(db, userId);
         if (user) {
           emailData.customerName = user.fname;
@@ -88,14 +118,32 @@ export class OrdersService {
             },
             "Failed to send order confirmation email to guest"
           );
+=======
+        const user = await this.usersRepo.findById(userId);
+        if (user) {
+          emailData.customerName = user.fname;
+          await this.emailService.sendOrderConfirmation(user.email, emailData).catch(() => {
+            /* ignore */
+          });
+        }
+      } else if (data?.guestEmail) {
+        await this.emailService.sendOrderConfirmation(data.guestEmail, emailData).catch(() => {
+          /* ignore */
+>>>>>>> origin/main
         });
       }
     }
 
     if (userId) {
+<<<<<<< HEAD
       await cartsService.clearCart(userId);
     } else if (order.guestSessionId) {
       await cartsService.clearCartBySession(order.guestSessionId);
+=======
+      await this.cartsService.clearCart(userId);
+    } else if (order.guestSessionId) {
+      await this.cartsService.clearCartBySession(order.guestSessionId);
+>>>>>>> origin/main
     }
   }
 
@@ -103,6 +151,7 @@ export class OrdersService {
     { userId, sessionId }: { userId?: string; sessionId?: string },
     data: CheckoutData
   ): Promise<Order> {
+<<<<<<< HEAD
     let cart: CartWithItems | undefined;
     if (userId) {
       cart = await cartsService.getCartForUser(userId);
@@ -153,6 +202,30 @@ export class OrdersService {
 
       return createdOrder;
     });
+=======
+    const cart = await this.getCart(userId, sessionId);
+    if (!cart || cart.items.length === 0) throw new Error("CART_EMPTY");
+
+    const { items, totalPrice } = this.processCartItems(cart);
+
+    const orderData: CreateOrderData = {
+      billingAddress: data.billingAddress || data.shippingAddress,
+      deliveryType: data.deliveryType,
+      discount: "0.00",
+      guestEmail: data.guestEmail,
+      guestName: data.guestName,
+      guestSessionId: sessionId,
+      paymentMethod: data.paymentMethod,
+      paymentStatus: "pending",
+      shippingAddress: data.shippingAddress,
+      shippingFee: "10.00",
+      status: "pending",
+      totalPrice,
+      userId,
+    };
+
+    const order = await this.ordersRepo.create(orderData, items);
+>>>>>>> origin/main
 
     // Non-blocking operations
     this.afterCheckout(order, items, userId, data).catch(() => {
@@ -162,6 +235,7 @@ export class OrdersService {
     return order;
   }
 
+<<<<<<< HEAD
   async getOrder(id: string, userId: string, isAdmin = false): Promise<OrderWithItems> {
     const order = await ordersRepo.findById(db, id);
     if (!order) throw new Error("NOT_FOUND");
@@ -231,6 +305,22 @@ export class OrdersService {
   }
 
   private validateAndProcessCart(cart: CartWithItems) {
+=======
+  async getCart(userId?: string, sessionId?: string) {
+    if (userId) return await this.cartsService.getCartForUser(userId);
+    if (sessionId) return await this.cartsService.getCartForSession(sessionId);
+    return null;
+  }
+
+  async getOrder(id: string, userId: string): Promise<OrderWithItems> {
+    const order = await this.ordersRepo.findById(id);
+    if (!order) throw new Error("NOT_FOUND");
+    if (order.userId !== userId) throw new Error("FORBIDDEN");
+    return order;
+  }
+
+  processCartItems(cart: CartWithItems) {
+>>>>>>> origin/main
     const items: CreateOrderItem[] = [];
     let subtotal = 0;
 
@@ -254,6 +344,7 @@ export class OrdersService {
 
     const shippingFee = 10;
     const totalPrice = (subtotal + shippingFee).toFixed(2);
+<<<<<<< HEAD
     return { items, totalPrice };
   }
 
@@ -278,3 +369,52 @@ export class OrdersService {
 }
 
 export const ordersService = new OrdersService();
+=======
+
+    return { items, totalPrice };
+  }
+
+  async updateStatus(
+    orderId: string,
+    _userId: string,
+    status: typeof orders.$inferSelect.status
+  ): Promise<Order> {
+    const order = await this.ordersRepo.findById(orderId);
+    if (!order) throw new Error("NOT_FOUND");
+
+    const updated = await this.ordersRepo.updateStatus(orderId, status);
+
+    if (order.userId) {
+      const user = await this.usersRepo.findById(order.userId);
+      if (user) {
+        await this.emailService
+          .sendOrderStatusUpdate(user.email, {
+            orderId: order.id,
+            status: updated.status,
+          })
+          .catch(() => {
+            /* ignore */
+          });
+      }
+    } else if (order.guestEmail) {
+      await this.emailService
+        .sendOrderStatusUpdate(order.guestEmail, {
+          orderId: order.id,
+          status: updated.status,
+        })
+        .catch(() => {
+          /* ignore */
+        });
+    }
+
+    return updated;
+  }
+}
+
+export const ordersService = new OrdersService(
+  ordersRepository,
+  cartsService,
+  emailService,
+  usersRepository
+);
+>>>>>>> origin/main

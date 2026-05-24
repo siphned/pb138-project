@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { Skeleton } from "@/components/ui/skeleton";
 import {
@@ -125,4 +126,15 @@ function OrdersListPage() {
       )}
     </main>
   );
+=======
+import { createFileRoute } from "@tanstack/react-router";
+import { RouteStub } from "./-components/RouteStub";
+
+export const Route = createFileRoute("/_authenticated/orders")({
+  component: OrdersPage,
+});
+
+function OrdersPage() {
+  return <RouteStub title="Order History" />;
+>>>>>>> origin/main
 }

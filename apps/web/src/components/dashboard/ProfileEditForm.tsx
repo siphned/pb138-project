@@ -1,4 +1,8 @@
+<<<<<<< HEAD
 import { UserIcon } from "hugeicons-react";
+=======
+import { User } from "lucide-react";
+>>>>>>> origin/main
 import { type ChangeEvent, type FormEvent, useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import {
@@ -81,7 +85,11 @@ export function ProfileEditForm({ onSuccess, onCancel }: ProfileEditFormProps) {
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div className="space-y-2">
               <Label className="flex items-center gap-2" htmlFor="fname">
+<<<<<<< HEAD
                 <UserIcon className="h-4 w-4" /> First Name
+=======
+                <User className="h-4 w-4" /> First Name
+>>>>>>> origin/main
               </Label>
               <Input
                 className={errors.fname ? "border-destructive focus-visible:ring-destructive" : ""}
@@ -96,7 +104,11 @@ export function ProfileEditForm({ onSuccess, onCancel }: ProfileEditFormProps) {
 
             <div className="space-y-2">
               <Label className="flex items-center gap-2" htmlFor="lname">
+<<<<<<< HEAD
                 <UserIcon className="h-4 w-4" /> Last Name
+=======
+                <User className="h-4 w-4" /> Last Name
+>>>>>>> origin/main
               </Label>
               <Input
                 className={errors.lname ? "border-destructive focus-visible:ring-destructive" : ""}

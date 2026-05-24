@@ -15,7 +15,10 @@ describe("ProfileEditForm", () => {
 
   beforeEach(() => {
     vi.clearAllMocks();
+<<<<<<< HEAD
     mockUpdateUser.mockResolvedValue(undefined);
+=======
+>>>>>>> origin/main
     vi.mocked(useUser).mockReturnValue({
       loading: false,
       refetch: vi.fn(),
@@ -24,6 +27,7 @@ describe("ProfileEditForm", () => {
     } as never);
   });
 
+<<<<<<< HEAD
   describe("Rendering", () => {
     it("renders with initial user data", () => {
       render(<ProfileEditForm />);
@@ -333,5 +337,42 @@ describe("ProfileEditForm", () => {
       const errorMsg = await screen.findByText("First name is required");
       expect(errorMsg).toBeInTheDocument();
     });
+=======
+  it("renders with initial user data", () => {
+    render(<ProfileEditForm />);
+    expect(screen.getByPlaceholderText("John")).toBeDefined();
+    expect(screen.getByPlaceholderText("Doe")).toBeDefined();
+  });
+
+  it("shows validation errors for empty fields", async () => {
+    render(<ProfileEditForm />);
+
+    // Clear fields
+    fireEvent.change(screen.getByLabelText(/first name/i), { target: { value: "" } });
+    fireEvent.change(screen.getByLabelText(/last name/i), { target: { value: "" } });
+
+    fireEvent.click(screen.getByText("Save Changes"));
+
+    expect(await screen.findByText("First name is required")).toBeDefined();
+    expect(await screen.findByText("Last name is required")).toBeDefined();
+  });
+
+  it("calls updateUser and onSuccess on valid submission", async () => {
+    render(<ProfileEditForm onSuccess={mockOnSuccess} />);
+
+    fireEvent.change(screen.getByLabelText(/first name/i), { target: { value: "Jane" } });
+    fireEvent.click(screen.getByText("Save Changes"));
+
+    await waitFor(() => {
+      expect(mockUpdateUser).toHaveBeenCalledWith({ fname: "Jane", lname: "Doe" });
+      expect(mockOnSuccess).toHaveBeenCalled();
+    });
+  });
+
+  it("calls onCancel when cancel button is clicked", () => {
+    render(<ProfileEditForm onCancel={mockOnCancel} />);
+    fireEvent.click(screen.getByText("Cancel"));
+    expect(mockOnCancel).toHaveBeenCalled();
+>>>>>>> origin/main
   });
 });

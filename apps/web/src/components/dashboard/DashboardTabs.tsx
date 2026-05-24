@@ -1,4 +1,8 @@
+<<<<<<< HEAD
 import { Calendar01Icon, DrinkIcon, Package01Icon, ShoppingBag01Icon } from "hugeicons-react";
+=======
+import { Calendar, Package, ShoppingBag, Wine } from "lucide-react";
+>>>>>>> origin/main
 import { Card, CardContent } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Role } from "@/types/roles";
@@ -25,9 +29,15 @@ export function DashboardTabs({ role = Role.winemaker }: DashboardTabsProps) {
             value="main"
           >
             {isCustomer ? (
+<<<<<<< HEAD
               <ShoppingBag01Icon className="h-4 w-4 mr-2" />
             ) : (
               <DrinkIcon className="h-4 w-4 mr-2" />
+=======
+              <ShoppingBag className="h-4 w-4 mr-2" />
+            ) : (
+              <Wine className="h-4 w-4 mr-2" />
+>>>>>>> origin/main
             )}
             {isCustomer ? "Order History" : "My Wines"}
           </TabsTrigger>
@@ -38,7 +48,11 @@ export function DashboardTabs({ role = Role.winemaker }: DashboardTabsProps) {
               className="flex-1 rounded-xl data-[state=active]:bg-background data-[state=active]:shadow-sm"
               value="bundles"
             >
+<<<<<<< HEAD
               <Package01Icon className="h-4 w-4 mr-2" />
+=======
+              <Package className="h-4 w-4 mr-2" />
+>>>>>>> origin/main
               Bundles
             </TabsTrigger>
           )}
@@ -47,7 +61,11 @@ export function DashboardTabs({ role = Role.winemaker }: DashboardTabsProps) {
             className="flex-1 rounded-xl data-[state=active]:bg-background data-[state=active]:shadow-sm"
             value="events"
           >
+<<<<<<< HEAD
             <Calendar01Icon className="h-4 w-4 mr-2" />
+=======
+            <Calendar className="h-4 w-4 mr-2" />
+>>>>>>> origin/main
             Events
           </TabsTrigger>
         </TabsList>

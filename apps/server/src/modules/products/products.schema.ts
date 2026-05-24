@@ -1,10 +1,30 @@
 import { t } from "elysia";
 
+<<<<<<< HEAD
+=======
+export const createProductBody = t.Object({
+  description: t.Optional(t.String({ minLength: 1 })),
+  name: t.String({ maxLength: 255, minLength: 1 }),
+  price: t.String({ pattern: "^\\d+(\\.\\d{1,2})?$" }),
+  quantity: t.Integer({ minimum: 0 }),
+  wineId: t.String({ format: "uuid" }),
+});
+
+export const updateProductBody = t.Object({
+  description: t.Optional(t.Nullable(t.String({ minLength: 1 }))),
+  name: t.Optional(t.String({ maxLength: 255, minLength: 1 })),
+  price: t.Optional(t.String({ pattern: "^\\d+(\\.\\d{1,2})?$" })),
+  quantity: t.Optional(t.Integer({ minimum: 0 })),
+  wineId: t.Optional(t.String({ format: "uuid" })),
+});
+
+>>>>>>> origin/main
 const wineEntry = t.Object({
   quantity: t.Integer({ minimum: 1 }),
   wineId: t.String({ format: "uuid" }),
 });
 
+<<<<<<< HEAD
 export const createProductOrBundleBody = t.Union([
   t.Object({
     description: t.Optional(t.String({ minLength: 1 })),
@@ -23,14 +43,33 @@ export const createProductOrBundleBody = t.Union([
 ]);
 
 export const updateProductOrBundleBody = t.Object({
+=======
+export const createBundleBody = t.Object({
+  description: t.Optional(t.String({ minLength: 1 })),
+  name: t.String({ maxLength: 255, minLength: 1 }),
+  price: t.String({ pattern: "^\\d+(\\.\\d{1,2})?$" }),
+  quantity: t.Integer({ minimum: 0 }),
+  wines: t.Array(wineEntry, { minItems: 2 }),
+});
+
+export const updateBundleBody = t.Object({
+>>>>>>> origin/main
   description: t.Optional(t.Nullable(t.String({ minLength: 1 }))),
   name: t.Optional(t.String({ maxLength: 255, minLength: 1 })),
   price: t.Optional(t.String({ pattern: "^\\d+(\\.\\d{1,2})?$" })),
   quantity: t.Optional(t.Integer({ minimum: 0 })),
+<<<<<<< HEAD
   wineId: t.Optional(t.String({ format: "uuid" })),
   wines: t.Optional(t.Array(wineEntry, { minItems: 2 })),
 });
 
+=======
+  wines: t.Optional(t.Array(wineEntry, { minItems: 2 })),
+});
+
+// ── Catalog (GET /products) ────────────────────────────────────────────────
+
+>>>>>>> origin/main
 const catalogWineType = t.Union([
   t.Literal("still"),
   t.Literal("sparkling"),
@@ -50,6 +89,7 @@ const catalogWineColor = t.Union([
 
 export const getAllProductsQuery = t.Object({
   color: t.Optional(catalogWineColor),
+<<<<<<< HEAD
   containsProductId: t.Optional(t.String({ format: "uuid" })),
   isBundle: t.Optional(t.BooleanString()),
   maxPrice: t.Optional(t.Numeric()),
@@ -59,6 +99,14 @@ export const getAllProductsQuery = t.Object({
   rating: t.Optional(t.Numeric({ maximum: 5, minimum: 1 })),
   region: t.Optional(t.String()),
   shopId: t.Optional(t.String({ format: "uuid" })),
+=======
+  maxPrice: t.Optional(t.Numeric()),
+  minPrice: t.Optional(t.Numeric()),
+  page: t.Optional(t.Integer({ minimum: 1 })),
+  rating: t.Optional(t.Numeric({ maximum: 5, minimum: 1 })),
+  region: t.Optional(t.String()),
+  search: t.Optional(t.String()),
+>>>>>>> origin/main
   sort: t.Optional(
     t.Union([
       t.Literal("newest"),
@@ -68,7 +116,10 @@ export const getAllProductsQuery = t.Object({
     ])
   ),
   type: t.Optional(catalogWineType),
+<<<<<<< HEAD
   wineId: t.Optional(t.String({ format: "uuid" })),
+=======
+>>>>>>> origin/main
 });
 
 const catalogWineItem = t.Object({

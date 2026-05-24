@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 import { Show, useAuth, useClerk, useUser as useClerkUser } from "@clerk/react";
 import {
   Calendar01Icon,
@@ -18,6 +19,23 @@ import { Link, useNavigate } from "@tanstack/react-router";
 import { DrinkIcon } from "hugeicons-react";
 import { useState } from "react";
 import { NavItem } from "@/components/primitives/nav-item";
+=======
+﻿import { Show, useAuth, useClerk, useUser as useClerkUser } from "@clerk/react";
+import { Link, useNavigate } from "@tanstack/react-router";
+import {
+  Calendar,
+  LogOut,
+  Menu,
+  Moon,
+  Package,
+  Search,
+  Settings,
+  ShoppingCart,
+  User as UserIcon,
+  Wine,
+} from "lucide-react";
+import { useState } from "react";
+>>>>>>> origin/main
 import {
   Accordion,
   AccordionContent,
@@ -27,9 +45,13 @@ import {
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
+<<<<<<< HEAD
 import { useTheme, useUser } from "@/context";
 import { useGetShopsMe } from "@/generated/hooks/useGetShopsMe";
 import { useGetWinemakersMe } from "@/generated/hooks/useGetWinemakersMe";
+=======
+import { useUser } from "@/context/UserContext";
+>>>>>>> origin/main
 
 import { Role } from "@/types/roles";
 
@@ -43,6 +65,7 @@ export function Sidebar({ userRoles = [Role.customer], activeRole, onRoleChange 
   const { user } = useUser();
   const { user: clerkUser } = useClerkUser();
   const { isSignedIn } = useAuth();
+<<<<<<< HEAD
   const { signOut } = useClerk();
   const navigate = useNavigate();
   const { theme, toggleTheme } = useTheme();
@@ -64,6 +87,13 @@ export function Sidebar({ userRoles = [Role.customer], activeRole, onRoleChange 
   const winemakerId = winemakerProfile.data?.id;
   const winemakerName = winemakerProfile.data?.name;
   const firstShopId = shopOwnerProfile.data?.[0]?.id;
+=======
+  const { signOut, openUserProfile } = useClerk();
+  const navigate = useNavigate();
+
+  const currentActiveRole = activeRole || userRoles[0];
+  const [accordionState, setAccordionState] = useState<string[]>([]);
+>>>>>>> origin/main
 
   const displayUserName = isSignedIn ? clerkUser?.fullName || "User" : "Guest";
   const fullName = user ? `${user.fname || ""} ${user.lname || ""}`.trim() : "Guest";
@@ -71,21 +101,33 @@ export function Sidebar({ userRoles = [Role.customer], activeRole, onRoleChange 
   const hasMultipleRoles = userRoles.length > 1;
 
   const handleLogout = async () => {
+<<<<<<< HEAD
     closeSheet();
     try {
       await signOut({ redirectUrl: "/" });
     } catch (_error) {
       /* sign-out navigation is optimistic; error here is non-critical */
     }
+=======
+    await signOut();
+>>>>>>> origin/main
     navigate({ to: "/" });
   };
 
   return (
+<<<<<<< HEAD
     <Sheet onOpenChange={setOpen} open={open}>
       <SheetTrigger
         render={
           <Button size="icon" variant="ghost">
             <HugeiconsIcon icon={Menu01Icon} />
+=======
+    <Sheet>
+      <SheetTrigger
+        render={
+          <Button size="icon" variant="ghost">
+            <Menu className="h-6 w-6" />
+>>>>>>> origin/main
           </Button>
         }
       />
@@ -115,7 +157,11 @@ export function Sidebar({ userRoles = [Role.customer], activeRole, onRoleChange 
             <p className="text-sm text-muted-foreground">
               Sign in to manage your wines and orders.
             </p>
+<<<<<<< HEAD
             <Link className="mt-4 block" onClick={closeSheet} to="/auth/login">
+=======
+            <Link className="mt-4 block" to="/auth/login">
+>>>>>>> origin/main
               <Button className="w-full">Sign In</Button>
             </Link>
           </div>
@@ -133,7 +179,11 @@ export function Sidebar({ userRoles = [Role.customer], activeRole, onRoleChange 
                   <AccordionItem className="border-none" value="user-roles">
                     <AccordionTrigger className="flex items-center gap-3 px-3 py-3 rounded-md bg-secondary hover:bg-secondary/80 transition-colors text-sm font-medium hover:no-underline text-primary">
                       <div className="flex items-center gap-3">
+<<<<<<< HEAD
                         <HugeiconsIcon icon={User02Icon} />
+=======
+                        <UserIcon className="h-4 w-4" />
+>>>>>>> origin/main
                         {currentActiveRole}
                       </div>
                     </AccordionTrigger>
@@ -142,8 +192,13 @@ export function Sidebar({ userRoles = [Role.customer], activeRole, onRoleChange 
                         {userRoles
                           .filter((role) => role !== currentActiveRole)
                           .map((role) => (
+<<<<<<< HEAD
                             <Button
                               className="w-full justify-start px-3 py-2 text-sm font-medium rounded-md text-muted-foreground"
+=======
+                            <button
+                              className="w-full text-left px-3 py-2 text-sm font-medium rounded-md hover:bg-secondary/50 text-muted-foreground transition-colors"
+>>>>>>> origin/main
                               key={role}
                               onClick={() => {
                                 setAccordionState([]);
@@ -151,24 +206,39 @@ export function Sidebar({ userRoles = [Role.customer], activeRole, onRoleChange 
                                   onRoleChange(role);
                                 }
                               }}
+<<<<<<< HEAD
                               variant="ghost"
                             >
                               {role}
                             </Button>
+=======
+                              type="button"
+                            >
+                              {role}
+                            </button>
+>>>>>>> origin/main
                           ))}
                       </div>
                     </AccordionContent>
                   </AccordionItem>
                 </Accordion>
               ) : (
+<<<<<<< HEAD
                 <NavItem render={<div />} variant="active">
                   <HugeiconsIcon icon={User02Icon} />
                   {currentActiveRole}
                 </NavItem>
+=======
+                <div className="flex-none flex items-center gap-3 px-3 py-3 rounded-md bg-secondary text-sm font-medium text-primary">
+                  <UserIcon className="h-4 w-4" />
+                  {currentActiveRole}
+                </div>
+>>>>>>> origin/main
               )}
             </Show>
 
             {/* SHARED PUBLIC LINKS */}
+<<<<<<< HEAD
             <NavItem
               className="sm:hidden"
               onClick={closeSheet}
@@ -231,11 +301,58 @@ export function Sidebar({ userRoles = [Role.customer], activeRole, onRoleChange 
               >
                 <HugeiconsIcon icon={User02Icon} /> Profile Settings
               </NavItem>
+=======
+            <Link
+              className="flex-none flex items-center gap-3 px-3 py-3 rounded-md bg-secondary hover:bg-secondary/80 transition-colors text-sm font-medium text-primary sm:hidden"
+              to="/search"
+            >
+              <Search className="h-4 w-4" /> Search
+            </Link>
+
+            <Link
+              className="flex-none flex items-center gap-3 px-3 py-3 rounded-md bg-secondary hover:bg-secondary/80 transition-colors text-sm font-medium text-primary sm:hidden"
+              to="/cart"
+            >
+              <ShoppingCart className="h-4 w-4" /> Shopping cart
+            </Link>
+
+            <Link
+              className="flex-none flex items-center gap-3 px-3 py-3 rounded-md bg-secondary hover:bg-secondary/80 transition-colors text-sm font-medium text-primary"
+              to="/explore"
+            >
+              <Wine className="h-4 w-4" /> Explore Wines
+            </Link>
+
+            <Link
+              className="flex-none flex items-center gap-3 px-3 py-3 rounded-md bg-secondary hover:bg-secondary/80 transition-colors text-sm font-medium text-primary"
+              search={{ page: 1, sort: "newest" }}
+              to="/bundles"
+            >
+              <Package className="h-4 w-4" /> Bundles
+            </Link>
+
+            <Link
+              className="flex-none flex items-center gap-3 px-3 py-3 rounded-md bg-secondary hover:bg-secondary/80 transition-colors text-sm font-medium text-primary"
+              to="/events"
+            >
+              <Calendar className="h-4 w-4" /> Events
+            </Link>
+
+            <Show when="signed-in">
+              <button
+                className="flex-none flex items-center gap-3 px-3 py-3 rounded-md hover:bg-secondary/50 transition-colors text-sm font-medium text-muted-foreground mt-2"
+                onClick={() => openUserProfile()}
+                type="button"
+              >
+                <Settings className="h-4 w-4" /> Settings
+              </button>
+>>>>>>> origin/main
             </Show>
           </nav>
         </div>
 
         <div className="flex-none border-t pt-4 pb-6 px-6 flex flex-col gap-1 bg-background z-10">
+<<<<<<< HEAD
           <Button
             className="flex items-center justify-between px-3 py-2 rounded-md text-sm font-medium text-muted-foreground w-full"
             onClick={toggleTheme}
@@ -250,12 +367,31 @@ export function Sidebar({ userRoles = [Role.customer], activeRole, onRoleChange 
             <NavItem className="mt-2 w-full text-left" onClick={handleLogout} variant="destructive">
               <HugeiconsIcon icon={LogoutSquare02Icon} /> Log out
             </NavItem>
+=======
+          <button
+            className="flex items-center justify-between px-3 py-2 rounded-md hover:bg-secondary/50 transition-colors text-sm font-medium text-muted-foreground w-full text-left"
+            type="button"
+          >
+            Theme
+            <Moon className="h-4 w-4" />
+          </button>
+
+          <Show when="signed-in">
+            <button
+              className="flex items-center gap-3 px-3 py-2 rounded-md hover:bg-destructive/10 transition-colors text-sm font-medium text-muted-foreground hover:text-destructive mt-2 w-full text-left"
+              onClick={handleLogout}
+              type="button"
+            >
+              <LogOut className="h-4 w-4" /> Log out
+            </button>
+>>>>>>> origin/main
           </Show>
         </div>
       </SheetContent>
     </Sheet>
   );
 }
+<<<<<<< HEAD
 
 interface RoleNavItemsProps {
   role: Role;
@@ -333,3 +469,5 @@ function RoleNavItems({
 
   return null;
 }
+=======
+>>>>>>> origin/main

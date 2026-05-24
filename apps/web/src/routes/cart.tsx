@@ -1,16 +1,21 @@
 import { createFileRoute } from "@tanstack/react-router";
+<<<<<<< HEAD
 import { AlertCircleIcon, Loading01Icon } from "hugeicons-react";
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { useGetCarts } from "@/generated/hooks/useGetCarts";
 import { CartSection } from "./-components/cart/CartSection";
 import { CheckoutSection } from "./-components/cart/CheckoutSection";
+=======
+import { RouteStub } from "./-components/RouteStub";
+>>>>>>> origin/main
 
 export const Route = createFileRoute("/cart")({
   component: CartPage,
 });
 
 function CartPage() {
+<<<<<<< HEAD
   const { data: cart, isLoading, isError, error } = useGetCarts();
   const cartData = cart ?? null;
   const [deliveryType, setDeliveryType] = useState<"pickup" | "shipping">("shipping");
@@ -60,4 +65,7 @@ function CartPage() {
       </div>
     </div>
   );
+=======
+  return <RouteStub title="Shopping Cart" />;
+>>>>>>> origin/main
 }
