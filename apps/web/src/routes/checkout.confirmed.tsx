@@ -9,7 +9,28 @@ import { buttonVariants } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
 import { useGetOrdersById } from "@/generated/hooks/useGetOrdersById";
+import type { GetOrdersById200 } from "@/generated/types/GetOrdersById";
 import { cn } from "@/lib/utils";
+
+type OrderItem = {
+  id: string;
+  quantity: number;
+  unitPriceAtPurchase: string;
+  product: { name: string };
+};
+
+type OrderAddress = {
+  street: string;
+  houseNumber: string;
+  postalCode: string;
+  city: string;
+  country: string;
+};
+
+type OrderDetail = GetOrdersById200 & {
+  items: OrderItem[];
+  shippingAddress: OrderAddress;
+};
 
 export const Route = createFileRoute("/checkout/confirmed")({
   component: CheckoutConfirmedPage,
@@ -21,12 +42,13 @@ export const Route = createFileRoute("/checkout/confirmed")({
 function CheckoutConfirmedPage() {
   const { orderId } = Route.useSearch();
   const {
-    data: order,
+    data,
     isLoading,
     isError,
     error,
     refetch,
   } = useGetOrdersById(orderId || undefined);
+  const order = data as OrderDetail | undefined;
 
   if (!orderId) {
     return (
