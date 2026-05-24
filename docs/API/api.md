@@ -155,36 +155,122 @@ This document specifies all REST API endpoints for the WineMarket platform. Each
 ---
 
 ## Module: ADMIN
-**Responsibility**: Back-office administration
+**Responsibility**: Back-office administration, moderation, user management
 
 | Method | Path | Description | Auth |
 |--------|------|---|---|
 | GET | `/admin/users` | List users (filterable by status/role) | ✅ (Admin) |
 | PATCH | `/admin/users/:id/status` | Set user status (active/suspended/banned) | ✅ (Admin) |
 | GET | `/admin/events` | List events by status (default: pending) | ✅ (Admin) |
-| PATCH | `/admin/events/:id/status` | Approve or reject a pending event | ✅ (Admin) |
+| POST | `/admin/events/:id/approve` | Approve a pending event | ✅ (Admin) |
+| POST | `/admin/events/:id/reject` | Reject a pending event | ✅ (Admin) |
 | GET | `/admin/reviews` | List all reviews (product + winemaker) | ✅ (Admin) |
-| DELETE | `/admin/reviews/:id` | Soft-delete a review (?type=product\|winemaker) | ✅ (Admin) |
+| DELETE | `/admin/reviews/:id` | Soft-delete a review | ✅ (Admin) |
+
+---
+
+## Module: STATS
+**Responsibility**: Role-scoped analytics and business metrics
+
+| Method | Path | Description | Auth |
+|--------|------|---|---|
+| GET | `/stats` | Get metrics by role (winemaker, shop_owner, admin) | ✅ |
+
+**Response includes**:
+- For **winemakers**: Total wines, events, attendees, rating
+- For **shop owners**: Total shops, products, orders (pending/shipped/delivered), revenue
+- For **admins**: Total users, events (pending/approved), reviews (visible/hidden)
+
+---
+
+## Module: SUPPLY AGREEMENTS
+**Responsibility**: B2B supply relationships between winemakers and shop owners
+
+| Method | Path | Description | Auth |
+|--------|------|---|---|
+| POST | `/supply-agreements` | Create supply agreement (shop owner requests wine) | ✅ (SHOP_OWNER) |
+| GET | `/supply-agreements` | List all supply agreements (admin) | ✅ (Admin) |
+| GET | `/supply-agreements/winemaker` | List my pending requests (winemaker) | ✅ (WINEMAKER) |
+| PATCH | `/supply-agreements/:id` | Approve/reject supply request | ✅ (WINEMAKER) |
+
+---
+
+## Module: GUEST SESSIONS
+**Responsibility**: Server-side anonymous session management
+
+| Method | Path | Description | Auth |
+|--------|------|---|---|
+| POST | `/guest-sessions` | Create anonymous session (returns cookie) | ❌ |
+| GET | `/guest-sessions/me` | Get current session info | ❌ |
+
+**Notes**: Guest session ID is set as `guest_session_id` cookie. Cart is stored per session. On login, guest cart merges into user cart.
+
+---
+
+## Module: IMAGES
+**Responsibility**: Image upload and asset management
+
+| Method | Path | Description | Auth |
+|--------|------|---|---|
+| POST | `/images` | Upload image (multipart/form-data) | ✅ |
+| GET | `/images/:id` | Download image by ID | ❌ |
+| DELETE | `/images/:id` | Delete image | ✅ (own) |
 
 ---
 
 ## Standard HTTP Status Codes
 
-| Code | Meaning |
-|------|---------|
-| 200 | OK |
-| 201 | Created |
-| 400 | Bad Request |
-| 401 | Unauthorized |
-| 403 | Forbidden |
-| 404 | Not Found |
-| 409 | Conflict |
-| 500 | Internal Server Error |
+| Code | Meaning | Common Cause |
+|------|---------|--------------|
+| 200 | OK | Successful request |
+| 201 | Created | Resource created |
+| 204 | No Content | Deletion successful |
+| 400 | Bad Request | Invalid input (validation error) |
+| 401 | Unauthorized | Missing/invalid JWT |
+| 403 | Forbidden | User lacks required role |
+| 404 | Not Found | Resource doesn't exist |
+| 410 | Gone | Resource was deleted (e.g., product) |
+| 422 | Unprocessable Entity | Business logic error (e.g., insufficient stock) |
+| 500 | Internal Server Error | Unexpected server error |
+
+---
+
+## Example Request/Response
+
+### Create Wine (POST /wines)
+```bash
+curl -X POST http://localhost:3000/wines \
+  -H "Authorization: Bearer <clerk-jwt>" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "name": "Château Margaux 2015",
+    "type": "Red",
+    "color": "Red",
+    "region": "Bordeaux",
+    "country": "France",
+    "vintageYear": 2015,
+    "description": "...",
+    "alcohol": 13.5,
+    "volume": 750,
+    "imageId": "..."
+  }'
+```
+
+### Response
+```json
+{
+  "id": "wine_123",
+  "name": "Château Margaux 2015",
+  "winemakerId": "winemaker_abc",
+  "createdAt": "2026-05-24T10:30:00Z"
+}
+```
 
 ---
 
 ## Revision History
 - **v1.0** (Week 6) — Initial API design from PRD requirements
-- **v1.1** (Week 9, WINE-79) — Admin module: event moderation moved from /events to /admin/events; user deactivate replaced with full status lifecycle (active/suspended/banned); review admin endpoints added under /admin/reviews; role-request admin routes removed (live at /role-requests without prefix); GET /admin/statistics deferred
-- **v1.2** (Week 10, WINE-65) — Carts & Orders implemented: paths changed from /cart to /carts/me; PUT replaces PATCH for item updates; guest cart is localStorage-only (no server sessions) with POST /carts/merge for login sync; order status update is per-item (PUT /orders/:id/items/:itemId/status) not per-order; /shops/:id/orders and DELETE /cart (clear) not implemented
-- **v1.3** (Week 10, WINE-148) — Synchronized with actual implementation: removed outdated AUTH module (using Clerk); moved /auth/me to /users/me; updated /carts to support server-side guest sessions; added /winemakers/me; added /role-requests root routes.
+- **v1.1** (Week 9) — Admin module restructured; event approval moved to /admin/events; role-requests separated
+- **v1.2** (Week 10) — Carts & Orders implemented with server-side guest sessions
+- **v1.3** (Week 10) — Synchronized with actual implementation (Clerk auth, /users/me, etc.)
+- **v1.4** (Week 12) — Complete endpoint inventory; added supply-agreements, stats, guest-sessions, images modules
