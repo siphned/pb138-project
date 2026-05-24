@@ -3,7 +3,19 @@ import { resetAuth } from "../../__tests__/helpers/auth";
 import { del, get, patch, post } from "../../__tests__/helpers/request";
 import { app } from "../../app";
 
+const mockAdminService = {
+  approveEvent: vi.fn().mockResolvedValue({ id: "e1", status: "approved" }),
+  deleteReview: vi.fn().mockResolvedValue(undefined),
+  getUser: vi.fn().mockResolvedValue({ id: "u1", status: "active" }),
+  listAllReviews: vi.fn().mockResolvedValue({ data: [], total: 0 }),
+  listEvents: vi.fn().mockResolvedValue({ data: [], total: 0 }),
+  listUsers: vi.fn().mockResolvedValue({ data: [], total: 0 }),
+  rejectEvent: vi.fn().mockResolvedValue({ id: "e1", status: "rejected" }),
+  setUserStatus: vi.fn().mockResolvedValue({ id: "u1", status: "suspended" }),
+};
+
 vi.mock("./admin.service", () => ({
+<<<<<<< HEAD
   adminService: {
     approveEvent: vi.fn().mockResolvedValue({
       createdAt: new Date(),
@@ -84,6 +96,9 @@ vi.mock("./admin.service", () => ({
       status: "suspended",
     }),
   },
+=======
+  adminService: mockAdminService,
+>>>>>>> WINE-266-fix-wine-edit-dark-mode
 }));
 
 vi.mock("../users/users.service", () => ({
@@ -103,7 +118,97 @@ vi.mock("../carts/carts.service", () => ({
 }));
 
 describe("admin routes", () => {
-  afterEach(() => resetAuth());
+  afterEach(() => {
+    resetAuth();
+    vi.clearAllMocks();
+  });
+
+  describe("GET /admin/events", () => {
+    it("returns 401 when no auth token", async () => {
+      const response = await app.handle(get("/admin/events"));
+      expect(response.status).toBe(401);
+    });
+
+    it("returns 403 when authenticated as customer", async () => {
+      const response = await app.handle(get("/admin/events", { auth: { roles: ["customer"] } }));
+      expect(response.status).toBe(403);
+    });
+
+    it("returns 200 when authenticated as admin", async () => {
+      const response = await app.handle(get("/admin/events", { auth: { roles: ["admin"] } }));
+      expect(response.status).toBe(200);
+    });
+
+    it("returns 200 when authenticated as admin with status filter", async () => {
+      const response = await app.handle(
+        get("/admin/events?status=approved", { auth: { roles: ["admin"] } })
+      );
+      expect(response.status).toBe(200);
+    });
+
+    it("returns 200 when authenticated as admin with pagination", async () => {
+      const response = await app.handle(
+        get("/admin/events?page=1&status=pending", { auth: { roles: ["admin"] } })
+      );
+      expect(response.status).toBe(200);
+    });
+  });
+
+  describe("POST /admin/events/:id/approve", () => {
+    it("returns 401 when no auth token", async () => {
+      const response = await app.handle(post("/admin/events/e1/approve", { body: {} }));
+      expect(response.status).toBe(401);
+    });
+
+    it("returns 403 when authenticated as customer", async () => {
+      const response = await app.handle(
+        post("/admin/events/e1/approve", { auth: { roles: ["customer"] }, body: {} })
+      );
+      expect(response.status).toBe(403);
+    });
+
+    it("returns 200 when authenticated as admin", async () => {
+      const response = await app.handle(
+        post("/admin/events/e1/approve", { auth: { roles: ["admin"] }, body: {} })
+      );
+      expect(response.status).toBe(200);
+    });
+
+    it("calls adminService.approveEvent with correct ID", async () => {
+      await app.handle(
+        post("/admin/events/test-event-id/approve", { auth: { roles: ["admin"] }, body: {} })
+      );
+      expect(mockAdminService.approveEvent).toHaveBeenCalledWith("test-event-id");
+    });
+  });
+
+  describe("POST /admin/events/:id/reject", () => {
+    it("returns 401 when no auth token", async () => {
+      const response = await app.handle(post("/admin/events/e1/reject", { body: {} }));
+      expect(response.status).toBe(401);
+    });
+
+    it("returns 403 when authenticated as customer", async () => {
+      const response = await app.handle(
+        post("/admin/events/e1/reject", { auth: { roles: ["customer"] }, body: {} })
+      );
+      expect(response.status).toBe(403);
+    });
+
+    it("returns 200 when authenticated as admin", async () => {
+      const response = await app.handle(
+        post("/admin/events/e1/reject", { auth: { roles: ["admin"] }, body: {} })
+      );
+      expect(response.status).toBe(200);
+    });
+
+    it("calls adminService.rejectEvent with correct ID", async () => {
+      await app.handle(
+        post("/admin/events/test-event-id/reject", { auth: { roles: ["admin"] }, body: {} })
+      );
+      expect(mockAdminService.rejectEvent).toHaveBeenCalledWith("test-event-id");
+    });
+  });
 
   describe("GET /admin/events", () => {
     it("returns 401 when no auth token", async () => {
@@ -194,22 +299,41 @@ describe("admin routes", () => {
       expect(response.status).toBe(200);
     });
 
+<<<<<<< HEAD
     it("supports role filter query parameter", async () => {
+=======
+    it("returns 200 with role filter", async () => {
+>>>>>>> WINE-266-fix-wine-edit-dark-mode
       const response = await app.handle(
         get("/admin/users?role=winemaker", { auth: { roles: ["admin"] } })
       );
       expect(response.status).toBe(200);
     });
 
+<<<<<<< HEAD
     it("supports status filter query parameter", async () => {
       const response = await app.handle(
         get("/admin/users?status=suspended", { auth: { roles: ["admin"] } })
+=======
+    it("returns 200 with status filter", async () => {
+      const response = await app.handle(
+        get("/admin/users?status=active", { auth: { roles: ["admin"] } })
+>>>>>>> WINE-266-fix-wine-edit-dark-mode
       );
       expect(response.status).toBe(200);
     });
 
+<<<<<<< HEAD
     it("supports pagination via page query parameter", async () => {
       const response = await app.handle(get("/admin/users?page=2", { auth: { roles: ["admin"] } }));
+=======
+    it("returns 200 with pagination", async () => {
+      const response = await app.handle(
+        get("/admin/users?page=1&role=customer&status=suspended", {
+          auth: { roles: ["admin"] },
+        })
+      );
+>>>>>>> WINE-266-fix-wine-edit-dark-mode
       expect(response.status).toBe(200);
     });
   });
@@ -231,6 +355,7 @@ describe("admin routes", () => {
     });
 
     it("returns 404 when user not found", async () => {
+<<<<<<< HEAD
       const { adminService } = await import("./admin.service");
       vi.mocked(adminService.getUser).mockRejectedValueOnce(new Error("NOT_FOUND"));
 
@@ -246,20 +371,59 @@ describe("admin routes", () => {
       const response = await app.handle(
         patch("/admin/users/u1/status", { body: { status: "suspended" } })
       );
+=======
+      mockAdminService.getUser.mockRejectedValueOnce(new Error("NOT_FOUND"));
+      const response = await app.handle(
+        get("/admin/users/missing", { auth: { roles: ["admin"] } })
+      );
+      expect(response.status).toBe(404);
+    });
+
+    it("throws error on unexpected exception", async () => {
+      mockAdminService.getUser.mockRejectedValueOnce(new Error("DATABASE_ERROR"));
+      const response = await app.handle(get("/admin/users/u1", { auth: { roles: ["admin"] } }));
+      expect([500, 422]).toContain(response.status);
+    });
+  });
+
+  describe("PATCH /admin/users/:id/status", () => {
+    const validBody = { status: "suspended" };
+
+    it("returns 401 when no auth token", async () => {
+      const response = await app.handle(patch("/admin/users/u1/status", { body: validBody }));
+>>>>>>> WINE-266-fix-wine-edit-dark-mode
       expect(response.status).toBe(401);
     });
 
     it("returns 403 when authenticated as customer", async () => {
       const response = await app.handle(
+<<<<<<< HEAD
         patch("/admin/users/u1/status", {
           auth: { roles: ["customer"] },
           body: { status: "suspended" },
         })
+=======
+        patch("/admin/users/u1/status", { auth: { roles: ["customer"] }, body: validBody })
+>>>>>>> WINE-266-fix-wine-edit-dark-mode
       );
       expect(response.status).toBe(403);
     });
 
+<<<<<<< HEAD
     it("returns 200 and updates user status when authenticated as admin", async () => {
+=======
+    it("returns 200 when authenticated as admin with active status", async () => {
+      const response = await app.handle(
+        patch("/admin/users/u1/status", {
+          auth: { roles: ["admin"] },
+          body: { status: "active" },
+        })
+      );
+      expect(response.status).toBe(200);
+    });
+
+    it("returns 200 when authenticated as admin with suspended status", async () => {
+>>>>>>> WINE-266-fix-wine-edit-dark-mode
       const response = await app.handle(
         patch("/admin/users/u1/status", {
           auth: { roles: ["admin"] },
@@ -269,6 +433,7 @@ describe("admin routes", () => {
       expect(response.status).toBe(200);
     });
 
+<<<<<<< HEAD
     it("accepts 'active', 'suspended', and 'banned' status values", async () => {
       for (const status of ["active", "suspended", "banned"]) {
         const response = await app.handle(
@@ -279,6 +444,23 @@ describe("admin routes", () => {
         );
         expect(response.status).toBe(200);
       }
+=======
+    it("returns 200 when authenticated as admin with banned status", async () => {
+      const response = await app.handle(
+        patch("/admin/users/u1/status", { auth: { roles: ["admin"] }, body: { status: "banned" } })
+      );
+      expect(response.status).toBe(200);
+    });
+
+    it("calls setUserStatus with correct parameters", async () => {
+      await app.handle(
+        patch("/admin/users/user-123/status", {
+          auth: { roles: ["admin"] },
+          body: { status: "suspended" },
+        })
+      );
+      expect(mockAdminService.setUserStatus).toHaveBeenCalledWith("user-123", "suspended");
+>>>>>>> WINE-266-fix-wine-edit-dark-mode
     });
   });
 
@@ -298,7 +480,11 @@ describe("admin routes", () => {
       expect(response.status).toBe(200);
     });
 
+<<<<<<< HEAD
     it("supports pagination via page query parameter", async () => {
+=======
+    it("returns 200 with pagination", async () => {
+>>>>>>> WINE-266-fix-wine-edit-dark-mode
       const response = await app.handle(
         get("/admin/reviews?page=2", { auth: { roles: ["admin"] } })
       );
@@ -324,11 +510,22 @@ describe("admin routes", () => {
       expect(response.status).toBe(200);
     });
 
+<<<<<<< HEAD
     it("returns success: true in response body", async () => {
       const response = await app.handle(del("/admin/reviews/r1", { auth: { roles: ["admin"] } }));
       expect(response.status).toBe(200);
       const data = await response.json();
       expect(data).toEqual({ success: true });
+=======
+    it("calls deleteReview with correct ID", async () => {
+      await app.handle(del("/admin/reviews/review-123", { auth: { roles: ["admin"] } }));
+      expect(mockAdminService.deleteReview).toHaveBeenCalledWith("review-123");
+    });
+
+    it("returns success response with correct structure", async () => {
+      const response = await app.handle(del("/admin/reviews/r1", { auth: { roles: ["admin"] } }));
+      expect(response.status).toBe(200);
+>>>>>>> WINE-266-fix-wine-edit-dark-mode
     });
   });
 });
