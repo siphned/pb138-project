@@ -5,8 +5,6 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { ProductDetailsCard } from "@/components/catalog/ProductDetailsCard";
 import { ErrorState } from "@/components/primitives/error-state";
 import { LoadingState } from "@/components/primitives/loading-state";
-import { PageHeader } from "@/components/primitives/page-header";
-import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 import { getCartsQueryKey } from "@/generated/hooks/useGetCarts";
 import { useGetProductsById } from "@/generated/hooks/useGetProductsById";
@@ -17,12 +15,6 @@ import { ProductReviewsSection } from "./-components/ProductReviewsSection";
 export const Route = createFileRoute("/products/$productId")({
   component: ProductDetailPage,
 });
-
-function stockBadge(quantity: number) {
-  if (quantity === 0) return { label: "Out of stock", variant: "destructive" as const };
-  if (quantity <= 5) return { label: `Only ${quantity} left`, variant: "warning" as const };
-  return { label: "In stock", variant: "success" as const };
-}
 
 function ProductDetailPage() {
   const { productId } = Route.useParams();
@@ -57,8 +49,6 @@ function ProductDetailPage() {
     );
   }
 
-  const stock = stockBadge(product.quantity);
-
   return (
     <div className="container mx-auto space-y-8 px-6 py-8 lg:px-12">
       <Link
@@ -68,27 +58,6 @@ function ProductDetailPage() {
         <HugeiconsIcon className="h-4 w-4" icon={ArrowLeft02Icon} />
         All products
       </Link>
-
-      <div className="space-y-3">
-        <PageHeader title={product.name} />
-        <div className="flex flex-wrap items-center gap-3 text-sm text-muted-foreground">
-          {product.shop && (
-            <>
-              <span>Sold by</span>
-              <Link
-                className="font-medium text-foreground transition-colors hover:text-primary"
-                params={{ id: product.shop.id }}
-                to="/shops/$id"
-              >
-                {product.shop.name}
-              </Link>
-            </>
-          )}
-          <span className="text-muted-foreground/40">·</span>
-          <Badge variant={stock.variant}>{stock.label}</Badge>
-          {product.isBundle && <Badge variant="secondary">Bundle</Badge>}
-        </div>
-      </div>
 
       <div className="space-y-12">
         <ProductDetailsCard

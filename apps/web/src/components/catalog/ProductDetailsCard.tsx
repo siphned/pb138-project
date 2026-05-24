@@ -7,9 +7,9 @@ import { HugeiconsIcon } from "@hugeicons/react";
 import { Link } from "@tanstack/react-router";
 import { useState } from "react";
 import { DataGrid } from "@/components/primitives/data-grid";
-import { DescriptionList, PropertyRow } from "@/components/primitives/description-list";
 import { Section } from "@/components/primitives/section";
 import { ShowOwner } from "@/components/primitives/show-owner";
+import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import {
@@ -118,6 +118,12 @@ function QuantityStepper({
   );
 }
 
+function stockBadge(quantity: number) {
+  if (quantity === 0) return { label: "Out of stock", variant: "destructive" as const };
+  if (quantity <= 5) return { label: `Only ${quantity} left`, variant: "warning" as const };
+  return { label: "In stock", variant: "success" as const };
+}
+
 export function ProductDetailsCard({
   product,
   onAddToCart,
@@ -133,68 +139,81 @@ export function ProductDetailsCard({
   // biome-ignore lint/suspicious/noExplicitAny: GetProductsById200 is `any` in OpenAPI (BE follow-up)
   const firstWineColor = (product.productWines as any)?.[0]?.wine?.color;
   const outOfStock = product.quantity === 0;
+  const stock = stockBadge(product.quantity);
+  const clampedQuantity = Math.min(quantity, Math.max(1, product.quantity));
 
   return (
     <div className="space-y-8">
-      <Section heading="About this product">
-        <Card variant="default">
-          <CardContent className="grid grid-cols-1 gap-8 md:grid-cols-[1fr_2fr]">
-            <ProductImageCarousel
-              fallbackColor={firstWineColor}
-              name={product.name}
-              productId={product.id}
-            />
-            <div className="space-y-6">
-              <DescriptionList>
-                <PropertyRow label="Price" value={price} />
-                <PropertyRow
-                  label="Availability"
-                  value={outOfStock ? "Out of stock" : `${product.quantity} in stock`}
-                />
-                <PropertyRow
-                  label="Type"
-                  value={product.isBundle ? "Bundle" : "Single Product"}
-                />
-              </DescriptionList>
-
-              {product.description && (
-                <>
-                  <Separator />
-                  <div className="space-y-2">
-                    <p className="text-xs font-bold uppercase tracking-widest text-muted-foreground">
-                      Description
-                    </p>
-                    <p className="text-sm leading-relaxed text-foreground">
-                      {product.description}
-                    </p>
-                  </div>
-                </>
-              )}
-
-              <Separator />
-
-              <div className="flex flex-wrap items-center gap-4">
-                <QuantityStepper
-                  disabled={outOfStock || isAddingToCart}
-                  max={product.quantity}
-                  onChange={setQuantity}
-                  value={Math.min(quantity, Math.max(1, product.quantity))}
-                />
-                <Button
-                  className="flex-1 sm:flex-none"
-                  disabled={isAddingToCart || outOfStock}
-                  onClick={() => onAddToCart(quantity)}
-                >
-                  <HugeiconsIcon className="mr-2 h-4 w-4" icon={ShoppingCart01Icon} />
-                  {isAddingToCart ? "Adding..." : `Add ${quantity} to cart`}
-                </Button>
-              </div>
+      <Card variant="default">
+        <CardContent className="grid grid-cols-1 gap-8 md:grid-cols-[1fr_2fr]">
+          <ProductImageCarousel
+            fallbackColor={firstWineColor}
+            name={product.name}
+            productId={product.id}
+          />
+          <div className="flex flex-col gap-5">
+            <div className="flex flex-wrap items-center gap-2">
+              {product.isBundle && <Badge variant="secondary">Bundle</Badge>}
+              <Badge variant={stock.variant}>{stock.label}</Badge>
             </div>
-          </CardContent>
-        </Card>
-      </Section>
 
-      {product.productWines && product.productWines.length > 0 && (
+            <div className="space-y-1">
+              <h1 className="font-heading text-3xl font-bold leading-tight tracking-tight text-foreground sm:text-4xl">
+                {product.name}
+              </h1>
+              {product.shop && (
+                <p className="text-sm text-muted-foreground">
+                  Sold by{" "}
+                  <Link
+                    className="font-medium text-foreground transition-colors hover:text-primary"
+                    params={{ id: product.shop.id }}
+                    to="/shops/$id"
+                  >
+                    {product.shop.name}
+                  </Link>
+                </p>
+              )}
+            </div>
+
+            <p className="font-heading text-3xl font-bold text-foreground">{price}</p>
+
+            {product.description && (
+              <>
+                <Separator />
+                <div className="space-y-2">
+                  <p className="text-xs font-bold uppercase tracking-widest text-muted-foreground">
+                    Description
+                  </p>
+                  <p className="text-sm leading-relaxed text-foreground">
+                    {product.description}
+                  </p>
+                </div>
+              </>
+            )}
+
+            <Separator />
+
+            <div className="flex flex-wrap items-center gap-4">
+              <QuantityStepper
+                disabled={outOfStock || isAddingToCart}
+                max={product.quantity}
+                onChange={setQuantity}
+                value={clampedQuantity}
+              />
+              <Button
+                className="flex-1 sm:flex-none"
+                disabled={isAddingToCart || outOfStock}
+                onClick={() => onAddToCart(clampedQuantity)}
+              >
+                <HugeiconsIcon className="mr-2 h-4 w-4" icon={ShoppingCart01Icon} />
+                {isAddingToCart ? "Adding..." : `Add ${clampedQuantity} to cart`}
+              </Button>
+            </div>
+          </div>
+        </CardContent>
+      </Card>
+
+      {product.isBundle && product.productWines && product.productWines.length > 0 && (
         <Section heading="Wines in this product">
           <DataGrid variant="catalog">
             {
