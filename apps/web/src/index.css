@@ -1,6 +1,9 @@
 @import "tailwindcss";
 @import "tw-animate-css";
+<<<<<<< HEAD
+=======
 /* @import "shadcn/tailwind.css"; */
+>>>>>>> origin/main
 
 @import "@fontsource-variable/source-sans-3";
 @import "@fontsource-variable/playfair-display";
@@ -208,10 +211,17 @@
 
 @utility stretched-link {
   &::after {
+<<<<<<< HEAD
+    position: absolute;
+    inset: 0;
+    z-index: 1;
+    content: "";
+=======
     content: "";
     position: absolute;
     inset: 0;
     z-index: 1;
+>>>>>>> origin/main
   }
 }
 
@@ -222,3 +232,14 @@
 @utility aspect-shop-hero-mobile {
   aspect-ratio: 4 / 3;
 }
+<<<<<<< HEAD
+
+@utility no-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+  &::-webkit-scrollbar {
+    display: none;
+  }
+}
+=======
+>>>>>>> origin/main

@@ -1,0 +1,61 @@
+import { ArrowLeft02Icon } from "@hugeicons/core-free-icons";
+import { HugeiconsIcon } from "@hugeicons/react";
+import { createFileRoute, Link } from "@tanstack/react-router";
+import { WineDetailsCard } from "@/components/catalog/WineDetailsCard";
+import { ErrorState } from "@/components/primitives/error-state";
+import { LoadingState } from "@/components/primitives/loading-state";
+import { Separator } from "@/components/ui/separator";
+import { useGetWinesById } from "@/generated/hooks/useGetWinesById";
+import { EntityReviewsSection } from "./-components/EntityReviewsSection";
+import { WinesAvailableInShops } from "./-components/WinesAvailableInShops";
+
+export const Route = createFileRoute("/wines/$id")({
+  component: WineDetailPage,
+});
+
+function WineDetailPage() {
+  const { id } = Route.useParams();
+  const { data: wine, isLoading, isError, refetch } = useGetWinesById(id);
+
+  if (isLoading) {
+    return (
+      <div className="container mx-auto px-6 py-8 lg:px-12">
+        <LoadingState variant="detail" />
+      </div>
+    );
+  }
+
+  if (isError || !wine) {
+    return (
+      <div className="container mx-auto px-6 py-8 lg:px-12">
+        <ErrorState onRetry={() => refetch()} />
+      </div>
+    );
+  }
+
+  return (
+    <div className="container mx-auto space-y-12 px-6 py-8 lg:px-12">
+      <Link
+        className="inline-flex items-center gap-2 text-sm text-muted-foreground transition-colors hover:text-foreground"
+        to="/explore"
+      >
+        <HugeiconsIcon className="h-4 w-4" icon={ArrowLeft02Icon} />
+        Back to explore
+      </Link>
+
+      <div className="grid grid-cols-1 gap-12 lg:grid-cols-[1fr_400px]">
+        <div className="space-y-12">
+          <WineDetailsCard wine={wine} />
+
+          <Separator />
+
+          <WinesAvailableInShops wineId={id} />
+        </div>
+
+        <aside className="space-y-12">
+          <EntityReviewsSection entityId={id} entityType="wine" />
+        </aside>
+      </div>
+    </div>
+  );
+}

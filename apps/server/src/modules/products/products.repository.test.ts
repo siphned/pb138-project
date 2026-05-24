@@ -1,3 +1,21 @@
+<<<<<<< HEAD
+import { products, productWines, wines } from "@repo/shared/schemas";
+import { beforeEach, describe, expect, it, vi } from "vitest";
+import { db } from "../../db";
+import * as productsRepo from "./products.repository";
+
+interface MockChained {
+  as: () => MockChained;
+  for: () => Promise<unknown[]>;
+  from: () => MockChained;
+  groupBy: () => MockChained;
+  having: () => MockChained;
+  innerJoin: () => MockChained;
+  leftJoin: () => MockChained;
+  limit: () => MockChained;
+  offset: () => MockChained;
+  orderBy: () => MockChained;
+=======
 import { products, wines } from "@repo/shared/schemas";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { db } from "../../db";
@@ -7,10 +25,15 @@ interface MockChained {
   from: () => MockChained;
   where: () => MockChained;
   for: () => Promise<unknown[]>;
+>>>>>>> origin/main
   returning: () => Promise<unknown[]>;
   values: () => MockChained;
   onConflictDoUpdate: () => MockChained;
   set: () => MockChained;
+<<<<<<< HEAD
+  where: () => MockChained;
+=======
+>>>>>>> origin/main
 }
 
 interface MockDatabase {
@@ -22,6 +45,18 @@ interface MockDatabase {
   onConflictDoUpdate: () => MockChained;
   set: () => MockChained;
   where: () => MockChained;
+<<<<<<< HEAD
+  query: {
+    products: {
+      findFirst: unknown;
+      findMany: unknown;
+    };
+    wines: {
+      findMany: unknown;
+    };
+  };
+=======
+>>>>>>> origin/main
 }
 
 const mockDb = db as unknown as MockDatabase;
@@ -45,6 +80,12 @@ vi.mock("../../db", () => {
         findFirst: vi.fn(),
         findMany: vi.fn(),
       },
+<<<<<<< HEAD
+      wines: {
+        findMany: vi.fn(),
+      },
+=======
+>>>>>>> origin/main
     },
     returning: vi.fn().mockReturnThis(),
     select: vi.fn().mockReturnThis(),
@@ -62,6 +103,82 @@ describe("productsRepository", () => {
     vi.clearAllMocks();
   });
 
+<<<<<<< HEAD
+  describe("create", () => {
+    it("inserts product and returns it", async () => {
+      const mockProduct = { id: "p1", name: "Wine" };
+      vi.mocked(mockDb.returning).mockResolvedValueOnce([mockProduct]);
+
+      const result = await productsRepo.create(db, { name: "Wine" } as any);
+
+      expect(db.insert).toHaveBeenCalledWith(products);
+      expect(result).toEqual(mockProduct);
+    });
+  });
+
+  describe("createProductWines", () => {
+    it("inserts product-wine associations", async () => {
+      await productsRepo.createProductWines(db, [{ productId: "p1", quantity: 1, wineId: "w1" }]);
+      expect(db.insert).toHaveBeenCalledWith(productWines);
+    });
+
+    it("does nothing if data is empty", async () => {
+      await productsRepo.createProductWines(db, []);
+      expect(db.insert).not.toHaveBeenCalled();
+    });
+  });
+
+  describe("deleteProductWines", () => {
+    it("deletes associations for a product", async () => {
+      await productsRepo.deleteProductWines(db, "p1");
+      expect(db.delete).toHaveBeenCalledWith(productWines);
+    });
+  });
+
+  describe("update", () => {
+    it("updates product and returns updated row", async () => {
+      const mockUpdated = { id: "p1", name: "New Name" };
+      vi.mocked(mockDb.returning).mockResolvedValueOnce([mockUpdated]);
+
+      const result = await productsRepo.update(db, "p1", { name: "New Name" });
+
+      expect(db.update).toHaveBeenCalledWith(products);
+      expect(result).toEqual(mockUpdated);
+    });
+  });
+
+  describe("getWineQuantityForUpdate", () => {
+    it("returns quantity for given wine", async () => {
+      vi.mocked(mockDb.select).mockReturnValueOnce({
+        for: vi.fn().mockResolvedValueOnce([{ quantity: 50 }]),
+        from: vi.fn().mockReturnThis(),
+        where: vi.fn().mockReturnThis(),
+      } as any);
+
+      const qty = await productsRepo.getWineQuantityForUpdate(db, "w1");
+      expect(qty).toBe(50);
+    });
+  });
+
+  describe("updateWineQuantity", () => {
+    it("updates wine quantity in db", async () => {
+      await productsRepo.updateWineQuantity(db, "w1", 10);
+      expect(db.update).toHaveBeenCalledWith(wines);
+    });
+  });
+
+  describe("winesExist", () => {
+    it("returns true if all wines found", async () => {
+      vi.mocked(db.query.wines.findMany).mockResolvedValue([{ id: "w1" }, { id: "w2" }] as never);
+      const exists = await productsRepo.winesExist(db, ["w1", "w2"]);
+      expect(exists).toBe(true);
+    });
+
+    it("returns false if some wines missing", async () => {
+      vi.mocked(db.query.wines.findMany).mockResolvedValue([{ id: "w1" }] as never);
+      const exists = await productsRepo.winesExist(db, ["w1", "w2"]);
+      expect(exists).toBe(false);
+=======
   describe("createProductWithWine", () => {
     it("successfully creates product and decrements wine quantity", async () => {
       vi.mocked(mockDb.select).mockReturnValueOnce({
@@ -188,12 +305,17 @@ describe("productsRepository", () => {
 
       expect(db.update).toHaveBeenCalledWith(wines);
       expect(db.update).toHaveBeenCalledWith(products);
+>>>>>>> origin/main
     });
   });
 
   describe("findByIds", () => {
     it("returns empty array immediately when ids list is empty", async () => {
+<<<<<<< HEAD
+      const result = await productsRepo.findByIds(db, []);
+=======
       const result = await productsRepository.findByIds([]);
+>>>>>>> origin/main
       expect(result).toEqual([]);
       expect(db.query.products.findMany).not.toHaveBeenCalled();
     });
@@ -220,11 +342,19 @@ describe("productsRepository", () => {
       ];
       vi.mocked(db.query.products.findMany).mockResolvedValue(mockData as never);
 
+<<<<<<< HEAD
+      const result = await productsRepo.findByIds(db, ["p1"]);
+
+      expect(db.query.products.findMany).toHaveBeenCalledWith(
+        expect.objectContaining({
+          where: expect.anything(),
+=======
       const result = await productsRepository.findByIds(["p1"]);
 
       expect(db.query.products.findMany).toHaveBeenCalledWith(
         expect.objectContaining({
           where: expect.anything(), // includes and(inArray(...), isNull(deletedAt))
+>>>>>>> origin/main
           with: expect.objectContaining({
             productWines: expect.anything(),
           }),
@@ -250,7 +380,10 @@ describe("productsRepository", () => {
         },
       ];
 
+<<<<<<< HEAD
+=======
       // First db.select call: main paginated query (chain ends with .offset)
+>>>>>>> origin/main
       const mainChain = {
         as: vi.fn().mockReturnThis(),
         from: vi.fn().mockReturnThis(),
@@ -264,7 +397,10 @@ describe("productsRepository", () => {
         where: vi.fn().mockReturnThis(),
       };
 
+<<<<<<< HEAD
+=======
       // Second db.select call: count subquery base (chain ends with .as())
+>>>>>>> origin/main
       const countSubqChain = {
         as: vi.fn().mockReturnValue({ _subq: true }),
         from: vi.fn().mockReturnThis(),
@@ -275,7 +411,10 @@ describe("productsRepository", () => {
         where: vi.fn().mockReturnThis(),
       };
 
+<<<<<<< HEAD
+=======
       // Third db.select call: count outer query (chain ends with .from(subq))
+>>>>>>> origin/main
       const countOuterChain = {
         from: vi.fn().mockResolvedValue([{ total: 1 }]),
       };
@@ -285,14 +424,23 @@ describe("productsRepository", () => {
         .mockReturnValueOnce(countSubqChain as never)
         .mockReturnValueOnce(countOuterChain as never);
 
+<<<<<<< HEAD
+      const result = await productsRepo.findAll(db, {}, { limit: 20, offset: 0 });
+=======
       const result = await productsRepository.findAll({}, { limit: 20, offset: 0 });
+>>>>>>> origin/main
 
       expect(result.rows).toEqual(mockRows);
       expect(result.total).toBe(1);
     });
 
+<<<<<<< HEAD
+    function makeChains(mockRows: unknown[]) {
+      const mainChain = {
+=======
     it("returns empty rows and zero total when nothing matches", async () => {
       const emptyMain = {
+>>>>>>> origin/main
         as: vi.fn().mockReturnThis(),
         from: vi.fn().mockReturnThis(),
         groupBy: vi.fn().mockReturnThis(),
@@ -300,11 +448,19 @@ describe("productsRepository", () => {
         innerJoin: vi.fn().mockReturnThis(),
         leftJoin: vi.fn().mockReturnThis(),
         limit: vi.fn().mockReturnThis(),
+<<<<<<< HEAD
+        offset: vi.fn().mockResolvedValue(mockRows),
+        orderBy: vi.fn().mockReturnThis(),
+        where: vi.fn().mockReturnThis(),
+      };
+      const countSubqChain = {
+=======
         offset: vi.fn().mockResolvedValue([]),
         orderBy: vi.fn().mockReturnThis(),
         where: vi.fn().mockReturnThis(),
       };
       const emptySubq = {
+>>>>>>> origin/main
         as: vi.fn().mockReturnValue({ _subq: true }),
         from: vi.fn().mockReturnThis(),
         groupBy: vi.fn().mockReturnThis(),
@@ -313,6 +469,72 @@ describe("productsRepository", () => {
         leftJoin: vi.fn().mockReturnThis(),
         where: vi.fn().mockReturnThis(),
       };
+<<<<<<< HEAD
+      const countOuterChain = {
+        from: vi.fn().mockResolvedValue([{ total: 1 }]),
+      };
+      vi.mocked(mockDb.select)
+        .mockReturnValueOnce(mainChain as never)
+        .mockReturnValueOnce(countSubqChain as never)
+        .mockReturnValueOnce(countOuterChain as never);
+      return mockRows;
+    }
+
+    it("accepts q filter without throwing", async () => {
+      const mockRows = [
+        {
+          avgRating: null,
+          id: "p1",
+          isBundle: false,
+          name: "Pinot",
+          price: "12.99",
+          quantity: 5,
+          reviewCount: 0,
+          shopId: "s1",
+          shopName: "Shop",
+        },
+      ];
+      makeChains(mockRows);
+
+      const result = await productsRepo.findAll(db, { q: "pinot" }, { limit: 20, offset: 0 });
+
+      expect(result.rows).toEqual(mockRows);
+      expect(result.total).toBe(1);
+    });
+
+    it("accepts shopId filter without throwing", async () => {
+      const mockRows: unknown[] = [];
+      makeChains(mockRows);
+
+      const result = await productsRepo.findAll(db, { shopId: "s1" }, { limit: 20, offset: 0 });
+
+      expect(result.rows).toEqual(mockRows);
+      expect(result.total).toBe(1);
+    });
+
+    it("accepts isBundle filter without throwing", async () => {
+      const mockRows: unknown[] = [];
+      makeChains(mockRows);
+
+      const result = await productsRepo.findAll(db, { isBundle: true }, { limit: 20, offset: 0 });
+
+      expect(result.rows).toEqual(mockRows);
+      expect(result.total).toBe(1);
+    });
+
+    it("accepts containsProductId filter without throwing", async () => {
+      const mockRows: unknown[] = [];
+      makeChains(mockRows);
+
+      const result = await productsRepo.findAll(
+        db,
+        { containsProductId: "p1" },
+        { limit: 20, offset: 0 }
+      );
+
+      expect(result.rows).toEqual(mockRows);
+      expect(result.total).toBe(1);
+=======
       const emptyCount = { from: vi.fn().mockResolvedValue([{ total: 0 }]) };
 
       vi.mocked(mockDb.select)
@@ -361,6 +583,7 @@ describe("productsRepository", () => {
       expect(ratedSubq.having).toHaveBeenCalled();
       expect(result.rows).toEqual([]);
       expect(result.total).toBe(0);
+>>>>>>> origin/main
     });
   });
 });

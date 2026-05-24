@@ -1,7 +1,22 @@
+<<<<<<< HEAD
+import {
+  MinusSignIcon,
+  PlusSignIcon,
+  ShoppingCart01Icon,
+  Tick01Icon,
+} from "@hugeicons/core-free-icons";
+import { HugeiconsIcon } from "@hugeicons/react";
+import { useQueryClient } from "@tanstack/react-query";
+import { useState } from "react";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { getCartsQueryKey } from "@/generated/hooks/useGetCarts";
+=======
 import { Check, Minus, Plus, ShoppingCart } from "lucide-react";
 import { useState } from "react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+>>>>>>> origin/main
 import { usePostCartsItems } from "@/generated/hooks/usePostCartsItems";
 
 interface ProductPriceRowProps {
@@ -11,6 +26,10 @@ interface ProductPriceRowProps {
 }
 
 export function ProductPriceRow({ price, quantity, productId }: ProductPriceRowProps) {
+<<<<<<< HEAD
+  const queryClient = useQueryClient();
+=======
+>>>>>>> origin/main
   const [qty, setQty] = useState(1);
   const [isSuccess, setIsSuccess] = useState(false);
   const { mutate: addToCart, isPending } = usePostCartsItems();
@@ -21,13 +40,21 @@ export function ProductPriceRow({ price, quantity, productId }: ProductPriceRowP
       {
         onSuccess: () => {
           setIsSuccess(true);
+<<<<<<< HEAD
+          queryClient.invalidateQueries({ queryKey: getCartsQueryKey() });
+=======
+>>>>>>> origin/main
           setTimeout(() => setIsSuccess(false), 2000);
         },
       }
     );
   };
 
+<<<<<<< HEAD
+  const formattedPrice = new Intl.NumberFormat("en-IE", {
+=======
   const formattedPrice = new Intl.NumberFormat("cs-CZ", {
+>>>>>>> origin/main
     currency: "EUR",
     style: "currency",
   }).format(Number.parseFloat(price));
@@ -54,7 +81,11 @@ export function ProductPriceRow({ price, quantity, productId }: ProductPriceRowP
               size="icon"
               variant="outline"
             >
+<<<<<<< HEAD
+              <HugeiconsIcon className="h-4 w-4" icon={MinusSignIcon} />
+=======
               <Minus className="h-4 w-4" />
+>>>>>>> origin/main
             </Button>
             <span className="w-4 text-center font-medium">{qty}</span>
             <Button
@@ -64,7 +95,11 @@ export function ProductPriceRow({ price, quantity, productId }: ProductPriceRowP
               size="icon"
               variant="outline"
             >
+<<<<<<< HEAD
+              <HugeiconsIcon className="h-4 w-4" icon={PlusSignIcon} />
+=======
               <Plus className="h-4 w-4" />
+>>>>>>> origin/main
             </Button>
           </div>
         </div>
@@ -77,14 +112,22 @@ export function ProductPriceRow({ price, quantity, productId }: ProductPriceRowP
         >
           {isSuccess && (
             <>
+<<<<<<< HEAD
+              <HugeiconsIcon className="mr-2 h-4 w-4" icon={Tick01Icon} />
+=======
               <Check className="mr-2 h-4 w-4" />
+>>>>>>> origin/main
               Added to cart!
             </>
           )}
           {!isSuccess && isPending && "Adding..."}
           {!isSuccess && !isPending && (
             <>
+<<<<<<< HEAD
+              <HugeiconsIcon className="mr-2 h-4 w-4" icon={ShoppingCart01Icon} />
+=======
               <ShoppingCart className="mr-2 h-4 w-4" />
+>>>>>>> origin/main
               Add to cart
             </>
           )}

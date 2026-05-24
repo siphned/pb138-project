@@ -14,6 +14,29 @@ A multi-vendor wine marketplace platform with event management, multi-shop order
 Multi-actor marketplace:
 - **Guests** → **Customers** (register) → **Winemakers** (manage catalog/supply) + **Shop Owners** (retail products/orders) → **Admins**
 - Wine catalog, B2B supply agreements, multi-vendor orders, server-side guest sessions.
+<<<<<<< HEAD
+
+## Development Workflow (MANDATORY — established May 2026, WINE-215)
+
+**No direct pushes to `dev`. All changes must follow this workflow:**
+
+1. **Jira ticket** — Every task starts with a Jira ticket in the `WINE` project (created or updated by `project-manager`)
+2. **Feature branch** — Work on a branch named after the Jira key: `WINE-xxx-brief-description`
+3. **PR targeting `dev`** — Open a pull request from the feature branch into `dev` at the end of the task
+4. **Merge via PR only** — Never push directly to `dev`; all merges happen through GitHub pull requests
+
+### Branch naming convention
+```
+WINE-{ticket-number}-{short-description}
+```
+Examples: `WINE-61-api-test-suite`, `WINE-171-page-stubs-and-backend-audit`
+
+### Agent responsibilities
+- `project-manager` — Creates/updates Jira tickets before work begins
+- Agent working on the task — Creates branch, implements, opens PR
+- `reviewer` — Reviews PR before merge
+=======
+>>>>>>> origin/main
 
 ## Quick Start Commands
 
@@ -85,5 +108,20 @@ winery/
 - Repository methods are typed and transactions are handled in services.
 
 ---
+<<<<<<< HEAD
+Last updated: May 2026
+=======
 Last updated: April 2026
+>>>>>>> origin/main
 Maintained by: Matej Šinogl
+
+## Agent skills
+
+### Issue tracker
+Jira integrated with GitHub. Jira for tracking, GitHub for PRs. See `docs/agents/issue-tracker.md`. 
+
+### Triage labels
+Standard canonical labels used as Jira labels. See `docs/agents/triage-labels.md`. 
+
+### Domain docs
+Multi-context layout for monorepo. See `docs/agents/domain.md`. 

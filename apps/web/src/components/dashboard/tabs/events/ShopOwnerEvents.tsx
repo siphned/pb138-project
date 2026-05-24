@@ -1,4 +1,14 @@
+<<<<<<< HEAD
+import {
+  Calendar01Icon,
+  Clock01Icon,
+  MoreHorizontalIcon,
+  PlusSignIcon,
+  UserGroupIcon,
+} from "hugeicons-react";
+=======
 import { Calendar, Clock, MoreHorizontal, Plus, Users } from "lucide-react";
+>>>>>>> origin/main
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 
@@ -18,10 +28,17 @@ export function ShopOwnerEvents() {
     <>
       <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-2">
         <div className="flex items-center gap-2 font-heading text-xl font-semibold text-primary">
+<<<<<<< HEAD
+          <Calendar01Icon className="h-5 w-5" /> Shop Events
+        </div>
+        <Button className="w-full sm:w-auto bg-primary hover:bg-primary/90 text-primary-foreground rounded-lg h-10 px-5">
+          <PlusSignIcon className="h-4 w-4 mr-2" /> Host Tasting
+=======
           <Calendar className="h-5 w-5" /> Shop Events
         </div>
         <Button className="w-full sm:w-auto bg-primary hover:bg-primary/90 text-primary-foreground rounded-lg h-10 px-5">
           <Plus className="h-4 w-4 mr-2" /> Host Tasting
+>>>>>>> origin/main
         </Button>
       </div>
 
@@ -44,6 +61,15 @@ export function ShopOwnerEvents() {
                   </h3>
                   <div className="flex flex-wrap items-center gap-x-5 gap-y-2 text-[13px] text-muted-foreground font-medium">
                     <span className="flex items-center gap-1.5">
+<<<<<<< HEAD
+                      <Calendar01Icon className="h-4 w-4" /> {event.date}
+                    </span>
+                    <span className="flex items-center gap-1.5">
+                      <Clock01Icon className="h-4 w-4" /> {event.time}
+                    </span>
+                    <span className="flex items-center gap-1.5">
+                      <UserGroupIcon className="h-4 w-4" /> {event.capacity}
+=======
                       <Calendar className="h-4 w-4" /> {event.date}
                     </span>
                     <span className="flex items-center gap-1.5">
@@ -51,6 +77,7 @@ export function ShopOwnerEvents() {
                     </span>
                     <span className="flex items-center gap-1.5">
                       <Users className="h-4 w-4" /> {event.capacity}
+>>>>>>> origin/main
                     </span>
                   </div>
                   <p className="text-[14px] text-muted-foreground leading-relaxed max-w-3xl">
@@ -62,7 +89,11 @@ export function ShopOwnerEvents() {
                   size="icon"
                   variant="ghost"
                 >
+<<<<<<< HEAD
+                  <MoreHorizontalIcon className="h-5 w-5" />
+=======
                   <MoreHorizontal className="h-5 w-5" />
+>>>>>>> origin/main
                 </Button>
               </div>
             ))}

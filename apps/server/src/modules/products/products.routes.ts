@@ -1,4 +1,24 @@
 import { Elysia, status, t } from "elysia";
+<<<<<<< HEAD
+import { errorResponse } from "../../utils/error-plugin";
+import { authPlugin } from "../auth";
+import {
+  createProductOrBundleBody,
+  getAllProductsQuery,
+  getAllProductsResponse,
+  updateProductOrBundleBody,
+} from "./products.schema";
+import { productsService } from "./products.service";
+
+export const productsRoutes = new Elysia({ prefix: "/products" })
+  .use(authPlugin)
+
+  .get("/", ({ query }) => productsService.getAllProducts(query), {
+    detail: {
+      description:
+        "Returns all non-deleted products. Filterable by shopId, isBundle, q, price, rating, type, etc.",
+      summary: "List all products (catalog)",
+=======
 import { authPlugin } from "../auth";
 import {
   createBundleBody,
@@ -75,12 +95,40 @@ export const productsRoutes = new Elysia()
       description:
         "Returns paginated retail products across all shops. Supports filtering by price, type, color, region, rating, and full-text search.",
       summary: "Browse product catalog",
+>>>>>>> origin/main
       tags: ["products"],
     },
     query: getAllProductsQuery,
     response: { 200: getAllProductsResponse },
   })
 
+<<<<<<< HEAD
+  .get("/:id", ({ params }) => productsService.getProduct(params.id), {
+    detail: {
+      description: "Returns a single product with its underlying wines.",
+      summary: "Get product by ID",
+      tags: ["products"],
+    },
+    params: t.Object({ id: t.String() }),
+    response: { 200: t.Any(), 404: errorResponse },
+  });
+
+export const shopProductsRoutes = new Elysia({ prefix: "/shops/:id" })
+  .use(authPlugin)
+
+  .get(
+    "/products",
+    ({ params, query }) => productsService.getAllProducts({ ...query, shopId: params.id }),
+    {
+      detail: {
+        description: "Returns all products belonging to a specific shop.",
+        summary: "List shop products",
+        tags: ["products"],
+      },
+      params: t.Object({ id: t.String() }),
+      query: getAllProductsQuery,
+      response: { 200: getAllProductsResponse, 404: errorResponse },
+=======
   .get(
     "/products/:id",
     async ({ params }) => {
@@ -96,10 +144,28 @@ export const productsRoutes = new Elysia()
         tags: ["products"],
       },
       params: t.Object({ id: t.String() }),
+>>>>>>> origin/main
     }
   )
 
   .post(
+<<<<<<< HEAD
+    "/products",
+    async ({ params, dbUser, body }) =>
+      status(201, await productsService.createProductOrBundle(params.id, dbUser.id, body)),
+    {
+      body: createProductOrBundleBody,
+      detail: {
+        description:
+          "Creates a product (wineId) or bundle (wines array with ≥2 entries) in a shop.",
+        security: [{ bearerAuth: [] }],
+        summary: "Create product or bundle",
+        tags: ["products"],
+      },
+      params: t.Object({ id: t.String() }),
+      requireRoles: ["shop_owner", "admin"],
+      response: { 201: t.Any(), 403: errorResponse, 404: errorResponse },
+=======
     "/shops/:id/products",
     async ({ params, dbUser, body }) => {
       try {
@@ -118,10 +184,27 @@ export const productsRoutes = new Elysia()
       params: shopParams,
       requireRoles: ["shop_owner"],
       response: { 201: bundleResponse, 403: t.String(), 404: t.String(), 422: t.String() },
+>>>>>>> origin/main
     }
   )
 
   .patch(
+<<<<<<< HEAD
+    "/products/:productId",
+    ({ params, dbUser, body }) =>
+      productsService.updateProductOrBundle(params.id, params.productId, dbUser.id, body),
+    {
+      body: updateProductOrBundleBody,
+      detail: {
+        description: "Updates a product or bundle. Supplying wines on a non-bundle returns 422.",
+        security: [{ bearerAuth: [] }],
+        summary: "Update product or bundle",
+        tags: ["products"],
+      },
+      params: t.Object({ id: t.String(), productId: t.String() }),
+      requireRoles: ["shop_owner", "admin"],
+      response: { 200: t.Any(), 403: errorResponse, 404: errorResponse },
+=======
     "/shops/:id/products/:productId",
     async ({ params, dbUser, body }) => {
       try {
@@ -140,10 +223,28 @@ export const productsRoutes = new Elysia()
       params: shopProductParams,
       requireAuth: true,
       response: { 200: bundleResponse, 403: t.String(), 404: t.String(), 422: t.String() },
+>>>>>>> origin/main
     }
   )
 
   .delete(
+<<<<<<< HEAD
+    "/products/:productId",
+    async ({ params, dbUser }) => {
+      await productsService.deleteProductOrBundle(params.id, params.productId, dbUser.id);
+      return status(204, "");
+    },
+    {
+      detail: {
+        description: "Soft-deletes a product or bundle and reverts stock allocations.",
+        security: [{ bearerAuth: [] }],
+        summary: "Delete product or bundle",
+        tags: ["products"],
+      },
+      params: t.Object({ id: t.String(), productId: t.String() }),
+      requireRoles: ["shop_owner", "admin"],
+      response: { 204: t.Null(), 403: errorResponse, 404: errorResponse },
+=======
     "/shops/:id/products/:productId",
     async ({ params, dbUser }) => {
       try {
@@ -230,5 +331,6 @@ export const productsRoutes = new Elysia()
       params: shopBundleParams,
       requireAuth: true,
       response: { 204: t.Null(), 403: t.String(), 404: t.String() },
+>>>>>>> origin/main
     }
   );

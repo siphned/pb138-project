@@ -1,0 +1,32 @@
+### WineMarket Deploy Smoke — 10 requests
+### Run: curl -f "{{base_url}}/wines" || exit 1
+
+### Wine catalog
+GET {{base_url}}/wines
+
+### Wine filter
+GET {{base_url}}/wines?region=Moravia
+
+### Wine detail
+GET {{base_url}}/wines/{{first_wine_id}}
+
+### Products
+GET {{base_url}}/products
+
+### Product detail
+GET {{base_url}}/products/{{first_product_id}}
+
+### Shops
+GET {{base_url}}/shops
+
+### Shop detail
+GET {{base_url}}/shops/1
+
+### Events
+GET {{base_url}}/events
+
+### Winemaker profile
+GET {{base_url}}/winemakers/1
+
+### Health
+GET {{base_url}}/health

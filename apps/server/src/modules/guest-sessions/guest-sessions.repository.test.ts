@@ -1,6 +1,11 @@
 import { guestSessions } from "@repo/shared/schemas";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { db } from "../../db";
+<<<<<<< HEAD
+import * as guestSessionsRepository from "./guest-sessions.repository";
+
+const mockDb = db as any;
+=======
 import { guestSessionsRepository } from "./guest-sessions.repository";
 
 interface MockChained {
@@ -19,6 +24,7 @@ interface MockDatabase {
 }
 
 const mockDb = db as unknown as MockDatabase;
+>>>>>>> origin/main
 
 vi.mock("../../db", () => {
   const m = {
@@ -43,7 +49,11 @@ describe("guestSessionsRepository", () => {
       const mockSession = { id: "s1" };
       vi.mocked(mockDb.where).mockResolvedValueOnce([mockSession]);
 
+<<<<<<< HEAD
+      const result = await guestSessionsRepository.findById(db, "s1");
+=======
       const result = await guestSessionsRepository.findById("s1");
+>>>>>>> origin/main
 
       expect(result).toBe(mockSession);
       expect(db.select).toHaveBeenCalled();
@@ -55,11 +65,17 @@ describe("guestSessionsRepository", () => {
       const mockSession = { id: "new-s" };
       vi.mocked(mockDb.returning).mockResolvedValueOnce([mockSession]);
 
+<<<<<<< HEAD
+      const result = await guestSessionsRepository.create(db, { expiresAt: new Date() });
+=======
       const result = await guestSessionsRepository.create({ expiresAt: new Date() });
+>>>>>>> origin/main
 
       expect(result).toBe(mockSession);
       expect(db.insert).toHaveBeenCalledWith(guestSessions);
     });
+<<<<<<< HEAD
+=======
 
     it("throws if insert fails", async () => {
       vi.mocked(mockDb.returning).mockResolvedValueOnce([]);
@@ -75,5 +91,6 @@ describe("guestSessionsRepository", () => {
       await guestSessionsRepository.delete("s1");
       expect(db.delete).toHaveBeenCalledWith(guestSessions);
     });
+>>>>>>> origin/main
   });
 });

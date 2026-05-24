@@ -118,7 +118,7 @@ export const formatDate = (date: Date): string => { /* ... */ };
 // utils/validators.ts
 export const validateEmail = (email: string): boolean => { /* ... */ };
 
-// utils/stringUtils.ts
+// utils/string-utils.ts
 export const truncateString = (str: string, length: number): string => { /* ... */ };
 ```
 
@@ -164,9 +164,9 @@ Centralize configuration and constants:
 
 ### Utils (`utils/`)
 Pure utility functions:
-- `dateFormatter.ts` - Format dates
+- `date-formatter.ts` - Format dates
 - `validators.ts` - Validation helpers
-- `stringUtils.ts` - String manipulation
+- `string-utils.ts` - String manipulation
 
 ### Generated Code
 

@@ -1,4 +1,59 @@
 import { t } from "elysia";
+<<<<<<< HEAD
+import z from "zod";
+
+/**
+ * Request/response schemas for availability module.
+ * Zod for shared types, TypeBox for Elysia route validation.
+ */
+
+export const addRegularBodySchema = z.object({
+  dow: z.number().int().min(0).max(6),
+  endTime: z.string().regex(/^([01]\d|2[0-3]):[0-5]\d$/),
+  startTime: z.string().regex(/^([01]\d|2[0-3]):[0-5]\d$/),
+  type: z.enum(["open", "closed"]),
+  validFrom: z.string().regex(/^\d{4}-\d{2}-\d{2}$/),
+  validTo: z
+    .string()
+    .regex(/^\d{4}-\d{2}-\d{2}$/)
+    .optional(),
+});
+
+export const addExceptionBodySchema = z.object({
+  action: z.enum(["closed", "modified_hours", "special_event"]),
+  endsAt: z.string().datetime(),
+  reason: z.string().optional(),
+  startsAt: z.string().datetime(),
+});
+
+export const regularResponseSchema = z.object({
+  dow: z.number().int(),
+  endTime: z.date(),
+  id: z.string(),
+  shopId: z.string(),
+  startTime: z.date(),
+  type: z.string(),
+  validFrom: z.string(),
+  validTo: z.union([z.string(), z.null()]),
+  winemakerId: z.union([z.string(), z.null()]),
+});
+
+export const exceptionResponseSchema = z.object({
+  action: z.string(),
+  endsAt: z.date(),
+  id: z.string(),
+  reason: z.union([z.string(), z.null()]),
+  shopId: z.string(),
+  startsAt: z.date(),
+  winemakerId: z.union([z.string(), z.null()]),
+});
+
+export const getAvailabilityResponseSchema = z.object({
+  exceptions: z.array(exceptionResponseSchema),
+  regular: z.array(regularResponseSchema),
+});
+=======
+>>>>>>> origin/main
 
 export const addRegularBody = t.Object({
   dow: t.Integer({ maximum: 6, minimum: 0 }),
@@ -16,7 +71,10 @@ export const addExceptionBody = t.Object({
   startsAt: t.String({ format: "date-time" }),
 });
 
+<<<<<<< HEAD
+=======
 // Response schemas
+>>>>>>> origin/main
 export const regularResponse = t.Object({
   dow: t.Integer(),
   endTime: t.Date(),

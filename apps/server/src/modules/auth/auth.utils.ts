@@ -1,4 +1,8 @@
 import { verifyToken } from "@clerk/backend";
+<<<<<<< HEAD
+import { logger } from "../../utils/logger";
+=======
+>>>>>>> origin/main
 
 export type AppRole = "customer" | "winemaker" | "shop_owner" | "admin";
 
@@ -25,7 +29,15 @@ export async function verifyClerkToken(
       jwtKey: CLERK_JWT_KEY,
     });
     return payload as ClerkPayload;
+<<<<<<< HEAD
+  } catch (error) {
+    logger.error(
+      { err: error, operation: "verifyClerkToken", tokenPrefix: token.slice(0, 20) },
+      "JWT token verification failed"
+    );
+=======
   } catch {
+>>>>>>> origin/main
     return null;
   }
 }

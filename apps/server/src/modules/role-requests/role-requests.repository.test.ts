@@ -1,6 +1,11 @@
 import { roleRequests } from "@repo/shared/schemas";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { db } from "../../db";
+<<<<<<< HEAD
+import * as roleRequestsRepository from "./role-requests.repository";
+
+const mockDb = db as any;
+=======
 import { roleRequestsRepository } from "./role-requests.repository";
 
 interface MockChained {
@@ -21,6 +26,7 @@ interface MockDatabase {
 }
 
 const mockDb = db as unknown as MockDatabase;
+>>>>>>> origin/main
 
 vi.mock("../../db", () => {
   const m = {
@@ -49,14 +55,33 @@ describe("roleRequestsRepository", () => {
   describe("findById", () => {
     it("delegates to db.query", async () => {
       const mockRequest = { id: "r1" };
+<<<<<<< HEAD
+      vi.mocked(db.query.roleRequests.findFirst).mockResolvedValue(mockRequest as any);
+      const result = await roleRequestsRepository.findById(db, "r1");
+=======
       vi.mocked(db.query.roleRequests.findFirst).mockResolvedValue(mockRequest as never);
       const result = await roleRequestsRepository.findById("r1");
+>>>>>>> origin/main
       expect(result).toBe(mockRequest);
     });
   });
 
   describe("create", () => {
     it("creates a role request", async () => {
+<<<<<<< HEAD
+      vi.mocked(mockDb.insert).mockReturnValue({
+        values: vi.fn().mockReturnValue({
+          returning: vi.fn().mockResolvedValue([{ id: "new-r" }]),
+        }),
+      });
+      const result = await roleRequestsRepository.create(db, {
+        businessName: "Biz",
+        requestedRole: "winemaker",
+        userId: "u1",
+      } as any);
+
+      expect(result.id).toBe("new-r");
+=======
       const mockRequest = { id: "new-r" };
       vi.mocked(mockDb.returning).mockResolvedValueOnce([mockRequest]);
 
@@ -67,18 +92,32 @@ describe("roleRequestsRepository", () => {
       } as never);
 
       expect(result).toBe(mockRequest);
+>>>>>>> origin/main
       expect(db.insert).toHaveBeenCalledWith(roleRequests);
     });
   });
 
   describe("updateStatus", () => {
     it("updates status and adminUserId", async () => {
+<<<<<<< HEAD
+      vi.mocked(mockDb.update).mockReturnValue({
+        set: vi.fn().mockReturnValue({
+          where: vi.fn().mockReturnValue({
+            returning: vi.fn().mockResolvedValue([{ id: "r1", status: "approved" }]),
+          }),
+        }),
+      });
+      const result = await roleRequestsRepository.updateStatus(db, "r1", "approved", "admin1");
+
+      expect(result?.status).toBe("approved");
+=======
       const mockRequest = { id: "r1", status: "approved" };
       vi.mocked(mockDb.returning).mockResolvedValueOnce([mockRequest]);
 
       const result = await roleRequestsRepository.updateStatus("r1", "approved", "admin1");
 
       expect(result).toBe(mockRequest);
+>>>>>>> origin/main
       expect(db.update).toHaveBeenCalledWith(roleRequests);
     });
   });

@@ -1,5 +1,9 @@
 import { BundleCard } from "@/components/catalog/BundleCard";
+<<<<<<< HEAD
+import { useGetProducts } from "@/generated/hooks/useGetProducts";
+=======
 import { useGetShopsByIdProducts } from "@/generated/hooks/useGetShopsByIdProducts";
+>>>>>>> origin/main
 
 type RawBundle = {
   id: string;
@@ -15,8 +19,13 @@ interface BundlesContainingWineProps {
 }
 
 export function BundlesContainingWine({ shopId, wineId }: BundlesContainingWineProps) {
+<<<<<<< HEAD
+  const { data: rawData, isLoading } = useGetProducts({ isBundle: true, shopId });
+  const allBundles = rawData?.data as RawBundle[] | undefined;
+=======
   const { data, isLoading } = useGetShopsByIdProducts(shopId, { isBundle: "true" });
   const allBundles = data as RawBundle[] | undefined;
+>>>>>>> origin/main
 
   const bundles =
     allBundles?.filter((b) => {

@@ -1,5 +1,14 @@
 import { t } from "elysia";
 
+<<<<<<< HEAD
+export const shopFiltersQuery = t.Object({
+  city: t.Optional(t.String({ maxLength: 255 })),
+  ownerUserId: t.Optional(t.String()),
+  q: t.Optional(t.String({ maxLength: 255 })),
+});
+
+=======
+>>>>>>> origin/main
 const addressBody = t.Object({
   city: t.String({ maxLength: 255, minLength: 1 }),
   country: t.String({ maxLength: 50, minLength: 1 }),

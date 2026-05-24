@@ -1,5 +1,10 @@
 import { Link } from "@tanstack/react-router";
+<<<<<<< HEAD
+import { CatalogCard, catalogCardLinkClass } from "./CatalogCard";
+import { CatalogPlaceholder } from "./CatalogPlaceholder";
+=======
 import { CatalogCard } from "./CatalogCard";
+>>>>>>> origin/main
 
 interface BundleCardProps {
   product: {
@@ -20,6 +25,24 @@ export function BundleCard({ product }: BundleCardProps) {
 
   return (
     <CatalogCard
+<<<<<<< HEAD
+      imageSlot={<CatalogPlaceholder text="BUNDLE" textClassName="text-2xl tracking-widest" />}
+      titleLink={
+        <Link
+          className={catalogCardLinkClass}
+          params={{ productId: product.id }}
+          to="/products/$productId"
+        >
+          {product.name}
+        </Link>
+      }
+    >
+      {wineCount > 0 && (
+        <p className="text-xs text-muted-foreground uppercase tracking-wider">{wineCount} wines</p>
+      )}
+      <div className="text-xl font-bold text-foreground">{price}</div>
+    </CatalogCard>
+=======
       imageSlot={
         <div className="flex h-full w-full items-center justify-center bg-linear-to-b from-secondary/10 to-secondary/30">
           <span className="font-heading text-2xl font-bold uppercase tracking-widest text-secondary-foreground/20">
@@ -40,5 +63,6 @@ export function BundleCard({ product }: BundleCardProps) {
       subtitle={wineCount > 0 ? `${wineCount} wines` : undefined}
       title={product.name}
     />
+>>>>>>> origin/main
   );
 }

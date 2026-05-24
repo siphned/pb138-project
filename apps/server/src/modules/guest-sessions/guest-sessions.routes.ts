@@ -1,6 +1,9 @@
 import { Elysia, status, t } from "elysia";
 import { authPlugin } from "../auth";
+<<<<<<< HEAD
+=======
 import { guestSessionsRepository } from "./guest-sessions.repository";
+>>>>>>> origin/main
 import { guestSessionsService } from "./guest-sessions.service";
 
 export const guestSessionsRoutes = new Elysia({
@@ -8,6 +11,14 @@ export const guestSessionsRoutes = new Elysia({
   tags: ["guest-sessions"],
 })
   .use(authPlugin)
+<<<<<<< HEAD
+
+  .post(
+    "/",
+    async ({ set }) => {
+      const session = await guestSessionsService.getOrCreateSession();
+      set.status = 201;
+=======
   .post(
     "/",
     async ({ cookie: { guest_session_id } }) => {
@@ -22,13 +33,19 @@ export const guestSessionsRoutes = new Elysia({
         guest_session_id.expires = session.expiresAt;
       }
 
+>>>>>>> origin/main
       return session;
     },
     {
       detail: {
         description:
+<<<<<<< HEAD
+          "Creates a new anonymous session record and returns the session ID in the response body. Used for guest carts and temporary state.",
+        summary: "Initialize guest session",
+=======
           "Returns an existing valid guest session or creates a new one. Sets a guest_session_id cookie.",
         summary: "Get or create a guest session",
+>>>>>>> origin/main
       },
       response: t.Object({
         createdAt: t.Date(),
@@ -37,6 +54,14 @@ export const guestSessionsRoutes = new Elysia({
       }),
     }
   )
+<<<<<<< HEAD
+
+  .get(
+    "/:id",
+    async ({ params }) => {
+      const session = await guestSessionsService.validateSession(params.id);
+      if (!session) return status(404, "Session not found or expired");
+=======
   .get(
     "/me",
     async ({ cookie: { guest_session_id } }) => {
@@ -50,10 +75,22 @@ export const guestSessionsRoutes = new Elysia({
         return status(404, "Invalid or expired guest session");
       }
 
+>>>>>>> origin/main
       return session;
     },
     {
       detail: {
+<<<<<<< HEAD
+        description: "Returns metadata for an existing guest session if it has not expired.",
+        summary: "Validate guest session",
+      },
+      params: t.Object({ id: t.String() }),
+      response: {
+        200: t.Object({ createdAt: t.Date(), expiresAt: t.Date(), id: t.String() }),
+        404: t.String(),
+      },
+    }
+=======
         description: "Returns the guest session associated with the guest_session_id cookie.",
         summary: "Get current guest session",
       },
@@ -82,4 +119,5 @@ export const guestSessionsRoutes = new Elysia({
       },
       requireRoles: ["admin"],
     }
+>>>>>>> origin/main
   );

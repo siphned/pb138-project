@@ -181,6 +181,23 @@ The file Claude reads **before doing anything**.
 ## Stack
 - Frontend: React + Vite, TanStack Router, shadcn/ui, Tailwind
 - Backend: Elysia + Bun, PostgreSQL + Drizzle ORM
+<<<<<<< HEAD
+- API: OpenAPI + Orval for type generation
+- Tooling: Biome (Linting + Formatting)
+
+## Key Patterns
+- Naming: PascalCase.tsx for FE components, kebab-case.ts for others.
+- 3-Layer Backend: Routes -> Service -> Repository.
+- Errors: Custom AppError subclasses, UPPER_SNAKE_CASE codes.
+- Validation: Zod for validation (shared FE/BE).
+- Always use generated Orval hooks, never fetch manually.
+
+## Commands
+- `bun run validate` — run all local checks (Lint, Format, Types, Tests)
+- `bun run generate` — regenerate Orval types
+- `bun run db:migrate` — apply migrations
+- `bun run check` — run Biome check
+=======
 - API: OpenAPI + Kubb for type generation
 
 ## Key Patterns
@@ -200,6 +217,7 @@ The file Claude reads **before doing anything**.
 - Don't add new dependencies — ask first
 - Don't manually write fetch code — regenerate with Kubb
 - Don't soft-delete without adding `deletedAt` column
+>>>>>>> origin/main
 ```
 
 **Keep it lean.** Research shows bloated context files **reduce** success rates and increase costs by 20%+. Only include universal rules.

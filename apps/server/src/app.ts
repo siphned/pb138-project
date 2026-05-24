@@ -6,6 +6,29 @@ import { availabilityRoutes } from "./modules/availability";
 import { cartsRoutes } from "./modules/carts";
 import { eventsRoutes } from "./modules/events";
 import { guestSessionsRoutes } from "./modules/guest-sessions";
+<<<<<<< HEAD
+import { imagesRoutes } from "./modules/images";
+import { ordersRoutes } from "./modules/orders";
+import { productsRoutes, shopProductsRoutes } from "./modules/products";
+import { reviewsRoutes } from "./modules/reviews";
+import { roleRequestsRoutes } from "./modules/role-requests";
+import { shopsRoutes } from "./modules/shops";
+import { statsRoutes } from "./modules/stats";
+import { supplyAgreementsRoutes } from "./modules/supply-agreements";
+import { usersRoutes } from "./modules/users";
+import { webhooksRoutes } from "./modules/webhooks";
+import { winemakersRoutes } from "./modules/winemakers";
+import { winesRoutes } from "./modules/wines";
+import { errorPlugin } from "./utils/error-plugin";
+
+const isProd = process.env.NODE_ENV === "production";
+const frontendUrl = process.env.FRONTEND_URL || "http://localhost:5173";
+const apiUrl = process.env.API_URL || "http://localhost:3000";
+
+export const app = new Elysia()
+  .use(errorPlugin)
+  .use(cors({ origin: frontendUrl }))
+=======
 import { ordersRoutes } from "./modules/orders";
 import { productsRoutes } from "./modules/products";
 import { reviewsRoutes } from "./modules/reviews";
@@ -23,6 +46,7 @@ export const app = new Elysia()
     return (error as Error).message;
   })
   .use(cors({ origin: "http://localhost:5173" }))
+>>>>>>> origin/main
   .use(
     openapi({
       documentation: {
@@ -41,7 +65,11 @@ export const app = new Elysia()
           title: "WineMarket API",
           version: "0.1.0",
         },
+<<<<<<< HEAD
+        servers: [{ description: isProd ? "Production" : "Development", url: apiUrl }],
+=======
         servers: [{ description: "Development", url: "http://localhost:3000" }],
+>>>>>>> origin/main
         tags: [
           { description: "Authenticated user profile endpoints", name: "users" },
           { description: "Winemaker/shop-owner role application flow", name: "role-requests" },
@@ -54,9 +82,17 @@ export const app = new Elysia()
           { description: "Shopping cart management for guests and users", name: "carts" },
           { description: "Order placement and history", name: "orders" },
           { description: "Product and winemaker reviews and ratings", name: "reviews" },
+<<<<<<< HEAD
+          { description: "Role-scoped aggregate statistics", name: "stats" },
           { description: "Platform administration and moderation", name: "admin" },
           { description: "Anonymous session management", name: "guest-sessions" },
           { description: "B2B supply relationship management", name: "supply-agreements" },
+          { description: "Image upload and management", name: "images" },
+=======
+          { description: "Platform administration and moderation", name: "admin" },
+          { description: "Anonymous session management", name: "guest-sessions" },
+          { description: "B2B supply relationship management", name: "supply-agreements" },
+>>>>>>> origin/main
         ],
       },
       provider: "scalar",
@@ -64,9 +100,17 @@ export const app = new Elysia()
     })
   )
   .use(usersRoutes)
+<<<<<<< HEAD
+  .use(webhooksRoutes)
   .use(roleRequestsRoutes)
   .use(shopsRoutes)
   .use(productsRoutes)
+  .use(shopProductsRoutes)
+=======
+  .use(roleRequestsRoutes)
+  .use(shopsRoutes)
+  .use(productsRoutes)
+>>>>>>> origin/main
   .use(availabilityRoutes)
   .use(cartsRoutes)
   .use(eventsRoutes)
@@ -76,4 +120,10 @@ export const app = new Elysia()
   .use(guestSessionsRoutes)
   .use(supplyAgreementsRoutes)
   .use(reviewsRoutes)
+<<<<<<< HEAD
+  .use(statsRoutes)
+  .use(adminRoutes)
+  .use(imagesRoutes);
+=======
   .use(adminRoutes);
+>>>>>>> origin/main

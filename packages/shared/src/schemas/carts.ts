@@ -1,4 +1,8 @@
 import { pgTable, smallint, uniqueIndex, uuid } from "drizzle-orm/pg-core";
+<<<<<<< HEAD
+import { createInsertSchema, createSelectSchema } from "drizzle-zod";
+=======
+>>>>>>> origin/main
 import { products } from "./catalog";
 import { guestSessions } from "./guest-sessions";
 import { timestamptz } from "./helpers";
@@ -36,3 +40,14 @@ export const cartItems = pgTable(
     unq: uniqueIndex("cart_items_cart_id_product_id_key").on(t.cartId, t.productId),
   })
 );
+<<<<<<< HEAD
+
+export const cartSelectSchema = createSelectSchema(carts);
+export const cartInsertSchema = createInsertSchema(carts);
+export type CartModel = typeof carts.$inferSelect;
+
+export const cartItemSelectSchema = createSelectSchema(cartItems);
+export const cartItemInsertSchema = createInsertSchema(cartItems);
+export type CartItemModel = typeof cartItems.$inferSelect;
+=======
+>>>>>>> origin/main

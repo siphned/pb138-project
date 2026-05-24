@@ -1,4 +1,8 @@
 import { pgTable, text, uuid, varchar } from "drizzle-orm/pg-core";
+<<<<<<< HEAD
+import { createInsertSchema, createSelectSchema } from "drizzle-zod";
+=======
+>>>>>>> origin/main
 import { addresses } from "./addresses";
 import { timestamptz } from "./helpers";
 import { users } from "./users";
@@ -13,7 +17,11 @@ export const winemakers = pgTable("winemakers", {
   email: text("email"),
   id: uuid("id").primaryKey().defaultRandom(),
   name: varchar("name", { length: 255 }).notNull(),
+<<<<<<< HEAD
+  phone: varchar("phone", { length: 50 }),
+=======
   phone: varchar("phone", { length: 20 }),
+>>>>>>> origin/main
   updatedAt: timestamptz("updated_at"),
   userId: uuid("user_id")
     .notNull()
@@ -36,3 +44,14 @@ export const shops = pgTable("shops", {
     .references(() => users.id),
   updatedAt: timestamptz("updated_at"),
 });
+<<<<<<< HEAD
+
+export const winemakerSelectSchema = createSelectSchema(winemakers);
+export const winemakerInsertSchema = createInsertSchema(winemakers);
+export type WinemakerModel = typeof winemakers.$inferSelect;
+
+export const shopSelectSchema = createSelectSchema(shops);
+export const shopInsertSchema = createInsertSchema(shops);
+export type ShopModel = typeof shops.$inferSelect;
+=======
+>>>>>>> origin/main

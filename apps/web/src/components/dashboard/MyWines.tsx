@@ -1,3 +1,13 @@
+<<<<<<< HEAD
+import { DrinkIcon, ShoppingBag01Icon } from "hugeicons-react";
+import { Card, CardContent } from "@/components/ui/card";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { BundlesListTab } from "./BundlesListTab";
+import { CustomerOrderHistoryTab } from "./CustomerOrderHistoryTab";
+import { EventsListTab } from "./EventsListTab";
+import { ShopOwnerInventoryTab } from "./ShopOwnerInventoryTab";
+import { WinemakerInventoryTab } from "./WinemakerInventoryTab";
+=======
 import {
   ArrowUpRight,
   Calendar,
@@ -26,12 +36,18 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+>>>>>>> origin/main
 
 interface MyWinesProps {
   role?: "Winemaker" | "Shop Owner" | "Customer" | string;
 }
 
 export function MyWines({ role = "Winemaker" }: MyWinesProps) {
+<<<<<<< HEAD
+  let mainTab = <WinemakerInventoryTab />;
+  if (role === "Customer") mainTab = <CustomerOrderHistoryTab />;
+  else if (role === "Shop Owner") mainTab = <ShopOwnerInventoryTab />;
+=======
   const renderTableContent = () => {
     switch (role) {
       case "Customer":
@@ -42,6 +58,7 @@ export function MyWines({ role = "Winemaker" }: MyWinesProps) {
         return <WinemakerInventory />;
     }
   };
+>>>>>>> origin/main
 
   return (
     <div className="flex flex-col gap-6 space-y-6 mt-6">
@@ -52,9 +69,15 @@ export function MyWines({ role = "Winemaker" }: MyWinesProps) {
             value="main"
           >
             {role === "Customer" ? (
+<<<<<<< HEAD
+              <ShoppingBag01Icon className="h-4 w-4 mr-2" />
+            ) : (
+              <DrinkIcon className="h-4 w-4 mr-2" />
+=======
               <ShoppingBag className="h-4 w-4 mr-2" />
             ) : (
               <Wine className="h-4 w-4 mr-2" />
+>>>>>>> origin/main
             )}
             {role === "Customer" ? "Order History" : "My Wines"}
           </TabsTrigger>
@@ -76,15 +99,23 @@ export function MyWines({ role = "Winemaker" }: MyWinesProps) {
 
         <TabsContent className="mt-6" value="main">
           <Card className="bg-secondary/40 border-none shadow-none rounded-3xl">
+<<<<<<< HEAD
+            <CardContent className="p-6 md:p-8">{mainTab}</CardContent>
+=======
             <CardContent className="p-6 md:p-8">{renderTableContent()}</CardContent>
+>>>>>>> origin/main
           </Card>
         </TabsContent>
 
         <TabsContent className="mt-6" value="bundles">
           <Card className="bg-secondary/40 border-none shadow-none rounded-3xl">
             <CardContent className="p-6 md:p-8">
+<<<<<<< HEAD
+              <BundlesListTab />
+=======
               {/* Plug in the Bundles component here! */}
               <BundlesList />
+>>>>>>> origin/main
             </CardContent>
           </Card>
         </TabsContent>
@@ -92,8 +123,12 @@ export function MyWines({ role = "Winemaker" }: MyWinesProps) {
         <TabsContent className="mt-6" value="events">
           <Card className="bg-secondary/40 border-none shadow-none rounded-3xl">
             <CardContent className="p-6 md:p-8">
+<<<<<<< HEAD
+              <EventsListTab />
+=======
               {/* Plug in the Events component here! */}
               <EventsList />
+>>>>>>> origin/main
             </CardContent>
           </Card>
         </TabsContent>
@@ -101,6 +136,8 @@ export function MyWines({ role = "Winemaker" }: MyWinesProps) {
     </div>
   );
 }
+<<<<<<< HEAD
+=======
 // ==========================================
 // 1. WINEMAKER VIEW
 // ==========================================
@@ -646,3 +683,4 @@ function EventsList() {
     </>
   );
 }
+>>>>>>> origin/main

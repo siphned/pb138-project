@@ -1,3 +1,19 @@
+<<<<<<< HEAD
+import { EntityReviewsSection } from "./EntityReviewsSection";
+
+interface ProductReviewsSectionProps {
+  productId: string;
+}
+
+export function ProductReviewsSection({ productId }: ProductReviewsSectionProps) {
+  return (
+    <EntityReviewsSection
+      emptyMessage="Be the first to review this product."
+      entityId={productId}
+      entityType="product"
+      title="Customer Reviews"
+    />
+=======
 import { ReviewList } from "@/components/reviews/ReviewList";
 import { ReviewsSummary } from "@/components/reviews/ReviewsSummary";
 import type { GetReviewsProductById200 } from "@/generated/types/GetReviewsProductById";
@@ -33,5 +49,6 @@ export function ProductReviewsSection({ reviewData, isLoading }: ProductReviewsS
         }
       />
     </div>
+>>>>>>> origin/main
   );
 }

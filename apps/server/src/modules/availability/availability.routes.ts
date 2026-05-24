@@ -8,6 +8,8 @@ const shopEntryParams = t.Object({ entryId: t.String(), id: t.String() });
 
 export const availabilityRoutes = new Elysia()
   .use(authPlugin)
+<<<<<<< HEAD
+=======
   .onError(({ error }) => {
     if (error instanceof Error) {
       if (error.message === "NOT_FOUND") return new Response("Shop not found", { status: 404 });
@@ -16,6 +18,7 @@ export const availabilityRoutes = new Elysia()
         return new Response("Invalid time range", { status: 422 });
     }
   })
+>>>>>>> origin/main
 
   .get(
     "/shops/:id/availability",
@@ -46,7 +49,11 @@ export const availabilityRoutes = new Elysia()
         tags: ["availability"],
       },
       params: shopParams,
+<<<<<<< HEAD
+      requireRoles: ["shop_owner", "admin"],
+=======
       requireAuth: true,
+>>>>>>> origin/main
     }
   )
 
@@ -63,7 +70,11 @@ export const availabilityRoutes = new Elysia()
         tags: ["availability"],
       },
       params: shopEntryParams,
+<<<<<<< HEAD
+      requireRoles: ["shop_owner", "admin"],
+=======
       requireAuth: true,
+>>>>>>> origin/main
     }
   )
 
@@ -80,7 +91,11 @@ export const availabilityRoutes = new Elysia()
         tags: ["availability"],
       },
       params: shopParams,
+<<<<<<< HEAD
+      requireRoles: ["shop_owner", "admin"],
+=======
       requireAuth: true,
+>>>>>>> origin/main
     }
   )
 
@@ -97,6 +112,10 @@ export const availabilityRoutes = new Elysia()
         tags: ["availability"],
       },
       params: shopEntryParams,
+<<<<<<< HEAD
+      requireRoles: ["shop_owner", "admin"],
+=======
       requireAuth: true,
+>>>>>>> origin/main
     }
   );

@@ -1,9 +1,19 @@
+<<<<<<< HEAD
+import { ArrowRight02Icon } from "@hugeicons/core-free-icons";
+import { HugeiconsIcon } from "@hugeicons/react";
+import { Link } from "@tanstack/react-router";
+import { BundleCard } from "@/components/catalog/BundleCard";
+import { ProductCard } from "@/components/catalog/ProductCard";
+import { buttonVariants } from "@/components/ui/button";
+import { useGetProducts } from "@/generated/hooks/useGetProducts";
+=======
 import { Link } from "@tanstack/react-router";
 import { ArrowRight } from "lucide-react";
 import { BundleCard } from "@/components/catalog/BundleCard";
 import { buttonVariants } from "@/components/ui/button";
 import { useGetProducts } from "@/generated/hooks/useGetProducts";
 import { WineCard } from "./WineCard";
+>>>>>>> origin/main
 
 interface ExploreSectionProps {
   mode: "wines" | "bundles";
@@ -16,8 +26,18 @@ export function ExploreSection({ mode }: ExploreSectionProps) {
     .slice(0, 8);
 
   const title = mode === "bundles" ? "Featured Bundles" : "Featured Wines";
+<<<<<<< HEAD
+  const linkTo = "/products" as const;
+  const linkLabel = mode === "bundles" ? "See all bundles" : "See all wines";
+  const linkSearch = {
+    page: 1,
+    sort: "newest" as const,
+    ...(mode === "bundles" ? ({ isBundle: true } as const) : {}),
+  };
+=======
   const linkTo = mode === "bundles" ? "/bundles" : "/wines";
   const linkLabel = mode === "bundles" ? "See all bundles" : "See all wines";
+>>>>>>> origin/main
 
   if (isLoading) {
     return (
@@ -39,7 +59,11 @@ export function ExploreSection({ mode }: ExploreSectionProps) {
     return (
       <section aria-label={title} className="space-y-4">
         <h2 className="font-heading text-2xl font-bold">{title}</h2>
+<<<<<<< HEAD
+        <p className="italic text-muted-foreground text-sm">
+=======
         <p className="text-sm text-muted-foreground italic">
+>>>>>>> origin/main
           No {mode} available to feature right now.
         </p>
       </section>
@@ -52,10 +76,17 @@ export function ExploreSection({ mode }: ExploreSectionProps) {
         <h2 className="font-heading text-2xl font-bold">{title}</h2>
         <Link
           className={buttonVariants({ size: "sm", variant: "ghost" })}
+<<<<<<< HEAD
+          search={linkSearch}
+          to={linkTo}
+        >
+          {linkLabel} <HugeiconsIcon className="ml-1 h-4 w-4" icon={ArrowRight02Icon} />
+=======
           search={{ page: 1, sort: "newest" }}
           to={linkTo}
         >
           {linkLabel} <ArrowRight className="ml-1 h-4 w-4" />
+>>>>>>> origin/main
         </Link>
       </div>
       <div className="flex gap-4 overflow-x-auto p-2 [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
@@ -66,7 +97,11 @@ export function ExploreSection({ mode }: ExploreSectionProps) {
             </div>
           ) : (
             <div className="w-70 shrink-0" key={product.id}>
+<<<<<<< HEAD
+              <ProductCard product={product} />
+=======
               <WineCard product={product} />
+>>>>>>> origin/main
             </div>
           )
         )}

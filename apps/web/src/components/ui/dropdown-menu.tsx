@@ -257,6 +257,14 @@ function DropdownMenuShortcut({ className, ...props }: React.ComponentProps<"spa
 
 export {
   DropdownMenu,
+<<<<<<< HEAD
+  DropdownMenuCheckboxItem,
+  DropdownMenuContent,
+  DropdownMenuGroup,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuPortal,
+=======
   DropdownMenuPortal,
   DropdownMenuTrigger,
   DropdownMenuContent,
@@ -264,11 +272,18 @@ export {
   DropdownMenuLabel,
   DropdownMenuItem,
   DropdownMenuCheckboxItem,
+>>>>>>> origin/main
   DropdownMenuRadioGroup,
   DropdownMenuRadioItem,
   DropdownMenuSeparator,
   DropdownMenuShortcut,
   DropdownMenuSub,
+<<<<<<< HEAD
+  DropdownMenuSubContent,
+  DropdownMenuSubTrigger,
+  DropdownMenuTrigger,
+=======
   DropdownMenuSubTrigger,
   DropdownMenuSubContent,
+>>>>>>> origin/main
 };

@@ -8,6 +8,10 @@ import {
   uuid,
   varchar,
 } from "drizzle-orm/pg-core";
+<<<<<<< HEAD
+import { createInsertSchema, createSelectSchema } from "drizzle-zod";
+=======
+>>>>>>> origin/main
 import { wineColorEnum, wineTypeEnum } from "./enums";
 import { timestamptz } from "./helpers";
 import { shops, winemakers } from "./sellers";
@@ -61,3 +65,19 @@ export const productWines = pgTable("product_wines", {
     .notNull()
     .references(() => wines.id),
 });
+<<<<<<< HEAD
+
+// Zod schemas for validation + type inference
+export const wineSelectSchema = createSelectSchema(wines);
+export const wineInsertSchema = createInsertSchema(wines);
+export type WineModel = typeof wines.$inferSelect;
+
+export const productSelectSchema = createSelectSchema(products);
+export const productInsertSchema = createInsertSchema(products);
+export type ProductModel = typeof products.$inferSelect;
+
+export const productWineSelectSchema = createSelectSchema(productWines);
+export const productWineInsertSchema = createInsertSchema(productWines);
+export type ProductWineModel = typeof productWines.$inferSelect;
+=======
+>>>>>>> origin/main

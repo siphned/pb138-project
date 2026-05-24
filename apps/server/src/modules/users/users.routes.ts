@@ -1,6 +1,9 @@
 import { Elysia } from "elysia";
 import { authPlugin } from "../auth";
+<<<<<<< HEAD
+=======
 import { userRolesRepository } from "./user-roles.repository";
+>>>>>>> origin/main
 import {
   addressBody,
   addressesResponseSchema,
@@ -13,6 +16,19 @@ import { usersService } from "./users.service";
 export const usersRoutes = new Elysia({ prefix: "/users" })
   .use(authPlugin)
 
+<<<<<<< HEAD
+  .get("/me", ({ dbUser }) => usersService.getUserWithRoles(dbUser.id), {
+    detail: {
+      description:
+        "Returns the caller's user record with their roles. If no local row exists yet, one is lazily created from Clerk profile data on first call.",
+      security: [{ bearerAuth: [] }],
+      summary: "Get current authenticated user",
+      tags: ["users"],
+    },
+    requireAuth: true,
+    response: userResponseSchema,
+  })
+=======
   .get(
     "/me",
     async ({ dbUser }) => {
@@ -31,13 +47,19 @@ export const usersRoutes = new Elysia({ prefix: "/users" })
       response: userResponseSchema,
     }
   )
+>>>>>>> origin/main
 
   .put(
     "/me",
     async ({ dbUser, body }) => {
+<<<<<<< HEAD
+      await usersService.updateProfileById(dbUser.id, body);
+      return usersService.getUserWithRoles(dbUser.id);
+=======
       const updated = await usersService.updateProfileById(dbUser.id, body);
       const roles = await userRolesRepository.findByUserId(dbUser.id);
       return { ...updated, roles };
+>>>>>>> origin/main
     },
 
     {
@@ -53,6 +75,18 @@ export const usersRoutes = new Elysia({ prefix: "/users" })
     }
   )
 
+<<<<<<< HEAD
+  .get("/me/addresses", ({ dbUser }) => usersService.getAddresses(dbUser.id), {
+    detail: {
+      description: "Returns the shipping and billing addresses linked to the authenticated user.",
+      security: [{ bearerAuth: [] }],
+      summary: "Get current user addresses",
+      tags: ["users"],
+    },
+    requireAuth: true,
+    response: addressesResponseSchema,
+  })
+=======
   .get(
     "/me/addresses",
     async ({ dbUser }) => {
@@ -69,6 +103,7 @@ export const usersRoutes = new Elysia({ prefix: "/users" })
       response: addressesResponseSchema,
     }
   )
+>>>>>>> origin/main
 
   .post(
     "/me/addresses",

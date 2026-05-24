@@ -1,0 +1,582 @@
+{
+  "info": {
+    "_postman_id": "winery-api-v1",
+    "description": "Complete API collection for WineMarket platform - 25+ endpoints covering all major flows",
+    "name": "WineMarket API",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "item": [
+        {
+          "name": "Get Current User",
+          "request": {
+            "auth": {
+              "bearer": [{ "key": "token", "value": "{{clerk_jwt_token}}" }],
+              "type": "bearer"
+            },
+            "method": "GET",
+            "url": {
+              "host": ["{{base_url}}"],
+              "path": ["users", "me"],
+              "raw": "{{base_url}}/users/me"
+            }
+          }
+        },
+        {
+          "name": "Update Profile",
+          "request": {
+            "auth": {
+              "bearer": [{ "key": "token", "value": "{{clerk_jwt_token}}" }],
+              "type": "bearer"
+            },
+            "body": { "mode": "raw", "raw": "{\"firstName\": \"John\", \"lastName\": \"Doe\"}" },
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "method": "PUT",
+            "url": {
+              "host": ["{{base_url}}"],
+              "path": ["users", "me"],
+              "raw": "{{base_url}}/users/me"
+            }
+          }
+        },
+        {
+          "name": "Get Addresses",
+          "request": {
+            "auth": {
+              "bearer": [{ "key": "token", "value": "{{clerk_jwt_token}}" }],
+              "type": "bearer"
+            },
+            "method": "GET",
+            "url": {
+              "host": ["{{base_url}}"],
+              "path": ["users", "me", "addresses"],
+              "raw": "{{base_url}}/users/me/addresses"
+            }
+          }
+        },
+        {
+          "name": "Set Shipping Address",
+          "request": {
+            "auth": {
+              "bearer": [{ "key": "token", "value": "{{clerk_jwt_token}}" }],
+              "type": "bearer"
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\"type\": \"shipping\", \"street\": \"123 Main\", \"houseNumber\": \"42\", \"city\": \"Prague\", \"postalCode\": \"11000\", \"country\": \"Czech Republic\"}"
+            },
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "method": "POST",
+            "url": {
+              "host": ["{{base_url}}"],
+              "path": ["users", "me", "addresses"],
+              "raw": "{{base_url}}/users/me/addresses"
+            }
+          }
+        }
+      ],
+      "name": "Users"
+    },
+    {
+      "item": [
+        {
+          "name": "List Wines",
+          "request": {
+            "method": "GET",
+            "url": { "host": ["{{base_url}}"], "path": ["wines"], "raw": "{{base_url}}/wines" }
+          }
+        },
+        {
+          "name": "Get Wine by ID",
+          "request": {
+            "method": "GET",
+            "url": {
+              "host": ["{{base_url}}"],
+              "path": ["wines", "wine_123"],
+              "raw": "{{base_url}}/wines/wine_123"
+            }
+          }
+        },
+        {
+          "name": "Create Wine",
+          "request": {
+            "auth": {
+              "bearer": [{ "key": "token", "value": "{{clerk_jwt_token}}" }],
+              "type": "bearer"
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\"name\": \"Bordeaux 2018\", \"region\": \"Bordeaux\", \"color\": \"red\", \"type\": \"dry\", \"vintageYear\": 2018}"
+            },
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "method": "POST",
+            "url": { "host": ["{{base_url}}"], "path": ["wines"], "raw": "{{base_url}}/wines" }
+          }
+        }
+      ],
+      "name": "Wines"
+    },
+    {
+      "item": [
+        {
+          "name": "List Products",
+          "request": {
+            "method": "GET",
+            "url": {
+              "host": ["{{base_url}}"],
+              "path": ["products"],
+              "raw": "{{base_url}}/products"
+            }
+          }
+        },
+        {
+          "name": "Get Product",
+          "request": {
+            "method": "GET",
+            "url": {
+              "host": ["{{base_url}}"],
+              "path": ["products", "product_123"],
+              "raw": "{{base_url}}/products/product_123"
+            }
+          }
+        },
+        {
+          "name": "Create Product",
+          "request": {
+            "auth": {
+              "bearer": [{ "key": "token", "value": "{{clerk_jwt_token}}" }],
+              "type": "bearer"
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\"name\": \"Premium Wine\", \"wineIds\": [\"wine_123\"], \"price\": \"79.99\", \"quantity\": 50}"
+            },
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "method": "POST",
+            "url": {
+              "host": ["{{base_url}}"],
+              "path": ["shops", "shop_123", "products"],
+              "raw": "{{base_url}}/shops/shop_123/products"
+            }
+          }
+        }
+      ],
+      "name": "Products"
+    },
+    {
+      "item": [
+        {
+          "name": "Get Cart",
+          "request": {
+            "method": "GET",
+            "url": { "host": ["{{base_url}}"], "path": ["carts"], "raw": "{{base_url}}/carts" }
+          }
+        },
+        {
+          "name": "Add Item to Cart",
+          "request": {
+            "body": { "mode": "raw", "raw": "{\"productId\": \"product_123\", \"quantity\": 2}" },
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "method": "POST",
+            "url": {
+              "host": ["{{base_url}}"],
+              "path": ["carts", "items"],
+              "raw": "{{base_url}}/carts/items"
+            }
+          }
+        },
+        {
+          "name": "Update Item Quantity",
+          "request": {
+            "body": { "mode": "raw", "raw": "{\"quantity\": 3}" },
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "method": "PUT",
+            "url": {
+              "host": ["{{base_url}}"],
+              "path": ["carts", "items", "product_123"],
+              "raw": "{{base_url}}/carts/items/product_123"
+            }
+          }
+        },
+        {
+          "name": "Checkout (Authenticated)",
+          "request": {
+            "auth": {
+              "bearer": [{ "key": "token", "value": "{{clerk_jwt_token}}" }],
+              "type": "bearer"
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\"paymentMethod\": \"card\", \"deliveryType\": \"shipping\", \"shippingAddress\": {\"street\": \"123 Main\", \"houseNumber\": \"42\", \"city\": \"Prague\", \"postalCode\": \"11000\", \"country\": \"Czech Republic\"}}"
+            },
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "method": "POST",
+            "url": {
+              "host": ["{{base_url}}"],
+              "path": ["orders", "checkout"],
+              "raw": "{{base_url}}/orders/checkout"
+            }
+          }
+        },
+        {
+          "name": "Checkout (Guest)",
+          "request": {
+            "body": {
+              "mode": "raw",
+              "raw": "{\"guestName\": \"John Doe\", \"guestEmail\": \"john@example.com\", \"paymentMethod\": \"card\", \"deliveryType\": \"shipping\", \"shippingAddress\": {\"street\": \"456 Oak\", \"houseNumber\": \"10\", \"city\": \"Brno\", \"postalCode\": \"60200\", \"country\": \"Czech Republic\"}}"
+            },
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "method": "POST",
+            "url": {
+              "host": ["{{base_url}}"],
+              "path": ["orders", "checkout"],
+              "raw": "{{base_url}}/orders/checkout"
+            }
+          }
+        },
+        {
+          "name": "Get Order",
+          "request": {
+            "auth": {
+              "bearer": [{ "key": "token", "value": "{{clerk_jwt_token}}" }],
+              "type": "bearer"
+            },
+            "method": "GET",
+            "url": {
+              "host": ["{{base_url}}"],
+              "path": ["orders", "{{last_order_id}}"],
+              "raw": "{{base_url}}/orders/{{last_order_id}}"
+            }
+          }
+        }
+      ],
+      "name": "Cart & Orders"
+    },
+    {
+      "item": [
+        {
+          "name": "List Events",
+          "request": {
+            "method": "GET",
+            "url": { "host": ["{{base_url}}"], "path": ["events"], "raw": "{{base_url}}/events" }
+          }
+        },
+        {
+          "name": "Get Event",
+          "request": {
+            "method": "GET",
+            "url": {
+              "host": ["{{base_url}}"],
+              "path": ["events", "event_123"],
+              "raw": "{{base_url}}/events/event_123"
+            }
+          }
+        },
+        {
+          "name": "Create Event",
+          "request": {
+            "auth": {
+              "bearer": [{ "key": "token", "value": "{{clerk_jwt_token}}" }],
+              "type": "bearer"
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\"title\": \"Wine Tasting\", \"description\": \"Experience our finest wines\", \"startAt\": \"2026-06-15T18:00:00Z\", \"endAt\": \"2026-06-15T21:00:00Z\", \"location\": \"Prague Wine House\", \"capacity\": 50, \"price\": \"29.99\"}"
+            },
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "method": "POST",
+            "url": { "host": ["{{base_url}}"], "path": ["events"], "raw": "{{base_url}}/events" }
+          }
+        },
+        {
+          "name": "Register for Event",
+          "request": {
+            "auth": {
+              "bearer": [{ "key": "token", "value": "{{clerk_jwt_token}}" }],
+              "type": "bearer"
+            },
+            "method": "POST",
+            "url": {
+              "host": ["{{base_url}}"],
+              "path": ["events", "event_123", "register"],
+              "raw": "{{base_url}}/events/event_123/register"
+            }
+          }
+        },
+        {
+          "name": "List Comments",
+          "request": {
+            "method": "GET",
+            "url": {
+              "host": ["{{base_url}}"],
+              "path": ["events", "event_123", "comments"],
+              "raw": "{{base_url}}/events/event_123/comments"
+            }
+          }
+        },
+        {
+          "name": "Post Comment",
+          "request": {
+            "auth": {
+              "bearer": [{ "key": "token", "value": "{{clerk_jwt_token}}" }],
+              "type": "bearer"
+            },
+            "body": { "mode": "raw", "raw": "{\"body\": \"Looking forward to this event!\"}" },
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "method": "POST",
+            "url": {
+              "host": ["{{base_url}}"],
+              "path": ["events", "event_123", "comments"],
+              "raw": "{{base_url}}/events/event_123/comments"
+            }
+          }
+        }
+      ],
+      "name": "Events"
+    },
+    {
+      "item": [
+        {
+          "name": "List Product Reviews",
+          "request": {
+            "method": "GET",
+            "url": {
+              "host": ["{{base_url}}"],
+              "path": ["products", "product_123", "reviews"],
+              "raw": "{{base_url}}/products/product_123/reviews"
+            }
+          }
+        },
+        {
+          "name": "Create Product Review",
+          "request": {
+            "auth": {
+              "bearer": [{ "key": "token", "value": "{{clerk_jwt_token}}" }],
+              "type": "bearer"
+            },
+            "body": { "mode": "raw", "raw": "{\"rating\": 5, \"body\": \"Excellent wine!\"}" },
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "method": "POST",
+            "url": {
+              "host": ["{{base_url}}"],
+              "path": ["products", "product_123", "reviews"],
+              "raw": "{{base_url}}/products/product_123/reviews"
+            }
+          }
+        },
+        {
+          "name": "List Winemaker Reviews",
+          "request": {
+            "method": "GET",
+            "url": {
+              "host": ["{{base_url}}"],
+              "path": ["winemakers", "winemaker_123", "reviews"],
+              "raw": "{{base_url}}/winemakers/winemaker_123/reviews"
+            }
+          }
+        },
+        {
+          "name": "Create Winemaker Review",
+          "request": {
+            "auth": {
+              "bearer": [{ "key": "token", "value": "{{clerk_jwt_token}}" }],
+              "type": "bearer"
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\"rating\": 4, \"body\": \"Great wines and service!\"}"
+            },
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "method": "POST",
+            "url": {
+              "host": ["{{base_url}}"],
+              "path": ["winemakers", "winemaker_123", "reviews"],
+              "raw": "{{base_url}}/winemakers/winemaker_123/reviews"
+            }
+          }
+        }
+      ],
+      "name": "Reviews"
+    },
+    {
+      "item": [
+        {
+          "name": "List Shops",
+          "request": {
+            "method": "GET",
+            "url": { "host": ["{{base_url}}"], "path": ["shops"], "raw": "{{base_url}}/shops" }
+          }
+        },
+        {
+          "name": "Get Shop",
+          "request": {
+            "method": "GET",
+            "url": {
+              "host": ["{{base_url}}"],
+              "path": ["shops", "shop_123"],
+              "raw": "{{base_url}}/shops/shop_123"
+            }
+          }
+        },
+        {
+          "name": "Create Shop",
+          "request": {
+            "auth": {
+              "bearer": [{ "key": "token", "value": "{{clerk_jwt_token}}" }],
+              "type": "bearer"
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\"name\": \"Prague Wine Emporium\", \"description\": \"Fine wines from across the globe\", \"address\": {\"street\": \"Nerudova\", \"houseNumber\": \"39\", \"city\": \"Prague\", \"postalCode\": \"11800\", \"country\": \"Czech Republic\"}}"
+            },
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "method": "POST",
+            "url": { "host": ["{{base_url}}"], "path": ["shops"], "raw": "{{base_url}}/shops" }
+          }
+        },
+        {
+          "name": "List Winemakers",
+          "request": {
+            "method": "GET",
+            "url": {
+              "host": ["{{base_url}}"],
+              "path": ["winemakers"],
+              "raw": "{{base_url}}/winemakers"
+            }
+          }
+        },
+        {
+          "name": "Get Winemaker",
+          "request": {
+            "method": "GET",
+            "url": {
+              "host": ["{{base_url}}"],
+              "path": ["winemakers", "winemaker_123"],
+              "raw": "{{base_url}}/winemakers/winemaker_123"
+            }
+          }
+        }
+      ],
+      "name": "Shops & Winemakers"
+    },
+    {
+      "item": [
+        {
+          "name": "List Events (Admin)",
+          "request": {
+            "auth": {
+              "bearer": [{ "key": "token", "value": "{{clerk_jwt_token}}" }],
+              "type": "bearer"
+            },
+            "method": "GET",
+            "url": {
+              "host": ["{{base_url}}"],
+              "path": ["admin", "events"],
+              "query": [{ "key": "status", "value": "pending" }],
+              "raw": "{{base_url}}/admin/events?status=pending"
+            }
+          }
+        },
+        {
+          "name": "Approve Event",
+          "request": {
+            "auth": {
+              "bearer": [{ "key": "token", "value": "{{clerk_jwt_token}}" }],
+              "type": "bearer"
+            },
+            "method": "POST",
+            "url": {
+              "host": ["{{base_url}}"],
+              "path": ["admin", "events", "event_123", "approve"],
+              "raw": "{{base_url}}/admin/events/event_123/approve"
+            }
+          }
+        },
+        {
+          "name": "Reject Event",
+          "request": {
+            "auth": {
+              "bearer": [{ "key": "token", "value": "{{clerk_jwt_token}}" }],
+              "type": "bearer"
+            },
+            "method": "POST",
+            "url": {
+              "host": ["{{base_url}}"],
+              "path": ["admin", "events", "event_123", "reject"],
+              "raw": "{{base_url}}/admin/events/event_123/reject"
+            }
+          }
+        },
+        {
+          "name": "List Users",
+          "request": {
+            "auth": {
+              "bearer": [{ "key": "token", "value": "{{clerk_jwt_token}}" }],
+              "type": "bearer"
+            },
+            "method": "GET",
+            "url": {
+              "host": ["{{base_url}}"],
+              "path": ["admin", "users"],
+              "raw": "{{base_url}}/admin/users"
+            }
+          }
+        },
+        {
+          "name": "Set User Status",
+          "request": {
+            "auth": {
+              "bearer": [{ "key": "token", "value": "{{clerk_jwt_token}}" }],
+              "type": "bearer"
+            },
+            "body": { "mode": "raw", "raw": "{\"status\": \"suspended\"}" },
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "method": "PATCH",
+            "url": {
+              "host": ["{{base_url}}"],
+              "path": ["admin", "users", "user_123", "status"],
+              "raw": "{{base_url}}/admin/users/user_123/status"
+            }
+          }
+        },
+        {
+          "name": "List Reviews",
+          "request": {
+            "auth": {
+              "bearer": [{ "key": "token", "value": "{{clerk_jwt_token}}" }],
+              "type": "bearer"
+            },
+            "method": "GET",
+            "url": {
+              "host": ["{{base_url}}"],
+              "path": ["admin", "reviews"],
+              "raw": "{{base_url}}/admin/reviews"
+            }
+          }
+        },
+        {
+          "name": "Delete Review",
+          "request": {
+            "auth": {
+              "bearer": [{ "key": "token", "value": "{{clerk_jwt_token}}" }],
+              "type": "bearer"
+            },
+            "method": "DELETE",
+            "url": {
+              "host": ["{{base_url}}"],
+              "path": ["admin", "reviews", "review_123"],
+              "raw": "{{base_url}}/admin/reviews/review_123"
+            }
+          }
+        }
+      ],
+      "name": "Admin"
+    }
+  ],
+  "variable": [
+    { "key": "base_url", "type": "string", "value": "http://localhost:3000" },
+    { "key": "clerk_jwt_token", "type": "string", "value": "" },
+    { "key": "last_order_id", "type": "string", "value": "" }
+  ]
+}

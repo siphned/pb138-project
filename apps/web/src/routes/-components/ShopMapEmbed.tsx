@@ -1,5 +1,12 @@
+<<<<<<< HEAD
+import { ArrowUpRight01Icon } from "@hugeicons/core-free-icons";
+import { HugeiconsIcon } from "@hugeicons/react";
+import { useQuery } from "@tanstack/react-query";
+import { Skeleton } from "@/components/ui/skeleton";
+=======
 import { ExternalLink } from "lucide-react";
 import { useEffect, useState } from "react";
+>>>>>>> origin/main
 import type { GetShopsById200 } from "@/generated/types/GetShopsById";
 
 interface ShopMapEmbedProps {
@@ -11,6 +18,29 @@ interface Coords {
   lon: string;
 }
 
+<<<<<<< HEAD
+async function geocode(query: string): Promise<Coords> {
+  const res = await fetch(
+    `https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(query)}&format=json&limit=1`,
+    { headers: { "Accept-Language": "en" } }
+  );
+  const data: { lat: string; lon: string }[] = await res.json();
+  if (!data[0]) throw new Error("NOT_FOUND");
+  return { lat: data[0].lat, lon: data[0].lon };
+}
+
+export function ShopMapEmbed({ address }: ShopMapEmbedProps) {
+  const query = `${address.street} ${address.houseNumber}, ${address.city}, ${address.country}`;
+  const osmSearchUrl = `https://www.openstreetmap.org/search?query=${encodeURIComponent(query)}`;
+
+  const { data: coords, isError } = useQuery({
+    queryFn: () => geocode(query),
+    queryKey: ["osm-geocode", query],
+    retry: false,
+  });
+
+  if (isError) {
+=======
 export function ShopMapEmbed({ address }: ShopMapEmbedProps) {
   const [coords, setCoords] = useState<Coords | null>(null);
   const [failed, setFailed] = useState(false);
@@ -41,6 +71,7 @@ export function ShopMapEmbed({ address }: ShopMapEmbedProps) {
   }, [query]);
 
   if (failed) {
+>>>>>>> origin/main
     return (
       <div className="flex h-64 w-full items-center justify-center rounded-2xl border bg-secondary/10">
         <a
@@ -49,7 +80,11 @@ export function ShopMapEmbed({ address }: ShopMapEmbedProps) {
           rel="noopener noreferrer"
           target="_blank"
         >
+<<<<<<< HEAD
+          <HugeiconsIcon className="h-4 w-4" icon={ArrowUpRight01Icon} />
+=======
           <ExternalLink className="h-4 w-4" />
+>>>>>>> origin/main
           View location on OpenStreetMap
         </a>
       </div>
@@ -57,7 +92,11 @@ export function ShopMapEmbed({ address }: ShopMapEmbedProps) {
   }
 
   if (!coords) {
+<<<<<<< HEAD
+    return <Skeleton className="h-64 w-full rounded-2xl" />;
+=======
     return <div className="h-64 w-full animate-pulse rounded-2xl bg-secondary/20" />;
+>>>>>>> origin/main
   }
 
   const delta = 0.01;

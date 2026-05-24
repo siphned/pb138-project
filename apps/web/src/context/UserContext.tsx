@@ -3,6 +3,10 @@ import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { createContext, type ReactNode, useContext, useEffect, useState } from "react";
 import { getUsersMeQueryKey, getUsersMeQueryOptions } from "@/generated/hooks/useGetUsersMe";
 import { usePutUsersMe } from "@/generated/hooks/usePutUsersMe";
+<<<<<<< HEAD
+import { Role } from "@/types/roles";
+=======
+>>>>>>> origin/main
 
 export interface UserProfile {
   id: string;
@@ -10,13 +14,37 @@ export interface UserProfile {
   lname: string;
   email: string;
   clerkId: string;
+<<<<<<< HEAD
+  roles: Role[];
+}
+
+// Backend sends lowercase/snake-case role strings (`customer`/`winemaker`/
+// `shop_owner`/`admin`); the FE Role enum uses Title-Case display values.
+// Map between them at the boundary; unknown roles (e.g. `admin`) are dropped.
+const API_TO_ROLE: Record<string, Role> = {
+  admin: Role.admin,
+  customer: Role.customer,
+  shop_owner: Role.shopOwner,
+  winemaker: Role.winemaker,
+};
+
+const toRoles = (apiRoles: readonly string[] | null | undefined): Role[] =>
+  (apiRoles ?? []).map((r) => API_TO_ROLE[r]).filter((r): r is Role => Boolean(r));
+
+=======
   roles: string[];
 }
 
+>>>>>>> origin/main
 interface UserContextType {
   user: UserProfile | null;
   updateUser: (newData: Partial<Pick<UserProfile, "fname" | "lname">>) => Promise<UserProfile>;
   isLoading: boolean;
+<<<<<<< HEAD
+  activeRole: Role;
+  setActiveRole: (role: Role) => void;
+=======
+>>>>>>> origin/main
 }
 
 const defaultUser: UserProfile | null = null;
@@ -39,6 +67,10 @@ export function UserProvider({ children }: { children: ReactNode }) {
   });
 
   const [user, setUser] = useState<UserProfile | null>(defaultUser);
+<<<<<<< HEAD
+
+=======
+>>>>>>> origin/main
   useEffect(() => {
     if (profile) {
       setUser({
@@ -47,13 +79,27 @@ export function UserProvider({ children }: { children: ReactNode }) {
         fname: profile.fname,
         id: profile.id,
         lname: profile.lname,
+<<<<<<< HEAD
+        roles: toRoles(profile.roles),
+=======
         roles: profile.roles ?? [],
+>>>>>>> origin/main
       });
     } else if (isLoaded && !isSignedIn) {
       setUser(null);
     }
   }, [profile, isLoaded, isSignedIn]);
 
+<<<<<<< HEAD
+  const [activeRole, setActiveRole] = useState<Role>(Role.customer);
+  useEffect(() => {
+    if (user && user.roles.length > 0 && !user.roles.includes(activeRole)) {
+      setActiveRole(user.roles[0] as Role);
+    }
+  }, [user, activeRole]);
+
+=======
+>>>>>>> origin/main
   const updateUser = async (
     newData: Partial<Pick<UserProfile, "fname" | "lname">>
   ): Promise<UserProfile> => {
@@ -65,14 +111,24 @@ export function UserProvider({ children }: { children: ReactNode }) {
       fname: updated.fname,
       id: updated.id,
       lname: updated.lname,
+<<<<<<< HEAD
+      roles: toRoles(updated.roles),
+=======
       roles: updated.roles ?? [],
+>>>>>>> origin/main
     };
   };
 
   const isLoading = !isLoaded || (isSignedIn && isQueryLoading);
 
   return (
+<<<<<<< HEAD
+    <UserContext.Provider value={{ activeRole, isLoading, setActiveRole, updateUser, user }}>
+      {children}
+    </UserContext.Provider>
+=======
     <UserContext.Provider value={{ isLoading, updateUser, user }}>{children}</UserContext.Provider>
+>>>>>>> origin/main
   );
 }
 

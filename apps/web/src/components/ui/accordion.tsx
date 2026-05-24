@@ -71,4 +71,8 @@ function AccordionContent({ className, children, ...props }: AccordionPrimitive.
   );
 }
 
+<<<<<<< HEAD
+export { Accordion, AccordionContent, AccordionItem, AccordionTrigger };
+=======
 export { Accordion, AccordionItem, AccordionTrigger, AccordionContent };
+>>>>>>> origin/main

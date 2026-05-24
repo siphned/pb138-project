@@ -22,7 +22,10 @@
     "noImplicitOverride": true,
 
     // Path aliases
+<<<<<<< HEAD
+=======
     "baseUrl": ".",
+>>>>>>> origin/main
     "paths": {
       "@repo/shared/*": ["../../../packages/shared/src/*"]
     },
@@ -31,5 +34,6 @@
     "noUnusedLocals": true,
     "noUnusedParameters": true,
     "noPropertyAccessFromIndexSignature": false
-  }
+  },
+  "exclude": ["src/**/*.test.*", "src/**/*.spec.*", "**/*.test.*", "**/*.spec.*"]
 }

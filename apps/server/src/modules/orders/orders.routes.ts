@@ -14,6 +14,31 @@ const addressSchema = t.Object({
   street: t.String(),
 });
 
+<<<<<<< HEAD
+const addressWithIdSchema = t.Object({
+  city: t.String(),
+  country: t.String(),
+  houseNumber: t.String(),
+  id: t.String(),
+  postalCode: t.String(),
+  street: t.String(),
+});
+
+const orderItemSchema = t.Object({
+  id: t.String(),
+  orderId: t.String(),
+  product: t.Object({
+    id: t.String(),
+    name: t.String(),
+  }),
+  productId: t.String(),
+  quantity: t.Number(),
+  shopId: t.String(),
+  unitPriceAtPurchase: t.String(),
+});
+
+=======
+>>>>>>> origin/main
 const orderResponse = t.Object({
   billingAddressId: t.String(),
   createdAt: t.Date(),
@@ -34,6 +59,32 @@ const orderResponse = t.Object({
   userId: t.Union([t.String(), t.Null()]),
 });
 
+<<<<<<< HEAD
+const orderDetailedResponse = t.Object({
+  billingAddress: addressWithIdSchema,
+  billingAddressId: t.String(),
+  createdAt: t.Date(),
+  deletedAt: t.Union([t.Date(), t.Null()]),
+  deliveryType: t.String(),
+  discount: t.String(),
+  guestEmail: t.Union([t.String(), t.Null()]),
+  guestName: t.Union([t.String(), t.Null()]),
+  guestSessionId: t.Union([t.String(), t.Null()]),
+  id: t.String(),
+  items: t.Array(orderItemSchema),
+  paymentMethod: t.String(),
+  paymentStatus: t.String(),
+  shippingAddress: addressWithIdSchema,
+  shippingAddressId: t.String(),
+  shippingFee: t.String(),
+  status: t.String(),
+  totalPrice: t.String(),
+  updatedAt: t.Union([t.Date(), t.Null()]),
+  userId: t.Union([t.String(), t.Null()]),
+});
+
+=======
+>>>>>>> origin/main
 const checkoutBody = t.Object({
   billingAddress: t.Optional(addressSchema),
   deliveryType: t.Union([t.Literal("pickup"), t.Literal("shipping")]),
@@ -52,17 +103,70 @@ export const ordersRoutes = new Elysia({ prefix: "/orders", tags: ["orders"] })
   .derive(async ({ headers, cookie: { guest_session_id } }) => {
     const payload = await verifyClerkToken(headers.authorization);
     if (payload) {
+<<<<<<< HEAD
+      const dbUser = await usersService.lazyGetOrCreate(payload.sub);
+=======
       const dbUser = await usersService.lazyGetOrCreate(payload.sub, payload);
+>>>>>>> origin/main
       const guestSessionId = guest_session_id?.value;
       if (typeof guestSessionId === "string") {
         await cartsService.mergeOnLogin(dbUser.id, guestSessionId);
         guest_session_id?.remove();
       }
+<<<<<<< HEAD
+      return {
+        clerkPayload: payload,
+        isAdmin: payload.roles?.includes("admin") ?? false,
+        sessionId: undefined as string | undefined,
+        user: dbUser,
+      };
+    }
+    return {
+      clerkPayload: null as Awaited<ReturnType<typeof verifyClerkToken>>,
+      isAdmin: false,
+      sessionId: guest_session_id?.value as string | undefined,
+      user: undefined,
+    };
+  })
+
+  .get(
+    "/",
+    async ({ user, clerkPayload, query }) => {
+      if (!user) return status(401, "Auth required");
+      if (!query.shopId) return ordersService.listForUser(user.id);
+
+      const roles = clerkPayload?.roles ?? [];
+      const isAdmin = roles.includes("admin");
+      if (!isAdmin && !roles.includes("shop_owner")) return status(403, "Forbidden");
+
+      try {
+        return await ordersService.listForShop(query.shopId, user.id, isAdmin);
+      } catch (e: unknown) {
+        if (e instanceof Error) {
+          if (e.message === "NOT_FOUND") return status(404, "Not found");
+          if (e.message === "FORBIDDEN") return status(403, "Forbidden");
+        }
+        throw e;
+      }
+    },
+    {
+      detail: {
+        description:
+          "Without shopId: returns the authenticated customer's order history. With shopId: returns all orders for that shop (shop_owner or admin only).",
+        summary: "List orders",
+      },
+      query: t.Object({ shopId: t.Optional(t.String()) }),
+      response: { 200: t.Array(orderResponse), 401: t.String(), 403: t.String(), 404: t.String() },
+    }
+  )
+
+=======
       return { sessionId: undefined as string | undefined, user: dbUser };
     }
     return { sessionId: guest_session_id?.value as string | undefined, user: undefined };
   })
 
+>>>>>>> origin/main
   .post(
     "/checkout",
     async ({ user, sessionId, body }) => {
@@ -97,10 +201,17 @@ export const ordersRoutes = new Elysia({ prefix: "/orders", tags: ["orders"] })
 
   .get(
     "/:id",
+<<<<<<< HEAD
+    async ({ user, params, isAdmin }) => {
+      if (!user) return status(401, "Auth required");
+      try {
+        return await ordersService.getOrder(params.id, user.id, isAdmin);
+=======
     async ({ user, params }) => {
       if (!user) return status(401, "Auth required");
       try {
         return await ordersService.getOrder(params.id, user.id);
+>>>>>>> origin/main
       } catch (e: unknown) {
         if (e instanceof Error) {
           if (e.message === "NOT_FOUND") return status(404, "Not found");
@@ -111,10 +222,61 @@ export const ordersRoutes = new Elysia({ prefix: "/orders", tags: ["orders"] })
     },
     {
       detail: {
+<<<<<<< HEAD
+        description:
+          "Returns an order by ID with items and addresses. The owning user or an admin can access it.",
+        summary: "Get order by ID",
+      },
+      params: t.Object({ id: t.String() }),
+      response: { 200: orderDetailedResponse, 401: t.String(), 403: t.String(), 404: t.String() },
+    }
+  )
+
+  .patch(
+    "/:id/status",
+    async ({ dbUser, clerkPayload, params, body }) => {
+      const isAdmin = clerkPayload.roles?.includes("admin") ?? false;
+      try {
+        return await ordersService.updateStatus(params.id, dbUser.id, body.status, isAdmin);
+      } catch (e: unknown) {
+        if (e instanceof Error) {
+          if (e.message === "NOT_FOUND") return status(404, "Not found");
+          if (e.message === "FORBIDDEN") return status(403, "Forbidden");
+          if (e.message === "INVALID_TRANSITION") return status(422, e.message);
+        }
+        throw e;
+      }
+    },
+    {
+      body: t.Object({
+        status: t.Union([
+          t.Literal("pending"),
+          t.Literal("confirmed"),
+          t.Literal("shipped"),
+          t.Literal("delivered"),
+          t.Literal("cancelled"),
+        ]),
+      }),
+      detail: {
+        description:
+          "Advance an order's status. Shop owners may only update orders containing items from their shops. Valid transitions: pending→confirmed, confirmed→shipped, shipped→delivered, any→cancelled.",
+        security: [{ bearerAuth: [] }],
+        summary: "Update order status",
+      },
+      params: t.Object({ id: t.String() }),
+      requireRoles: ["shop_owner", "admin"],
+      response: {
+        200: orderResponse,
+        403: t.String(),
+        404: t.String(),
+        422: t.String(),
+      },
+=======
         description: "Returns an order by ID. Only the owning user can access it.",
         summary: "Get order by ID",
       },
       params: t.Object({ id: t.String() }),
       response: { 200: orderResponse, 401: t.String(), 403: t.String(), 404: t.String() },
+>>>>>>> origin/main
     }
   );

@@ -1,4 +1,41 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
+<<<<<<< HEAD
+import { db } from "../../db";
+import * as productsRepo from "../products/products.repository";
+import * as cartsRepo from "./carts.repository";
+import { cartsService } from "./carts.service";
+
+vi.mock("./carts.repository", async (importOriginal) => {
+  const actual = await importOriginal<typeof import("./carts.repository")>();
+  return {
+    ...actual,
+    addItem: vi.fn(),
+    clearCart: vi.fn(),
+    create: vi.fn(),
+    deleteCart: vi.fn(),
+    findBySessionId: vi.fn(),
+    findByUserId: vi.fn(),
+    getCartItems: vi.fn(),
+    removeItem: vi.fn(),
+    updateItemQuantity: vi.fn(),
+  };
+});
+
+vi.mock("../products/products.repository", async (importOriginal) => {
+  const actual = await importOriginal<typeof import("../products/products.repository")>();
+  return { ...actual, findById: vi.fn() };
+});
+
+vi.mock("../../db", () => {
+  const m = {
+    query: {
+      carts: { findFirst: vi.fn() },
+    },
+    transaction: vi.fn((cb) => cb(m)),
+  };
+  return { db: m };
+});
+=======
 
 vi.mock("./carts.repository", () => ({
   cartsRepository: {
@@ -21,12 +58,40 @@ vi.mock("../products/products.repository", () => ({
 
 import { cartsRepository } from "./carts.repository";
 import { cartsService } from "./carts.service";
+>>>>>>> origin/main
 
 describe("cartsService", () => {
   beforeEach(() => {
     vi.clearAllMocks();
   });
 
+<<<<<<< HEAD
+  const userId = "u1";
+  const sessionId = "s1";
+  const productId = "p1";
+  const cartId = "c1";
+
+  describe("getCartForUser", () => {
+    it("returns existing cart if found", async () => {
+      const mockCart = { id: cartId, items: [] };
+      vi.mocked(cartsRepo.findByUserId).mockResolvedValue(mockCart as any);
+      vi.mocked(db.query.carts.findFirst).mockResolvedValue(mockCart as any);
+
+      const result = await cartsService.getCartForUser(userId);
+
+      expect(result?.id).toBe(cartId);
+    });
+
+    it("creates and returns new cart if none found", async () => {
+      vi.mocked(cartsRepo.findByUserId).mockResolvedValue(undefined);
+      vi.mocked(cartsRepo.create).mockResolvedValue({ id: "new-c" } as any);
+      vi.mocked(cartsRepo.getCartItems).mockResolvedValue([]);
+      vi.mocked(db.query.carts.findFirst).mockResolvedValue({ id: "new-c" } as any);
+
+      const result = await cartsService.getCartForUser(userId);
+
+      expect(result?.id).toBe("new-c");
+=======
   describe("getCartForUser", () => {
     it("creates a new cart if one doesn't exist for the user", async () => {
       vi.mocked(cartsRepository.findByUserId).mockResolvedValue(undefined);
@@ -64,10 +129,21 @@ describe("cartsService", () => {
 
       expect(result?.id).toBe("new-s-cart");
       expect(cartsRepository.create).toHaveBeenCalledWith({ sessionId: "s1" });
+>>>>>>> origin/main
     });
   });
 
   describe("addItem", () => {
+<<<<<<< HEAD
+    it("adds item to user cart and returns updated cart", async () => {
+      vi.mocked(cartsRepo.findByUserId).mockResolvedValue({ id: cartId } as any);
+      vi.mocked(productsRepo.findById).mockResolvedValue({ id: productId, quantity: 10 } as any);
+      vi.mocked(cartsRepo.getCartItems).mockResolvedValue([]);
+
+      await cartsService.addItem({ userId }, productId, 2);
+
+      expect(cartsRepo.addItem).toHaveBeenCalledWith(db, cartId, productId, 2);
+=======
     it("adds item to existing user cart", async () => {
       vi.mocked(cartsRepository.findByUserId).mockResolvedValue({ id: "c1" } as never);
 
@@ -115,11 +191,26 @@ describe("cartsService", () => {
       await cartsService.removeItem({ sessionId: "s1" }, "p1");
 
       expect(cartsRepository.removeItem).toHaveBeenCalledWith("c1", "p1");
+>>>>>>> origin/main
     });
   });
 
   describe("mergeOnLogin", () => {
     it("merges guest cart into user cart if guest cart exists", async () => {
+<<<<<<< HEAD
+      const guestCartId = "guest-c";
+      const userCartId = "user-c";
+      const guestItems = [{ productId: "p1", quantity: 1 }];
+
+      vi.mocked(cartsRepo.findBySessionId).mockResolvedValue({ id: guestCartId } as any);
+      vi.mocked(cartsRepo.findByUserId).mockResolvedValue({ id: userCartId } as any);
+      vi.mocked(cartsRepo.getCartItems).mockResolvedValue(guestItems as any);
+
+      await cartsService.mergeOnLogin(userId, sessionId);
+
+      expect(cartsRepo.addItem).toHaveBeenCalledWith(expect.anything(), userCartId, "p1", 1);
+      expect(cartsRepo.deleteCart).toHaveBeenCalledWith(expect.anything(), guestCartId);
+=======
       const guestCart = { id: "guest-cart-1" };
       const userCart = { id: "user-cart-1" };
 
@@ -148,6 +239,7 @@ describe("cartsService", () => {
       await cartsService.mergeOnLogin("user-1", "session-1");
 
       expect(cartsRepository.mergeCarts).not.toHaveBeenCalled();
+>>>>>>> origin/main
     });
   });
 });

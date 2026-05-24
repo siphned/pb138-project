@@ -1,7 +1,12 @@
 #next-steps {
   display: flex;
+<<<<<<< HEAD
+  text-align: left;
+  border-top: 1px solid var(--border);
+=======
   border-top: 1px solid var(--border);
   text-align: left;
+>>>>>>> origin/main
 
   & > div {
     flex: 1 1 0;
@@ -12,9 +17,15 @@
   }
 
   .icon {
+<<<<<<< HEAD
+    width: 22px;
+    height: 22px;
+    margin-bottom: 16px;
+=======
     margin-bottom: 16px;
     width: 22px;
     height: 22px;
+>>>>>>> origin/main
   }
 
   @media (max-width: 1024px) {
@@ -24,17 +35,36 @@
 }
 
 #next-steps ul {
+<<<<<<< HEAD
+  display: flex;
+  gap: 8px;
+  padding: 0;
+  margin: 32px 0 0;
+  list-style: none;
+=======
   list-style: none;
   padding: 0;
   display: flex;
   gap: 8px;
   margin: 32px 0 0;
+>>>>>>> origin/main
 
   .logo {
     height: 18px;
   }
 
   a {
+<<<<<<< HEAD
+    display: flex;
+    gap: 8px;
+    align-items: center;
+    padding: 6px 12px;
+    font-size: 16px;
+    color: var(--text-h);
+    text-decoration: none;
+    background: var(--social-bg);
+    border-radius: 6px;
+=======
     color: var(--text-h);
     font-size: 16px;
     border-radius: 6px;
@@ -44,21 +74,33 @@
     align-items: center;
     gap: 8px;
     text-decoration: none;
+>>>>>>> origin/main
     transition: box-shadow 0.3s;
 
     &:hover {
       box-shadow: var(--shadow);
     }
     .button-icon {
+<<<<<<< HEAD
+      width: 18px;
+      height: 18px;
+=======
       height: 18px;
       width: 18px;
+>>>>>>> origin/main
     }
   }
 
   @media (max-width: 1024px) {
+<<<<<<< HEAD
+    flex-wrap: wrap;
+    justify-content: center;
+    margin-top: 20px;
+=======
     margin-top: 20px;
     flex-wrap: wrap;
     justify-content: center;
+>>>>>>> origin/main
 
     li {
       flex: 1 1 calc(50% - 8px);
@@ -68,22 +110,29 @@
 
 @media (max-width: 1024px) {
   #next-steps ul a {
+<<<<<<< HEAD
+    box-sizing: border-box;
+    justify-content: center;
+    width: 100%;
+=======
     width: 100%;
     justify-content: center;
     box-sizing: border-box;
+>>>>>>> origin/main
   }
 }
 
 .counter {
-  font-size: 16px;
   padding: 5px 10px;
-  border-radius: 5px;
+  margin-bottom: 24px;
+  font-size: 16px;
   color: var(--accent);
   background: var(--accent-bg);
   border: 2px solid transparent;
+  border-radius: 5px;
   transition: border-color 0.3s;
-  margin-bottom: 24px;
 
+  /* biome-ignore lint/style/noDescendingSpecificity: specificity reorder would break nesting */
   &:hover {
     border-color: var(--accent-border);
   }
@@ -104,9 +153,9 @@
   }
 
   .base {
-    width: 170px;
     position: relative;
     z-index: 0;
+    width: 170px;
   }
 
   .framework,
@@ -115,32 +164,35 @@
   }
 
   .framework {
-    z-index: 1;
     top: 34px;
+    z-index: 1;
     height: 28px;
     transform: perspective(2000px) rotateZ(300deg) rotateX(44deg) rotateY(39deg) scale(1.4);
   }
 
   .vite {
-    z-index: 0;
     top: 107px;
-    height: 26px;
+    z-index: 0;
     width: auto;
+    height: 26px;
     transform: perspective(2000px) rotateZ(300deg) rotateX(40deg) rotateY(39deg) scale(0.8);
   }
 }
 
 #center {
   display: flex;
+  flex-grow: 1;
   flex-direction: column;
   gap: 25px;
   place-content: center;
   place-items: center;
-  flex-grow: 1;
 
   @media (max-width: 1024px) {
-    padding: 32px 20px 24px;
     gap: 18px;
+<<<<<<< HEAD
+    padding: 32px 20px 24px;
+=======
+>>>>>>> origin/main
   }
 }
 
@@ -167,9 +219,9 @@
 
   &::before,
   &::after {
-    content: "";
     position: absolute;
     top: -4.5px;
+    content: "";
     border: 5px solid transparent;
   }
 

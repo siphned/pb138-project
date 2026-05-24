@@ -1,3 +1,10 @@
+<<<<<<< HEAD
+import { Elysia, t } from "elysia";
+import { errorResponse } from "../../utils/error-plugin";
+import { authPlugin } from "../auth";
+import { supplyAgreementsService } from "./supply-agreements.service";
+
+=======
 import { Elysia, status, t } from "elysia";
 import { authPlugin } from "../auth";
 import { supplyAgreementsService } from "./supply-agreements.service";
@@ -12,6 +19,7 @@ function handleError(e: unknown) {
   throw e;
 }
 
+>>>>>>> origin/main
 const agreementResponse = t.Object({
   createdAt: t.Date(),
   id: t.String(),
@@ -21,12 +29,15 @@ const agreementResponse = t.Object({
   winemakerId: t.String(),
 });
 
+<<<<<<< HEAD
+=======
 const errorResponse = {
   403: t.String(),
   404: t.String(),
   422: t.String(),
 };
 
+>>>>>>> origin/main
 export const supplyAgreementsRoutes = new Elysia({
   prefix: "/supply-agreements",
   tags: ["supply-agreements"],
@@ -35,6 +46,10 @@ export const supplyAgreementsRoutes = new Elysia({
 
   .post(
     "/",
+<<<<<<< HEAD
+    ({ dbUser, body }) =>
+      supplyAgreementsService.createRequest(dbUser.id, body.winemakerId, body.shopId),
+=======
     async ({ dbUser, body }) => {
       try {
         return await supplyAgreementsService.createRequest(
@@ -46,6 +61,7 @@ export const supplyAgreementsRoutes = new Elysia({
         return handleError(e);
       }
     },
+>>>>>>> origin/main
     {
       body: t.Object({
         shopId: t.String(),
@@ -57,12 +73,20 @@ export const supplyAgreementsRoutes = new Elysia({
         summary: "Create a supply agreement request",
       },
       requireRoles: ["shop_owner"],
+<<<<<<< HEAD
+      response: { 200: agreementResponse, 403: errorResponse, 404: errorResponse },
+=======
       response: { 200: agreementResponse, ...errorResponse },
+>>>>>>> origin/main
     }
   )
 
   .patch(
     "/:id",
+<<<<<<< HEAD
+    ({ dbUser, params, body }) =>
+      supplyAgreementsService.respondToRequest(dbUser.id, params.id, body.status),
+=======
     async ({ dbUser, params, body }) => {
       try {
         return await supplyAgreementsService.respondToRequest(dbUser.id, params.id, body.status);
@@ -70,6 +94,7 @@ export const supplyAgreementsRoutes = new Elysia({
         return handleError(e);
       }
     },
+>>>>>>> origin/main
     {
       body: t.Object({
         status: t.Union([t.Literal("approved"), t.Literal("rejected")]),
@@ -81,12 +106,24 @@ export const supplyAgreementsRoutes = new Elysia({
       },
       params: t.Object({ id: t.String() }),
       requireRoles: ["winemaker"],
+<<<<<<< HEAD
+      response: {
+        200: agreementResponse,
+        403: errorResponse,
+        404: errorResponse,
+        409: errorResponse,
+      },
+=======
       response: { 200: agreementResponse, ...errorResponse },
+>>>>>>> origin/main
     }
   )
 
   .get(
     "/shop/:shopId",
+<<<<<<< HEAD
+    ({ dbUser, params }) => supplyAgreementsService.listForShop(dbUser.id, params.shopId),
+=======
     async ({ dbUser, params }) => {
       try {
         return await supplyAgreementsService.listForShop(dbUser.id, params.shopId);
@@ -94,6 +131,7 @@ export const supplyAgreementsRoutes = new Elysia({
         return handleError(e);
       }
     },
+>>>>>>> origin/main
     {
       detail: {
         security: [{ bearerAuth: [] }],
@@ -101,6 +139,20 @@ export const supplyAgreementsRoutes = new Elysia({
       },
       params: t.Object({ shopId: t.String() }),
       requireRoles: ["shop_owner"],
+<<<<<<< HEAD
+      response: { 200: t.Array(agreementResponse), 403: errorResponse },
+    }
+  )
+
+  .get("/winemaker", ({ dbUser }) => supplyAgreementsService.listForWinemaker(dbUser.id), {
+    detail: {
+      security: [{ bearerAuth: [] }],
+      summary: "List supply agreements for the authenticated winemaker",
+    },
+    requireRoles: ["winemaker"],
+    response: { 200: t.Array(agreementResponse), 403: errorResponse },
+  });
+=======
       response: { 200: t.Array(agreementResponse), ...errorResponse },
     }
   )
@@ -123,3 +175,4 @@ export const supplyAgreementsRoutes = new Elysia({
       response: { 200: t.Array(agreementResponse), ...errorResponse },
     }
   );
+>>>>>>> origin/main

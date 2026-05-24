@@ -1,15 +1,42 @@
 # server
 
-To install dependencies:
+## Local Development
 
-```bash
-bun install
-```
+1. **Start Database**:
+   ```bash
+   docker compose up -d
+   ```
 
-To run:
+2. **Setup Environment**:
+   Copy `.env.example` to `.env` and adjust if needed.
+   See [Clerk Setup](../../docs/CLERK_SETUP.md) for more details.
+   ```bash
+   cp .env.example .env
+   ```
 
-```bash
-bun run index.ts
-```
+3. **Install dependencies**:
+   ```bash
+   bun install
+   ```
 
-This project was created using `bun init` in bun v1.3.11. [Bun](https://bun.com) is a fast all-in-one JavaScript runtime.
+4. **Run migrations**:
+   ```bash
+   bun run db:migrate
+   ```
+
+5. **Seed database** (optional):
+   ```bash
+   bun run db:seed
+   ```
+
+6. **Start server**:
+   ```bash
+   bun run dev
+   ```
+
+## Tech Stack
+- **Framework**: ElysiaJS
+- **Runtime**: Bun
+- **ORM**: Drizzle ORM
+- **Database**: PostgreSQL
+- **Validation**: Zod
