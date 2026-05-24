@@ -53,7 +53,15 @@ export function ProductCard({ product }: ProductCardProps) {
           </Link>
         </h3>
 
-        <p className="text-xs text-muted-foreground mt-1">{product.shop.name}</p>
+        <p className="mt-1 text-xs text-muted-foreground">
+          <Link
+            className="relative z-10 transition-colors hover:text-primary hover:underline"
+            params={{ id: product.shop.id }}
+            to="/shops/$id"
+          >
+            {product.shop.name}
+          </Link>
+        </p>
 
         <div className="mt-2 text-lg font-bold text-foreground">{price}</div>
       </div>

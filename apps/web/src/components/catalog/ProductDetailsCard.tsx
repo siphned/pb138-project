@@ -165,7 +165,7 @@ export function ProductDetailsCard({
                 <p className="text-sm text-muted-foreground">
                   Sold by{" "}
                   <Link
-                    className="font-medium text-foreground transition-colors hover:text-primary"
+                    className="font-semibold text-primary underline-offset-2 transition-colors hover:underline"
                     params={{ id: product.shop.id }}
                     to="/shops/$id"
                   >
