@@ -1,10 +1,12 @@
 import { Show, useClerk } from "@clerk/react";
-import { ShoppingCart01Icon, UserCircleIcon } from "@hugeicons/core-free-icons";
+import { ShoppingCart02Icon, User02Icon } from "@hugeicons/core-free-icons";
 import { HugeiconsIcon } from "@hugeicons/react";
 import { Link } from "@tanstack/react-router";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Button } from "@/components/ui/button";
+import { buttonVariants } from "@/components/ui/button";
 import { useUser } from "@/context/UserContext";
+import { useGetCarts } from "@/generated/hooks/useGetCarts";
+import { cn } from "@/lib/utils";
 import { HeaderSearch } from "./HeaderSearch";
 import { Sidebar } from "./Sidebar";
 
@@ -14,27 +16,41 @@ export function Header() {
   const { user, activeRole, setActiveRole } = useUser();
   const roles = user?.roles ?? [];
 
+  const { data: cart } = useGetCarts();
+  const cartCount = cart?.items.reduce((acc, item) => acc + Number(item.quantity || 0), 0) ?? 0;
+
   return (
     <header className="h-16 border-b bg-background flex items-center justify-between px-6 lg:px-12">
-      {/* Left: Logo Area */}
       <Link to="/">
         <img alt="Wine Enjoyers" className="h-10 w-auto" src="/logo.png" />
       </Link>
 
-      {/* Right: Icons & Menus */}
       <div className="flex items-center gap-4">
         <HeaderSearch />
-        <Button className="hidden sm:flex" size="icon" variant="ghost">
-          <Link to="/cart">
-            <HugeiconsIcon className="h-5 w-5" icon={ShoppingCart01Icon} />
-          </Link>
-        </Button>
+
+        <Link
+          aria-label={cartCount > 0 ? `Shopping cart (${cartCount} items)` : "Shopping cart"}
+          className={cn(
+            buttonVariants({ size: "icon", variant: "ghost" }),
+            "relative hidden sm:flex"
+          )}
+          to="/cart"
+        >
+          <HugeiconsIcon className="h-5 w-5" icon={ShoppingCart02Icon} strokeWidth={2} />
+          {cartCount > 0 && (
+            <span className="absolute -right-1 -top-1 flex h-5 min-w-5 items-center justify-center rounded-full bg-primary px-1 text-xs font-semibold text-primary-foreground">
+              {cartCount > 99 ? "99+" : cartCount}
+            </span>
+          )}
+        </Link>
 
         <Show when="signed-out">
-          <Link to="/auth/login">
-            <Button className="rounded-full" size="icon" variant="ghost">
-              <HugeiconsIcon className="h-5 w-5" icon={UserCircleIcon} />
-            </Button>
+          <Link
+            aria-label="Sign in"
+            className={cn(buttonVariants({ size: "icon", variant: "ghost" }), "rounded-full")}
+            to="/auth/login"
+          >
+            <HugeiconsIcon className="h-5 w-5" icon={User02Icon} />
           </Link>
         </Show>
 
