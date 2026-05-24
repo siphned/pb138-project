@@ -1,4 +1,12 @@
-import { Calendar, CheckCircle2, Clock, Clock4, MoreVertical, Plus, Users } from "lucide-react";
+import {
+  Calendar01Icon,
+  CheckmarkCircle01Icon,
+  Clock01Icon,
+  MoreVerticalIcon,
+  PlusSignIcon,
+  UserGroupIcon,
+} from "@hugeicons/core-free-icons";
+import { HugeiconsIcon } from "@hugeicons/react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
@@ -52,7 +60,7 @@ export function WinemakerEvents() {
           className="border-emerald-200 bg-emerald-50 text-emerald-600 hover:bg-emerald-50 px-2 py-0.5 text-[10px] font-medium rounded"
           variant="outline"
         >
-          <CheckCircle2 className="w-3 h-3 mr-1" /> Approved
+          <HugeiconsIcon className="w-3 h-3 mr-1" icon={CheckmarkCircle01Icon} /> Approved
         </Badge>
       );
     }
@@ -61,7 +69,7 @@ export function WinemakerEvents() {
         className="border-amber-200 bg-amber-50 text-amber-600 hover:bg-amber-50 px-2 py-0.5 text-[10px] font-medium rounded"
         variant="outline"
       >
-        <Clock4 className="w-3 h-3 mr-1" /> Pending Approval
+        <HugeiconsIcon className="w-3 h-3 mr-1" icon={Clock01Icon} /> Pending Approval
       </Badge>
     );
   };
@@ -71,10 +79,10 @@ export function WinemakerEvents() {
       {/* Header */}
       <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-2">
         <div className="flex items-center gap-2 font-heading text-xl font-semibold text-primary">
-          <Calendar className="h-5 w-5" /> Tasting Events
+          <HugeiconsIcon className="h-5 w-5" icon={Calendar01Icon} /> Tasting Events
         </div>
         <Button className="w-full sm:w-auto bg-primary hover:bg-primary/90 text-white rounded-lg h-10 px-5">
-          <Plus className="h-4 w-4 mr-2" /> Schedule Event
+          <HugeiconsIcon className="h-4 w-4 mr-2" icon={PlusSignIcon} /> Schedule Event
         </Button>
       </div>
 
@@ -104,13 +112,14 @@ export function WinemakerEvents() {
                   {/* Meta Information Row */}
                   <div className="flex flex-wrap items-center gap-x-5 gap-y-2 text-[12px] text-muted-foreground font-medium">
                     <span className="flex items-center gap-1.5 shrink-0">
-                      <Calendar className="h-3.5 w-3.5" /> {event.date}
+                      <HugeiconsIcon className="h-3.5 w-3.5" icon={Calendar01Icon} /> {event.date}
                     </span>
                     <span className="flex items-center gap-1.5 shrink-0">
-                      <Clock className="h-3.5 w-3.5" /> {event.time}
+                      <HugeiconsIcon className="h-3.5 w-3.5" icon={Clock01Icon} /> {event.time}
                     </span>
                     <span className="flex items-center gap-1.5 shrink-0 w-full sm:w-auto mt-1 sm:mt-0">
-                      <Users className="h-3.5 w-3.5" /> {event.capacity}
+                      <HugeiconsIcon className="h-3.5 w-3.5" icon={UserGroupIcon} />{" "}
+                      {event.capacity}
                     </span>
                   </div>
 
@@ -124,7 +133,7 @@ export function WinemakerEvents() {
                   size="icon"
                   variant="ghost"
                 >
-                  <MoreVertical className="h-5 w-5" />
+                  <HugeiconsIcon className="h-5 w-5" icon={MoreVerticalIcon} />
                 </Button>
               </div>
             ))}
@@ -149,13 +158,14 @@ export function WinemakerEvents() {
 
                   <div className="flex flex-wrap items-center gap-x-5 gap-y-2 text-[12px] text-muted-foreground/70">
                     <span className="flex items-center gap-1.5 shrink-0">
-                      <Calendar className="h-3.5 w-3.5" /> {event.date}
+                      <HugeiconsIcon className="h-3.5 w-3.5" icon={Calendar01Icon} /> {event.date}
                     </span>
                     <span className="flex items-center gap-1.5 shrink-0">
-                      <Clock className="h-3.5 w-3.5" /> {event.time}
+                      <HugeiconsIcon className="h-3.5 w-3.5" icon={Clock01Icon} /> {event.time}
                     </span>
                     <span className="flex items-center gap-1.5 shrink-0 w-full sm:w-auto mt-1 sm:mt-0">
-                      <Users className="h-3.5 w-3.5" /> {event.capacity}
+                      <HugeiconsIcon className="h-3.5 w-3.5" icon={UserGroupIcon} />{" "}
+                      {event.capacity}
                     </span>
                   </div>
                 </div>

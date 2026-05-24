@@ -1,4 +1,5 @@
-import { MoreHorizontal, Plus, Wine } from "lucide-react";
+import { DrinkIcon, MoreHorizontalIcon, PlusSignIcon } from "@hugeicons/core-free-icons";
+import { HugeiconsIcon } from "@hugeicons/react";
 import { Button } from "@/components/ui/button";
 import {
   Select,
@@ -36,7 +37,7 @@ export function ShopOwnerInventoryTab() {
     <>
       <div className="flex flex-col md:flex-row items-start md:items-center justify-between mb-8 gap-4">
         <div className="flex items-center gap-2 font-heading text-xl font-semibold text-primary">
-          <Wine className="h-5 w-5" /> Shop Inventory
+          <HugeiconsIcon className="h-5 w-5" icon={DrinkIcon} /> Shop Inventory
         </div>
         <div className="flex flex-col sm:flex-row items-center gap-3 w-full md:w-auto">
           <Select defaultValue="all">
@@ -50,7 +51,7 @@ export function ShopOwnerInventoryTab() {
             </SelectContent>
           </Select>
           <Button className="w-full sm:w-auto bg-primary hover:bg-primary/90 text-primary-foreground rounded-lg h-10 px-5">
-            <Plus className="h-4 w-4 mr-2" /> Add Wine
+            <HugeiconsIcon className="h-4 w-4 mr-2" icon={PlusSignIcon} /> Add Wine
           </Button>
         </div>
       </div>
@@ -78,7 +79,7 @@ export function ShopOwnerInventoryTab() {
                 <TableCell className="text-center font-medium text-sm">{wine.qty}</TableCell>
                 <TableCell className="text-right">
                   <Button className="h-8 w-8 text-muted-foreground" size="icon" variant="ghost">
-                    <MoreHorizontal className="h-4 w-4" />
+                    <HugeiconsIcon className="h-4 w-4" icon={MoreHorizontalIcon} />
                   </Button>
                 </TableCell>
               </TableRow>
@@ -101,7 +102,7 @@ export function ShopOwnerInventoryTab() {
               </span>
             </div>
             <Button className="h-8 w-8 -mr-2 text-muted-foreground" size="icon" variant="ghost">
-              <MoreHorizontal className="h-5 w-5" />
+              <HugeiconsIcon className="h-5 w-5" icon={MoreHorizontalIcon} />
             </Button>
           </div>
         ))}

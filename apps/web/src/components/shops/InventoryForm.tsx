@@ -1,6 +1,7 @@
 "use client";
 
-import { Plus, Trash2 } from "lucide-react";
+import { Delete01Icon, PlusSignIcon } from "@hugeicons/core-free-icons";
+import { HugeiconsIcon } from "@hugeicons/react";
 import { useState } from "react";
 import { useFieldArray, useForm } from "react-hook-form";
 import { Button } from "@/components/ui/button";
@@ -231,7 +232,7 @@ export function InventoryForm({ shopId, onSuccess }: InventoryFormProps) {
                 type="button"
                 variant="outline"
               >
-                <Plus className="h-4 w-4 mr-1" />
+                <HugeiconsIcon className="h-4 w-4 mr-1" icon={PlusSignIcon} />
                 Add Wine
               </Button>
             </div>
@@ -287,7 +288,7 @@ export function InventoryForm({ shopId, onSuccess }: InventoryFormProps) {
                     />
 
                     <Button onClick={() => remove(index)} size="icon" type="button" variant="ghost">
-                      <Trash2 className="h-4 w-4 text-destructive" />
+                      <HugeiconsIcon className="h-4 w-4 text-destructive" icon={Delete01Icon} />
                     </Button>
                   </div>
                 ))}

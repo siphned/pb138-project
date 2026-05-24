@@ -1,6 +1,7 @@
 import { Show, useClerk } from "@clerk/react";
+import { ShoppingCart01Icon, UserCircleIcon } from "@hugeicons/core-free-icons";
+import { HugeiconsIcon } from "@hugeicons/react";
 import { Link } from "@tanstack/react-router";
-import { ShoppingCart, User } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { useUser } from "@/context/UserContext";
@@ -25,14 +26,14 @@ export function Header() {
         <HeaderSearch />
         <Button className="hidden sm:flex" size="icon" variant="ghost">
           <Link to="/cart">
-            <ShoppingCart className="h-5 w-5" />
+            <HugeiconsIcon className="h-5 w-5" icon={ShoppingCart01Icon} />
           </Link>
         </Button>
 
         <Show when="signed-out">
           <Link to="/auth/login">
             <Button className="rounded-full" size="icon" variant="ghost">
-              <User className="h-5 w-5" />
+              <HugeiconsIcon className="h-5 w-5" icon={UserCircleIcon} />
             </Button>
           </Link>
         </Show>

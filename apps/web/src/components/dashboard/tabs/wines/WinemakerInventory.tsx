@@ -1,4 +1,11 @@
-import { AlertTriangle, Loader2, MoreHorizontal, Plus, Wine } from "lucide-react";
+import {
+  Alert02Icon,
+  DrinkIcon,
+  Loading03Icon,
+  MoreHorizontalIcon,
+  PlusSignIcon,
+} from "@hugeicons/core-free-icons";
+import { HugeiconsIcon } from "@hugeicons/react";
 import { useState } from "react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -34,7 +41,10 @@ export function WinemakerInventory() {
   if (isLoading) {
     return (
       <div className="flex items-center justify-center py-12 gap-2">
-        <Loader2 className="h-5 w-5 animate-spin text-muted-foreground" />
+        <HugeiconsIcon
+          className="h-5 w-5 animate-spin text-muted-foreground"
+          icon={Loading03Icon}
+        />
         <span className="text-muted-foreground">Loading wines...</span>
       </div>
     );
@@ -43,7 +53,7 @@ export function WinemakerInventory() {
   if (isError) {
     return (
       <div className="flex flex-col items-center justify-center py-12 text-destructive gap-2">
-        <AlertTriangle className="h-8 w-8" />
+        <HugeiconsIcon className="h-8 w-8" icon={Alert02Icon} />
         <p className="font-medium">Failed to load wines</p>
         <p className="text-sm text-muted-foreground">Please try again later.</p>
       </div>
@@ -55,7 +65,7 @@ export function WinemakerInventory() {
       <>
         <h3 className="text-lg font-semibold mb-4">My Wines</h3>
         <div className="flex flex-col items-center justify-center py-16 text-center">
-          <Wine className="h-12 w-12 text-muted-foreground mb-4" />
+          <HugeiconsIcon className="h-12 w-12 text-muted-foreground mb-4" icon={DrinkIcon} />
           <h3 className="text-xl font-semibold mb-2">No wines yet</h3>
           <p className="text-muted-foreground">
             Add your first wine to start building your catalog.
@@ -89,7 +99,7 @@ export function WinemakerInventory() {
             </SelectContent>
           </Select>
           <Button size="sm">
-            <Plus className="mr-1 h-4 w-4" /> Add Wine
+            <HugeiconsIcon className="mr-1 h-4 w-4" icon={PlusSignIcon} /> Add Wine
           </Button>
         </div>
       </div>
@@ -129,7 +139,7 @@ export function WinemakerInventory() {
                     </TableCell>
                     <TableCell>
                       <Button size="icon" variant="ghost">
-                        <MoreHorizontal className="h-4 w-4" />
+                        <HugeiconsIcon className="h-4 w-4" icon={MoreHorizontalIcon} />
                       </Button>
                     </TableCell>
                   </TableRow>

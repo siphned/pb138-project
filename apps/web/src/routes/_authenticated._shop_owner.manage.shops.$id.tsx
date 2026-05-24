@@ -1,6 +1,6 @@
-// @ts-nocheck - route not yet in routeTree.gen.ts; suppress until tsr generate is run
+import { Alert02Icon, Loading03Icon, ShieldMinusIcon } from "@hugeicons/core-free-icons";
+import { HugeiconsIcon } from "@hugeicons/react";
 import { createFileRoute, Outlet } from "@tanstack/react-router";
-import { AlertTriangle, Loader2, ShieldX } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useUser } from "@/context/UserContext";
 import { useGetShopsById } from "@/generated/hooks/useGetShopsById";
@@ -17,8 +17,11 @@ function ShopOwnerLayout() {
 
   if (isLoading) {
     return (
-      <div className="flex items-center justify-center py-24 gap-2">
-        <Loader2 className="h-6 w-6 animate-spin text-muted-foreground" />
+      <div className="flex items-center justify-center gap-2 py-24">
+        <HugeiconsIcon
+          className="h-6 w-6 animate-spin text-muted-foreground"
+          icon={Loading03Icon}
+        />
         <span className="text-muted-foreground">Loading shop...</span>
       </div>
     );
@@ -26,8 +29,8 @@ function ShopOwnerLayout() {
 
   if (isError || !shop) {
     return (
-      <div className="flex flex-col items-center justify-center py-24 gap-4">
-        <AlertTriangle className="h-12 w-12 text-destructive" />
+      <div className="flex flex-col items-center justify-center gap-4 py-24">
+        <HugeiconsIcon className="h-12 w-12 text-destructive" icon={Alert02Icon} />
         <h2 className="text-xl font-semibold">Shop not found</h2>
         <p className="text-muted-foreground">
           The shop you are looking for does not exist or has been removed.
@@ -41,10 +44,10 @@ function ShopOwnerLayout() {
 
   if (!user || shop.ownerUserId !== user.id) {
     return (
-      <div className="flex flex-col items-center justify-center py-24 gap-4">
-        <ShieldX className="h-12 w-12 text-destructive" />
+      <div className="flex flex-col items-center justify-center gap-4 py-24">
+        <HugeiconsIcon className="h-12 w-12 text-destructive" icon={ShieldMinusIcon} />
         <h2 className="text-xl font-semibold">Access denied</h2>
-        <p className="text-muted-foreground text-center max-w-md">
+        <p className="max-w-md text-center text-muted-foreground">
           You do not have permission to manage this shop. Only the shop owner can access management
           features.
         </p>

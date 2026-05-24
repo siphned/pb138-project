@@ -1,4 +1,5 @@
-import { Wine, X } from "lucide-react";
+import { Cancel01Icon, DrinkIcon } from "@hugeicons/core-free-icons";
+import { HugeiconsIcon } from "@hugeicons/react";
 import { Button } from "@/components/ui/button";
 import type { GetCarts200 } from "@/generated/types/GetCarts";
 import { QuantityControl } from "./QuantityControl";
@@ -20,7 +21,7 @@ export function CartItemRow({ item, onQuantityChange, onRemove }: CartItemRowPro
     <div className="flex items-center gap-4 rounded-lg border border-border p-4">
       {/* Image Placeholder */}
       <div className="flex h-full w-20 shrink-0 items-center justify-center rounded-md bg-muted">
-        <Wine className="h-8 w-8 text-muted-foreground" />
+        <HugeiconsIcon className="h-8 w-8 text-muted-foreground" icon={DrinkIcon} />
       </div>
 
       {/* Product Info */}
@@ -45,7 +46,7 @@ export function CartItemRow({ item, onQuantityChange, onRemove }: CartItemRowPro
           size="icon"
           variant="ghost"
         >
-          <X className="h-4 w-4" />
+          <HugeiconsIcon className="h-4 w-4" icon={Cancel01Icon} />
           <span className="sr-only">Remove item</span>
         </Button>
       </div>

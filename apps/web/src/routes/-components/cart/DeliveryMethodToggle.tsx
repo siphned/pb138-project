@@ -1,4 +1,5 @@
-import { MapPin, Truck } from "lucide-react";
+import { DeliveryTruck01Icon, Location01Icon } from "@hugeicons/core-free-icons";
+import { HugeiconsIcon } from "@hugeicons/react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 
@@ -21,7 +22,7 @@ export function DeliveryMethodToggle({ value, onChange }: DeliveryMethodTogglePr
         type="button"
         variant="ghost"
       >
-        <MapPin className="h-6 w-6" />
+        <HugeiconsIcon className="h-6 w-6" icon={Location01Icon} />
         <span className="text-xs font-semibold">Personal Pickup</span>
       </Button>
       <Button
@@ -35,7 +36,7 @@ export function DeliveryMethodToggle({ value, onChange }: DeliveryMethodTogglePr
         type="button"
         variant="ghost"
       >
-        <Truck className="h-6 w-6" />
+        <HugeiconsIcon className="h-6 w-6" icon={DeliveryTruck01Icon} />
         <span className="text-xs font-semibold">Home Delivery</span>
       </Button>
     </div>

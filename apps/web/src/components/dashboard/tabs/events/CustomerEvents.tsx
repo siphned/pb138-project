@@ -1,4 +1,11 @@
-import { Calendar, Clock, MapPin, MoreHorizontal, Search } from "lucide-react";
+import {
+  Calendar01Icon,
+  Clock01Icon,
+  Location01Icon,
+  MoreHorizontalIcon,
+  Search01Icon,
+} from "@hugeicons/core-free-icons";
+import { HugeiconsIcon } from "@hugeicons/react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 
@@ -18,10 +25,10 @@ export function CustomerEvents() {
     <>
       <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-2">
         <div className="flex items-center gap-2 font-heading text-xl font-semibold text-primary">
-          <Calendar className="h-5 w-5" /> My Registrations
+          <HugeiconsIcon className="h-5 w-5" icon={Calendar01Icon} /> My Registrations
         </div>
         <Button className="w-full sm:w-auto bg-background rounded-lg h-10 px-5" variant="outline">
-          <Search className="h-4 w-4 mr-2" /> Browse Events
+          <HugeiconsIcon className="h-4 w-4 mr-2" icon={Search01Icon} /> Browse Events
         </Button>
       </div>
 
@@ -44,13 +51,13 @@ export function CustomerEvents() {
                   </h3>
                   <div className="flex flex-wrap items-center gap-x-5 gap-y-2 text-[13px] text-muted-foreground font-medium">
                     <span className="flex items-center gap-1.5">
-                      <Calendar className="h-4 w-4" /> {event.date}
+                      <HugeiconsIcon className="h-4 w-4" icon={Calendar01Icon} /> {event.date}
                     </span>
                     <span className="flex items-center gap-1.5">
-                      <Clock className="h-4 w-4" /> {event.time}
+                      <HugeiconsIcon className="h-4 w-4" icon={Clock01Icon} /> {event.time}
                     </span>
                     <span className="flex items-center gap-1.5">
-                      <MapPin className="h-4 w-4" /> {event.location}
+                      <HugeiconsIcon className="h-4 w-4" icon={Location01Icon} /> {event.location}
                     </span>
                   </div>
                   <p className="text-[14px] font-medium text-primary leading-relaxed max-w-3xl">
@@ -62,7 +69,7 @@ export function CustomerEvents() {
                   size="icon"
                   variant="ghost"
                 >
-                  <MoreHorizontal className="h-5 w-5" />
+                  <HugeiconsIcon className="h-5 w-5" icon={MoreHorizontalIcon} />
                 </Button>
               </div>
             ))}

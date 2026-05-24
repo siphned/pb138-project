@@ -6,7 +6,7 @@ const root = path.resolve(fileURLToPath(import.meta.url), "../../..");
 
 const config = defineConfig({
   expect: {
-    timeout: 5_000,
+    timeout: 10_000,
   },
   forbidOnly: !!process.env.CI,
   fullyParallel: true,

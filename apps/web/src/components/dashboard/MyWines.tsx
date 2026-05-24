@@ -1,4 +1,5 @@
-import { ShoppingBag, Wine } from "lucide-react";
+import { DrinkIcon, ShoppingBag01Icon } from "@hugeicons/core-free-icons";
+import { HugeiconsIcon } from "@hugeicons/react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { BundlesListTab } from "./BundlesListTab";
@@ -25,9 +26,9 @@ export function MyWines({ role = "Winemaker" }: MyWinesProps) {
             value="main"
           >
             {role === "Customer" ? (
-              <ShoppingBag className="h-4 w-4 mr-2" />
+              <HugeiconsIcon className="h-4 w-4 mr-2" icon={ShoppingBag01Icon} />
             ) : (
-              <Wine className="h-4 w-4 mr-2" />
+              <HugeiconsIcon className="h-4 w-4 mr-2" icon={DrinkIcon} />
             )}
             {role === "Customer" ? "Order History" : "My Wines"}
           </TabsTrigger>

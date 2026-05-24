@@ -1,4 +1,5 @@
-import { MoreHorizontal, Package, Plus } from "lucide-react";
+import { MoreHorizontalIcon, Package01Icon, PlusSignIcon } from "@hugeicons/core-free-icons";
+import { HugeiconsIcon } from "@hugeicons/react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
@@ -21,10 +22,10 @@ export function BundlesListTab() {
     <>
       <div className="flex flex-col md:flex-row items-start md:items-center justify-between mb-8 gap-4">
         <div className="flex items-center gap-2 font-heading text-xl font-semibold text-primary">
-          <Package className="h-5 w-5" /> Active Bundles
+          <HugeiconsIcon className="h-5 w-5" icon={Package01Icon} /> Active Bundles
         </div>
         <Button className="w-full sm:w-auto bg-primary hover:bg-primary/90 text-primary-foreground rounded-lg h-10 px-5">
-          <Plus className="h-4 w-4 mr-2" /> Create Bundle
+          <HugeiconsIcon className="h-4 w-4 mr-2" icon={PlusSignIcon} /> Create Bundle
         </Button>
       </div>
 
@@ -61,7 +62,7 @@ export function BundlesListTab() {
                 </TableCell>
                 <TableCell className="text-right">
                   <Button className="h-8 w-8 text-muted-foreground" size="icon" variant="ghost">
-                    <MoreHorizontal className="h-4 w-4" />
+                    <HugeiconsIcon className="h-4 w-4" icon={MoreHorizontalIcon} />
                   </Button>
                 </TableCell>
               </TableRow>
@@ -89,7 +90,7 @@ export function BundlesListTab() {
               </div>
             </div>
             <Button className="h-8 w-8 -mr-2 text-muted-foreground" size="icon" variant="ghost">
-              <MoreHorizontal className="h-5 w-5" />
+              <HugeiconsIcon className="h-5 w-5" icon={MoreHorizontalIcon} />
             </Button>
           </div>
         ))}

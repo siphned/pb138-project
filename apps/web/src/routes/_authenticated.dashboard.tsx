@@ -1,5 +1,12 @@
+import {
+  Alert02Icon,
+  BarChartIcon,
+  DrinkIcon,
+  ShoppingBag01Icon,
+  UserGroupIcon,
+} from "@hugeicons/core-free-icons";
+import { HugeiconsIcon } from "@hugeicons/react";
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { AlertTriangle, BarChart3, ShoppingBag, Users, Wine } from "lucide-react";
 import { useState } from "react";
 import { EventsTab } from "@/components/dashboard/tabs/EventsTab";
 import { MyBundlesTab } from "@/components/dashboard/tabs/MyBundlesTab";
@@ -83,7 +90,7 @@ function DashboardPage() {
         {(statsError || !stats) && (
           <Card className="col-span-full">
             <CardContent className="flex items-center gap-2 py-4 text-destructive">
-              <AlertTriangle className="h-5 w-5" />
+              <HugeiconsIcon className="h-5 w-5" icon={Alert02Icon} />
               <span>Failed to load statistics</span>
             </CardContent>
           </Card>
@@ -148,20 +155,22 @@ function DashboardPage() {
   );
 }
 
+type IconSvgObject = readonly (readonly [string, Readonly<Record<string, string | number>>])[];
+
 function StatCard({
   label,
   value,
-  icon: Icon,
+  icon,
 }: {
   label: string;
   value: string | number;
-  icon: React.ComponentType<{ className?: string }>;
+  icon: IconSvgObject;
 }) {
   return (
     <Card>
       <CardHeader className="flex flex-row items-center justify-between pb-2">
         <CardTitle className="text-sm font-medium text-muted-foreground">{label}</CardTitle>
-        <Icon className="h-4 w-4 text-muted-foreground" />
+        <HugeiconsIcon className="h-4 w-4 text-muted-foreground" icon={icon} />
       </CardHeader>
       <CardContent>
         <div className="text-2xl font-bold">{value}</div>
@@ -178,14 +187,22 @@ type AdminStats = Extract<GetStatsQueryResponse, { usersByRole: unknown }>;
 function renderCustomerStats(stats: CustomerStats) {
   return (
     <>
-      <StatCard icon={ShoppingBag} label="Orders" value={toNumber(stats.ordersCount)} />
+      <StatCard icon={ShoppingBag01Icon} label="Orders" value={toNumber(stats.ordersCount)} />
       <StatCard
-        icon={BarChart3}
+        icon={BarChartIcon}
         label="Total spent"
         value={eur(toNumber(stats.totalSpent as number))}
       />
-      <StatCard icon={Users} label="Events attended" value={toNumber(stats.eventsAttended)} />
-      <StatCard icon={BarChart3} label="Reviews written" value={toNumber(stats.reviewsWritten)} />
+      <StatCard
+        icon={UserGroupIcon}
+        label="Events attended"
+        value={toNumber(stats.eventsAttended)}
+      />
+      <StatCard
+        icon={BarChartIcon}
+        label="Reviews written"
+        value={toNumber(stats.reviewsWritten)}
+      />
     </>
   );
 }
@@ -194,15 +211,15 @@ function renderWinemakerStats(stats: WinemakerStats) {
   const avg = stats.avgReviewScore;
   return (
     <>
-      <StatCard icon={Wine} label="Wines in catalog" value={toNumber(stats.wineCount)} />
-      <StatCard icon={BarChart3} label="Total stock" value={toNumber(stats.totalStock)} />
+      <StatCard icon={DrinkIcon} label="Wines in catalog" value={toNumber(stats.wineCount)} />
+      <StatCard icon={BarChartIcon} label="Total stock" value={toNumber(stats.totalStock)} />
       <StatCard
-        icon={Users}
+        icon={UserGroupIcon}
         label="Approved events"
         value={toNumber(stats.eventsByStatus?.approved)}
       />
       <StatCard
-        icon={BarChart3}
+        icon={BarChartIcon}
         label="Avg review score"
         value={avg === null ? "—" : (avg as number).toFixed(1)}
       />
@@ -213,14 +230,18 @@ function renderWinemakerStats(stats: WinemakerStats) {
 function renderShopOwnerStats(stats: ShopOwnerStats) {
   return (
     <>
-      <StatCard icon={BarChart3} label="Shops" value={toNumber(stats.shopsCount)} />
-      <StatCard icon={Wine} label="Products" value={toNumber(stats.productsByType?.standard)} />
+      <StatCard icon={BarChartIcon} label="Shops" value={toNumber(stats.shopsCount)} />
       <StatCard
-        icon={ShoppingBag}
+        icon={DrinkIcon}
+        label="Products"
+        value={toNumber(stats.productsByType?.standard)}
+      />
+      <StatCard
+        icon={ShoppingBag01Icon}
         label="Orders processed"
         value={toNumber(stats.orderItemsProcessed)}
       />
-      <StatCard icon={BarChart3} label="Revenue" value={eur(toNumber(stats.revenue))} />
+      <StatCard icon={BarChartIcon} label="Revenue" value={eur(toNumber(stats.revenue))} />
     </>
   );
 }
@@ -229,7 +250,7 @@ function renderAdminStats(stats: AdminStats) {
   return (
     <>
       <StatCard
-        icon={Users}
+        icon={UserGroupIcon}
         label="Total users"
         value={
           toNumber(stats.usersByRole?.customer) +
@@ -238,10 +259,14 @@ function renderAdminStats(stats: AdminStats) {
           toNumber(stats.usersByRole?.admin)
         }
       />
-      <StatCard icon={Wine} label="Total products" value={toNumber(stats.totalProducts)} />
-      <StatCard icon={BarChart3} label="Total revenue" value={eur(toNumber(stats.totalRevenue))} />
+      <StatCard icon={DrinkIcon} label="Total products" value={toNumber(stats.totalProducts)} />
       <StatCard
-        icon={AlertTriangle}
+        icon={BarChartIcon}
+        label="Total revenue"
+        value={eur(toNumber(stats.totalRevenue))}
+      />
+      <StatCard
+        icon={Alert02Icon}
         label="Pending requests"
         value={toNumber(stats.pendingRoleRequests) + toNumber(stats.pendingEvents)}
       />

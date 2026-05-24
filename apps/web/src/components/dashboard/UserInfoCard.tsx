@@ -1,5 +1,6 @@
 ﻿import { useClerk } from "@clerk/react";
-import { Pencil } from "lucide-react";
+import { PencilEdit01Icon } from "@hugeicons/core-free-icons";
+import { HugeiconsIcon } from "@hugeicons/react";
 import { useState } from "react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
@@ -53,7 +54,7 @@ export function UserInfoCard({ onEdit }: { onEdit?: () => void }) {
                       }}
                       variant="outline"
                     >
-                      <Pencil className="h-4 w-4 mr-2" />
+                      <HugeiconsIcon className="h-4 w-4 mr-2" icon={PencilEdit01Icon} />
                       Edit Profile
                     </Button>
                   }

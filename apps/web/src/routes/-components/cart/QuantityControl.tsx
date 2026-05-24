@@ -1,4 +1,5 @@
-import { Minus, Plus } from "lucide-react";
+import { MinusSignIcon, PlusSignIcon } from "@hugeicons/core-free-icons";
+import { HugeiconsIcon } from "@hugeicons/react";
 import { Button } from "@/components/ui/button";
 
 type QuantityControlProps = {
@@ -25,7 +26,7 @@ export function QuantityControl({
         size="icon"
         variant="outline"
       >
-        <Minus className="h-4 w-4" />
+        <HugeiconsIcon className="h-4 w-4" icon={MinusSignIcon} />
         <span className="sr-only">Decrease quantity</span>
       </Button>
       <span className="w-8 text-center text-sm font-medium">{value}</span>
@@ -36,7 +37,7 @@ export function QuantityControl({
         size="icon"
         variant="outline"
       >
-        <Plus className="h-4 w-4" />
+        <HugeiconsIcon className="h-4 w-4" icon={PlusSignIcon} />
         <span className="sr-only">Increase quantity</span>
       </Button>
     </div>

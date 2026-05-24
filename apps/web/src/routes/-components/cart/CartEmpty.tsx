@@ -1,5 +1,6 @@
+import { ShoppingCart01Icon } from "@hugeicons/core-free-icons";
+import { HugeiconsIcon } from "@hugeicons/react";
 import { Link } from "@tanstack/react-router";
-import { ShoppingCart } from "lucide-react";
 import { buttonVariants } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 
@@ -7,7 +8,7 @@ export function CartEmpty() {
   return (
     <div className="flex flex-col items-center justify-center py-16 text-center">
       <div className="mb-4 rounded-full bg-muted p-6">
-        <ShoppingCart className="h-12 w-12 text-muted-foreground" />
+        <HugeiconsIcon className="h-12 w-12 text-muted-foreground" icon={ShoppingCart01Icon} />
       </div>
       <h3 className="mb-2 text-xl font-semibold">Your cart is empty</h3>
       <p className="mb-8 text-muted-foreground">

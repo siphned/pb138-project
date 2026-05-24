@@ -1,4 +1,11 @@
-import { Calendar, Clock, MoreHorizontal, Plus, Users } from "lucide-react";
+import {
+  Calendar01Icon,
+  Clock01Icon,
+  MoreHorizontalIcon,
+  PlusSignIcon,
+  UserGroupIcon,
+} from "@hugeicons/core-free-icons";
+import { HugeiconsIcon } from "@hugeicons/react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 
@@ -18,10 +25,10 @@ export function ShopOwnerEvents() {
     <>
       <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-2">
         <div className="flex items-center gap-2 font-heading text-xl font-semibold text-primary">
-          <Calendar className="h-5 w-5" /> Shop Events
+          <HugeiconsIcon className="h-5 w-5" icon={Calendar01Icon} /> Shop Events
         </div>
         <Button className="w-full sm:w-auto bg-primary hover:bg-primary/90 text-primary-foreground rounded-lg h-10 px-5">
-          <Plus className="h-4 w-4 mr-2" /> Host Tasting
+          <HugeiconsIcon className="h-4 w-4 mr-2" icon={PlusSignIcon} /> Host Tasting
         </Button>
       </div>
 
@@ -44,13 +51,13 @@ export function ShopOwnerEvents() {
                   </h3>
                   <div className="flex flex-wrap items-center gap-x-5 gap-y-2 text-[13px] text-muted-foreground font-medium">
                     <span className="flex items-center gap-1.5">
-                      <Calendar className="h-4 w-4" /> {event.date}
+                      <HugeiconsIcon className="h-4 w-4" icon={Calendar01Icon} /> {event.date}
                     </span>
                     <span className="flex items-center gap-1.5">
-                      <Clock className="h-4 w-4" /> {event.time}
+                      <HugeiconsIcon className="h-4 w-4" icon={Clock01Icon} /> {event.time}
                     </span>
                     <span className="flex items-center gap-1.5">
-                      <Users className="h-4 w-4" /> {event.capacity}
+                      <HugeiconsIcon className="h-4 w-4" icon={UserGroupIcon} /> {event.capacity}
                     </span>
                   </div>
                   <p className="text-[14px] text-muted-foreground leading-relaxed max-w-3xl">
@@ -62,7 +69,7 @@ export function ShopOwnerEvents() {
                   size="icon"
                   variant="ghost"
                 >
-                  <MoreHorizontal className="h-5 w-5" />
+                  <HugeiconsIcon className="h-5 w-5" icon={MoreHorizontalIcon} />
                 </Button>
               </div>
             ))}
