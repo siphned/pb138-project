@@ -15,7 +15,7 @@ import {
 } from "@hugeicons/core-free-icons";
 import { HugeiconsIcon } from "@hugeicons/react";
 import { Link, useNavigate } from "@tanstack/react-router";
-import { Wine } from "lucide-react";
+import { DrinkIcon } from "hugeicons-react";
 import { useState } from "react";
 import { NavItem } from "@/components/primitives/nav-item";
 import {
@@ -188,7 +188,7 @@ export function Sidebar({ userRoles = [Role.customer], activeRole, onRoleChange 
             </NavItem>
 
             <NavItem onClick={closeSheet} render={<Link to="/explore" />} variant="active">
-              <Wine className="h-4 w-4" /> Explore Wines
+              <DrinkIcon className="h-4 w-4" /> Explore Wines
             </NavItem>
 
             <NavItem onClick={closeSheet} render={<Link to="/products" />} variant="active">
@@ -295,7 +295,7 @@ function RoleNavItems({
           render={<Link search={winemakerId ? { winemakerId } : undefined} to="/explore" />}
           variant="active"
         >
-          <Wine className="h-4 w-4" /> My Wines
+          <DrinkIcon className="h-4 w-4" /> My Wines
         </NavItem>
         <NavItem
           onClick={closeSheet}

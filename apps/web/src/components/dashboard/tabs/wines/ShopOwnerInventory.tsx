@@ -1,4 +1,10 @@
-import { AlertTriangle, Loader2, MoreHorizontal, Plus, Wine } from "lucide-react";
+import {
+  Alert01Icon,
+  DrinkIcon,
+  Loading01Icon,
+  MoreHorizontalIcon,
+  PlusSignIcon,
+} from "hugeicons-react";
 import { useState } from "react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -39,7 +45,7 @@ export function ShopOwnerInventory() {
   if (isLoading) {
     return (
       <div className="flex items-center justify-center py-12 gap-2">
-        <Loader2 className="h-5 w-5 animate-spin text-muted-foreground" />
+        <Loading01Icon className="h-5 w-5 animate-spin text-muted-foreground" />
         <span className="text-muted-foreground">Loading inventory...</span>
       </div>
     );
@@ -48,7 +54,7 @@ export function ShopOwnerInventory() {
   if (isError) {
     return (
       <div className="flex flex-col items-center justify-center py-12 text-destructive gap-2">
-        <AlertTriangle className="h-8 w-8" />
+        <Alert01Icon className="h-8 w-8" />
         <p className="font-medium">Failed to load inventory</p>
         <p className="text-sm text-muted-foreground">Please try again later.</p>
       </div>
@@ -60,7 +66,7 @@ export function ShopOwnerInventory() {
       <>
         <h3 className="text-lg font-semibold mb-4">Shop Inventory</h3>
         <div className="flex flex-col items-center justify-center py-16 text-center">
-          <Wine className="h-12 w-12 text-muted-foreground mb-4" />
+          <DrinkIcon className="h-12 w-12 text-muted-foreground mb-4" />
           <h3 className="text-xl font-semibold mb-2">No shop yet</h3>
           <p className="text-muted-foreground">Create a shop to manage your inventory.</p>
         </div>
@@ -98,7 +104,7 @@ export function ShopOwnerInventory() {
             </SelectContent>
           </Select>
           <Button size="sm">
-            <Plus className="mr-1 h-4 w-4" /> Add Wine
+            <PlusSignIcon className="mr-1 h-4 w-4" /> Add Wine
           </Button>
         </div>
       </div>
@@ -140,7 +146,7 @@ export function ShopOwnerInventory() {
                     </TableCell>
                     <TableCell>
                       <Button size="icon" variant="ghost">
-                        <MoreHorizontal className="h-4 w-4" />
+                        <MoreHorizontalIcon className="h-4 w-4" />
                       </Button>
                     </TableCell>
                   </TableRow>

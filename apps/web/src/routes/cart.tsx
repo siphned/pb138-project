@@ -1,5 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { AlertTriangle, Loader2 } from "lucide-react";
+import { AlertCircleIcon, Loading01Icon } from "hugeicons-react";
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { useGetCarts } from "@/generated/hooks/useGetCarts";
@@ -20,7 +20,7 @@ function CartPage() {
       <div className="container mx-auto max-w-6xl px-4 py-8">
         <h2 className="mb-8">Cart & Checkout</h2>
         <div className="flex items-center justify-center py-24 gap-2">
-          <Loader2 className="h-6 w-6 animate-spin text-muted-foreground" />
+          <Loading01Icon className="h-6 w-6 animate-spin text-muted-foreground" />
           <span className="text-muted-foreground">Loading cart...</span>
         </div>
       </div>
@@ -32,7 +32,7 @@ function CartPage() {
       <div className="container mx-auto max-w-6xl px-4 py-8">
         <h2 className="mb-8">Cart & Checkout</h2>
         <div className="flex flex-col items-center justify-center py-24 gap-4">
-          <AlertTriangle className="h-12 w-12 text-destructive" />
+          <AlertCircleIcon className="h-12 w-12 text-destructive" />
           <h3 className="text-xl font-semibold">Failed to load cart</h3>
           <p className="text-muted-foreground text-center max-w-md">
             {typeof error === "string"
