@@ -1,7 +1,11 @@
 import { useQueryClient } from "@tanstack/react-query";
 import { useNavigate } from "@tanstack/react-router";
 import { useMemo, useRef, useState } from "react";
-import { AddressForm, type AddressFormValues } from "@/components/forms/AddressForm";
+import {
+  AddressForm,
+  type AddressFormHandle,
+  type AddressFormValues,
+} from "@/components/forms/AddressForm";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { useUser } from "@/context/UserContext";
@@ -25,7 +29,7 @@ export function CheckoutSection({
   const navigate = useNavigate();
   const queryClient = useQueryClient();
   const { user } = useUser();
-  const formRef = useRef<HTMLFormElement>(null);
+  const formRef = useRef<AddressFormHandle>(null);
 
   const checkout = usePostOrdersCheckout<unknown>();
   const [checkoutError, setCheckoutError] = useState<string | null>(null);
@@ -102,8 +106,8 @@ export function CheckoutSection({
         },
       });
 
+      await navigate({ search: { orderId: result.id }, to: "/checkout/confirmed" });
       queryClient.invalidateQueries({ queryKey: getCartsQueryKey() });
-      navigate({ search: { orderId: result.id }, to: "/checkout/confirmed" });
     } catch (err) {
       const message =
         err instanceof Error
@@ -144,7 +148,7 @@ export function CheckoutSection({
         <Button
           className="w-full"
           disabled={isCartEmpty || checkout.isPending}
-          onClick={() => formRef.current?.requestSubmit()}
+          onClick={() => formRef.current?.submit()}
         >
           {checkout.isPending ? "Processing..." : `Confirm Order — €${total.toFixed(2)}`}
         </Button>

@@ -1,5 +1,5 @@
 import { zodResolver } from "@hookform/resolvers/zod";
-import { forwardRef } from "react";
+import { forwardRef, useImperativeHandle, useMemo, useRef } from "react";
 import { type SubmitHandler, useForm } from "react-hook-form";
 import { z } from "zod";
 import { Button } from "@/components/ui/button";
@@ -17,26 +17,29 @@ import { DeliveryMethodToggle } from "@/routes/-components/cart/DeliveryMethodTo
 
 const requiredString = (label: string) => z.string().min(1, `${label} is required`);
 
-export const addressFormSchema = z
-  .object({
-    billingAddressSameAsShipping: z.boolean(),
-    city: requiredString("City"),
-    country: requiredString("Country"),
-    deliveryType: z.enum(["pickup", "shipping"]),
-    guestEmail: z.string().email("Invalid email").optional().or(z.literal("")),
-    guestName: z.string().optional().or(z.literal("")),
-    houseNumber: requiredString("House number"),
-    paymentMethod: z.enum(["card", "bank_transfer", "cash_on_delivery"]),
-    postalCode: requiredString("Postal code"),
-    street: requiredString("Street"),
+const baseAddressFormSchema = z.object({
+  billingAddressSameAsShipping: z.boolean(),
+  city: requiredString("City"),
+  country: requiredString("Country"),
+  deliveryType: z.enum(["pickup", "shipping"]),
+  guestEmail: z.string().optional().or(z.literal("")),
+  guestName: z.string().optional().or(z.literal("")),
+  houseNumber: requiredString("House number"),
+  paymentMethod: z.enum(["card", "bank_transfer", "cash_on_delivery"]),
+  postalCode: requiredString("Postal code"),
+  street: requiredString("Street"),
 
-    billingCity: z.string().optional().default(""),
-    billingCountry: z.string().optional().default(""),
-    billingHouseNumber: z.string().optional().default(""),
-    billingPostalCode: z.string().optional().default(""),
-    billingStreet: z.string().optional().default(""),
-  })
-  .superRefine((data, ctx) => {
+  billingCity: z.string().optional().default(""),
+  billingCountry: z.string().optional().default(""),
+  billingHouseNumber: z.string().optional().default(""),
+  billingPostalCode: z.string().optional().default(""),
+  billingStreet: z.string().optional().default(""),
+});
+
+export type AddressFormValues = z.infer<typeof baseAddressFormSchema>;
+
+function buildSchema(showGuestFields: boolean) {
+  return baseAddressFormSchema.superRefine((data, ctx) => {
     if (!data.billingAddressSameAsShipping) {
       const billing = [
         { field: "billingStreet" as const, label: "Street" },
@@ -55,9 +58,31 @@ export const addressFormSchema = z
         }
       }
     }
-  });
 
-export type AddressFormValues = z.infer<typeof addressFormSchema>;
+    if (showGuestFields) {
+      if (!data.guestName || data.guestName.trim().length === 0) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          path: ["guestName"],
+          message: "Name is required",
+        });
+      }
+      if (!data.guestEmail || data.guestEmail.trim().length === 0) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          path: ["guestEmail"],
+          message: "Email is required",
+        });
+      } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(data.guestEmail)) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          path: ["guestEmail"],
+          message: "Invalid email",
+        });
+      }
+    }
+  });
+}
 
 export type SavedAddress = {
   street: string;
@@ -66,6 +91,10 @@ export type SavedAddress = {
   postalCode: string;
   country: string;
 };
+
+export interface AddressFormHandle {
+  submit: () => void;
+}
 
 export interface AddressFormProps {
   defaultValues: Partial<AddressFormValues>;
@@ -93,7 +122,7 @@ const BILLING_FIELDS = [
   "billingCountry",
 ] as const satisfies ReadonlyArray<keyof AddressFormValues>;
 
-export const AddressForm = forwardRef<HTMLFormElement, AddressFormProps>(function AddressForm(
+export const AddressForm = forwardRef<AddressFormHandle, AddressFormProps>(function AddressForm(
   {
     defaultValues,
     onSubmit,
@@ -104,12 +133,15 @@ export const AddressForm = forwardRef<HTMLFormElement, AddressFormProps>(functio
   },
   ref
 ) {
+  const schema = useMemo(() => buildSchema(showGuestFields), [showGuestFields]);
+  const formElRef = useRef<HTMLFormElement>(null);
+
   const {
     register,
     handleSubmit,
     setValue,
     watch,
-    formState: { errors },
+    formState: { errors, isSubmitted },
   } = useForm<AddressFormValues>({
     defaultValues: {
       billingAddressSameAsShipping: true,
@@ -129,13 +161,24 @@ export const AddressForm = forwardRef<HTMLFormElement, AddressFormProps>(functio
       billingStreet: "",
       ...defaultValues,
     },
-    resolver: zodResolver(addressFormSchema as never),
+    resolver: zodResolver(schema as never),
   });
+
+  useImperativeHandle(
+    ref,
+    () => ({
+      submit: () => {
+        void handleSubmit(onSubmit)();
+      },
+    }),
+    [handleSubmit, onSubmit]
+  );
 
   const deliveryType = watch("deliveryType");
   const paymentMethod = watch("paymentMethod");
   const billingSameAsShipping = watch("billingAddressSameAsShipping");
-  const hasErrors = Object.keys(errors).length > 0;
+  const errorCount = Object.keys(errors).length;
+  const showErrorBanner = errorCount > 0 && isSubmitted;
 
   const applySavedAddress = (
     saved: SavedAddress,
@@ -161,10 +204,15 @@ export const AddressForm = forwardRef<HTMLFormElement, AddressFormProps>(functio
   const addressSectionTitle = deliveryType === "pickup" ? "Contact Address" : "Shipping Address";
 
   return (
-    <form className="space-y-6" onSubmit={handleSubmit(onSubmit)} ref={ref}>
-      {hasErrors && (
-        <div className="rounded-md border border-destructive/40 bg-destructive/10 px-4 py-3 text-sm text-destructive">
-          Please fix the errors below before confirming your order.
+    <form className="space-y-6" onSubmit={handleSubmit(onSubmit)} ref={formElRef}>
+      {showErrorBanner && (
+        <div
+          aria-live="polite"
+          className="rounded-md border border-destructive/40 bg-destructive/10 px-4 py-3 text-sm text-destructive"
+        >
+          {errorCount === 1
+            ? "Please fix the error below before confirming your order."
+            : `Please fix the ${errorCount} errors below before confirming your order.`}
         </div>
       )}
 
@@ -175,13 +223,9 @@ export const AddressForm = forwardRef<HTMLFormElement, AddressFormProps>(functio
             <Label htmlFor="guestName">
               Full Name <span className="text-destructive">*</span>
             </Label>
-            <Input
-              id="guestName"
-              {...register("guestName", { required: showGuestFields })}
-              placeholder="John Doe"
-            />
+            <Input id="guestName" {...register("guestName")} placeholder="John Doe" />
             {errors.guestName && (
-              <p className="mt-1 text-xs text-destructive">Name is required for guest checkout</p>
+              <p className="mt-1 text-xs text-destructive">{errors.guestName.message}</p>
             )}
           </div>
           <div>
@@ -191,13 +235,11 @@ export const AddressForm = forwardRef<HTMLFormElement, AddressFormProps>(functio
             <Input
               id="guestEmail"
               type="email"
-              {...register("guestEmail", { required: showGuestFields })}
+              {...register("guestEmail")}
               placeholder="john@example.com"
             />
             {errors.guestEmail && (
-              <p className="mt-1 text-xs text-destructive">
-                {errors.guestEmail.message || "Email is required for guest checkout"}
-              </p>
+              <p className="mt-1 text-xs text-destructive">{errors.guestEmail.message}</p>
             )}
           </div>
         </div>
