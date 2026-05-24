@@ -937,25 +937,38 @@ async function main() {
   logger.info(`Inserted ${reqPool.length} role requests`);
 
   // ── Images ───────────────────────────────────────────────────────────────────
-  // Custom URLs from data file take priority; placeholder is the fallback.
+  // Custom URLs from data file take priority. No global placeholders inserted;
+  // frontend handles fallbacks via local assets.
   logger.info("Inserting images...");
   const imageInputs: ImageInput[] = [
-    ...allWineImages.map(({ id, url }) => ({
-      entityType: "wine", entityId: id,
-      url: url ?? "/uploads/wine/wine_placeholder.webp",
-    })),
-    ...allEventImages.map(({ id, url }) => ({
-      entityType: "event", entityId: id,
-      url: url ?? "/uploads/event/event_placeholder.webp",
-    })),
-    ...allWinemakerImages.map(({ id, url }) => ({
-      entityType: "winemaker", entityId: id,
-      url: url ?? "/uploads/winemaker/winery_placeholder.webp",
-    })),
-    ...allShopImages.map(({ id, url }) => ({
-      entityType: "shop", entityId: id,
-      url: url ?? "/uploads/shop/shop_placeholder.webp",
-    })),
+    ...allWineImages
+      .filter((img) => !!img.url)
+      .map(({ id, url }) => ({
+        entityType: "wine",
+        entityId: id,
+        url: url!,
+      })),
+    ...allEventImages
+      .filter((img) => !!img.url)
+      .map(({ id, url }) => ({
+        entityType: "event",
+        entityId: id,
+        url: url!,
+      })),
+    ...allWinemakerImages
+      .filter((img) => !!img.url)
+      .map(({ id, url }) => ({
+        entityType: "winemaker",
+        entityId: id,
+        url: url!,
+      })),
+    ...allShopImages
+      .filter((img) => !!img.url)
+      .map(({ id, url }) => ({
+        entityType: "shop",
+        entityId: id,
+        url: url!,
+      })),
   ];
   await insertImages(imageInputs);
   logger.info(`Inserted ${imageInputs.length} images`);
