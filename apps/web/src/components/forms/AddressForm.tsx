@@ -16,16 +16,26 @@ import { DeliveryMethodToggle } from "@/routes/-components/cart/DeliveryMethodTo
 
 const requiredString = (label: string) => z.string().min(1, `${label} is required`);
 
+const POSTAL_CODE_REGEX = /^[\d\s-]{3,10}$/;
+const COUNTRY_REGEX = /^[\p{L}\s'-]+$/u;
+const HOUSE_NUMBER_REGEX = /^\d+[a-zA-Z]?(\/\d+)?$/;
+
 const baseAddressFormSchema = z.object({
   billingAddressSameAsShipping: z.boolean(),
   city: requiredString("City"),
-  country: requiredString("Country"),
+  country: requiredString("Country").regex(COUNTRY_REGEX, "Country must contain only letters"),
   deliveryType: z.enum(["pickup", "shipping"]),
   guestEmail: z.string().optional().or(z.literal("")),
   guestName: z.string().optional().or(z.literal("")),
-  houseNumber: requiredString("House number"),
+  houseNumber: requiredString("House number").regex(
+    HOUSE_NUMBER_REGEX,
+    "House number must be digits, optionally with one letter (e.g., 68A)"
+  ),
   paymentMethod: z.enum(["card", "bank_transfer", "cash_on_delivery"]),
-  postalCode: requiredString("Postal code"),
+  postalCode: requiredString("Postal code").regex(
+    POSTAL_CODE_REGEX,
+    "Postal code must be 3-10 digits (e.g., 60200 or 602 00)"
+  ),
   street: requiredString("Street"),
 
   billingCity: z.string().optional().default(""),
@@ -55,6 +65,28 @@ function buildSchema(showGuestFields: boolean) {
             message: `${label} is required`,
           });
         }
+      }
+
+      if (data.billingCountry && !COUNTRY_REGEX.test(data.billingCountry)) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          path: ["billingCountry"],
+          message: "Country must contain only letters",
+        });
+      }
+      if (data.billingPostalCode && !POSTAL_CODE_REGEX.test(data.billingPostalCode)) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          path: ["billingPostalCode"],
+          message: "Postal code must be 3-10 digits (e.g., 60200 or 602 00)",
+        });
+      }
+      if (data.billingHouseNumber && !HOUSE_NUMBER_REGEX.test(data.billingHouseNumber)) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          path: ["billingHouseNumber"],
+          message: "House number must be digits, optionally with one letter (e.g., 68A)",
+        });
       }
     }
 
