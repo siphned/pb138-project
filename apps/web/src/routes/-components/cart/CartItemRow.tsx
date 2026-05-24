@@ -19,7 +19,7 @@ export function CartItemRow({ item, onQuantityChange, onRemove }: CartItemRowPro
   const lineTotal = price * quantity;
 
   return (
-    <div className="flex items-center gap-4 rounded-lg border border-border p-4">
+    <div className="flex flex-wrap items-start gap-4 rounded-lg border border-border p-4 sm:flex-nowrap">
       <div className="h-20 w-20 shrink-0 overflow-hidden rounded-md">
         <ProductImage
           alt={item.product.name}
@@ -30,8 +30,13 @@ export function CartItemRow({ item, onQuantityChange, onRemove }: CartItemRowPro
       </div>
 
       <div className="flex min-w-0 flex-1 flex-col gap-1">
-        <h4 className="truncate font-semibold text-foreground">{item.product.name}</h4>
-        <p className="truncate text-sm text-muted-foreground">€{item.product.price}</p>
+        <h4 className="break-words text-sm font-semibold leading-tight text-foreground sm:text-base">
+          {item.product.name}
+        </h4>
+        {item.product.description && (
+          <p className="line-clamp-2 text-xs text-muted-foreground">{item.product.description}</p>
+        )}
+        <p className="text-sm text-muted-foreground">€{price.toFixed(2)} each</p>
         <div className="mt-1">
           <QuantityControl
             onDecrement={() => onQuantityChange(item.product.id, quantity - 1)}
@@ -41,7 +46,7 @@ export function CartItemRow({ item, onQuantityChange, onRemove }: CartItemRowPro
         </div>
       </div>
 
-      <div className="flex flex-col items-end gap-2">
+      <div className="ml-auto flex flex-col items-end gap-2 sm:ml-0">
         <span className="font-semibold text-foreground">€{lineTotal.toFixed(2)}</span>
         <Button
           className="h-8 w-8 text-muted-foreground hover:text-destructive"
