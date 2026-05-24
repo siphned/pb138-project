@@ -89,8 +89,8 @@ export function InventoryForm({ shopId, onSuccess }: InventoryFormProps) {
         id: shopId,
       });
       onSuccess();
-    } catch (error) {
-      console.error("Failed to create product:", error);
+    } catch {
+      // Error handling will be managed by mutation state
     } finally {
       setIsSubmitting(false);
     }

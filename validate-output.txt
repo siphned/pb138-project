@@ -1,0 +1,951 @@
+$ echo 'Running mandatory pre-push validation...' && bun run lint && bun run check && bun run generate && bun run check-types && bun run test && bun run test:e2e && bun run build
+Running mandatory pre-push validation...
+$ biome lint .
+Checked 469 files in 1209ms. No fixes applied.
+$ biome check --write .
+Checked 470 files in 720ms. No fixes applied.
+$ turbo run generate
+• turbo 2.9.14
+
+   • Packages in scope: @repo/shared, @repo/typescript-config, server, web
+   • Running generate in 4 packages
+   • Remote caching disabled
+
+server:generate: cache bypass, force executing 2a62300e0ff038cc
+web:generate: cache bypass, force executing f6c21a2d01182f7c
+server:generate: $ bun run scripts/export-spec.ts
+web:generate: $ kubb
+web:generate: Configuration started
+web:generate: ℹ Config loaded kubb.config.ts
+web:generate: ✓ Config loaded successfully kubb.config.ts
+web:generate: Configuration completed
+web:generate: Kubb CLI 🧩
+web:generate: Generation started
+web:generate: ℹ Setup generation ../server/openapi.json
+web:generate: ℹ Build generation ../server/openapi.json
+web:generate: Generating plugin-oas
+web:generate: ℹ OpenAPI schema validation failed.
+web:generate: 
+web:generate: [31m[1mADDITIONAL PROPERTY[22m must NOT have additional properties[39m
+web:generate: 
+web:generate:   11658 |                         },
+web:generate:   11659 |                         "role": {
+web:generate: > 11660 |                           "const": "customer",
+web:generate:         |                           ^^^^^^^ [95mconst[39m is not expected to be here!
+web:generate:   11661 |                           "type": "string"
+web:generate:   11662 |                         },
+web:generate:   11663 |                         "totalSpent": {
+web:generate: 
+web:generate: [31m[1mADDITIONAL PROPERTY[22m must NOT have additional properties[39m
+web:generate: 
+web:generate:   11728 |                         },
+web:generate:   11729 |                         "role": {
+web:generate: > 11730 |                           "const": "winemaker",
+web:generate:         |                           ^^^^^^^ [95mconst[39m is not expected to be here!
+web:generate:   11731 |                           "type": "string"
+web:generate:   11732 |                         },
+web:generate:   11733 |                         "supplyAgreementsByStatus": {
+web:generate: 
+web:generate: [31m[1mADDITIONAL PROPERTY[22m must NOT have additional properties[39m
+web:generate: 
+web:generate:   11864 |                         },
+web:generate:   11865 |                         "role": {
+web:generate: > 11866 |                           "const": "shop_owner",
+web:generate:         |                           ^^^^^^^ [95mconst[39m is not expected to be here!
+web:generate:   11867 |                           "type": "string"
+web:generate:   11868 |                         },
+web:generate:   11869 |                         "shopsCount": {
+web:generate: 
+web:generate: [31m[1mADDITIONAL PROPERTY[22m must NOT have additional properties[39m
+web:generate: 
+web:generate:   11982 |                         },
+web:generate:   11983 |                         "role": {
+web:generate: > 11984 |                           "const": "admin",
+web:generate:         |                           ^^^^^^^ [95mconst[39m is not expected to be here!
+web:generate:   11985 |                           "type": "string"
+web:generate:   11986 |                         },
+web:generate:   11987 |                         "totalEvents": { 
+web:generate: plugin-oas completed in 725ms
+web:generate: Generating plugin-ts
+web:generate: plugin-ts completed in 531ms
+web:generate: Generating plugin-client
+web:generate: plugin-client completed in 386ms
+web:generate: Generating plugin-react-query
+web:generate: plugin-react-query completed in 912ms
+web:generate: Writing 321 files
+web:generate: Writing src\generated\index.ts
+web:generate: Writing src\generated\types\index.ts
+web:generate: Writing src\generated\hooks\index.ts
+web:generate: Writing src\generated\.kubb\config.ts
+web:generate: Writing src\generated\clients\index.ts
+web:generate: Writing src\generated\types\GetShops.ts
+web:generate: Writing src\generated\types\GetCarts.ts
+web:generate: Writing src\generated\types\GetWines.ts
+web:generate: Writing src\generated\types\GetStats.ts
+web:generate: Writing src\generated\types\PostShops.ts
+web:generate: Writing src\generated\types\GetEvents.ts
+web:generate: Writing src\generated\types\GetOrders.ts
+web:generate: Writing src\generated\types\PostWines.ts
+web:generate: Writing src\generated\types\GetUsersMe.ts
+web:generate: Writing src\generated\types\PutUsersMe.ts
+web:generate: Writing src\generated\types\GetShopsMe.ts
+web:generate: Writing src\generated\types\PostEvents.ts
+web:generate: Writing src\generated\clients\getShops.ts
+web:generate: Writing src\generated\clients\getCarts.ts
+web:generate: Writing src\generated\clients\getWines.ts
+web:generate: Writing src\generated\clients\getStats.ts
+web:generate: Writing src\generated\types\GetProducts.ts
+web:generate: Writing src\generated\clients\postShops.ts
+web:generate: Writing src\generated\clients\getEvents.ts
+web:generate: Writing src\generated\clients\getOrders.ts
+web:generate: Writing src\generated\clients\postWines.ts
+web:generate: Writing src\generated\hooks\useGetShops.ts
+web:generate: Writing src\generated\hooks\useGetCarts.ts
+web:generate: Writing src\generated\hooks\useGetWines.ts
+web:generate: Writing src\generated\hooks\useGetStats.ts
+web:generate: Writing src\generated\types\GetShopsById.ts
+web:generate: Writing src\generated\types\GetWinesById.ts
+web:generate: Writing src\generated\types\PutWinesById.ts
+web:generate: Writing src\generated\clients\getUsersMe.ts
+web:generate: Writing src\generated\clients\putUsersMe.ts
+web:generate: Writing src\generated\clients\getShopsMe.ts
+web:generate: Writing src\generated\clients\postEvents.ts
+web:generate: Writing src\generated\hooks\useGetEvents.ts
+web:generate: Writing src\generated\hooks\useGetOrders.ts
+web:generate: Writing src\generated\hooks\usePostShops.ts
+web:generate: Writing src\generated\hooks\usePostWines.ts
+web:generate: Writing src\generated\types\GetEventsById.ts
+web:generate: Writing src\generated\types\GetOrdersById.ts
+web:generate: Writing src\generated\types\GetWinemakers.ts
+web:generate: Writing src\generated\types\GetAdminUsers.ts
+web:generate: Writing src\generated\clients\getProducts.ts
+web:generate: Writing src\generated\hooks\useGetUsersMe.ts
+web:generate: Writing src\generated\hooks\useGetShopsMe.ts
+web:generate: Writing src\generated\hooks\usePutUsersMe.ts
+web:generate: Writing src\generated\hooks\usePostEvents.ts
+web:generate: Writing src\generated\types\PatchShopsById.ts
+web:generate: Writing src\generated\types\PostCartsItems.ts
+web:generate: Writing src\generated\types\GetAdminEvents.ts
+web:generate: Writing src\generated\clients\getShopsById.ts
+web:generate: Writing src\generated\clients\getWinesById.ts
+web:generate: Writing src\generated\clients\putWinesById.ts
+web:generate: Writing src\generated\hooks\useGetProducts.ts
+web:generate: Writing src\generated\types\GetRoleRequests.ts
+web:generate: Writing src\generated\types\DeleteShopsById.ts
+web:generate: Writing src\generated\types\GetProductsById.ts
+web:generate: Writing src\generated\types\PatchEventsById.ts
+web:generate: Writing src\generated\types\DeleteWinesById.ts
+web:generate: Writing src\generated\types\GetWinemakersMe.ts
+web:generate: Writing src\generated\types\GetAdminReviews.ts
+web:generate: Writing src\generated\clients\getEventsById.ts
+web:generate: Writing src\generated\clients\getOrdersById.ts
+web:generate: Writing src\generated\clients\getWinemakers.ts
+web:generate: Writing src\generated\clients\getAdminUsers.ts
+web:generate: Writing src\generated\hooks\useGetShopsById.ts
+web:generate: Writing src\generated\hooks\useGetWinesById.ts
+web:generate: Writing src\generated\hooks\usePutWinesById.ts
+web:generate: Writing src\generated\types\PostRoleRequests.ts
+web:generate: Writing src\generated\types\DeleteEventsById.ts
+web:generate: Writing src\generated\clients\patchShopsById.ts
+web:generate: Writing src\generated\clients\postCartsItems.ts
+web:generate: Writing src\generated\clients\getAdminEvents.ts
+web:generate: Writing src\generated\hooks\useGetEventsById.ts
+web:generate: Writing src\generated\hooks\useGetOrdersById.ts
+web:generate: Writing src\generated\hooks\useGetWinemakers.ts
+web:generate: Writing src\generated\hooks\useGetAdminUsers.ts
+web:generate: Writing src\generated\types\PatchWinemakersMe.ts
+web:generate: Writing src\generated\types\GetWinemakersById.ts
+web:generate: Writing src\generated\types\PostGuestSessions.ts
+web:generate: Writing src\generated\types\DeleteReviewsById.ts
+web:generate: Writing src\generated\types\GetAdminUsersById.ts
+web:generate: Writing src\generated\clients\getRoleRequests.ts
+web:generate: Writing src\generated\clients\deleteShopsById.ts
+web:generate: Writing src\generated\clients\getProductsById.ts
+web:generate: Writing src\generated\clients\patchEventsById.ts
+web:generate: Writing src\generated\clients\deleteWinesById.ts
+web:generate: Writing src\generated\clients\getWinemakersMe.ts
+web:generate: Writing src\generated\clients\getAdminReviews.ts
+web:generate: Writing src\generated\hooks\useGetAdminEvents.ts
+web:generate: Writing src\generated\hooks\usePatchShopsById.ts
+web:generate: Writing src\generated\hooks\usePostCartsItems.ts
+web:generate: Writing src\generated\types\PostOrdersCheckout.ts
+web:generate: Writing src\generated\types\GetWinesByIdImages.ts
+web:generate: Writing src\generated\types\GetShopsByIdImages.ts
+web:generate: Writing src\generated\clients\postRoleRequests.ts
+web:generate: Writing src\generated\clients\deleteEventsById.ts
+web:generate: Writing src\generated\hooks\useGetRoleRequests.ts
+web:generate: Writing src\generated\hooks\useGetProductsById.ts
+web:generate: Writing src\generated\hooks\useGetWinemakersMe.ts
+web:generate: Writing src\generated\hooks\useGetAdminReviews.ts
+web:generate: Writing src\generated\hooks\useDeleteShopsById.ts
+web:generate: Writing src\generated\hooks\usePatchEventsById.ts
+web:generate: Writing src\generated\hooks\useDeleteWinesById.ts
+web:generate: Writing src\generated\types\GetUsersMeAddresses.ts
+web:generate: Writing src\generated\types\GetRoleRequestsById.ts
+web:generate: Writing src\generated\types\GetWinesByIdReviews.ts
+web:generate: Writing src\generated\types\PostWinesByIdImages.ts
+web:generate: Writing src\generated\types\PostShopsByIdImages.ts
+web:generate: Writing src\generated\types\GetEventsByIdImages.ts
+web:generate: Writing src\generated\clients\patchWinemakersMe.ts
+web:generate: Writing src\generated\clients\getWinemakersById.ts
+web:generate: Writing src\generated\clients\postGuestSessions.ts
+web:generate: Writing src\generated\clients\deleteReviewsById.ts
+web:generate: Writing src\generated\clients\getAdminUsersById.ts
+web:generate: Writing src\generated\hooks\useGetShopsSuspense.ts
+web:generate: Writing src\generated\hooks\useGetCartsSuspense.ts
+web:generate: Writing src\generated\hooks\useGetWinesSuspense.ts
+web:generate: Writing src\generated\hooks\useGetStatsSuspense.ts
+web:generate: Writing src\generated\hooks\usePostRoleRequests.ts
+web:generate: Writing src\generated\hooks\useDeleteEventsById.ts
+web:generate: Writing src\generated\types\PostUsersMeAddresses.ts
+web:generate: Writing src\generated\types\PostApiWebhooksClerk.ts
+web:generate: Writing src\generated\types\GetShopsByIdProducts.ts
+web:generate: Writing src\generated\types\GetGuestSessionsById.ts
+web:generate: Writing src\generated\types\PostSupplyAgreements.ts
+web:generate: Writing src\generated\types\PostWinesByIdReviews.ts
+web:generate: Writing src\generated\types\PostEventsByIdImages.ts
+web:generate: Writing src\generated\clients\postOrdersCheckout.ts
+web:generate: Writing src\generated\clients\getWinesByIdImages.ts
+web:generate: Writing src\generated\clients\getShopsByIdImages.ts
+web:generate: Writing src\generated\hooks\useGetWinemakersById.ts
+web:generate: Writing src\generated\hooks\useGetAdminUsersById.ts
+web:generate: Writing src\generated\hooks\useGetEventsSuspense.ts
+web:generate: Writing src\generated\hooks\useGetOrdersSuspense.ts
+web:generate: Writing src\generated\hooks\usePatchWinemakersMe.ts
+web:generate: Writing src\generated\hooks\usePostGuestSessions.ts
+web:generate: Writing src\generated\hooks\useDeleteReviewsById.ts
+web:generate: Writing src\generated\types\PostShopsByIdProducts.ts
+web:generate: Writing src\generated\types\GetEventsByIdComments.ts
+web:generate: Writing src\generated\types\PatchOrdersByIdStatus.ts
+web:generate: Writing src\generated\types\GetProductsByIdImages.ts
+web:generate: Writing src\generated\clients\getUsersMeAddresses.ts
+web:generate: Writing src\generated\clients\getRoleRequestsById.ts
+web:generate: Writing src\generated\clients\getWinesByIdReviews.ts
+web:generate: Writing src\generated\clients\postWinesByIdImages.ts
+web:generate: Writing src\generated\clients\postShopsByIdImages.ts
+web:generate: Writing src\generated\clients\getEventsByIdImages.ts
+web:generate: Writing src\generated\hooks\useGetWinesByIdImages.ts
+web:generate: Writing src\generated\hooks\useGetShopsByIdImages.ts
+web:generate: Writing src\generated\hooks\useGetUsersMeSuspense.ts
+web:generate: Writing src\generated\hooks\useGetShopsMeSuspense.ts
+web:generate: Writing src\generated\hooks\usePostOrdersCheckout.ts
+web:generate: Writing src\generated\types\PostEventsByIdRegister.ts
+web:generate: Writing src\generated\types\PostEventsByIdComments.ts
+web:generate: Writing src\generated\types\GetProductsByIdReviews.ts
+web:generate: Writing src\generated\types\DeleteAdminReviewsById.ts
+web:generate: Writing src\generated\types\PostProductsByIdImages.ts
+web:generate: Writing src\generated\clients\postUsersMeAddresses.ts
+web:generate: Writing src\generated\clients\postApiWebhooksClerk.ts
+web:generate: Writing src\generated\clients\getShopsByIdProducts.ts
+web:generate: Writing src\generated\clients\getGuestSessionsById.ts
+web:generate: Writing src\generated\clients\postSupplyAgreements.ts
+web:generate: Writing src\generated\clients\postWinesByIdReviews.ts
+web:generate: Writing src\generated\clients\postEventsByIdImages.ts
+web:generate: Writing src\generated\hooks\useGetUsersMeAddresses.ts
+web:generate: Writing src\generated\hooks\useGetRoleRequestsById.ts
+web:generate: Writing src\generated\hooks\useGetWinesByIdReviews.ts
+web:generate: Writing src\generated\hooks\useGetEventsByIdImages.ts
+web:generate: Writing src\generated\hooks\useGetProductsSuspense.ts
+web:generate: Writing src\generated\hooks\usePostWinesByIdImages.ts
+web:generate: Writing src\generated\hooks\usePostShopsByIdImages.ts
+web:generate: Writing src\generated\types\PostProductsByIdReviews.ts
+web:generate: Writing src\generated\types\GetWinemakersByIdImages.ts
+web:generate: Writing src\generated\clients\postShopsByIdProducts.ts
+web:generate: Writing src\generated\clients\getEventsByIdComments.ts
+web:generate: Writing src\generated\clients\patchOrdersByIdStatus.ts
+web:generate: Writing src\generated\clients\getProductsByIdImages.ts
+web:generate: Writing src\generated\hooks\useGetShopsByIdProducts.ts
+web:generate: Writing src\generated\hooks\useGetGuestSessionsById.ts
+web:generate: Writing src\generated\hooks\useGetShopsByIdSuspense.ts
+web:generate: Writing src\generated\hooks\useGetWinesByIdSuspense.ts
+web:generate: Writing src\generated\hooks\usePostUsersMeAddresses.ts
+web:generate: Writing src\generated\hooks\usePostApiWebhooksClerk.ts
+web:generate: Writing src\generated\hooks\usePostSupplyAgreements.ts
+web:generate: Writing src\generated\hooks\usePostWinesByIdReviews.ts
+web:generate: Writing src\generated\hooks\usePostEventsByIdImages.ts
+web:generate: Writing src\generated\types\GetShopsByIdAvailability.ts
+web:generate: Writing src\generated\types\PutCartsItemsByProductId.ts
+web:generate: Writing src\generated\types\DeleteEventsByIdRegister.ts
+web:generate: Writing src\generated\types\GetEventsByIdInvitations.ts
+web:generate: Writing src\generated\types\GetWinemakersByIdReviews.ts
+web:generate: Writing src\generated\types\PostWinemakersByIdImages.ts
+web:generate: Writing src\generated\clients\postEventsByIdRegister.ts
+web:generate: Writing src\generated\clients\postEventsByIdComments.ts
+web:generate: Writing src\generated\clients\getProductsByIdReviews.ts
+web:generate: Writing src\generated\clients\deleteAdminReviewsById.ts
+web:generate: Writing src\generated\clients\postProductsByIdImages.ts
+web:generate: Writing src\generated\hooks\useGetEventsByIdComments.ts
+web:generate: Writing src\generated\hooks\useGetProductsByIdImages.ts
+web:generate: Writing src\generated\hooks\useGetEventsByIdSuspense.ts
+web:generate: Writing src\generated\hooks\useGetOrdersByIdSuspense.ts
+web:generate: Writing src\generated\hooks\useGetWinemakersSuspense.ts
+web:generate: Writing src\generated\hooks\useGetAdminUsersSuspense.ts
+web:generate: Writing src\generated\hooks\usePostShopsByIdProducts.ts
+web:generate: Writing src\generated\hooks\usePatchOrdersByIdStatus.ts
+web:generate: Writing src\generated\types\PatchSupplyAgreementsById.ts
+web:generate: Writing src\generated\types\PostWinemakersByIdReviews.ts
+web:generate: Writing src\generated\types\PostAdminEventsByIdReject.ts
+web:generate: Writing src\generated\types\PatchAdminUsersByIdStatus.ts
+web:generate: Writing src\generated\clients\postProductsByIdReviews.ts
+web:generate: Writing src\generated\clients\getWinemakersByIdImages.ts
+web:generate: Writing src\generated\hooks\useGetProductsByIdReviews.ts
+web:generate: Writing src\generated\hooks\useGetAdminEventsSuspense.ts
+web:generate: Writing src\generated\hooks\usePostEventsByIdRegister.ts
+web:generate: Writing src\generated\hooks\usePostEventsByIdComments.ts
+web:generate: Writing src\generated\hooks\useDeleteAdminReviewsById.ts
+web:generate: Writing src\generated\hooks\usePostProductsByIdImages.ts
+web:generate: Writing src\generated\types\PostAdminEventsByIdApprove.ts
+web:generate: Writing src\generated\clients\getShopsByIdAvailability.ts
+web:generate: Writing src\generated\clients\putCartsItemsByProductId.ts
+web:generate: Writing src\generated\clients\deleteEventsByIdRegister.ts
+web:generate: Writing src\generated\clients\getEventsByIdInvitations.ts
+web:generate: Writing src\generated\clients\getWinemakersByIdReviews.ts
+web:generate: Writing src\generated\clients\postWinemakersByIdImages.ts
+web:generate: Writing src\generated\hooks\useGetWinemakersByIdImages.ts
+web:generate: Writing src\generated\hooks\useGetRoleRequestsSuspense.ts
+web:generate: Writing src\generated\hooks\useGetProductsByIdSuspense.ts
+web:generate: Writing src\generated\hooks\useGetWinemakersMeSuspense.ts
+web:generate: Writing src\generated\hooks\useGetAdminReviewsSuspense.ts
+web:generate: Writing src\generated\hooks\usePostProductsByIdReviews.ts
+web:generate: Writing src\generated\types\PatchRoleRequestsByIdReject.ts
+web:generate: Writing src\generated\types\DeleteCartsItemsByProductId.ts
+web:generate: Writing src\generated\clients\patchSupplyAgreementsById.ts
+web:generate: Writing src\generated\clients\postWinemakersByIdReviews.ts
+web:generate: Writing src\generated\clients\postAdminEventsByIdReject.ts
+web:generate: Writing src\generated\clients\patchAdminUsersByIdStatus.ts
+web:generate: Writing src\generated\hooks\useGetShopsByIdAvailability.ts
+web:generate: Writing src\generated\hooks\useGetEventsByIdInvitations.ts
+web:generate: Writing src\generated\hooks\useGetWinemakersByIdReviews.ts
+web:generate: Writing src\generated\hooks\usePutCartsItemsByProductId.ts
+web:generate: Writing src\generated\hooks\useDeleteEventsByIdRegister.ts
+web:generate: Writing src\generated\hooks\usePostWinemakersByIdImages.ts
+web:generate: Writing src\generated\types\PatchRoleRequestsByIdApprove.ts
+web:generate: Writing src\generated\types\GetSupplyAgreementsWinemaker.ts
+web:generate: Writing src\generated\clients\postAdminEventsByIdApprove.ts
+web:generate: Writing src\generated\hooks\useGetWinemakersByIdSuspense.ts
+web:generate: Writing src\generated\hooks\useGetAdminUsersByIdSuspense.ts
+web:generate: Writing src\generated\hooks\usePatchSupplyAgreementsById.ts
+web:generate: Writing src\generated\hooks\usePostWinemakersByIdReviews.ts
+web:generate: Writing src\generated\hooks\usePostAdminEventsByIdReject.ts
+web:generate: Writing src\generated\hooks\usePatchAdminUsersByIdStatus.ts
+web:generate: Writing src\generated\clients\patchRoleRequestsByIdReject.ts
+web:generate: Writing src\generated\clients\deleteCartsItemsByProductId.ts
+web:generate: Writing src\generated\hooks\useGetWinesByIdImagesSuspense.ts
+web:generate: Writing src\generated\hooks\useGetShopsByIdImagesSuspense.ts
+web:generate: Writing src\generated\hooks\usePostAdminEventsByIdApprove.ts
+web:generate: Writing src\generated\types\DeleteWinesByIdImagesByImageId.ts
+web:generate: Writing src\generated\types\DeleteShopsByIdImagesByImageId.ts
+web:generate: Writing src\generated\clients\patchRoleRequestsByIdApprove.ts
+web:generate: Writing src\generated\clients\getSupplyAgreementsWinemaker.ts
+web:generate: Writing src\generated\hooks\useGetUsersMeAddressesSuspense.ts
+web:generate: Writing src\generated\hooks\useGetRoleRequestsByIdSuspense.ts
+web:generate: Writing src\generated\hooks\useGetWinesByIdReviewsSuspense.ts
+web:generate: Writing src\generated\hooks\useGetEventsByIdImagesSuspense.ts
+web:generate: Writing src\generated\hooks\usePatchRoleRequestsByIdReject.ts
+web:generate: Writing src\generated\hooks\useDeleteCartsItemsByProductId.ts
+web:generate: Writing src\generated\types\GetSupplyAgreementsShopByShopId.ts
+web:generate: Writing src\generated\types\DeleteEventsByIdImagesByImageId.ts
+web:generate: Writing src\generated\hooks\useGetSupplyAgreementsWinemaker.ts
+web:generate: Writing src\generated\hooks\useGetShopsByIdProductsSuspense.ts
+web:generate: Writing src\generated\hooks\useGetGuestSessionsByIdSuspense.ts
+web:generate: Writing src\generated\hooks\usePatchRoleRequestsByIdApprove.ts
+web:generate: Writing src\generated\types\PostShopsByIdAvailabilityRegular.ts
+web:generate: Writing src\generated\types\GetUploadsByEntityTypeByFilename.ts
+web:generate: Writing src\generated\clients\deleteWinesByIdImagesByImageId.ts
+web:generate: Writing src\generated\clients\deleteShopsByIdImagesByImageId.ts
+web:generate: Writing src\generated\hooks\useGetEventsByIdCommentsSuspense.ts
+web:generate: Writing src\generated\hooks\useGetProductsByIdImagesSuspense.ts
+web:generate: Writing src\generated\types\PatchShopsByIdProductsByProductId.ts
+web:generate: Writing src\generated\types\DeleteProductsByIdImagesByImageId.ts
+web:generate: Writing src\generated\clients\getSupplyAgreementsShopByShopId.ts
+web:generate: Writing src\generated\clients\deleteEventsByIdImagesByImageId.ts
+web:generate: Writing src\generated\hooks\useGetProductsByIdReviewsSuspense.ts
+web:generate: Writing src\generated\hooks\useDeleteWinesByIdImagesByImageId.ts
+web:generate: Writing src\generated\hooks\useDeleteShopsByIdImagesByImageId.ts
+web:generate: Writing src\generated\types\DeleteShopsByIdProductsByProductId.ts
+web:generate: Writing src\generated\clients\postShopsByIdAvailabilityRegular.ts
+web:generate: Writing src\generated\clients\getUploadsByEntityTypeByFilename.ts
+web:generate: Writing src\generated\hooks\useGetSupplyAgreementsShopByShopId.ts
+web:generate: Writing src\generated\hooks\useGetWinemakersByIdImagesSuspense.ts
+web:generate: Writing src\generated\hooks\useDeleteEventsByIdImagesByImageId.ts
+web:generate: Writing src\generated\types\PostShopsByIdAvailabilityExceptions.ts
+web:generate: Writing src\generated\types\DeleteWinemakersByIdImagesByImageId.ts
+web:generate: Writing src\generated\clients\patchShopsByIdProductsByProductId.ts
+web:generate: Writing src\generated\clients\deleteProductsByIdImagesByImageId.ts
+web:generate: Writing src\generated\hooks\useGetUploadsByEntityTypeByFilename.ts
+web:generate: Writing src\generated\hooks\useGetShopsByIdAvailabilitySuspense.ts
+web:generate: Writing src\generated\hooks\useGetEventsByIdInvitationsSuspense.ts
+web:generate: Writing src\generated\hooks\useGetWinemakersByIdReviewsSuspense.ts
+web:generate: Writing src\generated\hooks\usePostShopsByIdAvailabilityRegular.ts
+web:generate: Writing src\generated\clients\deleteShopsByIdProductsByProductId.ts
+web:generate: Writing src\generated\hooks\usePatchShopsByIdProductsByProductId.ts
+web:generate: Writing src\generated\hooks\useDeleteProductsByIdImagesByImageId.ts
+web:generate: Writing src\generated\clients\postShopsByIdAvailabilityExceptions.ts
+web:generate: Writing src\generated\clients\deleteWinemakersByIdImagesByImageId.ts
+web:generate: Writing src\generated\hooks\useDeleteShopsByIdProductsByProductId.ts
+web:generate: Writing src\generated\hooks\usePostShopsByIdAvailabilityExceptions.ts
+web:generate: Writing src\generated\hooks\useDeleteWinemakersByIdImagesByImageId.ts
+web:generate: Writing src\generated\hooks\useGetSupplyAgreementsWinemakerSuspense.ts
+web:generate: Writing src\generated\hooks\useGetSupplyAgreementsShopByShopIdSuspense.ts
+web:generate: Writing src\generated\types\DeleteShopsByIdAvailabilityRegularByEntryId.ts
+web:generate: Writing src\generated\hooks\useGetUploadsByEntityTypeByFilenameSuspense.ts
+web:generate: Writing src\generated\clients\deleteShopsByIdAvailabilityRegularByEntryId.ts
+web:generate: Writing src\generated\types\DeleteShopsByIdAvailabilityExceptionsByEntryId.ts
+web:generate: Writing src\generated\hooks\useDeleteShopsByIdAvailabilityRegularByEntryId.ts
+web:generate: Writing src\generated\clients\deleteShopsByIdAvailabilityExceptionsByEntryId.ts
+web:generate: Writing src\generated\hooks\useDeleteShopsByIdAvailabilityExceptionsByEntryId.ts
+web:generate: Files written successfully
+web:generate: ℹ Load summary 
+web:generate: ✓ Generation successfully ../server/openapi.json
+web:generate: Generation completed
+web:generate: ───────────────────────────
+web:generate: Plugins:          4 successful, 4 total
+web:generate: Generated:        321 files in 3.12s
+web:generate: Output:           .
+web:generate: ───────────────────────────
+
+ Tasks:    2 successful, 2 total
+Cached:    0 cached, 2 total
+  Time:    10.339s 
+
+$ turbo run check-types
+• turbo 2.9.14
+
+   • Packages in scope: @repo/shared, @repo/typescript-config, server, web
+   • Running check-types in 4 packages
+   • Remote caching disabled
+
+@repo/shared:check-types: cache hit, replaying logs 4a6dca208a42dd40
+@repo/shared:check-types: $ tsc --noEmit
+server:check-types: cache hit, replaying logs ff95b9ec73b47a2a
+server:check-types: $ tsc --noEmit
+web:check-types: cache hit, replaying logs 23642efc56442c3b
+web:check-types: $ tsc --noEmit -p tsconfig.app.json && tsc --noEmit -p tsconfig.node.json
+
+ Tasks:    3 successful, 3 total
+Cached:    3 cached, 3 total
+  Time:    122ms >>> FULL TURBO
+
+$ turbo run test -- --run
+• turbo 2.9.14
+
+   • Packages in scope: @repo/shared, @repo/typescript-config, server, web
+   • Running test in 4 packages
+   • Remote caching disabled
+
+server:test: cache bypass, force executing 55c62467457a8550
+web:test: cache bypass, force executing f623e90c5387c7fd
+server:test: $ vitest run --run
+web:test: $ vitest run --run
+server:test: 
+server:test: [1m[30m[46m RUN [49m[39m[22m [36mv4.1.6 [39m[90mD:/pb138/project/winery/apps/server[39m
+server:test:       [2mCoverage enabled with [22m[33mv8[39m
+server:test: 
+web:test: 
+web:test: [1m[30m[46m RUN [49m[39m[22m [36mv4.1.6 [39m[90mD:/pb138/project/winery/apps/web[39m
+web:test:       [2mCoverage enabled with [22m[33mv8[39m
+web:test: 
+web:test:  [32m✓[39m src/__tests__/AuthenticatedLayout.test.tsx [2m([22m[2m25 tests[22m[2m | [22m[33m3 skipped[39m[2m)[22m[33m 318[2mms[22m[39m
+web:test:  [32m✓[39m src/components/catalog/WineCard.test.tsx [2m([22m[2m5 tests[22m[2m)[22m[32m 227[2mms[22m[39m
+web:test:  [32m✓[39m src/components/catalog/ProductCard.test.tsx [2m([22m[2m8 tests[22m[2m)[22m[32m 251[2mms[22m[39m
+web:test:  [32m✓[39m src/__tests__/UserContext.test.tsx [2m([22m[2m6 tests[22m[2m)[22m[33m 463[2mms[22m[39m
+web:test: [90mstderr[2m | src/__tests__/DashboardTabs.test.tsx[2m > [22m[2mDashboardTabs[2m > [22m[2mAccessibility[2m > [22m[2msupports keyboard navigation between tabs
+web:test: [22m[39mAn update to TabsList inside a test was not wrapped in act(...).
+web:test: 
+web:test: When testing, code that causes React state updates should be wrapped into act(...):
+web:test: 
+web:test: act(() => {
+web:test:   /* fire events that update state */
+web:test: });
+web:test: /* assert on the output */
+web:test: 
+web:test: This ensures that you're testing the behavior the user would see in the browser. Learn more at https://react.dev/link/wrap-tests-with-act
+web:test: 
+web:test:  [32m✓[39m src/__tests__/ProfileEditForm.test.tsx [2m([22m[2m30 tests[22m[2m)[22m[33m 1803[2mms[22m[39m
+web:test:  [32m✓[39m src/__tests__/DashboardTabs.test.tsx [2m([22m[2m31 tests[22m[2m)[22m[33m 1953[2mms[22m[39m
+server:test: [15:16:09.254] [31mERROR[39m (19028): [36mWebhook verification failed[39m
+server:test:     err: {
+server:test:       "type": "WebhookVerificationError",
+server:test:       "message": "No matching signature found",
+server:test:       "stack":
+server:test:           Error: No matching signature found
+server:test:               at new ExtendableError (D:\pb138\project\winery\node_modules\.bun\standardwebhooks@1.0.0\node_modules\standardwebhooks\dist\index.js:13:22)
+server:test:               at new WebhookVerificationError (D:\pb138\project\winery\node_modules\.bun\standardwebhooks@1.0.0\node_modules\standardwebhooks\dist\index.js:18:9)
+server:test:               at Webhook.verify (D:\pb138\project\winery\node_modules\.bun\standardwebhooks@1.0.0\node_modules\standardwebhooks\dist\index.js:72:15)
+server:test:               at Webhook.verify (D:\pb138\project\winery\node_modules\.bun\svix@1.93.0\node_modules\svix\dist\webhook.js:22:27)
+server:test:               at D:/pb138/project/winery/apps/server/src/modules/webhooks/webhooks.routes.ts:28:22
+server:test:               at processTicksAndRejections (node:internal/process/task_queues:104:5)
+server:test:               at Object.handle [as composed] (eval at composeHandler (file:///D:/pb138/project/winery/node_modules/.bun/elysia@1.4.28+fed83c92b98031fe/node_modules/elysia/dist/compose.mjs:988:12), <anonymous>:10:7)
+server:test:               at D:/pb138/project/winery/apps/server/src/modules/webhooks/webhooks.routes.test.ts:43:22
+server:test:               at file:///D:/pb138/project/winery/node_modules/.bun/@vitest+runner@4.1.6/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:20
+server:test:       "name": "WebhookVerificationError"
+server:test:     }
+server:test:  [32m✓[39m src/modules/webhooks/webhooks.routes.test.ts [2m([22m[2m6 tests[22m[2m)[22m[33m 5756[2mms[22m[39m
+web:test:  [32m✓[39m src/components/catalog/WinemakerDetailsCard.test.tsx [2m([22m[2m3 tests[22m[2m)[22m[32m 152[2mms[22m[39m
+web:test:  [32m✓[39m src/components/catalog/SearchSection.test.tsx [2m([22m[2m3 tests[22m[2m)[22m[32m 152[2mms[22m[39m
+web:test:  [32m✓[39m src/components/catalog/WineDetailsCard.test.tsx [2m([22m[2m3 tests[22m[2m)[22m[32m 138[2mms[22m[39m
+server:test:  [32m✓[39m src/modules/auth/auth.plugin.test.ts [2m([22m[2m11 tests[22m[2m)[22m[32m 148[2mms[22m[39m
+web:test:  [32m✓[39m src/components/catalog/CatalogCard.test.tsx [2m([22m[2m5 tests[22m[2m)[22m[32m 132[2mms[22m[39m
+web:test:  [32m✓[39m src/components/shops/ShopCard.test.tsx [2m([22m[2m4 tests[22m[2m)[22m[32m 141[2mms[22m[39m
+web:test:  [32m✓[39m src/components/catalog/EventImage.test.tsx [2m([22m[2m3 tests[22m[2m)[22m[32m 119[2mms[22m[39m
+web:test:  [32m✓[39m src/components/primitives/page-header.test.tsx [2m([22m[2m3 tests[22m[2m)[22m[32m 125[2mms[22m[39m
+web:test:  [32m✓[39m src/components/catalog/WinemakerCard.test.tsx [2m([22m[2m3 tests[22m[2m)[22m[32m 121[2mms[22m[39m
+web:test:  [32m✓[39m src/components/stats/StatTile.test.tsx [2m([22m[2m5 tests[22m[2m)[22m[32m 119[2mms[22m[39m
+web:test:  [32m✓[39m src/components/catalog/EntityImage.test.tsx [2m([22m[2m4 tests[22m[2m)[22m[32m 115[2mms[22m[39m
+server:test:  [32m✓[39m src/modules/events/events.routes.test.ts [2m([22m[2m24 tests[22m[2m)[22m[32m 137[2mms[22m[39m
+web:test:  [32m✓[39m src/components/stats/WinemakerStatsSection.test.tsx [2m([22m[2m4 tests[22m[2m)[22m[32m 145[2mms[22m[39m
+web:test:  [32m✓[39m src/components/catalog/ShopImage.test.tsx [2m([22m[2m3 tests[22m[2m)[22m[32m 100[2mms[22m[39m
+web:test:  [32m✓[39m src/components/shops/ShopHero.test.tsx [2m([22m[2m3 tests[22m[2m)[22m[32m 98[2mms[22m[39m
+web:test:  [32m✓[39m src/components/stats/AdminStatsSection.test.tsx [2m([22m[2m3 tests[22m[2m)[22m[32m 211[2mms[22m[39m
+web:test:  [32m✓[39m src/components/stats/ShopOwnerStatsSection.test.tsx [2m([22m[2m3 tests[22m[2m)[22m[32m 215[2mms[22m[39m
+web:test:  [32m✓[39m src/components/primitives/empty-state.test.tsx [2m([22m[2m4 tests[22m[2m)[22m[32m 160[2mms[22m[39m
+web:test:  [32m✓[39m src/components/primitives/error-state.test.tsx [2m([22m[2m5 tests[22m[2m)[22m[32m 269[2mms[22m[39m
+web:test:  [32m✓[39m src/components/catalog/ProductDetailsCard.test.tsx [2m([22m[2m5 tests[22m[2m)[22m[33m 340[2mms[22m[39m
+web:test:  [32m✓[39m src/components/primitives/loading-state.test.tsx [2m([22m[2m5 tests[22m[2m)[22m[32m 105[2mms[22m[39m
+web:test:  [32m✓[39m src/components/shops/ShopManageMenu.test.tsx [2m([22m[2m3 tests[22m[2m)[22m[33m 442[2mms[22m[39m
+web:test:  [32m✓[39m src/__tests__/Sidebar.test.tsx [2m([22m[2m23 tests[22m[2m)[22m[33m 1741[2mms[22m[39m
+web:test:  [32m✓[39m src/components/catalog/ProductImage.test.tsx [2m([22m[2m3 tests[22m[2m)[22m[32m 94[2mms[22m[39m
+web:test:  [32m✓[39m src/components/primitives/section.test.tsx [2m([22m[2m3 tests[22m[2m)[22m[32m 149[2mms[22m[39m
+web:test:  [32m✓[39m src/components/stats/CustomerStatsSection.test.tsx [2m([22m[2m3 tests[22m[2m)[22m[32m 218[2mms[22m[39m
+web:test:  [32m✓[39m src/components/catalog/CatalogFilters.test.tsx [2m([22m[2m6 tests[22m[2m)[22m[33m 1449[2mms[22m[39m
+web:test:      [33m[2m✓[22m[39m renders search input for all entities [33m 326[2mms[22m[39m
+web:test:      [33m[2m✓[22m[39m calls onSearchChange when search changes for products (debounced) [33m 496[2mms[22m[39m
+web:test:  [32m✓[39m src/components/catalog/CatalogResults.test.tsx [2m([22m[2m3 tests[22m[2m)[22m[32m 104[2mms[22m[39m
+server:test:  [32m✓[39m src/modules/orders/orders.routes.test.ts [2m([22m[2m16 tests[22m[2m)[22m[32m 125[2mms[22m[39m
+web:test:  [32m✓[39m src/components/catalog/WineImage.test.tsx [2m([22m[2m3 tests[22m[2m)[22m[32m 103[2mms[22m[39m
+web:test:  [32m✓[39m src/components/catalog/WinemakerImage.test.tsx [2m([22m[2m3 tests[22m[2m)[22m[32m 97[2mms[22m[39m
+web:test:  [32m✓[39m src/__tests__/WinesAvailableInShops.test.tsx [2m([22m[2m3 tests[22m[2m)[22m[32m 81[2mms[22m[39m
+web:test:  [32m✓[39m src/components/primitives/data-grid.test.tsx [2m([22m[2m3 tests[22m[2m)[22m[32m 81[2mms[22m[39m
+web:test:  [32m✓[39m src/components/primitives/description-list.test.tsx [2m([22m[2m2 tests[22m[2m)[22m[32m 105[2mms[22m[39m
+web:test:  [32m✓[39m src/__tests__/UserInfoCard.test.tsx [2m([22m[2m2 tests[22m[2m)[22m[32m 92[2mms[22m[39m
+web:test:  [32m✓[39m src/__tests__/utils.test.ts [2m([22m[2m14 tests[22m[2m)[22m[32m 60[2mms[22m[39m
+web:test:  [32m✓[39m src/components/primitives/show-owner.test.tsx [2m([22m[2m3 tests[22m[2m)[22m[32m 65[2mms[22m[39m
+web:test:  [32m✓[39m src/__tests__/useRoles.test.ts [2m([22m[2m3 tests[22m[2m)[22m[32m 37[2mms[22m[39m
+web:test:  [32m✓[39m src/hooks/useIsOwner.test.ts [2m([22m[2m4 tests[22m[2m)[22m[32m 43[2mms[22m[39m
+server:test:  [32m✓[39m src/modules/wines/wines.routes.test.ts [2m([22m[2m12 tests[22m[2m | [22m[33m1 skipped[39m[2m)[22m[32m 63[2mms[22m[39m
+web:test:  [32m✓[39m src/components/shops/ShopProductsRow.test.tsx [2m([22m[2m4 tests[22m[2m)[22m[32m 92[2mms[22m[39m
+web:test:  [32m✓[39m src/components/shops/ShopDetailsCard.test.tsx [2m([22m[2m4 tests[22m[2m)[22m[32m 92[2mms[22m[39m
+web:test: 
+web:test: [2m Test Files [22m [1m[32m44 passed[39m[22m[90m (44)[39m
+web:test: [2m      Tests [22m [1m[32m265 passed[39m[22m[2m | [22m[33m3 skipped[39m[90m (268)[39m
+web:test: [2m   Start at [22m 15:16:02
+web:test: [2m   Duration [22m 21.66s[2m (transform 6.52s, setup 14.20s, import 142.55s, tests 13.12s, environment 62.19s)[22m
+web:test: 
+web:test: [34m % [39m[2mCoverage report from [22m[33mv8[39m
+web:test: -------------------|---------|----------|---------|---------|-------------------
+web:test: File               | % Stmts | % Branch | % Funcs | % Lines | Uncovered Line #s 
+web:test: -------------------|---------|----------|---------|---------|-------------------
+web:test: All files          |   77.14 |    68.88 |   69.95 |   77.09 |                   
+web:test:  ...onents/catalog |   75.23 |    66.66 |      64 |      75 |                   
+web:test:   CatalogCard.tsx  |     100 |      100 |     100 |     100 |                   
+web:test:   ...ogFilters.tsx |   58.18 |    48.64 |   37.93 |   58.18 | ...20,259-363,387 
+web:test:   ...aceholder.tsx |     100 |      100 |     100 |     100 |                   
+web:test:   ...ogResults.tsx |     100 |       75 |     100 |     100 | 17-19             
+web:test:   EntityImage.tsx  |     100 |      100 |     100 |     100 |                   
+web:test:   EventImage.tsx   |     100 |      100 |     100 |     100 |                   
+web:test:   ProductCard.tsx  |     100 |      100 |     100 |     100 |                   
+web:test:   ...tailsCard.tsx |   85.71 |    81.25 |     100 |   85.71 | 40                
+web:test:   ProductImage.tsx |     100 |      100 |     100 |     100 |                   
+web:test:   ...chSection.tsx |     100 |      100 |     100 |     100 |                   
+web:test:   ShopImage.tsx    |     100 |      100 |     100 |     100 |                   
+web:test:   WineCard.tsx     |     100 |      100 |     100 |     100 |                   
+web:test:   ...tailsCard.tsx |      80 |       70 |     100 |      80 | 19                
+web:test:   WineImage.tsx    |     100 |      100 |     100 |     100 |                   
+web:test:   ...makerCard.tsx |     100 |      100 |     100 |     100 |                   
+web:test:   ...tailsCard.tsx |      80 |    83.33 |     100 |      80 | 19                
+web:test:   ...akerImage.tsx |     100 |      100 |     100 |     100 |                   
+web:test:  ...alog/__tests__ |     100 |      100 |     100 |     100 |                   
+web:test:   ...geWrapper.tsx |     100 |      100 |     100 |     100 |                   
+web:test:  ...ents/dashboard |   88.88 |    82.92 |   72.72 |    87.5 |                   
+web:test:   ...boardTabs.tsx |     100 |      100 |     100 |     100 |                   
+web:test:   ...eEditForm.tsx |     100 |    95.45 |     100 |     100 | 65                
+web:test:   UserInfoCard.tsx |      50 |       40 |      25 |      50 | 49-67             
+web:test:  components/layout |   84.21 |    62.22 |   85.71 |   83.78 |                   
+web:test:   Sidebar.tsx      |   84.21 |    62.22 |   85.71 |   83.78 | 149-151,311-334   
+web:test:  ...nts/primitives |     100 |      100 |     100 |     100 |                   
+web:test:   data-grid.tsx    |     100 |      100 |     100 |     100 |                   
+web:test:   ...tion-list.tsx |     100 |      100 |     100 |     100 |                   
+web:test:   empty-state.tsx  |     100 |      100 |     100 |     100 |                   
+web:test:   error-state.tsx  |     100 |      100 |     100 |     100 |                   
+web:test:   ...ing-state.tsx |     100 |      100 |     100 |     100 |                   
+web:test:   page-header.tsx  |     100 |      100 |     100 |     100 |                   
+web:test:   ...ion-label.tsx |     100 |      100 |     100 |     100 |                   
+web:test:   section.tsx      |     100 |      100 |     100 |     100 |                   
+web:test:   show-owner.tsx   |     100 |      100 |     100 |     100 |                   
+web:test:  components/shops  |   90.47 |    81.25 |   85.71 |   90.47 |                   
+web:test:   ShopCard.tsx     |     100 |      100 |     100 |     100 |                   
+web:test:   ...tailsCard.tsx |     100 |       50 |     100 |     100 | 17                
+web:test:   ShopHero.tsx     |     100 |      100 |     100 |     100 |                   
+web:test:   ...anageMenu.tsx |     100 |      100 |     100 |     100 |                   
+web:test:   ...oductsRow.tsx |   84.61 |    83.33 |   66.66 |   84.61 | 33-36             
+web:test:  components/stats  |   73.56 |     60.6 |   80.95 |   71.95 |                   
+web:test:   ...tsSection.tsx |      75 |       60 |      80 |   73.68 | 9-13,35           
+web:test:   ...tsSection.tsx |   72.22 |    61.53 |      75 |   70.58 | 9-13,37           
+web:test:   ...tsSection.tsx |   72.22 |    61.53 |      75 |   70.58 | 9-13,37           
+web:test:   StatTile.tsx     |     100 |      100 |     100 |     100 |                   
+web:test:   ...nScaffold.tsx |   72.72 |     37.5 |     100 |      70 | 40,60-61          
+web:test:   ...tsSection.tsx |   73.68 |    66.66 |   66.66 |   72.22 | 9-13,34           
+web:test:  components/ui     |      76 |    71.42 |   64.28 |      76 |                   
+web:test:   button.tsx       |     100 |      100 |     100 |     100 |                   
+web:test:   card.tsx         |    87.5 |      100 |   85.71 |    87.5 | 74                
+web:test:   checkbox.tsx     |     100 |      100 |     100 |     100 |                   
+web:test:   ...down-menu.tsx |   78.94 |    55.55 |   46.66 |   78.94 | ...67,195,206,246 
+web:test:   input.tsx        |     100 |      100 |     100 |     100 |                   
+web:test:   label.tsx        |     100 |      100 |     100 |     100 |                   
+web:test:   select.tsx       |      40 |      100 |   33.33 |      40 | 15,109-174        
+web:test:   skeleton.tsx     |     100 |      100 |     100 |     100 |                   
+web:test:   slider.tsx       |   57.14 |       50 |     100 |   57.14 | 16-19             
+web:test:   tabs.tsx         |     100 |      100 |     100 |     100 |                   
+web:test:  context           |   84.84 |    81.81 |   88.88 |   86.66 |                   
+web:test:   UserContext.tsx  |   84.84 |    81.81 |   88.88 |   86.66 | 52,70,77,108      
+web:test:  generated/clients |       0 |        0 |       0 |       0 |                   
+web:test:   getUsersMe.ts    |       0 |        0 |       0 |       0 | 11-26             
+web:test:   putUsersMe.ts    |       0 |        0 |       0 |       0 | 11-26             
+web:test:  generated/hooks   |    9.52 |        0 |       0 |   10.52 |                   
+web:test:   useGetUsersMe.ts |    9.09 |        0 |       0 |      10 | 18-54             
+web:test:   usePutUsersMe.ts |      10 |        0 |       0 |   11.11 | 18-47             
+web:test:  hooks             |     100 |      100 |     100 |     100 |                   
+web:test:   useDebounce.ts   |     100 |      100 |     100 |     100 |                   
+web:test:   useIsOwner.ts    |     100 |      100 |     100 |     100 |                   
+web:test:   useRoles.ts      |     100 |      100 |     100 |     100 |                   
+web:test:  lib               |   28.57 |    16.66 |   16.66 |   33.33 |                   
+web:test:   axios.ts         |   23.07 |    16.66 |       0 |   27.27 | 42-46,52-59       
+web:test:   utils.ts         |     100 |      100 |     100 |     100 |                   
+web:test:  routes            |     100 |      100 |   66.66 |     100 |                   
+web:test:   ...enticated.tsx |     100 |      100 |   66.66 |     100 |                   
+web:test:  ...es/-components |     100 |      100 |     100 |     100 |                   
+web:test:   ...leInShops.tsx |     100 |      100 |     100 |     100 |                   
+web:test:  types             |     100 |      100 |     100 |     100 |                   
+web:test:   roles.ts         |     100 |      100 |     100 |     100 |                   
+web:test:  utils             |     100 |      100 |     100 |     100 |                   
+web:test:   ...-formatter.ts |     100 |      100 |     100 |     100 |                   
+web:test:   stock.ts         |     100 |      100 |     100 |     100 |                   
+web:test:   string-utils.ts  |     100 |      100 |     100 |     100 |                   
+web:test:   validators.ts    |     100 |      100 |     100 |     100 |                   
+web:test: -------------------|---------|----------|---------|---------|-------------------
+server:test:  [32m✓[39m src/modules/carts/carts.routes.test.ts [2m([22m[2m7 tests[22m[2m)[22m[32m 64[2mms[22m[39m
+server:test:  [32m✓[39m src/modules/shops/shops.routes.test.ts [2m([22m[2m16 tests[22m[2m)[22m[32m 71[2mms[22m[39m
+server:test:  [32m✓[39m src/modules/products/products.routes.test.ts [2m([22m[2m6 tests[22m[2m)[22m[32m 56[2mms[22m[39m
+server:test:  [32m✓[39m src/modules/role-requests/role-requests.routes.test.ts [2m([22m[2m11 tests[22m[2m)[22m[32m 42[2mms[22m[39m
+server:test:  [32m✓[39m src/modules/users/users.routes.test.ts [2m([22m[2m10 tests[22m[2m)[22m[32m 62[2mms[22m[39m
+server:test:  [32m✓[39m src/modules/reviews/reviews.routes.test.ts [2m([22m[2m7 tests[22m[2m)[22m[32m 46[2mms[22m[39m
+server:test:  [32m✓[39m src/modules/winemakers/winemakers.routes.test.ts [2m([22m[2m7 tests[22m[2m)[22m[32m 58[2mms[22m[39m
+server:test:  [32m✓[39m src/modules/images/images.routes.test.ts [2m([22m[2m9 tests[22m[2m)[22m[32m 56[2mms[22m[39m
+server:test:  [32m✓[39m src/modules/stats/stats.routes.test.ts [2m([22m[2m4 tests[22m[2m)[22m[32m 50[2mms[22m[39m
+server:test:  [32m✓[39m src/modules/availability/availability.routes.test.ts [2m([22m[2m6 tests[22m[2m)[22m[32m 47[2mms[22m[39m
+server:test:  [32m✓[39m src/modules/admin/admin.routes.test.ts [2m([22m[2m5 tests[22m[2m)[22m[32m 38[2mms[22m[39m
+server:test:  [32m✓[39m src/modules/supply-agreements/supply-agreements.routes.test.ts [2m([22m[2m5 tests[22m[2m)[22m[32m 46[2mms[22m[39m
+server:test:  [32m✓[39m src/modules/guest-sessions/guest-sessions.routes.test.ts [2m([22m[2m3 tests[22m[2m)[22m[32m 37[2mms[22m[39m
+server:test:  [32m✓[39m src/modules/reviews/reviews.service.test.ts [2m([22m[2m18 tests[22m[2m)[22m[32m 32[2mms[22m[39m
+server:test:  [32m✓[39m src/modules/products/products.repository.test.ts [2m([22m[2m16 tests[22m[2m)[22m[32m 27[2mms[22m[39m
+server:test:  [32m✓[39m src/modules/admin/admin.repository.test.ts [2m([22m[2m20 tests[22m[2m)[22m[32m 21[2mms[22m[39m
+server:test:  [32m✓[39m src/modules/events/events.service.test.ts [2m([22m[2m15 tests[22m[2m)[22m[32m 22[2mms[22m[39m
+server:test:  [32m✓[39m src/modules/winemakers/winemakers.service.test.ts [2m([22m[2m9 tests[22m[2m)[22m[32m 16[2mms[22m[39m
+server:test:  [32m✓[39m src/modules/stats/stats.repository.test.ts [2m([22m[2m13 tests[22m[2m)[22m[32m 20[2mms[22m[39m
+server:test:  [32m✓[39m src/modules/stats/stats.service.test.ts [2m([22m[2m8 tests[22m[2m)[22m[32m 17[2mms[22m[39m
+server:test:  [32m✓[39m src/modules/role-requests/role-requests.service.test.ts [2m([22m[2m17 tests[22m[2m)[22m[32m 26[2mms[22m[39m
+server:test:  [32m✓[39m src/modules/auth/auth.utils.test.ts [2m([22m[2m7 tests[22m[2m)[22m[32m 14[2mms[22m[39m
+server:test:  [32m✓[39m src/modules/supply-agreements/supply-agreements.service.test.ts [2m([22m[2m13 tests[22m[2m)[22m[32m 19[2mms[22m[39m
+server:test:  [32m✓[39m src/modules/products/products.service.test.ts [2m([22m[2m8 tests[22m[2m)[22m[32m 19[2mms[22m[39m
+server:test:  [32m✓[39m src/modules/winemakers/winemakers.repository.test.ts [2m([22m[2m7 tests[22m[2m)[22m[32m 16[2mms[22m[39m
+server:test:  [32m✓[39m src/modules/orders/orders.service.test.ts [2m([22m[2m11 tests[22m[2m)[22m[32m 18[2mms[22m[39m
+server:test:  [32m✓[39m src/modules/supply-agreements/supply-agreements.repository.test.ts [2m([22m[2m3 tests[22m[2m)[22m[32m 10[2mms[22m[39m
+server:test:  [32m✓[39m src/modules/availability/availability.service.test.ts [2m([22m[2m6 tests[22m[2m)[22m[32m 19[2mms[22m[39m
+server:test:  [32m✓[39m src/modules/users/users.service.test.ts [2m([22m[2m5 tests[22m[2m)[22m[32m 15[2mms[22m[39m
+server:test:  [32m✓[39m src/modules/carts/carts.service.test.ts [2m([22m[2m4 tests[22m[2m)[22m[32m 12[2mms[22m[39m
+server:test:  [32m✓[39m src/modules/wines/wines.repository.test.ts [2m([22m[2m8 tests[22m[2m)[22m[32m 20[2mms[22m[39m
+server:test:  [32m✓[39m src/modules/images/images.service.test.ts [2m([22m[2m3 tests[22m[2m)[22m[32m 17[2mms[22m[39m
+server:test:  [32m✓[39m src/modules/guest-sessions/guest-sessions.repository.test.ts [2m([22m[2m2 tests[22m[2m)[22m[32m 10[2mms[22m[39m
+server:test:  [32m✓[39m src/modules/admin/admin.service.test.ts [2m([22m[2m6 tests[22m[2m)[22m[32m 19[2mms[22m[39m
+server:test:  [32m✓[39m src/modules/carts/carts.repository.test.ts [2m([22m[2m7 tests[22m[2m)[22m[32m 17[2mms[22m[39m
+server:test:  [32m✓[39m src/modules/wines/wines.service.test.ts [2m([22m[2m10 tests[22m[2m)[22m[32m 19[2mms[22m[39m
+server:test:  [32m✓[39m src/modules/shops/shops.service.test.ts [2m([22m[2m2 tests[22m[2m)[22m[32m 11[2mms[22m[39m
+server:test:  [32m✓[39m src/modules/guest-sessions/guest-sessions.service.test.ts [2m([22m[2m6 tests[22m[2m)[22m[32m 14[2mms[22m[39m
+server:test:  [32m✓[39m src/modules/shops/shops.repository.test.ts [2m([22m[2m5 tests[22m[2m)[22m[32m 13[2mms[22m[39m
+server:test:  [32m✓[39m src/modules/images/images.repository.test.ts [2m([22m[2m4 tests[22m[2m)[22m[32m 13[2mms[22m[39m
+server:test:  [32m✓[39m src/modules/role-requests/role-requests.repository.test.ts [2m([22m[2m3 tests[22m[2m)[22m[32m 15[2mms[22m[39m
+server:test:  [32m✓[39m src/modules/orders/orders.repository.test.ts [2m([22m[2m4 tests[22m[2m)[22m[32m 12[2mms[22m[39m
+server:test:  [32m✓[39m src/modules/availability/availability.repository.test.ts [2m([22m[2m2 tests[22m[2m)[22m[32m 11[2mms[22m[39m
+server:test:  [32m✓[39m src/modules/users/users.repository.test.ts [2m([22m[2m3 tests[22m[2m)[22m[32m 11[2mms[22m[39m
+server:test:  [32m✓[39m src/modules/reviews/reviews.repository.test.ts [2m([22m[2m2 tests[22m[2m)[22m[32m 8[2mms[22m[39m
+server:test:  [32m✓[39m src/utils/logger.test.ts [2m([22m[2m2 tests[22m[2m)[22m[32m 8[2mms[22m[39m
+server:test:  [32m✓[39m src/utils/pagination.test.ts [2m([22m[2m4 tests[22m[2m)[22m[32m 7[2mms[22m[39m
+server:test: 
+server:test: [2m Test Files [22m [1m[32m52 passed[39m[22m[90m (52)[39m
+server:test: [2m      Tests [22m [1m[32m417 passed[39m[22m[2m | [22m[33m1 skipped[39m[90m (418)[39m
+server:test: [2m   Start at [22m 15:16:02
+server:test: [2m   Duration [22m 84.38s[2m (transform 3.60s, setup 1.28s, import 55.75s, tests 7.45s, environment 10ms)[22m
+server:test: 
+server:test: [34m % [39m[2mCoverage report from [22m[33mv8[39m
+server:test: -------------------|---------|----------|---------|---------|-------------------
+server:test: File               | % Stmts | % Branch | % Funcs | % Lines | Uncovered Line #s 
+server:test: -------------------|---------|----------|---------|---------|-------------------
+server:test: All files          |   63.97 |    51.87 |   57.33 |   68.49 |                   
+server:test:  src               |     100 |    83.33 |     100 |     100 |                   
+server:test:   app.ts           |     100 |    83.33 |     100 |     100 | 48                
+server:test:  src/db            |      75 |    83.33 |     100 |      75 |                   
+server:test:   index.ts         |      75 |    83.33 |     100 |      75 | 6                 
+server:test:  src/db/schema     |       0 |        0 |       0 |       0 |                   
+server:test:   index.ts         |       0 |        0 |       0 |       0 |                   
+server:test:  src/modules/admin |   55.29 |    47.72 |   54.28 |   60.81 |                   
+server:test:   admin.errors.ts  |      25 |      100 |      25 |      25 | 5-11,23           
+server:test:   ...repository.ts |    87.5 |       80 |   78.57 |   86.95 | 77,100,137        
+server:test:   admin.routes.ts  |   29.41 |        0 |      25 |   31.25 | 12-43,88-129      
+server:test:   admin.service.ts |      50 |    44.82 |   55.55 |   61.29 | 16-18,40,64,75-82 
+server:test:   index.ts         |       0 |        0 |       0 |       0 |                   
+server:test:  src/modules/auth  |   92.15 |     90.9 |     100 |   90.47 |                   
+server:test:   auth.plugin.ts   |   89.18 |     87.5 |     100 |   87.09 | 43-44,67-68       
+server:test:   auth.utils.ts    |     100 |      100 |     100 |     100 |                   
+server:test:   index.ts         |       0 |        0 |       0 |       0 |                   
+server:test:  ...s/availability |   64.47 |    57.14 |   47.82 |   68.65 |                   
+server:test:   ...ity.errors.ts |      50 |      100 |      50 |      50 | 5                 
+server:test:   ...repository.ts |      40 |       50 |   22.22 |   46.15 | 7-57              
+server:test:   ...ity.routes.ts |      70 |      100 |      60 |      70 | 65-83             
+server:test:   ...ity.schema.ts |     100 |      100 |     100 |     100 |                   
+server:test:   ...ty.service.ts |    64.1 |    58.33 |   71.42 |   68.75 | 31-37,65,79-84    
+server:test:   index.ts         |       0 |        0 |       0 |       0 |                   
+server:test:  src/modules/carts |   54.62 |       35 |   59.25 |   59.37 |                   
+server:test:   carts.errors.ts  |       0 |      100 |       0 |       0 | 5                 
+server:test:   ...repository.ts |    61.9 |     37.5 |   66.66 |   68.42 | 44-46,57,73,107   
+server:test:   carts.routes.ts  |      84 |       75 |      80 |    82.6 | 54-55,96-101      
+server:test:   carts.service.ts |   40.98 |     22.5 |   44.44 |   47.16 | ...4-52,69,92-120 
+server:test:   index.ts         |       0 |        0 |       0 |       0 |                   
+server:test:  src/modules/email |   18.51 |    33.33 |       0 |      20 |                   
+server:test:   email.service.ts |   33.33 |       50 |       0 |    37.5 | 29-65             
+server:test:   ....templates.ts |   11.11 |        0 |       0 |   11.76 | ...,74-92,125-149 
+server:test:  ...modules/events |   58.53 |    41.91 |   43.39 |   66.66 |                   
+server:test:   events.errors.ts |       0 |      100 |       0 |       0 | 5-41              
+server:test:   ...repository.ts |       0 |        0 |       0 |       0 | 42-288            
+server:test:   events.routes.ts |   85.71 |    33.33 |     100 |   89.47 | 131-133           
+server:test:   events.schema.ts |     100 |      100 |     100 |     100 |                   
+server:test:   ...ts.service.ts |   74.74 |    61.11 |     100 |   93.24 | ...42,164,208-209 
+server:test:   index.ts         |       0 |        0 |       0 |       0 |                   
+server:test:  ...guest-sessions |   89.65 |    92.85 |      75 |   92.59 |                   
+server:test:   ...repository.ts |    62.5 |       50 |      50 |   71.42 | 7,17              
+server:test:   ...ons.routes.ts |     100 |      100 |     100 |     100 |                   
+server:test:   ...ns.service.ts |     100 |      100 |     100 |     100 |                   
+server:test:   index.ts         |       0 |        0 |       0 |       0 |                   
+server:test:  ...modules/images |   53.57 |    37.31 |   54.16 |   58.58 |                   
+server:test:   images.errors.ts |       0 |      100 |       0 |       0 | 5-23              
+server:test:   ...repository.ts |   23.68 |    11.53 |      50 |   26.47 | ...01,111-123,138 
+server:test:   images.routes.ts |   63.15 |       50 |      80 |    64.7 | 49-55,108,113-115 
+server:test:   images.schema.ts |     100 |      100 |     100 |     100 |                   
+server:test:   ...es.service.ts |   73.91 |    55.55 |   66.66 |      85 | 33,49,85-91,103   
+server:test:   index.ts         |       0 |        0 |       0 |       0 |                   
+server:test:  ...modules/orders |   70.58 |    55.55 |   68.75 |   72.61 |                   
+server:test:   index.ts         |       0 |        0 |       0 |       0 |                   
+server:test:   ...repository.ts |   54.54 |    33.33 |      50 |   66.66 | 41-42,64,68-72,83 
+server:test:   orders.routes.ts |    80.3 |    66.66 |     100 |   79.24 | ...62-170,195,221 
+server:test:   ...rs.service.ts |   67.67 |    50.72 |   68.42 |   69.76 | ...39,242,269-274 
+server:test:  ...dules/products |   51.09 |    42.55 |   49.05 |   56.71 |                   
+server:test:   index.ts         |       0 |        0 |       0 |       0 |                   
+server:test:   ...cts.errors.ts |   16.66 |       25 |   16.66 |   16.66 | 11-38             
+server:test:   ...repository.ts |      65 |       50 |   73.33 |   67.56 | ...59-263,336-342 
+server:test:   ...cts.routes.ts |   66.66 |      100 |      50 |   66.66 | 26,41,76          
+server:test:   ...cts.schema.ts |     100 |      100 |     100 |     100 |                   
+server:test:   ...ts.service.ts |    39.2 |    38.82 |    42.3 |    46.6 | ...25-296,333-345 
+server:test:  ...odules/reviews |   68.81 |    64.28 |   58.62 |   70.73 |                   
+server:test:   index.ts         |       0 |        0 |       0 |       0 |                   
+server:test:   ...ews.errors.ts |     100 |      100 |     100 |     100 |                   
+server:test:   ...repository.ts |      12 |        0 |    9.09 |    12.5 | 16-143,175-190    
+server:test:   ...ews.routes.ts |   82.35 |     87.5 |      75 |   82.35 | 82,126,149        
+server:test:   ...ws.service.ts |   91.66 |    84.61 |     100 |     100 | 25,44,63,78       
+server:test:  .../role-requests |   78.78 |    67.85 |   72.72 |   81.81 |                   
+server:test:   index.ts         |       0 |        0 |       0 |       0 |                   
+server:test:   ...sts.errors.ts |     100 |      100 |     100 |     100 |                   
+server:test:   ...repository.ts |   63.63 |       50 |      60 |   77.77 | 27-33             
+server:test:   ...sts.routes.ts |   76.92 |        0 |     100 |   76.92 | 66-68             
+server:test:   ...ts.service.ts |   82.05 |       85 |   55.55 |   83.33 | 43,53-55,77       
+server:test:  src/modules/shops |   57.95 |    35.18 |      60 |   66.66 |                   
+server:test:   index.ts         |       0 |        0 |       0 |       0 |                   
+server:test:   shops.errors.ts  |     100 |       50 |     100 |     100 | 5                 
+server:test:   ...repository.ts |      50 |    52.63 |      40 |      56 | 26-28,46-47,69-96 
+server:test:   shops.routes.ts  |     100 |      100 |     100 |     100 |                   
+server:test:   shops.schema.ts  |     100 |      100 |     100 |     100 |                   
+server:test:   shops.service.ts |    47.5 |    24.24 |   42.85 |   58.06 | 45-64,82-91       
+server:test:  src/modules/stats |   98.41 |    76.92 |     100 |   98.33 |                   
+server:test:   index.ts         |       0 |        0 |       0 |       0 |                   
+server:test:   ...repository.ts |     100 |       75 |     100 |     100 | ...52-257,259-260 
+server:test:   stats.routes.ts  |     100 |       50 |     100 |     100 | 12                
+server:test:   stats.schema.ts  |     100 |      100 |     100 |     100 |                   
+server:test:   stats.service.ts |   94.11 |     90.9 |     100 |   94.11 | 34                
+server:test:  ...ply-agreements |   87.23 |    91.66 |   76.47 |   90.24 |                   
+server:test:   index.ts         |       0 |        0 |       0 |       0 |                   
+server:test:   ...nts.errors.ts |     100 |      100 |     100 |     100 |                   
+server:test:   ...repository.ts |      60 |       50 |      50 |   66.66 | 26-46             
+server:test:   ...nts.routes.ts |   83.33 |      100 |      75 |   83.33 | 43                
+server:test:   ...ts.service.ts |   96.42 |    95.45 |     100 |     100 | 63                
+server:test:  src/modules/users |   47.28 |    22.05 |   43.24 |   52.25 |                   
+server:test:   index.ts         |       0 |        0 |       0 |       0 |                   
+server:test:   ...repository.ts |       0 |        0 |       0 |       0 | 7-59              
+server:test:   users.errors.ts  |      50 |       25 |      50 |      50 | 11                
+server:test:   ...repository.ts |      35 |       25 |   42.85 |   43.75 | 19-25,46-73       
+server:test:   users.routes.ts  |     100 |      100 |     100 |     100 |                   
+server:test:   users.schema.ts  |     100 |      100 |     100 |     100 |                   
+server:test:   users.service.ts |      50 |       24 |   53.33 |   53.22 | ...83-190,205-206 
+server:test:  ...dules/webhooks |      92 |    84.61 |     100 |      92 |                   
+server:test:   index.ts         |       0 |        0 |       0 |       0 |                   
+server:test:   ...oks.routes.ts |      92 |    84.61 |     100 |      92 | 10-11             
+server:test:  ...les/winemakers |   77.77 |    65.51 |   83.33 |   79.24 |                   
+server:test:   index.ts         |       0 |        0 |       0 |       0 |                   
+server:test:   ...repository.ts |   72.72 |    64.28 |      75 |   68.42 | 63-78,91          
+server:test:   ...ers.routes.ts |     100 |      100 |     100 |     100 |                   
+server:test:   ...ers.schema.ts |     100 |      100 |     100 |     100 |                   
+server:test:   ...rs.service.ts |   72.41 |    66.66 |   83.33 |   77.27 | 36-40             
+server:test:  src/modules/wines |   76.66 |    67.24 |      90 |   87.32 |                   
+server:test:   index.ts         |       0 |        0 |       0 |       0 |                   
+server:test:   wines.errors.ts  |     100 |       50 |     100 |     100 | 5                 
+server:test:   ...repository.ts |      80 |    77.27 |   85.71 |   95.23 | 74                
+server:test:   wines.routes.ts  |   41.17 |       20 |      80 |   46.66 | 19-24,83-84       
+server:test:   wines.schema.ts  |     100 |      100 |     100 |     100 |                   
+server:test:   wines.service.ts |   85.29 |    79.16 |     100 |     100 | 17-23,27,50,59    
+server:test:  src/utils         |      50 |       50 |      50 |      50 |                   
+server:test:   error-plugin.ts  |      25 |        0 |       0 |      25 | 14-28             
+server:test:   logger.ts        |     100 |      100 |     100 |     100 |                   
+server:test:   pagination.ts    |     100 |      100 |     100 |     100 |                   
+server:test: -------------------|---------|----------|---------|---------|-------------------
+
+ Tasks:    2 successful, 2 total
+Cached:    0 cached, 2 total
+  Time:    1m25.751s 
+
+$ turbo run test:e2e
+• turbo 2.9.14
+
+   • Packages in scope: @repo/shared, @repo/typescript-config, server, web
+   • Running test:e2e in 4 packages
+   • Remote caching disabled
+
+web:test:e2e: cache bypass, force executing a5993e51e1dcc87e
+server:test:e2e: cache bypass, force executing 8ca6f33af1b689dd
+web:test:e2e: $ concurrently --kill-others-on-exit 'bun run --cwd ../.. dev:server' 'bun run --cwd ../.. dev:web' 'sleep 10 && concurrently "bun run test:e2e:shard:1" "bun run test:e2e:shard:2" "bun run test:e2e:shard:3"'
+server:test:e2e: $ echo 'Run E2E tests from web package'
+server:test:e2e: Run E2E tests from web package
+web:test:e2e: (node:2072) [DEP0060] DeprecationWarning: The `util._extend` API is deprecated. Please use Object.assign() instead.
+web:test:e2e: (Use `node --trace-deprecation ...` to show where the warning was created)
+web:test:e2e: [0] $ turbo run dev --filter=web
+web:test:e2e: [0] • turbo 2.9.14
+web:test:e2e: [0] 
+web:test:e2e: [0]    • Packages in scope: web
+web:test:e2e: [0]    • Running dev in 1 packages
+web:test:e2e: [0]    • Remote caching disabled
+web:test:e2e: [0] 
+web:test:e2e: [0] web:dev: cache bypass, force executing 2b2ff385304f1386
+web:test:e2e: [0] web:dev: $ vite
+web:test:e2e: [0] web:dev: Port 5173 is in use, trying another one...
+web:test:e2e: [0] web:dev: Port 5174 is in use, trying another one...
+web:test:e2e: [0] web:dev: 
+web:test:e2e: [0] web:dev:   [32m[1mVITE[22m v8.0.13[39m  [2mready in [0m[1m1375[22m[2m[0m ms[22m
+web:test:e2e: [0] web:dev: 
+web:test:e2e: [0] web:dev:   [32m➜[39m  [1mLocal[22m:   [36mhttp://localhost:[1m5175[22m/[39m
+web:test:e2e: [0] web:dev: [2m  [32m➜[39m  [1mNetwork[22m[2m: use [22m[1m--host[22m[2m to expose[22m
+web:test:e2e: [1] (node:19192) [DEP0060] DeprecationWarning: The `util._extend` API is deprecated. Please use Object.assign() instead.
+web:test:e2e: [1] (Use `node --trace-deprecation ...` to show where the warning was created)
+web:test:e2e: [1] [0] $ SHARD=1/3 CI=true playwright test
+web:test:e2e: [1] [1] $ SHARD=2/3 CI=true playwright test
+web:test:e2e: [1] [2] $ SHARD=3/3 CI=true playwright test
+web:test:e2e: [1] [0] 
+web:test:e2e: [1] [0] Running 26 tests using 1 worker, shard 1 of 3
+web:test:e2e: [1] [0] °°°°°°°°°°°°°°°°°°°°
+web:test:e2e: [1] [2] Running 25 tests using 1 worker, shard 3 of 3
+web:test:e2e: [1] [1] 
+web:test:e2e: [1] [1] Running 25 tests using 1 worker, shard 2 of 3
+web:test:e2e: [1] [0] °°°°°°°°°°°
+web:test:e2e: [1] [0]   26 skipped
+web:test:e2e: [1] [1] °web:dev: [2m15:17:42[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mpage reload [39m[2mplaywright-report/index.html[22m
+web:test:e2e: [1] bun run test:e2e:shard:1 exited with code 0
+web:test:e2e: [0] web:dev: [2m15:17:42[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mpage reload [39m[2mplaywright-report/trace/index.html[22m
+web:test:e2e: [0] web:dev: [2m15:17:42[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mpage reload [39m[2mplaywright-report/trace/snapshot.html[22m
+web:test:e2e: [0] web:dev: [2m15:17:42[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mpage reload [39m[2mplaywright-report/trace/uiMode.html[22m
+web:test:e2e: [1] [1] °°··············×··×·F·····°°°°°°°°°°°°
+web:test:e2e: [1] [2]   12 skipped
+web:test:e2e: [1] [2]   13 passed (47.0s)
+web:test:e2e: [0] web:dev: [2m15:18:26[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mpage reload [39m[2mplaywright-report/index.html[22m
+web:test:e2e: [1] [2] bun run test:e2e:shard:3 exited with code 0
+web:test:e2e: [1] [1] ·······
+web:test:e2e: [1] [1] 
+web:test:e2e: [1] [1]   1) [chromium] › src\__tests__\e2e\critical-flows.spec.ts:90:5 › Critical flows › Checkout flow › cart page shows empty cart message when no items 
+web:test:e2e: [1] [1] 
+web:test:e2e: [1] [1]     Error: locator.isVisible: Unexpected token "=" while parsing css selector "[class*='empty'], text=/empty|no items/i". Did you mean to CSS.escape it?
+web:test:e2e: [1] [1]     Call log:
+web:test:e2e: [1] [1]     [2m    - checking visibility of [class*='empty'], text=/empty|no items/i >> nth=0[22m
+web:test:e2e: [1] [1] 
+web:test:e2e: [1] [1] 
+web:test:e2e: [1] [1]        97 |       const itemsList = page.locator("[class*='item'], [role='list']").first();
+web:test:e2e: [1] [1]        98 |
+web:test:e2e: [1] [1]     >  99 |       if (await emptyMessage.isVisible()) {
+web:test:e2e: [1] [1]           |                              ^
+web:test:e2e: [1] [1]       100 |         expect(emptyMessage).toBeDefined();
+web:test:e2e: [1] [1]       101 |       } else if (await itemsList.isVisible()) {
+web:test:e2e: [1] [1]       102 |         expect(itemsList).toBeDefined();
+web:test:e2e: [1] [1]         at D:\pb138\project\winery\apps\web\src\__tests__\e2e\critical-flows.spec.ts:99:30
+web:test:e2e: [1] [1] 
+web:test:e2e: [1] [1]     attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+web:test:e2e: [1] [1]     test-results\critical-flows-Critical-fl-315c6--cart-message-when-no-items-chromium\test-failed-1.png
+web:test:e2e: [1] [1]     ────────────────────────────────────────────────────────────────────────────────────────────────
+web:test:e2e: [1] [1] 
+web:test:e2e: [1] [1]     Error Context: test-results\critical-flows-Critical-fl-315c6--cart-message-when-no-items-chromium\error-context.md
+web:test:e2e: [1] [1] 
+web:test:e2e: [1] [1]     Retry #1 ───────────────────────────────────────────────────────────────────────────────────────
+web:test:e2e: [1] [1] 
+web:test:e2e: [1] [1]     Error: locator.isVisible: Unexpected token "=" while parsing css selector "[class*='empty'], text=/empty|no items/i". Did you mean to CSS.escape it?
+web:test:e2e: [1] [1]     Call log:
+web:test:e2e: [1] [1]     [2m    - checking visibility of [class*='empty'], text=/empty|no items/i >> nth=0[22m
+web:test:e2e: [1] [1] 
+web:test:e2e: [1] [1] 
+web:test:e2e: [1] [1]        97 |       const itemsList = page.locator("[class*='item'], [role='list']").first();
+web:test:e2e: [1] [1]        98 |
+web:test:e2e: [1] [1]     >  99 |       if (await emptyMessage.isVisible()) {
+web:test:e2e: [1] [1]           |                              ^
+web:test:e2e: [1] [1]       100 |         expect(emptyMessage).toBeDefined();
+web:test:e2e: [1] [1]       101 |       } else if (await itemsList.isVisible()) {
+web:test:e2e: [1] [1]       102 |         expect(itemsList).toBeDefined();
+web:test:e2e: [1] [1]         at D:\pb138\project\winery\apps\web\src\__tests__\e2e\critical-flows.spec.ts:99:30
+web:test:e2e: [1] [1] 
+web:test:e2e: [1] [1]     attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+web:test:e2e: [1] [1]     test-results\critical-flows-Critical-fl-315c6--cart-message-when-no-items-chromium-retry1\test-failed-1.png
+web:test:e2e: [1] [1]     ────────────────────────────────────────────────────────────────────────────────────────────────
+web:test:e2e: [1] [1] 
+web:test:e2e: [1] [1]     Error Context: test-results\critical-flows-Critical-fl-315c6--cart-message-when-no-items-chromium-retry1\error-context.md
+web:test:e2e: [1] [1] 
+web:test:e2e: [1] [1]     attachment #3: trace (application/zip) ─────────────────────────────────────────────────────────
+web:test:e2e: [1] [1]     test-results\critical-flows-Critical-fl-315c6--cart-message-when-no-items-chromium-retry1\trace.zip
+web:test:e2e: [1] [1]     Usage:
+web:test:e2e: [1] [1] 
+web:test:e2e: [1] [1]         npx playwright show-trace test-results\critical-flows-Critical-fl-315c6--cart-message-when-no-items-chromium-retry1\trace.zip
+web:test:e2e: [1] [1] 
+web:test:e2e: [1] [1]     ────────────────────────────────────────────────────────────────────────────────────────────────
+web:test:e2e: [1] [1] 
+web:test:e2e: [1] [1]     Retry #2 ───────────────────────────────────────────────────────────────────────────────────────
+web:test:e2e: [1] [1] 
+web:test:e2e: [1] [1]     Error: locator.isVisible: Unexpected token "=" while parsing css selector "[class*='empty'], text=/empty|no items/i". Did you mean to CSS.escape it?
+web:test:e2e: [1] [1]     Call log:
+web:test:e2e: [1] [1]     [2m    - checking visibility of [class*='empty'], text=/empty|no items/i >> nth=0[22m
+web:test:e2e: [1] [1] 
+web:test:e2e: [1] [1] 
+web:test:e2e: [1] [1]        97 |       const itemsList = page.locator("[class*='item'], [role='list']").first();
+web:test:e2e: [1] [1]        98 |
+web:test:e2e: [1] [1]     >  99 |       if (await emptyMessage.isVisible()) {
+web:test:e2e: [1] [1]           |                              ^
+web:test:e2e: [1] [1]       100 |         expect(emptyMessage).toBeDefined();
+web:test:e2e: [1] [1]       101 |       } else if (await itemsList.isVisible()) {
+web:test:e2e: [1] [1]       102 |         expect(itemsList).toBeDefined();
+web:test:e2e: [1] [1]         at D:\pb138\project\winery\apps\web\src\__tests__\e2e\critical-flows.spec.ts:99:30
+web:test:e2e: [1] [1] 
+web:test:e2e: [1] [1]     attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+web:test:e2e: [1] [1]     test-results\critical-flows-Critical-fl-315c6--cart-message-when-no-items-chromium-retry2\test-failed-1.png
+web:test:e2e: [1] [1]     ────────────────────────────────────────────────────────────────────────────────────────────────
+web:test:e2e: [1] [1] 
+web:test:e2e: [1] [1]     Error Context: test-results\critical-flows-Critical-fl-315c6--cart-message-when-no-items-chromium-retry2\error-context.md
+web:test:e2e: [1] [1] 
+web:test:e2e: [1]   1 failed
+web:test:e2e: [1] [1]     [chromium] › src\__tests__\e2e\critical-flows.spec.ts:90:5 › Critical flows › Checkout flow › cart page shows empty cart message when no items 
+web:test:e2e: [1] [1]   8 skipped
+web:test:e2e: [1] [1]   16 passed (1.2m)
+web:test:e2e: [0] web:dev: [2m15:18:51[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mpage reload [39m[2mplaywright-report/index.html[22m
+web:test:e2e: [0] web:dev: [2m15:18:51[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mpage reload [39m[2mplaywright-report/trace/index.html[22m
+web:test:e2e: [0] web:dev: [2m15:18:51[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mpage reload [39m[2mplaywright-report/trace/snapshot.html[22m
+web:test:e2e: [0] web:dev: [2m15:18:51[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mpage reload [39m[2mplaywright-report/trace/uiMode.html[22m
+web:test:e2e: [1] [1] error: script "test:e2e:shard:2" exited with code 1
+web:test:e2e: [1] [1] bun run test:e2e:shard:2 exited with code 1
+web:test:e2e: [1] sleep 10 && concurrently "bun run test:e2e:shard:1" "bun run test:e2e:shard:2" "bun run test:e2e:shard:3" exited with code 1

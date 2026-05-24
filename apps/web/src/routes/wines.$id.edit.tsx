@@ -75,14 +75,13 @@ function StatusMessage({ type, message }: { type: "success" | "error"; message: 
     </div>
   );
 }
-function WineEditContent({ id }: { id: string }) {
+function useWineEditForm(id: string, wine: Record<string, unknown>) {
   const navigate = useNavigate();
   const [statusMessage, setStatusMessage] = useState<{
     type: "success" | "error";
     message: string;
   } | null>(null);
 
-  const { data: wine } = useGetWinesByIdSuspense(id);
   const mutation = usePutWinesById({
     mutation: {
       onError: (error) => {
@@ -101,28 +100,37 @@ function WineEditContent({ id }: { id: string }) {
     },
   });
 
-  const {
-    register,
-    handleSubmit,
-    setValue,
-    watch,
-    formState: { errors, isSubmitting },
-  } = useForm<WineEditFormValues>({
+  const form = useForm<WineEditFormValues>({
     defaultValues: {
-      alcoholContent: wine.alcoholContent || "",
-      attribution: wine.attribution || "",
+      alcoholContent: (wine.alcoholContent as string) || "",
+      attribution: (wine.attribution as string) || "",
       color: (wine.color as WineEditFormValues["color"]) || "red",
-      composition: wine.composition || "",
-      description: wine.description || "",
-      name: wine.name || "",
+      composition: (wine.composition as string) || "",
+      description: (wine.description as string) || "",
+      name: (wine.name as string) || "",
       quantity: Number(wine.quantity) || 0,
-      region: wine.region || "",
+      region: (wine.region as string) || "",
       type: (wine.type as WineEditFormValues["type"]) || "still",
       vintageYear: Number(wine.vintageYear) || 2020,
       volumeMl: Number(wine.volumeMl) || 750,
     },
     resolver: zodResolver(wineEditSchema),
   });
+
+  return { form, mutation, navigate, statusMessage };
+}
+
+function WineEditContent({ id }: { id: string }) {
+  const { data: wine } = useGetWinesByIdSuspense(id);
+  const { statusMessage, mutation, form, navigate } = useWineEditForm(id, wine);
+
+  const {
+    register,
+    handleSubmit,
+    setValue,
+    watch,
+    formState: { errors, isSubmitting },
+  } = form;
 
   const color = watch("color");
   const type = watch("type");

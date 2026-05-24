@@ -60,8 +60,8 @@ export function AvailabilityExceptionForm({ shopId, onSuccess }: AvailabilityExc
         id: shopId,
       });
       onSuccess();
-    } catch (error) {
-      console.error("Failed to create exception:", error);
+    } catch {
+      // Error handling will be managed by mutation state
     } finally {
       setIsSubmitting(false);
     }

@@ -52,8 +52,8 @@ export function AvailabilityRegularForm({ shopId, onSuccess }: AvailabilityRegul
         id: shopId,
       });
       onSuccess();
-    } catch (error) {
-      console.error("Failed to create regular availability:", error);
+    } catch {
+      // Error handling will be managed by mutation state
     } finally {
       setIsSubmitting(false);
     }
