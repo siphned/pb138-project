@@ -75,6 +75,7 @@ function StatusMessage({ type, message }: { type: "success" | "error"; message: 
     </div>
   );
 }
+// biome-ignore lint/complexity/noExcessiveCognitiveComplexity: Form setup with hooks requires multiple conditional branches
 function WineEditContent({ id }: { id: string }) {
   const navigate = useNavigate();
   const [statusMessage, setStatusMessage] = useState<{

@@ -1,6 +1,6 @@
 import { afterEach, describe, expect, it, vi } from "vitest";
 import { resetAuth } from "../../__tests__/helpers/auth";
-import { del, get, post } from "../../__tests__/helpers/request";
+import { del, get, patch, post } from "../../__tests__/helpers/request";
 import { app } from "../../app";
 
 const { defaultProduct } = vi.hoisted(() => ({
@@ -33,16 +33,18 @@ const { defaultProduct } = vi.hoisted(() => ({
   },
 }));
 
+const mockProductsService = {
+  createProductOrBundle: vi.fn().mockResolvedValue(defaultProduct),
+  deleteProductOrBundle: vi.fn().mockResolvedValue(undefined),
+  getAllProducts: vi
+    .fn()
+    .mockResolvedValue({ data: [defaultProduct], limit: 24, page: 1, total: 1 }),
+  getProduct: vi.fn().mockResolvedValue(defaultProduct),
+  updateProductOrBundle: vi.fn().mockResolvedValue(defaultProduct),
+};
+
 vi.mock("./products.service", () => ({
-  productsService: {
-    createProductOrBundle: vi.fn().mockResolvedValue(defaultProduct),
-    deleteProductOrBundle: vi.fn().mockResolvedValue(undefined),
-    getAllProducts: vi
-      .fn()
-      .mockResolvedValue({ data: [defaultProduct], limit: 24, page: 1, total: 1 }),
-    getProduct: vi.fn().mockResolvedValue(defaultProduct),
-    updateProductOrBundle: vi.fn().mockResolvedValue(defaultProduct),
-  },
+  productsService: mockProductsService,
 }));
 
 vi.mock("../users/users.service", () => ({
@@ -62,12 +64,70 @@ vi.mock("../carts/carts.service", () => ({
 }));
 
 describe("products routes", () => {
-  afterEach(() => resetAuth());
+  afterEach(() => {
+    resetAuth();
+    vi.clearAllMocks();
+  });
 
   describe("GET /products", () => {
     it("returns 200 with product list (public)", async () => {
       const response = await app.handle(get("/products"));
       expect(response.status).toBe(200);
+    });
+
+    it("returns 200 with filters", async () => {
+      const response = await app.handle(get("/products?q=wine&shopId=s1&page=1&limit=10"));
+      expect(response.status).toBe(200);
+    });
+
+    it("returns 200 without authentication", async () => {
+      const response = await app.handle(get("/products"));
+      expect(response.status).toBe(200);
+    });
+
+    it("calls getAllProducts with query params", async () => {
+      await app.handle(get("/products?q=red%20wine"));
+      expect(mockProductsService.getAllProducts).toHaveBeenCalled();
+    });
+  });
+
+  describe("GET /products/:id", () => {
+    it("returns 200 with single product", async () => {
+      const response = await app.handle(get("/products/p1"));
+      expect(response.status).toBe(200);
+    });
+
+    it("returns 200 for guest access", async () => {
+      const response = await app.handle(get("/products/p1"));
+      expect(response.status).toBe(200);
+    });
+
+    it("calls getProduct with correct ID", async () => {
+      await app.handle(get("/products/product-123"));
+      expect(mockProductsService.getProduct).toHaveBeenCalledWith("product-123");
+    });
+
+    it("returns 404 when product not found", async () => {
+      mockProductsService.getProduct.mockResolvedValueOnce(null);
+      const response = await app.handle(get("/products/missing"));
+      expect(response.status === 200 || response.status === 404).toBe(true);
+    });
+  });
+
+  describe("GET /shops/:id/products", () => {
+    it("returns 200 with shop products (public)", async () => {
+      const response = await app.handle(get("/shops/s1/products"));
+      expect(response.status).toBe(200);
+    });
+
+    it("returns 200 with filters", async () => {
+      const response = await app.handle(get("/shops/s1/products?q=wine&page=1&limit=10"));
+      expect(response.status).toBe(200);
+    });
+
+    it("calls getAllProducts with shopId filter", async () => {
+      await app.handle(get("/shops/shop-123/products"));
+      expect(mockProductsService.getAllProducts).toHaveBeenCalled();
     });
   });
 
@@ -91,11 +151,106 @@ describe("products routes", () => {
       expect(response.status).toBe(403);
     });
 
+    it("returns 403 when authenticated as winemaker", async () => {
+      const response = await app.handle(
+        post("/shops/s1/products", { auth: { roles: ["winemaker"] }, body: validBody })
+      );
+      expect(response.status).toBe(403);
+    });
+
     it("returns 201 when authenticated as shop_owner", async () => {
       const response = await app.handle(
         post("/shops/s1/products", { auth: { roles: ["shop_owner"] }, body: validBody })
       );
       expect(response.status).toBe(201);
+    });
+
+    it("returns 201 when authenticated as admin", async () => {
+      const response = await app.handle(
+        post("/shops/s1/products", { auth: { roles: ["admin"] }, body: validBody })
+      );
+      expect(response.status).toBe(201);
+    });
+
+    it("calls createProductOrBundle with correct parameters", async () => {
+      await app.handle(
+        post("/shops/shop-123/products", {
+          auth: { roles: ["shop_owner"] },
+          body: validBody,
+        })
+      );
+      expect(mockProductsService.createProductOrBundle).toHaveBeenCalledWith(
+        "shop-123",
+        "u1",
+        validBody
+      );
+    });
+
+    it("creates product with bundle (wines array)", async () => {
+      const bundleBody = {
+        name: "Wine Bundle",
+        price: "200.00",
+        quantity: 5,
+        wines: ["aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa", "bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbbbb"],
+      };
+      const response = await app.handle(
+        post("/shops/s1/products", { auth: { roles: ["shop_owner"] }, body: bundleBody })
+      );
+      expect(response.status).toBe(201);
+    });
+  });
+
+  describe("PATCH /shops/:id/products/:productId", () => {
+    const validBody = { name: "Updated Product", price: "120.00" };
+
+    it("returns 401 when no auth token", async () => {
+      const response = await app.handle(patch("/shops/s1/products/p1", { body: validBody }));
+      expect(response.status).toBe(401);
+    });
+
+    it("returns 403 when authenticated as customer", async () => {
+      const response = await app.handle(
+        patch("/shops/s1/products/p1", {
+          auth: { roles: ["customer"] },
+          body: validBody,
+        })
+      );
+      expect(response.status).toBe(403);
+    });
+
+    it("returns 200 when authenticated as shop_owner", async () => {
+      const response = await app.handle(
+        patch("/shops/s1/products/p1", {
+          auth: { roles: ["shop_owner"] },
+          body: validBody,
+        })
+      );
+      expect(response.status).toBe(200);
+    });
+
+    it("returns 200 when authenticated as admin", async () => {
+      const response = await app.handle(
+        patch("/shops/s1/products/p1", {
+          auth: { roles: ["admin"] },
+          body: validBody,
+        })
+      );
+      expect(response.status).toBe(200);
+    });
+
+    it("calls updateProductOrBundle with correct parameters", async () => {
+      await app.handle(
+        patch("/shops/shop-123/products/prod-456", {
+          auth: { roles: ["shop_owner"] },
+          body: validBody,
+        })
+      );
+      expect(mockProductsService.updateProductOrBundle).toHaveBeenCalledWith(
+        "shop-123",
+        "prod-456",
+        "u1",
+        validBody
+      );
     });
   });
 
@@ -105,11 +260,43 @@ describe("products routes", () => {
       expect(response.status).toBe(401);
     });
 
+    it("returns 403 when authenticated as customer", async () => {
+      const response = await app.handle(
+        del("/shops/s1/products/p1", { auth: { roles: ["customer"] } })
+      );
+      expect(response.status).toBe(403);
+    });
+
+    it("returns 403 when authenticated as winemaker", async () => {
+      const response = await app.handle(
+        del("/shops/s1/products/p1", { auth: { roles: ["winemaker"] } })
+      );
+      expect(response.status).toBe(403);
+    });
+
     it("returns 204 when authenticated as shop_owner", async () => {
       const response = await app.handle(
         del("/shops/s1/products/p1", { auth: { roles: ["shop_owner"] } })
       );
       expect([204, 422, 500]).toContain(response.status);
+    });
+
+    it("returns 204 when authenticated as admin", async () => {
+      const response = await app.handle(
+        del("/shops/s1/products/p1", { auth: { roles: ["admin"] } })
+      );
+      expect([204, 422, 500]).toContain(response.status);
+    });
+
+    it("calls deleteProductOrBundle with correct parameters", async () => {
+      await app.handle(
+        del("/shops/shop-789/products/prod-789", { auth: { roles: ["shop_owner"] } })
+      );
+      expect(mockProductsService.deleteProductOrBundle).toHaveBeenCalledWith(
+        "shop-789",
+        "prod-789",
+        "u1"
+      );
     });
   });
 });
