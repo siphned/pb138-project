@@ -13,11 +13,12 @@ interface EntityImageProps {
   fallbackText: string;
   fallbackColor?: string;
   className?: string;
+  entityType?: "wine" | "product" | "shop" | "winery" | "event";
 }
 
 /**
  * Shared rendering for entity image slots: render the first image URL from
- * the hook result, or fall back to a `<CatalogPlaceholder>` while loading
+ * the hook result, or fall back to a placeholder image/component while loading
  * or when no image is attached.
  *
  * The thin per-entity wrappers (`WineImage`, `ProductImage`, etc.) call the
@@ -29,6 +30,7 @@ export function EntityImage({
   fallbackText,
   fallbackColor,
   className,
+  entityType,
 }: EntityImageProps) {
   const { data, isLoading } = imagesQuery;
   const first =
@@ -44,6 +46,16 @@ export function EntityImage({
           className
         )}
         src={url}
+      />
+    );
+  }
+
+  if (entityType) {
+    return (
+      <img
+        alt={alt}
+        className={cn("h-full w-full object-cover opacity-60 dark:opacity-40", className)}
+        src={`/placeholders/${entityType}.webp`}
       />
     );
   }

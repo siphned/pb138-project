@@ -16,6 +16,7 @@ export function WineImage({ wineId, alt, fallbackText, fallbackColor, className 
     <EntityImage
       alt={alt}
       className={className}
+      entityType="wine"
       fallbackColor={fallbackColor}
       fallbackText={fallbackText}
       imagesQuery={imagesQuery}

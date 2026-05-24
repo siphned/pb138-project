@@ -10,13 +10,15 @@ interface EventImageProps {
 
 /** Thin wrapper around `<EntityImage>` for event images. */
 export function EventImage({ eventId, alt, fallbackText, className }: EventImageProps) {
-  const imagesQuery = useGetEventsByIdImages(eventId);
+  const imagesQuery = useGetEventsByIdEventsIdImages(eventId);
   return (
     <EntityImage
       alt={alt}
       className={className}
+      entityType="event"
       fallbackText={fallbackText}
       imagesQuery={imagesQuery}
     />
   );
 }
+

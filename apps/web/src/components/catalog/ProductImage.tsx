@@ -22,6 +22,7 @@ export function ProductImage({
     <EntityImage
       alt={alt}
       className={className}
+      entityType="product"
       fallbackColor={fallbackColor}
       fallbackText={fallbackText}
       imagesQuery={imagesQuery}
