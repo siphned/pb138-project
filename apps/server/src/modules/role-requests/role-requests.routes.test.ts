@@ -3,8 +3,8 @@ import { resetAuth } from "../../__tests__/helpers/auth";
 import { get, patch, post } from "../../__tests__/helpers/request";
 import { app } from "../../app";
 
-const { defaultRequest } = vi.hoisted(() => ({
-  defaultRequest: {
+const { mockRoleRequestsService } = vi.hoisted(() => {
+  const req = {
     businessName: "Test Business",
     details: null,
     id: "rr1",
@@ -12,8 +12,17 @@ const { defaultRequest } = vi.hoisted(() => ({
     submittedAt: new Date("2025-01-01"),
     type: "winemaker" as const,
     userId: "u1",
-  },
-}));
+  };
+  const mocks = {
+    approve: vi.fn().mockResolvedValue({ ...req, status: "approved" }),
+    getById: vi.fn().mockResolvedValue(req),
+    lazyGetOrCreate: vi.fn().mockResolvedValue({ id: "u1" }),
+    listPending: vi.fn().mockResolvedValue([req]),
+    reject: vi.fn().mockResolvedValue({ ...req, status: "rejected" }),
+    submitRequest: vi.fn().mockResolvedValue(req),
+  };
+  return { mockRoleRequestsService: mocks };
+});
 
 const mockRoleRequestsService = {
   approve: vi.fn().mockResolvedValue({ ...defaultRequest, status: "approved" }),
@@ -65,7 +74,11 @@ describe("role-requests routes", () => {
       expect(response.status).toBe(201);
     });
 
+<<<<<<< HEAD
     it("returns 201 when authenticated as winemaker", async () => {
+=======
+    it("returns 201 as winemaker", async () => {
+>>>>>>> WINE-268-merge-conflict-resolution
       const response = await app.handle(
         post("/role-requests", { auth: { roles: ["winemaker"] }, body: validBody })
       );
@@ -73,13 +86,20 @@ describe("role-requests routes", () => {
     });
 
     it("submits shop_owner request", async () => {
+<<<<<<< HEAD
       const shopOwnerBody = { ...validBody, type: "shop_owner" as const };
       const response = await app.handle(
         post("/role-requests", { auth: { roles: ["customer"] }, body: shopOwnerBody })
+=======
+      const body = { ...validBody, type: "shop_owner" as const };
+      const response = await app.handle(
+        post("/role-requests", { auth: { roles: ["customer"] }, body })
+>>>>>>> WINE-268-merge-conflict-resolution
       );
       expect(response.status).toBe(201);
     });
 
+<<<<<<< HEAD
     it("calls submitRequest with correct parameters", async () => {
       const body = {
         businessName: "Test Winery",
@@ -97,11 +117,29 @@ describe("role-requests routes", () => {
 
     it("submits request without details", async () => {
       const bodyNoDetails = {
+=======
+    it("calls submitRequest with correct params", async () => {
+      const body = {
+        businessName: "Test Winery",
+        details: "Desc",
+        type: "winemaker" as const,
+      };
+      await app.handle(post("/role-requests", { auth: { roles: ["customer"] }, body }));
+      expect(mockRoleRequestsService.submitRequest).toHaveBeenCalled();
+    });
+
+    it("submits without details", async () => {
+      const body = {
+>>>>>>> WINE-268-merge-conflict-resolution
         businessName: "My Winery",
         type: "winemaker" as const,
       };
       const response = await app.handle(
+<<<<<<< HEAD
         post("/role-requests", { auth: { roles: ["customer"] }, body: bodyNoDetails })
+=======
+        post("/role-requests", { auth: { roles: ["customer"] }, body })
+>>>>>>> WINE-268-merge-conflict-resolution
       );
       expect(response.status).toBe(201);
     });
@@ -172,15 +210,25 @@ describe("role-requests routes", () => {
       expect(response.status).toBe(404);
     });
 
+<<<<<<< HEAD
     it("throws error on unexpected exception", async () => {
+=======
+    it("throws on unexpected exception", async () => {
+>>>>>>> WINE-268-merge-conflict-resolution
       mockRoleRequestsService.getById.mockRejectedValueOnce(new Error("DATABASE_ERROR"));
       const response = await app.handle(get("/role-requests/rr1", { auth: { roles: ["admin"] } }));
       expect([500, 422]).toContain(response.status);
     });
 
+<<<<<<< HEAD
     it("calls getById with correct ID", async () => {
       await app.handle(get("/role-requests/request-123", { auth: { roles: ["admin"] } }));
       expect(mockRoleRequestsService.getById).toHaveBeenCalledWith("request-123");
+=======
+    it("calls getById with ID", async () => {
+      await app.handle(get("/role-requests/req-123", { auth: { roles: ["admin"] } }));
+      expect(mockRoleRequestsService.getById).toHaveBeenCalledWith("req-123");
+>>>>>>> WINE-268-merge-conflict-resolution
     });
   });
 
@@ -211,9 +259,15 @@ describe("role-requests routes", () => {
       expect(response.status).toBe(200);
     });
 
+<<<<<<< HEAD
     it("calls approve with correct parameters", async () => {
       await app.handle(patch("/role-requests/req-123/approve", { auth: { roles: ["admin"] } }));
       expect(mockRoleRequestsService.approve).toHaveBeenCalledWith("req-123", "u1");
+=======
+    it("calls approve with params", async () => {
+      await app.handle(patch("/role-requests/req-123/approve", { auth: { roles: ["admin"] } }));
+      expect(mockRoleRequestsService.approve).toHaveBeenCalled();
+>>>>>>> WINE-268-merge-conflict-resolution
     });
   });
 
@@ -244,9 +298,15 @@ describe("role-requests routes", () => {
       expect(response.status).toBe(200);
     });
 
+<<<<<<< HEAD
     it("calls reject with correct parameters", async () => {
       await app.handle(patch("/role-requests/req-456/reject", { auth: { roles: ["admin"] } }));
       expect(mockRoleRequestsService.reject).toHaveBeenCalledWith("req-456", "u1");
+=======
+    it("calls reject with params", async () => {
+      await app.handle(patch("/role-requests/req-456/reject", { auth: { roles: ["admin"] } }));
+      expect(mockRoleRequestsService.reject).toHaveBeenCalled();
+>>>>>>> WINE-268-merge-conflict-resolution
     });
   });
 });
