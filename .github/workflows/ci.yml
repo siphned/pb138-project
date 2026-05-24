@@ -228,8 +228,8 @@ jobs:
         run: |
           cd apps/server
           bun run db:push
-      - name: Run unit tests
-        run: bun run test
+      - name: Run unit tests with coverage enforcement
+        run: bun run test:coverage
       - name: Upload junit results
         if: always()
         uses: actions/upload-artifact@v4
