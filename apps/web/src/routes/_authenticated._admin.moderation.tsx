@@ -1,6 +1,17 @@
+import { useQueryClient } from "@tanstack/react-query";
 import { createFileRoute } from "@tanstack/react-router";
+import { useState } from "react";
 import { Button } from "@/components/ui/button";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 import { Skeleton } from "@/components/ui/skeleton";
+import { useDeleteAdminReviewsById } from "@/generated/hooks/useDeleteAdminReviewsById";
 import { useGetAdminReviews } from "@/generated/hooks/useGetAdminReviews";
 
 export const Route = createFileRoute("/_authenticated/_admin/moderation")({
@@ -9,6 +20,11 @@ export const Route = createFileRoute("/_authenticated/_admin/moderation")({
 
 function ModerationPage() {
   const { data, isLoading, error } = useGetAdminReviews();
+  const queryClient = useQueryClient();
+  const { mutate: deleteReview, isPending: isDeleting } = useDeleteAdminReviewsById();
+  const [confirmDelete, setConfirmDelete] = useState<string | null>(null);
+  const [approvedReviews, setApprovedReviews] = useState<Set<string>>(new Set());
+
   // biome-ignore lint/suspicious/noExplicitAny: API response is untyped
   const reviews = (data as any)?.data || [];
 
@@ -66,10 +82,22 @@ function ModerationPage() {
                 </p>
               </div>
               <div className="flex shrink-0 gap-2">
-                <Button disabled size="sm" variant="outline">
-                  Approve
+                <Button
+                  disabled={approvedReviews.has(review.id)}
+                  onClick={() => {
+                    setApprovedReviews((prev) => new Set(prev).add(review.id));
+                  }}
+                  size="sm"
+                  variant="outline"
+                >
+                  {approvedReviews.has(review.id) ? "Approved" : "Approve"}
                 </Button>
-                <Button disabled size="sm" variant="destructive">
+                <Button
+                  disabled={isDeleting}
+                  onClick={() => setConfirmDelete(review.id)}
+                  size="sm"
+                  variant="destructive"
+                >
                   Delete
                 </Button>
               </div>
@@ -77,6 +105,18 @@ function ModerationPage() {
           </div>
         ))}
       </div>
+    );
+  };
+
+  const handleConfirmDelete = (reviewId: string) => {
+    deleteReview(
+      { id: reviewId },
+      {
+        onSuccess: () => {
+          setConfirmDelete(null);
+          queryClient.invalidateQueries({ queryKey: ["admin", "reviews"] });
+        },
+      }
     );
   };
 
@@ -88,6 +128,32 @@ function ModerationPage() {
       </p>
 
       {renderContent()}
+
+      <Dialog
+        onOpenChange={(open) => !open && setConfirmDelete(null)}
+        open={confirmDelete !== null}
+      >
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Delete Review?</DialogTitle>
+            <DialogDescription>
+              This action cannot be undone. The review will be permanently deleted.
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter>
+            <Button onClick={() => setConfirmDelete(null)} variant="outline">
+              Cancel
+            </Button>
+            <Button
+              disabled={isDeleting}
+              onClick={() => confirmDelete && handleConfirmDelete(confirmDelete)}
+              variant="destructive"
+            >
+              {isDeleting ? "Deleting..." : "Delete"}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </main>
   );
 }

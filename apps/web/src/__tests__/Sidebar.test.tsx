@@ -210,7 +210,7 @@ describe("Sidebar", () => {
     it("renders Explore Wines link with correct href", () => {
       render(<Sidebar />);
       const link = screen.getByText(/Explore Wines/i).closest("a");
-      expect(link).toHaveAttribute("href", "/explore");
+      expect(link).toHaveAttribute("href", "/wines");
     });
 
     it("renders correct links for customer role", () => {

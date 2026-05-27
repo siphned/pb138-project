@@ -97,6 +97,9 @@ apps/server/uploads/user/*
 docs/UI_AUDIT_hooks.txt
 docs/UI_AUDIT.md
 
+# Personal FE cleanup TODOs (Adam, local-only)
+LATER.md
+
 
 #Ignore vscode AI rules
 .github\instructions\codacy.instructions.md

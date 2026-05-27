@@ -1,4 +1,6 @@
-import { Wine, X } from "lucide-react";
+import { Cancel01Icon } from "@hugeicons/core-free-icons";
+import { HugeiconsIcon } from "@hugeicons/react";
+import { ProductImage } from "@/components/catalog/ProductImage";
 import { Button } from "@/components/ui/button";
 import type { GetCarts200 } from "@/generated/types/GetCarts";
 import { QuantityControl } from "./QuantityControl";
@@ -17,16 +19,24 @@ export function CartItemRow({ item, onQuantityChange, onRemove }: CartItemRowPro
   const lineTotal = price * quantity;
 
   return (
-    <div className="flex items-center gap-4 rounded-lg border border-border p-4">
-      {/* Image Placeholder */}
-      <div className="flex h-full w-20 shrink-0 items-center justify-center rounded-md bg-muted">
-        <Wine className="h-8 w-8 text-muted-foreground" />
+    <div className="flex flex-wrap items-start gap-4 rounded-lg border border-border p-4 sm:flex-nowrap">
+      <div className="h-20 w-20 shrink-0 overflow-hidden rounded-md">
+        <ProductImage
+          alt={item.product.name}
+          className="h-full w-full object-cover"
+          fallbackText={item.product.name}
+          productId={item.product.id}
+        />
       </div>
 
-      {/* Product Info */}
       <div className="flex min-w-0 flex-1 flex-col gap-1">
-        <h4 className="truncate font-semibold">{item.product.name}</h4>
-        <p className="truncate text-muted-foreground text-sm">{item.product.price}</p>
+        <h4 className="break-words text-sm font-semibold leading-tight text-foreground sm:text-base">
+          {item.product.name}
+        </h4>
+        {item.product.description && (
+          <p className="line-clamp-2 text-xs text-muted-foreground">{item.product.description}</p>
+        )}
+        <p className="text-sm text-muted-foreground">€{price.toFixed(2)} each</p>
         <div className="mt-1">
           <QuantityControl
             onDecrement={() => onQuantityChange(item.product.id, quantity - 1)}
@@ -36,16 +46,15 @@ export function CartItemRow({ item, onQuantityChange, onRemove }: CartItemRowPro
         </div>
       </div>
 
-      {/* Price & Remove */}
-      <div className="flex flex-col items-end gap-2">
-        <span className="font-semibold">{lineTotal.toFixed(2)}€</span>
+      <div className="ml-auto flex flex-col items-end gap-2 sm:ml-0">
+        <span className="font-semibold text-foreground">€{lineTotal.toFixed(2)}</span>
         <Button
           className="h-8 w-8 text-muted-foreground hover:text-destructive"
           onClick={() => onRemove(item.product.id)}
           size="icon"
           variant="ghost"
         >
-          <X className="h-4 w-4" />
+          <HugeiconsIcon className="h-4 w-4" icon={Cancel01Icon} />
           <span className="sr-only">Remove item</span>
         </Button>
       </div>

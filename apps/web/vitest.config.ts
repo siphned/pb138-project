@@ -10,8 +10,16 @@ export default defineConfig({
   },
   test: {
     coverage: {
-      enabled: false,
-      exclude: ["src/gen/**", "src/**/__tests__/e2e/**"],
+      enabled: true,
+      exclude: ["src/generated/**", "src/**/__tests__/e2e/**"],
+      provider: "v8",
+      reporter: ["text", "json", "html", "lcov"],
+      thresholds: {
+        branches: 68,
+        functions: 70,
+        lines: 70,
+        statements: 70,
+      },
     },
     environment: "happy-dom",
     exclude: ["src/**/__tests__/e2e/**", "**/*.spec.ts", "**/*.spec.tsx"],

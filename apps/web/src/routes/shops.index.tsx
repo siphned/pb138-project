@@ -1,13 +1,12 @@
 import { FilterIcon } from "@hugeicons/core-free-icons";
 import { HugeiconsIcon } from "@hugeicons/react";
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
-import { useMemo } from "react";
 import { CatalogFilters } from "@/components/catalog/CatalogFilters";
 import { CatalogResults } from "@/components/catalog/CatalogResults";
 import { CatalogState } from "@/components/catalog/CatalogState";
+import { ShopCard } from "@/components/catalog/ShopCard";
 import type { ShopSearch } from "@/components/catalog/types";
 import { PageHeader } from "@/components/primitives/page-header";
-import { ShopCard } from "@/components/shops/ShopCard";
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { useGetShops } from "@/generated/hooks/useGetShops";
@@ -15,8 +14,6 @@ import { useGetShops } from "@/generated/hooks/useGetShops";
 export const Route = createFileRoute("/shops/")({
   component: ShopsPage,
   validateSearch: (raw): ShopSearch => ({
-    city: typeof raw.city === "string" ? raw.city : undefined,
-    ownerUserId: typeof raw.ownerUserId === "string" ? raw.ownerUserId : undefined,
     q: typeof raw.q === "string" ? raw.q : undefined,
   }),
 });
@@ -32,24 +29,14 @@ function ShopsPage() {
 
   const shops = query.data || [];
 
-  // Client-side filtering until BE supports it
-  const filteredShops = useMemo(() => {
-    const cityFilter = search.city?.toLowerCase();
-    const qFilter = search.q?.toLowerCase();
-    return shops.filter((s) => {
-      const city = s.address?.city?.toLowerCase() ?? "";
-      if (qFilter && !s.name.toLowerCase().includes(qFilter) && !city.includes(qFilter)) {
-        return false;
-      }
-      if (cityFilter && !city.includes(cityFilter)) {
-        return false;
-      }
-      if (search.ownerUserId && s.ownerUserId !== search.ownerUserId) {
-        return false;
-      }
-      return true;
-    });
-  }, [shops, search.city, search.ownerUserId, search.q]);
+  // Client-side filtering for 'q' until BE supports it
+  const filteredShops = search.q
+    ? shops.filter(
+        (s) =>
+          s.name.toLowerCase().includes(String(search.q).toLowerCase()) ||
+          s.address.city.toLowerCase().includes(String(search.q).toLowerCase())
+      )
+    : shops;
 
   // TODO(WINE-XXX): cap at 20 until BE adds pagination
   const displayedShops = filteredShops.slice(0, 20);

@@ -1,15 +1,36 @@
+import { CheckmarkCircle02Icon } from "@hugeicons/core-free-icons";
+import { HugeiconsIcon } from "@hugeicons/react";
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { Button } from "@/components/ui/button";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardFooter,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
+import { ErrorState } from "@/components/primitives/error-state";
+import { LoadingState } from "@/components/primitives/loading-state";
+import { Section } from "@/components/primitives/section";
+import { Badge } from "@/components/ui/badge";
+import { buttonVariants } from "@/components/ui/button";
+import { Card } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
 import { useGetOrdersById } from "@/generated/hooks/useGetOrdersById";
+import type { GetOrdersById200 } from "@/generated/types/GetOrdersById";
+import { cn } from "@/lib/utils";
+
+type OrderItem = {
+  id: string;
+  quantity: number;
+  unitPriceAtPurchase: string;
+  product: { name: string };
+};
+
+type OrderAddress = {
+  street: string;
+  houseNumber: string;
+  postalCode: string;
+  city: string;
+  country: string;
+};
+
+type OrderDetail = GetOrdersById200 & {
+  items: OrderItem[];
+  shippingAddress: OrderAddress;
+};
 
 export const Route = createFileRoute("/checkout/confirmed")({
   component: CheckoutConfirmedPage,
@@ -20,19 +41,16 @@ export const Route = createFileRoute("/checkout/confirmed")({
 
 function CheckoutConfirmedPage() {
   const { orderId } = Route.useSearch();
-  const { data: order, isLoading, isError, error } = useGetOrdersById(orderId || undefined);
+  const { data, isLoading, isError, error, refetch } = useGetOrdersById(orderId || undefined);
+  const order = data as OrderDetail | undefined;
 
   if (!orderId) {
     return (
       <div className="container mx-auto max-w-2xl px-4 py-8">
-        <Card className="border-destructive">
-          <CardHeader>
-            <CardTitle className="text-destructive">Error</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <p>Missing order ID. Please check your order confirmation email.</p>
-          </CardContent>
-        </Card>
+        <ErrorState
+          message="Missing order ID. Please check your order confirmation email."
+          title="No order to show"
+        />
       </div>
     );
   }
@@ -40,172 +58,151 @@ function CheckoutConfirmedPage() {
   if (isLoading) {
     return (
       <div className="container mx-auto max-w-2xl px-4 py-8">
-        <div className="flex items-center justify-center gap-2 py-24">
-          <div className="h-6 w-6 animate-spin rounded-full border-2 border-muted-foreground border-t-transparent" />
-          <span className="text-muted-foreground">Loading order details...</span>
-        </div>
+        <LoadingState variant="detail" />
       </div>
     );
   }
 
   if (isError || !order) {
     return (
-      <div className="container mx-auto max-w-2xl px-4 py-8">
-        <Card className="border-destructive">
-          <CardHeader>
-            <CardTitle className="text-destructive">Order not found</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <p className="text-muted-foreground">
-              {typeof error === "string"
-                ? error
-                : "Could not load order details. Please try again."}
-            </p>
-          </CardContent>
-          <CardFooter>
-            <Link className="w-full" to="/explore">
-              <Button className="w-full">Back to shopping</Button>
-            </Link>
-          </CardFooter>
-        </Card>
+      <div className="container mx-auto max-w-2xl space-y-4 px-4 py-8">
+        <ErrorState
+          message={typeof error === "string" ? error : "Could not load order details."}
+          onRetry={() => refetch()}
+          title="Order not found"
+        />
+        <Link className={cn(buttonVariants({ variant: "outline" }), "w-full")} to="/wines">
+          Back to shopping
+        </Link>
       </div>
     );
   }
 
-  const subtotal = order.items.reduce((acc, item) => {
-    return acc + Number.parseFloat(item.unitPriceAtPurchase) * item.quantity;
-  }, 0);
-
+  const subtotal = order.items.reduce(
+    (acc, item) => acc + Number.parseFloat(item.unitPriceAtPurchase) * item.quantity,
+    0
+  );
   const deliveryFee = Number.parseFloat(order.shippingFee);
   const total = Number.parseFloat(order.totalPrice);
 
-  const formattedDate = new Date(order.createdAt).toLocaleDateString("en-US", {
+  const placedAt = new Date(order.createdAt);
+  const formattedDate = placedAt.toLocaleDateString("en-US", {
     day: "numeric",
     month: "long",
     year: "numeric",
   });
-  const formattedTime = new Date(order.createdAt).toLocaleTimeString("en-US", {
+  const formattedTime = placedAt.toLocaleTimeString("en-US", {
     hour: "2-digit",
     minute: "2-digit",
   });
 
   return (
-    <div className="container mx-auto max-w-2xl px-4 py-8">
-      <Card>
-        <CardHeader className="border-b">
-          <div className="flex items-start justify-between gap-4">
-            <div>
-              <div className="mb-2 flex items-center gap-2">
-                <span className="flex h-6 w-6 items-center justify-center text-green-600">✓</span>
-                <CardTitle>Order Confirmed</CardTitle>
-              </div>
-              <CardDescription>Thank you for your order!</CardDescription>
-            </div>
-          </div>
-        </CardHeader>
-
-        <CardContent className="space-y-6">
-          <div className="space-y-2">
-            <p className="text-sm text-muted-foreground">Order ID</p>
-            <p className="font-mono text-lg font-semibold">{order.id}</p>
-            <p className="text-sm text-muted-foreground">
-              Placed on {formattedDate} at {formattedTime}
-            </p>
-          </div>
-
-          <Separator />
-
-          <div className="space-y-3">
-            <p className="text-sm font-medium text-foreground">Order Items</p>
-            <div className="space-y-2">
-              {order.items.map((item) => (
-                <div
-                  className="flex items-center justify-between rounded-md bg-muted p-3"
-                  key={item.id}
-                >
-                  <div>
-                    <p className="font-medium">{item.product.name}</p>
-                    <p className="text-sm text-muted-foreground">Quantity: {item.quantity}</p>
-                  </div>
-                  <p className="text-right font-semibold">
-                    €{(Number.parseFloat(item.unitPriceAtPurchase) * item.quantity).toFixed(2)}
-                  </p>
-                </div>
-              ))}
-            </div>
-          </div>
-
-          <Separator />
-
-          <div className="space-y-2">
-            <div className="flex justify-between text-sm">
-              <span className="text-muted-foreground">Subtotal</span>
-              <span>€{subtotal.toFixed(2)}</span>
-            </div>
-            <div className="flex justify-between text-sm">
-              <span className="text-muted-foreground">
-                {order.deliveryType === "pickup" ? "Pickup" : "Shipping"}
-              </span>
-              <span>€{deliveryFee.toFixed(2)}</span>
-            </div>
-            <div className="flex justify-between border-t pt-2 text-lg font-bold">
-              <span>Total</span>
-              <span>€{total.toFixed(2)}</span>
-            </div>
-          </div>
-
-          <Separator />
-
-          <div className="space-y-3">
-            <p className="text-sm font-medium text-foreground">Delivery Details</p>
-            <div className="rounded-md bg-muted p-3">
-              <p className="text-sm font-medium">
-                {order.deliveryType === "pickup" ? "Pickup Location" : "Shipping Address"}
-              </p>
-              <p className="text-sm text-muted-foreground">
-                {order.shippingAddress.street} {order.shippingAddress.houseNumber}
-              </p>
-              <p className="text-sm text-muted-foreground">
-                {order.shippingAddress.postalCode} {order.shippingAddress.city}
-              </p>
-              <p className="text-sm text-muted-foreground">{order.shippingAddress.country}</p>
-            </div>
-          </div>
-
-          <div className="space-y-3">
-            <p className="text-sm font-medium text-foreground">Payment Method</p>
-            <div className="rounded-md bg-muted p-3">
-              <p className="text-sm text-muted-foreground capitalize">
-                {order.paymentMethod.replace("_", " ")}
-              </p>
-              <p className="mt-2 text-xs text-muted-foreground">
-                Status:{" "}
-                <span className="inline-block rounded bg-yellow-100 px-2 py-1 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-100">
-                  {order.paymentStatus}
-                </span>
-              </p>
-            </div>
-          </div>
-
-          <div className="space-y-3">
-            <p className="text-sm font-medium text-foreground">Order Status</p>
-            <div className="rounded-md bg-muted p-3">
-              <p className="inline-block rounded bg-blue-100 px-2 py-1 text-sm capitalize text-blue-800 dark:bg-blue-900 dark:text-blue-100">
-                {order.status}
-              </p>
-              <p className="mt-2 text-xs text-muted-foreground">
-                Your order is being processed. You'll receive an email update when it ships.
-              </p>
-            </div>
-          </div>
-        </CardContent>
-
-        <CardFooter className="border-t">
-          <Link className="w-full" to="/explore">
-            <Button className="w-full">Continue Shopping</Button>
-          </Link>
-        </CardFooter>
+    <div className="container mx-auto max-w-2xl space-y-8 px-4 py-8">
+      <Card className="space-y-2 p-6 text-center" variant="section">
+        <div className="flex justify-center">
+          <HugeiconsIcon
+            aria-hidden
+            className="h-12 w-12 text-primary"
+            icon={CheckmarkCircle02Icon}
+          />
+        </div>
+        <h1 className="font-heading text-3xl font-bold text-foreground">Order placed!</h1>
+        <p className="text-muted-foreground">Thank you for your order.</p>
+        <div className="flex flex-wrap items-center justify-center gap-2 pt-2 text-sm">
+          <span className="text-muted-foreground">Order</span>
+          <Badge className="font-mono" variant="secondary">
+            {order.id}
+          </Badge>
+          <span className="text-muted-foreground">
+            · {formattedDate} at {formattedTime}
+          </span>
+        </div>
       </Card>
+
+      <Section heading="Items">
+        <Card className="p-6" variant="section">
+          <ul className="space-y-3">
+            {order.items.map((item) => (
+              <li className="flex items-center justify-between gap-4" key={item.id}>
+                <div>
+                  <p className="font-medium text-foreground">{item.product.name}</p>
+                  <p className="text-sm text-muted-foreground">Quantity: {item.quantity}</p>
+                </div>
+                <p className="text-right font-semibold text-foreground">
+                  €{(Number.parseFloat(item.unitPriceAtPurchase) * item.quantity).toFixed(2)}
+                </p>
+              </li>
+            ))}
+          </ul>
+          <Separator className="my-4" />
+          <dl className="space-y-2 text-sm">
+            <div className="flex justify-between">
+              <dt className="text-muted-foreground">Subtotal</dt>
+              <dd className="text-foreground">€{subtotal.toFixed(2)}</dd>
+            </div>
+            <div className="flex justify-between">
+              <dt className="text-muted-foreground">
+                {order.deliveryType === "pickup" ? "Pickup" : "Shipping"}
+              </dt>
+              <dd className="text-foreground">€{deliveryFee.toFixed(2)}</dd>
+            </div>
+            <div className="flex justify-between border-t border-border pt-2 text-base font-bold">
+              <dt>Total</dt>
+              <dd>€{total.toFixed(2)}</dd>
+            </div>
+          </dl>
+        </Card>
+      </Section>
+
+      <Section heading="Delivery">
+        <Card className="space-y-1 p-6 text-sm text-muted-foreground" variant="section">
+          <p className="font-medium text-foreground">
+            {order.deliveryType === "pickup" ? "Pickup location" : "Shipping address"}
+          </p>
+          <p>
+            {order.shippingAddress.street} {order.shippingAddress.houseNumber}
+          </p>
+          <p>
+            {order.shippingAddress.postalCode} {order.shippingAddress.city}
+          </p>
+          <p>{order.shippingAddress.country}</p>
+        </Card>
+      </Section>
+
+      <Section heading="Payment & status">
+        <Card className="space-y-3 p-6" variant="section">
+          <div className="flex items-center justify-between text-sm">
+            <span className="text-muted-foreground">Method</span>
+            <span className="capitalize text-foreground">
+              {order.paymentMethod.replace("_", " ")}
+            </span>
+          </div>
+          <div className="flex items-center justify-between text-sm">
+            <span className="text-muted-foreground">Payment</span>
+            <Badge variant="outline">{order.paymentStatus}</Badge>
+          </div>
+          <div className="flex items-center justify-between text-sm">
+            <span className="text-muted-foreground">Order</span>
+            <Badge>{order.status}</Badge>
+          </div>
+          <p className="text-xs text-muted-foreground">
+            Your order is being processed. You'll receive an email update when it ships.
+          </p>
+        </Card>
+      </Section>
+
+      <div className="flex flex-col gap-3 sm:flex-row">
+        <Link
+          className={cn(buttonVariants({ variant: "outline" }), "flex-1")}
+          params={{ id: orderId }}
+          to="/orders/$id"
+        >
+          View order
+        </Link>
+        <Link className={cn(buttonVariants(), "flex-1")} to="/wines">
+          Back to shopping
+        </Link>
+      </div>
     </div>
   );
 }
