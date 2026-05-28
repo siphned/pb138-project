@@ -1,8 +1,12 @@
+import { useQueryClient } from "@tanstack/react-query";
 import { Link } from "@tanstack/react-router";
-import { useUser } from "@/context/UserContext";
 import { Button } from "@/components/ui/button";
+import { useUser } from "@/context/UserContext";
+import { getEventsQueryKey } from "@/generated/hooks/useGetEvents";
+import { getEventsByIdQueryKey } from "@/generated/hooks/useGetEventsById";
 import { useDeleteEventsByIdRegister } from "@/generated/hooks/useDeleteEventsByIdRegister";
 import { usePostEventsByIdRegister } from "@/generated/hooks/usePostEventsByIdRegister";
+import { parseApiError } from "@/lib/api-errors";
 
 interface EventRegistrationButtonProps {
   eventId: string;
@@ -14,10 +18,23 @@ interface EventRegistrationButtonProps {
   isRegistered?: boolean;
 }
 
-export function EventRegistrationButton({
-  eventId,
-  isRegistered,
-}: EventRegistrationButtonProps) {
+function friendlyMessage(code?: string, fallback?: string): string {
+  switch (code) {
+    case "ALREADY_REGISTERED":
+      return "You're already registered.";
+    case "CAPACITY_FULL":
+      return "Event is full.";
+    case "EVENT_NOT_AVAILABLE":
+      return "Registration closed.";
+    case "EVENT_NOT_FOUND":
+      return "Event not found.";
+    default:
+      return fallback ?? "Something went wrong.";
+  }
+}
+
+export function EventRegistrationButton({ eventId, isRegistered }: EventRegistrationButtonProps) {
+  const queryClient = useQueryClient();
   const { user, isLoading } = useUser();
   const registerMutation = usePostEventsByIdRegister();
   const cancelMutation = useDeleteEventsByIdRegister();
@@ -38,28 +55,72 @@ export function EventRegistrationButton({
     );
   }
 
-  if (isRegistered) {
+  const apiError = parseApiError(registerMutation.error);
+  const isAlreadyRegistered = apiError?.code === "ALREADY_REGISTERED";
+  const registered = !!isRegistered || registerMutation.isSuccess || isAlreadyRegistered;
+
+  const invalidate = () => {
+    queryClient.invalidateQueries({ queryKey: getEventsQueryKey() });
+    queryClient.invalidateQueries({ queryKey: getEventsByIdQueryKey(eventId) });
+  };
+
+  if (registered) {
     const pending = cancelMutation.isPending;
+    const cancelError = parseApiError(cancelMutation.error);
     return (
-      <Button
-        className="w-full"
-        disabled={pending}
-        onClick={() => cancelMutation.mutate({ id: eventId })}
-        variant="destructive"
-      >
-        {pending ? "Cancelling…" : "Cancel registration"}
-      </Button>
+      <div className="space-y-1">
+        <Button
+          className="w-full"
+          disabled={pending}
+          onClick={() =>
+            cancelMutation.mutate(
+              { id: eventId },
+              {
+                onSuccess: () => {
+                  registerMutation.reset();
+                  invalidate();
+                },
+              }
+            )
+          }
+          variant="destructive"
+        >
+          {pending ? "Cancelling…" : "Cancel registration"}
+        </Button>
+        {cancelError && (
+          <p className="text-xs text-destructive" role="alert">
+            {friendlyMessage(cancelError.code, cancelError.message)}
+          </p>
+        )}
+      </div>
     );
   }
 
   const pending = registerMutation.isPending;
   return (
-    <Button
-      className="w-full"
-      disabled={pending}
-      onClick={() => registerMutation.mutate({ id: eventId })}
-    >
-      {pending ? "Registering…" : "Register"}
-    </Button>
+    <div className="space-y-1">
+      <Button
+        className="w-full"
+        disabled={pending}
+        onClick={() =>
+          registerMutation.mutate(
+            { id: eventId },
+            {
+              onSuccess: () => {
+                cancelMutation.reset();
+                invalidate();
+              },
+            }
+          )
+        }
+      >
+        {pending ? "Registering…" : "Register"}
+      </Button>
+      {apiError && (
+        <p className="text-xs text-destructive" role="alert">
+          {friendlyMessage(apiError.code, apiError.message)}
+        </p>
+      )}
+    </div>
   );
 }

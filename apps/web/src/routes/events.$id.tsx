@@ -4,10 +4,13 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { EventCommentList } from "@/components/events/EventCommentList";
 import { EventDetailsCard } from "@/components/events/EventDetailsCard";
 import { EventHero } from "@/components/events/EventHero";
+import { EventImageCarousel } from "@/components/events/EventImageCarousel";
 import { EventManageMenu } from "@/components/events/EventManageMenu";
 import { ErrorState } from "@/components/primitives/error-state";
 import { LoadingState } from "@/components/primitives/loading-state";
+import { LocationMapEmbed } from "@/components/primitives/location-map-embed";
 import { Section } from "@/components/primitives/section";
+import { Separator } from "@/components/ui/separator";
 import { useGetEventsById } from "@/generated/hooks/useGetEventsById";
 
 export const Route = createFileRoute("/events/$id")({
@@ -42,31 +45,62 @@ function EventDetailPage() {
     (event as { ownerUserId?: string; winemakerOwnerUserId?: string }).ownerUserId ??
     (event as { winemakerOwnerUserId?: string }).winemakerOwnerUserId;
 
+  const title =
+    (event as { title?: string; name?: string }).title ?? event.name ?? "Untitled Event";
+
+  const heroEvent = {
+    ...event,
+    winemakerId: event.winemaker?.id ?? event.winemakerId,
+    winemakerName: event.winemaker?.name ?? event.winemakerName,
+  };
+
+  const address = event.address as
+    | { street?: string; houseNumber?: string; city?: string; country?: string }
+    | null
+    | undefined;
+  const hasAddress = !!(address?.street && address.city && address.country);
+
   return (
     <div className="container mx-auto space-y-12 px-6 py-8 lg:px-12">
       <div className="flex items-center justify-between gap-4">
         <Link
-          className="inline-flex items-center gap-2 text-sm font-medium text-muted-foreground transition-colors hover:text-foreground focus:outline-none"
+          className="inline-flex items-center gap-2 text-sm text-muted-foreground transition-colors hover:text-foreground"
           to="/events"
         >
           <HugeiconsIcon className="h-4 w-4" icon={ArrowLeft02Icon} />
-          Back to events
+          All events
         </Link>
 
         {ownerUserId && <EventManageMenu eventId={id} ownerUserId={ownerUserId} />}
       </div>
 
-      <EventHero event={event} />
+      <EventHero event={heroEvent} />
 
-      <div className="grid gap-8 lg:grid-cols-[2fr_1fr]">
+      <div className="grid grid-cols-1 gap-8 lg:grid-cols-[1fr_2fr]">
+        <EventImageCarousel eventId={id} name={title} />
+
         <EventDetailsCard event={event} />
-
-        <div className="space-y-6">
-          <Section heading="Discussion">
-            <EventCommentList eventId={id} />
-          </Section>
-        </div>
       </div>
+
+      {hasAddress && (
+        <Section heading="Location">
+          <LocationMapEmbed
+            address={{
+              city: address.city ?? "",
+              country: address.country ?? "",
+              houseNumber: address.houseNumber ?? "",
+              street: address.street ?? "",
+            }}
+            title={`${title} location`}
+          />
+        </Section>
+      )}
+
+      <Separator />
+
+      <Section heading="Discussion">
+        <EventCommentList eventId={id} />
+      </Section>
     </div>
   );
 }

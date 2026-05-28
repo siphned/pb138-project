@@ -16,32 +16,71 @@ vi.mock("./EventRegistrationButton", () => ({
   ),
 }));
 
+vi.mock("@tanstack/react-router", () => ({
+  Link: ({ children, to, params }: { children: React.ReactNode; to: string; params?: { id: string } }) => (
+    <a data-testid="link" href={`${to}/${params?.id ?? ""}`}>
+      {children}
+    </a>
+  ),
+}));
+
 const baseEvent = {
   id: "evt-1",
   description: "A celebration of new vintages and old friendships.",
-  startDate: "2026-06-01T10:00:00Z",
-  endDate: "2026-06-01T18:00:00Z",
-  location: "Brno, Moravia",
+  startTime: "2026-06-01T10:00:00Z",
+  endTime: "2026-06-01T18:00:00Z",
   capacity: 80,
   attendees: 42,
+  address: {
+    street: "Hlavná",
+    houseNumber: "12",
+    postalCode: "60200",
+    city: "Brno",
+    country: "Czech Republic",
+  },
+  winemaker: { id: "wm-1", name: "Lechovice" },
 };
 
 describe("EventDetailsCard", () => {
-  it("renders the section heading", () => {
+  it("renders the 'About this event' heading and description", () => {
     render(<EventDetailsCard event={baseEvent} />);
     expect(screen.getByText(/about this event/i)).toBeInTheDocument();
-  });
-
-  it("renders the description text", () => {
-    render(<EventDetailsCard event={baseEvent} />);
     expect(screen.getByText(/celebration of new vintages/i)).toBeInTheDocument();
   });
 
-  it("renders location, capacity and attendees", () => {
+  it("renders 'No description available.' fallback when description is missing", () => {
+    render(<EventDetailsCard event={{ id: "evt-2" }} />);
+    expect(screen.getByText(/no description available/i)).toBeInTheDocument();
+  });
+
+  it("renders a 'Hosted by' tablet with a link to the winemaker", () => {
     render(<EventDetailsCard event={baseEvent} />);
-    expect(screen.getByText("Brno, Moravia")).toBeInTheDocument();
-    expect(screen.getByText("80")).toBeInTheDocument();
-    expect(screen.getByText("42 people")).toBeInTheDocument();
+    expect(screen.getByText(/hosted by/i)).toBeInTheDocument();
+    const link = screen.getAllByTestId("link").find((el) => el.textContent === "Lechovice");
+    expect(link).toBeDefined();
+    expect(link).toHaveAttribute("href", "/winemakers/$id/wm-1");
+  });
+
+  it("renders a Location tablet with the formatted address", () => {
+    render(<EventDetailsCard event={baseEvent} />);
+    expect(screen.getByText(/^location$/i)).toBeInTheDocument();
+    expect(screen.getByText("Hlavná 12")).toBeInTheDocument();
+    expect(screen.getByText("60200 Brno")).toBeInTheDocument();
+    expect(screen.getByText("Czech Republic")).toBeInTheDocument();
+  });
+
+  it("renders a Capacity tablet with spots remaining", () => {
+    render(<EventDetailsCard event={baseEvent} />);
+    expect(screen.getByText(/80 total spots/i)).toBeInTheDocument();
+    expect(screen.getByText(/of 80 spots remaining/i)).toBeInTheDocument();
+    expect(screen.getByText(/42 attending/i)).toBeInTheDocument();
+  });
+
+  it("omits tablets for missing optional fields", () => {
+    render(<EventDetailsCard event={{ id: "evt-3" }} />);
+    expect(screen.queryByText(/hosted by/i)).not.toBeInTheDocument();
+    expect(screen.queryByText(/^location$/i)).not.toBeInTheDocument();
+    expect(screen.queryByText(/^capacity$/i)).not.toBeInTheDocument();
   });
 
   it("forwards the eventId and registration status to EventRegistrationButton", () => {
@@ -49,11 +88,5 @@ describe("EventDetailsCard", () => {
     const btn = screen.getByTestId("register-btn");
     expect(btn).toHaveAttribute("data-event-id", "evt-1");
     expect(btn).toHaveTextContent("registered");
-  });
-
-  it("omits property rows for missing optional fields", () => {
-    render(<EventDetailsCard event={{ id: "evt-2" }} />);
-    expect(screen.queryByText("Location")).not.toBeInTheDocument();
-    expect(screen.queryByText("Capacity")).not.toBeInTheDocument();
   });
 });

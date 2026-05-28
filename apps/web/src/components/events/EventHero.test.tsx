@@ -43,9 +43,8 @@ describe("EventHero", () => {
     expect(link).toHaveAttribute("href", "/winemakers/$id/wm-1");
   });
 
-  it("renders the image when imageUrl is provided", () => {
-    render(<EventHero event={{ ...baseEvent, imageUrl: "https://example.com/hero.jpg" }} />);
-    const img = screen.getByRole("img");
-    expect(img).toHaveAttribute("src", "https://example.com/hero.jpg");
+  it("renders a formatted date label when startDate is provided", () => {
+    render(<EventHero event={baseEvent} />);
+    expect(screen.getByText(/June/i)).toBeInTheDocument();
   });
 });

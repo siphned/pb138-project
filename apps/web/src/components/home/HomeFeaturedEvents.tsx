@@ -6,7 +6,7 @@ import { LoadingState } from "@/components/primitives/loading-state";
 import { Section } from "@/components/primitives/section";
 import { Button } from "@/components/ui/button";
 import { useGetEvents } from "@/generated/hooks/useGetEvents";
-import { EventCard } from "@/routes/-components/EventCard";
+import { EventCard } from "@/components/events/EventCard";
 
 export function HomeFeaturedEvents() {
   const { data, isLoading } = useGetEvents();

@@ -6,7 +6,7 @@ vi.mock("@/generated/hooks/useGetEvents", () => ({
   useGetEvents: vi.fn(),
 }));
 
-vi.mock("@/routes/-components/EventCard", () => ({
+vi.mock("@/components/events/EventCard", () => ({
   EventCard: ({ event }: { event: { id: string; name: string } }) => (
     <div data-testid="event-card">{event.name}</div>
   ),

@@ -1,7 +1,15 @@
-import { Location01Icon, UserGroupIcon } from "@hugeicons/core-free-icons";
+import { Location01Icon } from "@hugeicons/core-free-icons";
 import { HugeiconsIcon } from "@hugeicons/react";
+import { useQueryClient } from "@tanstack/react-query";
 import { Link } from "@tanstack/react-router";
+import { CatalogPlaceholder } from "@/components/catalog/CatalogPlaceholder";
 import { Button } from "@/components/ui/button";
+import { Card } from "@/components/ui/card";
+import { useUser } from "@/context/UserContext";
+import { getEventsQueryKey } from "@/generated/hooks/useGetEvents";
+import { getEventsByIdQueryKey } from "@/generated/hooks/useGetEventsById";
+import { usePostEventsByIdRegister } from "@/generated/hooks/usePostEventsByIdRegister";
+import { parseApiError } from "@/lib/api-errors";
 
 interface EventCardProps {
   event: {
@@ -14,68 +22,127 @@ interface EventCardProps {
     location?: string;
     winemakerName?: string;
     winemakerId?: string;
-    attendees?: number;
+    imageUrl?: string;
+    isRegisteredByMe?: boolean;
   };
 }
 
-export function EventCard({ event }: EventCardProps) {
-  const title = event.title || event.name || "Untitled Event";
-  const startDate = event.startDate ? new Date(event.startDate) : null;
-  const formattedDate = startDate?.toLocaleDateString("en-US", {
+function formatShortDate(value?: string | Date) {
+  if (!value) return null;
+  return new Date(value).toLocaleDateString("en-US", {
     day: "numeric",
     month: "short",
     year: "numeric",
   });
+}
+
+function friendlyMessage(code?: string, fallback?: string): string {
+  switch (code) {
+    case "ALREADY_REGISTERED":
+      return "You're already registered.";
+    case "CAPACITY_FULL":
+      return "Event is full.";
+    case "EVENT_NOT_AVAILABLE":
+      return "Registration closed.";
+    case "EVENT_NOT_FOUND":
+      return "Event not found.";
+    default:
+      return fallback ?? "Something went wrong.";
+  }
+}
+
+export function EventCard({ event }: EventCardProps) {
+  const queryClient = useQueryClient();
+  const { user } = useUser();
+  const registerMutation = usePostEventsByIdRegister();
+
+  const title = event.title || event.name || "Untitled Event";
+  const dateLabel = formatShortDate(event.startDate);
+
+  const apiError = parseApiError(registerMutation.error);
+  const isAlreadyRegistered = apiError?.code === "ALREADY_REGISTERED";
+  const isRegistered = !!event.isRegisteredByMe || registerMutation.isSuccess || isAlreadyRegistered;
+  const pending = registerMutation.isPending;
+  const canRegister = !!user && !isRegistered;
+
+  const handleRegister = () => {
+    if (!canRegister) return;
+    registerMutation.mutate(
+      { id: event.id },
+      {
+        onSuccess: () => {
+          queryClient.invalidateQueries({ queryKey: getEventsQueryKey() });
+          queryClient.invalidateQueries({ queryKey: getEventsByIdQueryKey(event.id) });
+        },
+      }
+    );
+  };
+
+  const showError = !!apiError && !isRegistered;
 
   return (
-    <Link params={{ id: event.id }} to="/events/$id">
-      <div className="rounded-2xl border bg-card p-6 transition-all hover:shadow-lg hover:border-primary">
-        {/* Header with date badge */}
-        <div className="mb-4 flex items-start justify-between">
-          {formattedDate && (
-            <div className="inline-block rounded-md bg-primary/10 px-3 py-1">
-              <p className="text-sm font-semibold text-primary">{formattedDate}</p>
-            </div>
-          )}
-        </div>
-
-        {/* Event title */}
-        <h3 className="mb-2 line-clamp-2 font-heading text-lg font-bold">{title}</h3>
-
-        {/* Description */}
-        {event.description && (
-          <p className="mb-4 line-clamp-2 text-sm text-muted-foreground">{event.description}</p>
+    <Card className="group relative" variant="polaroid">
+      <div className="relative aspect-square w-full overflow-hidden rounded-lg bg-muted shadow-xs">
+        {event.imageUrl ? (
+          <img
+            alt={title}
+            className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-105"
+            src={event.imageUrl}
+          />
+        ) : (
+          <CatalogPlaceholder text={title} />
         )}
 
-        {/* Location */}
-        {event.location && (
-          <div className="mb-4 flex items-center gap-2 text-sm text-muted-foreground">
-            <HugeiconsIcon className="h-4 w-4" icon={Location01Icon} />
-            <span className="line-clamp-1">{event.location}</span>
+        {dateLabel && (
+          <div className="absolute top-2 left-2 z-10">
+            <span className="rounded-md bg-background/90 px-2 py-1 text-[10px] font-semibold uppercase tracking-wider text-foreground shadow-sm backdrop-blur">
+              {dateLabel}
+            </span>
           </div>
         )}
+      </div>
 
-        {/* Winemaker and attendees */}
-        <div className="mb-4 space-y-2 border-t pt-4">
-          {event.winemakerName && (
-            <div className="flex items-center gap-2 text-sm">
-              <span className="text-muted-foreground">By:</span>
-              <span className="font-medium text-primary">{event.winemakerName}</span>
-            </div>
-          )}
-          {event.attendees !== undefined && (
-            <div className="flex items-center gap-2 text-sm text-muted-foreground">
-              <HugeiconsIcon className="h-4 w-4" icon={UserGroupIcon} />
-              <span>{event.attendees} attending</span>
-            </div>
+      <div className="space-y-2 pt-4 text-center">
+        <h3 className="font-heading text-base font-bold leading-tight line-clamp-2">
+          <Link
+            className="stretched-link transition-colors hover:text-primary focus:outline-none"
+            params={{ id: event.id }}
+            to="/events/$id"
+          >
+            {title}
+          </Link>
+        </h3>
+
+        {(event.location || event.winemakerName) && (
+          <p className="flex flex-wrap items-center justify-center gap-x-1 gap-y-0.5 text-xs text-muted-foreground">
+            {event.location && (
+              <span className="inline-flex items-center gap-1">
+                <HugeiconsIcon aria-hidden className="h-3 w-3" icon={Location01Icon} />
+                <span className="line-clamp-1">{event.location}</span>
+              </span>
+            )}
+            {event.location && event.winemakerName && <span>·</span>}
+            {event.winemakerName && <span className="line-clamp-1">{event.winemakerName}</span>}
+          </p>
+        )}
+
+        <div className="relative z-10 space-y-1 pt-2">
+          <Button
+            className="w-full"
+            disabled={isRegistered || pending || !user}
+            onClick={handleRegister}
+            size="sm"
+            variant={isRegistered ? "outline" : "default"}
+          >
+            {isRegistered ? "Registered" : pending ? "Registering…" : "Register"}
+          </Button>
+          {showError && (
+            <p className="text-xs text-destructive" role="alert">
+              {friendlyMessage(apiError.code, apiError.message)}
+            </p>
           )}
         </div>
-
-        {/* CTA */}
-        <Button className="w-full" size="sm">
-          View Details
-        </Button>
       </div>
-    </Link>
+    </Card>
   );
 }

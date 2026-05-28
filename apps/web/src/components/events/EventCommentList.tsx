@@ -4,6 +4,7 @@ import { ErrorState } from "@/components/primitives/error-state";
 import { LoadingState } from "@/components/primitives/loading-state";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
+import { Separator } from "@/components/ui/separator";
 import { Textarea } from "@/components/ui/textarea";
 import { useUser } from "@/context/UserContext";
 import { useGetEventsByIdComments } from "@/generated/hooks/useGetEventsByIdComments";
@@ -72,6 +73,34 @@ export function EventCommentList({ eventId }: EventCommentListProps) {
 
   return (
     <div className="space-y-6">
+      {user ? (
+        <form
+          className="space-y-3"
+          onSubmit={(e) => {
+            e.preventDefault();
+            if (!draft.trim()) return;
+            postMutation.mutate({ id: eventId, data: { body: draft } as never });
+          }}
+        >
+          <Textarea
+            aria-label="Comment body"
+            onChange={(e) => setDraft(e.target.value)}
+            placeholder="Write a comment…"
+            rows={3}
+            value={draft}
+          />
+          <div className="flex justify-end">
+            <Button disabled={postMutation.isPending || !draft.trim()} type="submit">
+              {postMutation.isPending ? "Posting…" : "Post comment"}
+            </Button>
+          </div>
+        </form>
+      ) : (
+        <p className="text-sm text-muted-foreground">Sign in to leave a comment.</p>
+      )}
+
+      <Separator />
+
       {list.length === 0 ? (
         <EmptyState
           description="Be the first to share a thought about this event."
@@ -97,32 +126,6 @@ export function EventCommentList({ eventId }: EventCommentListProps) {
             </li>
           ))}
         </ul>
-      )}
-
-      {user ? (
-        <form
-          className="space-y-3"
-          onSubmit={(e) => {
-            e.preventDefault();
-            if (!draft.trim()) return;
-            postMutation.mutate({ id: eventId, data: { body: draft } as never });
-          }}
-        >
-          <Textarea
-            aria-label="Comment body"
-            onChange={(e) => setDraft(e.target.value)}
-            placeholder="Write a comment…"
-            rows={3}
-            value={draft}
-          />
-          <div className="flex justify-end">
-            <Button disabled={postMutation.isPending || !draft.trim()} type="submit">
-              {postMutation.isPending ? "Posting…" : "Post comment"}
-            </Button>
-          </div>
-        </form>
-      ) : (
-        <p className="text-sm text-muted-foreground">Sign in to leave a comment.</p>
       )}
     </div>
   );

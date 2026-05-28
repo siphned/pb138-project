@@ -1,4 +1,6 @@
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { fireEvent, render, screen } from "@testing-library/react";
+import type { ReactNode } from "react";
 import { describe, expect, it, vi } from "vitest";
 import { useUser } from "@/context/UserContext";
 import { useDeleteEventsByIdRegister } from "@/generated/hooks/useDeleteEventsByIdRegister";
@@ -20,6 +22,9 @@ vi.mock("@/generated/hooks/useDeleteEventsByIdRegister", () => ({
 vi.mock("@tanstack/react-router", () => ({
   Link: ({ children, to }: any) => <a href={to}>{children}</a>,
 }));
+
+const renderWithClient = (ui: ReactNode) =>
+  render(<QueryClientProvider client={new QueryClient()}>{ui}</QueryClientProvider>);
 
 const mockRegister = (overrides: Partial<ReturnType<typeof usePostEventsByIdRegister>> = {}) => {
   const mutate = vi.fn();
@@ -46,7 +51,7 @@ describe("EventRegistrationButton", () => {
     vi.mocked(useUser).mockReturnValue({ user: null, isLoading: false } as any);
     mockRegister();
     mockCancel();
-    render(<EventRegistrationButton eventId="evt-1" />);
+    renderWithClient(<EventRegistrationButton eventId="evt-1" />);
     expect(screen.getByRole("link")).toHaveTextContent(/sign in to register/i);
   });
 
@@ -54,7 +59,7 @@ describe("EventRegistrationButton", () => {
     vi.mocked(useUser).mockReturnValue({ user: { id: "u-1" }, isLoading: false } as any);
     mockRegister();
     mockCancel();
-    render(<EventRegistrationButton eventId="evt-1" isRegistered={false} />);
+    renderWithClient(<EventRegistrationButton eventId="evt-1" isRegistered={false} />);
     expect(screen.getByRole("button")).toHaveTextContent(/register/i);
     expect(screen.queryByText(/cancel/i)).not.toBeInTheDocument();
   });
@@ -63,7 +68,7 @@ describe("EventRegistrationButton", () => {
     vi.mocked(useUser).mockReturnValue({ user: { id: "u-1" }, isLoading: false } as any);
     mockRegister();
     mockCancel();
-    render(<EventRegistrationButton eventId="evt-1" isRegistered={true} />);
+    renderWithClient(<EventRegistrationButton eventId="evt-1" isRegistered={true} />);
     expect(screen.getByRole("button")).toHaveTextContent(/cancel registration/i);
   });
 
@@ -71,25 +76,25 @@ describe("EventRegistrationButton", () => {
     vi.mocked(useUser).mockReturnValue({ user: { id: "u-1" }, isLoading: false } as any);
     const mutate = mockRegister();
     mockCancel();
-    render(<EventRegistrationButton eventId="evt-1" isRegistered={false} />);
+    renderWithClient(<EventRegistrationButton eventId="evt-1" isRegistered={false} />);
     fireEvent.click(screen.getByRole("button"));
-    expect(mutate).toHaveBeenCalledWith({ id: "evt-1" });
+    expect(mutate).toHaveBeenCalledWith({ id: "evt-1" }, expect.anything());
   });
 
   it("fires the cancel mutation on Cancel click", () => {
     vi.mocked(useUser).mockReturnValue({ user: { id: "u-1" }, isLoading: false } as any);
     mockRegister();
     const mutate = mockCancel();
-    render(<EventRegistrationButton eventId="evt-1" isRegistered={true} />);
+    renderWithClient(<EventRegistrationButton eventId="evt-1" isRegistered={true} />);
     fireEvent.click(screen.getByRole("button"));
-    expect(mutate).toHaveBeenCalledWith({ id: "evt-1" });
+    expect(mutate).toHaveBeenCalledWith({ id: "evt-1" }, expect.anything());
   });
 
   it("disables the button while the register mutation is pending", () => {
     vi.mocked(useUser).mockReturnValue({ user: { id: "u-1" }, isLoading: false } as any);
     mockRegister({ isPending: true } as any);
     mockCancel();
-    render(<EventRegistrationButton eventId="evt-1" isRegistered={false} />);
+    renderWithClient(<EventRegistrationButton eventId="evt-1" isRegistered={false} />);
     const button = screen.getByRole("button");
     expect(button).toBeDisabled();
     expect(button).toHaveTextContent(/registering/i);
@@ -99,9 +104,29 @@ describe("EventRegistrationButton", () => {
     vi.mocked(useUser).mockReturnValue({ user: { id: "u-1" }, isLoading: false } as any);
     mockRegister();
     mockCancel({ isPending: true } as any);
-    render(<EventRegistrationButton eventId="evt-1" isRegistered={true} />);
+    renderWithClient(<EventRegistrationButton eventId="evt-1" isRegistered={true} />);
     const button = screen.getByRole("button");
     expect(button).toBeDisabled();
     expect(button).toHaveTextContent(/cancelling/i);
+  });
+
+  it("flips to 'Cancel registration' when the BE returns ALREADY_REGISTERED", () => {
+    vi.mocked(useUser).mockReturnValue({ user: { id: "u-1" }, isLoading: false } as any);
+    mockRegister({
+      error: { response: { status: 409, data: { error: { code: "ALREADY_REGISTERED" } } } },
+    } as any);
+    mockCancel();
+    renderWithClient(<EventRegistrationButton eventId="evt-1" isRegistered={false} />);
+    expect(screen.getByRole("button")).toHaveTextContent(/cancel registration/i);
+  });
+
+  it("renders the friendly message when registration fails", () => {
+    vi.mocked(useUser).mockReturnValue({ user: { id: "u-1" }, isLoading: false } as any);
+    mockRegister({
+      error: { response: { status: 400, data: { error: { code: "EVENT_NOT_AVAILABLE" } } } },
+    } as any);
+    mockCancel();
+    renderWithClient(<EventRegistrationButton eventId="evt-1" isRegistered={false} />);
+    expect(screen.getByRole("alert")).toHaveTextContent(/registration closed/i);
   });
 });
