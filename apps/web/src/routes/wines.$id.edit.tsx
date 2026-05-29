@@ -1,7 +1,6 @@
-import { zodResolver } from "@hookform/resolvers/zod";
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
-import { Suspense, useState } from "react";
-import { type SubmitHandler, useForm } from "react-hook-form";
+import { Suspense, useMemo, useState } from "react";
+import { type Resolver, type SubmitHandler, useForm } from "react-hook-form";
 import { z } from "zod";
 import { PageHeader } from "@/components/primitives/page-header";
 import { Button } from "@/components/ui/button";
@@ -102,6 +101,20 @@ function WineEditContent({ id }: { id: string }) {
     },
   });
 
+  const resolver = useMemo<Resolver<WineEditFormValues>>(
+    () => async (values) => {
+      const result = wineEditSchema.safeParse(values);
+      if (result.success) return { errors: {}, values: result.data };
+      const errs: Record<string, { type: string; message: string }> = {};
+      for (const issue of result.error.issues) {
+        const path = issue.path[0] as string;
+        if (path && !errs[path]) errs[path] = { message: issue.message, type: "manual" };
+      }
+      return { errors: errs as never, values: {} };
+    },
+    []
+  );
+
   const {
     register,
     handleSubmit,
@@ -122,7 +135,7 @@ function WineEditContent({ id }: { id: string }) {
       vintageYear: Number(wine.vintageYear) || 2020,
       volumeMl: Number(wine.volumeMl) || 750,
     },
-    resolver: zodResolver(wineEditSchema),
+    resolver,
   });
 
   const color = watch("color");

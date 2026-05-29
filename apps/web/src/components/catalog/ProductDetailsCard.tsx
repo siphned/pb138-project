@@ -238,16 +238,24 @@ export function ProductDetailsCard({
         </Section>
       )}
 
-      <ShowOwner ownerUserId={shopOwnerUserId}>
-        <div className="flex flex-wrap gap-4">
-          <Button
-            render={<Link params={{ productId: product.id }} to="/products/$productId/edit" />}
-            variant="outline"
-          >
-            Edit Product
-          </Button>
-        </div>
-      </ShowOwner>
+      {shopId && (
+        <ShowOwner ownerUserId={shopOwnerUserId}>
+          <div className="flex flex-wrap gap-4">
+            <Button
+              render={
+                <Link
+                  params={{ id: shopId, productId: product.id }}
+                  search={{ isBundle: undefined }}
+                  to="/shops/$id/inventory/$productId/edit"
+                />
+              }
+              variant="outline"
+            >
+              Edit Product
+            </Button>
+          </div>
+        </ShowOwner>
+      )}
     </div>
   );
 }
