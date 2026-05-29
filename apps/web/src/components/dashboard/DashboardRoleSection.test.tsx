@@ -1,4 +1,4 @@
-import { fireEvent, render, screen } from "@testing-library/react";
+import { fireEvent, render, screen, waitFor } from "@testing-library/react";
 import { describe, expect, it, vi } from "vitest";
 import { DashboardRoleSection } from "./DashboardRoleSection";
 
@@ -79,7 +79,7 @@ describe("DashboardRoleSection", () => {
     expect(screen.getByRole("button", { name: /request/i })).toBeInTheDocument();
   });
 
-  it("calls the mutation with the form data on submit", () => {
+  it("calls the mutation with the form data on submit", async () => {
     const mutate = vi.fn();
     vi.mocked(useUser).mockReturnValue(mockUser(["Customer"]) as ReturnType<typeof useUser>);
     vi.mocked(usePostRoleRequests).mockReturnValue(
@@ -90,11 +90,13 @@ describe("DashboardRoleSection", () => {
       target: { value: "Acme Winery" },
     });
     fireEvent.click(screen.getByRole("button", { name: /request/i }));
-    expect(mutate).toHaveBeenCalledWith({
-      data: {
-        businessName: "Acme Winery",
-        type: "winemaker",
-      },
+    await waitFor(() => {
+      expect(mutate).toHaveBeenCalledWith({
+        data: {
+          businessName: "Acme Winery",
+          type: "winemaker",
+        },
+      });
     });
   });
 
