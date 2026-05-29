@@ -87,10 +87,16 @@ export class EventsService {
     await eventsRepo.softDelete(db, id);
   }
 
-  async getEvent(id: string): Promise<EventWithDetails> {
+  async getEvent(
+    id: string,
+    userId?: string
+  ): Promise<EventWithDetails & { isRegisteredByMe?: boolean; attendees: number }> {
     const event = await eventsRepo.findById(db, id);
     if (!event || event.status !== "approved") throw new EventNotFoundError();
-    return event;
+    const attendees = await eventsRepo.countActiveRegistrations(db, id);
+    if (!userId) return { ...event, attendees };
+    const registered = await eventsRepo.findRegisteredEventIds(db, userId, [id]);
+    return { ...event, attendees, isRegisteredByMe: registered.has(id) };
   }
 
   async listInvitations(eventId: string, userId: string): Promise<EventInvitationModel[]> {
@@ -129,8 +135,9 @@ export class EventsService {
       from?: string;
       to?: string;
     },
-    paginationQuery: { page?: number; limit?: number }
-  ): Promise<PaginatedResult<EventWithDetails>> {
+    paginationQuery: { page?: number; limit?: number },
+    userId?: string
+  ): Promise<PaginatedResult<EventWithDetails & { isRegisteredByMe?: boolean }>> {
     const { limit, offset } = parsePagination(paginationQuery);
     const page = Math.max(1, paginationQuery.page ?? 1);
 
@@ -155,7 +162,15 @@ export class EventsService {
       eventsRepo.countMany(db, repoFilters),
     ]);
 
-    return { data, limit, page, total };
+    if (!userId || data.length === 0) return { data, limit, page, total };
+
+    const registered = await eventsRepo.findRegisteredEventIds(
+      db,
+      userId,
+      data.map((e) => e.id)
+    );
+    const decorated = data.map((e) => ({ ...e, isRegisteredByMe: registered.has(e.id) }));
+    return { data: decorated, limit, page, total };
   }
 
   async registerForEvent(eventId: string, userId: string): Promise<EventRegistration> {

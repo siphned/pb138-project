@@ -1,5 +1,7 @@
 import { Elysia, status, t } from "elysia";
 import { authPlugin } from "../auth";
+import { verifyClerkToken } from "../auth/auth.utils";
+import { usersService } from "../users/users.service";
 import {
   createCommentBody,
   createEventBody,
@@ -13,12 +15,18 @@ import { eventsService } from "./events.service";
 
 export const eventsRoutes = new Elysia()
   .use(authPlugin)
+  .derive(async ({ headers }) => {
+    const payload = await verifyClerkToken(headers.authorization);
+    if (!payload) return { currentUserId: undefined as string | undefined };
+    const dbUser = await usersService.lazyGetOrCreate(payload.sub);
+    return { currentUserId: dbUser.id as string | undefined };
+  })
 
   .get(
     "/events",
-    ({ query }) => {
+    ({ query, currentUserId }) => {
       const { page, limit, ...filters } = query;
-      return eventsService.listEvents(filters, { limit, page });
+      return eventsService.listEvents(filters, { limit, page }, currentUserId);
     },
     {
       detail: { summary: "List approved events", tags: ["events"] },
@@ -26,10 +34,14 @@ export const eventsRoutes = new Elysia()
     }
   )
 
-  .get("/events/:id", ({ params }) => eventsService.getEvent(params.id), {
-    detail: { summary: "Get event by ID", tags: ["events"] },
-    params: eventParams,
-  })
+  .get(
+    "/events/:id",
+    ({ params, currentUserId }) => eventsService.getEvent(params.id, currentUserId),
+    {
+      detail: { summary: "Get event by ID", tags: ["events"] },
+      params: eventParams,
+    }
+  )
 
   .post(
     "/events",
