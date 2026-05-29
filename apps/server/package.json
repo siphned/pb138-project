@@ -45,6 +45,7 @@
     "generate:spec": "bun run scripts/export-spec.ts",
     "lint": "biome lint .",
     "test": "vitest run",
+    "test:coverage": "vitest run --coverage",
     "test:e2e": "echo 'Run E2E tests from web package'"
   },
   "type": "module"

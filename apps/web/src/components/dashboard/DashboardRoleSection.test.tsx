@@ -22,28 +22,28 @@ type MutationLike = {
 
 const baseUser = {
   activeRole: "Customer",
-  setActiveRole: vi.fn(),
   isLoading: false,
+  setActiveRole: vi.fn(),
   updateUser: vi.fn(),
 };
 
 const mockUser = (roles: string[]) => ({
   ...baseUser,
   user: {
-    id: "u1",
-    fname: "Adam",
-    lname: "M",
-    email: "a@b.com",
     clerkId: "clerk_1",
+    email: "a@b.com",
+    fname: "Adam",
+    id: "u1",
+    lname: "M",
     roles,
   },
 });
 
 const mockMutation = (overrides: Partial<MutationLike> = {}): MutationLike => ({
-  mutate: vi.fn(),
+  error: null,
   isPending: false,
   isSuccess: false,
-  error: null,
+  mutate: vi.fn(),
   ...overrides,
 });
 

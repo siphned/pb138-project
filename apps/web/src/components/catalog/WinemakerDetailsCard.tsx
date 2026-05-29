@@ -14,8 +14,8 @@ interface WinemakerDetailsCardProps {
 export function WinemakerDetailsCard({ winemaker }: WinemakerDetailsCardProps) {
   useEffect(() => {
     // @ts-expect-error - checking for BE gap
-    if (import.meta.env.DEV && winemaker && !winemaker.userId && !winemaker.id) {
-      // biome-ignore lint/suspicious/noConsole: intentional development diagnostic for BE gap in plan §8
+    if (winemaker && !winemaker.userId && !winemaker.id) {
+      // biome-ignore lint/suspicious/noConsole: intentional warning for BE gap
       console.warn("WinemakerDetailsCard: winemaker missing both userId and id.");
     }
   }, [winemaker]);

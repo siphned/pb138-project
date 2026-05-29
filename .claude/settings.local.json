@@ -32,7 +32,13 @@
       "Bash(find ../../node_modules/.bun/@tanstack+router-generator* -name \"package.json\")",
       "Bash(xargs dirname)",
       "Bash(find node_modules/.bun/@tanstack+router-plugin@1.168.2* -name \"router-generator\")",
-      "Bash(xargs grep -l \"<form \")"
+      "Bash(git show *)",
+      "Bash(echo \"wrote $?\")",
+      "Bash(awk '/^diff --git a\\\\/apps\\\\/web\\\\/src\\\\/routes\\\\/search\\\\.tsx/,/^diff --git/{ if \\(/^diff --git/ && !/search\\\\.tsx/\\) exit; print }')",
+      "Read(//tmp/**)",
+      "Bash(node *)",
+      "Bash(bun *)",
+      "Bash(grep -v 'InventoryForm\\\\|wines.$id.edit')"
     ]
   }
 }

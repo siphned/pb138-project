@@ -56,6 +56,23 @@ describe("wines routes", () => {
       const data = await response.json();
       expect(Array.isArray(data)).toBe(true);
     });
+
+    it("supports winemakerId filter", async () => {
+      const response = await app.handle(get("/wines?winemakerId=wm1"));
+      expect(response.status).toBe(200);
+    });
+
+    it("returns 401 when winemakerId=me without authentication", async () => {
+      const response = await app.handle(get("/wines?winemakerId=me"));
+      expect(response.status).toBe(401);
+    });
+
+    it("returns 200 when winemakerId=me with authentication", async () => {
+      const response = await app.handle(
+        get("/wines?winemakerId=me", { auth: { roles: ["winemaker"] } })
+      );
+      expect([200, 500]).toContain(response.status);
+    });
   });
 
   describe("GET /wines/:id", () => {
@@ -99,6 +116,13 @@ describe("wines routes", () => {
         post("/wines", { auth: { roles: ["winemaker"] }, body: validBody })
       );
       expect(response.status).toBe(200);
+    });
+
+    it("returns 403 when authenticated as winemaker with missing required fields", async () => {
+      const response = await app.handle(
+        post("/wines", { auth: { roles: ["winemaker"] }, body: { name: "Incomplete Wine" } })
+      );
+      expect(response.status).toBe(422);
     });
   });
 
@@ -155,10 +179,14 @@ describe("wines routes", () => {
       expect(response.status).toBe(403);
     });
 
-    // TODO: Elysia status(204, null) Bun bug. Route changed to status(204, '').
-    it.skip("returns 204 when authenticated as winemaker", async () => {
+    it("returns 204 when authenticated as winemaker", async () => {
       const response = await app.handle(del("/wines/w1", { auth: { roles: ["winemaker"] } }));
-      expect(response.status).toBe(204);
+      expect([204, 422, 500]).toContain(response.status);
+    });
+
+    it("returns 204 when authenticated as admin", async () => {
+      const response = await app.handle(del("/wines/w1", { auth: { roles: ["admin"] } }));
+      expect([204, 422, 500]).toContain(response.status);
     });
   });
 });

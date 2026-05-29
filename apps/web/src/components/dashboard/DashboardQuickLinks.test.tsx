@@ -17,15 +17,15 @@ vi.mock("@tanstack/react-router", () => ({
 import { useUser } from "@/context/UserContext";
 
 const baseUser = {
-  setActiveRole: vi.fn(),
   isLoading: false,
+  setActiveRole: vi.fn(),
   updateUser: vi.fn(),
   user: {
-    id: "u1",
-    fname: "Adam",
-    lname: "M",
-    email: "a@b.com",
     clerkId: "clerk_1",
+    email: "a@b.com",
+    fname: "Adam",
+    id: "u1",
+    lname: "M",
     roles: ["Customer", "Winemaker", "Shop Owner", "Admin"],
   },
 };
@@ -50,7 +50,7 @@ describe("DashboardQuickLinks", () => {
     render(<DashboardQuickLinks />);
     const hrefs = screen.getAllByTestId("link").map((el) => el.getAttribute("href"));
     expect(hrefs).toContain("/events/new");
-    expect(hrefs).toContain("/explore");
+    expect(hrefs).toContain("/wines");
   });
 
   it("renders shop-owner links when activeRole is Shop Owner", () => {
@@ -78,8 +78,8 @@ describe("DashboardQuickLinks", () => {
   it("renders nothing when there is no signed-in user", () => {
     vi.mocked(useUser).mockReturnValue({
       ...baseUser,
-      user: null,
       activeRole: "Customer",
+      user: null,
     } as ReturnType<typeof useUser>);
     const { container } = render(<DashboardQuickLinks />);
     expect(container).toBeEmptyDOMElement();

@@ -2,27 +2,18 @@ import { render, screen } from "@testing-library/react";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { WinesAvailableInShops } from "../routes/-components/WinesAvailableInShops";
 
-// Mock the router
 vi.mock("@tanstack/react-router", () => ({
   Link: ({ children }: any) => <a href="/">{children}</a>,
 }));
 
-// Mock the hook
 vi.mock("@/generated/hooks/useGetProducts", () => ({
   useGetProducts: vi.fn(),
 }));
 
-// Mock the components used inside - use paths relative to the test file
-vi.mock("../routes/-components/ProductPriceRow", () => ({
-  ProductPriceRow: ({ productId, price }: any) => (
-    <div data-testid="price-row">
-      {productId}: {price}
-    </div>
-  ),
+vi.mock("@/components/catalog/ProductCard", () => ({
+  ProductCard: ({ product }: any) => <div data-testid="product-card">{product.name}</div>,
 }));
-vi.mock("../routes/-components/ProductSoldAtCard", () => ({
-  ProductSoldAtCard: ({ shopName }: any) => <div data-testid="shop-card">{shopName}</div>,
-}));
+
 vi.mock("@/components/ui/skeleton", () => ({
   Skeleton: ({ className }: any) => <div className={className} data-testid="skeleton" />,
 }));
@@ -37,7 +28,7 @@ describe("WinesAvailableInShops", () => {
   it("renders loading state", () => {
     vi.mocked(useGetProducts).mockReturnValue({ isLoading: true } as any);
     render(<WinesAvailableInShops wineId="w1" />);
-    expect(screen.getAllByTestId("skeleton")).toHaveLength(2);
+    expect(screen.getAllByTestId("skeleton")).toHaveLength(4);
   });
 
   it("renders empty state when no products found", () => {
@@ -62,8 +53,6 @@ describe("WinesAvailableInShops", () => {
 
     render(<WinesAvailableInShops wineId="w1" />);
 
-    expect(screen.getByText("Product 1")).toBeInTheDocument();
-    expect(screen.getByTestId("shop-card")).toHaveTextContent("Shop 1");
-    expect(screen.getByTestId("price-row")).toHaveTextContent("p1: 100");
+    expect(screen.getByTestId("product-card")).toHaveTextContent("Product 1");
   });
 });

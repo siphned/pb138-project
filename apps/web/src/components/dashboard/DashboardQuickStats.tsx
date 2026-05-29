@@ -11,10 +11,10 @@ interface StatTile {
 }
 
 const TILES_BY_ROLE: Record<string, StatTile> = {
-  Customer: { label: "Orders placed", value: "—" },
-  Winemaker: { label: "Wines published", value: "—" },
-  "Shop Owner": { label: "Shops managed", value: "—" },
   Admin: { label: "Pending approvals", value: "—" },
+  Customer: { label: "Orders placed", value: "—" },
+  "Shop Owner": { label: "Shops managed", value: "—" },
+  Winemaker: { label: "Wines published", value: "—" },
 };
 
 export function DashboardQuickStats() {

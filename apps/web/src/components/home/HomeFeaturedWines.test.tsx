@@ -48,13 +48,13 @@ describe("HomeFeaturedWines", () => {
     expect(screen.queryByText("Wine 3")).not.toBeInTheDocument();
   });
 
-  it("renders a View all link to /explore", () => {
+  it("renders a View all link to /wines", () => {
     vi.mocked(useGetWines).mockReturnValue({
       data: [{ id: "w1", name: "Wine 1" }],
       isLoading: false,
     } as ReturnType<typeof useGetWines>);
     render(<HomeFeaturedWines />);
-    const link = screen.getAllByTestId("link").find((el) => el.getAttribute("href") === "/explore");
+    const link = screen.getAllByTestId("link").find((el) => el.getAttribute("href") === "/wines");
     expect(link).toBeDefined();
   });
 });

@@ -19,7 +19,7 @@ export function HomeFeaturedWines() {
   return (
     <Section
       actions={
-        <Button render={<Link to="/explore" />} size="sm" variant="outline">
+        <Button render={<Link to="/wines" />} size="sm" variant="outline">
           View all
           <HugeiconsIcon className="ml-2 h-3.5 w-3.5" icon={ArrowRight01Icon} />
         </Button>

@@ -1,4 +1,4 @@
-# WINE-68 — Catalog Cluster Implementation Plan
+# WINE-189 — Catalog Cluster Implementation Plan
 
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
 
@@ -26,38 +26,28 @@ You MUST follow every rule below. They override generic React habits.
 8. **Owner-gated UI via `<ShowOwner>`.** Never branch on roles inline. `<ShowOwner ownerUserId={wine.winemaker.userId}>{...}</ShowOwner>` is the only pattern.
 9. **`validateSearch` schemas already exist on every route.** Keep them. They produce typed search params consumed by the catalog hook. Do not delete or rewrite the schema unless adding a new param.
 10. **Don't add comments that describe what the code does.** Only one-line WHY comments when non-obvious. (`CLAUDE.md` § "Tone and style".)
-11. **Conventional commits.** `feat(WINE-68): …`, `refactor(WINE-68): …`, `test(WINE-68): …`. One commit per route migration (Tasks 4-10) plus one per new domain component (Tasks 2-3).
+11. **Conventional commits.** `feat(WINE-189): …`, `refactor(WINE-189): …`, `test(WINE-189): …`. One commit per route migration (Tasks 4-10) plus one per new domain component (Tasks 2-3).
 12. **Figma reference.** Each route has a target design in `docs/figma/<route-name>.png` if Adam has exported it. If the PNG exists, follow it. If not, the per-route §6 description in this plan is the contract.
 
 ---
 
 ## 1. Branch bootstrap
 
-This plan assumes the implementing agent starts on this branch:
+The branch `WINE-189-refactor-catalog-page` already exists locally as an empty / clean branch (no prior commits beyond what's on dev). Check it out and merge the foundation primitives in.
 
-```
-WINE-68-build-wine-catalog-page-with-search-and-filters
-```
+Once WINE-187 lands in dev (its own PR is in flight), the merge from `WINE-187-Foundation-primitives` is unnecessary — `origin/dev` will already contain the primitives.
 
-The branch currently contains stale UI work from earlier in the semester. The dev branch has since replaced all catalog routes with page stubs (WINE-171). **Reset this branch to dev + merge primitives + start fresh.** Old work is preserved in git reflog and remote.
-
-- [ ] **Step 1: Fetch + reset to dev**
+- [ ] **Step 1: Switch to the branch and merge primitives**
 
 ```powershell
 git fetch origin
-git checkout WINE-68-build-wine-catalog-page-with-search-and-filters
-git reset --hard origin/dev
+git checkout WINE-189-refactor-catalog-page
+git merge origin/WINE-187-Foundation-primitives --no-ff -m "merge(WINE-189): bring in WINE-187 foundation primitives"
 ```
 
-- [ ] **Step 2: Merge primitives**
+Expected: clean merge — no conflicts because WINE-187 only added new files in `components/primitives/` and `hooks/`, plus one tiny migration of `routes/-components/ProductPageSkeleton.tsx`.
 
-```powershell
-git merge origin/WINE-187-Foundation-primitives --no-ff -m "merge(WINE-68): bring in WINE-187 foundation primitives"
-```
-
-Expected: clean merge, no conflicts (WINE-187 only added files in `components/primitives/` and `hooks/`, and migrated one file `routes/-components/ProductPageSkeleton.tsx` which dev hasn't touched).
-
-- [ ] **Step 3: Sanity test**
+- [ ] **Step 2: Sanity test**
 
 ```powershell
 bun run --filter web test --run
@@ -66,13 +56,13 @@ bun run --filter web check-types
 
 Expected: web tests pass (190 + skipped), typecheck exit 0.
 
-- [ ] **Step 4: Force-push branch (overwrites the stale remote with the reset)**
+- [ ] **Step 3: Push the branch**
 
 ```powershell
-git push --force-with-lease origin WINE-68-build-wine-catalog-page-with-search-and-filters
+git push -u origin WINE-189-refactor-catalog-page
 ```
 
-Use `--force-with-lease` (not `--force`) so the push refuses if someone else pushed in the meantime. Adam has authorized this destructive op via the branch-reset decision.
+No force-push — branch is new on remote.
 
 ---
 
@@ -89,8 +79,8 @@ Use `--force-with-lease` (not `--force`) so the push refuses if someone else pus
 **Out of scope:**
 
 - Owner-side create/edit forms (`/wines/new`, `/wines/$id/edit`, etc.). Deferred to WINE-XXX owner-forms ticket (P8 in plan suite).
-- Shop owner inventory management. Deferred to WINE-70.
-- Real cart-add UX polish beyond calling `usePostCartsItems`. Deferred to WINE-71.
+- Shop owner inventory management. Deferred to WINE-190.
+- Real cart-add UX polish beyond calling `usePostCartsItems`. Deferred to WINE-192.
 - Image upload / gallery editing. View-only galleries are in scope; uploads are owner-side, deferred.
 - Backend changes. Any `❌ MISSING BE` or `⚠️ verify` from `docs/superpowers/specs/2026-05-08-page-stubs-design.md` §6.3 that turn out to be unimplemented are handed off to BE via a Jira ticket; this plan does NOT add BE code.
 
@@ -289,7 +279,7 @@ export function WineCard({ wine, minPrice }: WineCardProps) { ... }
 - [ ] Implement `WineCard.tsx`.
 - [ ] Run test — passes.
 - [ ] Run `bun run --filter web check-types` — exit 0.
-- [ ] Commit: `feat(WINE-68): add WineCard catalog component`.
+- [ ] Commit: `feat(WINE-189): add WineCard catalog component`.
 
 Refer to WINE-187 Task 1 for exact powershell command shape.
 
@@ -315,7 +305,7 @@ interface ProductCardProps {
 - Price shown directly (no min-price; products have a single price)
 - Shop name in metadata row
 
-**TDD steps:** 4 tests: renders name + price; renders link to `/products/$productId`; renders BUNDLE badge when `isBundle=true`; does NOT render BUNDLE badge when `isBundle=false`. Same TDD loop as Task 2. Commit: `feat(WINE-68): add ProductCard catalog component`.
+**TDD steps:** 4 tests: renders name + price; renders link to `/products/$productId`; renders BUNDLE badge when `isBundle=true`; does NOT render BUNDLE badge when `isBundle=false`. Same TDD loop as Task 2. Commit: `feat(WINE-189): add ProductCard catalog component`.
 
 ---
 
@@ -336,7 +326,7 @@ interface WinemakerCardProps {
 
 **Visual shape:** `<Card variant="catalog">` with `<CatalogPlaceholder text={initials} textClassName="text-4xl">` where `initials = winemaker.name.split(" ").map(w => w[0]).slice(0,2).join("")`.
 
-**TDD steps:** 3 tests. Commit: `feat(WINE-68): add WinemakerCard catalog component`.
+**TDD steps:** 3 tests. Commit: `feat(WINE-189): add WinemakerCard catalog component`.
 
 ---
 
@@ -374,7 +364,7 @@ Headings via `<SectionLabel>` from `components/primitives/section-label.tsx`.
 - [ ] Implement.
 - [ ] Run — passes (target 5 tests).
 - [ ] Typecheck.
-- [ ] Commit: `feat(WINE-68): add CatalogFilters domain component`.
+- [ ] Commit: `feat(WINE-189): add CatalogFilters domain component`.
 
 ---
 
@@ -396,7 +386,7 @@ interface CatalogResultsProps {
 
 Renders a small "X results" caption + `<DataGrid variant="catalog">` wrapping children. If `count === 0`, defers to caller's `<EmptyState>` (this component does not render empty UI — callers check upstream).
 
-**TDD steps:** 2 tests. Commit: `feat(WINE-68): add CatalogResults wrapper`.
+**TDD steps:** 2 tests. Commit: `feat(WINE-189): add CatalogResults wrapper`.
 
 ---
 
@@ -428,7 +418,7 @@ interface WineDetailsCardProps {
       - `<p>{wine.description}</p>` below the list
 - `<ShowOwner ownerUserId={wine.winemaker?.userId}>` block containing Edit and Delete buttons that `Link to="/wines/$id/edit"` and `Link to="/wines/$id/images"`. (Delete is a button, not a link — wires to `useDeleteWinesById` when the form ticket lands; for now button is disabled with title "Wired in WINE-XXX owner-forms".)
 
-**TDD steps:** 5 tests. Critical: assert the owner-gated buttons appear when `useUser` is mocked to match `wine.winemaker.userId`, and don't appear otherwise. Use the same `vi.mock("@/context/UserContext", …)` pattern as WINE-187 Task 9. Commit: `feat(WINE-68): add WineDetailsCard component`.
+**TDD steps:** 5 tests. Critical: assert the owner-gated buttons appear when `useUser` is mocked to match `wine.winemaker.userId`, and don't appear otherwise. Use the same `vi.mock("@/context/UserContext", …)` pattern as WINE-187 Task 9. Commit: `feat(WINE-189): add WineDetailsCard component`.
 
 ---
 
@@ -457,7 +447,7 @@ interface ProductDetailsCardProps {
 - `<Section heading="Wines in this product">` — list `product.productWines.map(pw => pw.wine)` using `<WineCard>` mini-variant (or a custom small layout — TBD per figma)
 - `<ShowOwner ownerUserId={product.shop?.ownerUserId}>` Edit/Delete
 
-**TDD steps:** 5 tests. Commit: `feat(WINE-68): add ProductDetailsCard component`.
+**TDD steps:** 5 tests. Commit: `feat(WINE-189): add ProductDetailsCard component`.
 
 ---
 
@@ -482,7 +472,7 @@ interface WinemakerDetailsCardProps {
 - `<Section heading="Contact">` with `<DescriptionList>` of email, phone, websiteUrl (only render rows whose values exist)
 - `<ShowOwner ownerUserId={winemaker.userId}>` Edit/Images
 
-**TDD steps:** 4 tests. Commit: `feat(WINE-68): add WinemakerDetailsCard component`.
+**TDD steps:** 4 tests. Commit: `feat(WINE-189): add WinemakerDetailsCard component`.
 
 ---
 
@@ -507,7 +497,7 @@ interface SearchSectionProps {
 
 Renders `<Section heading>` + child cards inside `<DataGrid variant="catalog">` + a "View all (N)" `<Link>` button at the bottom. If `count === 0`, renders nothing (caller controls).
 
-**TDD steps:** 3 tests. Commit: `feat(WINE-68): add SearchSection wrapper`.
+**TDD steps:** 3 tests. Commit: `feat(WINE-189): add SearchSection wrapper`.
 
 ---
 
@@ -528,7 +518,7 @@ Renders `<Section heading>` + child cards inside `<DataGrid variant="catalog">` 
   - Filter input updates URL search params
   - Empty state when typing a nonsense query
   - Dark mode parity
-- [ ] **Step 6:** Commit: `feat(WINE-68): migrate /explore route to cascade pattern`.
+- [ ] **Step 6:** Commit: `feat(WINE-189): migrate /explore route to cascade pattern`.
 
 ---
 
@@ -539,7 +529,7 @@ Renders `<Section heading>` + child cards inside `<DataGrid variant="catalog">` 
 
 Replace stub with: `<WineDetailsCard wine={wine}>` + `<WinesAvailableInShops wineId={id}>` (existing) + `<EntityReviewsSection entityType="wine" entityId={id}>` (existing).
 
-Same TDD-then-visual loop as Task 11. Commit: `feat(WINE-68): migrate /wines/$id route to cascade pattern`.
+Same TDD-then-visual loop as Task 11. Commit: `feat(WINE-189): migrate /wines/$id route to cascade pattern`.
 
 ---
 
@@ -548,7 +538,7 @@ Same TDD-then-visual loop as Task 11. Commit: `feat(WINE-68): migrate /wines/$id
 **Files:**
 - Modify: `apps/web/src/routes/products.index.tsx`
 
-Same canonical orchestrator shape as `/explore`, with `<ProductCard>` instead of `<WineCard>`. Filter: `entity="products"`. Commit: `feat(WINE-68): migrate /products route to cascade pattern`.
+Same canonical orchestrator shape as `/explore`, with `<ProductCard>` instead of `<WineCard>`. Filter: `entity="products"`. Commit: `feat(WINE-189): migrate /products route to cascade pattern`.
 
 ---
 
@@ -557,7 +547,7 @@ Same canonical orchestrator shape as `/explore`, with `<ProductCard>` instead of
 **Files:**
 - Modify: `apps/web/src/routes/products.$productId.tsx`
 
-Replace stub with `<ProductDetailsCard product={product} onAddToCart={...} isAddingToCart={...}>` + existing `<ProductReviewsSection>` + existing `<ProductRelatedSection>`. Wire `onAddToCart` to `usePostCartsItems`. Commit: `feat(WINE-68): migrate /products/$productId route to cascade pattern`.
+Replace stub with `<ProductDetailsCard product={product} onAddToCart={...} isAddingToCart={...}>` + existing `<ProductReviewsSection>` + existing `<ProductRelatedSection>`. Wire `onAddToCart` to `usePostCartsItems`. Commit: `feat(WINE-189): migrate /products/$productId route to cascade pattern`.
 
 ---
 
@@ -566,7 +556,7 @@ Replace stub with `<ProductDetailsCard product={product} onAddToCart={...} isAdd
 **Files:**
 - Modify: `apps/web/src/routes/winemakers.index.tsx`
 
-Same canonical orchestrator. Filter: `entity="winemakers"`. Cards: `<WinemakerCard>`. Commit: `feat(WINE-68): migrate /winemakers route to cascade pattern`.
+Same canonical orchestrator. Filter: `entity="winemakers"`. Cards: `<WinemakerCard>`. Commit: `feat(WINE-189): migrate /winemakers route to cascade pattern`.
 
 ---
 
@@ -575,7 +565,7 @@ Same canonical orchestrator. Filter: `entity="winemakers"`. Cards: `<WinemakerCa
 **Files:**
 - Modify: `apps/web/src/routes/winemakers.$id.tsx`
 
-Replace stub with `<WinemakerDetailsCard winemaker={...}>` + `<DataGrid variant="catalog">` of their `<WineCard>`s (from `useGetWines?winemakerId={id}`) + their events list (from `useGetEvents?winemakerId={id}`, rendered with existing `<EventCard>`) + `<EntityReviewsSection entityType="winemaker">`. Commit: `feat(WINE-68): migrate /winemakers/$id route to cascade pattern`.
+Replace stub with `<WinemakerDetailsCard winemaker={...}>` + `<DataGrid variant="catalog">` of their `<WineCard>`s (from `useGetWines?winemakerId={id}`) + their events list (from `useGetEvents?winemakerId={id}`, rendered with existing `<EventCard>`) + `<EntityReviewsSection entityType="winemaker">`. Commit: `feat(WINE-189): migrate /winemakers/$id route to cascade pattern`.
 
 ---
 
@@ -591,7 +581,7 @@ Compose 5 hooks in parallel: `useGetWines({ q })`, `useGetProducts({ q })`, `use
 
 If any hook does NOT accept `?q=` (per audit): note under §10 BE backlog and SKIP that section in this migration (do not render a broken hook call).
 
-Commit: `feat(WINE-68): migrate /search route to composite cascade`.
+Commit: `feat(WINE-189): migrate /search route to composite cascade`.
 
 ---
 
@@ -608,9 +598,9 @@ For each file in §4.4 marked "KEEP, migrate violations":
   - Inline static `style={{}}` → Tailwind classes.
 - [ ] **Step 3:** Run `bun run --filter web test --run` after every 2-3 files (don't wait until the end).
 - [ ] **Step 4:** Run `bun run --filter web check-types` after every 2-3 files.
-- [ ] **Step 5:** When all KEEP files clean, commit: `refactor(WINE-68): migrate kept route-private components to primitives and tokens`.
+- [ ] **Step 5:** When all KEEP files clean, commit: `refactor(WINE-189): migrate kept route-private components to primitives and tokens`.
 
-If a file is too big to audit safely in one pass (>200 lines), commit per file with `refactor(WINE-68): migrate <ComponentName> to primitives`.
+If a file is too big to audit safely in one pass (>200 lines), commit per file with `refactor(WINE-189): migrate <ComponentName> to primitives`.
 
 ---
 
@@ -624,7 +614,7 @@ After all routes are migrated:
 - [ ] `git rm apps/web/src/routes/-components/ProductImagePlaceholder.tsx`
 - [ ] Run `bun run --filter web check-types` — must pass (callers of these files were updated in Tasks 11-17).
 - [ ] Run `bun run --filter web test --run` — must pass.
-- [ ] Commit: `chore(WINE-68): remove obsolete route-private catalog components`.
+- [ ] Commit: `chore(WINE-189): remove obsolete route-private catalog components`.
 
 ---
 
@@ -642,7 +632,7 @@ After all routes are migrated:
   - `/winemakers/<id>`
   - `/search?q=ri` (or similar)
   - For each: loading, error, empty-results, success, dark mode.
-- [ ] Commit count check: ≥17 commits prefixed `feat(WINE-68):` / `refactor(WINE-68):` / `chore(WINE-68):`.
+- [ ] Commit count check: ≥17 commits prefixed `feat(WINE-189):` / `refactor(WINE-189):` / `chore(WINE-189):`.
 
 ---
 
@@ -718,7 +708,7 @@ For each route, the spec below is the contract until a figma PNG lands in `docs/
 
 - **Existing route-private components may have undiscovered violations** (legacy `bg-gray-*`, lucide imports, hand-rolled skeletons). Task 18 catches them, but Adam should sanity-check the audit pass commit before merging.
 - **The `?q=` and `?winemakerId=`, `?isBundle=` filters on Orval list hooks are not all confirmed wired on BE.** Plan assumes they exist per spec §6.3. If a filter param is silently ignored by the API, the FE will still render but the filter won't actually narrow results. Acceptable for milestone visibility — flag missing filters in `docs/UI_AUDIT.md`.
-- **Cart-add UX is minimal.** No optimistic update, no toast, no quantity picker on the product detail page. Add-to-cart is a single button. Polishing is deferred to WINE-71 cart cluster.
+- **Cart-add UX is minimal.** No optimistic update, no toast, no quantity picker on the product detail page. Add-to-cart is a single button. Polishing is deferred to WINE-192 cart cluster.
 - **Search-page composition is unoptimized.** 5 parallel queries on every keystroke (debounced ~300ms via `use-debounce` from `@/hooks`). If the page feels janky, debounce duration is the first knob.
 - **Owner-gating depends on hooks returning `winemaker.userId` / `shop.ownerUserId`.** If those fields aren't on the response shape (BE gap), `<ShowOwner>` will silently render nothing. Add a runtime warning console.warn in `WineDetailsCard` / `ProductDetailsCard` / `WinemakerDetailsCard` when these fields are missing.
 
@@ -735,7 +725,7 @@ The plan is complete when:
 5. `bun run --filter web test --run` passes.
 6. `bun run --filter web check-types` exits 0.
 7. Adam visually confirms all 7 routes in light + dark mode.
-8. The branch has ≥17 commits prefixed `feat(WINE-68):` / `refactor(WINE-68):` / `chore(WINE-68):`.
+8. The branch has ≥17 commits prefixed `feat(WINE-189):` / `refactor(WINE-189):` / `chore(WINE-189):`.
 
 ---
 
