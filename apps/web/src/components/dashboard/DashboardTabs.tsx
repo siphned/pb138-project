@@ -6,7 +6,6 @@ import { AdminUsersTab } from "@/components/dashboard/tabs/AdminUsersTab";
 import { CustomerEventsTab } from "@/components/dashboard/tabs/CustomerEventsTab";
 import { CustomerOrdersTab } from "@/components/dashboard/tabs/CustomerOrdersTab";
 import { ShopOwnerBundlesTab } from "@/components/dashboard/tabs/ShopOwnerBundlesTab";
-import { ShopOwnerInventoryTab } from "@/components/dashboard/tabs/ShopOwnerInventoryTab";
 import { ShopOwnerOrdersTab } from "@/components/dashboard/tabs/ShopOwnerOrdersTab";
 import { ShopOwnerShopsTab } from "@/components/dashboard/tabs/ShopOwnerShopsTab";
 import { ShopSelector } from "@/components/dashboard/tabs/ShopSelector";
@@ -46,14 +45,9 @@ export function DashboardTabs() {
       const shopId = selectedShopId === "all" ? undefined : selectedShopId;
       return [
         {
-          content: <ShopOwnerShopsTab />,
+          content: <ShopOwnerShopsTab shopId={shopId} />,
           label: "My Shops",
           value: "shops",
-        },
-        {
-          content: <ShopOwnerInventoryTab shopId={shopId} />,
-          label: "Inventory",
-          value: "inventory",
         },
         {
           content: <ShopOwnerBundlesTab shopId={shopId} />,

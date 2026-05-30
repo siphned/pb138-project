@@ -1,4 +1,7 @@
 import { Link } from "@tanstack/react-router";
+import { Button } from "@/components/ui/button";
+import { Separator } from "@/components/ui/separator";
+import { useGetShopsByIdProducts } from "@/generated/hooks/useGetShopsByIdProducts";
 import { useGetShopsMe } from "@/generated/hooks/useGetShopsMe";
 import { TabPreviewShell } from "./TabPreviewShell";
 
@@ -8,45 +11,142 @@ interface ShopRow {
   address?: { city?: string; country?: string };
 }
 
-export function ShopOwnerShopsTab() {
-  const query = useGetShopsMe();
-  const rows = (Array.isArray(query.data) ? query.data : []) as ShopRow[];
-  const shops = rows.slice(0, 10);
-  const hasMore = rows.length > 10;
+interface ProductRow {
+  id: string;
+  name: string;
+  quantity?: number;
+  isBundle?: boolean;
+  shopId?: string;
+}
+
+interface ShopOwnerShopsTabProps {
+  /** Specific shop id, or undefined for "all shops" mode. */
+  shopId?: string;
+}
+
+export function ShopOwnerShopsTab({ shopId }: ShopOwnerShopsTabProps) {
+  const me = useGetShopsMe();
+  const allShops = (Array.isArray(me.data) ? me.data : []) as ShopRow[];
+  const fallbackShopId = !shopId ? allShops[0]?.id : undefined;
+  const effectiveShopId = shopId ?? fallbackShopId;
+
+  const inventoryQuery = useGetShopsByIdProducts(
+    effectiveShopId ?? "",
+    {},
+    { query: { enabled: !!effectiveShopId } }
+  );
+
+  const inventoryList = ((inventoryQuery.data as { data?: ProductRow[] } | undefined)?.data ??
+    []) as ProductRow[];
+  const products = inventoryList.slice(0, 10);
+  const hasMoreInventory = inventoryList.length > 10;
+
+  const shopsToShow = allShops.slice(0, 10);
+  const hasMoreShops = allShops.length > 10;
+
+  const selectedShop = effectiveShopId
+    ? allShops.find((s) => s.id === effectiveShopId)
+    : undefined;
 
   return (
-    <TabPreviewShell
-      createLabel="+ Create shop"
-      createTo="/shops/new"
-      emptyDescription="Create your first shop to start selling wine."
-      emptyTitle="No shops yet"
-      hasMore={hasMore}
-      isEmpty={!query.isLoading && shops.length === 0}
-      isError={query.isError}
-      isLoading={query.isLoading}
-      onRetry={() => query.refetch()}
-      viewAllTo="/shops"
-    >
-      <ul className="divide-y divide-border rounded-md border border-border">
-        {shops.map((s) => (
-          <li className="flex items-center justify-between gap-4 p-4" key={s.id}>
-            <div className="min-w-0 flex-1">
-              <Link
-                className="font-medium text-foreground hover:text-primary"
-                params={{ id: s.id }}
-                to="/shops/$id"
-              >
-                {s.name}
-              </Link>
-              {s.address && (
-                <p className="text-xs text-muted-foreground">
-                  {[s.address.city, s.address.country].filter(Boolean).join(", ")}
-                </p>
+    <div className="space-y-8">
+      {/* Shops list */}
+      <TabPreviewShell
+        createLabel="+ Create shop"
+        createTo="/shops/new"
+        emptyDescription="Create your first shop to start selling wine."
+        emptyTitle="No shops yet"
+        hasMore={hasMoreShops}
+        isEmpty={!me.isLoading && allShops.length === 0}
+        isError={me.isError}
+        isLoading={me.isLoading}
+        onRetry={() => me.refetch()}
+        viewAllTo="/shops"
+      >
+        <ul className="divide-y divide-border rounded-md border border-border">
+          {shopsToShow.map((s) => (
+            <li className="flex items-center justify-between gap-4 p-4" key={s.id}>
+              <div className="min-w-0 flex-1">
+                <Link
+                  className="font-medium text-foreground hover:text-primary"
+                  params={{ id: s.id }}
+                  to="/shops/$id"
+                >
+                  {s.name}
+                </Link>
+                {s.address && (
+                  <p className="text-xs text-muted-foreground">
+                    {[s.address.city, s.address.country].filter(Boolean).join(", ")}
+                  </p>
+                )}
+              </div>
+            </li>
+          ))}
+        </ul>
+      </TabPreviewShell>
+
+      {/* Inventory for the selected (or first) shop */}
+      {allShops.length > 0 && (
+        <>
+          <Separator />
+          <div className="space-y-3">
+            <div className="flex items-center justify-between gap-4">
+              <h3 className="text-sm font-bold uppercase tracking-widest text-muted-foreground">
+                Inventory{selectedShop ? ` · ${selectedShop.name}` : ""}
+              </h3>
+              {effectiveShopId && (
+                <Button
+                  render={
+                    <Link
+                      params={{ id: effectiveShopId }}
+                      search={{ isBundle: undefined }}
+                      to="/shops/$id/inventory/new"
+                    />
+                  }
+                  size="sm"
+                >
+                  + Add product
+                </Button>
               )}
             </div>
-          </li>
-        ))}
-      </ul>
-    </TabPreviewShell>
+
+            <TabPreviewShell
+              emptyDescription="Add products or multi-wine bundles to this shop's catalog."
+              emptyTitle="No products yet"
+              hasMore={hasMoreInventory}
+              isEmpty={!inventoryQuery.isLoading && products.length === 0}
+              isError={inventoryQuery.isError}
+              isLoading={inventoryQuery.isLoading}
+              onRetry={() => inventoryQuery.refetch()}
+              viewAllTo={
+                effectiveShopId
+                  ? (`/shops/${effectiveShopId}/inventory` as never)
+                  : undefined
+              }
+            >
+              <ul className="divide-y divide-border rounded-md border border-border">
+                {products.map((p) => (
+                  <li className="flex items-center justify-between gap-4 p-4" key={p.id}>
+                    <div className="min-w-0 flex-1">
+                      <Link
+                        className="font-medium text-foreground hover:text-primary"
+                        params={{ productId: p.id }}
+                        to="/products/$productId"
+                      >
+                        {p.name}
+                      </Link>
+                      <p className="text-xs text-muted-foreground">
+                        {p.isBundle ? "Bundle" : "Product"}
+                        {p.quantity !== undefined && ` · ${p.quantity} in stock`}
+                      </p>
+                    </div>
+                  </li>
+                ))}
+              </ul>
+            </TabPreviewShell>
+          </div>
+        </>
+      )}
+    </div>
   );
 }

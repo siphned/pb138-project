@@ -20,16 +20,24 @@ export const Route = createFileRoute("/_authenticated/stats")({
 function StatsStub() {
   const { user } = useUser();
   const roles = user?.roles ?? [];
+  const isWinemaker = roles.includes(Role.winemaker);
+  const isShopOwner = roles.includes(Role.shopOwner);
+  const isAdmin = roles.includes(Role.admin);
 
   const userQuery = useGetUsersMe();
-  const myWinesQuery = useGetWines();
-  const myEventsQuery = useGetEvents();
-  const myShopsQuery = useGetShops();
-  const supplyQuery = useGetSupplyAgreementsWinemaker();
-  const adminUsersQuery = useGetAdminUsers();
-  const adminRoleReqQuery = useGetRoleRequests();
-  const adminEventsQuery = useGetAdminEvents();
-  const adminReviewsQuery = useGetAdminReviews();
+  // Winemaker-only queries
+  const myWinesQuery = useGetWines({}, { query: { enabled: isWinemaker } });
+  const myEventsQuery = useGetEvents({}, { query: { enabled: isWinemaker } });
+  const supplyQuery = useGetSupplyAgreementsWinemaker({
+    query: { enabled: isWinemaker },
+  });
+  // Shop-owner-only queries
+  const myShopsQuery = useGetShops({}, { query: { enabled: isShopOwner } });
+  // Admin-only queries
+  const adminUsersQuery = useGetAdminUsers({}, { query: { enabled: isAdmin } });
+  const adminRoleReqQuery = useGetRoleRequests({ query: { enabled: isAdmin } });
+  const adminEventsQuery = useGetAdminEvents({}, { query: { enabled: isAdmin } });
+  const adminReviewsQuery = useGetAdminReviews({}, { query: { enabled: isAdmin } });
 
   return (
     <StubPage
@@ -43,7 +51,7 @@ function StatsStub() {
         query={userQuery}
         title="Customer: my profile"
       />
-      {roles.includes(Role.winemaker) && (
+      {isWinemaker && (
         <>
           <StubGet
             actorRole="winemaker"
@@ -65,7 +73,7 @@ function StatsStub() {
           />
         </>
       )}
-      {roles.includes(Role.shopOwner) && (
+      {isShopOwner && (
         <StubGet
           actorRole="shop_owner"
           hookName="useGetShops (filter ownerUserId=me — verify BE)"
@@ -73,7 +81,7 @@ function StatsStub() {
           title="Shop owner: my shops"
         />
       )}
-      {roles.includes(Role.admin) && (
+      {isAdmin && (
         <>
           <StubGet
             actorRole="admin"
