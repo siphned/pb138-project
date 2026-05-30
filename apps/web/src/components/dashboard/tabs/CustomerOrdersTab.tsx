@@ -9,10 +9,6 @@ interface OrderRow {
   createdAt?: string | number;
 }
 
-interface ShopOwnerOrdersTabProps {
-  shopId?: string;
-}
-
 function formatDate(value?: string | number) {
   if (!value) return null;
   return new Date(value).toLocaleDateString("en-US", {
@@ -22,9 +18,8 @@ function formatDate(value?: string | number) {
   });
 }
 
-export function ShopOwnerOrdersTab({ shopId }: ShopOwnerOrdersTabProps) {
-  const query = useGetOrders({ shopId });
-
+export function CustomerOrdersTab() {
+  const query = useGetOrders();
   const raw = query.data;
   const list = (Array.isArray(raw)
     ? raw
@@ -34,11 +29,7 @@ export function ShopOwnerOrdersTab({ shopId }: ShopOwnerOrdersTabProps) {
 
   return (
     <TabPreviewShell
-      emptyDescription={
-        shopId
-          ? "Orders to this shop will appear here."
-          : "Orders to your shops will appear here."
-      }
+      emptyDescription="Orders you place will appear here."
       emptyTitle="No orders yet"
       hasMore={hasMore}
       isEmpty={!query.isLoading && orders.length === 0}

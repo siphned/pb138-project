@@ -1,14 +1,14 @@
 import { Link } from "@tanstack/react-router";
-import { useGetEvents } from "@/generated/hooks/useGetEvents";
-import { useGetWinemakersMe } from "@/generated/hooks/useGetWinemakersMe";
+import { useGetAdminEvents } from "@/generated/hooks/useGetAdminEvents";
 import { TabPreviewShell } from "./TabPreviewShell";
 
-interface EventRow {
+interface AdminEventRow {
   id: string;
   name?: string;
   title?: string;
+  status?: string;
   startTime?: string | Date;
-  startDate?: string | Date;
+  winemaker?: { name?: string };
 }
 
 function formatDate(value?: string | Date) {
@@ -20,38 +20,30 @@ function formatDate(value?: string | Date) {
   });
 }
 
-export function WinemakerEventsTab() {
-  const me = useGetWinemakersMe();
-  const query = useGetEvents(
-    { winemakerId: me.data?.id ?? undefined },
-    { query: { enabled: !!me.data?.id } }
-  );
-
-  const list = (() => {
-    const raw = query.data;
-    if (Array.isArray(raw)) return raw as EventRow[];
-    return ((raw as { data?: EventRow[] } | undefined)?.data ?? []) as EventRow[];
-  })();
+export function AdminEventApprovalsTab() {
+  const query = useGetAdminEvents({ status: "pending" });
+  const raw = query.data;
+  const list = (Array.isArray(raw)
+    ? raw
+    : ((raw as { data?: AdminEventRow[] } | undefined)?.data ?? [])) as AdminEventRow[];
   const events = list.slice(0, 10);
   const hasMore = list.length > 10;
 
   return (
     <TabPreviewShell
-      createLabel="Schedule Event"
-      createTo="/events/new"
-      emptyDescription="Tasting events you host will show up here."
-      emptyTitle="No events scheduled"
+      emptyDescription="Events submitted by winemakers awaiting your approval will appear here."
+      emptyTitle="No pending events"
       hasMore={hasMore}
       isEmpty={!query.isLoading && events.length === 0}
       isError={query.isError}
-      isLoading={query.isLoading || me.isLoading}
+      isLoading={query.isLoading}
       onRetry={() => query.refetch()}
       viewAllTo="/events"
     >
       <ul className="divide-y divide-border rounded-md border border-border">
         {events.map((ev) => {
           const title = ev.title ?? ev.name ?? "Untitled event";
-          const date = formatDate(ev.startTime ?? ev.startDate);
+          const date = formatDate(ev.startTime);
           return (
             <li className="flex items-center justify-between gap-4 p-4" key={ev.id}>
               <div className="min-w-0 flex-1">
@@ -62,7 +54,9 @@ export function WinemakerEventsTab() {
                 >
                   {title}
                 </Link>
-                {date && <p className="text-xs text-muted-foreground">{date}</p>}
+                <p className="text-xs text-muted-foreground">
+                  {[ev.winemaker?.name, date, ev.status].filter(Boolean).join(" · ")}
+                </p>
               </div>
             </li>
           );

@@ -8,7 +8,6 @@ import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 
 interface TabPreviewShellProps {
-  /** TanStack Router URL string used for both the "View all" CTA and the optional "Create new" CTA. */
   viewAllTo?: string;
   viewAllLabel?: string;
   createTo?: string;
@@ -19,6 +18,8 @@ interface TabPreviewShellProps {
   isEmpty?: boolean;
   emptyTitle?: string;
   emptyDescription?: string;
+  /** Whether more items exist beyond the 10 shown — drives the "View all" CTA. */
+  hasMore?: boolean;
   children?: ReactNode;
 }
 
@@ -33,23 +34,18 @@ export function TabPreviewShell({
   isEmpty,
   emptyTitle = "Nothing here yet",
   emptyDescription,
+  hasMore,
   children,
 }: TabPreviewShellProps) {
+  const showViewAllAtBottom = !!viewAllTo && !!hasMore && !isLoading && !isError && !isEmpty;
+
   return (
     <div className="space-y-4">
-      {(viewAllTo || createTo) && (
-        <div className="flex flex-wrap justify-end gap-2">
-          {createTo && createLabel && (
-            <Button render={<Link to={createTo} />} size="sm">
-              {createLabel}
-            </Button>
-          )}
-          {viewAllTo && (
-            <Button render={<Link to={viewAllTo} />} size="sm" variant="outline">
-              {viewAllLabel}
-              <HugeiconsIcon className="ml-2 h-3.5 w-3.5" icon={ArrowRight01Icon} />
-            </Button>
-          )}
+      {createTo && createLabel && (
+        <div className="flex justify-end">
+          <Button render={<Link to={createTo} />} size="sm">
+            {createLabel}
+          </Button>
         </div>
       )}
 
@@ -69,6 +65,15 @@ export function TabPreviewShell({
         <EmptyState description={emptyDescription} title={emptyTitle} />
       ) : (
         children
+      )}
+
+      {showViewAllAtBottom && (
+        <div className="flex justify-center pt-2">
+          <Button render={<Link to={viewAllTo} />} size="sm" variant="outline">
+            {viewAllLabel}
+            <HugeiconsIcon className="ml-2 h-3.5 w-3.5" icon={ArrowRight01Icon} />
+          </Button>
+        </div>
       )}
     </div>
   );

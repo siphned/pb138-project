@@ -14,12 +14,14 @@ export function WinemakerBundlesTab() {
   const query = useGetProducts({ isBundle: true });
 
   const list = ((query.data as { data?: BundleRow[] } | undefined)?.data ?? []) as BundleRow[];
-  const bundles = list.slice(0, 5);
+  const bundles = list.slice(0, 10);
+  const hasMore = list.length > 10;
 
   return (
     <TabPreviewShell
       emptyDescription="Bundles featuring your wines will appear here when shop owners create them."
       emptyTitle="No bundles yet"
+      hasMore={hasMore}
       isEmpty={!query.isLoading && bundles.length === 0}
       isError={query.isError}
       isLoading={query.isLoading}

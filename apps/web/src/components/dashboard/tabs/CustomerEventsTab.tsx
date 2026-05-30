@@ -1,6 +1,5 @@
 import { Link } from "@tanstack/react-router";
 import { useGetEvents } from "@/generated/hooks/useGetEvents";
-import { useGetWinemakersMe } from "@/generated/hooks/useGetWinemakersMe";
 import { TabPreviewShell } from "./TabPreviewShell";
 
 interface EventRow {
@@ -9,6 +8,7 @@ interface EventRow {
   title?: string;
   startTime?: string | Date;
   startDate?: string | Date;
+  isRegisteredByMe?: boolean;
 }
 
 function formatDate(value?: string | Date) {
@@ -20,31 +20,25 @@ function formatDate(value?: string | Date) {
   });
 }
 
-export function WinemakerEventsTab() {
-  const me = useGetWinemakersMe();
-  const query = useGetEvents(
-    { winemakerId: me.data?.id ?? undefined },
-    { query: { enabled: !!me.data?.id } }
-  );
-
-  const list = (() => {
-    const raw = query.data;
+export function CustomerEventsTab() {
+  const query = useGetEvents();
+  const raw = query.data;
+  const all = (() => {
     if (Array.isArray(raw)) return raw as EventRow[];
     return ((raw as { data?: EventRow[] } | undefined)?.data ?? []) as EventRow[];
   })();
-  const events = list.slice(0, 10);
-  const hasMore = list.length > 10;
+  const registered = all.filter((e) => e.isRegisteredByMe);
+  const events = registered.slice(0, 10);
+  const hasMore = registered.length > 10;
 
   return (
     <TabPreviewShell
-      createLabel="Schedule Event"
-      createTo="/events/new"
-      emptyDescription="Tasting events you host will show up here."
-      emptyTitle="No events scheduled"
+      emptyDescription="Events you register for will show up here."
+      emptyTitle="No registered events"
       hasMore={hasMore}
       isEmpty={!query.isLoading && events.length === 0}
       isError={query.isError}
-      isLoading={query.isLoading || me.isLoading}
+      isLoading={query.isLoading}
       onRetry={() => query.refetch()}
       viewAllTo="/events"
     >

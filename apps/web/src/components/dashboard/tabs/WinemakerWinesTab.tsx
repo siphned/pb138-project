@@ -20,7 +20,9 @@ export function WinemakerWinesTab() {
     { query: { enabled: !!winemakerId } }
   );
 
-  const wines = (Array.isArray(query.data) ? query.data : []).slice(0, 5) as WineRow[];
+  const rows = (Array.isArray(query.data) ? query.data : []) as WineRow[];
+  const wines = rows.slice(0, 10);
+  const hasMore = rows.length > 10;
 
   return (
     <TabPreviewShell
@@ -28,6 +30,7 @@ export function WinemakerWinesTab() {
       createTo="/wines/new"
       emptyDescription="Your wines will appear here once you add them."
       emptyTitle="No wines yet"
+      hasMore={hasMore}
       isEmpty={!query.isLoading && wines.length === 0}
       isError={query.isError}
       isLoading={query.isLoading || me.isLoading}

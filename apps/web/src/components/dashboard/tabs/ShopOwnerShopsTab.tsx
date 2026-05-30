@@ -10,7 +10,9 @@ interface ShopRow {
 
 export function ShopOwnerShopsTab() {
   const query = useGetShopsMe();
-  const shops = (Array.isArray(query.data) ? query.data : []).slice(0, 5) as ShopRow[];
+  const rows = (Array.isArray(query.data) ? query.data : []) as ShopRow[];
+  const shops = rows.slice(0, 10);
+  const hasMore = rows.length > 10;
 
   return (
     <TabPreviewShell
@@ -18,6 +20,7 @@ export function ShopOwnerShopsTab() {
       createTo="/shops/new"
       emptyDescription="Create your first shop to start selling wine."
       emptyTitle="No shops yet"
+      hasMore={hasMore}
       isEmpty={!query.isLoading && shops.length === 0}
       isError={query.isError}
       isLoading={query.isLoading}

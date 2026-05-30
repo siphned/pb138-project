@@ -29,16 +29,23 @@ export function ShopOwnerInventoryTab({ shopId }: ShopOwnerInventoryTabProps) {
   );
 
   const list = ((query.data as { data?: ProductRow[] } | undefined)?.data ?? []) as ProductRow[];
-  const products = list.slice(0, 5);
+  const products = list.slice(0, 10);
+  const hasMore = list.length > 10;
 
   return (
     <TabPreviewShell
       emptyDescription="Add products or multi-wine bundles to your shop's catalog."
       emptyTitle="No products yet"
+      hasMore={hasMore}
       isEmpty={!query.isLoading && !!effectiveShopId && products.length === 0}
       isError={query.isError}
       isLoading={query.isLoading || me.isLoading}
       onRetry={() => query.refetch()}
+      viewAllTo={
+        effectiveShopId
+          ? (`/shops/${effectiveShopId}/inventory` as never)
+          : undefined
+      }
     >
       {effectiveShopId ? (
         <>
