@@ -2,6 +2,7 @@ import { UserProfile } from "@clerk/react";
 import { ArrowLeft02Icon } from "@hugeicons/core-free-icons";
 import { HugeiconsIcon } from "@hugeicons/react";
 import { createFileRoute, Link } from "@tanstack/react-router";
+import { DashboardRoleSection } from "@/components/dashboard/DashboardRoleSection";
 import { ProfileEditForm } from "@/components/dashboard/ProfileEditForm";
 import { ErrorState } from "@/components/primitives/error-state";
 import { LoadingState } from "@/components/primitives/loading-state";
@@ -51,6 +52,10 @@ function SettingsPage() {
             />
           </CardContent>
         </Card>
+      </Section>
+
+      <Section heading="Roles">
+        <DashboardRoleSection />
       </Section>
 
       <Section heading="Default addresses">

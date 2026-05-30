@@ -22,35 +22,29 @@ export function DashboardProfileCard() {
   return (
     <Card variant="section">
       <CardContent className="p-6">
-        <div className="flex flex-col gap-6 md:flex-row md:items-start md:justify-between">
-          <div className="flex flex-col gap-4 sm:flex-row sm:items-start">
-            <Avatar className="h-20 w-20">
-              <AvatarImage alt={fullName} src={clerkUser?.imageUrl} />
-              <AvatarFallback className="bg-primary text-2xl font-heading font-bold text-primary-foreground">
-                {initials}
-              </AvatarFallback>
-            </Avatar>
+        <div className="flex flex-col items-center gap-4 text-center">
+          <Avatar className="h-24 w-24">
+            <AvatarImage alt={fullName} src={clerkUser?.imageUrl} />
+            <AvatarFallback className="bg-primary text-2xl font-heading font-bold text-primary-foreground">
+              {initials}
+            </AvatarFallback>
+          </Avatar>
 
-            <div className="space-y-2">
-              <h2 className="font-heading text-2xl font-bold leading-tight text-foreground">
-                {fullName}
-              </h2>
-              <p className="text-sm text-muted-foreground">{user.email}</p>
-              <div className="flex flex-wrap gap-2 pt-1">
-                <Badge variant="secondary">{activeRole}</Badge>
-                {user.roles.length > 1 && (
-                  <Badge variant="outline">{user.roles.length} roles</Badge>
-                )}
-              </div>
-            </div>
+          <div className="space-y-2">
+            <h2 className="font-heading text-2xl font-bold leading-tight text-foreground">
+              {fullName}
+            </h2>
+            <p className="text-sm text-muted-foreground">{user.email}</p>
           </div>
 
-          <Button
-            className="self-start"
-            render={<Link to="/settings" />}
-            size="sm"
-            variant="outline"
-          >
+          <div className="flex flex-wrap justify-center gap-2">
+            <Badge variant="secondary">{activeRole}</Badge>
+            {user.roles.length > 1 && (
+              <Badge variant="outline">{user.roles.length} roles</Badge>
+            )}
+          </div>
+
+          <Button render={<Link to="/settings" />} size="sm" variant="outline">
             <HugeiconsIcon className="mr-2 h-4 w-4" icon={Settings01Icon} />
             Edit Profile
           </Button>

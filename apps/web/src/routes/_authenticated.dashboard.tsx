@@ -1,7 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { DashboardProfileCard } from "@/components/dashboard/DashboardProfileCard";
 import { DashboardQuickStats } from "@/components/dashboard/DashboardQuickStats";
-import { DashboardRoleSection } from "@/components/dashboard/DashboardRoleSection";
 import { DashboardTabs } from "@/components/dashboard/DashboardTabs";
 import { Section } from "@/components/primitives/section";
 
@@ -19,10 +18,6 @@ function DashboardPage() {
       </Section>
 
       <DashboardTabs />
-
-      <Section heading="Roles">
-        <DashboardRoleSection />
-      </Section>
     </div>
   );
 }
