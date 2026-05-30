@@ -2,13 +2,14 @@ import type { ReactNode } from "react";
 import { useState } from "react";
 import { AdminEventApprovalsTab } from "@/components/dashboard/tabs/AdminEventApprovalsTab";
 import { AdminRoleRequestsTab } from "@/components/dashboard/tabs/AdminRoleRequestsTab";
+import { AdminUsersTab } from "@/components/dashboard/tabs/AdminUsersTab";
 import { CustomerEventsTab } from "@/components/dashboard/tabs/CustomerEventsTab";
 import { CustomerOrdersTab } from "@/components/dashboard/tabs/CustomerOrdersTab";
+import { ShopOwnerBundlesTab } from "@/components/dashboard/tabs/ShopOwnerBundlesTab";
 import { ShopOwnerInventoryTab } from "@/components/dashboard/tabs/ShopOwnerInventoryTab";
 import { ShopOwnerOrdersTab } from "@/components/dashboard/tabs/ShopOwnerOrdersTab";
 import { ShopOwnerShopsTab } from "@/components/dashboard/tabs/ShopOwnerShopsTab";
 import { ShopSelector } from "@/components/dashboard/tabs/ShopSelector";
-import { WinemakerBundlesTab } from "@/components/dashboard/tabs/WinemakerBundlesTab";
 import { WinemakerEventsTab } from "@/components/dashboard/tabs/WinemakerEventsTab";
 import { WinemakerWinesTab } from "@/components/dashboard/tabs/WinemakerWinesTab";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -34,13 +35,8 @@ export function DashboardTabs() {
           value: "wines",
         },
         {
-          content: <WinemakerBundlesTab />,
-          label: "Bundles",
-          value: "bundles",
-        },
-        {
           content: <WinemakerEventsTab />,
-          label: "Tasting Events",
+          label: "My Events",
           value: "events",
         },
       ];
@@ -58,6 +54,11 @@ export function DashboardTabs() {
           content: <ShopOwnerInventoryTab shopId={shopId} />,
           label: "Inventory",
           value: "inventory",
+        },
+        {
+          content: <ShopOwnerBundlesTab shopId={shopId} />,
+          label: "Bundles",
+          value: "bundles",
         },
         {
           content: <ShopOwnerOrdersTab shopId={shopId} />,
@@ -78,6 +79,11 @@ export function DashboardTabs() {
           content: <AdminEventApprovalsTab />,
           label: "Event Approvals",
           value: "event-approvals",
+        },
+        {
+          content: <AdminUsersTab />,
+          label: "Users",
+          value: "users",
         },
       ];
     }
