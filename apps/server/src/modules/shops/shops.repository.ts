@@ -49,10 +49,15 @@ export async function findAll(
   return filtered;
 }
 
-export async function findAllByOwnerUserId(db: Database, ownerUserId: string): Promise<Shop[]> {
-  return db.query.shops.findMany({
+export async function findAllByOwnerUserId(
+  db: Database,
+  ownerUserId: string
+): Promise<ShopWithAddress[]> {
+  const rows = await db.query.shops.findMany({
     where: and(eq(shops.ownerUserId, ownerUserId), isNull(shops.deletedAt)),
+    with: { address: true },
   });
+  return rows.filter((r) => r.address && !r.address.deletedAt) as ShopWithAddress[];
 }
 
 export async function findById(db: Database, id: string): Promise<ShopWithAddress | undefined> {
