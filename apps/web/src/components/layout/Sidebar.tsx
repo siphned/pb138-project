@@ -1,12 +1,15 @@
 import { Show, useAuth, useClerk, useUser as useClerkUser } from "@clerk/react";
 import {
   Calendar01Icon,
+  CheckmarkCircle01Icon,
   ChartBarLineIcon,
+  InboxIcon,
   LogoutSquare02Icon,
   Menu01Icon,
   Moon01Icon,
   Package01Icon,
   Search01Icon,
+  ShoppingBag01Icon,
   ShoppingCart02Icon,
   Store01Icon,
   Sun01Icon,
@@ -282,7 +285,7 @@ function RoleNavItems({
     return (
       <>
         <NavItem onClick={closeSheet} render={<Link to="/orders" />} variant="active">
-          <HugeiconsIcon icon={Package01Icon} /> Order History
+          <HugeiconsIcon icon={ShoppingBag01Icon} /> My Orders
         </NavItem>
         <NavItem onClick={closeSheet} render={<Link to="/events" />} variant="active">
           <HugeiconsIcon icon={Calendar01Icon} /> My Events
@@ -322,14 +325,53 @@ function RoleNavItems({
         >
           <HugeiconsIcon icon={Store01Icon} /> My Shops
         </NavItem>
+        {firstShopId && (
+          <NavItem
+            onClick={closeSheet}
+            render={
+              <Link
+                params={{ id: firstShopId }}
+                search={{ isBundle: undefined }}
+                to="/shops/$id/inventory"
+              />
+            }
+            variant="active"
+          >
+            <HugeiconsIcon icon={InboxIcon} /> Inventory
+          </NavItem>
+        )}
         <NavItem
           onClick={closeSheet}
           render={
-            <Link search={firstShopId ? { shopId: firstShopId } : undefined} to="/products" />
+            <Link
+              search={{ isBundle: true, shopId: firstShopId }}
+              to="/products"
+            />
           }
           variant="active"
         >
-          <HugeiconsIcon icon={Package01Icon} /> My Products
+          <HugeiconsIcon icon={Package01Icon} /> My Bundles
+        </NavItem>
+      </>
+    );
+  }
+
+  if (role === Role.admin) {
+    return (
+      <>
+        <NavItem
+          onClick={closeSheet}
+          render={<Link to="/role-requests" />}
+          variant="active"
+        >
+          <HugeiconsIcon icon={UserGroupIcon} /> Role Requests
+        </NavItem>
+        <NavItem
+          onClick={closeSheet}
+          render={<Link to="/events" />}
+          variant="active"
+        >
+          <HugeiconsIcon icon={CheckmarkCircle01Icon} /> Event Approvals
         </NavItem>
       </>
     );
