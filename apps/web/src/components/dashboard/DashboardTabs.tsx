@@ -98,19 +98,19 @@ export function DashboardTabs() {
 
   return (
     <Tabs defaultValue={tabs[0]?.value}>
-      <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-        <TabsList>
-          {tabs.map((t) => (
-            <TabsTrigger key={t.value} value={t.value}>
-              {t.label}
-            </TabsTrigger>
-          ))}
-        </TabsList>
-
-        {activeRole === Role.shopOwner && (
+      {activeRole === Role.shopOwner && (
+        <div className="flex justify-end">
           <ShopSelector onChange={setSelectedShopId} value={selectedShopId} />
-        )}
-      </div>
+        </div>
+      )}
+
+      <TabsList className="w-full">
+        {tabs.map((t) => (
+          <TabsTrigger key={t.value} value={t.value}>
+            {t.label}
+          </TabsTrigger>
+        ))}
+      </TabsList>
 
       {tabs.map((t) => (
         <TabsContent className="pt-4" key={t.value} value={t.value}>
