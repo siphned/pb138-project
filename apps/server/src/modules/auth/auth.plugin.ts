@@ -20,7 +20,7 @@ export type { AppRole, ClerkPayload };
  * template would 403 on every capability check even for legitimate
  * winemakers / shop owners / admins.
  */
-async function resolveCallerRoles(
+export async function resolveCallerRoles(
   payloadRoles: AppRole[] | undefined,
   userId: string
 ): Promise<string[]> {

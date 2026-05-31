@@ -1,5 +1,6 @@
 import { Elysia, status, t } from "elysia";
 import { authPlugin } from "../auth";
+import { resolveCallerRoles } from "../auth/auth.plugin";
 import { verifyClerkToken } from "../auth/auth.utils";
 import { cartsService } from "../carts/carts.service";
 import { usersService } from "../users/users.service";
@@ -98,14 +99,22 @@ export const ordersRoutes = new Elysia({ prefix: "/orders", tags: ["orders"] })
     const payload = await verifyClerkToken(headers.authorization);
     if (payload) {
       const dbUser = await usersService.lazyGetOrCreate(payload.sub);
+      // Resolve roles from DB if the JWT didn't include the `roles` claim
+      // — see auth.plugin.ts for the rationale.
+      const callerRoles = await resolveCallerRoles(payload.roles, dbUser.id);
+      const enrichedPayload = {
+        ...payload,
+        roles: callerRoles as ("customer" | "winemaker" | "shop_owner" | "admin")[],
+      };
+
       const guestSessionId = guest_session_id?.value;
       if (typeof guestSessionId === "string") {
         await cartsService.mergeOnLogin(dbUser.id, guestSessionId);
         guest_session_id?.remove();
       }
       return {
-        clerkPayload: payload,
-        isAdmin: payload.roles?.includes("admin") ?? false,
+        clerkPayload: enrichedPayload,
+        isAdmin: callerRoles.includes("admin"),
         sessionId: undefined as string | undefined,
         user: dbUser,
       };
