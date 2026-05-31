@@ -3,6 +3,7 @@ import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import { useGetShopsByIdProducts } from "@/generated/hooks/useGetShopsByIdProducts";
 import { useGetShopsMe } from "@/generated/hooks/useGetShopsMe";
+import { ShopRowMenu } from "./ShopRowMenu";
 import { TabPreviewShell } from "./TabPreviewShell";
 
 interface ShopRow {
@@ -41,8 +42,11 @@ export function ShopOwnerShopsTab({ shopId }: ShopOwnerShopsTabProps) {
   const products = inventoryList.slice(0, 10);
   const hasMoreInventory = inventoryList.length > 10;
 
-  const shopsToShow = allShops.slice(0, 10);
-  const hasMoreShops = allShops.length > 10;
+  // When a specific shop is selected, scope the list to that one shop so
+  // every section of this tab is in sync with the selector.
+  const visibleShops = shopId ? allShops.filter((s) => s.id === shopId) : allShops;
+  const shopsToShow = visibleShops.slice(0, 10);
+  const hasMoreShops = visibleShops.length > 10;
 
   const selectedShop = effectiveShopId
     ? allShops.find((s) => s.id === effectiveShopId)
@@ -80,6 +84,7 @@ export function ShopOwnerShopsTab({ shopId }: ShopOwnerShopsTabProps) {
                   </p>
                 )}
               </div>
+              <ShopRowMenu shopId={s.id} shopName={s.name} />
             </li>
           ))}
         </ul>

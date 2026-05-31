@@ -30,7 +30,9 @@ function ShopCreatePage() {
       },
       {
         onSuccess: (created) => {
-          navigate({ params: { id: created.id }, to: "/shops/$id" });
+          // Land on the edit page so the user can immediately add images
+          // and opening hours for the shop they just created.
+          navigate({ params: { id: created.id }, to: "/shops/$id/edit" });
         },
       }
     );
