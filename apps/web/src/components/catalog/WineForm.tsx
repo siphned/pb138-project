@@ -40,9 +40,7 @@ const wineFormSchema = z.object({
     .int()
     .min(1800, { message: "Year must be 1800 or later" })
     .max(2100, { message: "Year must be 2100 or earlier" }),
-  alcoholContent: z
-    .string()
-    .regex(/^\d{1,2}(\.\d{1,2})?$/, { message: "Use a number like 12.5" }),
+  alcoholContent: z.string().regex(/^\d{1,2}(\.\d{1,2})?$/, { message: "Use a number like 12.5" }),
   volumeMl: z.coerce.number().int().min(1, { message: "Volume must be at least 1 ml" }),
   quantity: z.coerce.number().int().min(0, { message: "Quantity cannot be negative" }),
 });

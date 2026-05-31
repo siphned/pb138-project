@@ -28,19 +28,13 @@ export function EventManageMenu({ eventId, ownerUserId }: EventManageMenuProps) 
           }
         />
         <DropdownMenuContent align="end">
-          <DropdownMenuItem
-            render={<Link params={{ id: eventId }} to="/events/$id/edit" />}
-          >
+          <DropdownMenuItem render={<Link params={{ id: eventId }} to="/events/$id/edit" />}>
             Edit event
           </DropdownMenuItem>
-          <DropdownMenuItem
-            render={<Link params={{ id: eventId }} to="/events/$id/images" />}
-          >
+          <DropdownMenuItem render={<Link params={{ id: eventId }} to="/events/$id/images" />}>
             Manage images
           </DropdownMenuItem>
-          <DropdownMenuItem
-            render={<Link params={{ id: eventId }} to="/events/$id/invitations" />}
-          >
+          <DropdownMenuItem render={<Link params={{ id: eventId }} to="/events/$id/invitations" />}>
             Manage invitations
           </DropdownMenuItem>
           <DropdownMenuItem

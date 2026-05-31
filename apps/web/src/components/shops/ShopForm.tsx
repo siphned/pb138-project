@@ -24,9 +24,7 @@ const shopFormSchema = z.object({
     .string()
     .refine((v) => v.trim().length > 0, { message: "House number is required" }),
   city: z.string().refine((v) => v.trim().length > 0, { message: "City is required" }),
-  postalCode: z
-    .string()
-    .refine((v) => v.trim().length > 0, { message: "Postal code is required" }),
+  postalCode: z.string().refine((v) => v.trim().length > 0, { message: "Postal code is required" }),
   country: z.string().refine((v) => v.trim().length > 0, { message: "Country is required" }),
 });
 
@@ -94,11 +92,7 @@ export function ShopForm({ defaultValues, onSubmit, isPending, submitLabel }: Sh
             <FormItem>
               <FormLabel>Description</FormLabel>
               <FormControl>
-                <Textarea
-                  placeholder="Tell customers about your shop."
-                  rows={4}
-                  {...field}
-                />
+                <Textarea placeholder="Tell customers about your shop." rows={4} {...field} />
               </FormControl>
               <FormDescription>What kind of wines do you sell? Atmosphere? Hours?</FormDescription>
               <FormMessage />

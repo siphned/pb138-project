@@ -1,3 +1,4 @@
+import { ForbiddenError } from "@repo/shared";
 import type { Wine } from "@repo/shared/schemas";
 import { db } from "../../db";
 import { WinemakerNotFoundError } from "../wines/wines.errors";
@@ -46,6 +47,29 @@ export class WinemakersService {
 
     await winemakersRepo.updateById(db, winemaker.id, data);
     const updated = await winemakersRepo.findByIdWithAddress(db, winemaker.id);
+    if (!updated) throw new WinemakerNotFoundError();
+    return updated;
+  }
+
+  async updateWinemakerById(
+    id: string,
+    actorUserId: string,
+    roles: string[],
+    data: UpdateWinemakerData
+  ): Promise<WinemakerListItem> {
+    const winemaker = await winemakersRepo.findByIdWithAddress(db, id);
+    if (!winemaker) throw new WinemakerNotFoundError();
+
+    const isAdmin = roles.includes("admin");
+    const isOwner = winemaker.userId === actorUserId;
+    if (!isAdmin && !isOwner)
+      throw new ForbiddenError(
+        "You do not have permission to edit this winemaker profile",
+        "FORBIDDEN_WINEMAKER_ACTION"
+      );
+
+    await winemakersRepo.updateById(db, id, data);
+    const updated = await winemakersRepo.findByIdWithAddress(db, id);
     if (!updated) throw new WinemakerNotFoundError();
     return updated;
   }

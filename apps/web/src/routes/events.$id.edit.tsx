@@ -79,7 +79,10 @@ function EventEditPage() {
         Back to event
       </Link>
 
-      <PageHeader description="Update the name, description, dates, or capacity." title="Edit event" />
+      <PageHeader
+        description="Update the name, description, dates, or capacity."
+        title="Edit event"
+      />
 
       <div className="max-w-3xl">
         <EventEditForm
