@@ -58,9 +58,7 @@ interface TabletProps {
 function Tablet({ icon, label, children }: TabletProps) {
   return (
     <div className="space-y-3 rounded-md border border-border p-4">
-      <h3 className="text-sm font-bold uppercase tracking-widest text-muted-foreground">
-        {label}
-      </h3>
+      <h3 className="text-sm font-bold uppercase tracking-widest text-muted-foreground">{label}</h3>
       <div className="flex items-start gap-3 text-sm">
         <div className="mt-0.5 flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-primary/10 text-primary">
           <HugeiconsIcon className="h-4 w-4" icon={icon} />
@@ -71,6 +69,7 @@ function Tablet({ icon, label, children }: TabletProps) {
   );
 }
 
+// biome-ignore lint/complexity/noExcessiveCognitiveComplexity: event details card renders multiple conditional sections (status, times, location, registration) in one component
 export function EventDetailsCard({ event }: EventDetailsCardProps) {
   const { start, end } = formatDateRange(
     event.startTime ?? event.startDate,

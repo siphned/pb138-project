@@ -48,4 +48,28 @@ export const winemakersRoutes = new Elysia({ prefix: "/winemakers", tags: ["wine
     detail: { summary: "Get winemaker by ID" },
     params: t.Object({ id: t.String() }),
     response: { 200: winemakerProfileResponse, 404: errorResponse },
-  });
+  })
+
+  .patch(
+    "/:id",
+    ({ params, dbUser, clerkPayload, body }) =>
+      winemakersService.updateWinemakerById(params.id, dbUser.id, clerkPayload.roles ?? [], body),
+    {
+      body: t.Partial(
+        t.Object({
+          description: t.String(),
+          email: t.String(),
+          name: t.String(),
+          phone: t.String(),
+          websiteUrl: t.Union([t.String(), t.Null()]),
+        })
+      ),
+      detail: {
+        security: [{ bearerAuth: [] }],
+        summary: "Update winemaker profile by ID (owner or admin)",
+      },
+      params: t.Object({ id: t.String() }),
+      requireRoles: ["winemaker", "admin"],
+      response: { 200: winemakerListItemResponse, 403: errorResponse, 404: errorResponse },
+    }
+  );

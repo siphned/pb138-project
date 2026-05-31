@@ -51,6 +51,7 @@ function friendlyMessage(code?: string, fallback?: string): string {
   }
 }
 
+// biome-ignore lint/complexity/noExcessiveCognitiveComplexity: event card handles registration state, error display, and conditional rendering in one component
 export function EventCard({ event }: EventCardProps) {
   const queryClient = useQueryClient();
   const { user } = useUser();
@@ -61,7 +62,8 @@ export function EventCard({ event }: EventCardProps) {
 
   const apiError = parseApiError(registerMutation.error);
   const isAlreadyRegistered = apiError?.code === "ALREADY_REGISTERED";
-  const isRegistered = !!event.isRegisteredByMe || registerMutation.isSuccess || isAlreadyRegistered;
+  const isRegistered =
+    !!event.isRegisteredByMe || registerMutation.isSuccess || isAlreadyRegistered;
   const pending = registerMutation.isPending;
   const canRegister = !!user && !isRegistered;
 
@@ -134,6 +136,7 @@ export function EventCard({ event }: EventCardProps) {
             size="sm"
             variant={isRegistered ? "outline" : "default"}
           >
+            {/* biome-ignore lint/style/noNestedTernary: three registration states need concise inline expression */}
             {isRegistered ? "Registered" : pending ? "Registering…" : "Register"}
           </Button>
           {showError && (

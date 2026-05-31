@@ -34,9 +34,7 @@ const eventFormSchema = z.object({
     .string()
     .refine((v) => v.trim().length > 0, { message: "House number is required" }),
   city: z.string().refine((v) => v.trim().length > 0, { message: "City is required" }),
-  postalCode: z
-    .string()
-    .refine((v) => v.trim().length > 0, { message: "Postal code is required" }),
+  postalCode: z.string().refine((v) => v.trim().length > 0, { message: "Postal code is required" }),
   country: z.string().refine((v) => v.trim().length > 0, { message: "Country is required" }),
 });
 

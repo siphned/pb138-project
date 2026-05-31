@@ -17,7 +17,15 @@ vi.mock("./EventRegistrationButton", () => ({
 }));
 
 vi.mock("@tanstack/react-router", () => ({
-  Link: ({ children, to, params }: { children: React.ReactNode; to: string; params?: { id: string } }) => (
+  Link: ({
+    children,
+    to,
+    params,
+  }: {
+    children: React.ReactNode;
+    to: string;
+    params?: { id: string };
+  }) => (
     <a data-testid="link" href={`${to}/${params?.id ?? ""}`}>
       {children}
     </a>
