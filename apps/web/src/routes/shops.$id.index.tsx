@@ -11,7 +11,7 @@ import { useGetShopsById } from "@/generated/hooks/useGetShopsById";
 import { ShopHeroGallery } from "./-components/ShopHeroGallery";
 import { ShopMapEmbed } from "./-components/ShopMapEmbed";
 
-export const Route = createFileRoute("/shops/$id")({
+export const Route = createFileRoute("/shops/$id/")({
   component: ShopDetailPage,
 });
 

@@ -15,7 +15,7 @@ import { useGetWines } from "@/generated/hooks/useGetWines";
 import { EventCard } from "@/components/events/EventCard";
 import { EntityReviewsSection } from "./-components/EntityReviewsSection";
 
-export const Route = createFileRoute("/winemakers/$id")({
+export const Route = createFileRoute("/winemakers/$id/")({
   component: WinemakerProfilePage,
 });
 
