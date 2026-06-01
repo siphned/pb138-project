@@ -2,6 +2,7 @@ import { Alert01Icon, ArrowLeft02Icon } from "@hugeicons/core-free-icons";
 import { HugeiconsIcon } from "@hugeicons/react";
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useState } from "react";
+import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -34,243 +35,184 @@ type AdminUser = {
 
 type ConfirmAction = "suspend" | "ban" | "reactivate" | null;
 
-function getStatusBadgeClass(status: string): string {
-  if (status === "active") {
-    return "bg-green-100/30 text-green-700 dark:text-green-400";
-  }
-  if (status === "suspended") {
-    return "bg-yellow-100/30 text-yellow-700 dark:text-yellow-400";
-  }
-  return "bg-destructive/30 text-destructive dark:text-red-400";
+const ROLE_LABEL: Record<string, string> = {
+  admin: "Admin",
+  customer: "Customer",
+  shop_owner: "Shop Owner",
+  winemaker: "Winemaker",
+};
+
+function statusVariant(status: string): "secondary" | "outline" | "destructive" {
+  if (status === "active") return "secondary";
+  if (status === "suspended") return "outline";
+  return "destructive";
 }
 
-function getRoleColor(role: string): string {
-  switch (role) {
-    case "admin":
-      return "bg-purple-100/30 text-purple-700 dark:text-purple-400";
-    case "winemaker":
-      return "bg-blue-100/30 text-blue-700 dark:text-blue-400";
-    case "shop_owner":
-      return "bg-orange-100/30 text-orange-700 dark:text-orange-400";
-    default:
-      return "bg-gray-100/30 text-gray-700 dark:text-gray-400";
-  }
-}
+function ProfileCard({ user }: { user: AdminUser }) {
+  const fullName = `${user.fname ?? ""} ${user.lname ?? ""}`.trim() || "Unnamed user";
+  const initials =
+    `${user.fname?.[0] ?? ""}${user.lname?.[0] ?? ""}`.toUpperCase() ||
+    user.email.slice(0, 2).toUpperCase();
+  const statusLabel = user.status.charAt(0).toUpperCase() + user.status.slice(1);
 
-function getStatusLabel(status: "suspended" | "banned"): string {
-  return status === "suspended" ? "Suspended" : "Banned";
-}
-
-function getStatusMessage(status: "suspended" | "banned"): string {
-  return status === "suspended"
-    ? "This user cannot log in or perform any actions."
-    : "This user is restricted from using the platform.";
-}
-
-interface ConfirmationTextParams {
-  action: ConfirmAction;
-  fname?: string;
-  lname?: string;
-}
-
-function getConfirmationText({ action, fname = "User", lname = "" }: ConfirmationTextParams) {
-  const fullName = `${fname} ${lname}`.trim();
-
-  switch (action) {
-    case "suspend":
-      return {
-        confirmText: "Suspend Account",
-        description: `Are you sure you want to suspend ${fullName}'s account? They will not be able to log in or perform any actions.`,
-        title: "Suspend User Account",
-      };
-    case "ban":
-      return {
-        confirmText: "Ban Account",
-        description: `Are you sure you want to ban ${fullName}'s account? This is a permanent action that can be reversed only by an admin.`,
-        title: "Ban User Account",
-      };
-    case "reactivate":
-      return {
-        confirmText: "Reactivate Account",
-        description: `Reactivate ${fullName}'s account? They will be able to log in and use the platform again.`,
-        title: "Reactivate User Account",
-      };
-    default:
-      return { confirmText: "", description: "", title: "" };
-  }
-}
-
-function ErrorCard({ id }: { id: string }) {
-  const navigate = useNavigate();
   return (
-    <main className="mx-auto max-w-4xl space-y-4 p-6">
-      <Button className="mb-4" onClick={() => navigate({ to: "/users" })} size="sm" variant="ghost">
-        <HugeiconsIcon className="mr-2 h-4 w-4" icon={ArrowLeft02Icon} />
-        Back to Users
-      </Button>
+    <Card variant="section">
+      <CardContent className="p-6">
+        <div className="flex flex-col gap-6 md:flex-row md:items-start md:justify-between">
+          <div className="flex flex-col gap-4 sm:flex-row sm:items-start">
+            <Avatar className="h-20 w-20">
+              <AvatarFallback className="bg-primary text-2xl font-heading font-bold text-primary-foreground">
+                {initials}
+              </AvatarFallback>
+            </Avatar>
 
-      <Card className="border-destructive/30">
-        <CardHeader>
-          <CardTitle className="text-destructive">User Not Found</CardTitle>
-          <CardDescription>Could not load user details</CardDescription>
-        </CardHeader>
-        <CardContent>
-          <p className="text-sm text-muted-foreground">
-            The user with ID <code className="font-mono">{id}</code> could not be found or you do
-            not have permission to view it.
-          </p>
-        </CardContent>
-      </Card>
-    </main>
-  );
-}
-
-function LoadingCard() {
-  const navigate = useNavigate();
-  return (
-    <main className="mx-auto max-w-4xl space-y-6 p-6">
-      <div className="flex items-center gap-4">
-        <Button onClick={() => navigate({ to: "/users" })} size="sm" variant="ghost">
-          <HugeiconsIcon className="mr-2 h-4 w-4" icon={ArrowLeft02Icon} />
-          Back
-        </Button>
-        <h1 className="text-3xl font-semibold">User Details</h1>
-      </div>
-
-      <Card>
-        <CardHeader>
-          <Skeleton className="h-6 w-48" />
-          <Skeleton className="mt-2 h-4 w-64" />
-        </CardHeader>
-        <CardContent className="space-y-4">
-          {Array.from({ length: 4 }).map((_, i) => (
-            <div className="space-y-2" key={i}>
-              <Skeleton className="h-4 w-20" />
-              <Skeleton className="h-5 w-full" />
+            <div className="space-y-2">
+              <h2 className="font-heading text-2xl font-bold leading-tight text-foreground">
+                {fullName}
+              </h2>
+              <p className="text-sm text-muted-foreground">{user.email}</p>
+              <div className="flex flex-wrap items-center gap-2 pt-1">
+                <Badge variant={statusVariant(user.status)}>{statusLabel}</Badge>
+                {user.roles?.map((r) => (
+                  <Badge key={r.id} variant="outline">
+                    {ROLE_LABEL[r.role] ?? r.role}
+                  </Badge>
+                ))}
+              </div>
+              <p className="pt-1 text-xs text-muted-foreground">
+                Member since{" "}
+                {new Date(user.createdAt).toLocaleDateString("en-US", {
+                  day: "numeric",
+                  month: "long",
+                  year: "numeric",
+                })}
+              </p>
             </div>
-          ))}
-        </CardContent>
-      </Card>
-    </main>
-  );
-}
-
-interface UserProfileProps {
-  user: AdminUser;
-}
-
-function UserProfile({ user }: UserProfileProps) {
-  return (
-    <Card>
-      <CardHeader>
-        <div className="flex items-start justify-between">
-          <div className="space-y-1">
-            <CardTitle className="text-2xl">
-              {user.fname} {user.lname}
-            </CardTitle>
-            <CardDescription className="font-mono text-sm">{user.email}</CardDescription>
           </div>
-          <span
-            className={`inline-flex rounded-full px-3 py-1 text-sm font-semibold ${getStatusBadgeClass(user.status)}`}
-          >
-            {user.status.charAt(0).toUpperCase() + user.status.slice(1)}
-          </span>
-        </div>
-      </CardHeader>
-      <CardContent className="space-y-6">
-        <div className="space-y-2">
-          <p className="text-sm font-medium text-muted-foreground">Roles</p>
-          <div className="flex flex-wrap gap-2">
-            {user.roles && user.roles.length > 0 ? (
-              user.roles.map((role) => (
-                <Badge className={`${getRoleColor(role.role)} border-0`} key={role.id}>
-                  {role.role.replace("_", " ")}
-                </Badge>
-              ))
-            ) : (
-              <p className="text-sm text-muted-foreground">No roles assigned</p>
-            )}
-          </div>
-        </div>
 
-        <div className="space-y-2">
-          <p className="text-sm font-medium text-muted-foreground">Member Since</p>
-          <p className="text-sm">
-            {new Date(user.createdAt).toLocaleDateString("en-US", {
-              day: "numeric",
-              month: "long",
-              year: "numeric",
-            })}
-          </p>
+          <Badge className="self-start" variant="outline">
+            Admin view
+          </Badge>
         </div>
       </CardContent>
     </Card>
   );
 }
 
-interface ActionButtonsProps {
-  user: AdminUser;
-  isUpdating: boolean;
-  onOpenDialog: (action: ConfirmAction) => void;
+interface UserShop {
+  id: string;
+  name: string;
+  description?: string;
+  address?: { city?: string; country?: string };
 }
 
-function ActionButtons({ isUpdating, onOpenDialog, user }: ActionButtonsProps) {
-  if (user.status === "active") {
-    return (
-      <div className="grid gap-3 sm:grid-cols-2">
-        <Button
-          className="border-yellow-200 text-yellow-700 hover:bg-yellow-50 dark:border-yellow-900 dark:text-yellow-400 dark:hover:bg-yellow-950"
-          disabled={isUpdating}
-          onClick={() => onOpenDialog("suspend")}
-          variant="outline"
-        >
-          Suspend Account
-        </Button>
-        <Button disabled={isUpdating} onClick={() => onOpenDialog("ban")} variant="destructive">
-          Ban Account
-        </Button>
-      </div>
-    );
-  }
+function UserShopsSection({ userId }: { userId: string }) {
+  const query = useGetShops({ ownerUserId: userId });
+  const shops = (Array.isArray(query.data) ? query.data : []) as UserShop[];
 
   return (
-    <div className="space-y-4">
-      <div className="flex items-start gap-3 rounded-md bg-yellow-50 p-4 dark:bg-yellow-950/20">
-        <HugeiconsIcon
-          className="mt-0.5 h-5 w-5 text-yellow-600 dark:text-yellow-400"
-          icon={Alert01Icon}
-        />
-        <div className="space-y-1">
-          <p className="text-sm font-semibold text-yellow-900 dark:text-yellow-200">
-            Account is {getStatusLabel(user.status as "suspended" | "banned")}
-          </p>
-          <p className="text-xs text-yellow-800 dark:text-yellow-300">
-            {getStatusMessage(user.status as "suspended" | "banned")}
-          </p>
-        </div>
-      </div>
-      <Button className="w-full" disabled={isUpdating} onClick={() => onOpenDialog("reactivate")}>
-        Reactivate Account
-      </Button>
-    </div>
+    <Card variant="section">
+      <CardHeader>
+        <CardTitle className="font-heading text-xl">Shops owned</CardTitle>
+        <CardDescription>
+          Public shops owned by this user. Click a shop to view its catalog.
+        </CardDescription>
+      </CardHeader>
+      <CardContent>
+        {query.isLoading ? (
+          <div className="space-y-2">
+            {[0, 1, 2].map((i) => (
+              <Skeleton className="h-14 w-full rounded-md" key={i} />
+            ))}
+          </div>
+        ) : query.isError ? (
+          <p className="text-sm text-destructive">Could not load this user's shops.</p>
+        ) : shops.length === 0 ? (
+          <p className="text-sm text-muted-foreground">This user doesn't own any shops yet.</p>
+        ) : (
+          <ul className="divide-y divide-border rounded-md border border-border">
+            {shops.map((s) => (
+              <li className="p-4" key={s.id}>
+                <Link
+                  className="block transition-colors hover:text-primary"
+                  params={{ id: s.id }}
+                  to="/shops/$id"
+                >
+                  <span className="font-medium text-foreground">{s.name}</span>
+                  {s.address && (
+                    <p className="text-xs text-muted-foreground">
+                      {[s.address.city, s.address.country].filter(Boolean).join(", ")}
+                    </p>
+                  )}
+                </Link>
+              </li>
+            ))}
+          </ul>
+        )}
+      </CardContent>
+    </Card>
   );
 }
 
-interface ActionPanelProps {
+interface ActionsCardProps {
   user: AdminUser;
   isUpdating: boolean;
   onOpenDialog: (action: ConfirmAction) => void;
 }
 
-function ActionPanel({ isUpdating, onOpenDialog, user }: ActionPanelProps) {
+function ActionsCard({ user, isUpdating, onOpenDialog }: ActionsCardProps) {
   return (
-    <Card>
+    <Card variant="section">
       <CardHeader>
-        <CardTitle>Account Actions</CardTitle>
-        <CardDescription>Manage user account status</CardDescription>
+        <CardTitle className="font-heading text-xl">Account actions</CardTitle>
+        <CardDescription>Suspend, ban, or reactivate this user.</CardDescription>
       </CardHeader>
       <CardContent className="space-y-4">
-        <ActionButtons isUpdating={isUpdating} onOpenDialog={onOpenDialog} user={user} />
+        {user.status !== "active" && (
+          <div className="flex items-start gap-3 rounded-md border border-yellow-300/50 bg-yellow-50/40 p-4 dark:border-yellow-800/50 dark:bg-yellow-950/20">
+            <HugeiconsIcon
+              className="mt-0.5 h-5 w-5 text-yellow-700 dark:text-yellow-400"
+              icon={Alert01Icon}
+            />
+            <div className="space-y-1">
+              <p className="text-sm font-semibold text-yellow-900 dark:text-yellow-200">
+                Account is {user.status === "suspended" ? "suspended" : "banned"}
+              </p>
+              <p className="text-xs text-yellow-800 dark:text-yellow-300">
+                {user.status === "suspended"
+                  ? "This user cannot log in or perform any actions."
+                  : "This user is restricted from using the platform."}
+              </p>
+            </div>
+          </div>
+        )}
+
+        {user.status === "active" ? (
+          <div className="grid gap-3 sm:grid-cols-2">
+            <Button
+              disabled={isUpdating}
+              onClick={() => onOpenDialog("suspend")}
+              variant="outline"
+            >
+              Suspend account
+            </Button>
+            <Button
+              disabled={isUpdating}
+              onClick={() => onOpenDialog("ban")}
+              variant="destructive"
+            >
+              Ban account
+            </Button>
+          </div>
+        ) : (
+          <Button
+            className="w-full"
+            disabled={isUpdating}
+            onClick={() => onOpenDialog("reactivate")}
+          >
+            Reactivate account
+          </Button>
+        )}
       </CardContent>
     </Card>
   );
@@ -293,11 +235,31 @@ function ConfirmationDialog({
   onConfirm,
   user,
 }: ConfirmDialogProps) {
-  const text = getConfirmationText({
-    action,
-    fname: user?.fname,
-    lname: user?.lname,
-  });
+  const fullName = `${user?.fname ?? ""} ${user?.lname ?? ""}`.trim() || "this user";
+  const text = (() => {
+    switch (action) {
+      case "suspend":
+        return {
+          confirmText: "Suspend account",
+          description: `${fullName} will not be able to log in or perform any actions.`,
+          title: "Suspend user account",
+        };
+      case "ban":
+        return {
+          confirmText: "Ban account",
+          description: `${fullName} will be permanently restricted. Reversible only by an admin.`,
+          title: "Ban user account",
+        };
+      case "reactivate":
+        return {
+          confirmText: "Reactivate account",
+          description: `${fullName} will be able to log in and use the platform again.`,
+          title: "Reactivate user account",
+        };
+      default:
+        return { confirmText: "", description: "", title: "" };
+    }
+  })();
 
   return (
     <Dialog onOpenChange={(open) => !open && onClose()} open={isOpen}>
@@ -319,74 +281,11 @@ function ConfirmationDialog({
             disabled={isUpdating}
             onClick={onConfirm}
           >
-            {isUpdating ? "Processing..." : text.confirmText}
+            {isUpdating ? "Processing…" : text.confirmText}
           </Button>
         </DialogFooter>
       </DialogContent>
     </Dialog>
-  );
-}
-
-interface UserShop {
-  id: string;
-  name: string;
-  description?: string;
-  address?: { city?: string; country?: string };
-}
-
-function UserShopsSection({ userId, isShopOwner }: { userId: string; isShopOwner: boolean }) {
-  const query = useGetShops(
-    { ownerUserId: userId },
-    { query: { enabled: isShopOwner } }
-  );
-
-  if (!isShopOwner) return null;
-
-  const shops = (Array.isArray(query.data) ? query.data : []) as UserShop[];
-
-  return (
-    <Card>
-      <CardHeader>
-        <CardTitle>Shops owned</CardTitle>
-        <CardDescription>
-          Click a shop to open it in the public catalog. Admins can edit/delete from there.
-        </CardDescription>
-      </CardHeader>
-      <CardContent>
-        {query.isLoading ? (
-          <div className="space-y-2">
-            {[0, 1, 2].map((i) => (
-              <Skeleton className="h-14 w-full rounded-md" key={i} />
-            ))}
-          </div>
-        ) : query.isError ? (
-          <p className="text-sm text-destructive">Could not load this user's shops.</p>
-        ) : shops.length === 0 ? (
-          <p className="text-sm text-muted-foreground">This user doesn't own any shops yet.</p>
-        ) : (
-          <ul className="divide-y divide-border rounded-md border border-border">
-            {shops.map((s) => (
-              <li className="flex items-center justify-between gap-4 p-4" key={s.id}>
-                <div className="min-w-0 flex-1">
-                  <Link
-                    className="font-medium text-foreground hover:text-primary"
-                    params={{ id: s.id }}
-                    to="/shops/$id"
-                  >
-                    {s.name}
-                  </Link>
-                  {s.address && (
-                    <p className="text-xs text-muted-foreground">
-                      {[s.address.city, s.address.country].filter(Boolean).join(", ")}
-                    </p>
-                  )}
-                </div>
-              </li>
-            ))}
-          </ul>
-        )}
-      </CardContent>
-    </Card>
   );
 }
 
@@ -395,66 +294,71 @@ function AdminUserDetail() {
   const navigate = useNavigate();
   const { data, error, isLoading } = useGetAdminUsersById(id);
   const { isPending: isUpdating, mutate: updateStatus } = usePatchAdminUsersByIdStatus();
-
   const [confirmAction, setConfirmAction] = useState<ConfirmAction>(null);
 
   // biome-ignore lint/suspicious/noExplicitAny: API response is untyped
   const user = data as any as AdminUser | undefined;
 
-  const handleStatusChange = (newStatus: "active" | "suspended" | "banned") => {
-    if (!user) return;
-    updateStatus(
-      {
-        data: { status: newStatus },
-        id: user.id,
-      },
-      {
-        onSuccess: () => {
-          setConfirmAction(null);
-        },
-      }
-    );
-  };
-
   const handleConfirm = () => {
-    if (!confirmAction) return;
-
+    if (!confirmAction || !user) return;
     const statusMap: Record<"suspend" | "ban" | "reactivate", "active" | "suspended" | "banned"> = {
       ban: "banned",
       reactivate: "active",
       suspend: "suspended",
     };
-
-    handleStatusChange(statusMap[confirmAction]);
+    updateStatus(
+      { data: { status: statusMap[confirmAction] }, id: user.id },
+      { onSuccess: () => setConfirmAction(null) }
+    );
   };
 
-  if (error) {
-    return <ErrorCard id={id} />;
-  }
-
   if (isLoading) {
-    return <LoadingCard />;
+    return (
+      <div className="container mx-auto space-y-8 px-6 py-8 lg:px-12">
+        <Skeleton className="h-9 w-40" />
+        <Skeleton className="h-48 w-full rounded-2xl" />
+        <Skeleton className="h-48 w-full rounded-2xl" />
+      </div>
+    );
   }
 
-  if (!user) {
-    return <ErrorCard id={id} />;
+  if (error || !user) {
+    return (
+      <div className="container mx-auto space-y-6 px-6 py-8 lg:px-12">
+        <Button onClick={() => navigate({ to: "/dashboard" })} size="sm" variant="ghost">
+          <HugeiconsIcon className="mr-2 h-4 w-4" icon={ArrowLeft02Icon} />
+          Back to dashboard
+        </Button>
+        <Card variant="section">
+          <CardHeader>
+            <CardTitle className="text-destructive">User not found</CardTitle>
+            <CardDescription>
+              The user with ID <code className="font-mono">{id}</code> could not be loaded.
+            </CardDescription>
+          </CardHeader>
+        </Card>
+      </div>
+    );
   }
 
   const isShopOwner = user.roles?.some((r) => r.role === "shop_owner") ?? false;
 
   return (
-    <main className="mx-auto max-w-4xl space-y-6 p-6">
-      <div className="flex items-center gap-4">
-        <Button onClick={() => navigate({ to: "/dashboard" })} size="sm" variant="ghost">
-          <HugeiconsIcon className="mr-2 h-4 w-4" icon={ArrowLeft02Icon} />
-          Back to dashboard
-        </Button>
-        <h1 className="text-3xl font-semibold">User Details</h1>
-      </div>
+    <div className="container mx-auto space-y-8 px-6 py-8 lg:px-12">
+      <Button onClick={() => navigate({ to: "/dashboard" })} size="sm" variant="ghost">
+        <HugeiconsIcon className="mr-2 h-4 w-4" icon={ArrowLeft02Icon} />
+        Back to dashboard
+      </Button>
 
-      <UserProfile user={user} />
-      <UserShopsSection isShopOwner={isShopOwner} userId={user.id} />
-      <ActionPanel isUpdating={isUpdating} onOpenDialog={setConfirmAction} user={user} />
+      <ProfileCard user={user} />
+
+      {isShopOwner && <UserShopsSection userId={user.id} />}
+
+      <ActionsCard
+        isUpdating={isUpdating}
+        onOpenDialog={setConfirmAction}
+        user={user}
+      />
 
       <ConfirmationDialog
         action={confirmAction}
@@ -464,6 +368,6 @@ function AdminUserDetail() {
         onConfirm={handleConfirm}
         user={user}
       />
-    </main>
+    </div>
   );
 }
