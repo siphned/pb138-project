@@ -40,11 +40,19 @@ const buttonVariants = cva(
 interface ButtonProps extends ButtonPrimitive.Props, VariantProps<typeof buttonVariants> {}
 
 function Button({ className, variant = "default", size = "default", ...props }: ButtonProps) {
+  // Base UI defaults `nativeButton` to true, which warns when `render` is a
+  // non-<button> element (e.g. a TanStack <Link> → <a>). Whenever a custom
+  // render is supplied without an explicit `nativeButton`, default it to
+  // false so the warning is suppressed.
+  const nativeButton =
+    props.nativeButton ?? (props.render !== undefined ? false : undefined);
+
   return (
     <ButtonPrimitive
       className={cn(buttonVariants({ className, size, variant }))}
       data-slot="button"
       {...props}
+      nativeButton={nativeButton}
     />
   );
 }
