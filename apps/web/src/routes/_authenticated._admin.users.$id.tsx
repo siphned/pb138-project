@@ -1,6 +1,6 @@
 import { Alert01Icon, ArrowLeft02Icon } from "@hugeicons/core-free-icons";
 import { HugeiconsIcon } from "@hugeicons/react";
-import { createFileRoute, useNavigate } from "@tanstack/react-router";
+import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useState } from "react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -15,6 +15,7 @@ import {
 } from "@/components/ui/dialog";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useGetAdminUsersById } from "@/generated/hooks/useGetAdminUsersById";
+import { useGetShops } from "@/generated/hooks/useGetShops";
 import { usePatchAdminUsersByIdStatus } from "@/generated/hooks/usePatchAdminUsersByIdStatus";
 
 export const Route = createFileRoute("/_authenticated/_admin/users/$id")({
@@ -326,6 +327,69 @@ function ConfirmationDialog({
   );
 }
 
+interface UserShop {
+  id: string;
+  name: string;
+  description?: string;
+  address?: { city?: string; country?: string };
+}
+
+function UserShopsSection({ userId, isShopOwner }: { userId: string; isShopOwner: boolean }) {
+  const query = useGetShops(
+    { ownerUserId: userId },
+    { query: { enabled: isShopOwner } }
+  );
+
+  if (!isShopOwner) return null;
+
+  const shops = (Array.isArray(query.data) ? query.data : []) as UserShop[];
+
+  return (
+    <Card>
+      <CardHeader>
+        <CardTitle>Shops owned</CardTitle>
+        <CardDescription>
+          Click a shop to open it in the public catalog. Admins can edit/delete from there.
+        </CardDescription>
+      </CardHeader>
+      <CardContent>
+        {query.isLoading ? (
+          <div className="space-y-2">
+            {[0, 1, 2].map((i) => (
+              <Skeleton className="h-14 w-full rounded-md" key={i} />
+            ))}
+          </div>
+        ) : query.isError ? (
+          <p className="text-sm text-destructive">Could not load this user's shops.</p>
+        ) : shops.length === 0 ? (
+          <p className="text-sm text-muted-foreground">This user doesn't own any shops yet.</p>
+        ) : (
+          <ul className="divide-y divide-border rounded-md border border-border">
+            {shops.map((s) => (
+              <li className="flex items-center justify-between gap-4 p-4" key={s.id}>
+                <div className="min-w-0 flex-1">
+                  <Link
+                    className="font-medium text-foreground hover:text-primary"
+                    params={{ id: s.id }}
+                    to="/shops/$id"
+                  >
+                    {s.name}
+                  </Link>
+                  {s.address && (
+                    <p className="text-xs text-muted-foreground">
+                      {[s.address.city, s.address.country].filter(Boolean).join(", ")}
+                    </p>
+                  )}
+                </div>
+              </li>
+            ))}
+          </ul>
+        )}
+      </CardContent>
+    </Card>
+  );
+}
+
 function AdminUserDetail() {
   const { id } = Route.useParams();
   const navigate = useNavigate();
@@ -376,17 +440,20 @@ function AdminUserDetail() {
     return <ErrorCard id={id} />;
   }
 
+  const isShopOwner = user.roles?.some((r) => r.role === "shop_owner") ?? false;
+
   return (
     <main className="mx-auto max-w-4xl space-y-6 p-6">
       <div className="flex items-center gap-4">
-        <Button onClick={() => navigate({ to: "/users" })} size="sm" variant="ghost">
+        <Button onClick={() => navigate({ to: "/dashboard" })} size="sm" variant="ghost">
           <HugeiconsIcon className="mr-2 h-4 w-4" icon={ArrowLeft02Icon} />
-          Back
+          Back to dashboard
         </Button>
         <h1 className="text-3xl font-semibold">User Details</h1>
       </div>
 
       <UserProfile user={user} />
+      <UserShopsSection isShopOwner={isShopOwner} userId={user.id} />
       <ActionPanel isUpdating={isUpdating} onOpenDialog={setConfirmAction} user={user} />
 
       <ConfirmationDialog
