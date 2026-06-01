@@ -1,6 +1,5 @@
 import type { ReactNode } from "react";
 import { useState } from "react";
-import { AdminEventApprovalsTab } from "@/components/dashboard/tabs/AdminEventApprovalsTab";
 import { AdminRoleRequestsTab } from "@/components/dashboard/tabs/AdminRoleRequestsTab";
 import { AdminUsersTab } from "@/components/dashboard/tabs/AdminUsersTab";
 import { CustomerEventsTab } from "@/components/dashboard/tabs/CustomerEventsTab";
@@ -68,11 +67,6 @@ export function DashboardTabs() {
           content: <AdminRoleRequestsTab />,
           label: "Role Requests",
           value: "role-requests",
-        },
-        {
-          content: <AdminEventApprovalsTab />,
-          label: "Event Approvals",
-          value: "event-approvals",
         },
         {
           content: <AdminUsersTab />,
