@@ -83,7 +83,7 @@ export function EventCard({ event }: EventCardProps) {
 
   return (
     <Card className="group relative" variant="polaroid">
-      <div className="relative aspect-square w-full overflow-hidden rounded-lg bg-muted shadow-xs">
+      <div className="relative aspect-3/4 w-full overflow-hidden rounded-lg bg-muted shadow-xs">
         <EventImage alt={title} eventId={event.id} fallbackText={title} />
 
         {dateLabel && (
