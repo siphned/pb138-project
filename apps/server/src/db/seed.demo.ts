@@ -126,16 +126,16 @@ function copyImageAssets() {
 
   const imageUrls: string[] = [];
   for (const wm of WINEMAKERS) {
-    if (wm.imageUrl) imageUrls.push(wm.imageUrl);
+    imageUrls.push(...(wm.imageUrls ?? []));
     for (const wine of wm.wines) {
-      if (wine.imageUrl) imageUrls.push(wine.imageUrl);
+      imageUrls.push(...(wine.imageUrls ?? []));
     }
     for (const event of wm.events ?? []) {
-      if (event.imageUrl) imageUrls.push(event.imageUrl);
+      imageUrls.push(...(event.imageUrls ?? []));
     }
   }
   for (const shop of SHOPS) {
-    if (shop.imageUrl) imageUrls.push(shop.imageUrl);
+    imageUrls.push(...(shop.imageUrls ?? []));
   }
   imageUrls.push("/uploads/wine/wine_placeholder.webp");
   imageUrls.push("/uploads/winemaker/winery_placeholder.webp");
@@ -285,7 +285,7 @@ async function main() {
     const [wmRow] = await insertWinemakers([winemakerInput]);
     const wmId = wmRow!.id;
     wmIdMap.set(wm.key, wmId);
-    allWinemakerImages.push({ id: wmId, url: wm.imageUrl });
+    for (const url of wm.imageUrls ?? []) allWinemakerImages.push({ id: wmId, url });
 
     // Winemaker Demo Reviews
     for (const r of wm.demoReviews ?? []) {
@@ -311,7 +311,7 @@ async function main() {
     insertedWines.forEach((row, i) => {
       const wineData = wm.wines[i]!;
       wineIdMap.set(`${wm.key}::${wineData.name}`, row.id);
-      allWineImages.push({ id: row.id, url: wineData.imageUrl });
+      for (const url of wineData.imageUrls ?? []) allWineImages.push({ id: row.id, url });
 
       // Wine Demo Reviews
       for (const r of wineData.demoReviews ?? []) {
@@ -341,7 +341,7 @@ async function main() {
     insertedEvents.forEach((row, i) => {
       const eventData = wm.events[i]!;
       eventIdMap.set(`${wm.key}-${i}`, row.id);
-      allEventImages.push({ id: row.id, url: eventData.imageUrl });
+      for (const url of eventData.imageUrls ?? []) allEventImages.push({ id: row.id, url });
 
       // Event Demo Comments
       for (const body of eventData.demoComments ?? []) {
@@ -392,7 +392,8 @@ async function main() {
     }]);
     wmIdMap.set(wmKey, wmRow!.id);
     fakerWmKeys.push(wmKey);
-    allWinemakerImages.push({ id: wmRow!.id, url: undefined });
+    allWinemakerImages.push({ id: wmRow!.id, url: `https://picsum.photos/seed/fwm-${i}-1/800/600` });
+    allWinemakerImages.push({ id: wmRow!.id, url: `https://picsum.photos/seed/fwm-${i}-2/800/600` });
 
     // 4-6 wines
     const wineCount = faker.number.int({ min: 4, max: 6 });
@@ -417,7 +418,8 @@ async function main() {
     const insertedFakerWines = await insertWines(fakerWineInputs);
     insertedFakerWines.forEach((row, idx) => {
       wineIdMap.set(`${wmKey}::${fakerWineInputs[idx]!.name}`, row.id);
-      allWineImages.push({ id: row.id, url: undefined });
+      allWineImages.push({ id: row.id, url: `https://picsum.photos/seed/fw-${i}-${idx}-1/800/600` });
+      allWineImages.push({ id: row.id, url: `https://picsum.photos/seed/fw-${i}-${idx}-2/800/600` });
     });
 
     // 0 or 1 future event
@@ -438,7 +440,8 @@ async function main() {
         status: "approved" as const,
       }]);
       eventIdMap.set(`${wmKey}-0`, evRow!.id);
-      allEventImages.push({ id: evRow!.id, url: undefined });
+      allEventImages.push({ id: evRow!.id, url: `https://picsum.photos/seed/fev-${i}-1/800/600` });
+      allEventImages.push({ id: evRow!.id, url: `https://picsum.photos/seed/fev-${i}-2/800/600` });
     }
   }
   logger.info(`Inserted ${fakerWmKeys.length} faker winemakers`);
@@ -476,7 +479,7 @@ async function main() {
     };
     const [shopRow] = await insertShops([shopInput]);
     shopIdMap.set(shop.key, shopRow!.id);
-    allShopImages.push({ id: shopRow!.id, url: shop.imageUrl });
+    for (const url of shop.imageUrls ?? []) allShopImages.push({ id: shopRow!.id, url });
 
     // Products: all wines from source winemakers
     for (const wmKey of shop.sourceWinemakerKeys) {
@@ -568,7 +571,8 @@ async function main() {
     }]);
     shopIdMap.set(shopKey, shopRow!.id);
     fakerShopKeys.push(shopKey);
-    allShopImages.push({ id: shopRow!.id, url: undefined });
+    allShopImages.push({ id: shopRow!.id, url: `https://picsum.photos/seed/fsh-${i}-1/800/600` });
+    allShopImages.push({ id: shopRow!.id, url: `https://picsum.photos/seed/fsh-${i}-2/800/600` });
 
     // Source from 2 random faker winemakers
     const sourceWmKeys = faker.helpers.arrayElements(fakerWmKeys, 2);

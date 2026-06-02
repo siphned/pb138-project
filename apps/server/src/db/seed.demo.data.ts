@@ -21,7 +21,7 @@ export type WineData = {
   composition: string;
   description: string;
   basePrice: number;
-  imageUrl?: string;
+  imageUrls?: string[];
   demoReviews?: ReviewData[];
 };
 
@@ -33,7 +33,7 @@ export type EventData = {
   durationHours: number;
   capacity: number;
   visibility: "public" | "private";
-  imageUrl?: string;
+  imageUrls?: string[];
   demoComments?: string[];
 };
 
@@ -46,7 +46,7 @@ export type WinemakerData = {
   phone: string;
   websiteUrl: string;
   city: string;
-  imageUrl?: string;
+  imageUrls?: string[];
   wines: WineData[];
   events: EventData[];
   demoReviews?: ReviewData[];
@@ -66,7 +66,7 @@ export type ShopData = {
   name: string;
   description: string;
   city: string;
-  imageUrl?: string;
+  imageUrls?: string[];
   sourceWinemakerKeys: string[];
   bundles: BundleData[];
 };
@@ -142,13 +142,13 @@ export const WINEMAKERS: WinemakerData[] = [
         description:
           "Vysoce neformální, neautorizované setkání přímo u nechvalně známých černých hodin na Náměstí Svobody. Očekávejte syrovou, autentickou pouliční atmosféru, kde budeme ochutnávat ty nejlepší PET lahvové ročníky přímo od zdroje.",
         durationHours: 3,
-        imageUrl: "/uploads/event/event_placeholder.webp",
+        imageUrls: ["/uploads/event/event_placeholder.webp", "https://picsum.photos/seed/ev-orloj-2/800/600", "https://picsum.photos/seed/ev-orloj-3/800/600"],
         isPast: false,
         name: "Půlnoční degustace pod Orlojem",
         visibility: "public",
       },
     ],
-    imageUrl: "/uploads/winemaker/la_lavicka.webp",
+    imageUrls: ["/uploads/winemaker/la_lavicka.webp", "https://picsum.photos/seed/lavicka2/800/600", "https://picsum.photos/seed/lavicka3/800/600", "https://picsum.photos/seed/lavicka4/800/600"],
     key: "lavicka",
     name: "Château de la Lavička",
     ownerKey: "test_user",
@@ -175,7 +175,7 @@ export const WINEMAKERS: WinemakerData[] = [
         ],
         description:
           "Zářivě neonově modrý ročník, který silně voní po umělém borůvkovém aroma a čistém přežití. Závěrečná agresivní kyselinka vyčistí nejen patro, ale i drobné skvrny od rzi. Nejlépe chutná přímo z plastové lahve při nočním sprintu na tramvaj číslo 1.",
-        imageUrl: "/uploads/wine/modry_blesk.webp",
+        imageUrls: ["/uploads/wine/modry_blesk.webp", "https://picsum.photos/seed/blesk2/800/600", "https://picsum.photos/seed/blesk3/800/600"],
         name: "Modrý Blesk 2024",
         quantity: 850,
         region: "Brněnská Nádražní Oblast",
@@ -205,7 +205,7 @@ export const WINEMAKERS: WinemakerData[] = [
         ],
         description:
           "Naše prémiová nabídka s revoluční technologií plastového šroubovacího uzávěru, která vám ušetří peníze za vývrtku. Očekávejte těžké třísloviny, které připomínají žvýkání asfaltu na D1, s překvapivě sirupovým závěrem. Skvěle se páruje se suchým rohlíkem.",
-        imageUrl: "/uploads/wine/hradni_svice.webp",
+        imageUrls: ["/uploads/wine/hradni_svice.webp", "https://picsum.photos/seed/svice2/800/600", "https://picsum.photos/seed/svice3/800/600", "https://picsum.photos/seed/svice4/800/600"],
         name: "Hradní Svíce Black Label",
         quantity: 650,
         region: "Brněnská Nádražní Oblast",
@@ -228,7 +228,7 @@ export const WINEMAKERS: WinemakerData[] = [
       "Maison de l'Ego bylo založeno výhradně proto, aby si technologičtí miliardáři a startupisté měli co odepsat z daní. Neprodáváme víno, prodáváme nalahvovanou nadřazenost a tekutou aroganci.",
     email: "prestige@maisondego.cz",
     events: [],
-    imageUrl: "/uploads/winemaker/maison_de.webp",
+    imageUrls: ["/uploads/winemaker/maison_de.webp", "https://picsum.photos/seed/maison2/800/600", "https://picsum.photos/seed/maison3/800/600"],
     key: "ego",
     name: "Maison de l'Ego",
     ownerKey: null,
@@ -257,7 +257,7 @@ export const WINEMAKERS: WinemakerData[] = [
         ],
         description:
           "Víno tak exkluzivní, že vás reálně soudí, když ho naléváte do sklenice. Ve vůni dominují bílé lanýže, kaviár a zřetelný náznak offshorových účtů.",
-        imageUrl: "/uploads/wine/arrogance.webp",
+        imageUrls: ["/uploads/wine/arrogance.webp", "https://picsum.photos/seed/arrogance2/800/600", "https://picsum.photos/seed/arrogance3/800/600", "https://picsum.photos/seed/arrogance4/800/600", "https://picsum.photos/seed/arrogance5/800/600"],
         name: "Liquid Arrogance",
         quantity: 12,
         region: "Tax Haven",
@@ -287,7 +287,7 @@ export const WINEMAKERS: WinemakerData[] = [
         ],
         description:
           "Navrženo pro lidi, kteří píší kód rovnou do produkce a nikdy nepoužívají komentáře.",
-        imageUrl: "/uploads/wine/10xdeveloper.webp",
+        imageUrls: ["/uploads/wine/10xdeveloper.webp", "https://picsum.photos/seed/dev2/800/600", "https://picsum.photos/seed/dev3/800/600"],
         name: "10x Developer",
         quantity: 20,
         region: "Tax Haven",
@@ -320,13 +320,13 @@ export const WINEMAKERS: WinemakerData[] = [
         description:
           "Extrémně chaotická degustace konaná ve sdílené kuchyňce na kolejích Vinařská. Atmosféra byla hustá vlhkostí z vařených těstovin a aromatem vín zrajících na radiátoru.",
         durationHours: 3,
-        imageUrl: "/uploads/event/event_placeholder.webp",
+        imageUrls: ["/uploads/event/event_placeholder.webp", "https://picsum.photos/seed/ev-kolaud-2/800/600", "https://picsum.photos/seed/ev-kolaud-3/800/600"],
         isPast: true,
         name: "Kolaudačka na Vinařské 2025",
         visibility: "public",
       },
     ],
-    imageUrl: "/uploads/winemaker/winery_placeholder.webp",
+    imageUrls: ["/uploads/winemaker/winery_placeholder.webp", "https://picsum.photos/seed/vinarska2/800/600", "https://picsum.photos/seed/vinarska3/800/600"],
     key: "vinarska",
     name: "Koleje Vinařská Cellars",
     ownerKey: null,
@@ -348,7 +348,7 @@ export const WINEMAKERS: WinemakerData[] = [
         ],
         description:
           "Zrálo přesně tři týdny za vařícím radiátorem na sdíleném pokoji na Vinařské. Tento urychlený termální proces stárnutí dodává vínu unikátní chuť.",
-        imageUrl: "/uploads/wine/ranni_rozjezd.webp",
+        imageUrls: ["/uploads/wine/ranni_rozjezd.webp", "https://picsum.photos/seed/radiator2/800/600", "https://picsum.photos/seed/radiator3/800/600"],
         name: "Radiator Reserve 2023",
         quantity: 280,
         region: "Pisárecká Kolejní Oblast",
@@ -377,7 +377,7 @@ export const WINEMAKERS: WinemakerData[] = [
           },
         ],
         description: "Vytvořeno specificky pro studenty čelící blížícím se deadlinům.",
-        imageUrl: "/uploads/wine/skuskove.webp",
+        imageUrls: ["/uploads/wine/skuskove.webp", "https://picsum.photos/seed/slzy2/800/600", "https://picsum.photos/seed/slzy3/800/600", "https://picsum.photos/seed/slzy4/800/600"],
         name: "Slzy Zkouškového",
         quantity: 320,
         region: "Pisárecká Kolejní Oblast",
@@ -404,13 +404,13 @@ export const WINEMAKERS: WinemakerData[] = [
         description:
           "Tento networkingový event se zaměřuje na Web3 investice a nalévají se vína, která stojí více než byt 2+kk v Králově Poli.",
         durationHours: 4,
-        imageUrl: "/uploads/event/event_placeholder.webp",
+        imageUrls: ["/uploads/event/event_placeholder.webp", "https://picsum.photos/seed/ev-crypto-2/800/600", "https://picsum.photos/seed/ev-crypto-3/800/600"],
         isPast: false,
         name: "Spielberk Tower Crypto-Gala",
         visibility: "private",
       },
     ],
-    imageUrl: "/uploads/winemaker/winery_placeholder.webp",
+    imageUrls: ["/uploads/winemaker/winery_placeholder.webp", "https://picsum.photos/seed/cayman2/800/600", "https://picsum.photos/seed/cayman3/800/600", "https://picsum.photos/seed/cayman4/800/600"],
     key: "cayman",
     name: "Krypton & Cayman Vineyards",
     ownerKey: null,
@@ -432,7 +432,7 @@ export const WINEMAKERS: WinemakerData[] = [
         ],
         description:
           "Vydáno speciálně k oslavě raketového růstu akcií. Cena divoce kolísá podle algoritmů na sociálních sítích.",
-        imageUrl: "/uploads/wine/bull_run.webp",
+        imageUrls: ["/uploads/wine/bull_run.webp", "https://picsum.photos/seed/bullrun2/800/600", "https://picsum.photos/seed/bullrun3/800/600"],
         name: "Bull Run",
         quantity: 77,
         region: "Blockchain Offshore Estate",
@@ -465,13 +465,13 @@ export const WINEMAKERS: WinemakerData[] = [
         description:
           "Vystresovaní studenti informatiky párovali naše vysokokofeinová Server Room vína se studenou pizzou.",
         durationHours: 4,
-        imageUrl: "/uploads/event/event_placeholder.webp",
+        imageUrls: ["/uploads/event/event_placeholder.webp", "https://picsum.photos/seed/ev-fimuni-2/800/600", "https://picsum.photos/seed/ev-fimuni-3/800/600"],
         isPast: true,
         name: "FI MUNI Debug & Drink",
         visibility: "public",
       },
     ],
-    imageUrl: "/uploads/winemaker/fi_muni_basement.webp",
+    imageUrls: ["/uploads/winemaker/fi_muni_basement.webp", "https://picsum.photos/seed/fimuni2/800/600", "https://picsum.photos/seed/fimuni3/800/600"],
     key: "fimuni",
     name: "FI MUNI Basement Brewery",
     ownerKey: null,
@@ -496,7 +496,7 @@ export const WINEMAKERS: WinemakerData[] = [
         ],
         description:
           "Těžké červené víno, které vzniklo chybou v Docker kontejneru během nasazování do produkce.",
-        imageUrl: "/uploads/wine/postgress.webp",
+        imageUrls: ["/uploads/wine/postgress.webp", "https://picsum.photos/seed/postgres2/800/600", "https://picsum.photos/seed/postgres3/800/600", "https://picsum.photos/seed/postgres4/800/600"],
         name: "Postgres Rollback 2019",
         quantity: 190,
         region: "Botanická Serverová Oblast",
@@ -519,7 +519,7 @@ export const WINEMAKERS: WinemakerData[] = [
         ],
         description:
           "Vzniklo, když dva vývojáři omylem přepsali produkční databázi a museli pít, aby zapomněli.",
-        imageUrl: "/uploads/wine/git_push.webp",
+        imageUrls: ["/uploads/wine/git_push.webp", "https://picsum.photos/seed/gitpush2/800/600", "https://picsum.photos/seed/gitpush3/800/600"],
         name: "Git Push --Force 2026",
         quantity: 42,
         region: "Botanická Serverová Oblast",
@@ -556,13 +556,13 @@ export const WINEMAKERS: WinemakerData[] = [
         description:
           "Striktně VIP událost pouze pro zvané, kde se funkcionalistická architektura setkává s neregulovaným kapitalismem.",
         durationHours: 3,
-        imageUrl: "/uploads/event/event_placeholder.webp",
+        imageUrls: ["/uploads/event/event_placeholder.webp", "https://picsum.photos/seed/ev-villa-2/800/600", "https://picsum.photos/seed/ev-villa-3/800/600", "https://picsum.photos/seed/ev-villa-4/800/600"],
         isPast: false,
         name: "Villa Tugendhat Elite Auction 2026",
         visibility: "private",
       },
     ],
-    imageUrl: "/uploads/winemaker/winery_placeholder.webp",
+    imageUrls: ["/uploads/winemaker/winery_placeholder.webp", "https://picsum.photos/seed/oligarch2/800/600", "https://picsum.photos/seed/oligarch3/800/600"],
     key: "oligarch",
     name: "Baron von Oligarch Estates",
     ownerKey: null,
@@ -585,7 +585,7 @@ export const WINEMAKERS: WinemakerData[] = [
         ],
         description:
           "Fermentováno s reálným diamantovým prachem, aby každý doušek jemně provedl peeling vašeho trávicího traktu.",
-        imageUrl: "/uploads/wine/diamond.webp",
+        imageUrls: ["/uploads/wine/diamond.webp", "https://picsum.photos/seed/diamond2/800/600", "https://picsum.photos/seed/diamond3/800/600", "https://picsum.photos/seed/diamond4/800/600"],
         name: "Diamond Infusion Cuvée",
         quantity: 8,
         region: "Exclusive Monopoly",
@@ -612,7 +612,7 @@ export const SHOPS: ShopData[] = [
     description:
       "Posledný maják nádeje v oceáne brnianskej noci. Ponúkame exkluzívny výber vín a bagety, ktoré majú viac skúseností ako tvoj priemerný profesor na FI.",
     email: "zachrana@vecerka.sk",
-    imageUrl: "/uploads/shop/vecerka_u_joska.webp",
+    imageUrls: ["/uploads/shop/vecerka_u_joska.webp", "https://picsum.photos/seed/vecerka2/800/600", "https://picsum.photos/seed/vecerka3/800/600"],
     key: "vecerka_posledna_zachrana",
     name: "Večerka Posledná Záchrana",
     ownerKey: "test_user",
@@ -624,7 +624,7 @@ export const SHOPS: ShopData[] = [
     description:
       "Miesto tak exkluzívne, že aj tvoj tieň potrebuje previerku od SIS. Naše vína sú tak drahé, že po ich kúpe ti zostane už len na suchý rohlík z vedľajšej Večerky.",
     email: "bunker@miliardari.biz",
-    imageUrl: "/uploads/shop/shop_placeholder.webp",
+    imageUrls: ["/uploads/shop/shop_placeholder.webp", "https://picsum.photos/seed/bunker2/800/600", "https://picsum.photos/seed/bunker3/800/600", "https://picsum.photos/seed/bunker4/800/600"],
     key: "miliardarsky_bunker",
     name: "Miliardársky Bunker",
     ownerKey: null,
