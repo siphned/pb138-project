@@ -147,6 +147,7 @@ function copyImageAssets() {
   let copied = 0;
 
   for (const url of unique) {
+    if (url.startsWith("http")) continue;
     const parts = url.split("/");
     const type = parts[2];
     const filename = parts[3];
