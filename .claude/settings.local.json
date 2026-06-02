@@ -38,7 +38,8 @@
       "Read(//tmp/**)",
       "Bash(node *)",
       "Bash(bun *)",
-      "Bash(grep -v 'InventoryForm\\\\|wines.$id.edit')"
+      "Bash(grep -v 'InventoryForm\\\\|wines.$id.edit')",
+      "Bash(npx tsc *)"
     ]
   }
 }

@@ -1,4 +1,3 @@
-import { CatalogPlaceholder } from "@/components/catalog/CatalogPlaceholder";
 import {
   Carousel,
   CarouselContent,
@@ -20,7 +19,11 @@ export function EventImageCarousel({ eventId, name }: EventImageCarouselProps) {
   if (photos.length === 0) {
     return (
       <div className="aspect-square w-full overflow-hidden rounded-lg bg-muted shadow-xs">
-        <CatalogPlaceholder text={name} />
+        <img
+          alt={name}
+          className="h-full w-full object-cover opacity-60 dark:opacity-40"
+          src="/placeholders/event.webp"
+        />
       </div>
     );
   }

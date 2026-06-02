@@ -100,6 +100,12 @@ docs/UI_AUDIT.md
 # Personal FE cleanup TODOs (Adam, local-only)
 LATER.md
 
+# TanStack Router temp files
+apps/web/.tanstack/
+
+# Temporary local docs / scratch
+docs/tmp/
+
 
 #Ignore vscode AI rules
 .github\instructions\codacy.instructions.md

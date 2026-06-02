@@ -1,6 +1,6 @@
 import { Link } from "@tanstack/react-router";
 import { CatalogCard, catalogCardLinkClass } from "./CatalogCard";
-import { CatalogPlaceholder } from "./CatalogPlaceholder";
+import { ProductImage } from "./ProductImage";
 
 interface BundleCardProps {
   product: {
@@ -21,7 +21,7 @@ export function BundleCard({ product }: BundleCardProps) {
 
   return (
     <CatalogCard
-      imageSlot={<CatalogPlaceholder text="BUNDLE" textClassName="text-2xl tracking-widest" />}
+      imageSlot={<ProductImage alt={product.name} fallbackText="BUNDLE" productId={product.id} />}
       titleLink={
         <Link
           className={catalogCardLinkClass}

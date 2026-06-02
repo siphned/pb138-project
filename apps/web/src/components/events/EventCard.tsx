@@ -2,7 +2,7 @@ import { Location01Icon } from "@hugeicons/core-free-icons";
 import { HugeiconsIcon } from "@hugeicons/react";
 import { useQueryClient } from "@tanstack/react-query";
 import { Link } from "@tanstack/react-router";
-import { CatalogPlaceholder } from "@/components/catalog/CatalogPlaceholder";
+import { EventImage } from "@/components/catalog/EventImage";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { useUser } from "@/context/UserContext";
@@ -22,7 +22,6 @@ interface EventCardProps {
     location?: string;
     winemakerName?: string;
     winemakerId?: string;
-    imageUrl?: string;
     isRegisteredByMe?: boolean;
   };
 }
@@ -84,16 +83,8 @@ export function EventCard({ event }: EventCardProps) {
 
   return (
     <Card className="group relative" variant="polaroid">
-      <div className="relative aspect-square w-full overflow-hidden rounded-lg bg-muted shadow-xs">
-        {event.imageUrl ? (
-          <img
-            alt={title}
-            className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-105"
-            src={event.imageUrl}
-          />
-        ) : (
-          <CatalogPlaceholder text={title} />
-        )}
+      <div className="relative aspect-3/4 w-full overflow-hidden rounded-lg bg-muted shadow-xs">
+        <EventImage alt={title} eventId={event.id} fallbackText={title} />
 
         {dateLabel && (
           <div className="absolute top-2 left-2 z-10">
