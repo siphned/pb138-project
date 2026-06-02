@@ -1477,7 +1477,7 @@ export const FALLBACK_REVIEWS = [
   "Svieže, čisté víno s peknou dochuťou. Spokojný zákazník.",
   "Párovanie s grilovaným mäsom bolo vynikajúce.",
   "Elegantné víno s dobrým potenciálom zrenia.",
-  "Príjemne ma prekvapilo. Vráti som sa pre viac.",
+  "Príjemne ma prekvapilo. Vrátim sa pre viac.",
   "Čistá odroda, dobre vyjadrený terroir. Palec hore.",
   "Ideálne na stretnutia s priateľmi. Ľahké a pitné.",
 ];
