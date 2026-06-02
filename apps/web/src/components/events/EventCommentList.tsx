@@ -21,6 +21,7 @@ interface CommentLike {
   text?: string;
   authorName?: string;
   author?: { name?: string; fname?: string; lname?: string };
+  user?: { fname?: string; lname?: string; id?: string };
   createdAt?: string | Date;
 }
 
@@ -31,9 +32,9 @@ function commentBody(c: CommentLike) {
 function commentAuthor(c: CommentLike) {
   if (c.authorName) return c.authorName;
   if (c.author?.name) return c.author.name;
-  if (c.author?.fname || c.author?.lname) {
+  if (c.author?.fname || c.author?.lname)
     return [c.author.fname, c.author.lname].filter(Boolean).join(" ");
-  }
+  if (c.user?.fname || c.user?.lname) return [c.user.fname, c.user.lname].filter(Boolean).join(" ");
   return "Anonymous";
 }
 

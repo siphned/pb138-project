@@ -38,7 +38,13 @@
       "Read(//tmp/**)",
       "Bash(node *)",
       "Bash(bun *)",
-      "Bash(grep -v 'InventoryForm\\\\|wines.$id.edit')"
+      "Bash(grep -v 'InventoryForm\\\\|wines.$id.edit')",
+      "Bash(npx tsc *)",
+      "Bash([ -f \"$SEED/$f\" ])",
+      "Bash(cp /home/johnny/Documents/Projects/PB138-Winery/new/pb138-project/apps/server/src/db/seeding_images/__TRACKED_VAR__ /home/johnny/Documents/Projects/PB138-Winery/new/pb138-project/apps/server/uploads/wine/__TRACKED_VAR__)",
+      "Bash(cp /home/johnny/Documents/Projects/PB138-Winery/new/pb138-project/apps/server/src/db/seeding_images/__TRACKED_VAR__ /home/johnny/Documents/Projects/PB138-Winery/new/pb138-project/apps/server/uploads/winemaker/__TRACKED_VAR__)",
+      "Bash(cp /home/johnny/Documents/Projects/PB138-Winery/new/pb138-project/apps/server/src/db/seeding_images/__TRACKED_VAR__ /home/johnny/Documents/Projects/PB138-Winery/new/pb138-project/apps/server/uploads/shop/__TRACKED_VAR__)",
+      "Bash(cp /home/johnny/Documents/Projects/PB138-Winery/new/pb138-project/apps/server/src/db/seeding_images/__TRACKED_VAR__ /home/johnny/Documents/Projects/PB138-Winery/new/pb138-project/apps/server/uploads/event/__TRACKED_VAR__)"
     ]
   }
 }

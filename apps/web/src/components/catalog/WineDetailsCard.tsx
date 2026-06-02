@@ -13,28 +13,23 @@ import {
 import { useGetWinemakersMe } from "@/generated/hooks/useGetWinemakersMe";
 import { useGetWinesByIdImages } from "@/generated/hooks/useGetWinesByIdImages";
 import type { GetWinesById200 } from "@/generated/types/GetWinesById";
-import { CatalogPlaceholder } from "./CatalogPlaceholder";
 
 interface WineDetailsCardProps {
   wine: GetWinesById200;
 }
 
-function WineImageCarousel({
-  wineId,
-  color,
-  name,
-}: {
-  wineId: string;
-  color: string;
-  name: string;
-}) {
+function WineImageCarousel({ wineId, name }: { wineId: string; color?: string; name: string }) {
   const { data: images } = useGetWinesByIdImages(wineId);
   const photos = images ?? [];
 
   if (photos.length === 0) {
     return (
       <div className="aspect-square w-full overflow-hidden rounded-lg bg-muted shadow-xs">
-        <CatalogPlaceholder color={color} text={name} />
+        <img
+          alt={name}
+          className="h-full w-full object-cover opacity-60 dark:opacity-40"
+          src="/placeholders/wine.webp"
+        />
       </div>
     );
   }
@@ -79,7 +74,7 @@ export function WineDetailsCard({ wine }: WineDetailsCardProps) {
       <Section heading="About this wine">
         <Card variant="default">
           <CardContent className="grid grid-cols-1 gap-8 md:grid-cols-[1fr_2fr]">
-            <WineImageCarousel color={wine.color} name={wine.name} wineId={wine.id} />
+            <WineImageCarousel name={wine.name} wineId={wine.id} />
             <div className="space-y-6">
               <DescriptionList>
                 <PropertyRow label="Color" value={wine.color} />
