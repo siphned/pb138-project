@@ -40,6 +40,7 @@ export const shopResponse = t.Object({
   createdAt: t.Date(),
   description: t.String(),
   id: t.String(),
+  imageUrl: t.Optional(t.Nullable(t.String())),
   name: t.String(),
   ownerUserId: t.String(),
   updatedAt: t.Union([t.Date(), t.Null()]),

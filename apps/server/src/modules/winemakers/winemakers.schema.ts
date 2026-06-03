@@ -27,6 +27,7 @@ export const winemakerListItemResponse = t.Object({
   description: t.String(),
   email: t.Nullable(t.String()),
   id: t.String(),
+  imageUrl: t.Optional(t.Nullable(t.String())),
   name: t.String(),
   phone: t.Nullable(t.String()),
   updatedAt: t.Nullable(t.Any()),

@@ -182,6 +182,7 @@ export const eventResponse = t.Object({
   description: t.Nullable(t.String()),
   endTime: t.Date(),
   id: t.String(),
+  imageUrl: t.Optional(t.Nullable(t.String())),
   inviteType: t.String(),
   name: t.String(),
   startTime: t.Date(),

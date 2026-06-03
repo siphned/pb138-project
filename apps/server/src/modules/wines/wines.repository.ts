@@ -2,9 +2,11 @@ import type { Wine, Winemaker } from "@repo/shared/schemas";
 import { winemakers, wines } from "@repo/shared/schemas";
 import { and, eq, ilike, isNull } from "drizzle-orm";
 import type { Database } from "../../db";
+import { primaryImageUrlSql } from "../images/images.sql";
 
 export type WineWithWinemaker = Wine & {
   winemaker: { id: string; name: string };
+  imageUrl?: string | null;
 };
 
 export type WineData = {
@@ -40,6 +42,7 @@ export async function findAll(db: Database, filters: WineFilters): Promise<WineW
   if (filters.winemakerId) conditions.push(eq(wines.winemakerId, filters.winemakerId));
 
   const rows = await db.query.wines.findMany({
+    extras: { imageUrl: primaryImageUrlSql("wine", wines.id).as("image_url") },
     where: and(...conditions),
     with: {
       winemaker: {
