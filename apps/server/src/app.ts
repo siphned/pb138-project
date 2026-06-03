@@ -1,6 +1,7 @@
 import { cors } from "@elysiajs/cors";
 import { openapi } from "@elysiajs/openapi";
 import { Elysia } from "elysia";
+import { zodToJsonSchema } from "zod-to-json-schema";
 import { adminRoutes } from "./modules/admin";
 import { availabilityRoutes } from "./modules/availability";
 import { cartsRoutes } from "./modules/carts";
@@ -29,6 +30,14 @@ export const app = new Elysia()
   .use(cors({ origin: frontendUrl }))
   .use(
     openapi({
+      mapJsonSchema: {
+        // biome-ignore lint/suspicious/noExplicitAny: mapper bridges Zod -> JSON Schema
+        zod: (schema: any) =>
+          // $refStrategy: "none" inlines repeated sub-schemas instead of emitting
+          // internal $ref pointers, which break once Elysia inlines each operation
+          // (the refs would point at a non-existent document root and Kubb fails).
+          zodToJsonSchema(schema, { $refStrategy: "none", target: "openApi3" }),
+      },
       documentation: {
         components: {
           securitySchemes: {

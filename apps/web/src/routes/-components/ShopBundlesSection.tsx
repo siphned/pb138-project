@@ -18,7 +18,7 @@ interface ShopBundlesSectionProps {
 }
 
 export function ShopBundlesSection({ shopId }: ShopBundlesSectionProps) {
-  const { data, isLoading } = useGetShopsByIdProducts(shopId, { isBundle: "true" });
+  const { data, isLoading } = useGetShopsByIdProducts(shopId, { isBundle: true });
   const products = data as ShopProductRaw[] | undefined;
 
   if (isLoading) {

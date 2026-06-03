@@ -36,7 +36,7 @@ export function AvailabilityRegularForm({ shopId, onSuccess }: AvailabilityRegul
 
   const form = useForm<PostShopsByIdAvailabilityRegularMutationRequest>({
     defaultValues: {
-      dow: "0",
+      dow: 0,
       endTime: "17:00",
       startTime: "09:00",
       type: "open",
@@ -68,7 +68,7 @@ export function AvailabilityRegularForm({ shopId, onSuccess }: AvailabilityRegul
           render={({ field }) => (
             <FormItem>
               <FormLabel>Day of Week</FormLabel>
-              <Select onValueChange={field.onChange} value={String(field.value)}>
+              <Select onValueChange={(v) => field.onChange(Number(v))} value={String(field.value)}>
                 <FormControl>
                   <SelectTrigger>
                     <SelectValue placeholder="Select a day" />

@@ -1,6 +1,13 @@
-import { Elysia, status, t } from "elysia";
+import { Elysia, status } from "elysia";
+import { z } from "zod";
 import { authPlugin } from "../auth";
 import { guestSessionsService } from "./guest-sessions.service";
+
+const sessionResponse = z.object({
+  createdAt: z.date(),
+  expiresAt: z.date(),
+  id: z.string(),
+});
 
 export const guestSessionsRoutes = new Elysia({
   prefix: "/guest-sessions",
@@ -21,11 +28,7 @@ export const guestSessionsRoutes = new Elysia({
           "Creates a new anonymous session record and returns the session ID in the response body. Used for guest carts and temporary state.",
         summary: "Initialize guest session",
       },
-      response: t.Object({
-        createdAt: t.Date(),
-        expiresAt: t.Date(),
-        id: t.String(),
-      }),
+      response: sessionResponse,
     }
   )
 
@@ -41,10 +44,10 @@ export const guestSessionsRoutes = new Elysia({
         description: "Returns metadata for an existing guest session if it has not expired.",
         summary: "Validate guest session",
       },
-      params: t.Object({ id: t.String() }),
+      params: z.object({ id: z.string() }),
       response: {
-        200: t.Object({ createdAt: t.Date(), expiresAt: t.Date(), id: t.String() }),
-        404: t.String(),
+        200: sessionResponse,
+        404: z.string(),
       },
     }
   );

@@ -155,8 +155,7 @@ describe("events routes", () => {
 
     it("returns 204 when authenticated as winemaker", async () => {
       const response = await app.handle(del("/events/e1", { auth: { roles: ["winemaker"] } }));
-      // TODO: Elysia status(204, null) → Bun Response constructor throws.
-      // Route changed to status(204, "") — verify after dependency bump.
+      // TODO: Elysia 204 responses can still surface as 500s. Verify after dependency bump.
       expect([204, 500]).toContain(response.status);
     });
   });
