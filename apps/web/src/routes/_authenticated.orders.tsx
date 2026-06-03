@@ -10,19 +10,11 @@ import {
 } from "@/components/ui/table";
 import { useGetOrders } from "@/generated/hooks/useGetOrders";
 import type { GetOrders200 } from "@/generated/types/GetOrders";
+import { formatEur } from "@/lib/utils";
 
 export const Route = createFileRoute("/_authenticated/orders")({
   component: OrdersListPage,
 });
-
-const formatPrice = (price: string | number): string => {
-  const num = typeof price === "string" ? Number.parseFloat(price) : price;
-  return new Intl.NumberFormat("en-IE", {
-    currency: "EUR",
-    maximumFractionDigits: 2,
-    style: "currency",
-  }).format(num);
-};
 
 const formatDate = (date: unknown): string => {
   if (typeof date === "string" || typeof date === "number") {
@@ -105,7 +97,7 @@ function OrdersListPage() {
                         {order.status}
                       </span>
                     </TableCell>
-                    <TableCell className="font-medium">{formatPrice(order.totalPrice)}</TableCell>
+                    <TableCell className="font-medium">{formatEur(order.totalPrice)}</TableCell>
                     <TableCell className="capitalize">{order.deliveryType}</TableCell>
                     <TableCell>
                       <Link

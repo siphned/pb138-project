@@ -1,5 +1,6 @@
 import { Link } from "@tanstack/react-router";
 import type { GetProducts200 } from "@/generated/types/GetProducts";
+import { formatEur } from "@/lib/utils";
 import { CatalogCard, catalogCardLinkClass } from "./CatalogCard";
 import { ProductImage } from "./ProductImage";
 
@@ -11,10 +12,7 @@ interface ProductCardProps {
 }
 
 export function ProductCard({ product, showShopName = true }: ProductCardProps) {
-  const price = Number(product.price).toLocaleString("en-IE", {
-    currency: "EUR",
-    style: "currency",
-  });
+  const price = formatEur(product.price);
 
   return (
     <CatalogCard
