@@ -1,5 +1,5 @@
 import { useGetWinemakersByIdImages } from "@/generated/hooks/useGetWinemakersByIdImages";
-import { EntityImage } from "./EntityImage";
+import { EntityImage, firstImageUrl } from "./EntityImage";
 
 interface WinemakerImageProps {
   winemakerId: string;
@@ -8,16 +8,16 @@ interface WinemakerImageProps {
   className?: string;
 }
 
-/** Thin wrapper around `<EntityImage>` for winemaker images. */
 export function WinemakerImage({ winemakerId, alt, fallbackText, className }: WinemakerImageProps) {
-  const imagesQuery = useGetWinemakersByIdImages(winemakerId);
+  const { data, isLoading } = useGetWinemakersByIdImages(winemakerId);
   return (
     <EntityImage
       alt={alt}
       className={className}
       entityType="winery"
       fallbackText={fallbackText}
-      imagesQuery={imagesQuery}
+      imageUrl={firstImageUrl(data)}
+      isLoading={isLoading}
     />
   );
 }

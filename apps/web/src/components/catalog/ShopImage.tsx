@@ -1,5 +1,5 @@
 import { useGetShopsByIdImages } from "@/generated/hooks/useGetShopsByIdImages";
-import { EntityImage } from "./EntityImage";
+import { EntityImage, firstImageUrl } from "./EntityImage";
 
 interface ShopImageProps {
   shopId: string;
@@ -8,16 +8,16 @@ interface ShopImageProps {
   className?: string;
 }
 
-/** Thin wrapper around `<EntityImage>` for shop images. */
 export function ShopImage({ shopId, alt, fallbackText, className }: ShopImageProps) {
-  const imagesQuery = useGetShopsByIdImages(shopId);
+  const { data, isLoading } = useGetShopsByIdImages(shopId);
   return (
     <EntityImage
       alt={alt}
       className={className}
       entityType="shop"
       fallbackText={fallbackText}
-      imagesQuery={imagesQuery}
+      imageUrl={firstImageUrl(data)}
+      isLoading={isLoading}
     />
   );
 }

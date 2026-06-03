@@ -1,5 +1,5 @@
 import { useGetWinesByIdImages } from "@/generated/hooks/useGetWinesByIdImages";
-import { EntityImage } from "./EntityImage";
+import { EntityImage, firstImageUrl } from "./EntityImage";
 
 interface WineImageProps {
   wineId: string;
@@ -8,16 +8,16 @@ interface WineImageProps {
   className?: string;
 }
 
-/** Thin wrapper around `<EntityImage>` for wine images. */
 export function WineImage({ wineId, alt, fallbackText, className }: WineImageProps) {
-  const imagesQuery = useGetWinesByIdImages(wineId);
+  const { data, isLoading } = useGetWinesByIdImages(wineId);
   return (
     <EntityImage
       alt={alt}
       className={className}
       entityType="wine"
       fallbackText={fallbackText}
-      imagesQuery={imagesQuery}
+      imageUrl={firstImageUrl(data)}
+      isLoading={isLoading}
     />
   );
 }

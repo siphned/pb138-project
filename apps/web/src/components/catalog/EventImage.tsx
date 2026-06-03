@@ -1,5 +1,5 @@
 import { useGetEventsByIdImages } from "@/generated/hooks/useGetEventsByIdImages";
-import { EntityImage } from "./EntityImage";
+import { EntityImage, firstImageUrl } from "./EntityImage";
 
 interface EventImageProps {
   eventId: string;
@@ -8,16 +8,16 @@ interface EventImageProps {
   className?: string;
 }
 
-/** Thin wrapper around `<EntityImage>` for event images. */
 export function EventImage({ eventId, alt, fallbackText, className }: EventImageProps) {
-  const imagesQuery = useGetEventsByIdImages(eventId);
+  const { data, isLoading } = useGetEventsByIdImages(eventId);
   return (
     <EntityImage
       alt={alt}
       className={className}
       entityType="event"
       fallbackText={fallbackText}
-      imagesQuery={imagesQuery}
+      imageUrl={firstImageUrl(data)}
+      isLoading={isLoading}
     />
   );
 }

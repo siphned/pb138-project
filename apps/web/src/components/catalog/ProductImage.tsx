@@ -1,5 +1,5 @@
 import { useGetProductsByIdImages } from "@/generated/hooks/useGetProductsByIdImages";
-import { EntityImage } from "./EntityImage";
+import { EntityImage, firstImageUrl } from "./EntityImage";
 
 interface ProductImageProps {
   productId: string;
@@ -8,16 +8,16 @@ interface ProductImageProps {
   className?: string;
 }
 
-/** Thin wrapper around `<EntityImage>` for product images. */
 export function ProductImage({ productId, alt, fallbackText, className }: ProductImageProps) {
-  const imagesQuery = useGetProductsByIdImages(productId);
+  const { data, isLoading } = useGetProductsByIdImages(productId);
   return (
     <EntityImage
       alt={alt}
       className={className}
       entityType="product"
       fallbackText={fallbackText}
-      imagesQuery={imagesQuery}
+      imageUrl={firstImageUrl(data)}
+      isLoading={isLoading}
     />
   );
 }
