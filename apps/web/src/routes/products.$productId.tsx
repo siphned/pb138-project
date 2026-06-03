@@ -22,9 +22,9 @@ function ProductDetailPage() {
   const { data: product, isLoading, isError, refetch } = useGetProductsById(productId);
   const addToCartMutation = usePostCartsItems();
 
-  const handleAddToCart = () => {
+  const handleAddToCart = (quantity: number) => {
     addToCartMutation.mutate(
-      { data: { productId, quantity: 1 } },
+      { data: { productId, quantity } },
       {
         onSuccess: () => {
           queryClient.invalidateQueries({ queryKey: getCartsQueryKey() });
