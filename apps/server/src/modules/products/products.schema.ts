@@ -37,13 +37,10 @@ const catalogWineType = z.enum(["still", "sparkling", "fortified", "dessert"]);
 
 const catalogWineColor = z.enum(["red", "white", "rosé", "orange", "gray", "tawny", "yellow"]);
 
-// Query booleans arrive as strings ("true"/"false"); coerce explicitly.
-const booleanString = z.enum(["true", "false"]).transform((v) => v === "true");
-
 export const getAllProductsQuery = z.object({
   color: catalogWineColor.optional(),
   containsProductId: z.string().uuid().optional(),
-  isBundle: booleanString.optional(),
+  isBundle: z.coerce.boolean().optional(),
   maxPrice: z.coerce.number().optional(),
   minPrice: z.coerce.number().optional(),
   page: z.coerce.number().int().min(1).optional(),

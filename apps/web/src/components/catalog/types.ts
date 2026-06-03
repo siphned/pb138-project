@@ -6,12 +6,18 @@ import type { GetWinesQueryParams } from "@/generated/types/GetWines";
 export const asString = (v: unknown): string | undefined => (typeof v === "string" ? v : undefined);
 
 /**
- * Coerces an unknown URL-search value into a numeric/stringy ID that the
- * generated Kubb param types accept (most numeric query params are typed
- * as `string | number` because TanStack Router serialises them as strings).
+ * Coerces an unknown URL-search value into `number | undefined`. Numeric query
+ * params are typed as `number` by the generated Kubb client (the backend Zod
+ * schemas coerce them), so string values from the URL are parsed here.
  */
-export const asNumOrStr = (v: unknown): string | number | undefined =>
-  typeof v === "string" || typeof v === "number" ? v : undefined;
+export const asNumOrStr = (v: unknown): number | undefined => {
+  if (typeof v === "number") return v;
+  if (typeof v === "string" && v.trim() !== "") {
+    const n = Number(v);
+    return Number.isNaN(n) ? undefined : n;
+  }
+  return undefined;
+};
 
 export type WineSearch = GetWinesQueryParams & { q?: string; sort?: string };
 // `isBundle` and `shopId` aren't in the OpenAPI list endpoint yet; we keep
@@ -28,8 +34,8 @@ export type ShopSearch = { q?: string };
 // Aggregated search-page state — spans wines + products + winemakers + shops.
 // Each sub-query strips the fields its endpoint doesn't accept.
 export type SearchPageSearch = WineSearch & {
-  minPrice?: string | number;
-  maxPrice?: string | number;
+  minPrice?: number;
+  maxPrice?: number;
   isBundle?: boolean;
 };
 

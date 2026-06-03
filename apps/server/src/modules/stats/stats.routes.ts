@@ -1,7 +1,8 @@
-import { Elysia, t } from "elysia";
+import { Elysia } from "elysia";
+import { z } from "zod";
 import { errorResponse } from "../../utils/error-plugin";
 import { authPlugin } from "../auth";
-import { statsResponseType } from "./stats.schema";
+import { statsResponseSchema } from "./stats.schema";
 import { statsService } from "./stats.service";
 
 export const statsRoutes = new Elysia()
@@ -18,15 +19,10 @@ export const statsRoutes = new Elysia()
         summary: "Get role-scoped stats",
         tags: ["stats"],
       },
-      query: t.Object({
-        role: t.Union([
-          t.Literal("customer"),
-          t.Literal("winemaker"),
-          t.Literal("shop_owner"),
-          t.Literal("admin"),
-        ]),
+      query: z.object({
+        role: z.enum(["customer", "winemaker", "shop_owner", "admin"]),
       }),
       requireAuth: true,
-      response: { 200: statsResponseType, 403: errorResponse, 404: errorResponse },
+      response: { 200: statsResponseSchema, 403: errorResponse, 404: errorResponse },
     }
   );

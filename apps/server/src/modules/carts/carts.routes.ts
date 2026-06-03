@@ -72,7 +72,7 @@ export const cartsRoutes = new Elysia({ prefix: "/carts", tags: ["carts"] })
         description: "Returns the cart for the authenticated user or guest session.",
         summary: "Get current cart",
       },
-      response: { 200: z.union([cartResponse, z.null()]), 400: z.string() },
+      response: { 200: cartResponse.nullable(), 400: z.string() },
     }
   )
 

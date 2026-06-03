@@ -32,7 +32,11 @@ export const app = new Elysia()
     openapi({
       mapJsonSchema: {
         // biome-ignore lint/suspicious/noExplicitAny: mapper bridges Zod -> JSON Schema
-        zod: (schema: any) => zodToJsonSchema(schema, { target: "openApi3" }),
+        zod: (schema: any) =>
+          // $refStrategy: "none" inlines repeated sub-schemas instead of emitting
+          // internal $ref pointers, which break once Elysia inlines each operation
+          // (the refs would point at a non-existent document root and Kubb fails).
+          zodToJsonSchema(schema, { $refStrategy: "none", target: "openApi3" }),
       },
       documentation: {
         components: {
