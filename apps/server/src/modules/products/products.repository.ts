@@ -1,9 +1,9 @@
 import type { NewProduct, NewProductWine, Product, ProductWine, Wine } from "@repo/shared/schemas";
 import { products, productWines, reviews, shops, wines } from "@repo/shared/schemas";
-import { primaryImageUrlSql } from "../images/images.sql";
 import type { SQL } from "drizzle-orm";
 import { and, asc, desc, eq, ilike, inArray, isNull, or, sql } from "drizzle-orm";
 import type { Database } from "../../db";
+import { primaryImageUrlSql } from "../images/images.sql";
 import { InsufficientStockError } from "./products.errors";
 
 export type WineInfo = Pick<
