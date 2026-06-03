@@ -3,6 +3,7 @@ import { z } from "zod";
 import { errorResponse } from "../../utils/error-plugin";
 import { authPlugin } from "../auth";
 import {
+  updateWinemakerBody,
   winemakerFiltersQuery,
   winemakerListItemResponse,
   winemakerProfileResponse,
@@ -10,16 +11,6 @@ import {
 import { winemakersService } from "./winemakers.service";
 
 const idParams = z.object({ id: z.string() });
-
-const updateProfileBody = z
-  .object({
-    description: z.string(),
-    email: z.string(),
-    name: z.string(),
-    phone: z.string(),
-    websiteUrl: z.string().nullable(),
-  })
-  .partial();
 
 export const winemakersRoutes = new Elysia({ prefix: "/winemakers", tags: ["winemakers"] })
   .use(authPlugin)
@@ -40,7 +31,7 @@ export const winemakersRoutes = new Elysia({ prefix: "/winemakers", tags: ["wine
   })
 
   .patch("/me", ({ dbUser, body }) => winemakersService.updateMyProfile(dbUser.id, body), {
-    body: updateProfileBody,
+    body: updateWinemakerBody,
     detail: {
       security: [{ bearerAuth: [] }],
       summary: "Update own winemaker profile",
@@ -60,7 +51,7 @@ export const winemakersRoutes = new Elysia({ prefix: "/winemakers", tags: ["wine
     ({ params, dbUser, clerkPayload, body }) =>
       winemakersService.updateWinemakerById(params.id, dbUser.id, clerkPayload.roles ?? [], body),
     {
-      body: updateProfileBody,
+      body: updateWinemakerBody,
       detail: {
         security: [{ bearerAuth: [] }],
         summary: "Update winemaker profile by ID (owner or admin)",
