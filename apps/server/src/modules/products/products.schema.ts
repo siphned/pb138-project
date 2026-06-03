@@ -40,7 +40,14 @@ const catalogWineColor = z.enum(["red", "white", "rosé", "orange", "gray", "taw
 export const getAllProductsQuery = z.object({
   color: catalogWineColor.optional(),
   containsProductId: z.string().uuid().optional(),
-  isBundle: z.coerce.boolean().optional(),
+  isBundle: z
+    .preprocess((v) => {
+      if (typeof v === "boolean") return v;
+      if (v === "true") return true;
+      if (v === "false") return false;
+      return v;
+    }, z.boolean())
+    .optional(),
   maxPrice: z.coerce.number().optional(),
   minPrice: z.coerce.number().optional(),
   page: z.coerce.number().int().min(1).optional(),
