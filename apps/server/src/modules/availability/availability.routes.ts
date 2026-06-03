@@ -1,10 +1,11 @@
-import { Elysia, status, t } from "elysia";
+import { Elysia, status } from "elysia";
+import { z } from "zod";
 import { authPlugin } from "../auth";
 import { addExceptionBody, addRegularBody, getAvailabilityResponse } from "./availability.schema";
 import { availabilityService } from "./availability.service";
 
-const shopParams = t.Object({ id: t.String() });
-const shopEntryParams = t.Object({ entryId: t.String(), id: t.String() });
+const shopParams = z.object({ id: z.string() });
+const shopEntryParams = z.object({ entryId: z.string(), id: z.string() });
 
 export const availabilityRoutes = new Elysia()
   .use(authPlugin)
