@@ -6,18 +6,28 @@ interface WinemakerImageProps {
   alt: string;
   fallbackText: string;
   className?: string;
+  imageUrl?: string | null;
 }
 
-export function WinemakerImage({ winemakerId, alt, fallbackText, className }: WinemakerImageProps) {
-  const { data, isLoading } = useGetWinemakersByIdImages(winemakerId);
+export function WinemakerImage({
+  winemakerId,
+  alt,
+  fallbackText,
+  className,
+  imageUrl,
+}: WinemakerImageProps) {
+  const hasInlineUrl = imageUrl !== undefined;
+  const { data, isLoading } = useGetWinemakersByIdImages(winemakerId, {
+    query: { enabled: !hasInlineUrl },
+  });
   return (
     <EntityImage
       alt={alt}
       className={className}
       entityType="winery"
       fallbackText={fallbackText}
-      imageUrl={firstImageUrl(data)}
-      isLoading={isLoading}
+      imageUrl={hasInlineUrl ? imageUrl : firstImageUrl(data)}
+      isLoading={!hasInlineUrl && isLoading}
     />
   );
 }

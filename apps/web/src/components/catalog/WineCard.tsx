@@ -15,7 +15,14 @@ export function WineCard({ wine, minPrice }: WineCardProps) {
 
   return (
     <CatalogCard
-      imageSlot={<WineImage alt={wine.name} fallbackText={wine.name} wineId={wine.id} />}
+      imageSlot={
+        <WineImage
+          alt={wine.name}
+          fallbackText={wine.name}
+          imageUrl={wine.imageUrl}
+          wineId={wine.id}
+        />
+      }
       titleLink={
         <Link className={catalogCardLinkClass} params={{ id: wine.id }} to="/wines/$id">
           {wine.name}

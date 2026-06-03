@@ -23,6 +23,7 @@ interface EventCardProps {
     winemakerName?: string;
     winemakerId?: string;
     isRegisteredByMe?: boolean;
+    imageUrl?: string | null;
   };
 }
 
@@ -84,7 +85,7 @@ export function EventCard({ event }: EventCardProps) {
   return (
     <Card className="group relative" variant="polaroid">
       <div className="relative aspect-3/4 w-full overflow-hidden rounded-lg bg-muted shadow-xs">
-        <EventImage alt={title} eventId={event.id} fallbackText={title} />
+        <EventImage alt={title} eventId={event.id} fallbackText={title} imageUrl={event.imageUrl} />
 
         {dateLabel && (
           <div className="absolute top-2 left-2 z-10">
