@@ -5,9 +5,30 @@ import { app } from "../../app";
 
 vi.mock("./reviews.service", () => ({
   reviewsService: {
-    createProductReview: vi.fn().mockResolvedValue({ id: "r1" }),
-    createWinemakerReview: vi.fn().mockResolvedValue({ id: "r3" }),
-    createWineReview: vi.fn().mockResolvedValue({ id: "r2" }),
+    createProductReview: vi.fn().mockResolvedValue({
+      body: null,
+      createdAt: new Date(),
+      id: "r1",
+      rating: 5,
+      user: { fname: "Test", id: "u1", lname: "User" },
+      userId: "u1",
+    }),
+    createWinemakerReview: vi.fn().mockResolvedValue({
+      body: null,
+      createdAt: new Date(),
+      id: "r3",
+      rating: 5,
+      user: { fname: "Test", id: "u1", lname: "User" },
+      userId: "u1",
+    }),
+    createWineReview: vi.fn().mockResolvedValue({
+      body: null,
+      createdAt: new Date(),
+      id: "r2",
+      rating: 5,
+      user: { fname: "Test", id: "u1", lname: "User" },
+      userId: "u1",
+    }),
     deleteReview: vi.fn().mockResolvedValue(undefined),
     listProductReviews: vi
       .fn()
