@@ -82,9 +82,9 @@ export const winesRoutes = new Elysia()
 
   .delete(
     "/wines/:id",
-    async ({ params, dbUser, clerkPayload }) => {
+    async ({ params, dbUser, clerkPayload, set }) => {
       await winesService.deleteWine(params.id, dbUser.id, clerkPayload.roles ?? []);
-      return status(204, "");
+      set.status = 204;
     },
     {
       detail: {
@@ -95,6 +95,6 @@ export const winesRoutes = new Elysia()
       },
       params: idParams,
       requireRoles: ["winemaker", "admin"],
-      response: { 204: z.null(), 403: errorResponse, 404: errorResponse },
+      response: { 403: errorResponse, 404: errorResponse },
     }
   );

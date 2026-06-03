@@ -81,14 +81,14 @@ function buildImageRoutes(entityPlural: string, entityType: EntityType) {
 
     .delete(
       `/${entityPlural}/:id/images/:imageId`,
-      async ({ params, dbUser, clerkPayload }) => {
+      async ({ params, dbUser, clerkPayload, set }) => {
         await imagesService.deleteImage(
           { roles: clerkPayload.roles ?? [], userId: dbUser.id },
           entityType,
           params.id,
           params.imageId
         );
-        return status(204, "");
+        set.status = 204;
       },
       {
         detail: {
@@ -99,7 +99,7 @@ function buildImageRoutes(entityPlural: string, entityType: EntityType) {
         },
         params: imageDeleteParams,
         requireRoles,
-        response: { 204: z.null(), 403: errorResponse, 404: errorResponse },
+        response: { 403: errorResponse, 404: errorResponse },
       }
     );
 }

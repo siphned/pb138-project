@@ -75,9 +75,9 @@ export const eventsRoutes = new Elysia()
 
   .delete(
     "/events/:id",
-    async ({ params, dbUser }) => {
+    async ({ params, dbUser, set }) => {
       await eventsService.deleteEvent(params.id, dbUser.id);
-      return status(204, "");
+      set.status = 204;
     },
     {
       detail: {
@@ -107,9 +107,9 @@ export const eventsRoutes = new Elysia()
 
   .delete(
     "/events/:id/register",
-    async ({ params, dbUser }) => {
+    async ({ params, dbUser, set }) => {
       await eventsService.unregisterFromEvent(params.id, dbUser.id);
-      return status(204, "");
+      set.status = 204;
     },
     {
       detail: {

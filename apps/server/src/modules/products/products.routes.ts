@@ -94,9 +94,9 @@ export const shopProductsRoutes = new Elysia({ prefix: "/shops/:id" })
 
   .delete(
     "/products/:productId",
-    async ({ params, dbUser }) => {
+    async ({ params, dbUser, set }) => {
       await productsService.deleteProductOrBundle(params.id, params.productId, dbUser.id);
-      return status(204, "");
+      set.status = 204;
     },
     {
       detail: {
@@ -107,6 +107,6 @@ export const shopProductsRoutes = new Elysia({ prefix: "/shops/:id" })
       },
       params: shopProductParams,
       requireRoles: ["shop_owner", "admin"],
-      response: { 204: z.null(), 403: errorResponse, 404: errorResponse },
+      response: { 403: errorResponse, 404: errorResponse },
     }
   );
