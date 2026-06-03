@@ -1,7 +1,7 @@
 import { Link } from "@tanstack/react-router";
 import type { GetProducts200 } from "@/generated/types/GetProducts";
 import { CatalogCard, catalogCardLinkClass } from "./CatalogCard";
-import { ProductImage } from "./ProductImage";
+import { EntityImage } from "./EntityImage";
 
 export type GetProducts200Item = GetProducts200["data"][number];
 
@@ -28,7 +28,12 @@ export function ProductCard({ product, showShopName = true }: ProductCardProps) 
         )
       }
       imageSlot={
-        <ProductImage alt={product.name} fallbackText={product.name} productId={product.id} />
+        <EntityImage
+          alt={product.name}
+          entityType="product"
+          fallbackText={product.name}
+          imageUrl={product.imageUrl}
+        />
       }
       titleLink={
         <Link
