@@ -1,5 +1,5 @@
 import type { NewProduct, NewProductWine, Product, ProductWine, Wine } from "@repo/shared/schemas";
-import { products, productWines, reviews, shops, wines } from "@repo/shared/schemas";
+import { images, products, productWines, reviews, shops, wines } from "@repo/shared/schemas";
 import type { SQL } from "drizzle-orm";
 import { and, asc, desc, eq, ilike, inArray, isNull, or, sql } from "drizzle-orm";
 import type { Database } from "../../db";
@@ -52,6 +52,7 @@ export type CatalogRow = {
   shopName: string;
   avgRating: string | null;
   reviewCount: number;
+  imageUrl: string | null;
 };
 
 export async function create(db: Database, data: NewProduct): Promise<Product> {
@@ -273,6 +274,14 @@ export async function findAll(
     .select({
       avgRating: sql<string | null>`AVG(${reviews.rating})`,
       id: products.id,
+      imageUrl: sql<string | null>`(
+        SELECT i.url FROM ${images} i
+        WHERE i.entity_type = 'product'
+          AND i.entity_id = ${products.id}
+          AND i.deleted_at IS NULL
+        ORDER BY i.created_at ASC, i.id ASC
+        LIMIT 1
+      )`,
       isBundle: products.isBundle,
       name: products.name,
       price: products.price,

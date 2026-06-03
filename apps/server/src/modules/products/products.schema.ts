@@ -83,6 +83,7 @@ const catalogWineItem = t.Object({
 
 const catalogProductItem = t.Object({
   id: t.String(),
+  imageUrl: t.Nullable(t.String()),
   isBundle: t.Boolean(),
   name: t.String(),
   price: t.String(),

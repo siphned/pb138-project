@@ -21,6 +21,7 @@ type CatalogProductItem = {
   price: string;
   quantity: number;
   isBundle: boolean;
+  imageUrl: string | null;
   shop: { id: string; name: string };
   rating: number | null;
   reviewCount: number;
@@ -88,6 +89,7 @@ export class ProductsService {
 
     const data: CatalogProductItem[] = rows.map((row) => ({
       id: row.id,
+      imageUrl: row.imageUrl,
       isBundle: row.isBundle,
       name: row.name,
       price: row.price,
