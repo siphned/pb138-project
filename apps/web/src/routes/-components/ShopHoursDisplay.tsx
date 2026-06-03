@@ -118,8 +118,12 @@ export function ShopHoursDisplay({ shopId }: ShopHoursDisplayProps) {
         <div className="flex items-center gap-2 pt-1">
           <Popover>
             <PopoverTrigger
+              closeDelay={150}
+              delay={120}
+              openOnHover
               render={
                 <button
+                  aria-label="Holiday and special hours"
                   className="flex items-center gap-1.5 text-[10px] font-bold uppercase tracking-wider text-primary hover:text-primary/80"
                   type="button"
                 />
