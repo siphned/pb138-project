@@ -1,6 +1,7 @@
 import { basename } from "node:path";
 import { fileURLToPath } from "node:url";
-import { Elysia, status, t } from "elysia";
+import { Elysia, status } from "elysia";
+import { z } from "zod";
 import { errorResponse } from "../../utils/error-plugin";
 import type { AppRole } from "../auth";
 import { authPlugin } from "../auth";
@@ -14,6 +15,9 @@ import {
 import { imagesService } from "./images.service";
 
 const UPLOADS_DIR = fileURLToPath(new URL("../../../uploads", import.meta.url));
+
+const idParams = z.object({ id: z.string() });
+const imageDeleteParams = z.object({ id: z.string(), imageId: z.string() });
 
 function buildImageRoutes(entityPlural: string, entityType: EntityType) {
   const requireRoles: AppRole[] =
@@ -35,9 +39,9 @@ function buildImageRoutes(entityPlural: string, entityType: EntityType) {
           summary: `List ${entityType} images`,
           tags: ["images"],
         },
-        params: t.Object({ id: t.String() }),
+        params: idParams,
         response: {
-          200: t.Array(imageResponse),
+          200: z.array(imageResponse),
           404: errorResponse,
         },
       }
@@ -62,7 +66,7 @@ function buildImageRoutes(entityPlural: string, entityType: EntityType) {
           summary: `Upload ${entityType} image`,
           tags: ["images"],
         },
-        params: t.Object({ id: t.String() }),
+        params: idParams,
         requireRoles,
         response: {
           201: imageResponse,
@@ -93,9 +97,9 @@ function buildImageRoutes(entityPlural: string, entityType: EntityType) {
           summary: `Delete ${entityType} image`,
           tags: ["images"],
         },
-        params: t.Object({ id: t.String(), imageId: t.String() }),
+        params: imageDeleteParams,
         requireRoles,
-        response: { 204: t.Null(), 403: errorResponse, 404: errorResponse },
+        response: { 204: z.null(), 403: errorResponse, 404: errorResponse },
       }
     );
 }
@@ -116,7 +120,7 @@ export const imagesRoutes = new Elysia()
     },
     {
       detail: { summary: "Serve uploaded image file", tags: ["images"] },
-      params: t.Object({ entityType: entityTypeSchema, filename: t.String() }),
+      params: z.object({ entityType: entityTypeSchema, filename: z.string() }),
     }
   )
   .use(buildImageRoutes("wines", "wine"))
