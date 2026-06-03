@@ -61,9 +61,9 @@ function ProductsPage() {
   const search = Route.useSearch();
   const navigate = useNavigate({ from: Route.fullPath });
 
-  // isBundle and shopId are UI-only filters until BE adds them to the
-  // products list endpoint in OpenAPI (see types.ts).
-  const { isBundle: _isBundle, shopId: _shopId, ...apiSearchParams } = search;
+  // shopId is a UI-only filter; the products list endpoint scopes by shop via
+  // its own /shops/:id/products route, not a query param.
+  const { shopId: _shopId, ...apiSearchParams } = search;
   const query = useGetProducts(apiSearchParams);
 
   const handleSearchChange = (next: ProductSearch) => {
