@@ -5,7 +5,6 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { ProductDetailsCard } from "@/components/catalog/ProductDetailsCard";
 import { ErrorState } from "@/components/primitives/error-state";
 import { LoadingState } from "@/components/primitives/loading-state";
-import { Separator } from "@/components/ui/separator";
 import { getCartsQueryKey } from "@/generated/hooks/useGetCarts";
 import { useGetProductsById } from "@/generated/hooks/useGetProductsById";
 import { usePostCartsItems } from "@/generated/hooks/usePostCartsItems";
@@ -67,8 +66,6 @@ function ProductDetailPage() {
             onAddToCart={handleAddToCart}
             product={product}
           />
-
-          <Separator />
 
           <ProductRelatedSection
             isBundle={!!product.isBundle}
