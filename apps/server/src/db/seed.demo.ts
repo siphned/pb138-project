@@ -45,6 +45,7 @@ import {
   insertUsers,
   insertWinemakers,
   insertWines,
+  realCzechAddress,
   teardown,
 } from "./seed.lib";
 
@@ -62,13 +63,7 @@ function fakeClerkId() {
 }
 
 function czechAddress(city: string): AddressInput {
-  return {
-    city,
-    country: "Czech Republic",
-    houseNumber: faker.location.buildingNumber(),
-    postalCode: `${faker.string.numeric(3)} ${faker.string.numeric(2)}`,
-    street: faker.location.street(),
-  };
+  return realCzechAddress(city);
 }
 
 function pick<T>(arr: readonly T[]): T {
