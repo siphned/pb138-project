@@ -62,12 +62,12 @@ export async function entityExists(db: Database, entityType: EntityType, entityI
 
 export function findByEntity(db: Database, entityType: EntityType, entityId: string) {
   return db.query.images.findMany({
+    orderBy: [asc(images.createdAt), asc(images.id)],
     where: and(
       eq(images.entityType, entityType),
       eq(images.entityId, entityId),
       isNull(images.deletedAt)
     ),
-    orderBy: [asc(images.createdAt), asc(images.id)],
   });
 }
 
