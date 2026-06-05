@@ -1,7 +1,9 @@
 import { useAuth } from "@clerk/react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { createContext, type ReactNode, useContext, useEffect, useState } from "react";
+import { getCartsQueryKey } from "@/generated/hooks/useGetCarts";
 import { getUsersMeQueryKey, getUsersMeQueryOptions } from "@/generated/hooks/useGetUsersMe";
+import { usePostGuestSessions } from "@/generated/hooks/usePostGuestSessions";
 import { usePutUsersMe } from "@/generated/hooks/usePutUsersMe";
 import { Role } from "@/types/roles";
 
@@ -53,6 +55,20 @@ export function UserProvider({ children }: { children: ReactNode }) {
       },
     },
   });
+
+  const { mutate: ensureGuestSession } = usePostGuestSessions({
+    mutation: {
+      onSuccess: () => {
+        queryClient.invalidateQueries({ queryKey: getCartsQueryKey() });
+      },
+    },
+  });
+
+  useEffect(() => {
+    if (isLoaded && !isSignedIn) {
+      ensureGuestSession();
+    }
+  }, [isLoaded, isSignedIn, ensureGuestSession]);
 
   const [user, setUser] = useState<UserProfile | null>(defaultUser);
 

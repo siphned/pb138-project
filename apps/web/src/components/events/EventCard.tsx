@@ -96,7 +96,7 @@ export function EventCard({ event }: EventCardProps) {
         )}
       </div>
 
-      <div className="space-y-2 pt-4 text-center">
+      <div className="flex flex-1 flex-col space-y-2 pt-4 text-center">
         <h3 className="font-heading text-base font-bold leading-tight line-clamp-2">
           <Link
             className="stretched-link transition-colors hover:text-primary focus:outline-none"
@@ -120,7 +120,7 @@ export function EventCard({ event }: EventCardProps) {
           </p>
         )}
 
-        <div className="relative z-10 space-y-1 pt-2">
+        <div className="relative z-10 mt-auto space-y-1 pt-2">
           <Button
             className="w-full"
             disabled={isRegistered || pending || !user}

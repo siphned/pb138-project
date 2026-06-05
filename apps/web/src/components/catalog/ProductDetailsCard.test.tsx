@@ -38,7 +38,7 @@ describe("ProductDetailsCard", () => {
     );
     expect(screen.getAllByText("Gala Pálava Bundle")[0]).toBeInTheDocument();
     expect(screen.getByText(/Vinotéka u Adama/)).toBeInTheDocument();
-    expect(screen.getByText(/€1,200/)).toBeInTheDocument();
+    expect(screen.getByText(/1,200.00 €/)).toBeInTheDocument();
     expect(screen.getByText(/in stock/i)).toBeInTheDocument();
   });
 

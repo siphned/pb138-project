@@ -36,7 +36,7 @@ describe("WineCard", () => {
 
   it("renders min-price badge when provided", () => {
     render(<WineCard minPrice={450} wine={mockWine} />);
-    expect(screen.getByText(/from €450/i)).toBeInTheDocument();
+    expect(screen.getByText(/from 450.00 €/i)).toBeInTheDocument();
   });
 
   it("renders CatalogPlaceholder when no image", () => {

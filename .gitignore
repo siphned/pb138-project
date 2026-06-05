@@ -82,6 +82,7 @@ apps/server/uploads/*
 !apps/server/uploads/shop/
 !apps/server/uploads/event/
 !apps/server/uploads/user/
+!apps/server/uploads/product/
 apps/server/uploads/wine/*
 apps/server/uploads/winemaker/*
 apps/server/uploads/shop/*

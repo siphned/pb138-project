@@ -1,12 +1,6 @@
-import { t } from "elysia";
-import z from "zod";
+import { z } from "zod";
 
-/**
- * Request/response schemas for events module.
- * Zod for shared types, TypeBox for Elysia route validation.
- */
-
-const addressBodySchema = z.object({
+const addressBody = z.object({
   city: z.string().min(1).max(255),
   country: z.string().min(1).max(50),
   houseNumber: z.string().min(1).max(20),
@@ -14,8 +8,8 @@ const addressBodySchema = z.object({
   street: z.string().min(1).max(255),
 });
 
-export const createEventBodySchema = z.object({
-  address: addressBodySchema,
+export const createEventBody = z.object({
+  address: addressBody,
   capacity: z.number().int().min(1).max(32767),
   description: z.string().min(1).max(10000).optional(),
   endTime: z.string().datetime(),
@@ -25,7 +19,7 @@ export const createEventBodySchema = z.object({
   visibility: z.enum(["public", "private"]),
 });
 
-export const updateEventBodySchema = z.object({
+export const updateEventBody = z.object({
   capacity: z.number().int().min(1).max(32767).optional(),
   description: z.string().min(1).max(10000).nullable().optional(),
   endTime: z.string().datetime().optional(),
@@ -33,28 +27,28 @@ export const updateEventBodySchema = z.object({
   startTime: z.string().datetime().optional(),
 });
 
-export const listEventsQuerySchema = z.object({
+export const listEventsQuery = z.object({
   from: z.string().datetime().optional(),
-  limit: z.number().min(1).max(100).optional(),
-  page: z.number().min(1).optional(),
+  limit: z.coerce.number().min(1).max(100).optional(),
+  page: z.coerce.number().min(1).optional(),
   q: z.string().max(255).optional(),
   to: z.string().datetime().optional(),
   winemakerId: z.string().optional(),
   winemakerName: z.string().max(255).optional(),
 });
 
-export const paginationQuerySchema = z.object({
-  limit: z.number().min(1).max(100).optional(),
-  page: z.number().min(1).optional(),
+export const paginationQuery = z.object({
+  limit: z.coerce.number().min(1).max(100).optional(),
+  page: z.coerce.number().min(1).optional(),
 });
 
-export const createCommentBodySchema = z.object({
+export const createCommentBody = z.object({
   body: z.string().min(1).max(2000),
 });
 
-export const eventParamsSchema = z.object({ id: z.string() });
+export const eventParams = z.object({ id: z.string() });
 
-const addressResponseSchema = z.object({
+const addressResponse = z.object({
   city: z.string(),
   country: z.string(),
   houseNumber: z.string(),
@@ -62,8 +56,8 @@ const addressResponseSchema = z.object({
   street: z.string(),
 });
 
-export const eventResponseSchema = z.object({
-  address: addressResponseSchema.nullable(),
+export const eventResponse = z.object({
+  address: addressResponse.nullable(),
   addressId: z.string(),
   capacity: z.number(),
   createdAt: z.date(),
@@ -80,21 +74,21 @@ export const eventResponseSchema = z.object({
   winemakerId: z.string(),
 });
 
-export const paginatedEventsResponseSchema = z.object({
-  data: z.array(eventResponseSchema),
+export const paginatedEventsResponse = z.object({
+  data: z.array(eventResponse),
   limit: z.number(),
   page: z.number(),
   total: z.number(),
 });
 
-export const registrationResponseSchema = z.object({
+export const registrationResponse = z.object({
   createdAt: z.date(),
   eventId: z.string(),
   id: z.string(),
   userId: z.string(),
 });
 
-const commentWithUserResponseSchema = z.object({
+const commentWithUserResponse = z.object({
   body: z.string(),
   createdAt: z.date(),
   eventId: z.string(),
@@ -103,7 +97,7 @@ const commentWithUserResponseSchema = z.object({
   userId: z.string(),
 });
 
-export const commentResponseSchema = z.object({
+export const commentResponse = z.object({
   body: z.string(),
   createdAt: z.date(),
   eventId: z.string(),
@@ -111,8 +105,8 @@ export const commentResponseSchema = z.object({
   userId: z.string(),
 });
 
-export const paginatedCommentsResponseSchema = z.object({
-  data: z.array(commentWithUserResponseSchema),
+export const paginatedCommentsResponse = z.object({
+  data: z.array(commentWithUserResponse),
   limit: z.number(),
   page: z.number(),
   total: z.number(),

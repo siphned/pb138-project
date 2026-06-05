@@ -1,5 +1,6 @@
 import { Separator } from "@/components/ui/separator";
 import type { GetCarts200 } from "@/generated/types/GetCarts";
+import { formatEur } from "@/lib/utils";
 
 type CartItem = NonNullable<GetCarts200>["items"][number];
 
@@ -16,23 +17,22 @@ export function CartSummary({ items, deliveryType = "shipping" }: CartSummaryPro
     return acc + price * quantity;
   }, 0);
 
-  const formatPrice = (n: number) => n.toFixed(2);
   const deliveryLabel = deliveryType === "pickup" ? "Pickup" : "Shipping";
 
   return (
     <div className="flex flex-col gap-4 rounded-lg border border-border p-4">
       <div className="flex justify-between">
         <span className="text-muted-foreground">Subtotal</span>
-        <span className="text-foreground">€{formatPrice(subtotal)}</span>
+        <span className="text-foreground">{formatEur(subtotal)}</span>
       </div>
       <div className="flex justify-between">
         <span className="text-muted-foreground">{deliveryLabel}</span>
-        <span className="text-foreground">€{formatPrice(deliveryCost)}</span>
+        <span className="text-foreground">{formatEur(deliveryCost)}</span>
       </div>
       <Separator />
       <div className="flex justify-between text-lg font-bold">
         <span>Total</span>
-        <span>€{formatPrice(subtotal + deliveryCost)}</span>
+        <span>{formatEur(subtotal + deliveryCost)}</span>
       </div>
     </div>
   );

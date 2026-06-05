@@ -9,7 +9,7 @@ import { getCartsQueryKey } from "@/generated/hooks/useGetCarts";
 import { useGetUsersMeAddresses } from "@/generated/hooks/useGetUsersMeAddresses";
 import { usePostOrdersCheckout } from "@/generated/hooks/usePostOrdersCheckout";
 import type { GetCarts200 } from "@/generated/types/GetCarts";
-import { cn } from "@/lib/utils";
+import { cn, formatEur } from "@/lib/utils";
 import { CartSummary } from "./CartSummary";
 
 function toErrorMessage(err: unknown): string {
@@ -133,7 +133,7 @@ export function CheckoutSection({
         disabled={isCartEmpty || checkout.isPending}
         type="submit"
       >
-        {checkout.isPending ? "Processing..." : `Confirm Order — €${total.toFixed(2)}`}
+        {checkout.isPending ? "Processing..." : `Confirm Order — ${formatEur(total)}`}
       </button>
       <p className="text-xs text-center text-muted-foreground">
         By purchasing you agree to our Terms of Service and Privacy Policy.

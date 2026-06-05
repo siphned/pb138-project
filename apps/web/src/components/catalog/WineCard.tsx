@@ -1,5 +1,6 @@
 import { Link } from "@tanstack/react-router";
 import type { GetWines200 } from "@/generated/types/GetWines";
+import { formatEur } from "@/lib/utils";
 import { CatalogCard, catalogCardLinkClass } from "./CatalogCard";
 import { WineImage } from "./WineImage";
 
@@ -32,7 +33,7 @@ export function WineCard({ wine, minPrice }: WineCardProps) {
       <p className="text-xs text-muted-foreground">{subtitle}</p>
       {minPrice !== undefined && (
         <span className="inline-block rounded-full bg-primary/10 px-2 py-0.5 text-[10px] font-semibold text-primary">
-          from €{minPrice}
+          from {formatEur(minPrice)}
         </span>
       )}
     </CatalogCard>

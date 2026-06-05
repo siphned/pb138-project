@@ -14,6 +14,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { useGetOrders } from "@/generated/hooks/useGetOrders";
+import { formatEur } from "@/lib/utils";
 
 export const Route = createFileRoute("/shops/$id/orders")({
   component: ShopOrdersPage,
@@ -84,13 +85,7 @@ function ShopOrdersPage() {
                 <TableRow key={order.id}>
                   <TableCell className="font-mono text-xs">{order.id.slice(0, 8)}…</TableCell>
                   <TableCell>{new Date(order.createdAt).toLocaleDateString("en-IE")}</TableCell>
-                  <TableCell>
-                    {new Intl.NumberFormat("en-IE", {
-                      currency: "EUR",
-                      maximumFractionDigits: 2,
-                      style: "currency",
-                    }).format(Number.parseFloat(order.totalPrice))}
-                  </TableCell>
+                  <TableCell>{formatEur(order.totalPrice)}</TableCell>
                   <TableCell className="capitalize">{order.deliveryType}</TableCell>
                   <TableCell>
                     <Badge variant={statusVariant(order.status)}>{order.status}</Badge>
