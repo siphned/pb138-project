@@ -38,11 +38,11 @@ export function describeEntityImageWrapper({
       expect(screen.getByAltText(alt)).toHaveAttribute("src", sampleUrl);
     });
 
-    it("renders the placeholder while the hook is loading", () => {
+    it("renders a skeleton while the hook is loading", () => {
       setQuery(undefined, true);
-      render(renderWrapper());
+      const { container } = render(renderWrapper());
       expect(screen.queryByAltText(alt)).not.toBeInTheDocument();
-      expect(screen.getByText(fallbackText)).toBeInTheDocument();
+      expect(container.querySelector('[data-slot="skeleton"]')).toBeInTheDocument();
     });
 
     it("renders the placeholder when no images are attached", () => {

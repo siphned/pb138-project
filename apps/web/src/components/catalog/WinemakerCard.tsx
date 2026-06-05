@@ -18,6 +18,7 @@ export function WinemakerCard({ winemaker }: WinemakerCardProps) {
         <WinemakerImage
           alt={winemaker.name}
           fallbackText={winemaker.name}
+          imageUrl={winemaker.imageUrl}
           winemakerId={winemaker.id}
         />
       }

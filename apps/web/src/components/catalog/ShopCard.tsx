@@ -14,7 +14,14 @@ export function ShopCard({ shop }: ShopCardProps) {
 
   return (
     <CatalogCard
-      imageSlot={<ShopImage alt={shop.name} fallbackText={shop.name} shopId={shop.id} />}
+      imageSlot={
+        <ShopImage
+          alt={shop.name}
+          fallbackText={shop.name}
+          imageUrl={shop.imageUrl}
+          shopId={shop.id}
+        />
+      }
       titleLink={
         <Link className={catalogCardLinkClass} params={{ id: shop.id }} to="/shops/$id">
           {shop.name}

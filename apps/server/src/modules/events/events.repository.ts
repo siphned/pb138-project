@@ -14,6 +14,7 @@ import {
 } from "@repo/shared/schemas";
 import { and, count, eq, gte, ilike, inArray, isNull, lte } from "drizzle-orm";
 import type { Database } from "../../db";
+import { primaryImageUrlSql } from "../images/images.sql";
 
 export type EventWithDetails = Event & {
   winemaker: { id: string; name: string } | null;
@@ -24,6 +25,7 @@ export type EventWithDetails = Event & {
     street: string;
     houseNumber: string;
   } | null;
+  imageUrl?: string | null;
 };
 
 export type CommentWithUser = EventComment & {
@@ -229,6 +231,7 @@ export async function findMany(
   ].filter((c): c is NonNullable<typeof c> => c !== undefined);
 
   const rows = await db.query.events.findMany({
+    extras: { imageUrl: primaryImageUrlSql("event", events.id).as("image_url") },
     limit: pagination.limit,
     offset: pagination.offset,
     orderBy: (e, { asc }) => [asc(e.startTime)],
