@@ -45,6 +45,7 @@ import {
   insertUsers,
   insertWinemakers,
   insertWines,
+  realCzechAddress,
   teardown,
 } from "./seed.lib";
 
@@ -62,13 +63,7 @@ function fakeClerkId() {
 }
 
 function czechAddress(city: string): AddressInput {
-  return {
-    city,
-    country: "Czech Republic",
-    houseNumber: faker.location.buildingNumber(),
-    postalCode: `${faker.string.numeric(3)} ${faker.string.numeric(2)}`,
-    street: faker.location.street(),
-  };
+  return realCzechAddress(city);
 }
 
 function pick<T>(arr: readonly T[]): T {
@@ -838,12 +833,16 @@ async function main() {
     }
   }
 
-  // Bulk reviews for products — min 3, target 3–5 each
-  for (const [, prod] of productMap) {
-    const existing = reviewInputs.filter(r => r.entityId === prod.id && r.entityType === "product").length;
+  // Bulk reviews for products (incl. bundles) — min 3, target 3–5 each.
+  // Iterate allProductIds, not productMap: bundles are pushed to allProductIds
+  // but never added to productMap, so keying off productMap left bundles unreviewed.
+  for (const prodId of allProductIds) {
+    const existing = reviewInputs.filter(
+      (r) => r.entityId === prodId && r.entityType === "product"
+    ).length;
     const target = faker.number.int({ min: 3, max: 5 });
     for (let i = existing; i < target; i++) {
-      addReview(pick(allCustomerIds), "product", prod.id, pick([3, 4, 4, 5, 5]), pick(FALLBACK_REVIEWS));
+      addReview(pick(allCustomerIds), "product", prodId, pick([3, 4, 4, 5, 5]), pick(FALLBACK_REVIEWS));
     }
   }
 

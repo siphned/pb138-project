@@ -16,6 +16,7 @@ import type {
   GetWinesQueryParamsTypeEnumKey,
 } from "@/generated/types/GetWines";
 import { useDebounce } from "@/hooks/useDebounce";
+import { formatEur } from "@/lib/utils";
 import type {
   EntityKind,
   EventSearch,
@@ -275,8 +276,8 @@ function ProductFilters({
             value={priceRange}
           />
           <div className="flex justify-between text-xs text-muted-foreground">
-            <span>€{priceRange[0]}</span>
-            <span>€{priceRange[1]}</span>
+            <span>{formatEur(priceRange[0], { decimals: 0 })}</span>
+            <span>{formatEur(priceRange[1], { decimals: 0 })}</span>
           </div>
         </div>
 

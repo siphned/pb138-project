@@ -1,4 +1,5 @@
 import { Link } from "@tanstack/react-router";
+import { formatEur } from "@/lib/utils";
 import { CatalogCard, catalogCardLinkClass } from "./CatalogCard";
 import { ProductImage } from "./ProductImage";
 
@@ -14,10 +15,7 @@ interface BundleCardProps {
 
 export function BundleCard({ product }: BundleCardProps) {
   const wineCount = (product.wines ?? product.productWines ?? []).length;
-  const price = Number(product.price).toLocaleString("cs-CZ", {
-    currency: "EUR",
-    style: "currency",
-  });
+  const price = formatEur(product.price);
 
   return (
     <CatalogCard

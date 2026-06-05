@@ -19,6 +19,7 @@ import { useGetProductsByIdImages } from "@/generated/hooks/useGetProductsByIdIm
 import { useGetShopsById } from "@/generated/hooks/useGetShopsById";
 import type { GetProductsById200 } from "@/generated/types/GetProductsById";
 import { DETAIL_CARD_GRID, DETAIL_CARD_ITEM } from "@/lib/detail-card-grid";
+import { formatEur } from "@/lib/utils";
 import { WineCard } from "./WineCard";
 
 interface ProductDetailsCardProps {
@@ -130,10 +131,7 @@ export function ProductDetailsCard({
   const shopName: string | undefined = product.shop?.name ?? fetchedShop?.name;
   const shopOwnerUserId: string | undefined = product.shop?.ownerUserId ?? fetchedShop?.ownerUserId;
 
-  const price = Number(product.price).toLocaleString("en-IE", {
-    currency: "EUR",
-    style: "currency",
-  });
+  const price = formatEur(product.price);
 
   const outOfStock = product.quantity === 0;
   const stock = stockBadge(product.quantity);

@@ -3,6 +3,7 @@ import { HugeiconsIcon } from "@hugeicons/react";
 import { ProductImage } from "@/components/catalog/ProductImage";
 import { Button } from "@/components/ui/button";
 import type { GetCarts200 } from "@/generated/types/GetCarts";
+import { formatEur } from "@/lib/utils";
 import { QuantityControl } from "./QuantityControl";
 
 type CartItem = NonNullable<GetCarts200>["items"][number];
@@ -36,7 +37,7 @@ export function CartItemRow({ item, onQuantityChange, onRemove }: CartItemRowPro
         {item.product.description && (
           <p className="line-clamp-2 text-xs text-muted-foreground">{item.product.description}</p>
         )}
-        <p className="text-sm text-muted-foreground">€{price.toFixed(2)} each</p>
+        <p className="text-sm text-muted-foreground">{formatEur(price)} each</p>
         <div className="mt-1">
           <QuantityControl
             onDecrement={() => onQuantityChange(item.product.id, quantity - 1)}
@@ -47,7 +48,7 @@ export function CartItemRow({ item, onQuantityChange, onRemove }: CartItemRowPro
       </div>
 
       <div className="ml-auto flex flex-col items-end gap-2 sm:ml-0">
-        <span className="font-semibold text-foreground">€{lineTotal.toFixed(2)}</span>
+        <span className="font-semibold text-foreground">{formatEur(lineTotal)}</span>
         <Button
           className="h-8 w-8 text-muted-foreground hover:text-destructive"
           onClick={() => onRemove(item.product.id)}

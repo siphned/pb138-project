@@ -17,8 +17,17 @@ export const guestSessionsRoutes = new Elysia({
 
   .post(
     "/",
-    async ({ set }) => {
-      const session = await guestSessionsService.getOrCreateSession();
+    async ({ cookie: { guest_session_id }, set }) => {
+      const session = await guestSessionsService.getOrCreateSession(
+        guest_session_id?.value as string | undefined
+      );
+      guest_session_id?.set({
+        expires: session.expiresAt,
+        httpOnly: true,
+        path: "/",
+        sameSite: "lax",
+        value: session.id,
+      });
       set.status = 201;
       return session;
     },

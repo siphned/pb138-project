@@ -27,7 +27,7 @@ const apiUrl = process.env.API_URL || "http://localhost:3000";
 
 export const app = new Elysia()
   .use(errorPlugin)
-  .use(cors({ origin: frontendUrl }))
+  .use(cors({ credentials: true, origin: frontendUrl }))
   .use(
     openapi({
       mapJsonSchema: {

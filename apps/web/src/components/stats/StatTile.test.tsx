@@ -10,8 +10,8 @@ describe("StatTile", () => {
   });
 
   it("renders a string value", () => {
-    render(<StatTile label="Total spent" value="€1,234" />);
-    expect(screen.getByText("€1,234")).toBeInTheDocument();
+    render(<StatTile label="Total spent" value="1,234 €" />);
+    expect(screen.getByText("1,234 €")).toBeInTheDocument();
   });
 
   it("renders the em-dash placeholder when value is —", () => {
