@@ -70,17 +70,17 @@ const catalogWineItem = z.object({
   winemaker: z.object({ name: z.string() }),
 });
 
-const catalogProductItem = t.Object({
-  id: t.String(),
-  imageUrl: t.Nullable(t.String()),
-  isBundle: t.Boolean(),
-  name: t.String(),
-  price: t.String(),
-  quantity: t.Integer(),
-  rating: t.Nullable(t.Number()),
-  reviewCount: t.Integer(),
-  shop: t.Object({ id: t.String(), name: t.String() }),
-  wines: t.Array(catalogWineItem),
+const catalogProductItem = z.object({
+  id: z.string(),
+  imageUrl: z.string().nullable(),
+  isBundle: z.boolean(),
+  name: z.string(),
+  price: z.string(),
+  quantity: z.number().int(),
+  rating: z.number().nullable(),
+  reviewCount: z.number().int(),
+  shop: z.object({ id: z.string(), name: z.string() }),
+  wines: z.array(catalogWineItem),
 });
 
 export const getAllProductsResponse = z.object({

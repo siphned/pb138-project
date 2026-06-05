@@ -23,15 +23,15 @@ const addressResponse = z.object({
 
 export const winemakerListItemResponse = z.object({
   address: addressResponse,
-  createdAt: t.Any(),
-  description: t.String(),
-  email: t.Nullable(t.String()),
-  id: t.String(),
-  imageUrl: t.Optional(t.Nullable(t.String())),
-  name: t.String(),
-  phone: t.Nullable(t.String()),
-  updatedAt: t.Nullable(t.Any()),
-  websiteUrl: t.Nullable(t.String()),
+  createdAt: z.any(),
+  description: z.string(),
+  email: z.string().nullable(),
+  id: z.string(),
+  imageUrl: z.string().nullable().optional(),
+  name: z.string(),
+  phone: z.string().nullable(),
+  updatedAt: z.any().nullable(),
+  websiteUrl: z.string().nullable(),
 });
 
 const wineInProfile = z.object({
