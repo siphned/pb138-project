@@ -19,7 +19,7 @@ function ShopsInventoryStub() {
   const { id } = Route.useParams();
   const { isBundle } = Route.useSearch();
   const query = useGetShopsByIdProducts(id, {
-    isBundle: isBundle === undefined ? undefined : String(isBundle),
+    isBundle,
   });
   return (
     <StubGet

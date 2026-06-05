@@ -1,13 +1,14 @@
 import { AppError } from "@repo/shared";
-import { Elysia, t } from "elysia";
+import { Elysia } from "elysia";
+import { z } from "zod";
 import { logger } from "./logger";
 
-export const errorResponse = t.Object({
-  error: t.Object({
-    code: t.String(),
-    message: t.String(),
+export const errorResponse = z.object({
+  error: z.object({
+    code: z.string(),
+    message: z.string(),
   }),
-  success: t.Boolean({ default: false }),
+  success: z.boolean().default(false),
 });
 
 export const errorPlugin = new Elysia({ name: "error-plugin" }).onError(

@@ -1,16 +1,16 @@
-import { t } from "elysia";
+import { z } from "zod";
 
-export const submitRoleRequestBody = t.Object({
-  businessName: t.String({ minLength: 1 }),
-  details: t.Optional(t.String()),
+export const submitRoleRequestBody = z.object({
+  businessName: z.string().min(1),
+  details: z.string().optional(),
 });
 
-export const roleRequestResponse = t.Object({
-  businessName: t.String(),
-  details: t.Optional(t.Nullable(t.String())),
-  id: t.String(),
-  requestedRole: t.Union([t.Literal("winemaker"), t.Literal("shop_owner")]),
-  status: t.Union([t.Literal("pending"), t.Literal("approved"), t.Literal("rejected")]),
-  submittedAt: t.Date(),
-  userId: t.String(),
+export const roleRequestResponse = z.object({
+  businessName: z.string(),
+  details: z.string().nullable().optional(),
+  id: z.string(),
+  requestedRole: z.enum(["winemaker", "shop_owner"]),
+  status: z.enum(["pending", "approved", "rejected"]),
+  submittedAt: z.date(),
+  userId: z.string(),
 });

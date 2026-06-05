@@ -5,7 +5,7 @@ import { useMemo } from "react";
 import { CatalogFilters } from "@/components/catalog/CatalogFilters";
 import { CatalogResults } from "@/components/catalog/CatalogResults";
 import { CatalogState } from "@/components/catalog/CatalogState";
-import type { WineSearch } from "@/components/catalog/types";
+import { asNumOrStr, type WineSearch } from "@/components/catalog/types";
 import { WineCard } from "@/components/catalog/WineCard";
 import { PageHeader } from "@/components/primitives/page-header";
 import { Button } from "@/components/ui/button";
@@ -38,10 +38,7 @@ export const Route = createFileRoute("/wines/")({
     q: typeof raw.q === "string" ? raw.q : undefined,
     region: typeof raw.region === "string" ? raw.region : undefined,
     type: isWineType(raw.type) ? raw.type : undefined,
-    vintageYear:
-      typeof raw.vintageYear === "string" || typeof raw.vintageYear === "number"
-        ? raw.vintageYear
-        : undefined,
+    vintageYear: asNumOrStr(raw.vintageYear),
     winemakerId: typeof raw.winemakerId === "string" ? raw.winemakerId : undefined,
   }),
 });

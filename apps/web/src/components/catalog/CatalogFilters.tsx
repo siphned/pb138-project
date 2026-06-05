@@ -208,7 +208,10 @@ function WineFilters({
           <SectionLabel>Vintage Year</SectionLabel>
           <Input
             onChange={(e) =>
-              onSearchChange({ ...search, vintageYear: e.target.value || undefined })
+              onSearchChange({
+                ...search,
+                vintageYear: e.target.value ? Number(e.target.value) : undefined,
+              })
             }
             placeholder="e.g. 2021"
             type="number"

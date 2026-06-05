@@ -1,74 +1,74 @@
-import { t } from "elysia";
+import { z } from "zod";
 
-export const winemakerFiltersQuery = t.Object({
-  q: t.Optional(t.String({ maxLength: 255 })),
+export const winemakerFiltersQuery = z.object({
+  q: z.string().max(255).optional(),
 });
 
-export const updateWinemakerBody = t.Object({
-  description: t.Optional(t.String({ minLength: 1 })),
-  email: t.Optional(t.String({ format: "email", maxLength: 255 })),
-  name: t.Optional(t.String({ minLength: 1 })),
-  phone: t.Optional(t.String({ maxLength: 30, minLength: 1 })),
-  websiteUrl: t.Optional(t.Nullable(t.String())),
+export const updateWinemakerBody = z.object({
+  description: z.string().min(1).optional(),
+  email: z.string().email().max(255).optional(),
+  name: z.string().min(1).optional(),
+  phone: z.string().min(1).max(30).optional(),
+  websiteUrl: z.string().nullable().optional(),
 });
 
-const addressResponse = t.Object({
-  city: t.String(),
-  country: t.String(),
-  houseNumber: t.String(),
-  id: t.String(),
-  postalCode: t.String(),
-  street: t.String(),
+const addressResponse = z.object({
+  city: z.string(),
+  country: z.string(),
+  houseNumber: z.string(),
+  id: z.string(),
+  postalCode: z.string(),
+  street: z.string(),
 });
 
-export const winemakerListItemResponse = t.Object({
+export const winemakerListItemResponse = z.object({
   address: addressResponse,
-  createdAt: t.Any(),
-  description: t.String(),
-  email: t.Nullable(t.String()),
-  id: t.String(),
-  name: t.String(),
-  phone: t.Nullable(t.String()),
-  updatedAt: t.Nullable(t.Any()),
-  websiteUrl: t.Nullable(t.String()),
+  createdAt: z.any(),
+  description: z.string(),
+  email: z.string().nullable(),
+  id: z.string(),
+  name: z.string(),
+  phone: z.string().nullable(),
+  updatedAt: z.any().nullable(),
+  websiteUrl: z.string().nullable(),
 });
 
-const wineInProfile = t.Object({
-  alcoholContent: t.String(),
-  color: t.String(),
-  createdAt: t.Any(),
-  description: t.String(),
-  id: t.String(),
-  name: t.String(),
-  quantity: t.Integer(),
-  region: t.String(),
-  type: t.String(),
-  updatedAt: t.Nullable(t.Any()),
-  vintageYear: t.Integer(),
-  volumeMl: t.Integer(),
+const wineInProfile = z.object({
+  alcoholContent: z.string(),
+  color: z.string(),
+  createdAt: z.any(),
+  description: z.string(),
+  id: z.string(),
+  name: z.string(),
+  quantity: z.number().int(),
+  region: z.string(),
+  type: z.string(),
+  updatedAt: z.any().nullable(),
+  vintageYear: z.number().int(),
+  volumeMl: z.number().int(),
 });
 
-const eventInProfile = t.Object({
-  createdAt: t.Any(),
-  description: t.Nullable(t.String()),
-  endTime: t.Any(),
-  id: t.String(),
-  inviteType: t.String(),
-  name: t.String(),
-  startTime: t.Any(),
-  visibility: t.String(),
+const eventInProfile = z.object({
+  createdAt: z.any(),
+  description: z.string().nullable(),
+  endTime: z.any(),
+  id: z.string(),
+  inviteType: z.string(),
+  name: z.string(),
+  startTime: z.any(),
+  visibility: z.string(),
 });
 
-export const winemakerProfileResponse = t.Object({
+export const winemakerProfileResponse = z.object({
   address: addressResponse,
-  createdAt: t.Any(),
-  description: t.String(),
-  email: t.Nullable(t.String()),
-  events: t.Array(eventInProfile),
-  id: t.String(),
-  name: t.String(),
-  phone: t.Nullable(t.String()),
-  updatedAt: t.Nullable(t.Any()),
-  websiteUrl: t.Nullable(t.String()),
-  wines: t.Array(wineInProfile),
+  createdAt: z.any(),
+  description: z.string(),
+  email: z.string().nullable(),
+  events: z.array(eventInProfile),
+  id: z.string(),
+  name: z.string(),
+  phone: z.string().nullable(),
+  updatedAt: z.any().nullable(),
+  websiteUrl: z.string().nullable(),
+  wines: z.array(wineInProfile),
 });

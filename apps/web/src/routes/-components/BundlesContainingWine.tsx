@@ -18,7 +18,7 @@ interface BundlesContainingWineProps {
 }
 
 export function BundlesContainingWine({ shopId, wineId }: BundlesContainingWineProps) {
-  const { data, isLoading } = useGetShopsByIdProducts(shopId, { isBundle: "true" });
+  const { data, isLoading } = useGetShopsByIdProducts(shopId, { isBundle: true });
   const allBundles: RawBundle[] = Array.isArray(data)
     ? (data as RawBundle[])
     : ((data as { data?: RawBundle[] } | undefined)?.data ?? []);
