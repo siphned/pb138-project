@@ -71,7 +71,7 @@ describe("EntityReviewsSection", () => {
     expect(screen.getByText("Radek Pospíšil")).toBeInTheDocument();
     expect(screen.getByText("Skvelé víno.")).toBeInTheDocument();
     expect(screen.getByText("4.8")).toBeInTheDocument();
-    expect(screen.getByText("5 reviews")).toBeInTheDocument();
+    expect(screen.getByText(/5 reviews/)).toBeInTheDocument();
     expect(screen.getByRole("combobox")).toBeInTheDocument();
   });
 });

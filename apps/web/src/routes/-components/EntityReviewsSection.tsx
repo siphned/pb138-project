@@ -60,15 +60,16 @@ export function EntityReviewsSection({
 
   return (
     <Section heading={title}>
-      {firstPage && firstPage.averageRating !== null && (
-        <ReviewsSummary
-          averageRating={firstPage.averageRating}
-          reviewCount={firstPage.totalCount}
-        />
-      )}
-
       {reviews.length > 0 && (
-        <div className="flex justify-end">
+        <div className="flex items-center justify-between gap-4">
+          {firstPage?.averageRating != null ? (
+            <ReviewsSummary
+              averageRating={firstPage.averageRating}
+              reviewCount={firstPage.totalCount}
+            />
+          ) : (
+            <span />
+          )}
           <Select onValueChange={(value) => setSort(value as ReviewSort)} value={sort}>
             <SelectTrigger className="w-40" size="sm">
               <SelectValue />

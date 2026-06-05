@@ -1,12 +1,13 @@
 import { useInfiniteQuery } from "@tanstack/react-query";
 import { getProductsByIdReviews } from "@/generated/clients/getProductsByIdReviews";
+import { getShopsByIdReviews } from "@/generated/clients/getShopsByIdReviews";
 import { getWinemakersByIdReviews } from "@/generated/clients/getWinemakersByIdReviews";
 import { getWinesByIdReviews } from "@/generated/clients/getWinesByIdReviews";
 
 const PAGE_SIZE = 10;
 
 export type ReviewSort = "newest" | "highest" | "lowest";
-export type ReviewEntityType = "product" | "winemaker" | "wine";
+export type ReviewEntityType = "product" | "winemaker" | "wine" | "shop";
 
 export interface EntityReview {
   id: string;
@@ -36,6 +37,9 @@ function fetchPage(
   }
   if (entityType === "wine") {
     return getWinesByIdReviews(entityId, params, config) as Promise<ReviewsPage>;
+  }
+  if (entityType === "shop") {
+    return getShopsByIdReviews(entityId, params, config) as Promise<ReviewsPage>;
   }
   return getProductsByIdReviews(entityId, params, config) as Promise<ReviewsPage>;
 }

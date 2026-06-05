@@ -122,6 +122,19 @@ export class ReviewsService {
     ]);
     return { averageRating, reviews, totalCount };
   }
+
+  async listShopReviews(
+    shopId: string,
+    opts: { page: number; limit: number; sort: "newest" | "highest" | "lowest" }
+  ): Promise<ReviewListResult<ReviewWithUser>> {
+    const { limit, offset } = parsePagination(opts);
+    const [reviews, totalCount, averageRating] = await Promise.all([
+      reviewsRepo.findShopReviews(db, shopId, { limit, offset, sort: opts.sort }),
+      reviewsRepo.countShopReviews(db, shopId),
+      reviewsRepo.averageShopRating(db, shopId),
+    ]);
+    return { averageRating, reviews, totalCount };
+  }
 }
 
 export const reviewsService = new ReviewsService();
