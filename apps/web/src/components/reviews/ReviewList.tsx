@@ -1,3 +1,4 @@
+import { Skeleton } from "@/components/ui/skeleton";
 import { ReviewCard } from "./ReviewCard";
 
 interface ReviewListProps {
@@ -22,7 +23,7 @@ export function ReviewList({
     return (
       <div className="space-y-3">
         {[1, 2, 3].map((i) => (
-          <div className="h-24 w-full animate-pulse rounded-xl bg-secondary/20" key={i} />
+          <Skeleton className="h-24 w-full rounded-xl" key={i} />
         ))}
       </div>
     );
