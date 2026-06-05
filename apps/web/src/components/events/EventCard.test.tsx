@@ -37,9 +37,9 @@ const mockRegister = (overrides: Partial<ReturnType<typeof usePostEventsByIdRegi
 
 const baseEvent = {
   id: "evt-1",
-  title: "Spring Wine Festival",
-  startDate: "2026-06-01T10:00:00Z",
   location: "Brno, Moravia",
+  startDate: "2026-06-01T10:00:00Z",
+  title: "Spring Wine Festival",
   winemakerName: "Lechovice",
 };
 
@@ -95,7 +95,7 @@ describe("EventCard", () => {
       typeof useUser
     >);
     mockRegister({
-      error: { response: { status: 409, data: { error: { code: "ALREADY_REGISTERED" } } } },
+      error: { response: { data: { error: { code: "ALREADY_REGISTERED" } }, status: 409 } },
     } as unknown as ReturnType<typeof usePostEventsByIdRegister>);
     renderWithClient(<EventCard event={baseEvent} />);
     const btn = screen.getByRole("button", { name: /registered/i });
@@ -107,7 +107,7 @@ describe("EventCard", () => {
       typeof useUser
     >);
     mockRegister({
-      error: { response: { status: 400, data: { error: { code: "EVENT_NOT_AVAILABLE" } } } },
+      error: { response: { data: { error: { code: "EVENT_NOT_AVAILABLE" } }, status: 400 } },
     } as unknown as ReturnType<typeof usePostEventsByIdRegister>);
     renderWithClient(<EventCard event={baseEvent} />);
     expect(screen.getByRole("alert")).toHaveTextContent(/registration closed/i);

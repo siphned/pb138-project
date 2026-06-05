@@ -2,9 +2,9 @@ import { useQueryClient } from "@tanstack/react-query";
 import { Link } from "@tanstack/react-router";
 import { Button } from "@/components/ui/button";
 import { useUser } from "@/context/UserContext";
+import { useDeleteEventsByIdRegister } from "@/generated/hooks/useDeleteEventsByIdRegister";
 import { getEventsQueryKey } from "@/generated/hooks/useGetEvents";
 import { getEventsByIdQueryKey } from "@/generated/hooks/useGetEventsById";
-import { useDeleteEventsByIdRegister } from "@/generated/hooks/useDeleteEventsByIdRegister";
 import { usePostEventsByIdRegister } from "@/generated/hooks/usePostEventsByIdRegister";
 import { parseApiError } from "@/lib/api-errors";
 

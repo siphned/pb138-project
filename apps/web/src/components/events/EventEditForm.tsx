@@ -15,11 +15,11 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 
 const eventEditFormSchema = z.object({
-  name: z.string().refine((v) => v.trim().length > 0, { message: "Name is required" }),
-  description: z.string().optional().default(""),
   capacity: z.coerce.number().int().min(1, { message: "Capacity must be at least 1" }),
-  startTime: z.string().refine((v) => v.trim().length > 0, { message: "Start time is required" }),
+  description: z.string().optional().default(""),
   endTime: z.string().refine((v) => v.trim().length > 0, { message: "End time is required" }),
+  name: z.string().refine((v) => v.trim().length > 0, { message: "Name is required" }),
+  startTime: z.string().refine((v) => v.trim().length > 0, { message: "Start time is required" }),
 });
 
 export type EventEditFormValues = z.infer<typeof eventEditFormSchema>;
@@ -55,8 +55,8 @@ export function EventEditForm({ defaultValues, onSubmit, isPending }: EventEditF
       ...defaultValues,
     },
     mode: "onSubmit",
-    reValidateMode: "onChange",
     resolver,
+    reValidateMode: "onChange",
   });
 
   return (

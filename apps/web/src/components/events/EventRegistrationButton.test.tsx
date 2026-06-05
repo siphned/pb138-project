@@ -29,8 +29,8 @@ const renderWithClient = (ui: ReactNode) =>
 const mockRegister = (overrides: Partial<ReturnType<typeof usePostEventsByIdRegister>> = {}) => {
   const mutate = vi.fn();
   vi.mocked(usePostEventsByIdRegister).mockReturnValue({
-    mutate,
     isPending: false,
+    mutate,
     ...overrides,
   } as any);
   return mutate;
@@ -39,8 +39,8 @@ const mockRegister = (overrides: Partial<ReturnType<typeof usePostEventsByIdRegi
 const mockCancel = (overrides: Partial<ReturnType<typeof useDeleteEventsByIdRegister>> = {}) => {
   const mutate = vi.fn();
   vi.mocked(useDeleteEventsByIdRegister).mockReturnValue({
-    mutate,
     isPending: false,
+    mutate,
     ...overrides,
   } as any);
   return mutate;
@@ -48,7 +48,7 @@ const mockCancel = (overrides: Partial<ReturnType<typeof useDeleteEventsByIdRegi
 
 describe("EventRegistrationButton", () => {
   it("renders 'Sign in to register' when no user is signed in", () => {
-    vi.mocked(useUser).mockReturnValue({ user: null, isLoading: false } as any);
+    vi.mocked(useUser).mockReturnValue({ isLoading: false, user: null } as any);
     mockRegister();
     mockCancel();
     renderWithClient(<EventRegistrationButton eventId="evt-1" />);
@@ -56,7 +56,7 @@ describe("EventRegistrationButton", () => {
   });
 
   it("renders 'Register' when signed in but not registered", () => {
-    vi.mocked(useUser).mockReturnValue({ user: { id: "u-1" }, isLoading: false } as any);
+    vi.mocked(useUser).mockReturnValue({ isLoading: false, user: { id: "u-1" } } as any);
     mockRegister();
     mockCancel();
     renderWithClient(<EventRegistrationButton eventId="evt-1" isRegistered={false} />);
@@ -65,7 +65,7 @@ describe("EventRegistrationButton", () => {
   });
 
   it("renders 'Cancel registration' when signed in and already registered", () => {
-    vi.mocked(useUser).mockReturnValue({ user: { id: "u-1" }, isLoading: false } as any);
+    vi.mocked(useUser).mockReturnValue({ isLoading: false, user: { id: "u-1" } } as any);
     mockRegister();
     mockCancel();
     renderWithClient(<EventRegistrationButton eventId="evt-1" isRegistered={true} />);
@@ -73,7 +73,7 @@ describe("EventRegistrationButton", () => {
   });
 
   it("fires the register mutation on Register click", () => {
-    vi.mocked(useUser).mockReturnValue({ user: { id: "u-1" }, isLoading: false } as any);
+    vi.mocked(useUser).mockReturnValue({ isLoading: false, user: { id: "u-1" } } as any);
     const mutate = mockRegister();
     mockCancel();
     renderWithClient(<EventRegistrationButton eventId="evt-1" isRegistered={false} />);
@@ -82,7 +82,7 @@ describe("EventRegistrationButton", () => {
   });
 
   it("fires the cancel mutation on Cancel click", () => {
-    vi.mocked(useUser).mockReturnValue({ user: { id: "u-1" }, isLoading: false } as any);
+    vi.mocked(useUser).mockReturnValue({ isLoading: false, user: { id: "u-1" } } as any);
     mockRegister();
     const mutate = mockCancel();
     renderWithClient(<EventRegistrationButton eventId="evt-1" isRegistered={true} />);
@@ -91,7 +91,7 @@ describe("EventRegistrationButton", () => {
   });
 
   it("disables the button while the register mutation is pending", () => {
-    vi.mocked(useUser).mockReturnValue({ user: { id: "u-1" }, isLoading: false } as any);
+    vi.mocked(useUser).mockReturnValue({ isLoading: false, user: { id: "u-1" } } as any);
     mockRegister({ isPending: true } as any);
     mockCancel();
     renderWithClient(<EventRegistrationButton eventId="evt-1" isRegistered={false} />);
@@ -101,7 +101,7 @@ describe("EventRegistrationButton", () => {
   });
 
   it("disables the button while the cancel mutation is pending", () => {
-    vi.mocked(useUser).mockReturnValue({ user: { id: "u-1" }, isLoading: false } as any);
+    vi.mocked(useUser).mockReturnValue({ isLoading: false, user: { id: "u-1" } } as any);
     mockRegister();
     mockCancel({ isPending: true } as any);
     renderWithClient(<EventRegistrationButton eventId="evt-1" isRegistered={true} />);
@@ -111,9 +111,9 @@ describe("EventRegistrationButton", () => {
   });
 
   it("flips to 'Cancel registration' when the BE returns ALREADY_REGISTERED", () => {
-    vi.mocked(useUser).mockReturnValue({ user: { id: "u-1" }, isLoading: false } as any);
+    vi.mocked(useUser).mockReturnValue({ isLoading: false, user: { id: "u-1" } } as any);
     mockRegister({
-      error: { response: { status: 409, data: { error: { code: "ALREADY_REGISTERED" } } } },
+      error: { response: { data: { error: { code: "ALREADY_REGISTERED" } }, status: 409 } },
     } as any);
     mockCancel();
     renderWithClient(<EventRegistrationButton eventId="evt-1" isRegistered={false} />);
@@ -121,9 +121,9 @@ describe("EventRegistrationButton", () => {
   });
 
   it("renders the friendly message when registration fails", () => {
-    vi.mocked(useUser).mockReturnValue({ user: { id: "u-1" }, isLoading: false } as any);
+    vi.mocked(useUser).mockReturnValue({ isLoading: false, user: { id: "u-1" } } as any);
     mockRegister({
-      error: { response: { status: 400, data: { error: { code: "EVENT_NOT_AVAILABLE" } } } },
+      error: { response: { data: { error: { code: "EVENT_NOT_AVAILABLE" } }, status: 400 } },
     } as any);
     mockCancel();
     renderWithClient(<EventRegistrationButton eventId="evt-1" isRegistered={false} />);

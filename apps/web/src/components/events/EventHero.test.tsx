@@ -11,13 +11,13 @@ vi.mock("@tanstack/react-router", () => ({
 }));
 
 const baseEvent = {
-  id: "evt-1",
-  title: "Spring Wine Festival",
-  startDate: "2026-06-01T10:00:00Z",
   endDate: "2026-06-01T18:00:00Z",
+  id: "evt-1",
   location: "Brno, Moravia",
-  winemakerName: "Lechovice",
+  startDate: "2026-06-01T10:00:00Z",
+  title: "Spring Wine Festival",
   winemakerId: "wm-1",
+  winemakerName: "Lechovice",
 } as const;
 
 describe("EventHero", () => {
