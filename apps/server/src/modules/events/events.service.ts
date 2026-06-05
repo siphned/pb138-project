@@ -134,12 +134,15 @@ export class EventsService {
       q?: string;
       from?: string;
       to?: string;
+      registeredByMe?: boolean;
     },
     paginationQuery: { page?: number; limit?: number },
     userId?: string
   ): Promise<PaginatedResult<EventWithDetails & { isRegisteredByMe?: boolean }>> {
     const { limit, offset } = parsePagination(paginationQuery);
     const page = Math.max(1, paginationQuery.page ?? 1);
+
+    if (filters.registeredByMe && !userId) return { data: [], limit, page, total: 0 };
 
     let winemakerIds: string[] | undefined;
     if (filters.winemakerId) {
@@ -152,6 +155,7 @@ export class EventsService {
     const repoFilters = {
       from: filters.from ? new Date(filters.from) : undefined,
       q: filters.q,
+      registeredByUserId: filters.registeredByMe ? userId : undefined,
       status: "approved" as const,
       to: filters.to ? new Date(filters.to) : undefined,
       winemakerIds,

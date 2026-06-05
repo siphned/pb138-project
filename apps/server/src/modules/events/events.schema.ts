@@ -32,6 +32,7 @@ export const listEventsQuery = z.object({
   limit: z.coerce.number().min(1).max(100).optional(),
   page: z.coerce.number().min(1).optional(),
   q: z.string().max(255).optional(),
+  registeredByMe: z.coerce.boolean().optional(),
   to: z.string().datetime().optional(),
   winemakerId: z.string().optional(),
   winemakerName: z.string().max(255).optional(),

@@ -39,6 +39,14 @@ interface SidebarProps {
   onRoleChange?: (role: Role) => void;
 }
 
+type MyEventsSearch = { winemakerId: string } | { registeredByMe: true } | undefined;
+
+function getMyEventsSearch(role: Role, winemakerId?: string): MyEventsSearch | null {
+  if (role === Role.winemaker) return winemakerId ? { winemakerId } : undefined;
+  if (role === Role.customer) return { registeredByMe: true };
+  return null;
+}
+
 export function Sidebar({ userRoles = [Role.customer], activeRole, onRoleChange }: SidebarProps) {
   const { user } = useUser();
   const { user: clerkUser } = useClerkUser();
@@ -66,13 +74,14 @@ export function Sidebar({ userRoles = [Role.customer], activeRole, onRoleChange 
     },
   });
   const winemakerId = winemakerProfile.data?.id;
-  const winemakerName = winemakerProfile.data?.name;
   const firstShopId = shopOwnerProfile.data?.[0]?.id;
 
   const displayUserName = isSignedIn ? clerkUser?.fullName || "User" : "Guest";
   const fullName = user ? `${user.fname || ""} ${user.lname || ""}`.trim() : "Guest";
   const initials = fullName === "Guest" ? "G" : fullName.substring(0, 2).toUpperCase() || "U";
   const hasMultipleRoles = userRoles.length > 1;
+
+  const myEventsSearch = getMyEventsSearch(currentActiveRole, winemakerId);
 
   const handleLogout = async () => {
     closeSheet();
@@ -207,6 +216,18 @@ export function Sidebar({ userRoles = [Role.customer], activeRole, onRoleChange 
               <HugeiconsIcon icon={Calendar01Icon} /> Events
             </NavItem>
 
+            <Show when="signed-in">
+              {myEventsSearch !== null && (
+                <NavItem
+                  onClick={closeSheet}
+                  render={<Link search={myEventsSearch} to="/events" />}
+                  variant="active"
+                >
+                  <HugeiconsIcon icon={Calendar01Icon} /> My Events
+                </NavItem>
+              )}
+            </Show>
+
             <NavItem onClick={closeSheet} render={<Link to="/shops" />} variant="active">
               <HugeiconsIcon icon={Store01Icon} /> Shops
             </NavItem>
@@ -218,7 +239,6 @@ export function Sidebar({ userRoles = [Role.customer], activeRole, onRoleChange 
                 role={currentActiveRole}
                 userId={user?.id}
                 winemakerId={winemakerId}
-                winemakerName={winemakerName}
               />
 
               <NavItem onClick={closeSheet} render={<Link to="/stats" />} variant="active">
@@ -266,49 +286,27 @@ interface RoleNavItemsProps {
   closeSheet: () => void;
   userId?: string;
   winemakerId?: string;
-  winemakerName?: string;
   firstShopId?: string;
 }
 
-function RoleNavItems({
-  role,
-  closeSheet,
-  userId,
-  winemakerId,
-  winemakerName,
-  firstShopId,
-}: RoleNavItemsProps) {
+function RoleNavItems({ role, closeSheet, userId, winemakerId, firstShopId }: RoleNavItemsProps) {
   if (role === Role.customer) {
     return (
-      <>
-        <NavItem onClick={closeSheet} render={<Link to="/orders" />} variant="active">
-          <HugeiconsIcon icon={Package01Icon} /> Order History
-        </NavItem>
-        <NavItem onClick={closeSheet} render={<Link to="/events" />} variant="active">
-          <HugeiconsIcon icon={Calendar01Icon} /> My Events
-        </NavItem>
-      </>
+      <NavItem onClick={closeSheet} render={<Link to="/orders" />} variant="active">
+        <HugeiconsIcon icon={Package01Icon} /> Order History
+      </NavItem>
     );
   }
 
   if (role === Role.winemaker) {
     return (
-      <>
-        <NavItem
-          onClick={closeSheet}
-          render={<Link search={winemakerId ? { winemakerId } : undefined} to="/wines" />}
-          variant="active"
-        >
-          <Wine className="h-4 w-4" /> My Wines
-        </NavItem>
-        <NavItem
-          onClick={closeSheet}
-          render={<Link search={winemakerName ? { winemakerName } : undefined} to="/events" />}
-          variant="active"
-        >
-          <HugeiconsIcon icon={Calendar01Icon} /> My Events
-        </NavItem>
-      </>
+      <NavItem
+        onClick={closeSheet}
+        render={<Link search={winemakerId ? { winemakerId } : undefined} to="/wines" />}
+        variant="active"
+      >
+        <Wine className="h-4 w-4" /> My Wines
+      </NavItem>
     );
   }
 

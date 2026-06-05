@@ -38,7 +38,18 @@ type RepoFilters = {
   q?: string;
   to?: Date;
   winemakerIds?: string[];
+  registeredByUserId?: string;
 };
+
+function registeredByCondition(db: Database, userId: string) {
+  return inArray(
+    events.id,
+    db
+      .select({ eventId: eventRegistrations.eventId })
+      .from(eventRegistrations)
+      .where(and(eq(eventRegistrations.userId, userId), isNull(eventRegistrations.deletedAt)))
+  );
+}
 
 export async function countActiveRegistrations(db: Database, eventId: string): Promise<number> {
   const [result] = await db
@@ -64,6 +75,7 @@ export async function countMany(db: Database, filters: RepoFilters): Promise<num
     filters.from ? gte(events.startTime, filters.from) : undefined,
     filters.to ? lte(events.startTime, filters.to) : undefined,
     filters.winemakerIds ? inArray(events.winemakerId, filters.winemakerIds) : undefined,
+    filters.registeredByUserId ? registeredByCondition(db, filters.registeredByUserId) : undefined,
     qCond,
   ].filter((c): c is NonNullable<typeof c> => c !== undefined);
 
@@ -227,6 +239,7 @@ export async function findMany(
     filters.from ? gte(events.startTime, filters.from) : undefined,
     filters.to ? lte(events.startTime, filters.to) : undefined,
     filters.winemakerIds ? inArray(events.winemakerId, filters.winemakerIds) : undefined,
+    filters.registeredByUserId ? registeredByCondition(db, filters.registeredByUserId) : undefined,
     qCond,
   ].filter((c): c is NonNullable<typeof c> => c !== undefined);
 
