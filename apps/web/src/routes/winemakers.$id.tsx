@@ -4,6 +4,7 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { CatalogState } from "@/components/catalog/CatalogState";
 import { WineCard } from "@/components/catalog/WineCard";
 import { WinemakerDetailsCard } from "@/components/catalog/WinemakerDetailsCard";
+import { EventCard } from "@/components/events/EventCard";
 import { DataGrid } from "@/components/primitives/data-grid";
 import { ErrorState } from "@/components/primitives/error-state";
 import { LoadingState } from "@/components/primitives/loading-state";
@@ -12,7 +13,6 @@ import { Separator } from "@/components/ui/separator";
 import { useGetEvents } from "@/generated/hooks/useGetEvents";
 import { useGetWinemakersById } from "@/generated/hooks/useGetWinemakersById";
 import { useGetWines } from "@/generated/hooks/useGetWines";
-import { EventCard } from "@/components/events/EventCard";
 import { EntityReviewsSection } from "./-components/EntityReviewsSection";
 
 export const Route = createFileRoute("/winemakers/$id")({

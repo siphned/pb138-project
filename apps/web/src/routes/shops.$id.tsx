@@ -8,6 +8,7 @@ import { ShopDetailsCard } from "@/components/shops/ShopDetailsCard";
 import { ShopHero } from "@/components/shops/ShopHero";
 import { ShopProductsRow } from "@/components/shops/ShopProductsRow";
 import { useGetShopsById } from "@/generated/hooks/useGetShopsById";
+import { EntityReviewsSection } from "./-components/EntityReviewsSection";
 import { ShopHeroGallery } from "./-components/ShopHeroGallery";
 import { ShopMapEmbed } from "./-components/ShopMapEmbed";
 
@@ -69,11 +70,7 @@ function ShopDetailPage() {
         <ShopProductsRow isBundle={false} shopId={id} />
         <ShopProductsRow isBundle={true} shopId={id} />
 
-        <Section heading="Customer Reviews">
-          <p className="text-sm italic text-muted-foreground">
-            Coming soon — we're working on bringing customer reviews to shop profiles!
-          </p>
-        </Section>
+        <EntityReviewsSection entityId={id} entityType="shop" />
       </div>
     </div>
   );

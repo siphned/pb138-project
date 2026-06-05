@@ -2,6 +2,7 @@ import { afterEach, describe, expect, it, vi } from "vitest";
 import { resetAuth } from "../../__tests__/helpers/auth";
 import { get, patch } from "../../__tests__/helpers/request";
 import { app } from "../../app";
+import { winemakersService } from "./winemakers.service";
 
 const { defaultWinemaker } = vi.hoisted(() => ({
   defaultWinemaker: {
@@ -58,6 +59,12 @@ describe("winemakers routes", () => {
       expect(response.status).toBe(200);
       const data = await response.json();
       expect(Array.isArray(data)).toBe(true);
+    });
+
+    it("forwards the city filter to the service", async () => {
+      const response = await app.handle(get("/winemakers?city=Brno&q=acme"));
+      expect(response.status).toBe(200);
+      expect(winemakersService.listWinemakers).toHaveBeenCalledWith({ city: "Brno", q: "acme" });
     });
   });
 

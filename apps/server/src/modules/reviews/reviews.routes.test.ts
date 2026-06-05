@@ -33,6 +33,7 @@ vi.mock("./reviews.service", () => ({
     listProductReviews: vi
       .fn()
       .mockResolvedValue({ averageRating: 4.5, reviews: [], totalCount: 0 }),
+    listShopReviews: vi.fn().mockResolvedValue({ averageRating: 4.3, reviews: [], totalCount: 0 }),
     listWinemakerReviews: vi
       .fn()
       .mockResolvedValue({ averageRating: 4.2, reviews: [], totalCount: 0 }),
@@ -83,6 +84,13 @@ describe("reviews routes", () => {
   describe("GET /wines/:id/reviews", () => {
     it("returns 200 with review list (public)", async () => {
       const response = await app.handle(get("/wines/w1/reviews"));
+      expect(response.status).toBe(200);
+    });
+  });
+
+  describe("GET /shops/:id/reviews", () => {
+    it("returns 200 with aggregated review list (public)", async () => {
+      const response = await app.handle(get("/shops/s1/reviews"));
       expect(response.status).toBe(200);
     });
   });

@@ -1,12 +1,12 @@
 import { ArrowRight01Icon } from "@hugeicons/core-free-icons";
 import { HugeiconsIcon } from "@hugeicons/react";
 import { Link } from "@tanstack/react-router";
+import { EventCard } from "@/components/events/EventCard";
 import { DataGrid } from "@/components/primitives/data-grid";
 import { LoadingState } from "@/components/primitives/loading-state";
 import { Section } from "@/components/primitives/section";
 import { Button } from "@/components/ui/button";
 import { useGetEvents } from "@/generated/hooks/useGetEvents";
-import { EventCard } from "@/components/events/EventCard";
 
 export function HomeFeaturedEvents() {
   const { data, isLoading } = useGetEvents();

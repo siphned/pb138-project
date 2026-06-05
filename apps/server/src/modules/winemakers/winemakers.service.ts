@@ -29,7 +29,7 @@ export class WinemakersService {
     return winemakersRepo.findWinesByWinemakerId(db, id);
   }
 
-  listWinemakers(filters: { q?: string } = {}): Promise<WinemakerListItem[]> {
+  listWinemakers(filters: { q?: string; city?: string } = {}): Promise<WinemakerListItem[]> {
     return winemakersRepo.findAll(db, filters);
   }
 

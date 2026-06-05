@@ -37,11 +37,11 @@ const addressResponse = z.object({
 
 export const shopResponse = z.object({
   address: addressResponse,
-  createdAt: t.Date(),
-  description: t.String(),
-  id: t.String(),
-  imageUrl: t.Optional(t.Nullable(t.String())),
-  name: t.String(),
-  ownerUserId: t.String(),
-  updatedAt: t.Union([t.Date(), t.Null()]),
+  createdAt: z.date(),
+  description: z.string(),
+  id: z.string(),
+  imageUrl: z.string().nullable().optional(),
+  name: z.string(),
+  ownerUserId: z.string(),
+  updatedAt: z.date().nullable(),
 });

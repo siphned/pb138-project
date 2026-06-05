@@ -172,6 +172,26 @@ describe("listEvents", () => {
       expect.any(Object)
     );
   });
+
+  it("scopes registeredByMe to the current user", async () => {
+    vi.mocked(eventsRepo.findMany).mockResolvedValue([]);
+    vi.mocked(eventsRepo.countMany).mockResolvedValue(0);
+
+    await eventsService.listEvents({ registeredByMe: true }, { limit: 20, page: 1 }, "user-1");
+
+    expect(eventsRepo.findMany).toHaveBeenCalledWith(
+      expect.anything(),
+      expect.objectContaining({ registeredByUserId: "user-1" }),
+      expect.any(Object)
+    );
+  });
+
+  it("returns empty for registeredByMe without an authenticated user", async () => {
+    const result = await eventsService.listEvents({ registeredByMe: true }, { limit: 20, page: 1 });
+
+    expect(result).toEqual({ data: [], limit: 20, page: 1, total: 0 });
+    expect(eventsRepo.findMany).not.toHaveBeenCalled();
+  });
 });
 
 describe("listInvitations", () => {

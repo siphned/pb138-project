@@ -15,17 +15,17 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 
 const shopFormSchema = z.object({
-  name: z.string().refine((v) => v.trim().length > 0, { message: "Name is required" }),
+  city: z.string().refine((v) => v.trim().length > 0, { message: "City is required" }),
+  country: z.string().refine((v) => v.trim().length > 0, { message: "Country is required" }),
   description: z.string().refine((v) => v.trim().length > 0, {
     message: "Description is required",
   }),
-  street: z.string().refine((v) => v.trim().length > 0, { message: "Street is required" }),
   houseNumber: z
     .string()
     .refine((v) => v.trim().length > 0, { message: "House number is required" }),
-  city: z.string().refine((v) => v.trim().length > 0, { message: "City is required" }),
+  name: z.string().refine((v) => v.trim().length > 0, { message: "Name is required" }),
   postalCode: z.string().refine((v) => v.trim().length > 0, { message: "Postal code is required" }),
-  country: z.string().refine((v) => v.trim().length > 0, { message: "Country is required" }),
+  street: z.string().refine((v) => v.trim().length > 0, { message: "Street is required" }),
 });
 
 export type ShopFormValues = z.infer<typeof shopFormSchema>;
@@ -64,8 +64,8 @@ export function ShopForm({ defaultValues, onSubmit, isPending, submitLabel }: Sh
       ...defaultValues,
     },
     mode: "onSubmit",
-    reValidateMode: "onChange",
     resolver,
+    reValidateMode: "onChange",
   });
 
   return (

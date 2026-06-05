@@ -138,6 +138,24 @@ export const createReviewsRoutes = (auth = authPlugin) =>
       }
     )
 
+    .get(
+      "/shops/:id/reviews",
+      async ({ params, query }) => {
+        const { page = 1, limit = 10, sort = "newest" } = query;
+        return reviewsService.listShopReviews(params.id, { limit, page, sort });
+      },
+      {
+        detail: {
+          description: "Returns aggregated reviews across all of a shop's products.",
+          summary: "List shop reviews",
+          tags: ["reviews"],
+        },
+        params: reviewParams,
+        query: listReviewsQuery,
+        response: { 200: reviewListResponse },
+      }
+    )
+
     .delete(
       "/reviews/:id",
       async ({ params, dbUser, clerkPayload, query }) => {

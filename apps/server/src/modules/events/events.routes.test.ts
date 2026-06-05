@@ -2,6 +2,7 @@ import { afterEach, describe, expect, it, vi } from "vitest";
 import { resetAuth } from "../../__tests__/helpers/auth";
 import { del, get, patch, post } from "../../__tests__/helpers/request";
 import { app } from "../../app";
+import { eventsService } from "./events.service";
 
 const { defaultEvent } = vi.hoisted(() => ({
   defaultEvent: {
@@ -59,6 +60,16 @@ describe("events routes", () => {
       expect(response.status).toBe(200);
       const data = await response.json();
       expect(Array.isArray((data as { data: unknown[] }).data)).toBe(true);
+    });
+
+    it("forwards the registeredByMe filter to the service", async () => {
+      const response = await app.handle(get("/events?registeredByMe=true"));
+      expect(response.status).toBe(200);
+      expect(eventsService.listEvents).toHaveBeenCalledWith(
+        expect.objectContaining({ registeredByMe: true }),
+        expect.any(Object),
+        undefined
+      );
     });
   });
 

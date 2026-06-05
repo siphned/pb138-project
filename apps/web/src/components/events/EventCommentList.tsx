@@ -1,45 +1,27 @@
+import { useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
 import { EmptyState } from "@/components/primitives/empty-state";
 import { ErrorState } from "@/components/primitives/error-state";
+import { InfiniteScrollArea } from "@/components/primitives/infinite-scroll-area";
 import { LoadingState } from "@/components/primitives/loading-state";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
 import { Textarea } from "@/components/ui/textarea";
 import { useUser } from "@/context/UserContext";
-import { useGetEventsByIdComments } from "@/generated/hooks/useGetEventsByIdComments";
 import { usePostEventsByIdComments } from "@/generated/hooks/usePostEventsByIdComments";
+import { type EventComment, eventCommentsQueryKey, useEventComments } from "./use-event-comments";
 
 interface EventCommentListProps {
   eventId: string;
 }
 
-interface CommentLike {
-  id?: string;
-  body?: string;
-  content?: string;
-  text?: string;
-  authorName?: string;
-  author?: { name?: string; fname?: string; lname?: string };
-  user?: { fname?: string; lname?: string; id?: string };
-  createdAt?: string | Date;
+function commentAuthor(c: EventComment) {
+  const name = [c.user?.fname, c.user?.lname].filter(Boolean).join(" ");
+  return name || "Anonymous";
 }
 
-function commentBody(c: CommentLike) {
-  return c.body ?? c.content ?? c.text ?? "";
-}
-
-function commentAuthor(c: CommentLike) {
-  if (c.authorName) return c.authorName;
-  if (c.author?.name) return c.author.name;
-  if (c.author?.fname || c.author?.lname)
-    return [c.author.fname, c.author.lname].filter(Boolean).join(" ");
-  if (c.user?.fname || c.user?.lname) return [c.user.fname, c.user.lname].filter(Boolean).join(" ");
-  return "Anonymous";
-}
-
-function commentDate(c: CommentLike) {
-  if (!c.createdAt) return null;
+function commentDate(c: EventComment) {
   return new Date(c.createdAt).toLocaleString("en-US", {
     dateStyle: "medium",
     timeStyle: "short",
@@ -48,29 +30,30 @@ function commentDate(c: CommentLike) {
 
 export function EventCommentList({ eventId }: EventCommentListProps) {
   const { user } = useUser();
+  const queryClient = useQueryClient();
   const [draft, setDraft] = useState("");
-  const query = useGetEventsByIdComments(eventId);
+
+  const { data, isLoading, isError, refetch, hasNextPage, isFetchingNextPage, fetchNextPage } =
+    useEventComments(eventId);
+
   const postMutation = usePostEventsByIdComments({
     mutation: {
       onSuccess: () => {
         setDraft("");
-        query.refetch();
+        queryClient.invalidateQueries({ queryKey: eventCommentsQueryKey(eventId) });
       },
     },
   });
 
-  if (query.isLoading) {
+  if (isLoading) {
     return <LoadingState variant="list" />;
   }
 
-  if (query.isError) {
-    return <ErrorState message="Could not load comments." onRetry={() => query.refetch()} />;
+  if (isError) {
+    return <ErrorState message="Could not load comments." onRetry={() => refetch()} />;
   }
 
-  const raw = query.data;
-  const list: CommentLike[] = Array.isArray(raw)
-    ? raw
-    : ((raw as { data?: CommentLike[] } | undefined)?.data ?? []);
+  const comments = data?.pages.flatMap((p) => p.data) ?? [];
 
   return (
     <div className="space-y-6">
@@ -80,7 +63,7 @@ export function EventCommentList({ eventId }: EventCommentListProps) {
           onSubmit={(e) => {
             e.preventDefault();
             if (!draft.trim()) return;
-            postMutation.mutate({ id: eventId, data: { body: draft } as never });
+            postMutation.mutate({ data: { body: draft }, id: eventId });
           }}
         >
           <Textarea
@@ -102,31 +85,35 @@ export function EventCommentList({ eventId }: EventCommentListProps) {
 
       <Separator />
 
-      {list.length === 0 ? (
+      {comments.length === 0 ? (
         <EmptyState
           description="Be the first to share a thought about this event."
           title="No comments yet"
         />
       ) : (
-        <ul className="space-y-4">
-          {list.map((c, idx) => (
-            <li key={c.id ?? idx}>
-              <Card variant="section">
-                <CardContent className="space-y-2 pt-6">
-                  <div className="flex items-baseline justify-between gap-4">
-                    <span className="font-medium text-foreground">{commentAuthor(c)}</span>
-                    {commentDate(c) && (
+        <InfiniteScrollArea
+          className="h-[28rem]"
+          fetchNextPage={fetchNextPage}
+          hasNextPage={hasNextPage}
+          isFetchingNextPage={isFetchingNextPage}
+          itemCount={comments.length}
+        >
+          <ul className="space-y-4 pb-2">
+            {comments.map((c) => (
+              <li key={c.id}>
+                <Card variant="section">
+                  <CardContent className="space-y-2 pt-6">
+                    <div className="flex items-baseline justify-between gap-4">
+                      <span className="font-medium text-foreground">{commentAuthor(c)}</span>
                       <span className="text-xs text-muted-foreground">{commentDate(c)}</span>
-                    )}
-                  </div>
-                  <p className="whitespace-pre-line text-sm text-muted-foreground">
-                    {commentBody(c)}
-                  </p>
-                </CardContent>
-              </Card>
-            </li>
-          ))}
-        </ul>
+                    </div>
+                    <p className="whitespace-pre-line text-sm text-muted-foreground">{c.body}</p>
+                  </CardContent>
+                </Card>
+              </li>
+            ))}
+          </ul>
+        </InfiniteScrollArea>
       )}
     </div>
   );
