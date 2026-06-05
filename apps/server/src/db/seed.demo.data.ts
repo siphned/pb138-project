@@ -161,11 +161,7 @@ export const WINEMAKERS: WinemakerData[] = [
         description:
           "Unikátna príležitosť ochutnať šesť ročníkov Dunaja Barrique od Karpatskej Perle, od ročníka 2015 až po 2021. Na vlastné oči a jazyk spoznáte, ako sa toto víno v čase vyvíja a naberá na komplexnosti. Degustáciu vedie hlavný enológ vinárstva Ing. Peter Štefánik a someliér Jakub Kráľ.",
         durationHours: 3,
-        imageUrls: [
-          "/uploads/event/ev_degustation.webp",
-          "/uploads/event/ev_s1.webp",
-          "/uploads/event/ev_s2.webp",
-        ],
+        imageUrls: ["/uploads/event/ev_degustation.webp", "/uploads/event/ev_s1.webp"],
         isPast: false,
         name: "Vertikálna Degustácia: Dunaj zo starých vinohradov",
         visibility: "public",
@@ -299,11 +295,7 @@ export const WINEMAKERS: WinemakerData[] = [
         description:
           "Dvojdňový kurz zameraný na základy vinohradníctva, vinárstva, degustačných techník a párovania vína s jedlom. Naučíte sa správne ochutnávať, spoznáte hlavné odrody a vinárske regióny sveta. Kurz je certifikovaný a určený pre úplných začiatočníkov. Lektori: Tomáš Mrva a someliér Jakub Kráľ.",
         durationHours: 8,
-        imageUrls: [
-          "/uploads/event/ev_kurz.webp",
-          "/uploads/event/ev_s3.webp",
-          "/uploads/event/ev_s4.webp",
-        ],
+        imageUrls: ["/uploads/event/ev_kurz.webp", "/uploads/event/ev_s3.webp"],
         isPast: false,
         name: "Vinársky Kurz Level 1: Základy pre milovníkov vína",
         visibility: "public",
@@ -1049,7 +1041,7 @@ export const WINEMAKERS: WinemakerData[] = [
         description:
           "Vystresovaní studenti informatiky párovali naše vysokokofeinová Server Room vína se studenou pizzou.",
         durationHours: 4,
-        imageUrls: ["/uploads/event/ev_5.webp", "/uploads/event/ev_s1.webp"],
+        imageUrls: ["/uploads/event/ev_5.webp", "/uploads/event/ev_s2.webp"],
         isPast: true,
         name: "FI MUNI Debug & Drink",
         visibility: "public",
@@ -1142,7 +1134,7 @@ export const WINEMAKERS: WinemakerData[] = [
         description:
           "Striktně VIP událost pouze pro zvané, kde se funkcionalistická architektura setkává s neregulovaným kapitalismem.",
         durationHours: 3,
-        imageUrls: ["/uploads/event/ev_6.webp", "/uploads/event/ev_s2.webp"],
+        imageUrls: ["/uploads/event/ev_6.webp", "/uploads/event/ev_s4.webp"],
         isPast: false,
         name: "Villa Tugendhat Elite Auction 2026",
         visibility: "private",

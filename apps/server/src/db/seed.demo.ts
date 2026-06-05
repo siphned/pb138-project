@@ -114,7 +114,7 @@ const FAKER_SHOP_COUNT = 2;
 const FAKER_WM_PRIMARY_IMAGES   = ["/uploads/winemaker/wm_s10.webp", "/uploads/winemaker/wm_s11.webp"] as const;
 const FAKER_WM_SECONDARY_IMAGES = ["/uploads/winemaker/wm_s12.webp", "/uploads/winemaker/wm_s13.webp"] as const;
 const FAKER_SHOP_PRIMARY_IMAGES  = ["/uploads/shop/shop_s4.webp", "/uploads/shop/shop_s5.webp"] as const;
-const FAKER_EVENT_IMAGES = ["/uploads/event/ev_7.webp", "/uploads/event/ev_8.webp", "/uploads/event/ev_s1.webp", "/uploads/event/ev_s2.webp", "/uploads/event/ev_s3.webp", "/uploads/event/ev_s4.webp"] as const;
+const FAKER_EVENT_IMAGES = ["/uploads/event/ev_7.webp", "/uploads/event/ev_8.webp"] as const;
 
 // Primary images for faker wines — user-provided wine bottle photos
 const FAKER_WINE_FIRST_IMAGES = [
@@ -440,7 +440,6 @@ async function main() {
       }]);
       eventIdMap.set(`${wmKey}-0`, evRow!.id);
       allEventImages.push({ id: evRow!.id, url: FAKER_EVENT_IMAGES[i % FAKER_EVENT_IMAGES.length]! });
-      allEventImages.push({ id: evRow!.id, url: FAKER_EVENT_IMAGES[(i + 3) % FAKER_EVENT_IMAGES.length]! });
     }
   }
   logger.info(`Inserted ${fakerWmKeys.length} faker winemakers`);
@@ -652,6 +651,7 @@ async function main() {
   const addRole = (userId: string, role: string) => roleSet.add(`${userId}::${role}`);
 
   addRole(userIdMap.get("test_user")!, "admin"); // test_user is admin
+  addRole(userIdMap.get("test_user")!, "customer");
 
   for (const wm of WINEMAKERS) {
     const ownerId = wm.ownerKey
