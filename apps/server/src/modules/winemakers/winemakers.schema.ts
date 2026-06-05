@@ -1,6 +1,7 @@
 import { z } from "zod";
 
 export const winemakerFiltersQuery = z.object({
+  city: z.string().max(255).optional(),
   q: z.string().max(255).optional(),
 });
 

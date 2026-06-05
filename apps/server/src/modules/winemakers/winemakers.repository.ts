@@ -31,7 +31,10 @@ export type UpdateWinemakerData = {
   phone?: string;
 };
 
-export async function findAll(db: Database, filters: { q?: string }): Promise<WinemakerListItem[]> {
+export async function findAll(
+  db: Database,
+  filters: { q?: string; city?: string }
+): Promise<WinemakerListItem[]> {
   const conditions = [isNull(winemakers.deletedAt)];
   if (filters.q) conditions.push(ilike(winemakers.name, `%${filters.q}%`));
 
@@ -43,7 +46,12 @@ export async function findAll(db: Database, filters: { q?: string }): Promise<Wi
     },
   });
 
-  return results.filter((w) => w.address && !w.address.deletedAt) as WinemakerListItem[];
+  const filtered = results.filter((w) => w.address && !w.address.deletedAt) as WinemakerListItem[];
+  if (filters.city) {
+    const city = filters.city.toLowerCase();
+    return filtered.filter((w) => w.address.city.toLowerCase().includes(city));
+  }
+  return filtered;
 }
 
 export async function findById(

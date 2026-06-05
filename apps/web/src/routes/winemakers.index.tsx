@@ -4,7 +4,7 @@ import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { CatalogFilters } from "@/components/catalog/CatalogFilters";
 import { CatalogResults } from "@/components/catalog/CatalogResults";
 import { CatalogState } from "@/components/catalog/CatalogState";
-import type { WinemakerSearch } from "@/components/catalog/types";
+import { asString, type WinemakerSearch } from "@/components/catalog/types";
 import { WinemakerCard } from "@/components/catalog/WinemakerCard";
 import { PageHeader } from "@/components/primitives/page-header";
 import { Button } from "@/components/ui/button";
@@ -14,14 +14,15 @@ import { useGetWinemakers } from "@/generated/hooks/useGetWinemakers";
 export const Route = createFileRoute("/winemakers/")({
   component: WinemakersPage,
   validateSearch: (raw): WinemakerSearch => ({
-    q: typeof raw.q === "string" ? raw.q : undefined,
+    city: asString(raw.city),
+    q: asString(raw.q),
   }),
 });
 
 function WinemakersPage() {
   const search = Route.useSearch();
   const navigate = useNavigate({ from: Route.fullPath });
-  const query = useGetWinemakers();
+  const query = useGetWinemakers({ city: search.city, q: search.q });
 
   const handleSearchChange = (next: WinemakerSearch) => {
     navigate({ replace: true, search: next });
@@ -29,13 +30,8 @@ function WinemakersPage() {
 
   const winemakers = query.data || [];
 
-  // Client-side filtering for 'q' until BE supports it
-  const filteredWinemakers = search.q
-    ? winemakers.filter((w) => w.name.toLowerCase().includes(String(search.q).toLowerCase()))
-    : winemakers;
-
   // TODO(WINE-XXX): cap at 20 until BE adds pagination
-  const displayedWinemakers = filteredWinemakers.slice(0, 20);
+  const displayedWinemakers = winemakers.slice(0, 20);
 
   return (
     <div className="container mx-auto space-y-8 px-6 py-8 lg:px-12">
@@ -73,7 +69,7 @@ function WinemakersPage() {
             isLoading={query.isLoading}
             onRetry={() => query.refetch()}
           >
-            <CatalogResults count={filteredWinemakers.length}>
+            <CatalogResults count={winemakers.length}>
               {displayedWinemakers.map((winemaker) => (
                 <WinemakerCard key={winemaker.id} winemaker={winemaker} />
               ))}

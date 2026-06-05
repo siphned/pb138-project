@@ -15,7 +15,7 @@ const idParams = z.object({ id: z.string() });
 export const winemakersRoutes = new Elysia({ prefix: "/winemakers", tags: ["winemakers"] })
   .use(authPlugin)
 
-  .get("/", ({ query }) => winemakersService.listWinemakers({ q: query.q }), {
+  .get("/", ({ query }) => winemakersService.listWinemakers({ city: query.city, q: query.q }), {
     detail: { summary: "List all winemakers" },
     query: winemakerFiltersQuery,
     response: { 200: z.array(winemakerListItemResponse) },
