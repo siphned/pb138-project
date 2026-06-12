@@ -29,16 +29,28 @@ export const Route = createFileRoute("/shops/$id/availability")({
   component: AvailabilityPage,
 });
 
-const DAYS = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
+// ISO-style: weeks start on Monday. The `dow` field on entries still uses the
+// BE convention 0=Sunday … 6=Saturday — we just display Sunday at the end.
+const DAYS = [
+  { dow: 1, name: "Monday" },
+  { dow: 2, name: "Tuesday" },
+  { dow: 3, name: "Wednesday" },
+  { dow: 4, name: "Thursday" },
+  { dow: 5, name: "Friday" },
+  { dow: 6, name: "Saturday" },
+  { dow: 0, name: "Sunday" },
+];
 
 function formatTime(value: unknown): string {
   if (!value) return "";
   const s = String(value);
+  // BE stores the wall-clock HH:MM as a UTC instant (parseTime sets UTC hours),
+  // so the response looks like "1970-01-01T08:00:00.000Z". Extract HH:MM
+  // directly — converting through `new Date()` would shift by the user's TZ
+  // offset and display "09:00" instead of "08:00" in CET.
   if (s.includes("T")) {
-    const d = new Date(s);
-    if (!Number.isNaN(d.getTime())) {
-      return `${String(d.getHours()).padStart(2, "0")}:${String(d.getMinutes()).padStart(2, "0")}`;
-    }
+    const m = s.match(/T(\d{2}:\d{2})/);
+    if (m) return m[1];
   }
   return s.slice(0, 5);
 }
@@ -101,8 +113,8 @@ function AvailabilityPage() {
     reason: string | null;
   }>;
 
-  const regularByDay = DAYS.map((dayName, dow) => ({
-    dayName,
+  const regularByDay = DAYS.map(({ name, dow }) => ({
+    dayName: name,
     entries: regular.filter((r) => Number(r.dow) === dow),
   }));
 
@@ -210,18 +222,13 @@ function AvailabilityPage() {
                           {formatDate(ex.startsAt)} – {formatDate(ex.endsAt)}
                         </span>
                       </div>
-                      {ex.reason && (
-                        <p className="text-sm text-muted-foreground">{ex.reason}</p>
-                      )}
+                      {ex.reason && <p className="text-sm text-muted-foreground">{ex.reason}</p>}
                     </div>
                     <Button
                       aria-label="Delete exception"
                       disabled={deleteException.isPending}
                       onClick={() =>
-                        deleteException.mutate(
-                          { entryId: ex.id, id },
-                          { onSuccess: invalidate }
-                        )
+                        deleteException.mutate({ entryId: ex.id, id }, { onSuccess: invalidate })
                       }
                       size="icon"
                       variant="ghost"
@@ -236,12 +243,26 @@ function AvailabilityPage() {
         )}
       </Section>
 
+      <div className="flex justify-end">
+        <Button
+          onClick={() => {
+            // Return to wherever the user came from (shop edit page or the
+            // post-create setup state on /shops/new). If history is empty
+            // (direct link / refresh), fall back to the edit page.
+            if (window.history.length > 1) window.history.back();
+            else window.location.assign(`/shops/${id}/edit`);
+          }}
+        >
+          Done
+        </Button>
+      </div>
+
       <Dialog onOpenChange={setOpenRegular} open={openRegular}>
-        <DialogContent>
+        <DialogContent className="max-h-[90vh] overflow-y-auto sm:max-w-lg">
           <DialogHeader>
             <DialogTitle>Add weekly hours</DialogTitle>
             <DialogDescription>
-              Set the open hours for a single day. Repeat to cover the whole week.
+              Pick one or more days to apply the same open hours.
             </DialogDescription>
           </DialogHeader>
           <AvailabilityRegularForm
@@ -255,7 +276,7 @@ function AvailabilityPage() {
       </Dialog>
 
       <Dialog onOpenChange={setOpenException} open={openException}>
-        <DialogContent>
+        <DialogContent className="max-h-[90vh] overflow-y-auto sm:max-w-lg">
           <DialogHeader>
             <DialogTitle>Add exception</DialogTitle>
             <DialogDescription>

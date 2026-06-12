@@ -1,18 +1,14 @@
-import { useMemo } from "react";
+import { useMemo, useState } from "react";
 import { type Resolver, useForm } from "react-hook-form";
 import { z } from "zod";
-import { Button } from "@/components/ui/button";
 import {
-  Form,
-  FormControl,
-  FormDescription,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
-} from "@/components/ui/form";
-import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
+  AddressFields,
+  ImageUploadField,
+  SubmitButton,
+  TextField,
+  TextareaField,
+} from "@/components/forms";
+import { Form } from "@/components/ui/form";
 
 const shopFormSchema = z.object({
   name: z.string().refine((v) => v.trim().length > 0, { message: "Name is required" }),
@@ -34,12 +30,22 @@ export type ShopFormValues = z.infer<typeof shopFormSchema>;
 
 interface ShopFormProps {
   defaultValues: Partial<ShopFormValues>;
-  onSubmit: (data: ShopFormValues) => void;
+  onSubmit: (data: ShopFormValues, images: File[]) => void;
   isPending: boolean;
   submitLabel: string;
+  /** When true, render an optional image picker that bubbles files up via onSubmit. */
+  showImageUpload?: boolean;
 }
 
-export function ShopForm({ defaultValues, onSubmit, isPending, submitLabel }: ShopFormProps) {
+export function ShopForm({
+  defaultValues,
+  onSubmit,
+  isPending,
+  submitLabel,
+  showImageUpload = false,
+}: ShopFormProps) {
+  const [imageFiles, setImageFiles] = useState<File[]>([]);
+  const [imageError, setImageError] = useState<string | null>(null);
   const resolver = useMemo<Resolver<ShopFormValues>>(
     () => async (values) => {
       const result = shopFormSchema.safeParse(values);
@@ -70,120 +76,42 @@ export function ShopForm({ defaultValues, onSubmit, isPending, submitLabel }: Sh
     resolver,
   });
 
+  const handleFormSubmit = (values: ShopFormValues) => {
+    if (imageError) return;
+    onSubmit(values, imageFiles);
+  };
+
   return (
     <Form {...form}>
-      <form className="space-y-6" onSubmit={form.handleSubmit(onSubmit)}>
-        <FormField
+      <form className="space-y-6" onSubmit={form.handleSubmit(handleFormSubmit)}>
+        <TextField
           control={form.control}
+          label="Shop name"
           name="name"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Shop name</FormLabel>
-              <FormControl>
-                <Input placeholder="e.g., Vinotéka Brno" {...field} />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
+          placeholder="e.g., Vinotéka Brno"
         />
 
-        <FormField
+        <TextareaField
           control={form.control}
+          description="What kind of wines do you sell? Atmosphere? Hours?"
+          label="Description"
           name="description"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Description</FormLabel>
-              <FormControl>
-                <Textarea
-                  placeholder="Tell customers about your shop."
-                  rows={4}
-                  {...field}
-                />
-              </FormControl>
-              <FormDescription>What kind of wines do you sell? Atmosphere? Hours?</FormDescription>
-              <FormMessage />
-            </FormItem>
-          )}
+          placeholder="Tell customers about your shop."
         />
 
-        <div className="space-y-4 rounded-md border border-border p-4">
-          <h3 className="text-sm font-bold uppercase tracking-widest text-muted-foreground">
-            Shop address
-          </h3>
-          <div className="grid gap-4 sm:grid-cols-[1fr_auto]">
-            <FormField
-              control={form.control}
-              name="street"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Street</FormLabel>
-                  <FormControl>
-                    <Input placeholder="Main St" {...field} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            <FormField
-              control={form.control}
-              name="houseNumber"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>House no.</FormLabel>
-                  <FormControl>
-                    <Input className="w-24" placeholder="12" {...field} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-          </div>
-          <div className="grid gap-4 sm:grid-cols-[auto_1fr]">
-            <FormField
-              control={form.control}
-              name="postalCode"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Postal code</FormLabel>
-                  <FormControl>
-                    <Input className="w-32" placeholder="60200" {...field} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            <FormField
-              control={form.control}
-              name="city"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>City</FormLabel>
-                  <FormControl>
-                    <Input placeholder="Brno" {...field} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-          </div>
-          <FormField
-            control={form.control}
-            name="country"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Country</FormLabel>
-                <FormControl>
-                  <Input placeholder="Czech Republic" {...field} />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-        </div>
+        <AddressFields control={form.control} title="Shop address" />
 
-        <Button className="w-full" disabled={isPending} type="submit">
-          {isPending ? "Saving…" : submitLabel}
-        </Button>
+        {showImageUpload && (
+          <ImageUploadField
+            description="PNG, JPEG, WebP, or AVIF up to 10 MB each. Uploaded after the shop is created."
+            onErrorChange={setImageError}
+            onFilesChange={setImageFiles}
+          />
+        )}
+
+        <SubmitButton disabled={!!imageError} isPending={isPending}>
+          {submitLabel}
+        </SubmitButton>
       </form>
     </Form>
   );

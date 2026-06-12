@@ -64,7 +64,7 @@ export const eventsRoutes = new Elysia()
       body: updateEventBody,
       detail: {
         security: [{ bearerAuth: [] }],
-        summary: "Update own pending event",
+        summary: "Update own upcoming event",
         tags: ["events"],
       },
       params: eventParams,

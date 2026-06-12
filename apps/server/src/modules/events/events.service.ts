@@ -212,7 +212,7 @@ export class EventsService {
 
     const winemaker = await eventsRepo.findWinemakerByUserId(db, userId);
     if (!winemaker || winemaker.id !== event.winemakerId) throw new ForbiddenWineActionError();
-    if (event.status !== "pending") throw new EventStatusConflictError();
+    if (event.startTime <= new Date()) throw new EventStatusConflictError();
 
     const startTime = data.startTime ? new Date(data.startTime) : event.startTime;
     const endTime = data.endTime ? new Date(data.endTime) : event.endTime;

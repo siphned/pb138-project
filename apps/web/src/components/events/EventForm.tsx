@@ -1,17 +1,22 @@
-import { useMemo } from "react";
+import { useMemo, useState } from "react";
 import { type Resolver, useForm } from "react-hook-form";
 import { z } from "zod";
-import { Button } from "@/components/ui/button";
+import {
+  AddressFields,
+  ImageUploadField,
+  SubmitButton,
+  TextField,
+  TextareaField,
+} from "@/components/forms";
+import { DateTimePicker } from "@/components/primitives/date-time-picker";
 import {
   Form,
   FormControl,
-  FormDescription,
   FormField,
   FormItem,
   FormLabel,
   FormMessage,
 } from "@/components/ui/form";
-import { Input } from "@/components/ui/input";
 import {
   Select,
   SelectContent,
@@ -19,37 +24,70 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Textarea } from "@/components/ui/textarea";
 
-const eventFormSchema = z.object({
-  name: z.string().refine((v) => v.trim().length > 0, { message: "Name is required" }),
-  description: z.string().optional().default(""),
-  capacity: z.coerce.number().int().min(1, { message: "Capacity must be at least 1" }),
-  startTime: z.string().refine((v) => v.trim().length > 0, { message: "Start time is required" }),
-  endTime: z.string().refine((v) => v.trim().length > 0, { message: "End time is required" }),
-  inviteType: z.enum(["open", "invite_only"]),
-  visibility: z.enum(["public", "private"]),
-  street: z.string().refine((v) => v.trim().length > 0, { message: "Street is required" }),
-  houseNumber: z
-    .string()
-    .refine((v) => v.trim().length > 0, { message: "House number is required" }),
-  city: z.string().refine((v) => v.trim().length > 0, { message: "City is required" }),
-  postalCode: z
-    .string()
-    .refine((v) => v.trim().length > 0, { message: "Postal code is required" }),
-  country: z.string().refine((v) => v.trim().length > 0, { message: "Country is required" }),
-});
+const eventFormSchema = z
+  .object({
+    name: z.string().refine((v) => v.trim().length > 0, { message: "Name is required" }),
+    description: z.string().optional().default(""),
+    capacity: z.coerce.number().int().min(1, { message: "Capacity must be at least 1" }),
+    startTime: z.string().refine((v) => v.trim().length > 0, { message: "Start time is required" }),
+    endTime: z.string().refine((v) => v.trim().length > 0, { message: "End time is required" }),
+    inviteType: z.enum(["open", "invite_only"]),
+    visibility: z.enum(["public", "private"]),
+    street: z.string().refine((v) => v.trim().length > 0, { message: "Street is required" }),
+    houseNumber: z
+      .string()
+      .refine((v) => v.trim().length > 0, { message: "House number is required" }),
+    city: z.string().refine((v) => v.trim().length > 0, { message: "City is required" }),
+    postalCode: z
+      .string()
+      .refine((v) => v.trim().length > 0, { message: "Postal code is required" }),
+    country: z.string().refine((v) => v.trim().length > 0, { message: "Country is required" }),
+  })
+  .superRefine((data, ctx) => {
+    if (!data.startTime || !data.endTime) return;
+    const start = new Date(data.startTime);
+    const end = new Date(data.endTime);
+    if (Number.isNaN(start.getTime()) || Number.isNaN(end.getTime())) return;
+    if (start <= new Date()) {
+      ctx.addIssue({
+        code: "custom",
+        message: "Start time must be in the future",
+        path: ["startTime"],
+      });
+    }
+    if (end <= start) {
+      ctx.addIssue({
+        code: "custom",
+        message: "End time must be after start time",
+        path: ["endTime"],
+      });
+    }
+  });
 
 export type EventFormValues = z.infer<typeof eventFormSchema>;
 
 interface EventFormProps {
   defaultValues: Partial<EventFormValues>;
-  onSubmit: (values: EventFormValues) => void;
+  onSubmit: (values: EventFormValues, images: File[]) => void;
   isPending: boolean;
   submitLabel: string;
+  serverError?: string | null;
+  /** When true, render an optional image picker that bubbles files up via onSubmit. */
+  showImageUpload?: boolean;
 }
 
-export function EventForm({ defaultValues, onSubmit, isPending, submitLabel }: EventFormProps) {
+export function EventForm({
+  defaultValues,
+  onSubmit,
+  isPending,
+  submitLabel,
+  serverError,
+  showImageUpload = false,
+}: EventFormProps) {
+  const [imageFiles, setImageFiles] = useState<File[]>([]);
+  const [imageError, setImageError] = useState<string | null>(null);
+
   const resolver = useMemo<Resolver<EventFormValues>>(
     () => async (values) => {
       const result = eventFormSchema.safeParse(values);
@@ -85,35 +123,26 @@ export function EventForm({ defaultValues, onSubmit, isPending, submitLabel }: E
     resolver,
   });
 
+  const handleFormSubmit = (values: EventFormValues) => {
+    if (imageError) return;
+    onSubmit(values, imageFiles);
+  };
+
   return (
     <Form {...form}>
-      <form className="space-y-6" onSubmit={form.handleSubmit(onSubmit)}>
-        <FormField
+      <form className="space-y-6" onSubmit={form.handleSubmit(handleFormSubmit)}>
+        <TextField
           control={form.control}
+          label="Event name"
           name="name"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Event name</FormLabel>
-              <FormControl>
-                <Input placeholder="Spring Wine Tasting" {...field} />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
+          placeholder="Spring Wine Tasting"
         />
 
-        <FormField
+        <TextareaField
           control={form.control}
+          label="Description (optional)"
           name="description"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Description (optional)</FormLabel>
-              <FormControl>
-                <Textarea placeholder="What's on the agenda?" rows={4} {...field} />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
+          placeholder="What's on the agenda?"
         />
 
         <div className="grid gap-4 sm:grid-cols-2">
@@ -124,7 +153,12 @@ export function EventForm({ defaultValues, onSubmit, isPending, submitLabel }: E
               <FormItem>
                 <FormLabel>Starts</FormLabel>
                 <FormControl>
-                  <Input type="datetime-local" {...field} />
+                  <DateTimePicker
+                    minDate={new Date()}
+                    onChange={field.onChange}
+                    placeholder="Pick start date and time"
+                    value={field.value ?? ""}
+                  />
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -137,7 +171,12 @@ export function EventForm({ defaultValues, onSubmit, isPending, submitLabel }: E
               <FormItem>
                 <FormLabel>Ends</FormLabel>
                 <FormControl>
-                  <Input type="datetime-local" {...field} />
+                  <DateTimePicker
+                    minDate={new Date()}
+                    onChange={field.onChange}
+                    placeholder="Pick end date and time"
+                    value={field.value ?? ""}
+                  />
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -145,19 +184,13 @@ export function EventForm({ defaultValues, onSubmit, isPending, submitLabel }: E
           />
         </div>
 
-        <FormField
+        <TextField
           control={form.control}
+          description="Maximum number of attendees."
+          label="Capacity"
+          min="1"
           name="capacity"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Capacity</FormLabel>
-              <FormControl>
-                <Input min="1" type="number" {...field} />
-              </FormControl>
-              <FormDescription>Maximum number of attendees.</FormDescription>
-              <FormMessage />
-            </FormItem>
-          )}
+          type="number"
         />
 
         <div className="grid gap-4 sm:grid-cols-2">
@@ -205,84 +238,25 @@ export function EventForm({ defaultValues, onSubmit, isPending, submitLabel }: E
           />
         </div>
 
-        <div className="space-y-4 rounded-md border border-border p-4">
-          <h3 className="text-sm font-bold uppercase tracking-widest text-muted-foreground">
-            Event location
-          </h3>
-          <div className="grid gap-4 sm:grid-cols-[1fr_auto]">
-            <FormField
-              control={form.control}
-              name="street"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Street</FormLabel>
-                  <FormControl>
-                    <Input placeholder="Cellar Street" {...field} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            <FormField
-              control={form.control}
-              name="houseNumber"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>House no.</FormLabel>
-                  <FormControl>
-                    <Input className="w-24" placeholder="1" {...field} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-          </div>
-          <div className="grid gap-4 sm:grid-cols-[auto_1fr]">
-            <FormField
-              control={form.control}
-              name="postalCode"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Postal code</FormLabel>
-                  <FormControl>
-                    <Input className="w-32" placeholder="69102" {...field} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            <FormField
-              control={form.control}
-              name="city"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>City</FormLabel>
-                  <FormControl>
-                    <Input placeholder="Velké Bílovice" {...field} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-          </div>
-          <FormField
-            control={form.control}
-            name="country"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Country</FormLabel>
-                <FormControl>
-                  <Input placeholder="Czech Republic" {...field} />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-        </div>
+        <AddressFields control={form.control} title="Event location" />
 
-        <Button className="w-full" disabled={isPending} type="submit">
-          {isPending ? "Saving…" : submitLabel}
-        </Button>
+        {showImageUpload && (
+          <ImageUploadField
+            description="PNG, JPEG, WebP, or AVIF up to 10 MB each. Uploaded after the event is created."
+            onErrorChange={setImageError}
+            onFilesChange={setImageFiles}
+          />
+        )}
+
+        {serverError && (
+          <p className="text-sm text-destructive" role="alert">
+            {serverError}
+          </p>
+        )}
+
+        <SubmitButton disabled={!!imageError} isPending={isPending}>
+          {submitLabel}
+        </SubmitButton>
       </form>
     </Form>
   );

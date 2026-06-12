@@ -1,7 +1,6 @@
 import { Show, useAuth, useClerk, useUser as useClerkUser } from "@clerk/react";
 import {
   Calendar01Icon,
-  CheckmarkCircle01Icon,
   ChartBarLineIcon,
   InboxIcon,
   LogoutSquare02Icon,
@@ -358,22 +357,13 @@ function RoleNavItems({
 
   if (role === Role.admin) {
     return (
-      <>
-        <NavItem
-          onClick={closeSheet}
-          render={<Link to="/role-requests" />}
-          variant="active"
-        >
-          <HugeiconsIcon icon={UserGroupIcon} /> Role Requests
-        </NavItem>
-        <NavItem
-          onClick={closeSheet}
-          render={<Link to="/events" />}
-          variant="active"
-        >
-          <HugeiconsIcon icon={CheckmarkCircle01Icon} /> Event Approvals
-        </NavItem>
-      </>
+      <NavItem
+        onClick={closeSheet}
+        render={<Link to="/role-requests" />}
+        variant="active"
+      >
+        <HugeiconsIcon icon={UserGroupIcon} /> Role Requests
+      </NavItem>
     );
   }
 

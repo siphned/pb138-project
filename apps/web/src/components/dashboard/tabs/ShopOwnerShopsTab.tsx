@@ -28,13 +28,11 @@ interface ShopOwnerShopsTabProps {
 export function ShopOwnerShopsTab({ shopId }: ShopOwnerShopsTabProps) {
   const me = useGetShopsMe();
   const allShops = (Array.isArray(me.data) ? me.data : []) as ShopRow[];
-  const fallbackShopId = !shopId ? allShops[0]?.id : undefined;
-  const effectiveShopId = shopId ?? fallbackShopId;
 
   const inventoryQuery = useGetShopsByIdProducts(
-    effectiveShopId ?? "",
+    shopId ?? "",
     {},
-    { query: { enabled: !!effectiveShopId } }
+    { query: { enabled: !!shopId } }
   );
 
   const inventoryList = ((inventoryQuery.data as { data?: ProductRow[] } | undefined)?.data ??
@@ -48,9 +46,7 @@ export function ShopOwnerShopsTab({ shopId }: ShopOwnerShopsTabProps) {
   const shopsToShow = visibleShops.slice(0, 10);
   const hasMoreShops = visibleShops.length > 10;
 
-  const selectedShop = effectiveShopId
-    ? allShops.find((s) => s.id === effectiveShopId)
-    : undefined;
+  const selectedShop = shopId ? allShops.find((s) => s.id === shopId) : undefined;
 
   return (
     <div className="space-y-8">
@@ -90,29 +86,27 @@ export function ShopOwnerShopsTab({ shopId }: ShopOwnerShopsTabProps) {
         </ul>
       </TabPreviewShell>
 
-      {/* Inventory for the selected (or first) shop */}
-      {allShops.length > 0 && (
+      {/* Inventory section — only shown when a specific shop is selected. */}
+      {shopId && selectedShop && (
         <>
           <Separator />
           <div className="space-y-3">
             <div className="flex items-center justify-between gap-4">
               <h3 className="text-sm font-bold uppercase tracking-widest text-muted-foreground">
-                Inventory{selectedShop ? ` · ${selectedShop.name}` : ""}
+                Inventory · {selectedShop.name}
               </h3>
-              {effectiveShopId && (
-                <Button
-                  render={
-                    <Link
-                      params={{ id: effectiveShopId }}
-                      search={{ isBundle: undefined }}
-                      to="/shops/$id/inventory/new"
-                    />
-                  }
-                  size="sm"
-                >
-                  + Add product
-                </Button>
-              )}
+              <Button
+                render={
+                  <Link
+                    params={{ id: shopId }}
+                    search={{ isBundle: undefined }}
+                    to="/shops/$id/inventory/new"
+                  />
+                }
+                size="sm"
+              >
+                + Add product
+              </Button>
             </div>
 
             <TabPreviewShell
@@ -123,11 +117,7 @@ export function ShopOwnerShopsTab({ shopId }: ShopOwnerShopsTabProps) {
               isError={inventoryQuery.isError}
               isLoading={inventoryQuery.isLoading}
               onRetry={() => inventoryQuery.refetch()}
-              viewAllTo={
-                effectiveShopId
-                  ? (`/shops/${effectiveShopId}/inventory` as never)
-                  : undefined
-              }
+              viewAllTo={`/shops/${shopId}/inventory` as never}
             >
               <ul className="divide-y divide-border rounded-md border border-border">
                 {products.map((p) => (

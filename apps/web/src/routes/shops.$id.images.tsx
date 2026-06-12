@@ -59,31 +59,45 @@ function ShopImagesPage() {
   });
   const deleteMutation = useDeleteShopsByIdImagesByImageId();
 
-  const invalidate = () => queryClient.invalidateQueries({ queryKey });
+  // Invalidate + force a refetch so the grid updates immediately. Plain
+  // invalidate() didn't always trigger a refetch (depends on observer state),
+  // so chain refetch() after to guarantee the new list lands in cache.
+  const refresh = async () => {
+    await queryClient.invalidateQueries({ queryKey });
+    await refetch();
+  };
 
-  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
+  const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const files = Array.from(e.target.files ?? []);
     e.target.value = "";
-    if (!file) return;
+    if (files.length === 0) return;
 
-    if (file.size > MAX_BYTES) {
-      setUploadError(`File is too large (max ${(MAX_BYTES / 1024 / 1024).toFixed(0)} MB).`);
+    const oversize = files.find((f) => f.size > MAX_BYTES);
+    if (oversize) {
+      setUploadError(
+        `${oversize.name} is too large (max ${(MAX_BYTES / 1024 / 1024).toFixed(0)} MB).`
+      );
       return;
     }
     setUploadError(null);
 
-    uploadMutation.mutate(file, {
-      onError: (err: unknown) => {
-        const status = (err as { response?: { status?: number } })?.response?.status;
-        if (status === 415) setUploadError("Unsupported file type.");
-        else if (status === 413) setUploadError("File is too large.");
-        else if (status === 409) setUploadError("That image is already uploaded.");
-        else setUploadError("Upload failed. Please try again.");
-      },
-      onSuccess: () => {
-        invalidate();
-      },
-    });
+    let firstError: number | null = null;
+    for (const file of files) {
+      try {
+        await uploadMutation.mutateAsync(file);
+      } catch (err: unknown) {
+        const status = (err as { response?: { status?: number } })?.response?.status ?? 0;
+        firstError ??= status;
+        // Continue uploading remaining files so a single bad one doesn't block the rest.
+      }
+    }
+
+    if (firstError === 415) setUploadError("One or more files have an unsupported type.");
+    else if (firstError === 413) setUploadError("One or more files are too large.");
+    else if (firstError === 409) setUploadError("Some images are already uploaded.");
+    else if (firstError) setUploadError("Some uploads failed. Please try again.");
+
+    await refresh();
   };
 
   if (isLoading) {
@@ -129,6 +143,7 @@ function ShopImagesPage() {
           <input
             accept={ACCEPT}
             className="hidden"
+            multiple
             onChange={handleFileChange}
             ref={fileInputRef}
             type="file"
@@ -138,8 +153,9 @@ function ShopImagesPage() {
             onClick={() => fileInputRef.current?.click()}
           >
             <HugeiconsIcon className="mr-2 h-4 w-4" icon={Upload03Icon} />
-            {uploadMutation.isPending ? "Uploading…" : "Choose image"}
+            {uploadMutation.isPending ? "Uploading…" : "Choose images"}
           </Button>
+          <span className="text-xs text-muted-foreground">Select one or more images.</span>
           {uploadError && (
             <p className="text-sm text-destructive" role="alert">
               {uploadError}
@@ -174,7 +190,7 @@ function ShopImagesPage() {
                         onClick={() =>
                           deleteMutation.mutate(
                             { id, imageId: img.id },
-                            { onSuccess: invalidate }
+                            { onSuccess: () => refresh() }
                           )
                         }
                         size="icon-sm"
@@ -190,6 +206,20 @@ function ShopImagesPage() {
           </ul>
         )}
       </Section>
+
+      <div className="flex justify-end">
+        <Button
+          onClick={() => {
+            // Return to wherever the user came from (shop edit page or the
+            // post-create setup state on /shops/new). If history is empty
+            // (direct link / refresh), fall back to the edit page.
+            if (window.history.length > 1) window.history.back();
+            else window.location.assign(`/shops/${id}/edit`);
+          }}
+        >
+          Done
+        </Button>
+      </div>
     </div>
   );
 }

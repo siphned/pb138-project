@@ -1,6 +1,12 @@
 import { ArrowLeft02Icon, Edit01Icon } from "@hugeicons/core-free-icons";
 import { HugeiconsIcon } from "@hugeicons/react";
-import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
+import {
+  createFileRoute,
+  Link,
+  Outlet,
+  useChildMatches,
+  useNavigate,
+} from "@tanstack/react-router";
 import { EmptyState } from "@/components/primitives/empty-state";
 import { ErrorState } from "@/components/primitives/error-state";
 import { LoadingState } from "@/components/primitives/loading-state";
@@ -23,11 +29,16 @@ function parseIsBundle(v: unknown): boolean | undefined {
   return undefined;
 }
 
+interface ShopInventorySearch {
+  isBundle?: boolean;
+}
+
 export const Route = createFileRoute("/shops/$id/inventory")({
   component: ShopInventoryPage,
-  validateSearch: (search) => ({
-    isBundle: parseIsBundle((search as { isBundle?: unknown }).isBundle),
-  }),
+  validateSearch: (search): ShopInventorySearch => {
+    const value = parseIsBundle((search as { isBundle?: unknown }).isBundle);
+    return value === undefined ? {} : { isBundle: value };
+  },
 });
 
 interface ProductRow {
@@ -42,6 +53,11 @@ function ShopInventoryPage() {
   const { id } = Route.useParams();
   const { isBundle } = Route.useSearch();
   const navigate = useNavigate({ from: Route.fullPath });
+  // This route file doubles as the layout for its children (/new,
+  // /$productId/edit). When the URL targets a child route, render the Outlet so
+  // the child component takes over instead of the list page.
+  const hasChildRoute = useChildMatches().length > 0;
+  if (hasChildRoute) return <Outlet />;
 
   const query = useGetShopsByIdProducts(id, {
     isBundle: isBundle === undefined ? undefined : String(isBundle),

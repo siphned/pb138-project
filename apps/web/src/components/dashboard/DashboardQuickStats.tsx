@@ -59,7 +59,7 @@ function tilesFor(stats: any): StatTile[] {
               ? asNumber(stats.avgReviewScore).toFixed(1)
               : "—",
         },
-        { label: "Approved events", value: String(asNumber(stats.eventsByStatus?.approved)) },
+        { label: "My events", value: String(asNumber(stats.eventsByStatus?.approved)) },
       ];
     case "shop_owner":
       return [
@@ -74,7 +74,6 @@ function tilesFor(stats: any): StatTile[] {
     case "admin":
       return [
         { label: "Pending role requests", value: String(asNumber(stats.pendingRoleRequests)) },
-        { label: "Pending events", value: String(asNumber(stats.pendingEvents)) },
         { label: "Total events", value: String(asNumber(stats.totalEvents)) },
         { label: "Total products", value: String(asNumber(stats.totalProducts)) },
       ];

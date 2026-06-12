@@ -1,17 +1,11 @@
-import {
-  ArrowLeft02Icon,
-  ArrowRight01Icon,
-  Calendar03Icon,
-  Image01Icon,
-} from "@hugeicons/core-free-icons";
+import { ArrowLeft02Icon } from "@hugeicons/core-free-icons";
 import { HugeiconsIcon } from "@hugeicons/react";
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { ErrorState } from "@/components/primitives/error-state";
 import { LoadingState } from "@/components/primitives/loading-state";
 import { PageHeader } from "@/components/primitives/page-header";
-import { Section } from "@/components/primitives/section";
 import { ShopForm, type ShopFormValues } from "@/components/shops/ShopForm";
-import { Card, CardContent } from "@/components/ui/card";
+import { ShopMoreSetupCards } from "@/components/shops/ShopMoreSetupCards";
 import { useGetShopsById } from "@/generated/hooks/useGetShopsById";
 import { usePatchShopsById } from "@/generated/hooks/usePatchShopsById";
 
@@ -97,49 +91,7 @@ function ShopEditPage() {
         />
       </div>
 
-      <Section heading="More setup">
-        <div className="grid gap-4 sm:grid-cols-2">
-          <Link params={{ id }} to="/shops/$id/images">
-            <Card className="transition-colors hover:border-primary" variant="section">
-              <CardContent className="flex items-start gap-4 p-6">
-                <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-primary/10 text-primary">
-                  <HugeiconsIcon className="h-5 w-5" icon={Image01Icon} />
-                </div>
-                <div className="flex-1">
-                  <h3 className="font-medium text-foreground">Manage images</h3>
-                  <p className="text-sm text-muted-foreground">
-                    Upload photos so customers recognise your shop.
-                  </p>
-                </div>
-                <HugeiconsIcon
-                  className="mt-2 h-4 w-4 shrink-0 text-muted-foreground"
-                  icon={ArrowRight01Icon}
-                />
-              </CardContent>
-            </Card>
-          </Link>
-
-          <Link params={{ id }} to="/shops/$id/availability">
-            <Card className="transition-colors hover:border-primary" variant="section">
-              <CardContent className="flex items-start gap-4 p-6">
-                <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-primary/10 text-primary">
-                  <HugeiconsIcon className="h-5 w-5" icon={Calendar03Icon} />
-                </div>
-                <div className="flex-1">
-                  <h3 className="font-medium text-foreground">Opening hours</h3>
-                  <p className="text-sm text-muted-foreground">
-                    Set your regular weekly hours and any exceptions.
-                  </p>
-                </div>
-                <HugeiconsIcon
-                  className="mt-2 h-4 w-4 shrink-0 text-muted-foreground"
-                  icon={ArrowRight01Icon}
-                />
-              </CardContent>
-            </Card>
-          </Link>
-        </div>
-      </Section>
+      <ShopMoreSetupCards shopId={id} />
     </div>
   );
 }

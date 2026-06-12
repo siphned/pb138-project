@@ -42,15 +42,18 @@ interface BundleWinesCarouselProps {
 
 export function BundleWinesCarousel({ shopId, wineIds }: BundleWinesCarouselProps) {
   const { data, isLoading } = useGetShopsByIdProducts(shopId, { isBundle: "false" });
-  const allProducts = data as ShopProductRaw[] | undefined;
+  // BE returns { data: [...], limit, page, total }. Tolerate both shapes in case
+  // a future caller hands in a bare array.
+  const allProducts: ShopProductRaw[] = Array.isArray(data)
+    ? (data as ShopProductRaw[])
+    : ((data as { data?: ShopProductRaw[] } | undefined)?.data ?? []);
 
-  const products =
-    allProducts?.filter((p) => {
-      const ids = Array.isArray(p.wines)
-        ? p.wines.map((w) => w.id)
-        : (p.productWines ?? []).map((pw) => pw.wine.id);
-      return ids.some((id) => wineIds.includes(id));
-    }) ?? [];
+  const products = allProducts.filter((p) => {
+    const ids = Array.isArray(p.wines)
+      ? p.wines.map((w) => w.id)
+      : (p.productWines ?? []).map((pw) => pw.wine.id);
+    return ids.some((id) => wineIds.includes(id));
+  });
 
   if (isLoading) {
     return (

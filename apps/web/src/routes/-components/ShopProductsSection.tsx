@@ -43,7 +43,11 @@ interface ShopProductsSectionProps {
 
 export function ShopProductsSection({ shopId }: ShopProductsSectionProps) {
   const { data, isLoading } = useGetShopsByIdProducts(shopId, { isBundle: "false" });
-  const products = data as ShopProductRaw[] | undefined;
+  // BE returns { data: [...], limit, page, total } — keep a fallback for callers
+  // that may receive a bare array.
+  const products: ShopProductRaw[] = Array.isArray(data)
+    ? (data as ShopProductRaw[])
+    : ((data as { data?: ShopProductRaw[] } | undefined)?.data ?? []);
 
   if (isLoading) {
     return (
@@ -58,7 +62,7 @@ export function ShopProductsSection({ shopId }: ShopProductsSectionProps) {
     );
   }
 
-  if (!products || products.length === 0) {
+  if (products.length === 0) {
     return (
       <div className="space-y-4">
         <h2 className="font-heading text-2xl font-bold">Best Seller Wines</h2>

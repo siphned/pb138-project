@@ -2,13 +2,13 @@ import { ArrowLeft02Icon } from "@hugeicons/core-free-icons";
 import { HugeiconsIcon } from "@hugeicons/react";
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { PageHeader } from "@/components/primitives/page-header";
-import { InventoryForm } from "@/components/shops/InventoryForm";
+import { BundleForm } from "@/components/shops/BundleForm";
 
-export const Route = createFileRoute("/shops/$id/inventory/new")({
-  component: InventoryNewPage,
+export const Route = createFileRoute("/shops/$id/bundles/new")({
+  component: BundleNewPage,
 });
 
-function InventoryNewPage() {
+function BundleNewPage() {
   const { id } = Route.useParams();
   const navigate = useNavigate();
 
@@ -25,13 +25,13 @@ function InventoryNewPage() {
       </Link>
 
       <PageHeader
-        description="Add a single product to this shop's catalog."
-        title="Add inventory"
+        description="Combine wines you already stock into a single bundle for this shop."
+        title="Create a bundle"
       />
 
-      <InventoryForm
-        onSuccess={() =>
-          navigate({ params: { id }, search: { isBundle: undefined }, to: "/shops/$id/inventory" })
+      <BundleForm
+        onSuccess={(productId) =>
+          navigate({ params: { productId }, to: "/products/$productId" })
         }
         shopId={id}
       />

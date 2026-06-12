@@ -38,7 +38,7 @@ describe("WinemakerStatsSection", () => {
     expect(screen.getByText("11")).toBeInTheDocument();
     expect(screen.getByText("Total stock")).toBeInTheDocument();
     expect(screen.getByText("215")).toBeInTheDocument();
-    expect(screen.getByText("Approved events")).toBeInTheDocument();
+    expect(screen.getByText("My events")).toBeInTheDocument();
     expect(screen.getByText("3")).toBeInTheDocument();
     expect(screen.getByText("Approved supply agreements")).toBeInTheDocument();
     expect(screen.getByText("2")).toBeInTheDocument();

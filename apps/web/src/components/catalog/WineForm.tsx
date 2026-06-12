@@ -1,17 +1,20 @@
-import { useMemo } from "react";
+import { useMemo, useState } from "react";
 import { type Resolver, useForm } from "react-hook-form";
 import { z } from "zod";
-import { Button } from "@/components/ui/button";
+import {
+  ImageUploadField,
+  SubmitButton,
+  TextField,
+  TextareaField,
+} from "@/components/forms";
 import {
   Form,
   FormControl,
-  FormDescription,
   FormField,
   FormItem,
   FormLabel,
   FormMessage,
 } from "@/components/ui/form";
-import { Input } from "@/components/ui/input";
 import {
   Select,
   SelectContent,
@@ -19,7 +22,6 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Textarea } from "@/components/ui/textarea";
 
 const wineFormSchema = z.object({
   name: z.string().refine((v) => v.trim().length > 0, { message: "Name is required" }),
@@ -51,12 +53,25 @@ export type WineFormValues = z.infer<typeof wineFormSchema>;
 
 interface WineFormProps {
   defaultValues: Partial<WineFormValues>;
-  onSubmit: (values: WineFormValues) => void;
+  onSubmit: (values: WineFormValues, images: File[]) => void;
   isPending: boolean;
   submitLabel: string;
+  /** When true, render an optional image picker that bubbles files up via onSubmit. */
+  showImageUpload?: boolean;
+  /** When true, hide the Attribution field — caller has pre-filled it via defaultValues. */
+  hideAttribution?: boolean;
 }
 
-export function WineForm({ defaultValues, onSubmit, isPending, submitLabel }: WineFormProps) {
+export function WineForm({
+  defaultValues,
+  onSubmit,
+  isPending,
+  submitLabel,
+  showImageUpload = false,
+  hideAttribution = false,
+}: WineFormProps) {
+  const [imageFiles, setImageFiles] = useState<File[]>([]);
+  const [imageError, setImageError] = useState<string | null>(null);
   const resolver = useMemo<Resolver<WineFormValues>>(
     () => async (values) => {
       const result = wineFormSchema.safeParse(values);
@@ -91,51 +106,37 @@ export function WineForm({ defaultValues, onSubmit, isPending, submitLabel }: Wi
     resolver,
   });
 
+  const handleFormSubmit = (values: WineFormValues) => {
+    if (imageError) return;
+    onSubmit(values, imageFiles);
+  };
+
   return (
     <Form {...form}>
-      <form className="space-y-6" onSubmit={form.handleSubmit(onSubmit)}>
-        <FormField
+      <form className="space-y-6" onSubmit={form.handleSubmit(handleFormSubmit)}>
+        <TextField
           control={form.control}
+          label="Wine name"
           name="name"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Wine name</FormLabel>
-              <FormControl>
-                <Input placeholder="Pálava 2024" {...field} />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
+          placeholder="Pálava 2024"
         />
 
-        <FormField
+        <TextareaField
           control={form.control}
+          label="Description"
           name="description"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Description</FormLabel>
-              <FormControl>
-                <Textarea rows={3} {...field} />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
+          rows={3}
         />
 
-        <FormField
-          control={form.control}
-          name="attribution"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Attribution</FormLabel>
-              <FormControl>
-                <Input placeholder="Vinařství Lechovice" {...field} />
-              </FormControl>
-              <FormDescription>The producer / vineyard name on the label.</FormDescription>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
+        {!hideAttribution && (
+          <TextField
+            control={form.control}
+            description="The producer / vineyard name on the label."
+            label="Attribution"
+            name="attribution"
+            placeholder="Vinařství Lechovice"
+          />
+        )}
 
         <div className="grid gap-4 sm:grid-cols-2">
           <FormField
@@ -190,94 +191,62 @@ export function WineForm({ defaultValues, onSubmit, isPending, submitLabel }: Wi
         </div>
 
         <div className="grid gap-4 sm:grid-cols-2">
-          <FormField
+          <TextField
             control={form.control}
+            label="Region"
             name="region"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Region</FormLabel>
-                <FormControl>
-                  <Input placeholder="Moravia" {...field} />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
+            placeholder="Moravia"
           />
-          <FormField
+          <TextField
             control={form.control}
+            label="Composition"
             name="composition"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Composition</FormLabel>
-                <FormControl>
-                  <Input placeholder="Pálava 100%" {...field} />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
+            placeholder="Pálava 100%"
           />
         </div>
 
         <div className="grid gap-4 sm:grid-cols-3">
-          <FormField
+          <TextField
             control={form.control}
+            label="Vintage year"
             name="vintageYear"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Vintage year</FormLabel>
-                <FormControl>
-                  <Input type="number" {...field} />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
+            type="number"
           />
-          <FormField
+          <TextField
             control={form.control}
+            label="Alcohol %"
             name="alcoholContent"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Alcohol %</FormLabel>
-                <FormControl>
-                  <Input placeholder="12.5" {...field} />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
+            placeholder="12.5"
           />
-          <FormField
+          <TextField
             control={form.control}
+            label="Volume (ml)"
+            min="1"
             name="volumeMl"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Volume (ml)</FormLabel>
-                <FormControl>
-                  <Input min="1" type="number" {...field} />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
+            type="number"
           />
         </div>
 
-        <FormField
+        <TextField
           control={form.control}
+          description="Bottles available for retail allocation."
+          label="Initial stock"
+          min="0"
           name="quantity"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Initial stock</FormLabel>
-              <FormControl>
-                <Input min="0" type="number" {...field} />
-              </FormControl>
-              <FormDescription>Bottles available for retail allocation.</FormDescription>
-              <FormMessage />
-            </FormItem>
-          )}
+          type="number"
         />
 
-        <Button className="w-full" disabled={isPending} type="submit">
-          {isPending ? "Saving…" : submitLabel}
-        </Button>
+        {showImageUpload && (
+          <ImageUploadField
+            description="PNG, JPEG, WebP, or AVIF up to 10 MB each. Uploaded after the wine is created."
+            onErrorChange={setImageError}
+            onFilesChange={setImageFiles}
+          />
+        )}
+
+        <SubmitButton disabled={!!imageError} isPending={isPending}>
+          {submitLabel}
+        </SubmitButton>
       </form>
     </Form>
   );

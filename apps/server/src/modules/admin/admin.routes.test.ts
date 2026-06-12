@@ -5,12 +5,9 @@ import { app } from "../../app";
 
 vi.mock("./admin.service", () => ({
   adminService: {
-    approveEvent: vi.fn().mockResolvedValue({}),
     deleteReview: vi.fn().mockResolvedValue(undefined),
     listAllReviews: vi.fn().mockResolvedValue({ data: [], total: 0 }),
-    listEvents: vi.fn().mockResolvedValue({ data: [], total: 0 }),
     listUsers: vi.fn().mockResolvedValue({ data: [], total: 0 }),
-    rejectEvent: vi.fn().mockResolvedValue({}),
     setUserStatus: vi.fn().mockResolvedValue({}),
   },
 }));

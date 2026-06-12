@@ -8,6 +8,7 @@ import { ShopDetailsCard } from "@/components/shops/ShopDetailsCard";
 import { ShopHero } from "@/components/shops/ShopHero";
 import { ShopProductsRow } from "@/components/shops/ShopProductsRow";
 import { useGetShopsById } from "@/generated/hooks/useGetShopsById";
+import { useGetShopsByIdImages } from "@/generated/hooks/useGetShopsByIdImages";
 import { ShopHeroGallery } from "./-components/ShopHeroGallery";
 import { ShopMapEmbed } from "./-components/ShopMapEmbed";
 
@@ -18,6 +19,7 @@ export const Route = createFileRoute("/shops/$id/")({
 function ShopDetailPage() {
   const { id } = Route.useParams();
   const { data: shop, isLoading, isError, refetch } = useGetShopsById(id);
+  const { data: shopImages } = useGetShopsByIdImages(id);
 
   if (isLoading) {
     return (
@@ -53,7 +55,7 @@ function ShopDetailPage() {
 
       <div className="grid grid-cols-1 gap-12 lg:grid-cols-2">
         <div className="overflow-hidden rounded-3xl bg-muted shadow-lg">
-          <ShopHeroGallery shopName={shop.name} />
+          <ShopHeroGallery images={shopImages?.map((img) => img.url)} shopName={shop.name} />
         </div>
 
         <ShopDetailsCard shop={shop} />

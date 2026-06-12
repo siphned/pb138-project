@@ -2,7 +2,6 @@ import { createFileRoute } from "@tanstack/react-router";
 import { StubGet } from "@/components/dev/StubGet";
 import { StubPage } from "@/components/dev/StubPage";
 import { useUser } from "@/context/UserContext";
-import { useGetAdminEvents } from "@/generated/hooks/useGetAdminEvents";
 import { useGetAdminReviews } from "@/generated/hooks/useGetAdminReviews";
 import { useGetAdminUsers } from "@/generated/hooks/useGetAdminUsers";
 import { useGetEvents } from "@/generated/hooks/useGetEvents";
@@ -36,7 +35,6 @@ function StatsStub() {
   // Admin-only queries
   const adminUsersQuery = useGetAdminUsers({}, { query: { enabled: isAdmin } });
   const adminRoleReqQuery = useGetRoleRequests({ query: { enabled: isAdmin } });
-  const adminEventsQuery = useGetAdminEvents({}, { query: { enabled: isAdmin } });
   const adminReviewsQuery = useGetAdminReviews({}, { query: { enabled: isAdmin } });
 
   return (
@@ -94,12 +92,6 @@ function StatsStub() {
             hookName="useGetRoleRequests"
             query={adminRoleReqQuery}
             title="Admin: pending role requests"
-          />
-          <StubGet
-            actorRole="admin"
-            hookName="useGetAdminEvents"
-            query={adminEventsQuery}
-            title="Admin: pending events"
           />
           <StubGet
             actorRole="admin"
