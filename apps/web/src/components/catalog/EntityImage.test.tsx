@@ -1,48 +1,40 @@
 import { render, screen } from "@testing-library/react";
+import "@testing-library/jest-dom/vitest";
 import { describe, expect, it } from "vitest";
-import { EntityImage } from "./EntityImage";
+import { EntityImage, firstImageUrl } from "./EntityImage";
 
 describe("EntityImage", () => {
-  it("renders the first attached image URL", () => {
-    render(
-      <EntityImage
-        alt="Foo"
-        fallbackText="Foo"
-        imagesQuery={{ data: [{ url: "/uploads/x/foo.webp" }], isLoading: false }}
-      />
-    );
+  it("renders the provided image URL", () => {
+    render(<EntityImage alt="Foo" fallbackText="Foo" imageUrl="/uploads/x/foo.webp" />);
     expect(screen.getByAltText("Foo")).toHaveAttribute("src", "/uploads/x/foo.webp");
   });
 
-  it("renders the placeholder while loading", () => {
-    render(<EntityImage alt="Foo" fallbackText="Foo Item" imagesQuery={{ isLoading: true }} />);
+  it("renders a skeleton while loading", () => {
+    const { container } = render(<EntityImage alt="Foo" fallbackText="Foo Item" isLoading />);
     expect(screen.queryByAltText("Foo")).not.toBeInTheDocument();
-    expect(screen.getByText("Foo Item")).toBeInTheDocument();
+    expect(container.querySelector('[data-slot="skeleton"]')).toBeInTheDocument();
   });
 
-  it("renders the placeholder when no images are attached", () => {
-    render(
-      <EntityImage
-        alt="Foo"
-        fallbackColor="red"
-        fallbackText="Foo Item"
-        imagesQuery={{ data: [], isLoading: false }}
-      />
-    );
+  it("renders the placeholder when no image URL is provided", () => {
+    render(<EntityImage alt="Foo" fallbackColor="red" fallbackText="Foo Item" imageUrl={null} />);
     expect(screen.queryByAltText("Foo")).not.toBeInTheDocument();
     expect(screen.getByText("Foo Item")).toBeInTheDocument();
     expect(screen.getByText("red")).toBeInTheDocument();
   });
 
-  it("renders the placeholder when data is not an array", () => {
-    render(
-      <EntityImage
-        alt="Foo"
-        fallbackText="Foo Item"
-        imagesQuery={{ data: undefined, isLoading: false }}
-      />
-    );
-    expect(screen.queryByAltText("Foo")).not.toBeInTheDocument();
-    expect(screen.getByText("Foo Item")).toBeInTheDocument();
+  it("renders the entity placeholder webp when entityType is given and no URL", () => {
+    render(<EntityImage alt="Foo" entityType="product" fallbackText="Foo Item" imageUrl={null} />);
+    expect(screen.getByAltText("Foo")).toHaveAttribute("src", "/placeholders/product.webp");
+  });
+});
+
+describe("firstImageUrl", () => {
+  it("returns the first url from an array", () => {
+    expect(firstImageUrl([{ url: "/a.webp" }, { url: "/b.webp" }])).toBe("/a.webp");
+  });
+
+  it("returns undefined for empty array or non-array", () => {
+    expect(firstImageUrl([])).toBeUndefined();
+    expect(firstImageUrl(undefined)).toBeUndefined();
   });
 });

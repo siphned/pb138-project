@@ -1,22 +1,27 @@
 import { useGetShopsByIdImages } from "@/generated/hooks/useGetShopsByIdImages";
-import { EntityImage } from "./EntityImage";
+import { EntityImage, firstImageUrl } from "./EntityImage";
 
 interface ShopImageProps {
   shopId: string;
   alt: string;
   fallbackText: string;
   className?: string;
+  imageUrl?: string | null;
 }
 
-/** Thin wrapper around `<EntityImage>` for shop images. */
-export function ShopImage({ shopId, alt, fallbackText, className }: ShopImageProps) {
-  const imagesQuery = useGetShopsByIdImages(shopId);
+export function ShopImage({ shopId, alt, fallbackText, className, imageUrl }: ShopImageProps) {
+  const hasInlineUrl = imageUrl !== undefined;
+  const { data, isLoading } = useGetShopsByIdImages(shopId, {
+    query: { enabled: !hasInlineUrl },
+  });
   return (
     <EntityImage
       alt={alt}
       className={className}
+      entityType="shop"
       fallbackText={fallbackText}
-      imagesQuery={imagesQuery}
+      imageUrl={hasInlineUrl ? imageUrl : firstImageUrl(data)}
+      isLoading={!hasInlineUrl && isLoading}
     />
   );
 }

@@ -1,6 +1,14 @@
 import { NotFoundError } from "@repo/shared";
 import type { Review } from "@repo/shared/schemas";
-import { orderItems, orders, productWines, reviews, wines } from "@repo/shared/schemas";
+import {
+  orderItems,
+  orders,
+  products,
+  productWines,
+  reviews,
+  users,
+  wines,
+} from "@repo/shared/schemas";
 import { and, asc, avg, count, desc, eq, isNull } from "drizzle-orm";
 import type { Database } from "../../db";
 
@@ -74,6 +82,73 @@ export async function findReviews(
     ),
     with: { user: { columns: { fname: true, id: true, lname: true } } },
   }) as Promise<ReviewWithUser[]>;
+}
+
+export async function averageShopRating(db: Database, shopId: string): Promise<number | null> {
+  const [row] = await db
+    .select({ avg: avg(reviews.rating) })
+    .from(reviews)
+    .innerJoin(products, eq(reviews.entityId, products.id))
+    .where(
+      and(
+        eq(reviews.entityType, "product"),
+        eq(products.shopId, shopId),
+        isNull(reviews.deletedAt),
+        isNull(products.deletedAt)
+      )
+    );
+  return row?.avg !== null && row?.avg !== undefined ? Number.parseFloat(row.avg) : null;
+}
+
+export async function countShopReviews(db: Database, shopId: string): Promise<number> {
+  const [row] = await db
+    .select({ count: count() })
+    .from(reviews)
+    .innerJoin(products, eq(reviews.entityId, products.id))
+    .where(
+      and(
+        eq(reviews.entityType, "product"),
+        eq(products.shopId, shopId),
+        isNull(reviews.deletedAt),
+        isNull(products.deletedAt)
+      )
+    );
+  return row?.count ?? 0;
+}
+
+export async function findShopReviews(
+  db: Database,
+  shopId: string,
+  opts: { limit: number; offset: number; sort: "newest" | "highest" | "lowest" }
+): Promise<ReviewWithUser[]> {
+  let orderBy = [desc(reviews.createdAt)];
+  if (opts.sort === "highest") {
+    orderBy = [desc(reviews.rating), desc(reviews.createdAt)];
+  } else if (opts.sort === "lowest") {
+    orderBy = [asc(reviews.rating), desc(reviews.createdAt)];
+  }
+
+  const rows = await db
+    .select({
+      review: reviews,
+      user: { fname: users.fname, id: users.id, lname: users.lname },
+    })
+    .from(reviews)
+    .innerJoin(products, eq(reviews.entityId, products.id))
+    .innerJoin(users, eq(reviews.userId, users.id))
+    .where(
+      and(
+        eq(reviews.entityType, "product"),
+        eq(products.shopId, shopId),
+        isNull(reviews.deletedAt),
+        isNull(products.deletedAt)
+      )
+    )
+    .orderBy(...orderBy)
+    .limit(opts.limit)
+    .offset(opts.offset);
+
+  return rows.map((row) => ({ ...row.review, user: row.user }));
 }
 
 export async function findReviewWithUser(
@@ -192,10 +267,13 @@ export async function softDelete(db: Database, reviewId: string): Promise<void> 
 
 export const reviewsRepository = {
   averageRating,
+  averageShopRating,
   countReviews,
+  countShopReviews,
   findById,
   findReviews,
   findReviewWithUser,
+  findShopReviews,
   findUserReview,
   hasPurchasedFromWinemaker,
   hasPurchasedProduct,

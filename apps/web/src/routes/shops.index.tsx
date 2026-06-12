@@ -5,7 +5,7 @@ import { CatalogFilters } from "@/components/catalog/CatalogFilters";
 import { CatalogResults } from "@/components/catalog/CatalogResults";
 import { CatalogState } from "@/components/catalog/CatalogState";
 import { ShopCard } from "@/components/catalog/ShopCard";
-import type { ShopSearch } from "@/components/catalog/types";
+import { asString, type ShopSearch } from "@/components/catalog/types";
 import { PageHeader } from "@/components/primitives/page-header";
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
@@ -14,14 +14,15 @@ import { useGetShops } from "@/generated/hooks/useGetShops";
 export const Route = createFileRoute("/shops/")({
   component: ShopsPage,
   validateSearch: (raw): ShopSearch => ({
-    q: typeof raw.q === "string" ? raw.q : undefined,
+    city: asString(raw.city),
+    q: asString(raw.q),
   }),
 });
 
 function ShopsPage() {
   const search = Route.useSearch();
   const navigate = useNavigate({ from: Route.fullPath });
-  const query = useGetShops();
+  const query = useGetShops({ city: search.city, q: search.q });
 
   const handleSearchChange = (next: ShopSearch) => {
     navigate({ replace: true, search: next });
@@ -29,17 +30,8 @@ function ShopsPage() {
 
   const shops = query.data || [];
 
-  // Client-side filtering for 'q' until BE supports it
-  const filteredShops = search.q
-    ? shops.filter(
-        (s) =>
-          s.name.toLowerCase().includes(String(search.q).toLowerCase()) ||
-          s.address.city.toLowerCase().includes(String(search.q).toLowerCase())
-      )
-    : shops;
-
   // TODO(WINE-XXX): cap at 20 until BE adds pagination
-  const displayedShops = filteredShops.slice(0, 20);
+  const displayedShops = shops.slice(0, 20);
 
   return (
     <div className="container mx-auto space-y-8 px-6 py-8 lg:px-12">
@@ -77,7 +69,7 @@ function ShopsPage() {
             isLoading={query.isLoading}
             onRetry={() => query.refetch()}
           >
-            <CatalogResults count={filteredShops.length}>
+            <CatalogResults count={shops.length}>
               {displayedShops.map((shop) => (
                 <ShopCard key={shop.id} shop={shop} />
               ))}

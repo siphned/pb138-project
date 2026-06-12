@@ -11,7 +11,9 @@ vi.mock("./products.repository", async (importOriginal) => {
     create: vi.fn(),
     createProductWines: vi.fn(),
     deleteProductWines: vi.fn(),
+    findAll: vi.fn(),
     findById: vi.fn(),
+    findByIds: vi.fn(),
     getWineQuantityForUpdate: vi.fn(),
     update: vi.fn(),
     updateWineQuantity: vi.fn(),
@@ -39,6 +41,62 @@ describe("productsService", () => {
   const shopId = "s1";
   const requesterId = "u1";
   const productId = "p1";
+
+  describe("getAllProducts", () => {
+    it("maps imageUrl from catalog rows into response items", async () => {
+      vi.mocked(productsRepo.findAll).mockResolvedValue({
+        rows: [
+          {
+            avgRating: null,
+            id: productId,
+            imageUrl: "/uploads/product/p.webp",
+            isBundle: false,
+            name: "P",
+            price: "10.00",
+            quantity: 5,
+            reviewCount: 0,
+            shopId: "s1",
+            shopName: "Shop",
+          },
+        ],
+        total: 1,
+      } as any);
+      vi.mocked(productsRepo.findByIds).mockResolvedValue([
+        { id: productId, productWines: [] },
+      ] as any);
+
+      const result = await productsService.getAllProducts({ page: 1 });
+
+      expect(result.data[0].imageUrl).toBe("/uploads/product/p.webp");
+    });
+
+    it("passes through a null imageUrl when the product has no image", async () => {
+      vi.mocked(productsRepo.findAll).mockResolvedValue({
+        rows: [
+          {
+            avgRating: null,
+            id: productId,
+            imageUrl: null,
+            isBundle: false,
+            name: "P",
+            price: "10.00",
+            quantity: 5,
+            reviewCount: 0,
+            shopId: "s1",
+            shopName: "Shop",
+          },
+        ],
+        total: 1,
+      } as any);
+      vi.mocked(productsRepo.findByIds).mockResolvedValue([
+        { id: productId, productWines: [] },
+      ] as any);
+
+      const result = await productsService.getAllProducts({ page: 1 });
+
+      expect(result.data[0].imageUrl).toBeNull();
+    });
+  });
 
   describe("createProductOrBundle", () => {
     it("creates a single product when wineId is present", async () => {

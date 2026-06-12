@@ -10,7 +10,7 @@ import { Card } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
 import { useGetOrdersById } from "@/generated/hooks/useGetOrdersById";
 import type { GetOrdersById200 } from "@/generated/types/GetOrdersById";
-import { cn } from "@/lib/utils";
+import { cn, formatEur } from "@/lib/utils";
 
 type OrderItem = {
   id: string;
@@ -129,7 +129,7 @@ function CheckoutConfirmedPage() {
                   <p className="text-sm text-muted-foreground">Quantity: {item.quantity}</p>
                 </div>
                 <p className="text-right font-semibold text-foreground">
-                  €{(Number.parseFloat(item.unitPriceAtPurchase) * item.quantity).toFixed(2)}
+                  {formatEur(Number.parseFloat(item.unitPriceAtPurchase) * item.quantity)}
                 </p>
               </li>
             ))}
@@ -138,17 +138,17 @@ function CheckoutConfirmedPage() {
           <dl className="space-y-2 text-sm">
             <div className="flex justify-between">
               <dt className="text-muted-foreground">Subtotal</dt>
-              <dd className="text-foreground">€{subtotal.toFixed(2)}</dd>
+              <dd className="text-foreground">{formatEur(subtotal)}</dd>
             </div>
             <div className="flex justify-between">
               <dt className="text-muted-foreground">
                 {order.deliveryType === "pickup" ? "Pickup" : "Shipping"}
               </dt>
-              <dd className="text-foreground">€{deliveryFee.toFixed(2)}</dd>
+              <dd className="text-foreground">{formatEur(deliveryFee)}</dd>
             </div>
             <div className="flex justify-between border-t border-border pt-2 text-base font-bold">
               <dt>Total</dt>
-              <dd>€{total.toFixed(2)}</dd>
+              <dd>{formatEur(total)}</dd>
             </div>
           </dl>
         </Card>

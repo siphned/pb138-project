@@ -1,6 +1,6 @@
 import type { Image } from "@repo/shared/schemas";
 import { events, images, products, shops, winemakers, wines } from "@repo/shared/schemas";
-import { and, count, eq, isNull } from "drizzle-orm";
+import { and, asc, count, eq, isNull } from "drizzle-orm";
 import type { Database } from "../../db";
 import type { VALID_ENTITY_TYPES } from "./images.schema";
 
@@ -62,6 +62,7 @@ export async function entityExists(db: Database, entityType: EntityType, entityI
 
 export function findByEntity(db: Database, entityType: EntityType, entityId: string) {
   return db.query.images.findMany({
+    orderBy: [asc(images.createdAt), asc(images.id)],
     where: and(
       eq(images.entityType, entityType),
       eq(images.entityId, entityId),

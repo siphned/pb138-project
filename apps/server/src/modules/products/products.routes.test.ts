@@ -9,6 +9,7 @@ const { defaultProduct } = vi.hoisted(() => ({
     deletedAt: null,
     description: "A test product",
     id: "p1",
+    imageUrl: null,
     isBundle: false,
     name: "Test Product",
     price: "150.00",

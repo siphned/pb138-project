@@ -48,7 +48,10 @@ function InventoryEditPage() {
         Back to inventory
       </Link>
 
-      <PageHeader description="Update the product name, price, quantity, or description." title="Edit product" />
+      <PageHeader
+        description="Update the product name, price, quantity, or description."
+        title="Edit product"
+      />
 
       <InventoryEditForm
         onSuccess={() =>

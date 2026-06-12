@@ -23,7 +23,7 @@ describe("ProductCard", () => {
     render(<ProductCard product={mockProduct} />);
     // Name appears in both the polaroid placeholder caption and the heading link.
     expect(screen.getAllByText("Gala Pálava Bundle").length).toBeGreaterThan(0);
-    expect(screen.getByText(/€1,200/)).toBeInTheDocument();
+    expect(screen.getByText(/1,200.00 €/)).toBeInTheDocument();
   });
 
   it("renders link to correct URL", () => {

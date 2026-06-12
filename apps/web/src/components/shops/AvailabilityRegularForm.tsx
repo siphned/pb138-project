@@ -85,10 +85,7 @@ export function AvailabilityRegularForm({ shopId, onSuccess }: AvailabilityRegul
       // selected weekday.
       for (const day of selectedDays) {
         await mutation.mutateAsync({
-          data: {
-            ...data,
-            dow: String(day),
-          } as PostShopsByIdAvailabilityRegularMutationRequest,
+          data: { ...data, dow: day } satisfies PostShopsByIdAvailabilityRegularMutationRequest,
           id: shopId,
         });
       }

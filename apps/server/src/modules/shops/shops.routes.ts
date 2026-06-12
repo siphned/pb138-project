@@ -1,8 +1,11 @@
-import { Elysia, status, t } from "elysia";
+import { Elysia, status } from "elysia";
+import { z } from "zod";
 import { errorResponse } from "../../utils/error-plugin";
 import { authPlugin } from "../auth";
 import { createShopBody, shopFiltersQuery, shopResponse, updateShopBody } from "./shops.schema";
 import { shopsService } from "./shops.service";
+
+const idParams = z.object({ id: z.string() });
 
 export const shopsRoutes = new Elysia()
   .use(authPlugin)
@@ -15,7 +18,7 @@ export const shopsRoutes = new Elysia()
       tags: ["shops"],
     },
     query: shopFiltersQuery,
-    response: { 200: t.Array(shopResponse) },
+    response: { 200: z.array(shopResponse) },
   })
 
   .get("/shops/me", ({ dbUser }) => shopsService.listMyShops(dbUser.id), {
@@ -26,7 +29,7 @@ export const shopsRoutes = new Elysia()
       tags: ["shops"],
     },
     requireRoles: ["shop_owner"],
-    response: { 200: t.Array(shopResponse) },
+    response: { 200: z.array(shopResponse) },
   })
 
   .get("/shops/:id", ({ params }) => shopsService.getShop(params.id), {
@@ -35,7 +38,7 @@ export const shopsRoutes = new Elysia()
       summary: "Get shop by ID",
       tags: ["shops"],
     },
-    params: t.Object({ id: t.String() }),
+    params: idParams,
     response: { 200: shopResponse, 404: errorResponse },
   })
 
@@ -68,10 +71,10 @@ export const shopsRoutes = new Elysia()
         summary: "Delete shop",
         tags: ["shops"],
       },
-      params: t.Object({ id: t.String() }),
+      params: idParams,
       requireRoles: ["shop_owner"],
       response: {
-        200: t.Object({ success: t.Boolean() }),
+        200: z.object({ success: z.boolean() }),
         403: errorResponse,
         404: errorResponse,
       },
@@ -89,7 +92,7 @@ export const shopsRoutes = new Elysia()
         summary: "Update shop",
         tags: ["shops"],
       },
-      params: t.Object({ id: t.String() }),
+      params: idParams,
       requireRoles: ["shop_owner", "admin"],
       response: { 200: shopResponse, 403: errorResponse, 404: errorResponse },
     }

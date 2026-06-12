@@ -81,7 +81,7 @@ function friendlyError(code?: string, fallback?: string): string {
 }
 
 export function BundleForm({ shopId, onSuccess }: BundleFormProps) {
-  const productsQuery = useGetShopsByIdProducts(shopId, { isBundle: "false" });
+  const productsQuery = useGetShopsByIdProducts(shopId, { isBundle: false });
   const mutation = usePostShopsByIdProducts();
 
   const form = useForm<BundleFormValues>({

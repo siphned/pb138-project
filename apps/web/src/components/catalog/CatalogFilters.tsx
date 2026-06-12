@@ -16,6 +16,7 @@ import type {
   GetWinesQueryParamsTypeEnumKey,
 } from "@/generated/types/GetWines";
 import { useDebounce } from "@/hooks/useDebounce";
+import { formatEur } from "@/lib/utils";
 import type {
   EntityKind,
   EventSearch,
@@ -71,11 +72,11 @@ export function CatalogFilters<E extends EntityKind>({ entity, search, onSearchC
 function SearchInput({
   value,
   onChange,
-  isProduct,
+  serverSearch,
 }: {
   value: string;
   onChange: (val: string) => void;
-  isProduct: boolean;
+  serverSearch: boolean;
 }) {
   const [local, setLocal] = useState(value);
   const debounced = useDebounce(local, 300);
@@ -105,7 +106,7 @@ function SearchInput({
         ref={inputRef}
         value={local}
       />
-      {!isProduct && (
+      {!serverSearch && (
         <p className="text-[10px] italic text-muted-foreground">
           Search coming soon to API (client-filter active)
         </p>
@@ -162,7 +163,7 @@ function WineFilters({
 
   return (
     <div className="space-y-8">
-      <SearchInput isProduct={false} onChange={handleSearchChange} value={search.q || ""} />
+      <SearchInput onChange={handleSearchChange} serverSearch={false} value={search.q || ""} />
 
       <div className="space-y-6">
         <ColorFilter
@@ -207,7 +208,10 @@ function WineFilters({
           <SectionLabel>Vintage Year</SectionLabel>
           <Input
             onChange={(e) =>
-              onSearchChange({ ...search, vintageYear: e.target.value || undefined })
+              onSearchChange({
+                ...search,
+                vintageYear: e.target.value ? Number(e.target.value) : undefined,
+              })
             }
             placeholder="e.g. 2021"
             type="number"
@@ -242,7 +246,7 @@ function ProductFilters({
 
   return (
     <div className="space-y-8">
-      <SearchInput isProduct={true} onChange={handleSearchChange} value={search.q || ""} />
+      <SearchInput onChange={handleSearchChange} serverSearch={true} value={search.q || ""} />
 
       <div className="space-y-6">
         <ColorFilter
@@ -272,8 +276,8 @@ function ProductFilters({
             value={priceRange}
           />
           <div className="flex justify-between text-xs text-muted-foreground">
-            <span>€{priceRange[0]}</span>
-            <span>€{priceRange[1]}</span>
+            <span>{formatEur(priceRange[0], { decimals: 0 })}</span>
+            <span>{formatEur(priceRange[1], { decimals: 0 })}</span>
           </div>
         </div>
 
@@ -331,9 +335,15 @@ function GenericFilters({
 
   return (
     <div className="space-y-8">
-      <SearchInput isProduct={false} onChange={handleSearchChange} value={search.q ?? ""} />
-      <div className="py-4">
-        <p className="text-sm italic text-muted-foreground">Filters coming soon...</p>
+      <SearchInput onChange={handleSearchChange} serverSearch={true} value={search.q ?? ""} />
+
+      <div className="space-y-3">
+        <SectionLabel>City</SectionLabel>
+        <Input
+          onChange={(e) => onSearchChange({ ...search, city: e.target.value || undefined })}
+          placeholder="Filter by city..."
+          value={search.city ?? ""}
+        />
       </div>
     </div>
   );

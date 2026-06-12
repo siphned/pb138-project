@@ -17,7 +17,15 @@ vi.mock("./EventRegistrationButton", () => ({
 }));
 
 vi.mock("@tanstack/react-router", () => ({
-  Link: ({ children, to, params }: { children: React.ReactNode; to: string; params?: { id: string } }) => (
+  Link: ({
+    children,
+    to,
+    params,
+  }: {
+    children: React.ReactNode;
+    to: string;
+    params?: { id: string };
+  }) => (
     <a data-testid="link" href={`${to}/${params?.id ?? ""}`}>
       {children}
     </a>
@@ -25,19 +33,19 @@ vi.mock("@tanstack/react-router", () => ({
 }));
 
 const baseEvent = {
-  id: "evt-1",
-  description: "A celebration of new vintages and old friendships.",
-  startTime: "2026-06-01T10:00:00Z",
-  endTime: "2026-06-01T18:00:00Z",
-  capacity: 80,
-  attendees: 42,
   address: {
-    street: "Hlavná",
-    houseNumber: "12",
-    postalCode: "60200",
     city: "Brno",
     country: "Czech Republic",
+    houseNumber: "12",
+    postalCode: "60200",
+    street: "Hlavná",
   },
+  attendees: 42,
+  capacity: 80,
+  description: "A celebration of new vintages and old friendships.",
+  endTime: "2026-06-01T18:00:00Z",
+  id: "evt-1",
+  startTime: "2026-06-01T10:00:00Z",
   winemaker: { id: "wm-1", name: "Lechovice" },
 };
 

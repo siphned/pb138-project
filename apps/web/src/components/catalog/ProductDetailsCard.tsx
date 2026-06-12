@@ -19,7 +19,7 @@ import { useGetProductsByIdImages } from "@/generated/hooks/useGetProductsByIdIm
 import { useGetShopsById } from "@/generated/hooks/useGetShopsById";
 import type { GetProductsById200 } from "@/generated/types/GetProductsById";
 import { DETAIL_CARD_GRID, DETAIL_CARD_ITEM } from "@/lib/detail-card-grid";
-import { CatalogPlaceholder } from "./CatalogPlaceholder";
+import { formatEur } from "@/lib/utils";
 import { WineCard } from "./WineCard";
 
 interface ProductDetailsCardProps {
@@ -28,22 +28,18 @@ interface ProductDetailsCardProps {
   isAddingToCart: boolean;
 }
 
-function ProductImageCarousel({
-  productId,
-  name,
-  fallbackColor,
-}: {
-  productId: string;
-  name: string;
-  fallbackColor?: string;
-}) {
+function ProductImageCarousel({ productId, name }: { productId: string; name: string }) {
   const { data: images } = useGetProductsByIdImages(productId);
   const photos = images ?? [];
 
   if (photos.length === 0) {
     return (
       <div className="aspect-square w-full overflow-hidden rounded-lg bg-muted shadow-xs">
-        <CatalogPlaceholder color={fallbackColor} text={name} />
+        <img
+          alt={name}
+          className="h-full w-full object-cover opacity-60 dark:opacity-40"
+          src="/placeholders/product.webp"
+        />
       </div>
     );
   }
@@ -135,13 +131,8 @@ export function ProductDetailsCard({
   const shopName: string | undefined = product.shop?.name ?? fetchedShop?.name;
   const shopOwnerUserId: string | undefined = product.shop?.ownerUserId ?? fetchedShop?.ownerUserId;
 
-  const price = Number(product.price).toLocaleString("en-IE", {
-    currency: "EUR",
-    style: "currency",
-  });
+  const price = formatEur(product.price);
 
-  // biome-ignore lint/suspicious/noExplicitAny: GetProductsById200 is `any` in OpenAPI (BE follow-up)
-  const firstWineColor = (product.productWines as any)?.[0]?.wine?.color;
   const outOfStock = product.quantity === 0;
   const stock = stockBadge(product.quantity);
   const clampedQuantity = Math.min(quantity, Math.max(1, product.quantity));
@@ -150,11 +141,7 @@ export function ProductDetailsCard({
     <div className="space-y-8">
       <Card variant="default">
         <CardContent className="grid grid-cols-1 gap-8 md:grid-cols-[1fr_2fr]">
-          <ProductImageCarousel
-            fallbackColor={firstWineColor}
-            name={product.name}
-            productId={product.id}
-          />
+          <ProductImageCarousel name={product.name} productId={product.id} />
           <div className="flex flex-col gap-5">
             <div className="flex flex-wrap items-center gap-2">
               {product.isBundle && <Badge variant="secondary">Bundle</Badge>}

@@ -223,6 +223,23 @@ describe("Sidebar", () => {
       expect(screen.getByText(/My Wines/i)).toBeInTheDocument();
     });
 
+    it("shows My Events for the customer role", () => {
+      render(<Sidebar activeRole={Role.customer} />);
+      expect(screen.getByText(/My Events/i)).toBeInTheDocument();
+    });
+
+    it("renders My Shops and My Products for the shop owner role", () => {
+      render(<Sidebar activeRole={Role.shopOwner} />);
+      expect(screen.getByText(/My Shops/i)).toBeInTheDocument();
+      expect(screen.getByText(/My Products/i)).toBeInTheDocument();
+    });
+
+    it("hides discovery and cart outside the customer view", () => {
+      render(<Sidebar activeRole={Role.winemaker} />);
+      expect(screen.queryByText(/Explore Wines/i)).not.toBeInTheDocument();
+      expect(screen.queryByText(/Shopping cart/i)).not.toBeInTheDocument();
+    });
+
     it("shows Products link pointing to /products", () => {
       render(<Sidebar />);
       expect(screen.getByText(/Products/i).closest("a")).toHaveAttribute("href", "/products");

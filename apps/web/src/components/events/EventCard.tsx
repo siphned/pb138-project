@@ -2,7 +2,7 @@ import { Location01Icon } from "@hugeicons/core-free-icons";
 import { HugeiconsIcon } from "@hugeicons/react";
 import { useQueryClient } from "@tanstack/react-query";
 import { Link } from "@tanstack/react-router";
-import { CatalogPlaceholder } from "@/components/catalog/CatalogPlaceholder";
+import { EventImage } from "@/components/catalog/EventImage";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { useUser } from "@/context/UserContext";
@@ -22,8 +22,8 @@ interface EventCardProps {
     location?: string;
     winemakerName?: string;
     winemakerId?: string;
-    imageUrl?: string;
     isRegisteredByMe?: boolean;
+    imageUrl?: string | null;
   };
 }
 
@@ -51,6 +51,7 @@ function friendlyMessage(code?: string, fallback?: string): string {
   }
 }
 
+// biome-ignore lint/complexity/noExcessiveCognitiveComplexity: event card handles registration state, error display, and conditional rendering in one component
 export function EventCard({ event }: EventCardProps) {
   const queryClient = useQueryClient();
   const { user } = useUser();
@@ -61,7 +62,8 @@ export function EventCard({ event }: EventCardProps) {
 
   const apiError = parseApiError(registerMutation.error);
   const isAlreadyRegistered = apiError?.code === "ALREADY_REGISTERED";
-  const isRegistered = !!event.isRegisteredByMe || registerMutation.isSuccess || isAlreadyRegistered;
+  const isRegistered =
+    !!event.isRegisteredByMe || registerMutation.isSuccess || isAlreadyRegistered;
   const pending = registerMutation.isPending;
   const canRegister = !!user && !isRegistered;
 
@@ -82,16 +84,8 @@ export function EventCard({ event }: EventCardProps) {
 
   return (
     <Card className="group relative" variant="polaroid">
-      <div className="relative aspect-square w-full overflow-hidden rounded-lg bg-muted shadow-xs">
-        {event.imageUrl ? (
-          <img
-            alt={title}
-            className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-105"
-            src={event.imageUrl}
-          />
-        ) : (
-          <CatalogPlaceholder text={title} />
-        )}
+      <div className="relative aspect-3/4 w-full overflow-hidden rounded-lg bg-muted shadow-xs">
+        <EventImage alt={title} eventId={event.id} fallbackText={title} imageUrl={event.imageUrl} />
 
         {dateLabel && (
           <div className="absolute top-2 left-2 z-10">
@@ -102,7 +96,7 @@ export function EventCard({ event }: EventCardProps) {
         )}
       </div>
 
-      <div className="space-y-2 pt-4 text-center">
+      <div className="flex flex-1 flex-col space-y-2 pt-4 text-center">
         <h3 className="font-heading text-base font-bold leading-tight line-clamp-2">
           <Link
             className="stretched-link transition-colors hover:text-primary focus:outline-none"
@@ -126,7 +120,7 @@ export function EventCard({ event }: EventCardProps) {
           </p>
         )}
 
-        <div className="relative z-10 space-y-1 pt-2">
+        <div className="relative z-10 mt-auto space-y-1 pt-2">
           <Button
             className="w-full"
             disabled={isRegistered || pending || !user}
@@ -134,6 +128,7 @@ export function EventCard({ event }: EventCardProps) {
             size="sm"
             variant={isRegistered ? "outline" : "default"}
           >
+            {/* biome-ignore lint/style/noNestedTernary: three registration states need concise inline expression */}
             {isRegistered ? "Registered" : pending ? "Registering…" : "Register"}
           </Button>
           {showError && (

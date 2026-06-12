@@ -45,6 +45,16 @@ describe("winemakersRepository", () => {
       await winemakersRepository.findAll(db, { q: "chateau" });
       expect(db.query.winemakers.findMany).toHaveBeenCalled();
     });
+
+    it("filters by city case-insensitively", async () => {
+      const mockList = [
+        { address: { city: "Brno", deletedAt: null, id: "a1" }, id: "wm1" },
+        { address: { city: "Praha", deletedAt: null, id: "a2" }, id: "wm2" },
+      ];
+      vi.mocked(db.query.winemakers.findMany).mockResolvedValue(mockList as any);
+      const result = await winemakersRepository.findAll(db, { city: "brn" });
+      expect(result).toStrictEqual([mockList[0]]);
+    });
   });
 
   describe("findById", () => {

@@ -1,7 +1,10 @@
-import { Elysia, status, t } from "elysia";
+import { Elysia, status } from "elysia";
+import { z } from "zod";
 import { parsePagination } from "../../utils/pagination";
 import { authPlugin } from "../auth";
 import { adminService } from "./admin.service";
+
+const idParams = z.object({ id: z.string() });
 
 export const adminRoutes = new Elysia({ prefix: "/admin" })
   .use(authPlugin)
@@ -19,19 +22,10 @@ export const adminRoutes = new Elysia({ prefix: "/admin" })
         summary: "List users (admin)",
         tags: ["admin"],
       },
-      query: t.Object({
-        page: t.Optional(t.Numeric()),
-        role: t.Optional(
-          t.Union([
-            t.Literal("customer"),
-            t.Literal("winemaker"),
-            t.Literal("shop_owner"),
-            t.Literal("admin"),
-          ])
-        ),
-        status: t.Optional(
-          t.Union([t.Literal("active"), t.Literal("suspended"), t.Literal("banned")])
-        ),
+      query: z.object({
+        page: z.coerce.number().optional(),
+        role: z.enum(["customer", "winemaker", "shop_owner", "admin"]).optional(),
+        status: z.enum(["active", "suspended", "banned"]).optional(),
       }),
       requireRoles: ["admin"],
     }
@@ -54,7 +48,7 @@ export const adminRoutes = new Elysia({ prefix: "/admin" })
         summary: "Get user by ID (admin)",
         tags: ["admin"],
       },
-      params: t.Object({ id: t.String() }),
+      params: idParams,
       requireRoles: ["admin"],
     }
   )
@@ -63,8 +57,8 @@ export const adminRoutes = new Elysia({ prefix: "/admin" })
     "/users/:id/status",
     ({ params, body }) => adminService.setUserStatus(params.id, body.status),
     {
-      body: t.Object({
-        status: t.Union([t.Literal("active"), t.Literal("suspended"), t.Literal("banned")]),
+      body: z.object({
+        status: z.enum(["active", "suspended", "banned"]),
       }),
       detail: {
         description: "Update a user's account status.",
@@ -72,7 +66,7 @@ export const adminRoutes = new Elysia({ prefix: "/admin" })
         summary: "Set user status",
         tags: ["admin"],
       },
-      params: t.Object({ id: t.String() }),
+      params: idParams,
       requireRoles: ["admin"],
     }
   )
@@ -90,7 +84,7 @@ export const adminRoutes = new Elysia({ prefix: "/admin" })
         summary: "List reviews (admin)",
         tags: ["admin"],
       },
-      query: t.Object({ page: t.Optional(t.Numeric()) }),
+      query: z.object({ page: z.coerce.number().optional() }),
       requireRoles: ["admin"],
     }
   )
@@ -108,7 +102,7 @@ export const adminRoutes = new Elysia({ prefix: "/admin" })
         summary: "Delete review (admin)",
         tags: ["admin"],
       },
-      params: t.Object({ id: t.String() }),
+      params: idParams,
       requireRoles: ["admin"],
     }
   );

@@ -24,29 +24,27 @@ import {
 } from "@/components/ui/select";
 
 const wineFormSchema = z.object({
-  name: z.string().refine((v) => v.trim().length > 0, { message: "Name is required" }),
-  description: z
-    .string()
-    .refine((v) => v.trim().length > 0, { message: "Description is required" }),
+  alcoholContent: z.string().regex(/^\d{1,2}(\.\d{1,2})?$/, { message: "Use a number like 12.5" }),
   attribution: z
     .string()
     .refine((v) => v.trim().length > 0, { message: "Attribution is required" }),
-  region: z.string().refine((v) => v.trim().length > 0, { message: "Region is required" }),
+  color: z.enum(["red", "white", "rosé", "orange", "gray", "tawny", "yellow"]),
   composition: z
     .string()
     .refine((v) => v.trim().length > 0, { message: "Composition is required" }),
-  color: z.enum(["red", "white", "rosé", "orange", "gray", "tawny", "yellow"]),
+  description: z
+    .string()
+    .refine((v) => v.trim().length > 0, { message: "Description is required" }),
+  name: z.string().refine((v) => v.trim().length > 0, { message: "Name is required" }),
+  quantity: z.coerce.number().int().min(0, { message: "Quantity cannot be negative" }),
+  region: z.string().refine((v) => v.trim().length > 0, { message: "Region is required" }),
   type: z.enum(["still", "sparkling", "fortified", "dessert"]),
   vintageYear: z.coerce
     .number()
     .int()
     .min(1800, { message: "Year must be 1800 or later" })
     .max(2100, { message: "Year must be 2100 or earlier" }),
-  alcoholContent: z
-    .string()
-    .regex(/^\d{1,2}(\.\d{1,2})?$/, { message: "Use a number like 12.5" }),
   volumeMl: z.coerce.number().int().min(1, { message: "Volume must be at least 1 ml" }),
-  quantity: z.coerce.number().int().min(0, { message: "Quantity cannot be negative" }),
 });
 
 export type WineFormValues = z.infer<typeof wineFormSchema>;
@@ -102,8 +100,8 @@ export function WineForm({
       ...defaultValues,
     },
     mode: "onSubmit",
-    reValidateMode: "onChange",
     resolver,
+    reValidateMode: "onChange",
   });
 
   const handleFormSubmit = (values: WineFormValues) => {

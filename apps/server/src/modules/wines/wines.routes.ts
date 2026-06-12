@@ -1,4 +1,5 @@
-import { Elysia, status, t } from "elysia";
+import { Elysia, status } from "elysia";
+import { z } from "zod";
 import { db } from "../../db";
 import { errorResponse } from "../../utils/error-plugin";
 import { authPlugin } from "../auth";
@@ -7,6 +8,8 @@ import { usersService } from "../users/users.service";
 import * as winesRepo from "./wines.repository";
 import { createWineBody, updateWineBody, wineFiltersQuery, wineResponse } from "./wines.schema";
 import { winesService } from "./wines.service";
+
+const idParams = z.object({ id: z.string() });
 
 export const winesRoutes = new Elysia()
   .use(authPlugin)
@@ -33,7 +36,7 @@ export const winesRoutes = new Elysia()
         tags: ["wines"],
       },
       query: wineFiltersQuery,
-      response: { 200: t.Array(wineResponse), 401: t.String() },
+      response: { 200: z.array(wineResponse), 401: z.string() },
     }
   )
 
@@ -43,7 +46,7 @@ export const winesRoutes = new Elysia()
       summary: "Get wine by ID",
       tags: ["wines"],
     },
-    params: t.Object({ id: t.String() }),
+    params: idParams,
     response: { 200: wineResponse, 404: errorResponse },
   })
 
@@ -71,7 +74,7 @@ export const winesRoutes = new Elysia()
         summary: "Replace wine",
         tags: ["wines"],
       },
-      params: t.Object({ id: t.String() }),
+      params: idParams,
       requireRoles: ["winemaker", "admin"],
       response: { 200: wineResponse, 403: errorResponse, 404: errorResponse },
     }
@@ -79,9 +82,9 @@ export const winesRoutes = new Elysia()
 
   .delete(
     "/wines/:id",
-    async ({ params, dbUser, clerkPayload }) => {
+    async ({ params, dbUser, clerkPayload, set }) => {
       await winesService.deleteWine(params.id, dbUser.id, clerkPayload.roles ?? []);
-      return status(204, "");
+      set.status = 204;
     },
     {
       detail: {
@@ -90,8 +93,8 @@ export const winesRoutes = new Elysia()
         summary: "Delete wine",
         tags: ["wines"],
       },
-      params: t.Object({ id: t.String() }),
+      params: idParams,
       requireRoles: ["winemaker", "admin"],
-      response: { 204: t.Null(), 403: errorResponse, 404: errorResponse },
+      response: { 403: errorResponse, 404: errorResponse },
     }
   );

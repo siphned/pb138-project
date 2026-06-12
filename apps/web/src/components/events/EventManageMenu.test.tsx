@@ -18,17 +18,13 @@ vi.mock("@tanstack/react-router", () => ({
 describe("EventManageMenu", () => {
   it("renders nothing when the current user is not the owner", () => {
     vi.mocked(useUser).mockReturnValue({ user: { id: "u-other" } } as any);
-    const { container } = render(
-      <EventManageMenu eventId="evt-1" ownerUserId="u-owner" />
-    );
+    const { container } = render(<EventManageMenu eventId="evt-1" ownerUserId="u-owner" />);
     expect(container.textContent ?? "").not.toMatch(/manage/i);
   });
 
   it("renders nothing when there is no signed-in user", () => {
     vi.mocked(useUser).mockReturnValue({ user: null } as any);
-    const { container } = render(
-      <EventManageMenu eventId="evt-1" ownerUserId="u-owner" />
-    );
+    const { container } = render(<EventManageMenu eventId="evt-1" ownerUserId="u-owner" />);
     expect(container.textContent ?? "").not.toMatch(/manage/i);
   });
 

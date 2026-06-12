@@ -42,7 +42,7 @@ interface ShopProductsSectionProps {
 }
 
 export function ShopProductsSection({ shopId }: ShopProductsSectionProps) {
-  const { data, isLoading } = useGetShopsByIdProducts(shopId, { isBundle: "false" });
+  const { data, isLoading } = useGetShopsByIdProducts(shopId, { isBundle: false });
   // BE returns { data: [...], limit, page, total } — keep a fallback for callers
   // that may receive a bare array.
   const products: ShopProductRaw[] = Array.isArray(data)

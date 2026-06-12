@@ -39,6 +39,7 @@ import {
   insertUsers,
   insertWinemakers,
   insertWines,
+  realCzechAddress,
   teardown,
 } from "./seed.lib";
 
@@ -50,13 +51,9 @@ function clerkId() {
 }
 
 function czechAddress(): AddressInput {
-  return {
-    city: faker.helpers.arrayElement(["Praha", "Brno", "Ostrava", "Olomouc", "Plzeň", "Liberec"]),
-    country: "Czech Republic",
-    houseNumber: faker.location.buildingNumber(),
-    postalCode: `${faker.string.numeric(3)} ${faker.string.numeric(2)}`,
-    street: faker.location.street(),
-  };
+  return realCzechAddress(
+    faker.helpers.arrayElement(["Praha", "Brno", "Ostrava", "Olomouc", "Plzeň", "Liberec"])
+  );
 }
 
 function pick<T>(arr: readonly T[]): T {

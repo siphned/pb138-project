@@ -72,7 +72,10 @@ function ShopEditPage() {
         Back to shop
       </Link>
 
-      <PageHeader description="Update your shop's name, description, or address." title="Edit shop" />
+      <PageHeader
+        description="Update your shop's name, description, or address."
+        title="Edit shop"
+      />
 
       <div className="max-w-2xl">
         <ShopForm

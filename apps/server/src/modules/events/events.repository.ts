@@ -14,6 +14,7 @@ import {
 } from "@repo/shared/schemas";
 import { and, count, eq, gte, ilike, inArray, isNull, lte } from "drizzle-orm";
 import type { Database } from "../../db";
+import { primaryImageUrlSql } from "../images/images.sql";
 
 export type EventWithDetails = Event & {
   winemaker: { id: string; name: string } | null;
@@ -24,6 +25,7 @@ export type EventWithDetails = Event & {
     street: string;
     houseNumber: string;
   } | null;
+  imageUrl?: string | null;
 };
 
 export type CommentWithUser = EventComment & {
@@ -36,7 +38,18 @@ type RepoFilters = {
   q?: string;
   to?: Date;
   winemakerIds?: string[];
+  registeredByUserId?: string;
 };
+
+function registeredByCondition(db: Database, userId: string) {
+  return inArray(
+    events.id,
+    db
+      .select({ eventId: eventRegistrations.eventId })
+      .from(eventRegistrations)
+      .where(and(eq(eventRegistrations.userId, userId), isNull(eventRegistrations.deletedAt)))
+  );
+}
 
 export async function countActiveRegistrations(db: Database, eventId: string): Promise<number> {
   const [result] = await db
@@ -62,6 +75,7 @@ export async function countMany(db: Database, filters: RepoFilters): Promise<num
     filters.from ? gte(events.startTime, filters.from) : undefined,
     filters.to ? lte(events.startTime, filters.to) : undefined,
     filters.winemakerIds ? inArray(events.winemakerId, filters.winemakerIds) : undefined,
+    filters.registeredByUserId ? registeredByCondition(db, filters.registeredByUserId) : undefined,
     qCond,
   ].filter((c): c is NonNullable<typeof c> => c !== undefined);
 
@@ -225,10 +239,12 @@ export async function findMany(
     filters.from ? gte(events.startTime, filters.from) : undefined,
     filters.to ? lte(events.startTime, filters.to) : undefined,
     filters.winemakerIds ? inArray(events.winemakerId, filters.winemakerIds) : undefined,
+    filters.registeredByUserId ? registeredByCondition(db, filters.registeredByUserId) : undefined,
     qCond,
   ].filter((c): c is NonNullable<typeof c> => c !== undefined);
 
   const rows = await db.query.events.findMany({
+    extras: { imageUrl: primaryImageUrlSql("event", events.id).as("image_url") },
     limit: pagination.limit,
     offset: pagination.offset,
     orderBy: (e, { asc }) => [asc(e.startTime)],

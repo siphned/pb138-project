@@ -32,7 +32,7 @@ function validateEventDates(
 export class EventsService {
   async addComment(eventId: string, userId: string, body: string): Promise<EventComment> {
     const event = await eventsRepo.findById(db, eventId);
-    if (!event || event.status !== "approved") throw new EventNotAvailableError();
+    if (event?.status !== "approved") throw new EventNotAvailableError();
     return eventsRepo.createComment(db, eventId, userId, body);
   }
 
@@ -92,7 +92,7 @@ export class EventsService {
     userId?: string
   ): Promise<EventWithDetails & { isRegisteredByMe?: boolean; attendees: number }> {
     const event = await eventsRepo.findById(db, id);
-    if (!event || event.status !== "approved") throw new EventNotFoundError();
+    if (event?.status !== "approved") throw new EventNotFoundError();
     const attendees = await eventsRepo.countActiveRegistrations(db, id);
     if (!userId) return { ...event, attendees };
     const registered = await eventsRepo.findRegisteredEventIds(db, userId, [id]);
@@ -114,7 +114,7 @@ export class EventsService {
     paginationQuery: { page?: number; limit?: number }
   ): Promise<PaginatedResult<CommentWithUser>> {
     const event = await eventsRepo.findById(db, eventId);
-    if (!event || event.status !== "approved") throw new EventNotFoundError();
+    if (event?.status !== "approved") throw new EventNotFoundError();
 
     const { limit, offset } = parsePagination(paginationQuery);
     const page = Math.max(1, paginationQuery.page ?? 1);
@@ -134,12 +134,15 @@ export class EventsService {
       q?: string;
       from?: string;
       to?: string;
+      registeredByMe?: boolean;
     },
     paginationQuery: { page?: number; limit?: number },
     userId?: string
   ): Promise<PaginatedResult<EventWithDetails & { isRegisteredByMe?: boolean }>> {
     const { limit, offset } = parsePagination(paginationQuery);
     const page = Math.max(1, paginationQuery.page ?? 1);
+
+    if (filters.registeredByMe && !userId) return { data: [], limit, page, total: 0 };
 
     let winemakerIds: string[] | undefined;
     if (filters.winemakerId) {
@@ -152,6 +155,7 @@ export class EventsService {
     const repoFilters = {
       from: filters.from ? new Date(filters.from) : undefined,
       q: filters.q,
+      registeredByUserId: filters.registeredByMe ? userId : undefined,
       status: "approved" as const,
       to: filters.to ? new Date(filters.to) : undefined,
       winemakerIds,
@@ -175,7 +179,7 @@ export class EventsService {
 
   async registerForEvent(eventId: string, userId: string): Promise<EventRegistration> {
     const event = await eventsRepo.findById(db, eventId);
-    if (!event || event.status !== "approved" || event.startTime <= new Date()) {
+    if (event?.status !== "approved" || event.startTime <= new Date()) {
       throw new EventNotAvailableError();
     }
 

@@ -11,6 +11,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { getCartsQueryKey } from "@/generated/hooks/useGetCarts";
 import { usePostCartsItems } from "@/generated/hooks/usePostCartsItems";
+import { formatEur } from "@/lib/utils";
 
 interface ProductPriceRowProps {
   price: string;
@@ -37,10 +38,7 @@ export function ProductPriceRow({ price, quantity, productId }: ProductPriceRowP
     );
   };
 
-  const formattedPrice = new Intl.NumberFormat("en-IE", {
-    currency: "EUR",
-    style: "currency",
-  }).format(Number.parseFloat(price));
+  const formattedPrice = formatEur(price);
 
   return (
     <div className="space-y-6 rounded-2xl bg-secondary/10 p-6 lg:sticky lg:top-8">

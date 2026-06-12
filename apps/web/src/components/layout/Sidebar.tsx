@@ -33,7 +33,7 @@ import { useTheme, useUser } from "@/context";
 import { useGetShopsMe } from "@/generated/hooks/useGetShopsMe";
 import { useGetWinemakersMe } from "@/generated/hooks/useGetWinemakersMe";
 
-import { Role } from "@/types/roles";
+import { isCustomerView, Role } from "@/types/roles";
 
 interface SidebarProps {
   userRoles?: Role[];
@@ -68,13 +68,13 @@ export function Sidebar({ userRoles = [Role.customer], activeRole, onRoleChange 
     },
   });
   const winemakerId = winemakerProfile.data?.id;
-  const winemakerName = winemakerProfile.data?.name;
   const firstShopId = shopOwnerProfile.data?.[0]?.id;
 
   const displayUserName = isSignedIn ? clerkUser?.fullName || "User" : "Guest";
   const fullName = user ? `${user.fname || ""} ${user.lname || ""}`.trim() : "Guest";
   const initials = fullName === "Guest" ? "G" : fullName.substring(0, 2).toUpperCase() || "U";
   const hasMultipleRoles = userRoles.length > 1;
+  const customerView = isCustomerView(currentActiveRole);
 
   const handleLogout = async () => {
     closeSheet();
@@ -174,44 +174,47 @@ export function Sidebar({ userRoles = [Role.customer], activeRole, onRoleChange 
               )}
             </Show>
 
-            {/* SHARED PUBLIC LINKS */}
-            <NavItem
-              className="sm:hidden"
-              onClick={closeSheet}
-              render={<Link to="/search" />}
-              variant="active"
-            >
-              <HugeiconsIcon icon={Search01Icon} /> Search
-            </NavItem>
+            {customerView && (
+              <>
+                <NavItem
+                  className="sm:hidden"
+                  onClick={closeSheet}
+                  render={<Link to="/search" />}
+                  variant="active"
+                >
+                  <HugeiconsIcon icon={Search01Icon} /> Search
+                </NavItem>
 
-            <NavItem
-              className="sm:hidden"
-              onClick={closeSheet}
-              render={<Link to="/cart" />}
-              variant="active"
-            >
-              <HugeiconsIcon icon={ShoppingCart02Icon} /> Shopping cart
-            </NavItem>
+                <NavItem
+                  className="sm:hidden"
+                  onClick={closeSheet}
+                  render={<Link to="/cart" />}
+                  variant="active"
+                >
+                  <HugeiconsIcon icon={ShoppingCart02Icon} /> Shopping cart
+                </NavItem>
 
-            <NavItem onClick={closeSheet} render={<Link to="/wines" />} variant="active">
-              <Wine className="h-5 w-5" /> Explore Wines
-            </NavItem>
+                <NavItem onClick={closeSheet} render={<Link to="/wines" />} variant="active">
+                  <Wine className="h-5 w-5" /> Explore Wines
+                </NavItem>
 
-            <NavItem onClick={closeSheet} render={<Link to="/products" />} variant="active">
-              <HugeiconsIcon icon={Package01Icon} /> Products
-            </NavItem>
+                <NavItem onClick={closeSheet} render={<Link to="/products" />} variant="active">
+                  <HugeiconsIcon icon={Package01Icon} /> Products
+                </NavItem>
 
-            <NavItem onClick={closeSheet} render={<Link to="/winemakers" />} variant="active">
-              <HugeiconsIcon icon={UserGroupIcon} /> Winemakers
-            </NavItem>
+                <NavItem onClick={closeSheet} render={<Link to="/winemakers" />} variant="active">
+                  <HugeiconsIcon icon={UserGroupIcon} /> Winemakers
+                </NavItem>
 
-            <NavItem onClick={closeSheet} render={<Link to="/events" />} variant="active">
-              <HugeiconsIcon icon={Calendar01Icon} /> Events
-            </NavItem>
+                <NavItem onClick={closeSheet} render={<Link to="/events" />} variant="active">
+                  <HugeiconsIcon icon={Calendar01Icon} /> Events
+                </NavItem>
 
-            <NavItem onClick={closeSheet} render={<Link to="/shops" />} variant="active">
-              <HugeiconsIcon icon={Store01Icon} /> Shops
-            </NavItem>
+                <NavItem onClick={closeSheet} render={<Link to="/shops" />} variant="active">
+                  <HugeiconsIcon icon={Store01Icon} /> Shops
+                </NavItem>
+              </>
+            )}
 
             <Show when="signed-in">
               <RoleNavItems
@@ -220,7 +223,6 @@ export function Sidebar({ userRoles = [Role.customer], activeRole, onRoleChange 
                 role={currentActiveRole}
                 userId={user?.id}
                 winemakerId={winemakerId}
-                winemakerName={winemakerName}
               />
 
               <NavItem onClick={closeSheet} render={<Link to="/stats" />} variant="active">
@@ -268,26 +270,22 @@ interface RoleNavItemsProps {
   closeSheet: () => void;
   userId?: string;
   winemakerId?: string;
-  winemakerName?: string;
   firstShopId?: string;
 }
 
-function RoleNavItems({
-  role,
-  closeSheet,
-  userId,
-  winemakerId,
-  winemakerName,
-  firstShopId,
-}: RoleNavItemsProps) {
+function RoleNavItems({ role, closeSheet, userId, winemakerId, firstShopId }: RoleNavItemsProps) {
   if (role === Role.customer) {
     return (
       <>
+        <NavItem
+          onClick={closeSheet}
+          render={<Link search={{ registeredByMe: true }} to="/events" />}
+          variant="active"
+        >
+          <HugeiconsIcon icon={Calendar01Icon} /> My Events
+        </NavItem>
         <NavItem onClick={closeSheet} render={<Link to="/orders" />} variant="active">
           <HugeiconsIcon icon={ShoppingBag01Icon} /> My Orders
-        </NavItem>
-        <NavItem onClick={closeSheet} render={<Link to="/events" />} variant="active">
-          <HugeiconsIcon icon={Calendar01Icon} /> My Events
         </NavItem>
       </>
     );
@@ -305,7 +303,7 @@ function RoleNavItems({
         </NavItem>
         <NavItem
           onClick={closeSheet}
-          render={<Link search={winemakerName ? { winemakerName } : undefined} to="/events" />}
+          render={<Link search={winemakerId ? { winemakerId } : undefined} to="/events" />}
           variant="active"
         >
           <HugeiconsIcon icon={Calendar01Icon} /> My Events

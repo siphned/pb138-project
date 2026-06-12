@@ -1,7 +1,16 @@
 import { BadRequestError } from "@repo/shared";
-import { Elysia, t } from "elysia";
+import { Elysia } from "elysia";
 import { errorResponse } from "../../utils/error-plugin";
 import { authPlugin } from "../auth";
+import {
+  createReviewBody,
+  deleteReviewQuery,
+  deleteReviewResponse,
+  listReviewsQuery,
+  reviewListResponse,
+  reviewParams,
+  reviewResponse,
+} from "./reviews.schema";
 import { reviewsService } from "./reviews.service";
 
 export const createReviewsRoutes = (auth = authPlugin) =>
@@ -20,15 +29,9 @@ export const createReviewsRoutes = (auth = authPlugin) =>
           summary: "List product reviews",
           tags: ["reviews"],
         },
-        params: t.Object({ id: t.String() }),
-        query: t.Object({
-          limit: t.Optional(t.Numeric()),
-          page: t.Optional(t.Numeric()),
-          sort: t.Optional(
-            t.Union([t.Literal("newest"), t.Literal("highest"), t.Literal("lowest")])
-          ),
-        }),
-        response: { 200: t.Any() },
+        params: reviewParams,
+        query: listReviewsQuery,
+        response: { 200: reviewListResponse },
       }
     )
 
@@ -36,19 +39,21 @@ export const createReviewsRoutes = (auth = authPlugin) =>
       "/products/:id/reviews",
       ({ params, dbUser, body }) => reviewsService.createProductReview(dbUser.id, params.id, body),
       {
-        body: t.Object({
-          body: t.Optional(t.String()),
-          rating: t.Numeric({ maximum: 5, minimum: 1 }),
-        }),
+        body: createReviewBody,
         detail: {
           description: "Creates a review for a product. Must have purchased it.",
           security: [{ bearerAuth: [] }],
           summary: "Review product",
           tags: ["reviews"],
         },
-        params: t.Object({ id: t.String() }),
+        params: reviewParams,
         requireAuth: true,
-        response: { 200: t.Any(), 400: errorResponse, 403: errorResponse, 404: errorResponse },
+        response: {
+          200: reviewResponse,
+          400: errorResponse,
+          403: errorResponse,
+          404: errorResponse,
+        },
       }
     )
 
@@ -64,15 +69,9 @@ export const createReviewsRoutes = (auth = authPlugin) =>
           summary: "List winemaker reviews",
           tags: ["reviews"],
         },
-        params: t.Object({ id: t.String() }),
-        query: t.Object({
-          limit: t.Optional(t.Numeric()),
-          page: t.Optional(t.Numeric()),
-          sort: t.Optional(
-            t.Union([t.Literal("newest"), t.Literal("highest"), t.Literal("lowest")])
-          ),
-        }),
-        response: { 200: t.Any() },
+        params: reviewParams,
+        query: listReviewsQuery,
+        response: { 200: reviewListResponse },
       }
     )
 
@@ -81,19 +80,21 @@ export const createReviewsRoutes = (auth = authPlugin) =>
       ({ params, dbUser, body }) =>
         reviewsService.createWinemakerReview(dbUser.id, params.id, body),
       {
-        body: t.Object({
-          body: t.Optional(t.String()),
-          rating: t.Numeric({ maximum: 5, minimum: 1 }),
-        }),
+        body: createReviewBody,
         detail: {
           description: "Creates a review for a winemaker profile.",
           security: [{ bearerAuth: [] }],
           summary: "Review winemaker",
           tags: ["reviews"],
         },
-        params: t.Object({ id: t.String() }),
+        params: reviewParams,
         requireAuth: true,
-        response: { 200: t.Any(), 400: errorResponse, 403: errorResponse, 404: errorResponse },
+        response: {
+          200: reviewResponse,
+          400: errorResponse,
+          403: errorResponse,
+          404: errorResponse,
+        },
       }
     )
 
@@ -109,15 +110,9 @@ export const createReviewsRoutes = (auth = authPlugin) =>
           summary: "List wine reviews",
           tags: ["reviews"],
         },
-        params: t.Object({ id: t.String() }),
-        query: t.Object({
-          limit: t.Optional(t.Numeric()),
-          page: t.Optional(t.Numeric()),
-          sort: t.Optional(
-            t.Union([t.Literal("newest"), t.Literal("highest"), t.Literal("lowest")])
-          ),
-        }),
-        response: { 200: t.Any() },
+        params: reviewParams,
+        query: listReviewsQuery,
+        response: { 200: reviewListResponse },
       }
     )
 
@@ -125,19 +120,39 @@ export const createReviewsRoutes = (auth = authPlugin) =>
       "/wines/:id/reviews",
       ({ params, dbUser, body }) => reviewsService.createWineReview(dbUser.id, params.id, body),
       {
-        body: t.Object({
-          body: t.Optional(t.String()),
-          rating: t.Numeric({ maximum: 5, minimum: 1 }),
-        }),
+        body: createReviewBody,
         detail: {
           description: "Creates a review for a wine. Must have purchased a product with it.",
           security: [{ bearerAuth: [] }],
           summary: "Review wine",
           tags: ["reviews"],
         },
-        params: t.Object({ id: t.String() }),
+        params: reviewParams,
         requireAuth: true,
-        response: { 200: t.Any(), 400: errorResponse, 403: errorResponse, 404: errorResponse },
+        response: {
+          200: reviewResponse,
+          400: errorResponse,
+          403: errorResponse,
+          404: errorResponse,
+        },
+      }
+    )
+
+    .get(
+      "/shops/:id/reviews",
+      async ({ params, query }) => {
+        const { page = 1, limit = 10, sort = "newest" } = query;
+        return reviewsService.listShopReviews(params.id, { limit, page, sort });
+      },
+      {
+        detail: {
+          description: "Returns aggregated reviews across all of a shop's products.",
+          summary: "List shop reviews",
+          tags: ["reviews"],
+        },
+        params: reviewParams,
+        query: listReviewsQuery,
+        response: { 200: reviewListResponse },
       }
     )
 
@@ -152,7 +167,7 @@ export const createReviewsRoutes = (auth = authPlugin) =>
           dbUser.id,
           clerkPayload.roles?.[0] ?? "customer",
           entityId,
-          entityType as "product" | "winemaker" | "wine"
+          entityType
         );
         return { success: true };
       },
@@ -163,13 +178,10 @@ export const createReviewsRoutes = (auth = authPlugin) =>
           summary: "Delete review",
           tags: ["reviews"],
         },
-        params: t.Object({ id: t.String() }),
-        query: t.Object({
-          entityId: t.String(),
-          entityType: t.Union([t.Literal("product"), t.Literal("winemaker"), t.Literal("wine")]),
-        }),
+        params: reviewParams,
+        query: deleteReviewQuery,
         requireAuth: true,
-        response: { 200: t.Any(), 403: errorResponse, 404: errorResponse },
+        response: { 200: deleteReviewResponse, 403: errorResponse, 404: errorResponse },
       }
     );
 

@@ -60,7 +60,7 @@ function ShopInventoryPage() {
   if (hasChildRoute) return <Outlet />;
 
   const query = useGetShopsByIdProducts(id, {
-    isBundle: isBundle === undefined ? undefined : String(isBundle),
+    isBundle,
   });
 
   const list = ((query.data as { data?: ProductRow[] } | undefined)?.data ?? []) as ProductRow[];

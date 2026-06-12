@@ -78,11 +78,15 @@ cp .env.example .env.local
 ```
 
 ### Step 3: Start PostgreSQL
+
+For the host dev flow (running `bun dev` on the host), start only the database:
 ```bash
-docker compose up -d
+docker compose up -d db
 ```
 
-Verify: `docker ps` should show `winery_postgres`
+Verify: `docker ps` should show `winemarket-db` (healthy). Host port is **5433** → `postgresql://postgres:postgres@localhost:5433/winemarket`.
+
+> Want the whole stack (API + web) in containers instead? See [Run with Docker](#run-with-docker) below.
 
 ### Step 4: Setup Database
 ```bash
@@ -111,6 +115,49 @@ bun run dev:server
 # API at http://localhost:3000
 # Swagger docs at http://localhost:3000/swagger
 ```
+
+---
+
+## Run with Docker
+
+Full stack (Postgres + API + web) in one command — no host Bun/Node needed.
+
+### Prerequisites
+- Docker + Docker Compose
+- A root `.env` (copy from `.env.docker.example`) with your Clerk keys:
+  - `CLERK_SECRET_KEY`, `CLERK_JWT_KEY` (server, runtime)
+  - `VITE_CLERK_PUBLISHABLE_KEY` (baked into the web build)
+
+### Start
+```bash
+cp .env.docker.example .env   # then fill in the Clerk keys
+docker compose up -d --build
+```
+- Web: http://localhost:8080
+- API: http://localhost:3000  (Swagger JSON at `/swagger/json`)
+- Postgres: localhost:**5433** (postgres/postgres, db `winemarket`)
+
+Migrations run automatically via the one-shot `migrate` service before the server starts.
+
+### Seed demo data (on demand)
+```bash
+docker compose run --rm seed
+```
+
+### Optional pgAdmin
+```bash
+docker compose --profile tools up -d pgadmin   # http://localhost:5050
+```
+
+### Stop / reset
+```bash
+docker compose down       # stop, keep data
+docker compose down -v    # stop + drop the DB volume (fresh start)
+```
+
+> **Notes**
+> - `VITE_API_URL` is baked into the web bundle at build time as `http://localhost:3000` (the browser runs on the host, so it cannot use the internal `server` hostname). Change it via the `web` build arg if you expose the API elsewhere, then rebuild.
+> - Optional server vars `CLERK_WEBHOOK_SIGNING_SECRET` and `RESEND_API_KEY` are not wired into compose by default (an empty value fails the server's validation). Add them via `env_file` / the list form in `docker-compose.yml` only when you have real values.
 
 ---
 

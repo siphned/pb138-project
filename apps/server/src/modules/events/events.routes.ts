@@ -1,4 +1,5 @@
-import { Elysia, status, t } from "elysia";
+import { Elysia, status } from "elysia";
+import { z } from "zod";
 import { authPlugin } from "../auth";
 import { verifyClerkToken } from "../auth/auth.utils";
 import { usersService } from "../users/users.service";
@@ -74,9 +75,9 @@ export const eventsRoutes = new Elysia()
 
   .delete(
     "/events/:id",
-    async ({ params, dbUser }) => {
+    async ({ params, dbUser, set }) => {
       await eventsService.deleteEvent(params.id, dbUser.id);
-      return status(204, "");
+      set.status = 204;
     },
     {
       detail: {
@@ -106,9 +107,9 @@ export const eventsRoutes = new Elysia()
 
   .delete(
     "/events/:id/register",
-    async ({ params, dbUser }) => {
+    async ({ params, dbUser, set }) => {
       await eventsService.unregisterFromEvent(params.id, dbUser.id);
-      return status(204, "");
+      set.status = 204;
     },
     {
       detail: {
@@ -153,7 +154,7 @@ export const eventsRoutes = new Elysia()
       },
       params: eventParams,
       requireCapability: "winemaker",
-      response: { 200: t.Array(invitationResponse), 403: t.String(), 404: t.String() },
+      response: { 200: z.array(invitationResponse), 403: z.string(), 404: z.string() },
     }
   )
 

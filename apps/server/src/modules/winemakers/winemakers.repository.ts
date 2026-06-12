@@ -2,6 +2,7 @@ import type { Address, Wine, Winemaker } from "@repo/shared/schemas";
 import { events, winemakers, wines } from "@repo/shared/schemas";
 import { and, eq, ilike, isNull } from "drizzle-orm";
 import type { Database } from "../../db";
+import { primaryImageUrlSql } from "../images/images.sql";
 
 export type EventRow = {
   id: string;
@@ -14,7 +15,7 @@ export type EventRow = {
   createdAt: Date;
 };
 
-export type WinemakerListItem = Winemaker & { address: Address };
+export type WinemakerListItem = Winemaker & { address: Address; imageUrl?: string | null };
 
 export type WinemakerWithRelations = Winemaker & {
   address: Address;
@@ -30,18 +31,27 @@ export type UpdateWinemakerData = {
   phone?: string;
 };
 
-export async function findAll(db: Database, filters: { q?: string }): Promise<WinemakerListItem[]> {
+export async function findAll(
+  db: Database,
+  filters: { q?: string; city?: string }
+): Promise<WinemakerListItem[]> {
   const conditions = [isNull(winemakers.deletedAt)];
   if (filters.q) conditions.push(ilike(winemakers.name, `%${filters.q}%`));
 
   const results = await db.query.winemakers.findMany({
+    extras: { imageUrl: primaryImageUrlSql("winemaker", winemakers.id).as("image_url") },
     where: and(...conditions),
     with: {
       address: true,
     },
   });
 
-  return results.filter((w) => w.address && !w.address.deletedAt) as WinemakerListItem[];
+  const filtered = results.filter((w) => w.address && !w.address.deletedAt) as WinemakerListItem[];
+  if (filters.city) {
+    const city = filters.city.toLowerCase();
+    return filtered.filter((w) => w.address.city.toLowerCase().includes(city));
+  }
+  return filtered;
 }
 
 export async function findById(

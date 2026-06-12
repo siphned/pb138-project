@@ -51,7 +51,9 @@ export const Route = createFileRoute("/events/")({
     from: typeof raw.from === "string" ? raw.from : undefined,
     limit: toNum(raw.limit),
     page: toNum(raw.page),
+    registeredByMe: raw.registeredByMe === true || raw.registeredByMe === "true" ? true : undefined,
     to: typeof raw.to === "string" ? raw.to : undefined,
+    winemakerId: typeof raw.winemakerId === "string" ? raw.winemakerId : undefined,
     winemakerName: typeof raw.winemakerName === "string" ? raw.winemakerName : undefined,
   }),
 });
@@ -79,8 +81,12 @@ function EventsPage() {
   return (
     <div className="container mx-auto space-y-8 px-6 py-8 lg:px-12">
       <PageHeader
-        description="Discover wine tastings, festivals, and exclusive gatherings hosted by our winemakers."
-        title="Upcoming Events"
+        description={
+          search.registeredByMe
+            ? "Events you've registered for."
+            : "Discover wine tastings, festivals, and exclusive gatherings hosted by our winemakers."
+        }
+        title={search.registeredByMe ? "My Events" : "Upcoming Events"}
       />
 
       <div className="grid grid-cols-1 gap-12 lg:grid-cols-[280px_1fr]">

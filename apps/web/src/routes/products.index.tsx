@@ -61,13 +61,16 @@ function ProductsPage() {
   const search = Route.useSearch();
   const navigate = useNavigate({ from: Route.fullPath });
 
-  // isBundle and shopId are UI-only filters until BE adds them to the
-  // products list endpoint in OpenAPI (see types.ts).
-  const { isBundle: _isBundle, shopId: _shopId, ...apiSearchParams } = search;
+  // shopId is a UI-only filter; the products list endpoint scopes by shop via
+  // its own /shops/:id/products route, not a query param.
+  const { shopId: _shopId, ...apiSearchParams } = search;
   const query = useGetProducts(apiSearchParams);
 
+  // A filter change always returns to page 1: a filtered result set usually has
+  // fewer pages, so keeping a deep page (e.g. page 2) would land past the last
+  // page and render an empty "No products found" list.
   const handleSearchChange = (next: ProductSearch) => {
-    navigate({ replace: true, search: next });
+    navigate({ replace: true, search: { ...next, page: 1 } });
   };
 
   const products = query.data?.data || [];
@@ -76,7 +79,7 @@ function ProductsPage() {
   const limit = Number(query.data?.limit || 20);
 
   const handlePageChange = (newPage: number) => {
-    handleSearchChange({ ...search, page: newPage });
+    navigate({ replace: true, search: { ...search, page: newPage } });
   };
 
   return (
