@@ -7,6 +7,8 @@ import { LoadingState } from "@/components/primitives/loading-state";
 import { PageHeader } from "@/components/primitives/page-header";
 import { Separator } from "@/components/ui/separator";
 import { useGetWinesById } from "@/generated/hooks/useGetWinesById";
+import { useGetWinesByIdImages } from "@/generated/hooks/useGetWinesByIdImages";
+import { WineGallery } from "./-components/WineGallery";
 import { WinesAvailableInShops } from "./-components/WinesAvailableInShops";
 
 export const Route = createFileRoute("/wines/$id")({
@@ -16,6 +18,7 @@ export const Route = createFileRoute("/wines/$id")({
 function WineDetailPage() {
   const { id } = Route.useParams();
   const { data: wine, isLoading, isError, refetch } = useGetWinesById(id);
+  const { data: wineImages } = useGetWinesByIdImages(id);
 
   if (isLoading) {
     return (
@@ -49,13 +52,17 @@ function WineDetailPage() {
 
       <PageHeader description={subtitle} title={wine.name} />
 
-      <div className="space-y-12">
+      <div className="grid grid-cols-1 gap-12 lg:grid-cols-2">
+        <div className="overflow-hidden rounded-3xl bg-muted shadow-lg">
+          <WineGallery images={wineImages?.map((img) => img.url)} wineName={wine.name} />
+        </div>
+
         <WineDetailsCard wine={wine} />
-
-        <Separator />
-
-        <WinesAvailableInShops wineId={id} />
       </div>
+
+      <Separator />
+
+      <WinesAvailableInShops wineId={id} />
     </div>
   );
 }

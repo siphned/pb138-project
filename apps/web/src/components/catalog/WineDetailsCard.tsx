@@ -3,64 +3,11 @@ import { DescriptionList, PropertyRow } from "@/components/primitives/descriptio
 import { Section } from "@/components/primitives/section";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
-import {
-  Carousel,
-  CarouselContent,
-  CarouselItem,
-  CarouselNext,
-  CarouselPrevious,
-} from "@/components/ui/carousel";
 import { useGetWinemakersMe } from "@/generated/hooks/useGetWinemakersMe";
-import { useGetWinesByIdImages } from "@/generated/hooks/useGetWinesByIdImages";
 import type { GetWinesById200 } from "@/generated/types/GetWinesById";
 
 interface WineDetailsCardProps {
   wine: GetWinesById200;
-}
-
-function WineImageCarousel({ wineId, name }: { wineId: string; color?: string; name: string }) {
-  const { data: images } = useGetWinesByIdImages(wineId);
-  const photos = images ?? [];
-
-  if (photos.length === 0) {
-    return (
-      <div className="aspect-square w-full overflow-hidden rounded-lg bg-muted shadow-xs">
-        <img
-          alt={name}
-          className="h-full w-full object-cover opacity-60 dark:opacity-40"
-          src="/placeholders/wine.webp"
-        />
-      </div>
-    );
-  }
-
-  if (photos.length === 1) {
-    return (
-      <div className="aspect-square w-full overflow-hidden rounded-lg bg-muted shadow-xs">
-        <img alt={name} className="h-full w-full object-cover" src={photos[0].url} />
-      </div>
-    );
-  }
-
-  return (
-    <Carousel className="w-full" opts={{ loop: true }}>
-      <CarouselContent>
-        {photos.map((img, i) => (
-          <CarouselItem key={img.id}>
-            <div className="aspect-square w-full overflow-hidden rounded-lg bg-muted shadow-xs">
-              <img
-                alt={`${name} — ${i + 1}`}
-                className="h-full w-full object-cover"
-                src={img.url}
-              />
-            </div>
-          </CarouselItem>
-        ))}
-      </CarouselContent>
-      <CarouselPrevious className="left-2" />
-      <CarouselNext className="right-2" />
-    </Carousel>
-  );
 }
 
 export function WineDetailsCard({ wine }: WineDetailsCardProps) {
@@ -73,8 +20,7 @@ export function WineDetailsCard({ wine }: WineDetailsCardProps) {
     <div className="space-y-8">
       <Section heading="About this wine">
         <Card variant="default">
-          <CardContent className="grid grid-cols-1 gap-8 md:grid-cols-[1fr_2fr]">
-            <WineImageCarousel name={wine.name} wineId={wine.id} />
+          <CardContent>
             <div className="space-y-6">
               <DescriptionList>
                 <PropertyRow label="Color" value={wine.color} />

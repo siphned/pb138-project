@@ -1,14 +1,7 @@
 import { ShopGalleryDesktop } from "./ShopGalleryDesktop";
 import { ShopGalleryMobile } from "./ShopGalleryMobile";
 
-// TODO(BE): replace when GET /products/:id returns images[]
-const PLACEHOLDER_IMAGES = [
-  "https://images.unsplash.com/photo-1510812431401-41d2bd2722f3?w=1200&q=80",
-  "https://images.unsplash.com/photo-1474722883778-792e7990302f?w=800&q=80",
-  "https://images.unsplash.com/photo-1506377247377-2a5b3b417ebb?w=800&q=80",
-  "https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=800&q=80",
-  "https://images.unsplash.com/photo-1504279577054-acfeccf8fc52?w=800&q=80",
-];
+const PLACEHOLDER_IMAGES = ["/placeholders/product.webp"];
 
 interface ProductGalleryProps {
   productName: string;

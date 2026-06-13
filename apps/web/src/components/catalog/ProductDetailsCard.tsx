@@ -2,75 +2,19 @@ import { MinusSignIcon, PlusSignIcon, ShoppingCart02Icon } from "@hugeicons/core
 import { HugeiconsIcon } from "@hugeicons/react";
 import { Link } from "@tanstack/react-router";
 import { useState } from "react";
-import { Section } from "@/components/primitives/section";
 import { ShowOwner } from "@/components/primitives/show-owner";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
-import {
-  Carousel,
-  CarouselContent,
-  CarouselItem,
-  CarouselNext,
-  CarouselPrevious,
-} from "@/components/ui/carousel";
 import { Separator } from "@/components/ui/separator";
-import { useGetProductsByIdImages } from "@/generated/hooks/useGetProductsByIdImages";
 import { useGetShopsById } from "@/generated/hooks/useGetShopsById";
 import type { GetProductsById200 } from "@/generated/types/GetProductsById";
-import { DETAIL_CARD_GRID, DETAIL_CARD_ITEM } from "@/lib/detail-card-grid";
 import { formatEur } from "@/lib/utils";
-import { WineCard } from "./WineCard";
 
 interface ProductDetailsCardProps {
   product: GetProductsById200;
   onAddToCart: (quantity: number) => void;
   isAddingToCart: boolean;
-}
-
-function ProductImageCarousel({ productId, name }: { productId: string; name: string }) {
-  const { data: images } = useGetProductsByIdImages(productId);
-  const photos = images ?? [];
-
-  if (photos.length === 0) {
-    return (
-      <div className="aspect-square w-full overflow-hidden rounded-lg bg-muted shadow-xs">
-        <img
-          alt={name}
-          className="h-full w-full object-cover opacity-60 dark:opacity-40"
-          src="/placeholders/product.webp"
-        />
-      </div>
-    );
-  }
-
-  if (photos.length === 1) {
-    return (
-      <div className="aspect-square w-full overflow-hidden rounded-lg bg-muted shadow-xs">
-        <img alt={name} className="h-full w-full object-cover" src={photos[0].url} />
-      </div>
-    );
-  }
-
-  return (
-    <Carousel className="w-full" opts={{ loop: true }}>
-      <CarouselContent>
-        {photos.map((img, i) => (
-          <CarouselItem key={img.id}>
-            <div className="aspect-square w-full overflow-hidden rounded-lg bg-muted shadow-xs">
-              <img
-                alt={`${name} — ${i + 1}`}
-                className="h-full w-full object-cover"
-                src={img.url}
-              />
-            </div>
-          </CarouselItem>
-        ))}
-      </CarouselContent>
-      <CarouselPrevious className="left-2" />
-      <CarouselNext className="right-2" />
-    </Carousel>
-  );
 }
 
 function QuantityStepper({
@@ -140,8 +84,7 @@ export function ProductDetailsCard({
   return (
     <div className="space-y-8">
       <Card variant="default">
-        <CardContent className="grid grid-cols-1 gap-8 md:grid-cols-[1fr_2fr]">
-          <ProductImageCarousel name={product.name} productId={product.id} />
+        <CardContent>
           <div className="flex flex-col gap-5">
             <div className="flex flex-wrap items-center gap-2">
               {product.isBundle && <Badge variant="secondary">Bundle</Badge>}
@@ -200,30 +143,6 @@ export function ProductDetailsCard({
           </div>
         </CardContent>
       </Card>
-
-      {product.isBundle && product.productWines && product.productWines.length > 0 && (
-        <Section heading="Wines in this product">
-          <div className={DETAIL_CARD_GRID}>
-            {
-              // biome-ignore lint/suspicious/noExplicitAny: GetProductsById200 is `any` in OpenAPI; pw shape lost
-              product.productWines.map((pw: any) => {
-                const wineWithFallbacks = {
-                  color: "unknown",
-                  region: "",
-                  vintageYear: "",
-                  ...pw.wine,
-                  // biome-ignore lint/suspicious/noExplicitAny: productWines.wine in OpenAPI is narrower than GetWines200Item (BE follow-up)
-                } as any;
-                return (
-                  <div className={DETAIL_CARD_ITEM} key={pw.wine.id}>
-                    <WineCard wine={wineWithFallbacks} />
-                  </div>
-                );
-              })
-            }
-          </div>
-        </Section>
-      )}
 
       {shopId && (
         <ShowOwner ownerUserId={shopOwnerUserId}>
