@@ -174,47 +174,45 @@ export function Sidebar({ userRoles = [Role.customer], activeRole, onRoleChange 
               )}
             </Show>
 
+            <NavItem
+              className="sm:hidden"
+              onClick={closeSheet}
+              render={<Link to="/search" />}
+              variant="active"
+            >
+              <HugeiconsIcon icon={Search01Icon} /> Search
+            </NavItem>
+
             {customerView && (
-              <>
-                <NavItem
-                  className="sm:hidden"
-                  onClick={closeSheet}
-                  render={<Link to="/search" />}
-                  variant="active"
-                >
-                  <HugeiconsIcon icon={Search01Icon} /> Search
-                </NavItem>
-
-                <NavItem
-                  className="sm:hidden"
-                  onClick={closeSheet}
-                  render={<Link to="/cart" />}
-                  variant="active"
-                >
-                  <HugeiconsIcon icon={ShoppingCart02Icon} /> Shopping cart
-                </NavItem>
-
-                <NavItem onClick={closeSheet} render={<Link to="/wines" />} variant="active">
-                  <Wine className="h-5 w-5" /> Explore Wines
-                </NavItem>
-
-                <NavItem onClick={closeSheet} render={<Link to="/products" />} variant="active">
-                  <HugeiconsIcon icon={Package01Icon} /> Products
-                </NavItem>
-
-                <NavItem onClick={closeSheet} render={<Link to="/winemakers" />} variant="active">
-                  <HugeiconsIcon icon={UserGroupIcon} /> Winemakers
-                </NavItem>
-
-                <NavItem onClick={closeSheet} render={<Link to="/events" />} variant="active">
-                  <HugeiconsIcon icon={Calendar01Icon} /> Events
-                </NavItem>
-
-                <NavItem onClick={closeSheet} render={<Link to="/shops" />} variant="active">
-                  <HugeiconsIcon icon={Store01Icon} /> Shops
-                </NavItem>
-              </>
+              <NavItem
+                className="sm:hidden"
+                onClick={closeSheet}
+                render={<Link to="/cart" />}
+                variant="active"
+              >
+                <HugeiconsIcon icon={ShoppingCart02Icon} /> Shopping cart
+              </NavItem>
             )}
+
+            <NavItem onClick={closeSheet} render={<Link to="/wines" />} variant="active">
+              <Wine className="h-5 w-5" /> Explore Wines
+            </NavItem>
+
+            <NavItem onClick={closeSheet} render={<Link to="/products" />} variant="active">
+              <HugeiconsIcon icon={Package01Icon} /> Products
+            </NavItem>
+
+            <NavItem onClick={closeSheet} render={<Link to="/winemakers" />} variant="active">
+              <HugeiconsIcon icon={UserGroupIcon} /> Winemakers
+            </NavItem>
+
+            <NavItem onClick={closeSheet} render={<Link to="/events" />} variant="active">
+              <HugeiconsIcon icon={Calendar01Icon} /> Events
+            </NavItem>
+
+            <NavItem onClick={closeSheet} render={<Link to="/shops" />} variant="active">
+              <HugeiconsIcon icon={Store01Icon} /> Shops
+            </NavItem>
 
             <Show when="signed-in">
               <RoleNavItems
