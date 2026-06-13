@@ -93,8 +93,10 @@ describe("Sidebar", () => {
 
     vi.mocked(useClerkUser).mockReturnValue({
       user: {
+        firstName: "Clerk",
         fullName: "Clerk User",
         imageUrl: "https://example.com/avatar.jpg",
+        lastName: "User",
       },
     } as never);
 
@@ -117,7 +119,7 @@ describe("Sidebar", () => {
 
     it("displays user initials in avatar fallback", () => {
       render(<Sidebar />);
-      expect(screen.getByText("JO")).toBeInTheDocument();
+      expect(screen.getByText("CL")).toBeInTheDocument();
     });
 
     it("shows Explore Wines link", () => {
@@ -133,32 +135,32 @@ describe("Sidebar", () => {
 
   describe("User Information Display", () => {
     it("handles missing last name gracefully", () => {
-      vi.mocked(useUser).mockReturnValue({
-        user: { fname: "John", id: "user-123", lname: null },
-      } as any);
+      vi.mocked(useClerkUser).mockReturnValue({
+        user: { firstName: "John", imageUrl: "", lastName: null },
+      } as never);
       render(<Sidebar />);
       expect(screen.getByText("John")).toBeInTheDocument();
     });
 
-    it("shows Guest when user is null", () => {
-      vi.mocked(useUser).mockReturnValue({ user: null } as any);
+    it("shows Guest when signed out", () => {
+      vi.mocked(useClerkUser).mockReturnValue({ user: null } as never);
       vi.mocked(useAuth).mockReturnValue({ isSignedIn: false } as any);
       render(<Sidebar />);
-      expect(screen.getAllByText("Guest")).toHaveLength(2);
+      expect(screen.getAllByText("Guest")).toHaveLength(1);
     });
 
     it("displays full name trimmed correctly", () => {
-      vi.mocked(useUser).mockReturnValue({
-        user: { fname: "  John  ", id: "user-123", lname: "  Doe  " },
-      } as any);
+      vi.mocked(useClerkUser).mockReturnValue({
+        user: { firstName: "  John  ", imageUrl: "", lastName: "  Doe  " },
+      } as never);
       render(<Sidebar />);
       expect(screen.getByText("John Doe")).toBeInTheDocument();
     });
 
     it("handles special characters in names", () => {
-      vi.mocked(useUser).mockReturnValue({
-        user: { fname: "François", id: "user-123", lname: "O'Reilly" },
-      } as any);
+      vi.mocked(useClerkUser).mockReturnValue({
+        user: { firstName: "François", imageUrl: "", lastName: "O'Reilly" },
+      } as never);
       render(<Sidebar />);
       expect(screen.getByText("François O'Reilly")).toBeInTheDocument();
     });
@@ -167,7 +169,6 @@ describe("Sidebar", () => {
   describe("Authentication", () => {
     it("shows signed-in content when authenticated", () => {
       render(<Sidebar />);
-      expect(screen.getByText("John Doe")).toBeInTheDocument();
       expect(screen.getByText("Clerk User")).toBeInTheDocument();
     });
   });
@@ -271,16 +272,16 @@ describe("Sidebar", () => {
   describe("Multiple Renders", () => {
     it("maintains state across re-renders", () => {
       const { rerender } = render(<Sidebar />);
-      expect(screen.getByText("John Doe")).toBeInTheDocument();
+      expect(screen.getByText("Clerk User")).toBeInTheDocument();
       rerender(<Sidebar />);
-      expect(screen.getByText("John Doe")).toBeInTheDocument();
+      expect(screen.getByText("Clerk User")).toBeInTheDocument();
     });
 
     it("updates display name when user changes", () => {
       const { rerender } = render(<Sidebar />);
-      vi.mocked(useUser).mockReturnValue({
-        user: { fname: "Jane", id: "user-123", lname: "Smith" },
-      } as any);
+      vi.mocked(useClerkUser).mockReturnValue({
+        user: { firstName: "Jane", imageUrl: "", lastName: "Smith" },
+      } as never);
       rerender(<Sidebar />);
       expect(screen.getByText("Jane Smith")).toBeInTheDocument();
     });

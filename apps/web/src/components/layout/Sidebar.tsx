@@ -70,8 +70,9 @@ export function Sidebar({ userRoles = [Role.customer], activeRole, onRoleChange 
   const winemakerId = winemakerProfile.data?.id;
   const firstShopId = shopOwnerProfile.data?.[0]?.id;
 
-  const displayUserName = isSignedIn ? clerkUser?.fullName || "User" : "Guest";
-  const fullName = user ? `${user.fname || ""} ${user.lname || ""}`.trim() : "Guest";
+  const fullName = isSignedIn
+    ? `${clerkUser?.firstName ?? ""} ${clerkUser?.lastName ?? ""}`.trim() || "User"
+    : "Guest";
   const initials = fullName === "Guest" ? "G" : fullName.substring(0, 2).toUpperCase() || "U";
   const hasMultipleRoles = userRoles.length > 1;
   const customerView = isCustomerView(currentActiveRole);
@@ -108,8 +109,7 @@ export function Sidebar({ userRoles = [Role.customer], activeRole, onRoleChange 
                   </AvatarFallback>
                 </Avatar>
                 <div className="flex flex-col">
-                  <span className="text-sm font-semibold">{fullName}</span>
-                  {displayUserName}
+                  <span className="text-2xl font-semibold">{fullName}</span>
                 </div>
               </SheetTitle>
             </SheetHeader>
@@ -337,12 +337,7 @@ function RoleNavItems({ role, closeSheet, userId, winemakerId, firstShopId }: Ro
         )}
         <NavItem
           onClick={closeSheet}
-          render={
-            <Link
-              search={{ isBundle: true, shopId: firstShopId }}
-              to="/products"
-            />
-          }
+          render={<Link search={{ isBundle: true, shopId: firstShopId }} to="/products" />}
           variant="active"
         >
           <HugeiconsIcon icon={Package01Icon} /> My Bundles
@@ -353,11 +348,7 @@ function RoleNavItems({ role, closeSheet, userId, winemakerId, firstShopId }: Ro
 
   if (role === Role.admin) {
     return (
-      <NavItem
-        onClick={closeSheet}
-        render={<Link to="/role-requests" />}
-        variant="active"
-      >
+      <NavItem onClick={closeSheet} render={<Link to="/role-requests" />} variant="active">
         <HugeiconsIcon icon={UserGroupIcon} /> Role Requests
       </NavItem>
     );

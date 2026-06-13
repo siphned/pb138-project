@@ -1,16 +1,15 @@
-import { UserProfile } from "@clerk/react";
 import { ArrowLeft02Icon } from "@hugeicons/core-free-icons";
 import { HugeiconsIcon } from "@hugeicons/react";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { DashboardRoleSection } from "@/components/dashboard/DashboardRoleSection";
-import { ProfileEditForm } from "@/components/dashboard/ProfileEditForm";
 import { ErrorState } from "@/components/primitives/error-state";
 import { LoadingState } from "@/components/primitives/loading-state";
 import { PageHeader } from "@/components/primitives/page-header";
 import { Section } from "@/components/primitives/section";
+import { ClerkNameForm } from "@/components/settings/ClerkNameForm";
+import { PasswordChangeForm } from "@/components/settings/PasswordChangeForm";
 import { SettingsAddressForm } from "@/components/settings/SettingsAddressForm";
 import { Card, CardContent } from "@/components/ui/card";
-import { useTheme } from "@/context";
 import { useGetUsersMeAddresses } from "@/generated/hooks/useGetUsersMeAddresses";
 
 export const Route = createFileRoute("/_authenticated/settings")({
@@ -18,7 +17,6 @@ export const Route = createFileRoute("/_authenticated/settings")({
 });
 
 function SettingsPage() {
-  const { theme } = useTheme();
   const { data: addresses, isLoading, isError, refetch } = useGetUsersMeAddresses();
 
   const renderAddresses = () => {
@@ -65,27 +63,19 @@ function SettingsPage() {
       </Link>
 
       <PageHeader
-        description="Manage your name, email, password, and saved addresses."
+        description="Manage your name, password, roles, and saved addresses."
         title="Settings"
       />
 
-      <Section heading="Your name">
-        <ProfileEditForm />
-      </Section>
+      <div className="grid gap-6 lg:grid-cols-2">
+        <Section className="flex flex-col" heading="Your name">
+          <ClerkNameForm />
+        </Section>
 
-      <Section heading="Account">
-        <Card variant="section">
-          <CardContent className="pt-6">
-            <UserProfile
-              appearance={{
-                baseTheme: theme === "dark" ? undefined : undefined,
-                elements: { card: "shadow-none w-full", rootBox: "w-full" },
-              }}
-              routing="hash"
-            />
-          </CardContent>
-        </Card>
-      </Section>
+        <Section className="flex flex-col" heading="Password">
+          <PasswordChangeForm />
+        </Section>
+      </div>
 
       <Section heading="Roles">
         <DashboardRoleSection />
