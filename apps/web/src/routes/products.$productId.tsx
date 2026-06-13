@@ -7,7 +7,10 @@ import { ErrorState } from "@/components/primitives/error-state";
 import { LoadingState } from "@/components/primitives/loading-state";
 import { getCartsQueryKey } from "@/generated/hooks/useGetCarts";
 import { useGetProductsById } from "@/generated/hooks/useGetProductsById";
+import { useGetProductsByIdImages } from "@/generated/hooks/useGetProductsByIdImages";
 import { usePostCartsItems } from "@/generated/hooks/usePostCartsItems";
+import { BundleWinesSection } from "./-components/BundleWinesSection";
+import { ProductGallery } from "./-components/ProductGallery";
 import { ProductRelatedSection } from "./-components/ProductRelatedSection";
 import { ProductReviewsSection } from "./-components/ProductReviewsSection";
 import { ProductSoldAtCard } from "./-components/ProductSoldAtCard";
@@ -20,6 +23,7 @@ function ProductDetailPage() {
   const { productId } = Route.useParams();
   const queryClient = useQueryClient();
   const { data: product, isLoading, isError, refetch } = useGetProductsById(productId);
+  const { data: productImages } = useGetProductsByIdImages(productId);
   const addToCartMutation = usePostCartsItems();
 
   const handleAddToCart = (quantity: number) => {
@@ -59,30 +63,30 @@ function ProductDetailPage() {
         Back to products
       </Link>
 
-      <div className="grid grid-cols-1 gap-12 lg:grid-cols-[1fr_400px]">
-        <div className="space-y-12">
-          <ProductDetailsCard
-            isAddingToCart={addToCartMutation.isPending}
-            onAddToCart={handleAddToCart}
-            product={product}
-          />
-
-          <ProductRelatedSection
-            isBundle={!!product.isBundle}
-            shopId={product.shopId}
-            // biome-ignore lint/suspicious/noExplicitAny: productWines.wine shape is too narrow in OpenAPI (track in BE follow-up)
-            wines={product.productWines?.map((pw: any) => pw.wine) || []}
-          />
+      <div className="grid grid-cols-1 gap-12 lg:grid-cols-2">
+        <div className="overflow-hidden rounded-3xl bg-muted shadow-lg">
+          <ProductGallery images={productImages?.map((img) => img.url)} productName={product.name} />
         </div>
 
-        <aside className="space-y-12">
-          {product.shop && (
-            <ProductSoldAtCard shopId={product.shop.id} shopName={product.shop.name} />
-          )}
-
-          <ProductReviewsSection productId={productId} />
-        </aside>
+        <ProductDetailsCard
+          isAddingToCart={addToCartMutation.isPending}
+          onAddToCart={handleAddToCart}
+          product={product}
+        />
       </div>
+
+      {product.shop && <ProductSoldAtCard shopId={product.shop.id} shopName={product.shop.name} />}
+
+      {product.isBundle && <BundleWinesSection productWines={product.productWines} />}
+
+      <ProductRelatedSection
+        isBundle={!!product.isBundle}
+        shopId={product.shopId}
+        // biome-ignore lint/suspicious/noExplicitAny: productWines.wine shape is too narrow in OpenAPI (track in BE follow-up)
+        wines={product.productWines?.map((pw: any) => pw.wine) || []}
+      />
+
+      <ProductReviewsSection productId={productId} />
     </div>
   );
 }

@@ -69,7 +69,7 @@ describe("ProductDetailsCard", () => {
     expect(screen.getByRole("button", { name: /adding/i })).toBeDisabled();
   });
 
-  it("renders wines in bundle", () => {
+  it("renders a bundle the same as a regular product (no separate wines section)", () => {
     render(
       <QueryClientProvider client={new QueryClient()}>
         <ProductDetailsCard
@@ -79,9 +79,7 @@ describe("ProductDetailsCard", () => {
         />
       </QueryClientProvider>
     );
-    expect(screen.getByText("Wines in this product")).toBeInTheDocument();
-    // Wine name appears in both the polaroid placeholder caption and the heading link.
-    expect(screen.getAllByText("Pálava 2022").length).toBeGreaterThan(0);
+    expect(screen.queryByText("Wines in this product")).not.toBeInTheDocument();
   });
 
   it("shows owner actions for shop owner", () => {
