@@ -12,7 +12,7 @@ import { useGetOrders } from "@/generated/hooks/useGetOrders";
 import type { GetOrders200 } from "@/generated/types/GetOrders";
 import { formatEur } from "@/lib/utils";
 
-export const Route = createFileRoute("/_authenticated/orders")({
+export const Route = createFileRoute("/_authenticated/orders/")({
   component: OrdersListPage,
 });
 
