@@ -62,6 +62,12 @@ function formatDate(value: unknown): string {
   return d.toLocaleDateString("en-US", { day: "numeric", month: "short", year: "numeric" });
 }
 
+function exceptionLabel(action: string): string {
+  if (action === "closed") return "Closed";
+  if (action === "modified_hours") return "Modified hours";
+  return "Special event";
+}
+
 function AvailabilityPage() {
   const { id } = Route.useParams();
   const queryClient = useQueryClient();
@@ -212,11 +218,7 @@ function AvailabilityPage() {
                     <div className="min-w-0 flex-1 space-y-1">
                       <div className="flex flex-wrap items-baseline gap-2">
                         <span className="font-medium text-foreground">
-                          {ex.action === "closed"
-                            ? "Closed"
-                            : ex.action === "modified_hours"
-                              ? "Modified hours"
-                              : "Special event"}
+                          {exceptionLabel(ex.action)}
                         </span>
                         <span className="text-xs text-muted-foreground">
                           {formatDate(ex.startsAt)} – {formatDate(ex.endsAt)}

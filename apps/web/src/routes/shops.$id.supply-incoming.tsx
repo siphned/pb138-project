@@ -9,11 +9,11 @@ import { PageHeader } from "@/components/primitives/page-header";
 import { Section } from "@/components/primitives/section";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { usePatchSupplyAgreementsById } from "@/generated/hooks/usePatchSupplyAgreementsById";
 import {
   getSupplyAgreementsWinemakerQueryKey,
   useGetSupplyAgreementsWinemaker,
 } from "@/generated/hooks/useGetSupplyAgreementsWinemaker";
+import { usePatchSupplyAgreementsById } from "@/generated/hooks/usePatchSupplyAgreementsById";
 
 export const Route = createFileRoute("/shops/$id/supply-incoming")({
   component: ShopSupplyIncomingPage,
@@ -40,9 +40,9 @@ function ShopSupplyIncomingPage() {
   const updateStatus = usePatchSupplyAgreementsById();
 
   const raw = query.data;
-  const list = (Array.isArray(raw)
-    ? raw
-    : ((raw as { data?: AgreementRow[] } | undefined)?.data ?? [])) as AgreementRow[];
+  const list = (
+    Array.isArray(raw) ? raw : ((raw as { data?: AgreementRow[] } | undefined)?.data ?? [])
+  ) as AgreementRow[];
 
   const handleDecision = (agreementId: string, status: "approved" | "rejected") => {
     updateStatus.mutate(
@@ -52,6 +52,71 @@ function ShopSupplyIncomingPage() {
           queryClient.invalidateQueries({ queryKey: getSupplyAgreementsWinemakerQueryKey() });
         },
       }
+    );
+  };
+
+  const renderRequests = () => {
+    if (query.isLoading) return <LoadingState variant="list" />;
+    if (query.isError) {
+      return (
+        <ErrorState
+          message="Could not load incoming supply requests."
+          onRetry={() => query.refetch()}
+          title="Failed to load"
+        />
+      );
+    }
+    if (list.length === 0) {
+      return (
+        <EmptyState
+          description="When a shop owner proposes an agreement to stock your wines, it'll appear here."
+          title="No incoming requests"
+        />
+      );
+    }
+    return (
+      <ul className="divide-y divide-border rounded-md border border-border">
+        {list.map((a) => {
+          const pending = updateStatus.isPending && updateStatus.variables?.id === a.id;
+          const isOpen = !a.status || a.status === "pending";
+          return (
+            <li className="flex items-center justify-between gap-4 p-4" key={a.id}>
+              <div className="min-w-0 flex-1">
+                <Link
+                  className="font-medium text-foreground hover:text-primary"
+                  params={{ id: a.shopId }}
+                  to="/shops/$id"
+                >
+                  {a.shop?.name ?? "Shop"}
+                </Link>
+                <p className="text-xs text-muted-foreground">Wants to stock your wines.</p>
+              </div>
+              <div className="flex items-center gap-2">
+                <Badge variant={statusBadgeVariant(a.status)}>{a.status ?? "pending"}</Badge>
+                {isOpen && (
+                  <>
+                    <Button
+                      disabled={pending}
+                      onClick={() => handleDecision(a.id, "rejected")}
+                      size="sm"
+                      variant="outline"
+                    >
+                      Reject
+                    </Button>
+                    <Button
+                      disabled={pending}
+                      onClick={() => handleDecision(a.id, "approved")}
+                      size="sm"
+                    >
+                      Approve
+                    </Button>
+                  </>
+                )}
+              </div>
+            </li>
+          );
+        })}
+      </ul>
     );
   };
 
@@ -71,67 +136,7 @@ function ShopSupplyIncomingPage() {
         title="Incoming supply requests"
       />
 
-      <Section heading={`Requests (${list.length})`}>
-        {query.isLoading ? (
-          <LoadingState variant="list" />
-        ) : query.isError ? (
-          <ErrorState
-            message="Could not load incoming supply requests."
-            onRetry={() => query.refetch()}
-            title="Failed to load"
-          />
-        ) : list.length === 0 ? (
-          <EmptyState
-            description="When a shop owner proposes an agreement to stock your wines, it'll appear here."
-            title="No incoming requests"
-          />
-        ) : (
-          <ul className="divide-y divide-border rounded-md border border-border">
-            {list.map((a) => {
-              const pending = updateStatus.isPending && updateStatus.variables?.id === a.id;
-              const isOpen = !a.status || a.status === "pending";
-              return (
-                <li className="flex items-center justify-between gap-4 p-4" key={a.id}>
-                  <div className="min-w-0 flex-1">
-                    <Link
-                      className="font-medium text-foreground hover:text-primary"
-                      params={{ id: a.shopId }}
-                      to="/shops/$id"
-                    >
-                      {a.shop?.name ?? "Shop"}
-                    </Link>
-                    <p className="text-xs text-muted-foreground">
-                      Wants to stock your wines.
-                    </p>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <Badge variant={statusBadgeVariant(a.status)}>{a.status ?? "pending"}</Badge>
-                    {isOpen && (
-                      <>
-                        <Button
-                          disabled={pending}
-                          onClick={() => handleDecision(a.id, "rejected")}
-                          size="sm"
-                          variant="outline"
-                        >
-                          Reject
-                        </Button>
-                        <Button
-                          disabled={pending}
-                          onClick={() => handleDecision(a.id, "approved")}
-                          size="sm"
-                        >
-                          Approve
-                        </Button>
-                      </>
-                    )}
-                  </div>
-                </li>
-              );
-            })}
-          </ul>
-        )}
-      </Section>
+      <Section heading={`Requests (${list.length})`}>{renderRequests()}</Section>
     </div>
   );
 }

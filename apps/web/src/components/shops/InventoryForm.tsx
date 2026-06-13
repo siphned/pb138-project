@@ -2,12 +2,7 @@ import { Add01Icon, Delete01Icon } from "@hugeicons/core-free-icons";
 import { HugeiconsIcon } from "@hugeicons/react";
 import { useState } from "react";
 import { useFieldArray, useForm } from "react-hook-form";
-import {
-  ImageUploadField,
-  SubmitButton,
-  TextField,
-  TextareaField,
-} from "@/components/forms";
+import { ImageUploadField, SubmitButton, TextareaField, TextField } from "@/components/forms";
 import { Button } from "@/components/ui/button";
 import {
   Form,
@@ -98,59 +93,65 @@ export function InventoryForm({ shopId, onSuccess }: InventoryFormProps) {
 
   const wines = Array.isArray(winesData) ? winesData : [];
 
-  const onSubmit = async (data: FormData) => {
-    setSubmitError(null);
-
-    // Trim description to undefined when empty — BE requires minLength 1 when present.
-    const description = data.description?.trim() ? data.description.trim() : undefined;
-
+  const validateProduct = (data: FormData): string | null => {
     if (isBundle) {
       const wineRows = (data.wines ?? []).filter((w) => w.wineId);
-      if (wineRows.length < 2) {
-        setSubmitError("A bundle must contain at least 2 wines.");
-        return;
-      }
+      if (wineRows.length < 2) return "A bundle must contain at least 2 wines.";
       const wineIds = wineRows.map((w) => w.wineId);
       if (new Set(wineIds).size !== wineIds.length) {
-        setSubmitError("Each wine in a bundle must be unique.");
-        return;
+        return "Each wine in a bundle must be unique.";
       }
-    } else if (!data.wineId) {
-      setSubmitError("Please select a wine.");
+      return null;
+    }
+    if (!data.wineId) return "Please select a wine.";
+    return null;
+  };
+
+  const buildSubmitData = (data: FormData) => {
+    // Trim description to undefined when empty — BE requires minLength 1 when present.
+    const description = data.description?.trim() ? data.description.trim() : undefined;
+    const base = {
+      description,
+      name: data.name,
+      price: data.price,
+      quantity: Number(data.quantity),
+    };
+    if (isBundle) {
+      return {
+        ...base,
+        wines: (data.wines ?? []).map((w) => ({
+          quantity: Number(w.quantity),
+          wineId: w.wineId,
+        })),
+      };
+    }
+    return { ...base, wineId: data.wineId };
+  };
+
+  const uploadImages = async (productId: string) => {
+    for (const file of imageFiles) {
+      await uploadProductImage(productId, file);
+    }
+  };
+
+  const onSubmit = async (data: FormData) => {
+    const validationError = validateProduct(data);
+    if (validationError) {
+      setSubmitError(validationError);
       return;
     }
 
+    setSubmitError(null);
     setIsSubmitting(true);
     try {
-      const submitData = isBundle
-        ? {
-            description,
-            name: data.name,
-            price: data.price,
-            quantity: Number(data.quantity),
-            wines: (data.wines ?? []).map((w) => ({
-              quantity: Number(w.quantity),
-              wineId: w.wineId,
-            })),
-          }
-        : {
-            description,
-            name: data.name,
-            price: data.price,
-            quantity: Number(data.quantity),
-            wineId: data.wineId,
-          };
-
       const created = await mutation.mutateAsync({
-        data: submitData as PostShopsByIdProductsMutationRequest,
+        data: buildSubmitData(data) as PostShopsByIdProductsMutationRequest,
         id: shopId,
       });
 
       const productId = (created as { id?: string } | undefined)?.id;
       if (productId && imageFiles.length > 0) {
-        for (const file of imageFiles) {
-          await uploadProductImage(productId, file);
-        }
+        await uploadImages(productId);
       }
 
       onSuccess();

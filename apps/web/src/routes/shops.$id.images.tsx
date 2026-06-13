@@ -33,6 +33,14 @@ interface ImageRow {
 const ACCEPT = "image/png,image/jpeg,image/webp,image/avif";
 const MAX_BYTES = 10 * 1024 * 1024; // 10 MB — match BE 413 boundary expectation.
 
+function uploadErrorMessage(status: number | null): string | null {
+  if (status === 415) return "One or more files have an unsupported type.";
+  if (status === 413) return "One or more files are too large.";
+  if (status === 409) return "Some images are already uploaded.";
+  if (status) return "Some uploads failed. Please try again.";
+  return null;
+}
+
 function ShopImagesPage() {
   const { id } = Route.useParams();
   const queryClient = useQueryClient();
@@ -67,6 +75,21 @@ function ShopImagesPage() {
     await refetch();
   };
 
+  // Upload each file in turn, continuing past failures so one bad file doesn't
+  // block the rest. Returns the first error status seen (or null).
+  const uploadFiles = async (files: File[]): Promise<number | null> => {
+    let firstError: number | null = null;
+    for (const file of files) {
+      try {
+        await uploadMutation.mutateAsync(file);
+      } catch (err: unknown) {
+        const status = (err as { response?: { status?: number } })?.response?.status ?? 0;
+        firstError ??= status;
+      }
+    }
+    return firstError;
+  };
+
   const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = Array.from(e.target.files ?? []);
     e.target.value = "";
@@ -81,21 +104,8 @@ function ShopImagesPage() {
     }
     setUploadError(null);
 
-    let firstError: number | null = null;
-    for (const file of files) {
-      try {
-        await uploadMutation.mutateAsync(file);
-      } catch (err: unknown) {
-        const status = (err as { response?: { status?: number } })?.response?.status ?? 0;
-        firstError ??= status;
-        // Continue uploading remaining files so a single bad one doesn't block the rest.
-      }
-    }
-
-    if (firstError === 415) setUploadError("One or more files have an unsupported type.");
-    else if (firstError === 413) setUploadError("One or more files are too large.");
-    else if (firstError === 409) setUploadError("Some images are already uploaded.");
-    else if (firstError) setUploadError("Some uploads failed. Please try again.");
+    const firstError = await uploadFiles(files);
+    setUploadError(uploadErrorMessage(firstError));
 
     await refresh();
   };
@@ -148,10 +158,7 @@ function ShopImagesPage() {
             ref={fileInputRef}
             type="file"
           />
-          <Button
-            disabled={uploadMutation.isPending}
-            onClick={() => fileInputRef.current?.click()}
-          >
+          <Button disabled={uploadMutation.isPending} onClick={() => fileInputRef.current?.click()}>
             <HugeiconsIcon className="mr-2 h-4 w-4" icon={Upload03Icon} />
             {uploadMutation.isPending ? "Uploading…" : "Choose images"}
           </Button>
@@ -173,7 +180,8 @@ function ShopImagesPage() {
         ) : (
           <ul className="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-4">
             {images.map((img) => {
-              const pending = deleteMutation.isPending && deleteMutation.variables?.imageId === img.id;
+              const pending =
+                deleteMutation.isPending && deleteMutation.variables?.imageId === img.id;
               return (
                 <li key={img.id}>
                   <div className="group relative aspect-square overflow-hidden rounded-lg border border-border bg-muted">

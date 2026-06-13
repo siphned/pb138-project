@@ -55,9 +55,9 @@ function ShopOrdersPage() {
   const updateStatus = usePatchOrdersByIdStatus();
 
   const raw = query.data;
-  const list = (Array.isArray(raw)
-    ? raw
-    : ((raw as { data?: OrderRow[] } | undefined)?.data ?? [])) as OrderRow[];
+  const list = (
+    Array.isArray(raw) ? raw : ((raw as { data?: OrderRow[] } | undefined)?.data ?? [])
+  ) as OrderRow[];
 
   const handleStatusChange = (orderId: string, status: Status) => {
     updateStatus.mutate(
@@ -67,6 +67,79 @@ function ShopOrdersPage() {
           queryClient.invalidateQueries({ queryKey: getOrdersQueryKey({ shopId: id }) });
         },
       }
+    );
+  };
+
+  const renderOrders = () => {
+    if (query.isLoading) return <LoadingState variant="list" />;
+    if (query.isError) {
+      return (
+        <ErrorState
+          message="Could not load orders for this shop."
+          onRetry={() => query.refetch()}
+          title="Failed to load"
+        />
+      );
+    }
+    if (list.length === 0) {
+      return (
+        <EmptyState
+          description="Customer orders for this shop will appear here as they come in."
+          title="No orders yet"
+        />
+      );
+    }
+    return (
+      <ul className="divide-y divide-border rounded-md border border-border">
+        {list.map((o) => {
+          const pending = updateStatus.isPending && updateStatus.variables?.id === o.id;
+          const date = formatDate(o.createdAt);
+          return (
+            <li className="flex items-center justify-between gap-4 p-4" key={o.id}>
+              <div className="min-w-0 flex-1">
+                <Link
+                  className="font-medium text-foreground hover:text-primary"
+                  params={{ id: o.id }}
+                  to="/orders/$id"
+                >
+                  Order {o.id.slice(0, 8)}
+                </Link>
+                <p className="text-xs text-muted-foreground">
+                  {[date, o.totalAmount !== undefined ? `€${o.totalAmount}` : null]
+                    .filter(Boolean)
+                    .join(" · ")}
+                </p>
+              </div>
+              <div className="flex items-center gap-3">
+                <Badge variant={statusBadgeVariant(o.status)}>{o.status ?? "pending"}</Badge>
+                <Select
+                  disabled={pending}
+                  onValueChange={(v) => v && handleStatusChange(o.id, v as Status)}
+                  value={(o.status as Status) ?? "pending"}
+                >
+                  <SelectTrigger className="w-[150px]" size="sm">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {STATUS_OPTIONS.map((s) => (
+                      <SelectItem key={s} value={s}>
+                        {s.charAt(0).toUpperCase() + s.slice(1)}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+                <Button
+                  render={<Link params={{ id: o.id }} to="/orders/$id" />}
+                  size="sm"
+                  variant="outline"
+                >
+                  View
+                </Button>
+              </div>
+            </li>
+          );
+        })}
+      </ul>
     );
   };
 
@@ -86,73 +159,7 @@ function ShopOrdersPage() {
         title="Orders"
       />
 
-      <Section heading={`Orders (${list.length})`}>
-        {query.isLoading ? (
-          <LoadingState variant="list" />
-        ) : query.isError ? (
-          <ErrorState
-            message="Could not load orders for this shop."
-            onRetry={() => query.refetch()}
-            title="Failed to load"
-          />
-        ) : list.length === 0 ? (
-          <EmptyState
-            description="Customer orders for this shop will appear here as they come in."
-            title="No orders yet"
-          />
-        ) : (
-          <ul className="divide-y divide-border rounded-md border border-border">
-            {list.map((o) => {
-              const pending = updateStatus.isPending && updateStatus.variables?.id === o.id;
-              const date = formatDate(o.createdAt);
-              return (
-                <li className="flex items-center justify-between gap-4 p-4" key={o.id}>
-                  <div className="min-w-0 flex-1">
-                    <Link
-                      className="font-medium text-foreground hover:text-primary"
-                      params={{ id: o.id }}
-                      to="/orders/$id"
-                    >
-                      Order {o.id.slice(0, 8)}
-                    </Link>
-                    <p className="text-xs text-muted-foreground">
-                      {[date, o.totalAmount !== undefined ? `€${o.totalAmount}` : null]
-                        .filter(Boolean)
-                        .join(" · ")}
-                    </p>
-                  </div>
-                  <div className="flex items-center gap-3">
-                    <Badge variant={statusBadgeVariant(o.status)}>{o.status ?? "pending"}</Badge>
-                    <Select
-                      disabled={pending}
-                      onValueChange={(v) => v && handleStatusChange(o.id, v as Status)}
-                      value={(o.status as Status) ?? "pending"}
-                    >
-                      <SelectTrigger className="w-[150px]" size="sm">
-                        <SelectValue />
-                      </SelectTrigger>
-                      <SelectContent>
-                        {STATUS_OPTIONS.map((s) => (
-                          <SelectItem key={s} value={s}>
-                            {s.charAt(0).toUpperCase() + s.slice(1)}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                    <Button
-                      render={<Link params={{ id: o.id }} to="/orders/$id" />}
-                      size="sm"
-                      variant="outline"
-                    >
-                      View
-                    </Button>
-                  </div>
-                </li>
-              );
-            })}
-          </ul>
-        )}
-      </Section>
+      <Section heading={`Orders (${list.length})`}>{renderOrders()}</Section>
     </div>
   );
 }

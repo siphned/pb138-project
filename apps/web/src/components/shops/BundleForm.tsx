@@ -3,12 +3,7 @@ import { HugeiconsIcon } from "@hugeicons/react";
 import { Link } from "@tanstack/react-router";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
-import {
-  ImageUploadField,
-  SubmitButton,
-  TextField,
-  TextareaField,
-} from "@/components/forms";
+import { ImageUploadField, SubmitButton, TextareaField, TextField } from "@/components/forms";
 import { Button } from "@/components/ui/button";
 import {
   Form,
@@ -131,27 +126,102 @@ export function BundleForm({ shopId, onSuccess }: BundleFormProps) {
       ? Math.min(...selected.map((s) => Math.floor(s.productStock / Math.max(1, s.quantity))))
       : 0;
 
-  const onSubmit = async (values: BundleFormValues) => {
-    setSubmitError(null);
-
+  const validateBundle = (values: BundleFormValues): string | null => {
     if (selected.length < 2) {
-      setSubmitError("A bundle must contain at least 2 wines from your inventory.");
-      return;
+      return "A bundle must contain at least 2 wines from your inventory.";
     }
+    if (Number(values.quantity) > maxBundles) {
+      return `You can list at most ${maxBundles} bundle${maxBundles === 1 ? "" : "s"} with your current stock.`;
+    }
+    return null;
+  };
 
-    const requested = Number(values.quantity);
-    if (requested > maxBundles) {
-      setSubmitError(
-        `You can list at most ${maxBundles} bundle${maxBundles === 1 ? "" : "s"} with your current stock.`
+  const uploadBundleImages = async (productId: string) => {
+    for (const file of imageFiles) {
+      await uploadProductImage(productId, file);
+    }
+  };
+
+  const renderInventory = () => {
+    if (productsQuery.isLoading) {
+      return (
+        <div className="space-y-2">
+          <Skeleton className="h-14 w-full" />
+          <Skeleton className="h-14 w-full" />
+          <Skeleton className="h-14 w-full" />
+        </div>
       );
+    }
+    if (productsQuery.isError) {
+      return (
+        <p className="text-sm text-destructive" role="alert">
+          Could not load this shop's inventory.
+        </p>
+      );
+    }
+    if (products.length === 0) {
+      return (
+        <div className="rounded-md border border-dashed border-border p-6 text-center">
+          <p className="text-sm text-muted-foreground">
+            No single-wine products yet. Add some to your inventory first, then come back to bundle
+            them.
+          </p>
+        </div>
+      );
+    }
+    return (
+      <ul className="divide-y divide-border rounded-md border border-border">
+        {products.map((p) => {
+          const stock = Number(p.quantity);
+          const outOfStock = stock <= 0;
+          const wine = p.wines[0];
+          return (
+            <li className="flex items-center justify-between gap-4 p-4" key={p.id}>
+              <div className="min-w-0 flex-1">
+                <p className="font-medium text-foreground">{p.name}</p>
+                <p className="text-xs text-muted-foreground">
+                  {wine.name} · {outOfStock ? "Out of stock" : `${stock} in stock`}
+                </p>
+              </div>
+              <div className="flex items-center gap-2">
+                <Button
+                  aria-label={`View ${p.name}`}
+                  render={<Link params={{ productId: p.id }} to="/products/$productId" />}
+                  size="icon"
+                  variant="ghost"
+                >
+                  <HugeiconsIcon className="h-4 w-4" icon={ViewIcon} />
+                </Button>
+                <Button
+                  disabled={isSelected(wine.id) || outOfStock}
+                  onClick={() => addToBundle(p)}
+                  size="sm"
+                  type="button"
+                  variant="outline"
+                >
+                  <HugeiconsIcon className="h-4 w-4 mr-1" icon={Add01Icon} />
+                  {isSelected(wine.id) ? "Added" : "Add to bundle"}
+                </Button>
+              </div>
+            </li>
+          );
+        })}
+      </ul>
+    );
+  };
+
+  const onSubmit = async (values: BundleFormValues) => {
+    const validationError = validateBundle(values);
+    if (validationError) {
+      setSubmitError(validationError);
       return;
     }
 
+    setSubmitError(null);
     setIsSubmitting(true);
     try {
-      const description = values.description.trim() || undefined;
       const submitData = {
-        description,
+        description: values.description.trim() || undefined,
         name: values.name,
         price: values.price,
         quantity: Number(values.quantity),
@@ -164,13 +234,10 @@ export function BundleForm({ shopId, onSuccess }: BundleFormProps) {
       });
 
       const productId = (created as { id?: string } | undefined)?.id;
-      if (productId && imageFiles.length > 0) {
-        for (const file of imageFiles) {
-          await uploadProductImage(productId, file);
-        }
-      }
+      if (!productId) return;
 
-      if (productId) onSuccess(productId);
+      await uploadBundleImages(productId);
+      onSuccess(productId);
     } catch (err) {
       const apiError = parseApiError(err);
       setSubmitError(friendlyError(apiError?.code, apiError?.message));
@@ -191,64 +258,7 @@ export function BundleForm({ shopId, onSuccess }: BundleFormProps) {
           </p>
         </div>
 
-        {productsQuery.isLoading ? (
-          <div className="space-y-2">
-            <Skeleton className="h-14 w-full" />
-            <Skeleton className="h-14 w-full" />
-            <Skeleton className="h-14 w-full" />
-          </div>
-        ) : productsQuery.isError ? (
-          <p className="text-sm text-destructive" role="alert">
-            Could not load this shop's inventory.
-          </p>
-        ) : products.length === 0 ? (
-          <div className="rounded-md border border-dashed border-border p-6 text-center">
-            <p className="text-sm text-muted-foreground">
-              No single-wine products yet. Add some to your inventory first, then come back to
-              bundle them.
-            </p>
-          </div>
-        ) : (
-          <ul className="divide-y divide-border rounded-md border border-border">
-            {products.map((p) => {
-              const stock = Number(p.quantity);
-              const outOfStock = stock <= 0;
-              const wine = p.wines[0];
-              return (
-                <li className="flex items-center justify-between gap-4 p-4" key={p.id}>
-                  <div className="min-w-0 flex-1">
-                    <p className="font-medium text-foreground">{p.name}</p>
-                    <p className="text-xs text-muted-foreground">
-                      {wine.name} · {outOfStock ? "Out of stock" : `${stock} in stock`}
-                    </p>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <Button
-                      aria-label={`View ${p.name}`}
-                      render={
-                        <Link params={{ productId: p.id }} to="/products/$productId" />
-                      }
-                      size="icon"
-                      variant="ghost"
-                    >
-                      <HugeiconsIcon className="h-4 w-4" icon={ViewIcon} />
-                    </Button>
-                    <Button
-                      disabled={isSelected(wine.id) || outOfStock}
-                      onClick={() => addToBundle(p)}
-                      size="sm"
-                      type="button"
-                      variant="outline"
-                    >
-                      <HugeiconsIcon className="h-4 w-4 mr-1" icon={Add01Icon} />
-                      {isSelected(wine.id) ? "Added" : "Add to bundle"}
-                    </Button>
-                  </div>
-                </li>
-              );
-            })}
-          </ul>
-        )}
+        {renderInventory()}
       </section>
 
       <section className="space-y-3">
@@ -273,8 +283,8 @@ export function BundleForm({ shopId, onSuccess }: BundleFormProps) {
                     <div className="min-w-0 flex-1">
                       <p className="truncate text-sm font-medium">{s.wineName}</p>
                       <p className="text-xs text-muted-foreground">
-                        {s.productStock} in shop stock · enables {perWineCap}{" "}
-                        bundle{perWineCap === 1 ? "" : "s"}
+                        {s.productStock} in shop stock · enables {perWineCap} bundle
+                        {perWineCap === 1 ? "" : "s"}
                       </p>
                     </div>
                     <div className="flex items-center gap-1 text-xs text-muted-foreground">
@@ -302,8 +312,8 @@ export function BundleForm({ shopId, onSuccess }: BundleFormProps) {
             </ul>
             <p className="text-xs text-muted-foreground">
               With these wines and per-bundle quantities, you can list up to{" "}
-              <strong className="text-foreground">{maxBundles}</strong>{" "}
-              bundle{maxBundles === 1 ? "" : "s"}.
+              <strong className="text-foreground">{maxBundles}</strong> bundle
+              {maxBundles === 1 ? "" : "s"}.
             </p>
           </>
         )}
