@@ -13,7 +13,7 @@ import { Section } from "@/components/primitives/section";
 import { Separator } from "@/components/ui/separator";
 import { useGetEventsById } from "@/generated/hooks/useGetEventsById";
 
-export const Route = createFileRoute("/events/$id")({
+export const Route = createFileRoute("/events/$id/")({
   component: EventDetailPage,
 });
 

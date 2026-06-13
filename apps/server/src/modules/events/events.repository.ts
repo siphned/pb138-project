@@ -121,7 +121,7 @@ export async function createEvent(
       inviteType: data.inviteType,
       name: data.name,
       startTime: data.startTime,
-      status: "pending",
+      status: "approved",
       visibility: data.visibility,
       winemakerId,
     })

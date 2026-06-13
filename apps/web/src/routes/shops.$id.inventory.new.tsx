@@ -25,7 +25,7 @@ function InventoryNewPage() {
       </Link>
 
       <PageHeader
-        description="Add a single product or a multi-wine bundle to this shop's catalog."
+        description="Add a single product to this shop's catalog."
         title="Add inventory"
       />
 

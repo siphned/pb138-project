@@ -1,5 +1,5 @@
 // apps/server/src/modules/stats/stats.service.ts
-import { ForbiddenError, NotFoundError } from "@repo/shared";
+import { ForbiddenError } from "@repo/shared";
 import { db } from "../../db";
 import * as winemakersRepo from "../winemakers/winemakers.repository";
 import * as statsRepo from "./stats.repository";
@@ -19,9 +19,18 @@ export class StatsService {
         break;
       case "winemaker": {
         const winemaker = await winemakersRepo.findByUserId(db, userId);
-        if (!winemaker)
-          throw new NotFoundError("Winemaker profile not found", "WINEMAKER_NOT_FOUND");
-        raw = await statsRepo.getWinemakerStats(db, winemaker.id);
+        // Return zeroed stats if the caller has the winemaker role but no
+        // profile yet (newly approved role request, no wines created yet).
+        raw = winemaker
+          ? await statsRepo.getWinemakerStats(db, winemaker.id)
+          : {
+              avgReviewScore: null,
+              eventsByStatus: { approved: 0, pending: 0, rejected: 0 },
+              role: "winemaker",
+              supplyAgreementsByStatus: { approved: 0, pending: 0, rejected: 0 },
+              totalStock: 0,
+              wineCount: 0,
+            };
         break;
       }
       case "shop_owner":

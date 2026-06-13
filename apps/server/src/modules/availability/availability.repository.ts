@@ -1,6 +1,6 @@
 import type { AvailabilityException, AvailabilityRegular } from "@repo/shared/schemas";
 import { availabilityExceptions, availabilityRegular, shops } from "@repo/shared/schemas";
-import { and, eq, isNull } from "drizzle-orm";
+import { and, eq, gte, isNull, lt } from "drizzle-orm";
 import type { Database } from "../../db";
 
 export async function deleteException(db: Database, id: string): Promise<void> {
@@ -90,4 +90,55 @@ export async function insertRegular(
   const [entry] = await db.insert(availabilityRegular).values(data).returning();
   if (!entry) throw new Error("Insert returned no rows");
   return entry;
+}
+
+/**
+ * When a new regular entry is added for a shop/dow, any existing open-ended
+ * entries for the same shop+dow must give way to it:
+ *  - if they started before the new validFrom → cap their validTo at the day
+ *    before the new entry starts, so the old hours remain visible until then.
+ *  - if they started on/after the new validFrom → soft-delete, since they'd
+ *    never actually apply (the new one supersedes them from day one).
+ *
+ * Entries that already have a validTo set are bounded explicitly by the user
+ * and are left alone.
+ */
+export async function supersedeOpenEndedRegular(
+  db: Database,
+  params: { shopId: string; dow: number; newValidFrom: string }
+): Promise<void> {
+  const capDate = previousDay(params.newValidFrom);
+
+  await db
+    .update(availabilityRegular)
+    .set({ validTo: capDate })
+    .where(
+      and(
+        eq(availabilityRegular.shopId, params.shopId),
+        eq(availabilityRegular.dow, params.dow),
+        isNull(availabilityRegular.deletedAt),
+        isNull(availabilityRegular.validTo),
+        lt(availabilityRegular.validFrom, params.newValidFrom)
+      )
+    );
+
+  await db
+    .update(availabilityRegular)
+    .set({ deletedAt: new Date() })
+    .where(
+      and(
+        eq(availabilityRegular.shopId, params.shopId),
+        eq(availabilityRegular.dow, params.dow),
+        isNull(availabilityRegular.deletedAt),
+        isNull(availabilityRegular.validTo),
+        gte(availabilityRegular.validFrom, params.newValidFrom)
+      )
+    );
+}
+
+function previousDay(dateStr: string): string {
+  // Parse as UTC midnight so the subtraction doesn't drift across timezones.
+  const d = new Date(`${dateStr}T00:00:00Z`);
+  d.setUTCDate(d.getUTCDate() - 1);
+  return d.toISOString().slice(0, 10);
 }

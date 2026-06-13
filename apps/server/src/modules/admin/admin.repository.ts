@@ -1,5 +1,5 @@
-import type { Event, Review, User } from "@repo/shared/schemas";
-import { events, reviews, userRoles, users } from "@repo/shared/schemas";
+import type { Review, User } from "@repo/shared/schemas";
+import { reviews, userRoles, users } from "@repo/shared/schemas";
 import { and, count, eq, isNull } from "drizzle-orm";
 import type { Database } from "../../db";
 
@@ -7,41 +7,9 @@ export type AdminUserRow = User & {
   roles: { id: string; role: string }[];
 };
 
-export type AdminEventRow = Event & {
-  winemaker: { id: string; name: string } | null;
-  address: {
-    country: string;
-    city: string;
-    postalCode: string;
-    street: string;
-    houseNumber: string;
-  } | null;
-};
-
 export type AdminReviewRow = Review & {
   user: { id: string; fname: string; lname: string } | null;
 };
-
-export async function findEventById(db: Database, id: string): Promise<Event | undefined> {
-  return db.query.events.findFirst({
-    where: and(eq(events.id, id), isNull(events.deletedAt)),
-  });
-}
-
-export async function findEventWithDetailsById(
-  db: Database,
-  id: string
-): Promise<AdminEventRow | undefined> {
-  return db.query.events.findFirst({
-    where: and(eq(events.id, id), isNull(events.deletedAt)),
-    with: {
-      address: {
-        columns: { city: true, country: true, houseNumber: true, postalCode: true, street: true },
-      },
-      winemaker: { columns: { id: true, name: true } },
-    },
-  }) as Promise<AdminEventRow | undefined>;
-}
 
 export async function findReviewById(db: Database, id: string) {
   return db.query.reviews.findFirst({
@@ -86,38 +54,6 @@ export async function listAllReviews(
   return { data: data as AdminReviewRow[], total: Number(countResult[0]?.value ?? 0) };
 }
 
-export async function listEvents(
-  db: Database,
-  filters: { status: "pending" | "approved" | "rejected" },
-  pagination: { limit: number; offset: number }
-): Promise<{ data: AdminEventRow[]; total: number }> {
-  const where = and(eq(events.status, filters.status), isNull(events.deletedAt));
-
-  const [data, countResult] = await Promise.all([
-    db.query.events.findMany({
-      limit: pagination.limit,
-      offset: pagination.offset,
-      orderBy: (e, { asc }) => [asc(e.startTime)],
-      where,
-      with: {
-        address: {
-          columns: {
-            city: true,
-            country: true,
-            houseNumber: true,
-            postalCode: true,
-            street: true,
-          },
-        },
-        winemaker: { columns: { id: true, name: true } },
-      },
-    }),
-    db.select({ value: count() }).from(events).where(where),
-  ]);
-
-  return { data: data as AdminEventRow[], total: Number(countResult[0]?.value ?? 0) };
-}
-
 export async function listUsers(
   db: Database,
   filters: { status?: "active" | "suspended" | "banned"; role?: string },
@@ -147,17 +83,6 @@ export async function listUsers(
   ]);
 
   return { data: data as AdminUserRow[], total: Number(countResult[0]?.value ?? 0) };
-}
-
-export async function setEventStatus(
-  db: Database,
-  id: string,
-  newStatus: "approved" | "rejected"
-): Promise<void> {
-  await db
-    .update(events)
-    .set({ status: newStatus, updatedAt: new Date() })
-    .where(eq(events.id, id));
 }
 
 export async function setUserStatus(

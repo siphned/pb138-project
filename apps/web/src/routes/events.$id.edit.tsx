@@ -7,21 +7,29 @@ import { LoadingState } from "@/components/primitives/loading-state";
 import { PageHeader } from "@/components/primitives/page-header";
 import { useGetEventsById } from "@/generated/hooks/useGetEventsById";
 import { usePatchEventsById } from "@/generated/hooks/usePatchEventsById";
+import { parseApiError } from "@/lib/api-errors";
 
 export const Route = createFileRoute("/events/$id/edit")({
   component: EventEditPage,
 });
 
-function toLocalInput(value: unknown): string {
+function toIsoOrEmpty(value: unknown): string {
   if (!value) return "";
   const d = new Date(value as string | number);
-  if (Number.isNaN(d.getTime())) return "";
-  const pad = (n: number) => n.toString().padStart(2, "0");
-  return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}T${pad(d.getHours())}:${pad(d.getMinutes())}`;
+  return Number.isNaN(d.getTime()) ? "" : d.toISOString();
 }
 
-function toIsoString(local: string): string {
-  return new Date(local).toISOString();
+function friendlyUpdateError(code?: string, fallback?: string): string {
+  switch (code) {
+    case "INVALID_DATES":
+      return "Start must be in the future and end must be after start.";
+    case "EVENT_STATUS_CONFLICT":
+      return "This event has already started and can't be edited.";
+    case "CAPACITY_TOO_LOW":
+      return "Capacity can't be lower than the current number of registrations.";
+    default:
+      return fallback ?? "Couldn't save the event. Please try again.";
+  }
 }
 
 function EventEditPage() {
@@ -56,9 +64,9 @@ function EventEditPage() {
         data: {
           capacity: values.capacity,
           description: values.description?.trim() || null,
-          endTime: toIsoString(values.endTime),
+          endTime: values.endTime,
           name: values.name,
-          startTime: toIsoString(values.startTime),
+          startTime: values.startTime,
         },
         id,
       },
@@ -67,6 +75,9 @@ function EventEditPage() {
       }
     );
   };
+
+  const apiError = parseApiError(mutation.error);
+  const serverError = apiError ? friendlyUpdateError(apiError.code, apiError.message) : null;
 
   return (
     <div className="container mx-auto space-y-8 px-6 py-8 lg:px-12">
@@ -89,12 +100,13 @@ function EventEditPage() {
           defaultValues={{
             capacity: typeof event.capacity === "number" ? event.capacity : 30,
             description: event.description ?? "",
-            endTime: toLocalInput(event.endTime),
+            endTime: toIsoOrEmpty(event.endTime),
             name: event.name ?? "",
-            startTime: toLocalInput(event.startTime),
+            startTime: toIsoOrEmpty(event.startTime),
           }}
           isPending={mutation.isPending}
           onSubmit={handleSubmit}
+          serverError={serverError}
         />
       </div>
     </div>

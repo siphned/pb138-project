@@ -84,12 +84,16 @@ describe("getStats — winemaker", () => {
     );
   });
 
-  it("throws NotFoundError when winemaker profile does not exist", async () => {
+  it("returns zeroed stats when caller has winemaker role but no profile yet", async () => {
     vi.mocked(winemakersRepo.findByUserId).mockResolvedValue(undefined);
 
-    await expect(statsService.getStats(userId, "winemaker", ["winemaker"])).rejects.toThrow(
-      "Winemaker profile not found"
-    );
+    const result = await statsService.getStats(userId, "winemaker", ["winemaker"]);
+    expect(result).toMatchObject({
+      avgReviewScore: null,
+      role: "winemaker",
+      totalStock: 0,
+      wineCount: 0,
+    });
   });
 
   it("returns winemaker stats when caller has winemaker role", async () => {

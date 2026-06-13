@@ -215,7 +215,7 @@ describe("Sidebar", () => {
 
     it("renders correct links for customer role", () => {
       render(<Sidebar activeRole={Role.customer} />);
-      expect(screen.getByText(/Order History/i)).toBeInTheDocument();
+      expect(screen.getByText(/My Orders/i)).toBeInTheDocument();
     });
 
     it("renders correct links for winemaker role", () => {

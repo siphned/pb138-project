@@ -43,11 +43,26 @@ describe("shopsRepository", () => {
   });
 
   describe("findAllByOwnerUserId", () => {
-    it("delegates to db.query.findMany", async () => {
-      const mockShops = [{ id: "s1" }];
+    it("returns shops with their non-deleted address", async () => {
+      const mockShops = [
+        { id: "s1", address: { id: "a1", deletedAt: null } },
+        { id: "s2", address: { id: "a2", deletedAt: null } },
+      ];
       vi.mocked(db.query.shops.findMany).mockResolvedValue(mockShops as any);
       const result = await shopsRepository.findAllByOwnerUserId(db, "u1");
-      expect(result).toBe(mockShops);
+      expect(result).toHaveLength(2);
+      expect(result[0]?.id).toBe("s1");
+    });
+
+    it("filters out shops whose address has been soft-deleted", async () => {
+      const mockShops = [
+        { id: "s1", address: { id: "a1", deletedAt: null } },
+        { id: "s2", address: { id: "a2", deletedAt: new Date() } },
+      ];
+      vi.mocked(db.query.shops.findMany).mockResolvedValue(mockShops as any);
+      const result = await shopsRepository.findAllByOwnerUserId(db, "u1");
+      expect(result).toHaveLength(1);
+      expect(result[0]?.id).toBe("s1");
     });
   });
 

@@ -1,6 +1,7 @@
 import { useMemo } from "react";
 import { type Resolver, useForm } from "react-hook-form";
 import { z } from "zod";
+import { DateTimePicker } from "@/components/primitives/date-time-picker";
 import { Button } from "@/components/ui/button";
 import {
   Form,
@@ -14,13 +15,34 @@ import {
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 
-const eventEditFormSchema = z.object({
-  capacity: z.coerce.number().int().min(1, { message: "Capacity must be at least 1" }),
-  description: z.string().optional().default(""),
-  endTime: z.string().refine((v) => v.trim().length > 0, { message: "End time is required" }),
-  name: z.string().refine((v) => v.trim().length > 0, { message: "Name is required" }),
-  startTime: z.string().refine((v) => v.trim().length > 0, { message: "Start time is required" }),
-});
+const eventEditFormSchema = z
+  .object({
+    name: z.string().refine((v) => v.trim().length > 0, { message: "Name is required" }),
+    description: z.string().optional().default(""),
+    capacity: z.coerce.number().int().min(1, { message: "Capacity must be at least 1" }),
+    startTime: z.string().refine((v) => v.trim().length > 0, { message: "Start time is required" }),
+    endTime: z.string().refine((v) => v.trim().length > 0, { message: "End time is required" }),
+  })
+  .superRefine((data, ctx) => {
+    if (!data.startTime || !data.endTime) return;
+    const start = new Date(data.startTime);
+    const end = new Date(data.endTime);
+    if (Number.isNaN(start.getTime()) || Number.isNaN(end.getTime())) return;
+    if (start <= new Date()) {
+      ctx.addIssue({
+        code: "custom",
+        message: "Start time must be in the future",
+        path: ["startTime"],
+      });
+    }
+    if (end <= start) {
+      ctx.addIssue({
+        code: "custom",
+        message: "End time must be after start time",
+        path: ["endTime"],
+      });
+    }
+  });
 
 export type EventEditFormValues = z.infer<typeof eventEditFormSchema>;
 
@@ -28,9 +50,15 @@ interface EventEditFormProps {
   defaultValues: Partial<EventEditFormValues>;
   onSubmit: (values: EventEditFormValues) => void;
   isPending: boolean;
+  serverError?: string | null;
 }
 
-export function EventEditForm({ defaultValues, onSubmit, isPending }: EventEditFormProps) {
+export function EventEditForm({
+  defaultValues,
+  onSubmit,
+  isPending,
+  serverError,
+}: EventEditFormProps) {
   const resolver = useMemo<Resolver<EventEditFormValues>>(
     () => async (values) => {
       const result = eventEditFormSchema.safeParse(values);
@@ -55,8 +83,8 @@ export function EventEditForm({ defaultValues, onSubmit, isPending }: EventEditF
       ...defaultValues,
     },
     mode: "onSubmit",
-    resolver,
     reValidateMode: "onChange",
+    resolver,
   });
 
   return (
@@ -98,7 +126,12 @@ export function EventEditForm({ defaultValues, onSubmit, isPending }: EventEditF
               <FormItem>
                 <FormLabel>Starts</FormLabel>
                 <FormControl>
-                  <Input type="datetime-local" {...field} />
+                  <DateTimePicker
+                    minDate={new Date()}
+                    onChange={field.onChange}
+                    placeholder="Pick start date and time"
+                    value={field.value ?? ""}
+                  />
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -111,7 +144,12 @@ export function EventEditForm({ defaultValues, onSubmit, isPending }: EventEditF
               <FormItem>
                 <FormLabel>Ends</FormLabel>
                 <FormControl>
-                  <Input type="datetime-local" {...field} />
+                  <DateTimePicker
+                    minDate={new Date()}
+                    onChange={field.onChange}
+                    placeholder="Pick end date and time"
+                    value={field.value ?? ""}
+                  />
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -133,6 +171,12 @@ export function EventEditForm({ defaultValues, onSubmit, isPending }: EventEditF
             </FormItem>
           )}
         />
+
+        {serverError && (
+          <p className="text-sm text-destructive" role="alert">
+            {serverError}
+          </p>
+        )}
 
         <Button className="w-full" disabled={isPending} type="submit">
           {isPending ? "Saving…" : "Save changes"}

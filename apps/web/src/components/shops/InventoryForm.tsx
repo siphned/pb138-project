@@ -2,6 +2,7 @@ import { Add01Icon, Delete01Icon } from "@hugeicons/core-free-icons";
 import { HugeiconsIcon } from "@hugeicons/react";
 import { useState } from "react";
 import { useFieldArray, useForm } from "react-hook-form";
+import { ImageUploadField, SubmitButton, TextareaField, TextField } from "@/components/forms";
 import { Button } from "@/components/ui/button";
 import {
   Form,
@@ -23,6 +24,8 @@ import {
 import { useGetWines } from "@/generated/hooks/useGetWines";
 import { usePostShopsByIdProducts } from "@/generated/hooks/usePostShopsByIdProducts";
 import type { PostShopsByIdProductsMutationRequest } from "@/generated/types/PostShopsByIdProducts";
+import { parseApiError } from "@/lib/api-errors";
+import { axiosInstance } from "@/lib/axios";
 
 interface InventoryFormProps {
   shopId: string;
@@ -39,11 +42,37 @@ interface FormData {
   wines?: Array<{ wineId: string; quantity: number }>;
 }
 
+async function uploadProductImage(productId: string, file: File): Promise<void> {
+  // Generated client posts { file: Blob } as JSON; multipart upload requires FormData,
+  // same workaround used in shops.$id.images.tsx.
+  const fd = new FormData();
+  fd.append("file", file);
+  await axiosInstance.post(`/products/${productId}/images`, fd, {
+    headers: { "Content-Type": "multipart/form-data" },
+  });
+}
+
+function friendlyProductError(code?: string, fallback?: string): string {
+  switch (code) {
+    case "DUPLICATE_WINE":
+      return "Each wine in a bundle must be unique.";
+    case "WINE_NOT_FOUND":
+      return "One of the selected wines no longer exists.";
+    case "INSUFFICIENT_STOCK":
+      return "Not enough winemaker stock to allocate this product.";
+    default:
+      return fallback ?? "Couldn't create the product. Please check the fields and try again.";
+  }
+}
+
 export function InventoryForm({ shopId, onSuccess }: InventoryFormProps) {
   const mutation = usePostShopsByIdProducts();
   const { data: winesData } = useGetWines();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isBundle, setIsBundle] = useState(false);
+  const [imageFiles, setImageFiles] = useState<File[]>([]);
+  const [imageError, setImageError] = useState<string | null>(null);
+  const [submitError, setSubmitError] = useState<string | null>(null);
 
   const form = useForm<FormData>({
     defaultValues: {
@@ -64,32 +93,71 @@ export function InventoryForm({ shopId, onSuccess }: InventoryFormProps) {
 
   const wines = Array.isArray(winesData) ? winesData : [];
 
+  const validateProduct = (data: FormData): string | null => {
+    if (isBundle) {
+      const wineRows = (data.wines ?? []).filter((w) => w.wineId);
+      if (wineRows.length < 2) return "A bundle must contain at least 2 wines.";
+      const wineIds = wineRows.map((w) => w.wineId);
+      if (new Set(wineIds).size !== wineIds.length) {
+        return "Each wine in a bundle must be unique.";
+      }
+      return null;
+    }
+    if (!data.wineId) return "Please select a wine.";
+    return null;
+  };
+
+  const buildSubmitData = (data: FormData) => {
+    // Trim description to undefined when empty — BE requires minLength 1 when present.
+    const description = data.description?.trim() ? data.description.trim() : undefined;
+    const base = {
+      description,
+      name: data.name,
+      price: data.price,
+      quantity: Number(data.quantity),
+    };
+    if (isBundle) {
+      return {
+        ...base,
+        wines: (data.wines ?? []).map((w) => ({
+          quantity: Number(w.quantity),
+          wineId: w.wineId,
+        })),
+      };
+    }
+    return { ...base, wineId: data.wineId };
+  };
+
+  const uploadImages = async (productId: string) => {
+    for (const file of imageFiles) {
+      await uploadProductImage(productId, file);
+    }
+  };
+
   const onSubmit = async (data: FormData) => {
+    const validationError = validateProduct(data);
+    if (validationError) {
+      setSubmitError(validationError);
+      return;
+    }
+
+    setSubmitError(null);
     setIsSubmitting(true);
     try {
-      const submitData = isBundle
-        ? {
-            description: data.description,
-            name: data.name,
-            price: data.price,
-            quantity: data.quantity,
-            wines: data.wines || [],
-          }
-        : {
-            description: data.description,
-            name: data.name,
-            price: data.price,
-            quantity: data.quantity,
-            wineId: data.wineId,
-          };
-
-      await mutation.mutateAsync({
-        data: submitData as PostShopsByIdProductsMutationRequest,
+      const created = await mutation.mutateAsync({
+        data: buildSubmitData(data) as PostShopsByIdProductsMutationRequest,
         id: shopId,
       });
+
+      const productId = (created as { id?: string } | undefined)?.id;
+      if (productId && imageFiles.length > 0) {
+        await uploadImages(productId);
+      }
+
       onSuccess();
-    } catch (_error) {
-      // Error handling is delegated to the mutation hook's error state
+    } catch (err) {
+      const apiError = parseApiError(err);
+      setSubmitError(friendlyProductError(apiError?.code, apiError?.message));
     } finally {
       setIsSubmitting(false);
     }
@@ -130,68 +198,40 @@ export function InventoryForm({ shopId, onSuccess }: InventoryFormProps) {
           )}
         />
 
-        <FormField
+        <TextField
           control={form.control}
+          description="The name displayed to customers"
+          label="Product Name"
           name="name"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Product Name</FormLabel>
-              <FormControl>
-                <Input placeholder="e.g., Premium Wine Selection" {...field} />
-              </FormControl>
-              <FormDescription>The name displayed to customers</FormDescription>
-              <FormMessage />
-            </FormItem>
-          )}
+          placeholder="e.g., Premium Wine Selection"
         />
 
-        <FormField
+        <TextareaField
           control={form.control}
+          description="Additional details about the product"
+          label="Description (Optional)"
           name="description"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Description (Optional)</FormLabel>
-              <FormControl>
-                <Input
-                  placeholder="e.g., A curated selection of fine wines"
-                  {...field}
-                  value={field.value || ""}
-                />
-              </FormControl>
-              <FormDescription>Additional details about the product</FormDescription>
-              <FormMessage />
-            </FormItem>
-          )}
+          placeholder="e.g., A curated selection of fine wines"
+          rows={3}
         />
 
-        <FormField
+        <TextField
           control={form.control}
+          description="Price per unit"
+          label="Price (EUR)"
           name="price"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Price (EUR)</FormLabel>
-              <FormControl>
-                <Input placeholder="29.99" step="0.01" type="number" {...field} />
-              </FormControl>
-              <FormDescription>Price per unit</FormDescription>
-              <FormMessage />
-            </FormItem>
-          )}
+          placeholder="29.99"
+          step="0.01"
+          type="number"
         />
 
-        <FormField
+        <TextField
           control={form.control}
+          description="Number of units in stock"
+          label="Quantity"
+          min="0"
           name="quantity"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Quantity</FormLabel>
-              <FormControl>
-                <Input min="0" type="number" {...field} />
-              </FormControl>
-              <FormDescription>Number of units in stock</FormDescription>
-              <FormMessage />
-            </FormItem>
-          )}
+          type="number"
         />
 
         {!isBundle ? (
@@ -295,9 +335,25 @@ export function InventoryForm({ shopId, onSuccess }: InventoryFormProps) {
           </div>
         )}
 
-        <Button className="w-full" disabled={isSubmitting || mutation.isPending} type="submit">
-          {isSubmitting || mutation.isPending ? "Creating..." : "Create Product"}
-        </Button>
+        <ImageUploadField
+          description="PNG, JPEG, WebP, or AVIF up to 10 MB. Uploaded after the product is created."
+          onErrorChange={setImageError}
+          onFilesChange={setImageFiles}
+        />
+
+        {submitError && (
+          <p className="text-sm text-destructive" role="alert">
+            {submitError}
+          </p>
+        )}
+
+        <SubmitButton
+          disabled={!!imageError}
+          isPending={isSubmitting || mutation.isPending}
+          pendingLabel="Creating..."
+        >
+          Create Product
+        </SubmitButton>
       </form>
     </Form>
   );

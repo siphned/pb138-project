@@ -48,7 +48,7 @@ export function WinemakerStatsSection() {
       <DataGrid variant="gallery">
         <StatTile label="Wines in catalog" value={toNumber(winemaker.wineCount)} />
         <StatTile label="Total stock" value={toNumber(winemaker.totalStock)} />
-        <StatTile label="Approved events" value={eventsApproved} />
+        <StatTile label="My events" value={eventsApproved} />
         <StatTile label="Approved supply agreements" value={supplyApproved} />
         <StatTile
           label="Average review score"

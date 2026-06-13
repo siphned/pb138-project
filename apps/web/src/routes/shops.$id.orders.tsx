@@ -1,57 +1,147 @@
 import { ArrowLeft02Icon } from "@hugeicons/core-free-icons";
 import { HugeiconsIcon } from "@hugeicons/react";
+import { useQueryClient } from "@tanstack/react-query";
 import { createFileRoute, Link } from "@tanstack/react-router";
+import { EmptyState } from "@/components/primitives/empty-state";
 import { ErrorState } from "@/components/primitives/error-state";
 import { LoadingState } from "@/components/primitives/loading-state";
 import { PageHeader } from "@/components/primitives/page-header";
+import { Section } from "@/components/primitives/section";
 import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table";
-import { useGetOrders } from "@/generated/hooks/useGetOrders";
-import { formatEur } from "@/lib/utils";
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { getOrdersQueryKey, useGetOrders } from "@/generated/hooks/useGetOrders";
+import { usePatchOrdersByIdStatus } from "@/generated/hooks/usePatchOrdersByIdStatus";
 
 export const Route = createFileRoute("/shops/$id/orders")({
   component: ShopOrdersPage,
 });
 
-const statusVariant = (status: string): "default" | "secondary" | "destructive" | "outline" => {
-  switch (status) {
-    case "delivered":
-      return "default";
-    case "cancelled":
-      return "destructive";
-    case "pending":
-      return "outline";
-    default:
-      return "secondary";
-  }
-};
+interface OrderRow {
+  id: string;
+  status?: string;
+  totalAmount?: string | number;
+  createdAt?: string | number;
+}
+
+const STATUS_OPTIONS = ["pending", "confirmed", "shipped", "delivered", "cancelled"] as const;
+type Status = (typeof STATUS_OPTIONS)[number];
+
+function statusBadgeVariant(status?: string): "secondary" | "outline" | "destructive" {
+  if (status === "cancelled") return "destructive";
+  if (status === "delivered") return "secondary";
+  return "outline";
+}
+
+function formatDate(value?: string | number) {
+  if (!value) return null;
+  return new Date(value).toLocaleDateString("en-US", {
+    day: "numeric",
+    month: "short",
+    year: "numeric",
+  });
+}
 
 function ShopOrdersPage() {
   const { id } = Route.useParams();
-  const { data: orders, isLoading, isError, refetch } = useGetOrders({ shopId: id });
+  const queryClient = useQueryClient();
+  const query = useGetOrders({ shopId: id });
+  const updateStatus = usePatchOrdersByIdStatus();
 
-  if (isLoading) {
-    return (
-      <div className="container mx-auto px-6 py-8 lg:px-12">
-        <LoadingState variant="list" />
-      </div>
-    );
-  }
+  const raw = query.data;
+  const list = (
+    Array.isArray(raw) ? raw : ((raw as { data?: OrderRow[] } | undefined)?.data ?? [])
+  ) as OrderRow[];
 
-  if (isError) {
-    return (
-      <div className="container mx-auto px-6 py-8 lg:px-12">
-        <ErrorState onRetry={() => refetch()} />
-      </div>
+  const handleStatusChange = (orderId: string, status: Status) => {
+    updateStatus.mutate(
+      { data: { status }, id: orderId },
+      {
+        onSuccess: () => {
+          queryClient.invalidateQueries({ queryKey: getOrdersQueryKey({ shopId: id }) });
+        },
+      }
     );
-  }
+  };
+
+  const renderOrders = () => {
+    if (query.isLoading) return <LoadingState variant="list" />;
+    if (query.isError) {
+      return (
+        <ErrorState
+          message="Could not load orders for this shop."
+          onRetry={() => query.refetch()}
+          title="Failed to load"
+        />
+      );
+    }
+    if (list.length === 0) {
+      return (
+        <EmptyState
+          description="Customer orders for this shop will appear here as they come in."
+          title="No orders yet"
+        />
+      );
+    }
+    return (
+      <ul className="divide-y divide-border rounded-md border border-border">
+        {list.map((o) => {
+          const pending = updateStatus.isPending && updateStatus.variables?.id === o.id;
+          const date = formatDate(o.createdAt);
+          return (
+            <li className="flex items-center justify-between gap-4 p-4" key={o.id}>
+              <div className="min-w-0 flex-1">
+                <Link
+                  className="font-medium text-foreground hover:text-primary"
+                  params={{ id: o.id }}
+                  to="/orders/$id"
+                >
+                  Order {o.id.slice(0, 8)}
+                </Link>
+                <p className="text-xs text-muted-foreground">
+                  {[date, o.totalAmount !== undefined ? `€${o.totalAmount}` : null]
+                    .filter(Boolean)
+                    .join(" · ")}
+                </p>
+              </div>
+              <div className="flex items-center gap-3">
+                <Badge variant={statusBadgeVariant(o.status)}>{o.status ?? "pending"}</Badge>
+                <Select
+                  disabled={pending}
+                  onValueChange={(v) => v && handleStatusChange(o.id, v as Status)}
+                  value={(o.status as Status) ?? "pending"}
+                >
+                  <SelectTrigger className="w-[150px]" size="sm">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {STATUS_OPTIONS.map((s) => (
+                      <SelectItem key={s} value={s}>
+                        {s.charAt(0).toUpperCase() + s.slice(1)}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+                <Button
+                  render={<Link params={{ id: o.id }} to="/orders/$id" />}
+                  size="sm"
+                  variant="outline"
+                >
+                  View
+                </Button>
+              </div>
+            </li>
+          );
+        })}
+      </ul>
+    );
+  };
 
   return (
     <div className="container mx-auto space-y-8 px-6 py-8 lg:px-12">
@@ -64,38 +154,12 @@ function ShopOrdersPage() {
         Back to shop
       </Link>
 
-      <PageHeader description="Orders placed in your shop." title="Shop orders" />
+      <PageHeader
+        description="Customer orders placed at this shop. Advance the status as you fulfil each one."
+        title="Orders"
+      />
 
-      {!orders || orders.length === 0 ? (
-        <p className="text-muted-foreground">No orders yet.</p>
-      ) : (
-        <div className="rounded-md border border-border">
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead>Order ID</TableHead>
-                <TableHead>Date</TableHead>
-                <TableHead>Total</TableHead>
-                <TableHead>Delivery</TableHead>
-                <TableHead>Status</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {orders.map((order) => (
-                <TableRow key={order.id}>
-                  <TableCell className="font-mono text-xs">{order.id.slice(0, 8)}…</TableCell>
-                  <TableCell>{new Date(order.createdAt).toLocaleDateString("en-IE")}</TableCell>
-                  <TableCell>{formatEur(order.totalPrice)}</TableCell>
-                  <TableCell className="capitalize">{order.deliveryType}</TableCell>
-                  <TableCell>
-                    <Badge variant={statusVariant(order.status)}>{order.status}</Badge>
-                  </TableCell>
-                </TableRow>
-              ))}
-            </TableBody>
-          </Table>
-        </div>
-      )}
+      <Section heading={`Orders (${list.length})`}>{renderOrders()}</Section>
     </div>
   );
 }

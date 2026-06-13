@@ -1,4 +1,6 @@
-import { useState } from "react";
+import { useMemo } from "react";
+import { type Resolver, useForm } from "react-hook-form";
+import z from "zod";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -13,12 +15,37 @@ import {
 import { useUser } from "@/context/UserContext";
 import { usePostRoleRequests } from "@/generated/hooks/usePostRoleRequests";
 
-type RequestType = "winemaker" | "shop_owner";
+const roleRequestSchema = z.object({
+  type: z.enum(["winemaker", "shop_owner"]),
+  businessName: z
+    .string()
+    .refine((v) => v.trim().length > 0, { message: "Business name is required" }),
+  details: z.string().optional(),
+});
 
-const TYPE_OPTIONS: { value: RequestType; label: string }[] = [
-  { label: "Winemaker", value: "winemaker" },
-  { label: "Shop owner", value: "shop_owner" },
+type RoleRequestValues = z.infer<typeof roleRequestSchema>;
+
+const TYPE_OPTIONS: { value: RoleRequestValues["type"]; label: string }[] = [
+  { value: "winemaker", label: "Winemaker" },
+  { value: "shop_owner", label: "Shop owner" },
 ];
+
+function buildResolver(): Resolver<RoleRequestValues> {
+  return (values) => {
+    const result = roleRequestSchema.safeParse(values);
+    if (result.success) {
+      return { errors: {}, values: result.data };
+    }
+    const fieldErrors: Record<string, { type: string; message: string }> = {};
+    for (const issue of result.error.issues) {
+      const key = issue.path.map(String).join(".");
+      if (key && !fieldErrors[key]) {
+        fieldErrors[key] = { message: issue.message, type: issue.code };
+      }
+    }
+    return { errors: fieldErrors as never, values: {} as RoleRequestValues };
+  };
+}
 
 function is409Error(error: unknown): boolean {
   if (!error || typeof error !== "object") return false;
@@ -28,28 +55,38 @@ function is409Error(error: unknown): boolean {
 
 export function DashboardRoleSection() {
   const { user } = useUser();
-  const [type, setType] = useState<RequestType>("winemaker");
-  const [businessName, setBusinessName] = useState("");
-  const [details, setDetails] = useState("");
+  const resolver = useMemo(() => buildResolver(), []);
   const mutation = usePostRoleRequests();
+
+  const {
+    register,
+    handleSubmit,
+    setValue,
+    watch,
+    formState: { errors },
+  } = useForm<RoleRequestValues>({
+    defaultValues: { businessName: "", details: "", type: "winemaker" },
+    mode: "onSubmit",
+    reValidateMode: "onChange",
+    resolver,
+  });
+
+  const type = watch("type");
+  const alreadyPending = is409Error(mutation.error);
 
   if (!user) return null;
 
   const roles = user.roles ?? [];
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!businessName.trim()) return;
+  const onSubmit = (data: RoleRequestValues) => {
     mutation.mutate({
       data: {
-        businessName: businessName.trim(),
-        type,
-        ...(details.trim() ? { details: details.trim() } : {}),
+        businessName: data.businessName.trim(),
+        type: data.type,
+        ...(data.details?.trim() ? { details: data.details.trim() } : {}),
       },
     });
   };
-
-  const alreadyPending = is409Error(mutation.error);
 
   return (
     <div className="space-y-6" data-slot="dashboard-role-section">
@@ -66,10 +103,13 @@ export function DashboardRoleSection() {
           Request submitted, awaiting admin approval.
         </p>
       ) : (
-        <form className="space-y-4" onSubmit={handleSubmit}>
+        <form className="space-y-4" noValidate onSubmit={handleSubmit(onSubmit)}>
           <div className="space-y-2">
             <Label htmlFor="request-type">Request a new role</Label>
-            <Select onValueChange={(v) => setType(v as RequestType)} value={type}>
+            <Select
+              onValueChange={(v) => setValue("type", v as RoleRequestValues["type"])}
+              value={type}
+            >
               <SelectTrigger id="request-type">
                 <SelectValue />
               </SelectTrigger>
@@ -86,20 +126,22 @@ export function DashboardRoleSection() {
           <div className="space-y-2">
             <Label htmlFor="business-name">Business name</Label>
             <Input
+              aria-invalid={!!errors.businessName || undefined}
               id="business-name"
-              onChange={(e) => setBusinessName(e.target.value)}
               placeholder="e.g. Hron Vineyards"
-              value={businessName}
+              {...register("businessName")}
             />
+            {errors.businessName && (
+              <p className="mt-1 text-xs text-destructive">{errors.businessName.message}</p>
+            )}
           </div>
 
           <div className="space-y-2">
             <Label htmlFor="details">Notes (optional)</Label>
             <Input
               id="details"
-              onChange={(e) => setDetails(e.target.value)}
               placeholder="Anything else the admin team should know"
-              value={details}
+              {...register("details")}
             />
           </div>
 
@@ -109,7 +151,7 @@ export function DashboardRoleSection() {
             </p>
           )}
 
-          <Button disabled={mutation.isPending || !businessName.trim()} type="submit">
+          <Button disabled={mutation.isPending} type="submit">
             {mutation.isPending ? "Submitting..." : "Request access"}
           </Button>
         </form>

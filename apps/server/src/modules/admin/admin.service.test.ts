@@ -1,7 +1,5 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { db } from "../../db";
-import { emailService } from "../email/email.service";
-import * as winemakersRepo from "../winemakers/winemakers.repository";
 import * as adminRepo from "./admin.repository";
 import { adminService } from "./admin.service";
 
@@ -9,30 +7,12 @@ vi.mock("./admin.repository", async (importOriginal) => {
   const actual = await importOriginal<typeof import("./admin.repository")>();
   return {
     ...actual,
-    findEventById: vi.fn(),
-    findEventWithDetailsById: vi.fn(),
     findReviewById: vi.fn(),
     findUserById: vi.fn(),
     listAllReviews: vi.fn(),
-    listEvents: vi.fn(),
     listUsers: vi.fn(),
-    setEventStatus: vi.fn(),
     setUserStatus: vi.fn(),
     softDeleteReview: vi.fn(),
-  };
-});
-
-vi.mock("../email/email.service", () => ({
-  emailService: {
-    sendEventApproval: vi.fn().mockResolvedValue(undefined),
-  },
-}));
-
-vi.mock("../winemakers/winemakers.repository", async (importOriginal) => {
-  const actual = await importOriginal<typeof import("../winemakers/winemakers.repository")>();
-  return {
-    ...actual,
-    findById: vi.fn(),
   };
 });
 
@@ -42,7 +22,6 @@ describe("adminService", () => {
   });
 
   const userId = "u1";
-  const eventId = "e1";
   const reviewId = "r1";
 
   describe("listUsers", () => {
@@ -71,29 +50,6 @@ describe("adminService", () => {
     it("throws NOT_FOUND if user not found", async () => {
       vi.mocked(adminRepo.findUserById).mockResolvedValue(undefined);
       await expect(adminService.setUserStatus(userId, "active")).rejects.toThrow("User not found");
-    });
-  });
-
-  describe("approveEvent", () => {
-    it("approves pending event and sends email", async () => {
-      const mockEvent = {
-        endTime: new Date(),
-        id: eventId,
-        name: "Wine Fest",
-        startTime: new Date(),
-        status: "pending",
-        winemakerId: "wm1",
-      };
-      const mockWinemaker = { email: "wine@test.com", id: "wm1", name: "Winery" };
-
-      vi.mocked(adminRepo.findEventById).mockResolvedValue(mockEvent as never);
-      vi.mocked(adminRepo.findEventWithDetailsById).mockResolvedValue(mockEvent as never);
-      vi.mocked(winemakersRepo.findById).mockResolvedValue(mockWinemaker as never);
-
-      await adminService.approveEvent(eventId);
-
-      expect(adminRepo.setEventStatus).toHaveBeenCalledWith(db, eventId, "approved");
-      expect(emailService.sendEventApproval).toHaveBeenCalled();
     });
   });
 

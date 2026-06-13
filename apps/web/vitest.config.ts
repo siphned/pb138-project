@@ -10,7 +10,10 @@ export default defineConfig({
   },
   test: {
     coverage: {
-      enabled: true,
+      // Off by default: the v8 provider needs node:inspector APIs Bun's runtime
+      // doesn't implement, so `vitest run` under Bun crashes if coverage starts.
+      // The `test:coverage` script re-enables it via the --coverage flag.
+      enabled: false,
       exclude: ["src/generated/**", "src/**/__tests__/e2e/**"],
       provider: "v8",
       reporter: ["text", "json", "html", "lcov"],

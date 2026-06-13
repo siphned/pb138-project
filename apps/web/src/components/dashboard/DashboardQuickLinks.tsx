@@ -24,7 +24,6 @@ const LINKS_BY_ROLE: Record<string, QuickLink[]> = {
   Admin: [
     { icon: UserMultipleIcon, label: "User management", to: "/admin/users" },
     { icon: ShieldUserIcon, label: "Content moderation", to: "/admin/moderation" },
-    { icon: Calendar03Icon, label: "Event approvals", to: "/admin/events" },
     { icon: ShieldUserIcon, label: "Role requests", to: "/admin/role-requests" },
   ],
   Customer: [

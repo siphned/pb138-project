@@ -10,49 +10,6 @@ export const adminRoutes = new Elysia({ prefix: "/admin" })
   .use(authPlugin)
 
   .get(
-    "/events",
-    async ({ query }) => {
-      const { page, status = "pending" } = query;
-      return adminService.listEvents({ status }, parsePagination({ page }));
-    },
-    {
-      detail: {
-        description: "List events by status for moderation.",
-        security: [{ bearerAuth: [] }],
-        summary: "List events (admin)",
-        tags: ["admin"],
-      },
-      query: z.object({
-        page: z.coerce.number().optional(),
-        status: z.enum(["pending", "approved", "rejected"]).optional(),
-      }),
-      requireRoles: ["admin"],
-    }
-  )
-
-  .post("/events/:id/approve", ({ params }) => adminService.approveEvent(params.id), {
-    detail: {
-      description: "Approve a pending event.",
-      security: [{ bearerAuth: [] }],
-      summary: "Approve event",
-      tags: ["admin"],
-    },
-    params: idParams,
-    requireRoles: ["admin"],
-  })
-
-  .post("/events/:id/reject", ({ params }) => adminService.rejectEvent(params.id), {
-    detail: {
-      description: "Reject a pending event.",
-      security: [{ bearerAuth: [] }],
-      summary: "Reject event",
-      tags: ["admin"],
-    },
-    params: idParams,
-    requireRoles: ["admin"],
-  })
-
-  .get(
     "/users",
     async ({ query }) => {
       const { page, status, role } = query;
