@@ -74,7 +74,11 @@
       "Bash(cat src/components/catalog/WineImage.tsx)",
       "Bash(git log *)",
       "Bash(rm -f test-run.log web-only.log apps/web/web-fails.txt)",
-      "Bash(rm -f \"C:/Users/adamk/AppData/Local/Temp/vitest-web.json\")"
+      "Bash(rm -f \"C:/Users/adamk/AppData/Local/Temp/vitest-web.json\")",
+      "Bash(bunx --bun vitest run src/components/stats --coverage.enabled=false)",
+      "Bash(bunx --bun vitest run src/components/stats/StatTile.test.tsx --coverage.enabled=false --pool=forks)",
+      "Bash(echo \"tsc exit: $?\")",
+      "Bash(bunx biome *)"
     ]
   }
 }

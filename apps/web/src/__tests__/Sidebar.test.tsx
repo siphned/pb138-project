@@ -228,15 +228,15 @@ describe("Sidebar", () => {
       expect(screen.getByText(/My Events/i)).toBeInTheDocument();
     });
 
-    it("renders My Shops and My Products for the shop owner role", () => {
+    it("renders My Shops and My Bundles for the shop owner role", () => {
       render(<Sidebar activeRole={Role.shopOwner} />);
       expect(screen.getByText(/My Shops/i)).toBeInTheDocument();
-      expect(screen.getByText(/My Products/i)).toBeInTheDocument();
+      expect(screen.getByText(/My Bundles/i)).toBeInTheDocument();
     });
 
-    it("hides discovery and cart outside the customer view", () => {
+    it("shows discovery for all roles but hides cart outside the customer view", () => {
       render(<Sidebar activeRole={Role.winemaker} />);
-      expect(screen.queryByText(/Explore Wines/i)).not.toBeInTheDocument();
+      expect(screen.getByText(/Explore Wines/i)).toBeInTheDocument();
       expect(screen.queryByText(/Shopping cart/i)).not.toBeInTheDocument();
     });
 

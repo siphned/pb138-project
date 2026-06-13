@@ -33,35 +33,30 @@ export function Header() {
       </Link>
 
       <div className="flex items-center gap-4">
-        {customerView && (
-          <>
-            <HeaderSearch />
+        <HeaderSearch />
 
-            <Link
-              aria-label={cartCount > 0 ? `Shopping cart (${cartCount} items)` : "Shopping cart"}
-              className={cn(
-                buttonVariants({ size: "icon", variant: "ghost" }),
-                "relative hidden sm:flex"
-              )}
-              to="/cart"
-            >
-              <HugeiconsIcon className="h-5 w-5" icon={ShoppingCart02Icon} strokeWidth={2} />
-              {cartCount > 0 && (
-                <span className="absolute -right-1 -top-1 flex h-5 min-w-5 items-center justify-center rounded-full bg-primary px-1 text-xs font-semibold text-primary-foreground">
-                  {cartCount > 99 ? "99+" : cartCount}
-                </span>
-              )}
-            </Link>
-          </>
-        )}
+          <Link
+            aria-label={cartCount > 0 ? `Shopping cart (${cartCount} items)` : "Shopping cart"}
+            className={cn(
+              buttonVariants({ size: "icon", variant: "ghost" }),
+              "relative hidden sm:flex"
+            )}
+            to="/cart"
+          >
+            <HugeiconsIcon className="h-5 w-5" icon={ShoppingCart02Icon} strokeWidth={2} />
+            {cartCount > 0 && (
+              <span className="absolute -right-1 -top-1 flex h-5 min-w-5 items-center justify-center rounded-full bg-primary px-1 text-xs font-semibold text-primary-foreground">
+                {cartCount > 99 ? "99+" : cartCount}
+              </span>
+            )}
+          </Link>
 
         <Show when="signed-out">
-          <Link
-            aria-label="Sign in"
-            className={cn(buttonVariants({ size: "icon", variant: "ghost" }), "rounded-full")}
-            to="/auth/login"
-          >
-            <HugeiconsIcon className="h-5 w-5" icon={User02Icon} />
+          <Link to="/auth/login" className={cn(
+              buttonVariants({ size: "icon", variant: "ghost" }),
+              "relative hidden sm:flex"
+            )}>
+            <HugeiconsIcon className="h-5 w-5" icon={User02Icon} strokeWidth={2} />
           </Link>
         </Show>
 
