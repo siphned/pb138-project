@@ -110,6 +110,44 @@ function UserShopsSection({ userId }: { userId: string }) {
   const query = useGetShops({ ownerUserId: userId });
   const shops = (Array.isArray(query.data) ? query.data : []) as UserShop[];
 
+  const renderShops = () => {
+    if (query.isLoading) {
+      return (
+        <div className="space-y-2">
+          {[0, 1, 2].map((i) => (
+            <Skeleton className="h-14 w-full rounded-md" key={i} />
+          ))}
+        </div>
+      );
+    }
+    if (query.isError) {
+      return <p className="text-sm text-destructive">Could not load this user's shops.</p>;
+    }
+    if (shops.length === 0) {
+      return <p className="text-sm text-muted-foreground">This user doesn't own any shops yet.</p>;
+    }
+    return (
+      <ul className="divide-y divide-border rounded-md border border-border">
+        {shops.map((s) => (
+          <li className="p-4" key={s.id}>
+            <Link
+              className="block transition-colors hover:text-primary"
+              params={{ id: s.id }}
+              to="/shops/$id"
+            >
+              <span className="font-medium text-foreground">{s.name}</span>
+              {s.address && (
+                <p className="text-xs text-muted-foreground">
+                  {[s.address.city, s.address.country].filter(Boolean).join(", ")}
+                </p>
+              )}
+            </Link>
+          </li>
+        ))}
+      </ul>
+    );
+  };
+
   return (
     <Card variant="section">
       <CardHeader>
@@ -118,38 +156,7 @@ function UserShopsSection({ userId }: { userId: string }) {
           Public shops owned by this user. Click a shop to view its catalog.
         </CardDescription>
       </CardHeader>
-      <CardContent>
-        {query.isLoading ? (
-          <div className="space-y-2">
-            {[0, 1, 2].map((i) => (
-              <Skeleton className="h-14 w-full rounded-md" key={i} />
-            ))}
-          </div>
-        ) : query.isError ? (
-          <p className="text-sm text-destructive">Could not load this user's shops.</p>
-        ) : shops.length === 0 ? (
-          <p className="text-sm text-muted-foreground">This user doesn't own any shops yet.</p>
-        ) : (
-          <ul className="divide-y divide-border rounded-md border border-border">
-            {shops.map((s) => (
-              <li className="p-4" key={s.id}>
-                <Link
-                  className="block transition-colors hover:text-primary"
-                  params={{ id: s.id }}
-                  to="/shops/$id"
-                >
-                  <span className="font-medium text-foreground">{s.name}</span>
-                  {s.address && (
-                    <p className="text-xs text-muted-foreground">
-                      {[s.address.city, s.address.country].filter(Boolean).join(", ")}
-                    </p>
-                  )}
-                </Link>
-              </li>
-            ))}
-          </ul>
-        )}
-      </CardContent>
+      <CardContent>{renderShops()}</CardContent>
     </Card>
   );
 }
@@ -189,18 +196,10 @@ function ActionsCard({ user, isUpdating, onOpenDialog }: ActionsCardProps) {
 
         {user.status === "active" ? (
           <div className="grid gap-3 sm:grid-cols-2">
-            <Button
-              disabled={isUpdating}
-              onClick={() => onOpenDialog("suspend")}
-              variant="outline"
-            >
+            <Button disabled={isUpdating} onClick={() => onOpenDialog("suspend")} variant="outline">
               Suspend account
             </Button>
-            <Button
-              disabled={isUpdating}
-              onClick={() => onOpenDialog("ban")}
-              variant="destructive"
-            >
+            <Button disabled={isUpdating} onClick={() => onOpenDialog("ban")} variant="destructive">
               Ban account
             </Button>
           </div>
@@ -354,11 +353,7 @@ function AdminUserDetail() {
 
       {isShopOwner && <UserShopsSection userId={user.id} />}
 
-      <ActionsCard
-        isUpdating={isUpdating}
-        onOpenDialog={setConfirmAction}
-        user={user}
-      />
+      <ActionsCard isUpdating={isUpdating} onOpenDialog={setConfirmAction} user={user} />
 
       <ConfirmationDialog
         action={confirmAction}

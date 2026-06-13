@@ -39,6 +39,31 @@ export function TabPreviewShell({
 }: TabPreviewShellProps) {
   const showViewAllAtBottom = !!viewAllTo && !!hasMore && !isLoading && !isError && !isEmpty;
 
+  const renderBody = () => {
+    if (isLoading) {
+      return (
+        <div className="space-y-3">
+          {[0, 1, 2].map((i) => (
+            <Skeleton className="h-16 w-full rounded-md" key={i} />
+          ))}
+        </div>
+      );
+    }
+    if (isError) {
+      return (
+        <ErrorState
+          message="Could not load this section."
+          onRetry={onRetry}
+          title="Failed to load"
+        />
+      );
+    }
+    if (isEmpty) {
+      return <EmptyState description={emptyDescription} title={emptyTitle} />;
+    }
+    return children;
+  };
+
   return (
     <div className="space-y-4">
       {createTo && createLabel && (
@@ -49,23 +74,7 @@ export function TabPreviewShell({
         </div>
       )}
 
-      {isLoading ? (
-        <div className="space-y-3">
-          {[0, 1, 2].map((i) => (
-            <Skeleton className="h-16 w-full rounded-md" key={i} />
-          ))}
-        </div>
-      ) : isError ? (
-        <ErrorState
-          message="Could not load this section."
-          onRetry={onRetry}
-          title="Failed to load"
-        />
-      ) : isEmpty ? (
-        <EmptyState description={emptyDescription} title={emptyTitle} />
-      ) : (
-        children
-      )}
+      {renderBody()}
 
       {showViewAllAtBottom && (
         <div className="flex justify-center pt-2">

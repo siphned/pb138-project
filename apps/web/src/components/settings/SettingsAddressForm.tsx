@@ -14,15 +14,13 @@ import { Input } from "@/components/ui/input";
 import { usePostUsersMeAddresses } from "@/generated/hooks/usePostUsersMeAddresses";
 
 const addressSchema = z.object({
-  street: z.string().refine((v) => v.trim().length > 0, { message: "Street is required" }),
+  city: z.string().refine((v) => v.trim().length > 0, { message: "City is required" }),
+  country: z.string().refine((v) => v.trim().length > 0, { message: "Country is required" }),
   houseNumber: z
     .string()
     .refine((v) => v.trim().length > 0, { message: "House number is required" }),
-  city: z.string().refine((v) => v.trim().length > 0, { message: "City is required" }),
-  postalCode: z
-    .string()
-    .refine((v) => v.trim().length > 0, { message: "Postal code is required" }),
-  country: z.string().refine((v) => v.trim().length > 0, { message: "Country is required" }),
+  postalCode: z.string().refine((v) => v.trim().length > 0, { message: "Postal code is required" }),
+  street: z.string().refine((v) => v.trim().length > 0, { message: "Street is required" }),
 });
 
 type AddressFormValues = z.infer<typeof addressSchema>;
@@ -33,11 +31,7 @@ interface SettingsAddressFormProps {
   onSaved?: () => void;
 }
 
-export function SettingsAddressForm({
-  type,
-  defaultValues,
-  onSaved,
-}: SettingsAddressFormProps) {
+export function SettingsAddressForm({ type, defaultValues, onSaved }: SettingsAddressFormProps) {
   const mutation = usePostUsersMeAddresses();
 
   const resolver = useMemo<Resolver<AddressFormValues>>(
@@ -64,16 +58,15 @@ export function SettingsAddressForm({
       ...defaultValues,
     },
     mode: "onSubmit",
-    reValidateMode: "onChange",
     resolver,
+    reValidateMode: "onChange",
   });
 
   const onSubmit = (values: AddressFormValues) => {
-    mutation.mutate(
-      { data: { ...values, type } },
-      { onSuccess: () => onSaved?.() }
-    );
+    mutation.mutate({ data: { ...values, type } }, { onSuccess: () => onSaved?.() });
   };
+
+  const idleLabel = type === "shipping" ? "Save shipping address" : "Save billing address";
 
   return (
     <Form {...form}>
@@ -152,11 +145,7 @@ export function SettingsAddressForm({
             <p className="text-xs text-muted-foreground">Saved.</p>
           )}
           <Button className="ml-auto" disabled={mutation.isPending} type="submit">
-            {mutation.isPending
-              ? "Saving…"
-              : type === "shipping"
-                ? "Save shipping address"
-                : "Save billing address"}
+            {mutation.isPending ? "Saving…" : idleLabel}
           </Button>
         </div>
       </form>
