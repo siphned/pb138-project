@@ -48,13 +48,12 @@ const mockWinemaker = { id: winemakerId, name: "Test Winery" };
 const mockApprovedEvent = {
   capacity: 10,
   deletedAt: null,
+  endTime: futureEnd,
   id: eventId,
   startTime: futureStart,
   status: "approved",
   winemakerId,
 } as any;
-
-const mockPendingEvent = { ...mockApprovedEvent, status: "pending" } as any;
 
 const validCreateInput = {
   address: {
@@ -80,7 +79,7 @@ describe("createEvent", () => {
   it("creates event when winemaker exists and dates are valid", async () => {
     vi.mocked(eventsRepo.findWinemakerByUserId).mockResolvedValue(mockWinemaker as any);
     vi.mocked(eventsRepo.insertAddress).mockResolvedValue({ id: "a1" } as any);
-    vi.mocked(eventsRepo.createEvent).mockResolvedValue(mockPendingEvent);
+    vi.mocked(eventsRepo.createEvent).mockResolvedValue(mockApprovedEvent);
 
     await eventsService.createEvent(userId, validCreateInput);
 
@@ -97,10 +96,10 @@ describe("createEvent", () => {
 });
 
 describe("updateEvent", () => {
-  it("updates own pending event", async () => {
-    vi.mocked(eventsRepo.findById).mockResolvedValue(mockPendingEvent);
+  it("updates own upcoming event", async () => {
+    vi.mocked(eventsRepo.findById).mockResolvedValue(mockApprovedEvent);
     vi.mocked(eventsRepo.findWinemakerByUserId).mockResolvedValue(mockWinemaker as any);
-    vi.mocked(eventsRepo.update).mockResolvedValue(mockPendingEvent);
+    vi.mocked(eventsRepo.update).mockResolvedValue(mockApprovedEvent);
 
     await eventsService.updateEvent(eventId, userId, { name: "New Name" });
 
@@ -110,11 +109,21 @@ describe("updateEvent", () => {
       expect.objectContaining({ name: "New Name" })
     );
   });
+
+  it("throws EVENT_STATUS_CONFLICT when event has already started", async () => {
+    const pastEvent = { ...mockApprovedEvent, startTime: new Date(Date.now() - 86400000) };
+    vi.mocked(eventsRepo.findById).mockResolvedValue(pastEvent);
+    vi.mocked(eventsRepo.findWinemakerByUserId).mockResolvedValue(mockWinemaker as any);
+
+    await expect(
+      eventsService.updateEvent(eventId, userId, { name: "New Name" })
+    ).rejects.toThrow(/EVENT_STATUS_CONFLICT|already/i);
+  });
 });
 
 describe("deleteEvent", () => {
   it("soft deletes own event", async () => {
-    vi.mocked(eventsRepo.findById).mockResolvedValue(mockPendingEvent);
+    vi.mocked(eventsRepo.findById).mockResolvedValue(mockApprovedEvent);
     vi.mocked(eventsRepo.findWinemakerByUserId).mockResolvedValue(mockWinemaker as any);
 
     await eventsService.deleteEvent(eventId, userId);
@@ -171,6 +180,26 @@ describe("listEvents", () => {
       expect.objectContaining({ q: "harvest" }),
       expect.any(Object)
     );
+  });
+
+  it("scopes registeredByMe to the current user", async () => {
+    vi.mocked(eventsRepo.findMany).mockResolvedValue([]);
+    vi.mocked(eventsRepo.countMany).mockResolvedValue(0);
+
+    await eventsService.listEvents({ registeredByMe: true }, { limit: 20, page: 1 }, "user-1");
+
+    expect(eventsRepo.findMany).toHaveBeenCalledWith(
+      expect.anything(),
+      expect.objectContaining({ registeredByUserId: "user-1" }),
+      expect.any(Object)
+    );
+  });
+
+  it("returns empty for registeredByMe without an authenticated user", async () => {
+    const result = await eventsService.listEvents({ registeredByMe: true }, { limit: 20, page: 1 });
+
+    expect(result).toEqual({ data: [], limit: 20, page: 1, total: 0 });
+    expect(eventsRepo.findMany).not.toHaveBeenCalled();
   });
 });
 

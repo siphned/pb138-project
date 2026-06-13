@@ -1,6 +1,7 @@
 import { Link } from "@tanstack/react-router";
+import { formatEur } from "@/lib/utils";
 import { CatalogCard, catalogCardLinkClass } from "./CatalogCard";
-import { CatalogPlaceholder } from "./CatalogPlaceholder";
+import { ProductImage } from "./ProductImage";
 
 interface BundleCardProps {
   product: {
@@ -14,14 +15,11 @@ interface BundleCardProps {
 
 export function BundleCard({ product }: BundleCardProps) {
   const wineCount = (product.wines ?? product.productWines ?? []).length;
-  const price = Number(product.price).toLocaleString("cs-CZ", {
-    currency: "EUR",
-    style: "currency",
-  });
+  const price = formatEur(product.price);
 
   return (
     <CatalogCard
-      imageSlot={<CatalogPlaceholder text="BUNDLE" textClassName="text-2xl tracking-widest" />}
+      imageSlot={<ProductImage alt={product.name} fallbackText="BUNDLE" productId={product.id} />}
       titleLink={
         <Link
           className={catalogCardLinkClass}

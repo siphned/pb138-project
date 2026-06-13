@@ -1,4 +1,5 @@
-import { Elysia, status, t } from "elysia";
+import { Elysia, status } from "elysia";
+import { z } from "zod";
 import { errorResponse } from "../../utils/error-plugin";
 import { authPlugin } from "../auth";
 import {
@@ -8,6 +9,9 @@ import {
   updateProductOrBundleBody,
 } from "./products.schema";
 import { productsService } from "./products.service";
+
+const idParams = z.object({ id: z.string() });
+const shopProductParams = z.object({ id: z.string(), productId: z.string() });
 
 export const productsRoutes = new Elysia({ prefix: "/products" })
   .use(authPlugin)
@@ -29,12 +33,27 @@ export const productsRoutes = new Elysia({ prefix: "/products" })
       summary: "Get product by ID",
       tags: ["products"],
     },
-    params: t.Object({ id: t.String() }),
-    response: { 200: t.Any(), 404: errorResponse },
+    params: idParams,
+    response: { 200: z.any(), 404: errorResponse },
   });
 
 export const shopProductsRoutes = new Elysia({ prefix: "/shops/:id" })
   .use(authPlugin)
+
+  .get(
+    "/products",
+    ({ params, query }) => productsService.getAllProducts({ ...query, shopId: params.id }),
+    {
+      detail: {
+        description: "Returns all products belonging to a specific shop.",
+        summary: "List shop products",
+        tags: ["products"],
+      },
+      params: idParams,
+      query: getAllProductsQuery,
+      response: { 200: getAllProductsResponse, 404: errorResponse },
+    }
+  )
 
   .post(
     "/products",
@@ -49,9 +68,9 @@ export const shopProductsRoutes = new Elysia({ prefix: "/shops/:id" })
         summary: "Create product or bundle",
         tags: ["products"],
       },
-      params: t.Object({ id: t.String() }),
+      params: idParams,
       requireRoles: ["shop_owner", "admin"],
-      response: { 201: t.Any(), 403: errorResponse, 404: errorResponse },
+      response: { 201: z.any(), 403: errorResponse, 404: errorResponse },
     }
   )
 
@@ -67,17 +86,17 @@ export const shopProductsRoutes = new Elysia({ prefix: "/shops/:id" })
         summary: "Update product or bundle",
         tags: ["products"],
       },
-      params: t.Object({ id: t.String(), productId: t.String() }),
+      params: shopProductParams,
       requireRoles: ["shop_owner", "admin"],
-      response: { 200: t.Any(), 403: errorResponse, 404: errorResponse },
+      response: { 200: z.any(), 403: errorResponse, 404: errorResponse },
     }
   )
 
   .delete(
     "/products/:productId",
-    async ({ params, dbUser }) => {
+    async ({ params, dbUser, set }) => {
       await productsService.deleteProductOrBundle(params.id, params.productId, dbUser.id);
-      return status(204, null);
+      set.status = 204;
     },
     {
       detail: {
@@ -86,8 +105,8 @@ export const shopProductsRoutes = new Elysia({ prefix: "/shops/:id" })
         summary: "Delete product or bundle",
         tags: ["products"],
       },
-      params: t.Object({ id: t.String(), productId: t.String() }),
+      params: shopProductParams,
       requireRoles: ["shop_owner", "admin"],
-      response: { 204: t.Null(), 403: errorResponse, 404: errorResponse },
+      response: { 403: errorResponse, 404: errorResponse },
     }
   );

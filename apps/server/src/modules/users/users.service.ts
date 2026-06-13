@@ -139,8 +139,7 @@ export class UsersService {
   async deleteUserFromWebhook(clerkId: string): Promise<void> {
     const user = await usersRepo.findByClerkId(db, clerkId);
     if (!user) return;
-    // biome-ignore lint/suspicious/noExplicitAny: Temporary cast for monorepo sync
-    await usersRepo.updateById(db, user.id, { deletedAt: new Date(), status: "deleted" } as any);
+    await usersRepo.updateById(db, user.id, { deletedAt: new Date(), status: "deleted" });
   }
 
   updateProfileById(userId: string, data: { fname?: string; lname?: string }): Promise<User> {

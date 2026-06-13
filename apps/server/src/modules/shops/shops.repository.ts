@@ -2,8 +2,9 @@ import type { Address, Shop } from "@repo/shared/schemas";
 import { addresses, shops } from "@repo/shared/schemas";
 import { and, eq, ilike, isNull } from "drizzle-orm";
 import type { Database } from "../../db";
+import { primaryImageUrlSql } from "../images/images.sql";
 
-export type ShopWithAddress = Shop & { address: Address };
+export type ShopWithAddress = Shop & { address: Address; imageUrl?: string | null };
 
 type AddressData = {
   country: string;
@@ -37,6 +38,7 @@ export async function findAll(
   if (filters.ownerUserId) conditions.push(eq(shops.ownerUserId, filters.ownerUserId));
 
   const results = await db.query.shops.findMany({
+    extras: { imageUrl: primaryImageUrlSql("shop", shops.id).as("image_url") },
     where: and(...conditions),
     with: { address: true },
   });
@@ -49,10 +51,15 @@ export async function findAll(
   return filtered;
 }
 
-export async function findAllByOwnerUserId(db: Database, ownerUserId: string): Promise<Shop[]> {
-  return db.query.shops.findMany({
+export async function findAllByOwnerUserId(
+  db: Database,
+  ownerUserId: string
+): Promise<ShopWithAddress[]> {
+  const rows = await db.query.shops.findMany({
     where: and(eq(shops.ownerUserId, ownerUserId), isNull(shops.deletedAt)),
+    with: { address: true },
   });
+  return rows.filter((r) => r.address && !r.address.deletedAt) as ShopWithAddress[];
 }
 
 export async function findById(db: Database, id: string): Promise<ShopWithAddress | undefined> {

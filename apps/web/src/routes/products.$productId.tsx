@@ -1,10 +1,11 @@
 import { ArrowLeft02Icon } from "@hugeicons/core-free-icons";
 import { HugeiconsIcon } from "@hugeicons/react";
+import { useQueryClient } from "@tanstack/react-query";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { ProductDetailsCard } from "@/components/catalog/ProductDetailsCard";
 import { ErrorState } from "@/components/primitives/error-state";
 import { LoadingState } from "@/components/primitives/loading-state";
-import { Separator } from "@/components/ui/separator";
+import { getCartsQueryKey } from "@/generated/hooks/useGetCarts";
 import { useGetProductsById } from "@/generated/hooks/useGetProductsById";
 import { usePostCartsItems } from "@/generated/hooks/usePostCartsItems";
 import { ProductRelatedSection } from "./-components/ProductRelatedSection";
@@ -17,11 +18,19 @@ export const Route = createFileRoute("/products/$productId")({
 
 function ProductDetailPage() {
   const { productId } = Route.useParams();
+  const queryClient = useQueryClient();
   const { data: product, isLoading, isError, refetch } = useGetProductsById(productId);
   const addToCartMutation = usePostCartsItems();
 
-  const handleAddToCart = () => {
-    addToCartMutation.mutate({ data: { productId, quantity: 1 } });
+  const handleAddToCart = (quantity: number) => {
+    addToCartMutation.mutate(
+      { data: { productId, quantity } },
+      {
+        onSuccess: () => {
+          queryClient.invalidateQueries({ queryKey: getCartsQueryKey() });
+        },
+      }
+    );
   };
 
   if (isLoading) {
@@ -57,8 +66,6 @@ function ProductDetailPage() {
             onAddToCart={handleAddToCart}
             product={product}
           />
-
-          <Separator />
 
           <ProductRelatedSection
             isBundle={!!product.isBundle}

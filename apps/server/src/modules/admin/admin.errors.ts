@@ -1,10 +1,4 @@
-import { ConflictError, NotFoundError } from "@repo/shared";
-
-export class AdminEventNotFoundError extends NotFoundError {
-  constructor() {
-    super("Event not found", "EVENT_NOT_FOUND");
-  }
-}
+import { NotFoundError } from "@repo/shared";
 
 export class AdminReviewNotFoundError extends NotFoundError {
   constructor() {
@@ -15,11 +9,5 @@ export class AdminReviewNotFoundError extends NotFoundError {
 export class AdminUserNotFoundError extends NotFoundError {
   constructor() {
     super("User not found", "USER_NOT_FOUND");
-  }
-}
-
-export class EventNotPendingError extends ConflictError {
-  constructor() {
-    super("Event is not in pending status", "NOT_PENDING");
   }
 }

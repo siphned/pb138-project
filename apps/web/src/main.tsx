@@ -6,7 +6,7 @@ import { createRoot } from "react-dom/client";
 import "./index.css";
 import { AppErrorBoundary } from "./components/AppErrorBoundary";
 import { Button } from "./components/ui/button";
-import { UserProvider } from "./context/UserContext.tsx";
+import { ThemeProvider, UserProvider } from "./context";
 import { routeTree } from "./routeTree.gen.ts";
 
 const queryClient = new QueryClient({
@@ -35,26 +35,28 @@ if (!PUBLISHABLE_KEY) {
 // biome-ignore lint/style/noNonNullAssertion: root element is guaranteed to exist in index.html
 createRoot(document.getElementById("root")!).render(
   <StrictMode>
-    <ClerkProvider afterSignOutUrl="/" publishableKey={PUBLISHABLE_KEY}>
-      <QueryClientProvider client={queryClient}>
-        <UserProvider>
-          <AppErrorBoundary
-            fallback={
-              <div className="flex flex-col items-center justify-center min-h-screen p-8 text-center bg-background">
-                <h1 className="text-2xl font-bold text-foreground mb-4">Something went wrong</h1>
-                <p className="text-muted-foreground mb-8">
-                  An unexpected error occurred. Please try reloading the application.
-                </p>
-                <Button className="px-6 py-2" onClick={() => window.location.reload()}>
-                  Reload App
-                </Button>
-              </div>
-            }
-          >
-            <RouterProvider router={router} />
-          </AppErrorBoundary>
-        </UserProvider>
-      </QueryClientProvider>
-    </ClerkProvider>
+    <ThemeProvider>
+      <ClerkProvider afterSignOutUrl="/" publishableKey={PUBLISHABLE_KEY}>
+        <QueryClientProvider client={queryClient}>
+          <UserProvider>
+            <AppErrorBoundary
+              fallback={
+                <div className="flex flex-col items-center justify-center min-h-dvh p-8 text-center bg-background">
+                  <h1 className="text-2xl font-bold text-foreground mb-4">Something went wrong</h1>
+                  <p className="text-muted-foreground mb-8">
+                    An unexpected error occurred. Please try reloading the application.
+                  </p>
+                  <Button className="px-6 py-2" onClick={() => window.location.reload()}>
+                    Reload App
+                  </Button>
+                </div>
+              }
+            >
+              <RouterProvider router={router} />
+            </AppErrorBoundary>
+          </UserProvider>
+        </QueryClientProvider>
+      </ClerkProvider>
+    </ThemeProvider>
   </StrictMode>
 );

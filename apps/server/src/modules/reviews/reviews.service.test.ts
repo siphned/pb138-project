@@ -8,10 +8,13 @@ vi.mock("./reviews.repository", async (importOriginal) => {
   return {
     ...actual,
     averageRating: vi.fn(),
+    averageShopRating: vi.fn(),
     countReviews: vi.fn(),
+    countShopReviews: vi.fn(),
     findById: vi.fn(),
     findReviews: vi.fn(),
     findReviewWithUser: vi.fn(),
+    findShopReviews: vi.fn(),
     findUserReview: vi.fn(),
     hasPurchasedFromWinemaker: vi.fn(),
     hasPurchasedProduct: vi.fn(),
@@ -75,6 +78,31 @@ describe("reviewsService", () => {
         limit: 5,
         offset: 5,
         sort: "highest",
+      });
+    });
+  });
+
+  describe("listShopReviews", () => {
+    it("aggregates reviews, totalCount, and averageRating across the shop's products", async () => {
+      const shopId = "s1";
+      const mockReviews = [{ id: "r3" }];
+      vi.mocked(reviewsRepo.findShopReviews).mockResolvedValue(mockReviews as any);
+      vi.mocked(reviewsRepo.averageShopRating).mockResolvedValue(4.2);
+      vi.mocked(reviewsRepo.countShopReviews).mockResolvedValue(15);
+
+      const result = await reviewsService.listShopReviews(shopId, {
+        limit: 10,
+        page: 2,
+        sort: "lowest",
+      });
+
+      expect(result.reviews).toBe(mockReviews);
+      expect(result.averageRating).toBe(4.2);
+      expect(result.totalCount).toBe(15);
+      expect(reviewsRepo.findShopReviews).toHaveBeenCalledWith(db, shopId, {
+        limit: 10,
+        offset: 10,
+        sort: "lowest",
       });
     });
   });

@@ -6,11 +6,11 @@ import { CatalogPagination } from "@/components/catalog/CatalogPagination";
 import { CatalogResults } from "@/components/catalog/CatalogResults";
 import { CatalogState } from "@/components/catalog/CatalogState";
 import type { EventSearch } from "@/components/catalog/types";
+import { EventCard } from "@/components/events/EventCard";
 import { PageHeader } from "@/components/primitives/page-header";
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { useGetEvents } from "@/generated/hooks/useGetEvents";
-import { EventCard } from "./-components/EventCard";
 
 const toNum = (v: unknown): number | undefined => {
   if (typeof v === "number" && Number.isFinite(v)) return v;
@@ -51,7 +51,9 @@ export const Route = createFileRoute("/events/")({
     from: typeof raw.from === "string" ? raw.from : undefined,
     limit: toNum(raw.limit),
     page: toNum(raw.page),
+    registeredByMe: raw.registeredByMe === true || raw.registeredByMe === "true" ? true : undefined,
     to: typeof raw.to === "string" ? raw.to : undefined,
+    winemakerId: typeof raw.winemakerId === "string" ? raw.winemakerId : undefined,
     winemakerName: typeof raw.winemakerName === "string" ? raw.winemakerName : undefined,
   }),
 });
@@ -79,8 +81,12 @@ function EventsPage() {
   return (
     <div className="container mx-auto space-y-8 px-6 py-8 lg:px-12">
       <PageHeader
-        description="Discover wine tastings, festivals, and exclusive gatherings hosted by our winemakers."
-        title="Upcoming Events"
+        description={
+          search.registeredByMe
+            ? "Events you've registered for."
+            : "Discover wine tastings, festivals, and exclusive gatherings hosted by our winemakers."
+        }
+        title={search.registeredByMe ? "My Events" : "Upcoming Events"}
       />
 
       <div className="grid grid-cols-1 gap-12 lg:grid-cols-[280px_1fr]">

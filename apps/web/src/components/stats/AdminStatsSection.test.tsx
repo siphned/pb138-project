@@ -11,8 +11,8 @@ import { useGetStats } from "@/generated/hooks/useGetStats";
 const mock = (data: unknown, overrides: Record<string, unknown> = {}) =>
   vi.mocked(useGetStats).mockReturnValue({
     data,
-    isLoading: false,
     isError: false,
+    isLoading: false,
     refetch: vi.fn(),
     ...overrides,
   } as unknown as ReturnType<typeof useGetStats>);
@@ -42,7 +42,7 @@ describe("AdminStatsSection", () => {
     expect(screen.getByText("41")).toBeInTheDocument(); // 1 + 30 + 4 + 6
     expect(screen.getByText("Pending role requests")).toBeInTheDocument();
     expect(screen.getByText("4")).toBeInTheDocument();
-    expect(screen.getByText("Pending events")).toBeInTheDocument();
+    expect(screen.queryByText("Pending events")).not.toBeInTheDocument();
     expect(screen.getByText("Deleted reviews")).toBeInTheDocument();
     expect(screen.getByText("Total products")).toBeInTheDocument();
     expect(screen.getByText("120")).toBeInTheDocument();

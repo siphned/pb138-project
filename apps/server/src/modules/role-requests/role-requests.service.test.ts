@@ -96,7 +96,7 @@ describe("roleRequestsService", () => {
 
       await expect(
         roleRequestsService.submitRequest(userId, "winemaker", "My Business")
-      ).rejects.toThrow("ALREADY_HAS_PENDING_REQUEST");
+      ).rejects.toMatchObject({ code: "ALREADY_HAS_PENDING_REQUEST" });
     });
 
     it("allows new request if previous was rejected", async () => {
@@ -161,10 +161,12 @@ describe("roleRequestsService", () => {
       });
     });
 
-    it("throws NOT_FOUND if request doesn't exist", async () => {
+    it("throws ROLE_REQUEST_NOT_FOUND if request doesn't exist", async () => {
       vi.mocked(roleRequestsRepo.findById).mockResolvedValue(undefined);
 
-      await expect(roleRequestsService.approve(requestId, adminId)).rejects.toThrow("NOT_FOUND");
+      await expect(roleRequestsService.approve(requestId, adminId)).rejects.toMatchObject({
+        code: "ROLE_REQUEST_NOT_FOUND",
+      });
     });
 
     it("throws ALREADY_RESPONDED if already approved", async () => {
@@ -175,9 +177,9 @@ describe("roleRequestsService", () => {
         userId,
       } as any);
 
-      await expect(roleRequestsService.approve(requestId, adminId)).rejects.toThrow(
-        "ALREADY_RESPONDED"
-      );
+      await expect(roleRequestsService.approve(requestId, adminId)).rejects.toMatchObject({
+        code: "ALREADY_RESPONDED",
+      });
     });
 
     it("throws ALREADY_RESPONDED if already rejected", async () => {
@@ -188,9 +190,9 @@ describe("roleRequestsService", () => {
         userId,
       } as any);
 
-      await expect(roleRequestsService.approve(requestId, adminId)).rejects.toThrow(
-        "ALREADY_RESPONDED"
-      );
+      await expect(roleRequestsService.approve(requestId, adminId)).rejects.toMatchObject({
+        code: "ALREADY_RESPONDED",
+      });
     });
 
     it("throws USER_NOT_FOUND if user doesn't exist", async () => {
@@ -202,9 +204,9 @@ describe("roleRequestsService", () => {
       } as any);
       vi.mocked(usersRepo.findById).mockResolvedValue(undefined);
 
-      await expect(roleRequestsService.approve(requestId, adminId)).rejects.toThrow(
-        "USER_NOT_FOUND"
-      );
+      await expect(roleRequestsService.approve(requestId, adminId)).rejects.toMatchObject({
+        code: "USER_NOT_FOUND",
+      });
     });
   });
 
@@ -230,10 +232,12 @@ describe("roleRequestsService", () => {
       );
     });
 
-    it("throws NOT_FOUND if request doesn't exist", async () => {
+    it("throws ROLE_REQUEST_NOT_FOUND if request doesn't exist", async () => {
       vi.mocked(roleRequestsRepo.findById).mockResolvedValue(undefined);
 
-      await expect(roleRequestsService.reject(requestId, adminId)).rejects.toThrow("NOT_FOUND");
+      await expect(roleRequestsService.reject(requestId, adminId)).rejects.toMatchObject({
+        code: "ROLE_REQUEST_NOT_FOUND",
+      });
     });
 
     it("throws ALREADY_RESPONDED if already approved", async () => {
@@ -244,9 +248,9 @@ describe("roleRequestsService", () => {
         userId,
       } as any);
 
-      await expect(roleRequestsService.reject(requestId, adminId)).rejects.toThrow(
-        "ALREADY_RESPONDED"
-      );
+      await expect(roleRequestsService.reject(requestId, adminId)).rejects.toMatchObject({
+        code: "ALREADY_RESPONDED",
+      });
     });
 
     it("throws ALREADY_RESPONDED if already rejected", async () => {
@@ -257,9 +261,9 @@ describe("roleRequestsService", () => {
         userId,
       } as any);
 
-      await expect(roleRequestsService.reject(requestId, adminId)).rejects.toThrow(
-        "ALREADY_RESPONDED"
-      );
+      await expect(roleRequestsService.reject(requestId, adminId)).rejects.toMatchObject({
+        code: "ALREADY_RESPONDED",
+      });
     });
   });
 

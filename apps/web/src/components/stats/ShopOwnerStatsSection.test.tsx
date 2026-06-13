@@ -11,8 +11,8 @@ import { useGetStats } from "@/generated/hooks/useGetStats";
 const mock = (data: unknown, overrides: Record<string, unknown> = {}) =>
   vi.mocked(useGetStats).mockReturnValue({
     data,
-    isLoading: false,
     isError: false,
+    isLoading: false,
     refetch: vi.fn(),
     ...overrides,
   } as unknown as ReturnType<typeof useGetStats>);

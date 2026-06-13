@@ -1,5 +1,8 @@
 import { BundleCard } from "@/components/catalog/BundleCard";
-import { useGetProducts } from "@/generated/hooks/useGetProducts";
+import { Section } from "@/components/primitives/section";
+import { Skeleton } from "@/components/ui/skeleton";
+import { useGetShopsByIdProducts } from "@/generated/hooks/useGetShopsByIdProducts";
+import { DETAIL_CARD_GRID, DETAIL_CARD_ITEM } from "@/lib/detail-card-grid";
 
 type RawBundle = {
   id: string;
@@ -15,44 +18,40 @@ interface BundlesContainingWineProps {
 }
 
 export function BundlesContainingWine({ shopId, wineId }: BundlesContainingWineProps) {
-  const { data: rawData, isLoading } = useGetProducts({ isBundle: true, shopId });
-  const allBundles = rawData?.data as RawBundle[] | undefined;
+  const { data, isLoading } = useGetShopsByIdProducts(shopId, { isBundle: true });
+  const allBundles: RawBundle[] = Array.isArray(data)
+    ? (data as RawBundle[])
+    : ((data as { data?: RawBundle[] } | undefined)?.data ?? []);
 
-  const bundles =
-    allBundles?.filter((b) => {
-      if (Array.isArray(b.wines)) return b.wines.some((w) => w.id === wineId);
-      if (Array.isArray(b.productWines)) return b.productWines.some((pw) => pw.wine?.id === wineId);
-      return false;
-    }) ?? [];
+  const bundles = allBundles.filter((b) => {
+    if (Array.isArray(b.wines)) return b.wines.some((w) => w.id === wineId);
+    if (Array.isArray(b.productWines)) return b.productWines.some((pw) => pw.wine?.id === wineId);
+    return false;
+  });
 
   if (isLoading) {
     return (
-      <div className="space-y-4">
-        <h2 className="font-heading text-2xl font-bold">Also Available in Bundles</h2>
-        <div className="flex gap-4">
-          {[1, 2, 3].map((i) => (
-            <div
-              className="h-[280px] w-[200px] shrink-0 animate-pulse rounded-2xl bg-secondary/20"
-              key={i}
-            />
+      <Section heading="Also available in bundles">
+        <div className={DETAIL_CARD_GRID}>
+          {[1, 2, 3, 4].map((i) => (
+            <Skeleton className={`aspect-square rounded-2xl ${DETAIL_CARD_ITEM}`} key={i} />
           ))}
         </div>
-      </div>
+      </Section>
     );
   }
 
   if (bundles.length === 0) return null;
 
   return (
-    <div className="space-y-4">
-      <h2 className="font-heading text-2xl font-bold">Also Available in Bundles</h2>
-      <div className="flex gap-4 overflow-x-auto p-2 [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+    <Section heading="Also available in bundles">
+      <div className={DETAIL_CARD_GRID}>
         {bundles.map((b) => (
-          <div className="w-60 shrink-0" key={b.id}>
-            <BundleCard key={b.id} product={b} />
+          <div className={DETAIL_CARD_ITEM} key={b.id}>
+            <BundleCard product={b} />
           </div>
         ))}
       </div>
-    </div>
+    </Section>
   );
 }

@@ -1,24 +1,40 @@
-import { createFileRoute } from "@tanstack/react-router";
-import { StubMutation } from "@/components/dev/StubMutation";
-import { usePostShopsByIdProducts } from "@/generated/hooks/usePostShopsByIdProducts";
+import { ArrowLeft02Icon } from "@hugeicons/core-free-icons";
+import { HugeiconsIcon } from "@hugeicons/react";
+import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
+import { PageHeader } from "@/components/primitives/page-header";
+import { InventoryForm } from "@/components/shops/InventoryForm";
 
 export const Route = createFileRoute("/shops/$id/inventory/new")({
-  component: ShopsInventoryNewStub,
+  component: InventoryNewPage,
 });
 
-function ShopsInventoryNewStub() {
+function InventoryNewPage() {
   const { id } = Route.useParams();
-  const mutation = usePostShopsByIdProducts();
+  const navigate = useNavigate();
+
   return (
-    <StubMutation
-      actorRole="shop_owner (owner)"
-      hookName="usePostShopsByIdProducts"
-      mutation={mutation}
-      payloadExample={{
-        data: { name: "New Product", price: "29.99", quantity: 12, wineId: "WINE_ID" },
-        id,
-      }}
-      title={`Create product at shop ${id}`}
-    />
+    <div className="container mx-auto space-y-8 px-6 py-8 lg:px-12">
+      <Link
+        className="inline-flex items-center gap-2 text-sm text-muted-foreground transition-colors hover:text-foreground"
+        params={{ id }}
+        search={{ isBundle: undefined }}
+        to="/shops/$id/inventory"
+      >
+        <HugeiconsIcon className="h-4 w-4" icon={ArrowLeft02Icon} />
+        Back to inventory
+      </Link>
+
+      <PageHeader
+        description="Add a single product to this shop's catalog."
+        title="Add inventory"
+      />
+
+      <InventoryForm
+        onSuccess={() =>
+          navigate({ params: { id }, search: { isBundle: undefined }, to: "/shops/$id/inventory" })
+        }
+        shopId={id}
+      />
+    </div>
   );
 }

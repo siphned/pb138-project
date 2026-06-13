@@ -1,46 +1,47 @@
-import { t } from "elysia";
+import { z } from "zod";
 
-export const shopFiltersQuery = t.Object({
-  city: t.Optional(t.String({ maxLength: 255 })),
-  ownerUserId: t.Optional(t.String()),
-  q: t.Optional(t.String({ maxLength: 255 })),
+export const shopFiltersQuery = z.object({
+  city: z.string().max(255).optional(),
+  ownerUserId: z.string().optional(),
+  q: z.string().max(255).optional(),
 });
 
-const addressBody = t.Object({
-  city: t.String({ maxLength: 255, minLength: 1 }),
-  country: t.String({ maxLength: 50, minLength: 1 }),
-  houseNumber: t.String({ maxLength: 20, minLength: 1 }),
-  postalCode: t.String({ maxLength: 20, minLength: 1 }),
-  street: t.String({ maxLength: 255, minLength: 1 }),
+const addressBody = z.object({
+  city: z.string().min(1).max(255),
+  country: z.string().min(1).max(50),
+  houseNumber: z.string().min(1).max(20),
+  postalCode: z.string().min(1).max(20),
+  street: z.string().min(1).max(255),
 });
 
-export const createShopBody = t.Object({
+export const createShopBody = z.object({
   address: addressBody,
-  description: t.String({ minLength: 1 }),
-  name: t.String({ maxLength: 255, minLength: 1 }),
+  description: z.string().min(1),
+  name: z.string().min(1).max(255),
 });
 
-export const updateShopBody = t.Object({
-  address: t.Optional(t.Partial(addressBody)),
-  description: t.Optional(t.String({ minLength: 1 })),
-  name: t.Optional(t.String({ maxLength: 255, minLength: 1 })),
+export const updateShopBody = z.object({
+  address: addressBody.partial().optional(),
+  description: z.string().min(1).optional(),
+  name: z.string().min(1).max(255).optional(),
 });
 
-const addressResponse = t.Object({
-  city: t.String(),
-  country: t.String(),
-  houseNumber: t.String(),
-  id: t.String(),
-  postalCode: t.String(),
-  street: t.String(),
+const addressResponse = z.object({
+  city: z.string(),
+  country: z.string(),
+  houseNumber: z.string(),
+  id: z.string(),
+  postalCode: z.string(),
+  street: z.string(),
 });
 
-export const shopResponse = t.Object({
+export const shopResponse = z.object({
   address: addressResponse,
-  createdAt: t.Date(),
-  description: t.String(),
-  id: t.String(),
-  name: t.String(),
-  ownerUserId: t.String(),
-  updatedAt: t.Union([t.Date(), t.Null()]),
+  createdAt: z.date(),
+  description: z.string(),
+  id: z.string(),
+  imageUrl: z.string().nullable().optional(),
+  name: z.string(),
+  ownerUserId: z.string(),
+  updatedAt: z.date().nullable(),
 });

@@ -36,6 +36,7 @@ export const axiosInstance = axios.create({
   headers: {
     "Content-Type": "application/json",
   },
+  withCredentials: true,
 });
 
 axiosInstance.interceptors.request.use(async (config) => {
@@ -49,8 +50,9 @@ axiosInstance.interceptors.request.use(async (config) => {
 const client = async <TData, TError = unknown, TVariables = unknown>(
   config: RequestConfig<TVariables>
 ): Promise<ResponseConfig<TData>> => {
-  // Add artificial 200ms delay for perceived performance (skeleton visibility)
-  await new Promise((resolve) => setTimeout(resolve, 200));
+  if (import.meta.env.DEV) {
+    await new Promise((resolve) => setTimeout(resolve, 200));
+  }
 
   return axiosInstance
     .request<TData, ResponseConfig<TData>>({ ...config })

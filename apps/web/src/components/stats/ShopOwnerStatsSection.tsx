@@ -1,8 +1,9 @@
 import { DataGrid } from "@/components/primitives/data-grid";
 import { Section } from "@/components/primitives/section";
 import { useGetStats } from "@/generated/hooks/useGetStats";
-import { StatTile } from "./StatTile";
+import { formatEur } from "@/lib/utils";
 import { is403, StatsErrorState, StatTilesSkeleton } from "./StatsSectionScaffold";
+import { StatTile } from "./StatTile";
 
 const toNumber = (n: unknown): number => {
   if (typeof n === "number") return n;
@@ -13,8 +14,7 @@ const toNumber = (n: unknown): number => {
   return 0;
 };
 
-const eur = (n: number) =>
-  n.toLocaleString("en-IE", { currency: "EUR", maximumFractionDigits: 0, style: "currency" });
+const eur = (n: number) => formatEur(n, { decimals: 0 });
 
 const TILE_COUNT = 6;
 

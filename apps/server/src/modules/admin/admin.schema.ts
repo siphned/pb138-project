@@ -1,130 +1,96 @@
-import { t } from "elysia";
-import z from "zod";
+import { z } from "zod";
 
 /**
- * Admin API response schemas.
- * Zod schemas are exported for shared types and OpenAPI generation.
- * TypeBox schemas (t.*) are provided for Elysia route validation.
+ * Response schemas for admin module.
+ * Mirrors the AdminUserRow, AdminEventRow, AdminReviewRow types from admin.repository.ts
  */
 
-export const adminUserResponseSchema = z.object({
+const adminAddress = z.object({
+  city: z.string(),
+  country: z.string(),
+  houseNumber: z.string(),
+  postalCode: z.string(),
+  street: z.string(),
+});
+
+const adminWinemaker = z.object({
+  id: z.string(),
+  name: z.string(),
+});
+
+export const adminEvent = z.object({
+  address: adminAddress.nullable(),
+  addressId: z.string(),
+  capacity: z.number(),
+  createdAt: z.date(),
+  deletedAt: z.date().nullable(),
+  description: z.string().nullable(),
+  endTime: z.date(),
+  id: z.string(),
+  inviteType: z.string(),
+  name: z.string(),
+  startTime: z.date(),
+  status: z.enum(["pending", "approved", "rejected"]),
+  updatedAt: z.date().nullable(),
+  visibility: z.string(),
+  winemaker: adminWinemaker.nullable(),
+  winemakerId: z.string(),
+});
+
+export const adminEventListResponse = z.object({
+  data: z.array(adminEvent),
+  total: z.number(),
+});
+
+const adminUserRole = z.object({
+  id: z.string(),
+  role: z.string(),
+});
+
+export const adminUser = z.object({
+  billingAddressId: z.string().nullable(),
+  clerkId: z.string(),
   createdAt: z.date(),
   deletedAt: z.date().nullable(),
   email: z.string(),
   fname: z.string(),
   id: z.string(),
   lname: z.string(),
-  role: z.string(),
-  status: z.string(),
+  roles: z.array(adminUserRole),
+  shippingAddressId: z.string().nullable(),
+  status: z.enum(["active", "suspended", "banned"]),
+  updatedAt: z.date().nullable(),
 });
 
-export const adminEventResponseSchema = z.object({
-  address: z.nullable(
-    z.object({
-      city: z.string(),
-      country: z.string(),
-      houseNumber: z.string(),
-      postalCode: z.string(),
-      street: z.string(),
-    })
-  ),
-  addressId: z.string(),
-  endTime: z.date(),
+export const adminUserListResponse = z.object({
+  data: z.array(adminUser),
+  total: z.number(),
+});
+
+const adminReviewUser = z.object({
+  fname: z.string(),
   id: z.string(),
-  name: z.string(),
-  startTime: z.date(),
-  status: z.string(),
-  winemaker: z.nullable(
-    z.object({
-      id: z.string(),
-      name: z.string(),
-    })
-  ),
-  winemakerId: z.string(),
+  lname: z.string(),
 });
 
-export const adminReviewResponseSchema = z.object({
+export const adminReview = z.object({
   body: z.string().nullable(),
   createdAt: z.date(),
+  deletedAt: z.date().nullable(),
   entityId: z.string(),
   entityType: z.string(),
   id: z.string(),
   rating: z.number(),
-  user: z.nullable(
-    z.object({
-      fname: z.string(),
-      id: z.string(),
-      lname: z.string(),
-    })
-  ),
+  updatedAt: z.date().nullable(),
+  user: adminReviewUser.nullable(),
   userId: z.string(),
 });
 
-export const adminStatsResponseSchema = z.object({
-  events: z.number(),
-  reviews: z.number(),
-  users: z.number(),
+export const adminReviewListResponse = z.object({
+  data: z.array(adminReview),
+  total: z.number(),
 });
 
-/**
- * TypeBox schemas for Elysia route validation.
- * Mirrors Zod schemas above for route compatibility.
- */
-export const adminUserResponse = t.Object({
-  createdAt: t.Date(),
-  deletedAt: t.Nullable(t.Date()),
-  email: t.String(),
-  fname: t.String(),
-  id: t.String(),
-  lname: t.String(),
-  role: t.String(),
-  status: t.String(),
-});
-
-export const adminEventResponse = t.Object({
-  address: t.Nullable(
-    t.Object({
-      city: t.String(),
-      country: t.String(),
-      houseNumber: t.String(),
-      postalCode: t.String(),
-      street: t.String(),
-    })
-  ),
-  addressId: t.String(),
-  endTime: t.Date(),
-  id: t.String(),
-  name: t.String(),
-  startTime: t.Date(),
-  status: t.String(),
-  winemaker: t.Nullable(
-    t.Object({
-      id: t.String(),
-      name: t.String(),
-    })
-  ),
-  winemakerId: t.String(),
-});
-
-export const adminReviewResponse = t.Object({
-  body: t.Nullable(t.String()),
-  createdAt: t.Date(),
-  entityId: t.String(),
-  entityType: t.String(),
-  id: t.String(),
-  rating: t.Number(),
-  user: t.Nullable(
-    t.Object({
-      fname: t.String(),
-      id: t.String(),
-      lname: t.String(),
-    })
-  ),
-  userId: t.String(),
-});
-
-export const adminStatsResponse = t.Object({
-  events: t.Number(),
-  reviews: t.Number(),
-  users: t.Number(),
+export const adminDeleteResponse = z.object({
+  success: z.boolean(),
 });

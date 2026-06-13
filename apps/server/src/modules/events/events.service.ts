@@ -32,7 +32,7 @@ function validateEventDates(
 export class EventsService {
   async addComment(eventId: string, userId: string, body: string): Promise<EventComment> {
     const event = await eventsRepo.findById(db, eventId);
-    if (!event || event.status !== "approved") throw new EventNotAvailableError();
+    if (event?.status !== "approved") throw new EventNotAvailableError();
     return eventsRepo.createComment(db, eventId, userId, body);
   }
 
@@ -87,10 +87,16 @@ export class EventsService {
     await eventsRepo.softDelete(db, id);
   }
 
-  async getEvent(id: string): Promise<EventWithDetails> {
+  async getEvent(
+    id: string,
+    userId?: string
+  ): Promise<EventWithDetails & { isRegisteredByMe?: boolean; attendees: number }> {
     const event = await eventsRepo.findById(db, id);
-    if (!event || event.status !== "approved") throw new EventNotFoundError();
-    return event;
+    if (event?.status !== "approved") throw new EventNotFoundError();
+    const attendees = await eventsRepo.countActiveRegistrations(db, id);
+    if (!userId) return { ...event, attendees };
+    const registered = await eventsRepo.findRegisteredEventIds(db, userId, [id]);
+    return { ...event, attendees, isRegisteredByMe: registered.has(id) };
   }
 
   async listInvitations(eventId: string, userId: string): Promise<EventInvitationModel[]> {
@@ -108,7 +114,7 @@ export class EventsService {
     paginationQuery: { page?: number; limit?: number }
   ): Promise<PaginatedResult<CommentWithUser>> {
     const event = await eventsRepo.findById(db, eventId);
-    if (!event || event.status !== "approved") throw new EventNotFoundError();
+    if (event?.status !== "approved") throw new EventNotFoundError();
 
     const { limit, offset } = parsePagination(paginationQuery);
     const page = Math.max(1, paginationQuery.page ?? 1);
@@ -128,11 +134,15 @@ export class EventsService {
       q?: string;
       from?: string;
       to?: string;
+      registeredByMe?: boolean;
     },
-    paginationQuery: { page?: number; limit?: number }
-  ): Promise<PaginatedResult<EventWithDetails>> {
+    paginationQuery: { page?: number; limit?: number },
+    userId?: string
+  ): Promise<PaginatedResult<EventWithDetails & { isRegisteredByMe?: boolean }>> {
     const { limit, offset } = parsePagination(paginationQuery);
     const page = Math.max(1, paginationQuery.page ?? 1);
+
+    if (filters.registeredByMe && !userId) return { data: [], limit, page, total: 0 };
 
     let winemakerIds: string[] | undefined;
     if (filters.winemakerId) {
@@ -145,6 +155,7 @@ export class EventsService {
     const repoFilters = {
       from: filters.from ? new Date(filters.from) : undefined,
       q: filters.q,
+      registeredByUserId: filters.registeredByMe ? userId : undefined,
       status: "approved" as const,
       to: filters.to ? new Date(filters.to) : undefined,
       winemakerIds,
@@ -155,12 +166,20 @@ export class EventsService {
       eventsRepo.countMany(db, repoFilters),
     ]);
 
-    return { data, limit, page, total };
+    if (!userId || data.length === 0) return { data, limit, page, total };
+
+    const registered = await eventsRepo.findRegisteredEventIds(
+      db,
+      userId,
+      data.map((e) => e.id)
+    );
+    const decorated = data.map((e) => ({ ...e, isRegisteredByMe: registered.has(e.id) }));
+    return { data: decorated, limit, page, total };
   }
 
   async registerForEvent(eventId: string, userId: string): Promise<EventRegistration> {
     const event = await eventsRepo.findById(db, eventId);
-    if (!event || event.status !== "approved" || event.startTime <= new Date()) {
+    if (event?.status !== "approved" || event.startTime <= new Date()) {
       throw new EventNotAvailableError();
     }
 
@@ -197,7 +216,7 @@ export class EventsService {
 
     const winemaker = await eventsRepo.findWinemakerByUserId(db, userId);
     if (!winemaker || winemaker.id !== event.winemakerId) throw new ForbiddenWineActionError();
-    if (event.status !== "pending") throw new EventStatusConflictError();
+    if (event.startTime <= new Date()) throw new EventStatusConflictError();
 
     const startTime = data.startTime ? new Date(data.startTime) : event.startTime;
     const endTime = data.endTime ? new Date(data.endTime) : event.endTime;

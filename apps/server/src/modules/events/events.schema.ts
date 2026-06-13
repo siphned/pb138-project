@@ -1,12 +1,6 @@
-import { t } from "elysia";
-import z from "zod";
+import { z } from "zod";
 
-/**
- * Request/response schemas for events module.
- * Zod for shared types, TypeBox for Elysia route validation.
- */
-
-const addressBodySchema = z.object({
+const addressBody = z.object({
   city: z.string().min(1).max(255),
   country: z.string().min(1).max(50),
   houseNumber: z.string().min(1).max(20),
@@ -14,8 +8,8 @@ const addressBodySchema = z.object({
   street: z.string().min(1).max(255),
 });
 
-export const createEventBodySchema = z.object({
-  address: addressBodySchema,
+export const createEventBody = z.object({
+  address: addressBody,
   capacity: z.number().int().min(1).max(32767),
   description: z.string().min(1).max(10000).optional(),
   endTime: z.string().datetime(),
@@ -25,7 +19,7 @@ export const createEventBodySchema = z.object({
   visibility: z.enum(["public", "private"]),
 });
 
-export const updateEventBodySchema = z.object({
+export const updateEventBody = z.object({
   capacity: z.number().int().min(1).max(32767).optional(),
   description: z.string().min(1).max(10000).nullable().optional(),
   endTime: z.string().datetime().optional(),
@@ -33,28 +27,29 @@ export const updateEventBodySchema = z.object({
   startTime: z.string().datetime().optional(),
 });
 
-export const listEventsQuerySchema = z.object({
+export const listEventsQuery = z.object({
   from: z.string().datetime().optional(),
-  limit: z.number().min(1).max(100).optional(),
-  page: z.number().min(1).optional(),
+  limit: z.coerce.number().min(1).max(100).optional(),
+  page: z.coerce.number().min(1).optional(),
   q: z.string().max(255).optional(),
+  registeredByMe: z.coerce.boolean().optional(),
   to: z.string().datetime().optional(),
   winemakerId: z.string().optional(),
   winemakerName: z.string().max(255).optional(),
 });
 
-export const paginationQuerySchema = z.object({
-  limit: z.number().min(1).max(100).optional(),
-  page: z.number().min(1).optional(),
+export const paginationQuery = z.object({
+  limit: z.coerce.number().min(1).max(100).optional(),
+  page: z.coerce.number().min(1).optional(),
 });
 
-export const createCommentBodySchema = z.object({
+export const createCommentBody = z.object({
   body: z.string().min(1).max(2000),
 });
 
-export const eventParamsSchema = z.object({ id: z.string() });
+export const eventParams = z.object({ id: z.string() });
 
-const addressResponseSchema = z.object({
+const addressResponse = z.object({
   city: z.string(),
   country: z.string(),
   houseNumber: z.string(),
@@ -62,14 +57,15 @@ const addressResponseSchema = z.object({
   street: z.string(),
 });
 
-export const eventResponseSchema = z.object({
-  address: addressResponseSchema.nullable(),
+export const eventResponse = z.object({
+  address: addressResponse.nullable(),
   addressId: z.string(),
   capacity: z.number(),
   createdAt: z.date(),
   description: z.string().nullable(),
   endTime: z.date(),
   id: z.string(),
+  imageUrl: z.string().nullable().optional(),
   inviteType: z.string(),
   name: z.string(),
   startTime: z.date(),
@@ -80,21 +76,21 @@ export const eventResponseSchema = z.object({
   winemakerId: z.string(),
 });
 
-export const paginatedEventsResponseSchema = z.object({
-  data: z.array(eventResponseSchema),
+export const paginatedEventsResponse = z.object({
+  data: z.array(eventResponse),
   limit: z.number(),
   page: z.number(),
   total: z.number(),
 });
 
-export const registrationResponseSchema = z.object({
+export const registrationResponse = z.object({
   createdAt: z.date(),
   eventId: z.string(),
   id: z.string(),
   userId: z.string(),
 });
 
-const commentWithUserResponseSchema = z.object({
+const commentWithUserResponse = z.object({
   body: z.string(),
   createdAt: z.date(),
   eventId: z.string(),
@@ -103,7 +99,7 @@ const commentWithUserResponseSchema = z.object({
   userId: z.string(),
 });
 
-export const commentResponseSchema = z.object({
+export const commentResponse = z.object({
   body: z.string(),
   createdAt: z.date(),
   eventId: z.string(),
@@ -111,132 +107,20 @@ export const commentResponseSchema = z.object({
   userId: z.string(),
 });
 
-export const paginatedCommentsResponseSchema = z.object({
-  data: z.array(commentWithUserResponseSchema),
+export const paginatedCommentsResponse = z.object({
+  data: z.array(commentWithUserResponse),
   limit: z.number(),
   page: z.number(),
   total: z.number(),
 });
 
-const addressBody = t.Object({
-  city: t.String({ maxLength: 255, minLength: 1 }),
-  country: t.String({ maxLength: 50, minLength: 1 }),
-  houseNumber: t.String({ maxLength: 20, minLength: 1 }),
-  postalCode: t.String({ maxLength: 20, minLength: 1 }),
-  street: t.String({ maxLength: 255, minLength: 1 }),
-});
-
-export const createEventBody = t.Object({
-  address: addressBody,
-  capacity: t.Integer({ maximum: 32767, minimum: 1 }),
-  description: t.Optional(t.String({ maxLength: 10000, minLength: 1 })),
-  endTime: t.String({ format: "date-time" }),
-  inviteType: t.Union([t.Literal("open"), t.Literal("invite_only")]),
-  name: t.String({ maxLength: 255, minLength: 1 }),
-  startTime: t.String({ format: "date-time" }),
-  visibility: t.Union([t.Literal("public"), t.Literal("private")]),
-});
-
-export const updateEventBody = t.Object({
-  capacity: t.Optional(t.Integer({ maximum: 32767, minimum: 1 })),
-  description: t.Optional(t.Nullable(t.String({ maxLength: 10000, minLength: 1 }))),
-  endTime: t.Optional(t.String({ format: "date-time" })),
-  name: t.Optional(t.String({ maxLength: 255, minLength: 1 })),
-  startTime: t.Optional(t.String({ format: "date-time" })),
-});
-
-export const listEventsQuery = t.Object({
-  from: t.Optional(t.String({ format: "date-time" })),
-  limit: t.Optional(t.Number({ maximum: 100, minimum: 1 })),
-  page: t.Optional(t.Number({ minimum: 1 })),
-  q: t.Optional(t.String({ maxLength: 255 })),
-  to: t.Optional(t.String({ format: "date-time" })),
-  winemakerId: t.Optional(t.String()),
-  winemakerName: t.Optional(t.String({ maxLength: 255 })),
-});
-
-export const paginationQuery = t.Object({
-  limit: t.Optional(t.Number({ maximum: 100, minimum: 1 })),
-  page: t.Optional(t.Number({ minimum: 1 })),
-});
-
-export const createCommentBody = t.Object({
-  body: t.String({ maxLength: 2000, minLength: 1 }),
-});
-
-export const eventParams = t.Object({ id: t.String() });
-
-export const eventResponse = t.Object({
-  address: t.Nullable(
-    t.Object({
-      city: t.String(),
-      country: t.String(),
-      houseNumber: t.String(),
-      postalCode: t.String(),
-      street: t.String(),
-    })
-  ),
-  addressId: t.String(),
-  capacity: t.Number(),
-  createdAt: t.Date(),
-  description: t.Nullable(t.String()),
-  endTime: t.Date(),
-  id: t.String(),
-  inviteType: t.String(),
-  name: t.String(),
-  startTime: t.Date(),
-  status: t.Union([t.Literal("pending"), t.Literal("approved"), t.Literal("rejected")]),
-  updatedAt: t.Nullable(t.Date()),
-  visibility: t.Union([t.Literal("public"), t.Literal("private")]),
-  winemaker: t.Nullable(t.Object({ id: t.String(), name: t.String() })),
-  winemakerId: t.String(),
-});
-
-export const paginatedEventsResponse = t.Object({
-  data: t.Array(eventResponse),
-  limit: t.Number(),
-  page: t.Number(),
-  total: t.Number(),
-});
-
-export const registrationResponse = t.Object({
-  createdAt: t.Date(),
-  eventId: t.String(),
-  id: t.String(),
-  userId: t.String(),
-});
-
-const commentWithUserResponse = t.Object({
-  body: t.String(),
-  createdAt: t.Date(),
-  eventId: t.String(),
-  id: t.String(),
-  user: t.Object({ fname: t.String(), id: t.String(), lname: t.String() }),
-  userId: t.String(),
-});
-
-export const commentResponse = t.Object({
-  body: t.String(),
-  createdAt: t.Date(),
-  eventId: t.String(),
-  id: t.String(),
-  userId: t.String(),
-});
-
-export const paginatedCommentsResponse = t.Object({
-  data: t.Array(commentWithUserResponse),
-  limit: t.Number(),
-  page: t.Number(),
-  total: t.Number(),
-});
-
-export const invitationResponse = t.Object({
-  createdAt: t.Date(),
-  deletedAt: t.Nullable(t.Date()),
-  email: t.String(),
-  eventId: t.String(),
-  expiresAt: t.Date(),
-  id: t.String(),
-  token: t.String(),
-  updatedAt: t.Nullable(t.Date()),
+export const invitationResponse = z.object({
+  createdAt: z.date(),
+  deletedAt: z.date().nullable(),
+  email: z.string(),
+  eventId: z.string(),
+  expiresAt: z.date(),
+  id: z.string(),
+  token: z.string(),
+  updatedAt: z.date().nullable(),
 });

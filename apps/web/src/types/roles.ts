@@ -10,3 +10,7 @@ export const Role = {
 } as const;
 
 export type Role = (typeof Role)[keyof typeof Role];
+
+export function isCustomerView(activeRole: Role): boolean {
+  return activeRole === Role.customer;
+}

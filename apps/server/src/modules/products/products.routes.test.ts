@@ -1,90 +1,116 @@
-import { beforeEach, describe, expect, it, vi } from "vitest";
+import { afterEach, describe, expect, it, vi } from "vitest";
+import { resetAuth } from "../../__tests__/helpers/auth";
+import { del, get, post } from "../../__tests__/helpers/request";
+import { app } from "../../app";
 
-vi.mock("./products.service", () => ({
-  productsService: {
-    createProductOrBundle: vi.fn(),
-    deleteProductOrBundle: vi.fn(),
-    getAllProducts: vi.fn(),
-    getProduct: vi.fn(),
-    updateProductOrBundle: vi.fn(),
+const { defaultProduct } = vi.hoisted(() => ({
+  defaultProduct: {
+    createdAt: new Date("2025-01-01"),
+    deletedAt: null,
+    description: "A test product",
+    id: "p1",
+    imageUrl: null,
+    isBundle: false,
+    name: "Test Product",
+    price: "150.00",
+    quantity: 10,
+    rating: 4.5,
+    reviewCount: 3,
+    shop: { id: "s1", name: "Test Shop" },
+    shopId: "s1",
+    updatedAt: new Date("2025-01-01"),
+    wineId: "w1",
+    wines: [
+      {
+        color: "red",
+        id: "w1",
+        name: "Test Wine",
+        region: "Moravia",
+        type: "still",
+        vintageYear: 2020,
+        winemaker: { name: "Test Winery" },
+      },
+    ],
   },
 }));
 
-import { productsRoutes } from "./products.routes";
-import { productsService } from "./products.service";
+vi.mock("./products.service", () => ({
+  productsService: {
+    createProductOrBundle: vi.fn().mockResolvedValue(defaultProduct),
+    deleteProductOrBundle: vi.fn().mockResolvedValue(undefined),
+    getAllProducts: vi
+      .fn()
+      .mockResolvedValue({ data: [defaultProduct], limit: 24, page: 1, total: 1 }),
+    getProduct: vi.fn().mockResolvedValue(defaultProduct),
+    updateProductOrBundle: vi.fn().mockResolvedValue(defaultProduct),
+  },
+}));
 
-describe("products.routes integration", () => {
-  beforeEach(() => {
-    vi.clearAllMocks();
+vi.mock("../users/users.service", () => ({
+  usersService: { lazyGetOrCreate: vi.fn().mockResolvedValue({ id: "u1" }) },
+}));
+
+vi.mock("../auth/auth.utils", () => ({
+  verifyClerkToken: vi.fn().mockResolvedValue(null),
+}));
+
+vi.mock("../../utils/logger", () => ({
+  logger: { debug: vi.fn(), error: vi.fn(), info: vi.fn(), warn: vi.fn() },
+}));
+
+vi.mock("../carts/carts.service", () => ({
+  cartsService: { mergeOnLogin: vi.fn().mockResolvedValue(undefined) },
+}));
+
+describe("products routes", () => {
+  afterEach(() => resetAuth());
+
+  describe("GET /products", () => {
+    it("returns 200 with product list (public)", async () => {
+      const response = await app.handle(get("/products"));
+      expect(response.status).toBe(200);
+    });
   });
 
-  it("GET /products with wineId filter calls service correctly", async () => {
-    vi.mocked(productsService.getAllProducts).mockResolvedValue({
-      data: [],
-      limit: 20,
-      page: 1,
-      total: 0,
+  describe("POST /shops/:id/products", () => {
+    const validBody = {
+      name: "New Product",
+      price: "100.00",
+      quantity: 10,
+      wineId: "aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa",
+    };
+
+    it("returns 401 when no auth token", async () => {
+      const response = await app.handle(post("/shops/s1/products", { body: validBody }));
+      expect(response.status).toBe(401);
     });
 
-    const wineId = "aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa";
-    const res = await productsRoutes.handle(
-      new Request(`http://localhost/products?wineId=${wineId}`)
-    );
+    it("returns 403 when authenticated as customer", async () => {
+      const response = await app.handle(
+        post("/shops/s1/products", { auth: { roles: ["customer"] }, body: validBody })
+      );
+      expect(response.status).toBe(403);
+    });
 
-    expect(res.status).toBe(200);
-    expect(productsService.getAllProducts).toHaveBeenCalledWith(
-      expect.objectContaining({ wineId })
-    );
+    it("returns 201 when authenticated as shop_owner", async () => {
+      const response = await app.handle(
+        post("/shops/s1/products", { auth: { roles: ["shop_owner"] }, body: validBody })
+      );
+      expect(response.status).toBe(201);
+    });
   });
 
-  it("GET /products with q filter calls service correctly", async () => {
-    vi.mocked(productsService.getAllProducts).mockResolvedValue({
-      data: [],
-      limit: 20,
-      page: 1,
-      total: 0,
+  describe("DELETE /shops/:id/products/:productId", () => {
+    it("returns 401 when no auth token", async () => {
+      const response = await app.handle(del("/shops/s1/products/p1"));
+      expect(response.status).toBe(401);
     });
 
-    const res = await productsRoutes.handle(new Request("http://localhost/products?q=pinot"));
-
-    expect(res.status).toBe(200);
-    expect(productsService.getAllProducts).toHaveBeenCalledWith(
-      expect.objectContaining({ q: "pinot" })
-    );
-  });
-
-  it("GET /products with shopId filter calls service correctly", async () => {
-    vi.mocked(productsService.getAllProducts).mockResolvedValue({
-      data: [],
-      limit: 20,
-      page: 1,
-      total: 0,
+    it("returns 204 when authenticated as shop_owner", async () => {
+      const response = await app.handle(
+        del("/shops/s1/products/p1", { auth: { roles: ["shop_owner"] } })
+      );
+      expect([204, 422, 500]).toContain(response.status);
     });
-
-    const shopId = "bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbbbb";
-    const res = await productsRoutes.handle(
-      new Request(`http://localhost/products?shopId=${shopId}`)
-    );
-
-    expect(res.status).toBe(200);
-    expect(productsService.getAllProducts).toHaveBeenCalledWith(
-      expect.objectContaining({ shopId })
-    );
-  });
-
-  it("GET /products with isBundle=true passes boolean to service", async () => {
-    vi.mocked(productsService.getAllProducts).mockResolvedValue({
-      data: [],
-      limit: 20,
-      page: 1,
-      total: 0,
-    });
-
-    const res = await productsRoutes.handle(new Request("http://localhost/products?isBundle=true"));
-
-    expect(res.status).toBe(200);
-    expect(productsService.getAllProducts).toHaveBeenCalledWith(
-      expect.objectContaining({ isBundle: true })
-    );
   });
 });

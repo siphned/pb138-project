@@ -1,8 +1,8 @@
 import { DataGrid } from "@/components/primitives/data-grid";
 import { Section } from "@/components/primitives/section";
 import { useGetStats } from "@/generated/hooks/useGetStats";
-import { StatTile } from "./StatTile";
 import { is403, StatsErrorState, StatTilesSkeleton } from "./StatsSectionScaffold";
+import { StatTile } from "./StatTile";
 
 const toNumber = (n: unknown): number => {
   if (typeof n === "number") return n;
@@ -48,7 +48,7 @@ export function WinemakerStatsSection() {
       <DataGrid variant="gallery">
         <StatTile label="Wines in catalog" value={toNumber(winemaker.wineCount)} />
         <StatTile label="Total stock" value={toNumber(winemaker.totalStock)} />
-        <StatTile label="Approved events" value={eventsApproved} />
+        <StatTile label="My events" value={eventsApproved} />
         <StatTile label="Approved supply agreements" value={supplyApproved} />
         <StatTile
           label="Average review score"

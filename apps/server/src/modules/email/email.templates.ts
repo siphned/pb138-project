@@ -80,37 +80,6 @@ export function orderStatusUpdateTemplate(data: OrderStatusData): string {
   `);
 }
 
-export type EventApprovalData = {
-  eventName: string;
-  winemakerName: string;
-  startTime: Date;
-  endTime: Date;
-};
-
-export function eventApprovalTemplate(data: EventApprovalData): string {
-  const fmt = (d: Date) => d.toLocaleString("en-GB", { dateStyle: "medium", timeStyle: "short" });
-  return wrap(`
-    <h2 style="margin-top:0;">Your Event Has Been Approved</h2>
-    <p>Hi <strong>${data.winemakerName}</strong>,</p>
-    <p>Great news! Your event has been reviewed and approved by the WineMarket team.</p>
-    <table style="border-collapse:collapse;margin:16px 0;">
-      <tr>
-        <td style="padding:6px 16px 6px 0;color:#666;">Event</td>
-        <td style="padding:6px 0;"><strong>${data.eventName}</strong></td>
-      </tr>
-      <tr>
-        <td style="padding:6px 16px 6px 0;color:#666;">Starts</td>
-        <td style="padding:6px 0;">${fmt(data.startTime)}</td>
-      </tr>
-      <tr>
-        <td style="padding:6px 16px 6px 0;color:#666;">Ends</td>
-        <td style="padding:6px 0;">${fmt(data.endTime)}</td>
-      </tr>
-    </table>
-    <p>Your event is now visible to customers on the platform.</p>
-  `);
-}
-
 export type RoleRequestData = {
   fname: string;
   role: "winemaker" | "shop_owner";
@@ -138,5 +107,27 @@ export function roleRequestRejectedTemplate(data: RoleRequestData): string {
     <p>Hi <strong>${data.fname}</strong>,</p>
     <p>Unfortunately, your application for the <strong>${label}</strong> role was not approved at this time.</p>
     <p>If you have questions, please contact our support team.</p>
+  `);
+}
+
+export type WelcomeEmailData = {
+  fname: string;
+};
+
+export function welcomeEmailTemplate(data: WelcomeEmailData): string {
+  return wrap(`
+    <h2 style="margin-top:0;">Welcome to WineMarket</h2>
+    <p>Hi <strong>${data.fname}</strong>,</p>
+    <p>Thank you for joining WineMarket! We're excited to have you in our community of wine enthusiasts.</p>
+    <p>Whether you're here to explore wines, manage your collection, or connect with winemakers, you'll find everything you need right here.</p>
+    <p style="margin-top:24px;"><strong>Getting started:</strong></p>
+    <ul style="margin:8px 0;padding-left:24px;">
+      <li>Browse our curated wine collection</li>
+      <li>Attend exclusive winemaker events</li>
+      <li>Write reviews and share your thoughts</li>
+      <li>Connect with other wine enthusiasts</li>
+    </ul>
+    <p style="margin-top:16px;">If you have any questions, feel free to reach out to our support team.</p>
+    <p>Cheers,<br>The WineMarket Team</p>
   `);
 }

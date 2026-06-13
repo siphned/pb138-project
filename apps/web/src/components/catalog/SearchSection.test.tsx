@@ -12,7 +12,7 @@ vi.mock("@tanstack/react-router", () => ({
 describe("SearchSection", () => {
   it("renders heading and children in a grid", () => {
     render(
-      <SearchSection count={5} heading="Wines" viewAllHref="/explore">
+      <SearchSection count={5} heading="Wines" viewAllHref="/wines">
         <div data-testid="child">Child</div>
       </SearchSection>
     );
@@ -27,19 +27,19 @@ describe("SearchSection", () => {
       <SearchSection
         count={12}
         heading="Wines"
-        viewAllHref="/explore"
+        viewAllHref="/wines"
         viewAllSearch={{ q: "riesling" }}
       >
         <div>Children</div>
       </SearchSection>
     );
     const link = screen.getByRole("link", { name: /view all \(12\)/i });
-    expect(link).toHaveAttribute("href", "/explore?q=riesling");
+    expect(link).toHaveAttribute("href", "/wines?q=riesling");
   });
 
   it("renders nothing if count is 0", () => {
     const { container } = render(
-      <SearchSection count={0} heading="Wines" viewAllHref="/explore">
+      <SearchSection count={0} heading="Wines" viewAllHref="/wines">
         <div>Children</div>
       </SearchSection>
     );

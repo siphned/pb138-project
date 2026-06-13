@@ -1,5 +1,8 @@
-import { Elysia, status, t } from "elysia";
+import { Elysia, status } from "elysia";
+import { z } from "zod";
 import { authPlugin } from "../auth";
+import { verifyClerkToken } from "../auth/auth.utils";
+import { usersService } from "../users/users.service";
 import {
   createCommentBody,
   createEventBody,
@@ -13,12 +16,18 @@ import { eventsService } from "./events.service";
 
 export const eventsRoutes = new Elysia()
   .use(authPlugin)
+  .derive(async ({ headers }) => {
+    const payload = await verifyClerkToken(headers.authorization);
+    if (!payload) return { currentUserId: undefined as string | undefined };
+    const dbUser = await usersService.lazyGetOrCreate(payload.sub);
+    return { currentUserId: dbUser.id as string | undefined };
+  })
 
   .get(
     "/events",
-    ({ query }) => {
+    ({ query, currentUserId }) => {
       const { page, limit, ...filters } = query;
-      return eventsService.listEvents(filters, { limit, page });
+      return eventsService.listEvents(filters, { limit, page }, currentUserId);
     },
     {
       detail: { summary: "List approved events", tags: ["events"] },
@@ -26,10 +35,14 @@ export const eventsRoutes = new Elysia()
     }
   )
 
-  .get("/events/:id", ({ params }) => eventsService.getEvent(params.id), {
-    detail: { summary: "Get event by ID", tags: ["events"] },
-    params: eventParams,
-  })
+  .get(
+    "/events/:id",
+    ({ params, currentUserId }) => eventsService.getEvent(params.id, currentUserId),
+    {
+      detail: { summary: "Get event by ID", tags: ["events"] },
+      params: eventParams,
+    }
+  )
 
   .post(
     "/events",
@@ -52,7 +65,7 @@ export const eventsRoutes = new Elysia()
       body: updateEventBody,
       detail: {
         security: [{ bearerAuth: [] }],
-        summary: "Update own pending event",
+        summary: "Update own upcoming event",
         tags: ["events"],
       },
       params: eventParams,
@@ -62,9 +75,9 @@ export const eventsRoutes = new Elysia()
 
   .delete(
     "/events/:id",
-    async ({ params, dbUser }) => {
+    async ({ params, dbUser, set }) => {
       await eventsService.deleteEvent(params.id, dbUser.id);
-      return status(204, null);
+      set.status = 204;
     },
     {
       detail: {
@@ -94,9 +107,9 @@ export const eventsRoutes = new Elysia()
 
   .delete(
     "/events/:id/register",
-    async ({ params, dbUser }) => {
+    async ({ params, dbUser, set }) => {
       await eventsService.unregisterFromEvent(params.id, dbUser.id);
-      return status(204, null);
+      set.status = 204;
     },
     {
       detail: {
@@ -141,7 +154,7 @@ export const eventsRoutes = new Elysia()
       },
       params: eventParams,
       requireCapability: "winemaker",
-      response: { 200: t.Array(invitationResponse), 403: t.String(), 404: t.String() },
+      response: { 200: z.array(invitationResponse), 403: z.string(), 404: z.string() },
     }
   )
 

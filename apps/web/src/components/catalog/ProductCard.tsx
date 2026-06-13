@@ -1,7 +1,8 @@
 import { Link } from "@tanstack/react-router";
 import type { GetProducts200 } from "@/generated/types/GetProducts";
+import { formatEur } from "@/lib/utils";
 import { CatalogCard, catalogCardLinkClass } from "./CatalogCard";
-import { ProductImage } from "./ProductImage";
+import { EntityImage } from "./EntityImage";
 
 export type GetProducts200Item = GetProducts200["data"][number];
 
@@ -11,11 +12,7 @@ interface ProductCardProps {
 }
 
 export function ProductCard({ product, showShopName = true }: ProductCardProps) {
-  const price = Number(product.price).toLocaleString("en-IE", {
-    currency: "EUR",
-    style: "currency",
-  });
-  const firstWineColor = product.wines?.[0]?.color;
+  const price = formatEur(product.price);
 
   return (
     <CatalogCard
@@ -29,11 +26,11 @@ export function ProductCard({ product, showShopName = true }: ProductCardProps) 
         )
       }
       imageSlot={
-        <ProductImage
+        <EntityImage
           alt={product.name}
-          fallbackColor={firstWineColor}
+          entityType="product"
           fallbackText={product.name}
-          productId={product.id}
+          imageUrl={product.imageUrl}
         />
       }
       titleLink={

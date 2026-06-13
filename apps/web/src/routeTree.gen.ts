@@ -10,7 +10,6 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as SearchRouteImport } from './routes/search'
-import { Route as ExploreRouteImport } from './routes/explore'
 import { Route as CartRouteImport } from './routes/cart'
 import { Route as AuthenticatedRouteImport } from './routes/_authenticated'
 import { Route as IndexRouteImport } from './routes/index'
@@ -21,20 +20,20 @@ import { Route as ProductsIndexRouteImport } from './routes/products.index'
 import { Route as EventsIndexRouteImport } from './routes/events.index'
 import { Route as WinesNewRouteImport } from './routes/wines.new'
 import { Route as WinesIdRouteImport } from './routes/wines.$id'
-import { Route as WinemakersIdRouteImport } from './routes/winemakers.$id'
 import { Route as ShopsNewRouteImport } from './routes/shops.new'
-import { Route as ShopsIdRouteImport } from './routes/shops.$id'
-import { Route as ProductsNewRouteImport } from './routes/products.new'
 import { Route as ProductsProductIdRouteImport } from './routes/products.$productId'
 import { Route as EventsNewRouteImport } from './routes/events.new'
-import { Route as EventsIdRouteImport } from './routes/events.$id'
 import { Route as CheckoutConfirmedRouteImport } from './routes/checkout.confirmed'
 import { Route as AuthRegisterRouteImport } from './routes/auth/register'
 import { Route as AuthLoginRouteImport } from './routes/auth/login'
 import { Route as AuthenticatedStatsRouteImport } from './routes/_authenticated.stats'
+import { Route as AuthenticatedSettingsRouteImport } from './routes/_authenticated.settings'
 import { Route as AuthenticatedOrdersRouteImport } from './routes/_authenticated.orders'
 import { Route as AuthenticatedDashboardRouteImport } from './routes/_authenticated.dashboard'
 import { Route as AuthenticatedAdminRouteImport } from './routes/_authenticated._admin'
+import { Route as WinemakersIdIndexRouteImport } from './routes/winemakers.$id.index'
+import { Route as ShopsIdIndexRouteImport } from './routes/shops.$id.index'
+import { Route as EventsIdIndexRouteImport } from './routes/events.$id.index'
 import { Route as WinesIdImagesRouteImport } from './routes/wines.$id.images'
 import { Route as WinesIdEditRouteImport } from './routes/wines.$id.edit'
 import { Route as WinemakersIdImagesRouteImport } from './routes/winemakers.$id.images'
@@ -46,7 +45,6 @@ import { Route as ShopsIdInventoryRouteImport } from './routes/shops.$id.invento
 import { Route as ShopsIdImagesRouteImport } from './routes/shops.$id.images'
 import { Route as ShopsIdEditRouteImport } from './routes/shops.$id.edit'
 import { Route as ShopsIdAvailabilityRouteImport } from './routes/shops.$id.availability'
-import { Route as ProductsProductIdEditRouteImport } from './routes/products.$productId.edit'
 import { Route as EventsIdInvitationsRouteImport } from './routes/events.$id.invitations'
 import { Route as EventsIdImagesRouteImport } from './routes/events.$id.images'
 import { Route as EventsIdEditRouteImport } from './routes/events.$id.edit'
@@ -57,21 +55,17 @@ import { Route as AuthenticatedAdminShopsRouteImport } from './routes/_authentic
 import { Route as AuthenticatedAdminRoleRequestsRouteImport } from './routes/_authenticated._admin.role-requests'
 import { Route as AuthenticatedAdminProductsRouteImport } from './routes/_authenticated._admin.products'
 import { Route as AuthenticatedAdminModerationRouteImport } from './routes/_authenticated._admin.moderation'
-import { Route as AuthenticatedAdminEventsRouteImport } from './routes/_authenticated._admin.events'
 import { Route as AuthenticatedAdminAdminRouteImport } from './routes/_authenticated._admin.admin'
 import { Route as ShopsIdInventoryNewRouteImport } from './routes/shops.$id.inventory.new'
+import { Route as ShopsIdBundlesNewRouteImport } from './routes/shops.$id.bundles.new'
 import { Route as AuthenticatedAdminUsersIdRouteImport } from './routes/_authenticated._admin.users.$id'
 import { Route as AuthenticatedAdminRoleRequestsIdRouteImport } from './routes/_authenticated._admin.role-requests.$id'
 import { Route as ShopsIdInventoryProductIdEditRouteImport } from './routes/shops.$id.inventory.$productId.edit'
+import { Route as AuthenticatedShop_ownerManageShopsIdRouteImport } from './routes/_authenticated._shop_owner.manage.shops.$id'
 
 const SearchRoute = SearchRouteImport.update({
   id: '/search',
   path: '/search',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ExploreRoute = ExploreRouteImport.update({
-  id: '/explore',
-  path: '/explore',
   getParentRoute: () => rootRouteImport,
 } as any)
 const CartRoute = CartRouteImport.update({
@@ -123,24 +117,9 @@ const WinesIdRoute = WinesIdRouteImport.update({
   path: '/wines/$id',
   getParentRoute: () => rootRouteImport,
 } as any)
-const WinemakersIdRoute = WinemakersIdRouteImport.update({
-  id: '/winemakers/$id',
-  path: '/winemakers/$id',
-  getParentRoute: () => rootRouteImport,
-} as any)
 const ShopsNewRoute = ShopsNewRouteImport.update({
   id: '/shops/new',
   path: '/shops/new',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ShopsIdRoute = ShopsIdRouteImport.update({
-  id: '/shops/$id',
-  path: '/shops/$id',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ProductsNewRoute = ProductsNewRouteImport.update({
-  id: '/products/new',
-  path: '/products/new',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ProductsProductIdRoute = ProductsProductIdRouteImport.update({
@@ -151,11 +130,6 @@ const ProductsProductIdRoute = ProductsProductIdRouteImport.update({
 const EventsNewRoute = EventsNewRouteImport.update({
   id: '/events/new',
   path: '/events/new',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const EventsIdRoute = EventsIdRouteImport.update({
-  id: '/events/$id',
-  path: '/events/$id',
   getParentRoute: () => rootRouteImport,
 } as any)
 const CheckoutConfirmedRoute = CheckoutConfirmedRouteImport.update({
@@ -178,6 +152,11 @@ const AuthenticatedStatsRoute = AuthenticatedStatsRouteImport.update({
   path: '/stats',
   getParentRoute: () => AuthenticatedRoute,
 } as any)
+const AuthenticatedSettingsRoute = AuthenticatedSettingsRouteImport.update({
+  id: '/settings',
+  path: '/settings',
+  getParentRoute: () => AuthenticatedRoute,
+} as any)
 const AuthenticatedOrdersRoute = AuthenticatedOrdersRouteImport.update({
   id: '/orders',
   path: '/orders',
@@ -192,6 +171,21 @@ const AuthenticatedAdminRoute = AuthenticatedAdminRouteImport.update({
   id: '/_admin',
   getParentRoute: () => AuthenticatedRoute,
 } as any)
+const WinemakersIdIndexRoute = WinemakersIdIndexRouteImport.update({
+  id: '/winemakers/$id/',
+  path: '/winemakers/$id/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ShopsIdIndexRoute = ShopsIdIndexRouteImport.update({
+  id: '/shops/$id/',
+  path: '/shops/$id/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const EventsIdIndexRoute = EventsIdIndexRouteImport.update({
+  id: '/events/$id/',
+  path: '/events/$id/',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const WinesIdImagesRoute = WinesIdImagesRouteImport.update({
   id: '/images',
   path: '/images',
@@ -203,69 +197,64 @@ const WinesIdEditRoute = WinesIdEditRouteImport.update({
   getParentRoute: () => WinesIdRoute,
 } as any)
 const WinemakersIdImagesRoute = WinemakersIdImagesRouteImport.update({
-  id: '/images',
-  path: '/images',
-  getParentRoute: () => WinemakersIdRoute,
+  id: '/winemakers/$id/images',
+  path: '/winemakers/$id/images',
+  getParentRoute: () => rootRouteImport,
 } as any)
 const WinemakersIdEditRoute = WinemakersIdEditRouteImport.update({
-  id: '/edit',
-  path: '/edit',
-  getParentRoute: () => WinemakersIdRoute,
+  id: '/winemakers/$id/edit',
+  path: '/winemakers/$id/edit',
+  getParentRoute: () => rootRouteImport,
 } as any)
 const ShopsIdSupplyIncomingRoute = ShopsIdSupplyIncomingRouteImport.update({
-  id: '/supply-incoming',
-  path: '/supply-incoming',
-  getParentRoute: () => ShopsIdRoute,
+  id: '/shops/$id/supply-incoming',
+  path: '/shops/$id/supply-incoming',
+  getParentRoute: () => rootRouteImport,
 } as any)
 const ShopsIdSupplyBrowseRoute = ShopsIdSupplyBrowseRouteImport.update({
-  id: '/supply-browse',
-  path: '/supply-browse',
-  getParentRoute: () => ShopsIdRoute,
+  id: '/shops/$id/supply-browse',
+  path: '/shops/$id/supply-browse',
+  getParentRoute: () => rootRouteImport,
 } as any)
 const ShopsIdOrdersRoute = ShopsIdOrdersRouteImport.update({
-  id: '/orders',
-  path: '/orders',
-  getParentRoute: () => ShopsIdRoute,
+  id: '/shops/$id/orders',
+  path: '/shops/$id/orders',
+  getParentRoute: () => rootRouteImport,
 } as any)
 const ShopsIdInventoryRoute = ShopsIdInventoryRouteImport.update({
-  id: '/inventory',
-  path: '/inventory',
-  getParentRoute: () => ShopsIdRoute,
+  id: '/shops/$id/inventory',
+  path: '/shops/$id/inventory',
+  getParentRoute: () => rootRouteImport,
 } as any)
 const ShopsIdImagesRoute = ShopsIdImagesRouteImport.update({
-  id: '/images',
-  path: '/images',
-  getParentRoute: () => ShopsIdRoute,
+  id: '/shops/$id/images',
+  path: '/shops/$id/images',
+  getParentRoute: () => rootRouteImport,
 } as any)
 const ShopsIdEditRoute = ShopsIdEditRouteImport.update({
-  id: '/edit',
-  path: '/edit',
-  getParentRoute: () => ShopsIdRoute,
+  id: '/shops/$id/edit',
+  path: '/shops/$id/edit',
+  getParentRoute: () => rootRouteImport,
 } as any)
 const ShopsIdAvailabilityRoute = ShopsIdAvailabilityRouteImport.update({
-  id: '/availability',
-  path: '/availability',
-  getParentRoute: () => ShopsIdRoute,
-} as any)
-const ProductsProductIdEditRoute = ProductsProductIdEditRouteImport.update({
-  id: '/edit',
-  path: '/edit',
-  getParentRoute: () => ProductsProductIdRoute,
+  id: '/shops/$id/availability',
+  path: '/shops/$id/availability',
+  getParentRoute: () => rootRouteImport,
 } as any)
 const EventsIdInvitationsRoute = EventsIdInvitationsRouteImport.update({
-  id: '/invitations',
-  path: '/invitations',
-  getParentRoute: () => EventsIdRoute,
+  id: '/events/$id/invitations',
+  path: '/events/$id/invitations',
+  getParentRoute: () => rootRouteImport,
 } as any)
 const EventsIdImagesRoute = EventsIdImagesRouteImport.update({
-  id: '/images',
-  path: '/images',
-  getParentRoute: () => EventsIdRoute,
+  id: '/events/$id/images',
+  path: '/events/$id/images',
+  getParentRoute: () => rootRouteImport,
 } as any)
 const EventsIdEditRoute = EventsIdEditRouteImport.update({
-  id: '/edit',
-  path: '/edit',
-  getParentRoute: () => EventsIdRoute,
+  id: '/events/$id/edit',
+  path: '/events/$id/edit',
+  getParentRoute: () => rootRouteImport,
 } as any)
 const AuthenticatedOrdersIdRoute = AuthenticatedOrdersIdRouteImport.update({
   id: '/$id',
@@ -306,12 +295,6 @@ const AuthenticatedAdminModerationRoute =
     path: '/moderation',
     getParentRoute: () => AuthenticatedAdminRoute,
   } as any)
-const AuthenticatedAdminEventsRoute =
-  AuthenticatedAdminEventsRouteImport.update({
-    id: '/events',
-    path: '/events',
-    getParentRoute: () => AuthenticatedAdminRoute,
-  } as any)
 const AuthenticatedAdminAdminRoute = AuthenticatedAdminAdminRouteImport.update({
   id: '/admin',
   path: '/admin',
@@ -321,6 +304,11 @@ const ShopsIdInventoryNewRoute = ShopsIdInventoryNewRouteImport.update({
   id: '/new',
   path: '/new',
   getParentRoute: () => ShopsIdInventoryRoute,
+} as any)
+const ShopsIdBundlesNewRoute = ShopsIdBundlesNewRouteImport.update({
+  id: '/shops/$id/bundles/new',
+  path: '/shops/$id/bundles/new',
+  getParentRoute: () => rootRouteImport,
 } as any)
 const AuthenticatedAdminUsersIdRoute =
   AuthenticatedAdminUsersIdRouteImport.update({
@@ -340,25 +328,27 @@ const ShopsIdInventoryProductIdEditRoute =
     path: '/$productId/edit',
     getParentRoute: () => ShopsIdInventoryRoute,
   } as any)
+const AuthenticatedShop_ownerManageShopsIdRoute =
+  AuthenticatedShop_ownerManageShopsIdRouteImport.update({
+    id: '/_shop_owner/manage/shops/$id',
+    path: '/manage/shops/$id',
+    getParentRoute: () => AuthenticatedRoute,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/cart': typeof CartRoute
-  '/explore': typeof ExploreRoute
   '/search': typeof SearchRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
   '/orders': typeof AuthenticatedOrdersRouteWithChildren
+  '/settings': typeof AuthenticatedSettingsRoute
   '/stats': typeof AuthenticatedStatsRoute
   '/auth/login': typeof AuthLoginRoute
   '/auth/register': typeof AuthRegisterRoute
   '/checkout/confirmed': typeof CheckoutConfirmedRoute
-  '/events/$id': typeof EventsIdRouteWithChildren
   '/events/new': typeof EventsNewRoute
-  '/products/$productId': typeof ProductsProductIdRouteWithChildren
-  '/products/new': typeof ProductsNewRoute
-  '/shops/$id': typeof ShopsIdRouteWithChildren
+  '/products/$productId': typeof ProductsProductIdRoute
   '/shops/new': typeof ShopsNewRoute
-  '/winemakers/$id': typeof WinemakersIdRouteWithChildren
   '/wines/$id': typeof WinesIdRouteWithChildren
   '/wines/new': typeof WinesNewRoute
   '/events/': typeof EventsIndexRoute
@@ -367,7 +357,6 @@ export interface FileRoutesByFullPath {
   '/winemakers/': typeof WinemakersIndexRoute
   '/wines/': typeof WinesIndexRoute
   '/admin': typeof AuthenticatedAdminAdminRoute
-  '/events': typeof AuthenticatedAdminEventsRoute
   '/moderation': typeof AuthenticatedAdminModerationRoute
   '/products': typeof AuthenticatedAdminProductsRoute
   '/role-requests': typeof AuthenticatedAdminRoleRequestsRouteWithChildren
@@ -378,7 +367,6 @@ export interface FileRoutesByFullPath {
   '/events/$id/edit': typeof EventsIdEditRoute
   '/events/$id/images': typeof EventsIdImagesRoute
   '/events/$id/invitations': typeof EventsIdInvitationsRoute
-  '/products/$productId/edit': typeof ProductsProductIdEditRoute
   '/shops/$id/availability': typeof ShopsIdAvailabilityRoute
   '/shops/$id/edit': typeof ShopsIdEditRoute
   '/shops/$id/images': typeof ShopsIdImagesRoute
@@ -390,32 +378,33 @@ export interface FileRoutesByFullPath {
   '/winemakers/$id/images': typeof WinemakersIdImagesRoute
   '/wines/$id/edit': typeof WinesIdEditRoute
   '/wines/$id/images': typeof WinesIdImagesRoute
+  '/events/$id/': typeof EventsIdIndexRoute
+  '/shops/$id/': typeof ShopsIdIndexRoute
+  '/winemakers/$id/': typeof WinemakersIdIndexRoute
   '/role-requests/$id': typeof AuthenticatedAdminRoleRequestsIdRoute
   '/users/$id': typeof AuthenticatedAdminUsersIdRoute
+  '/shops/$id/bundles/new': typeof ShopsIdBundlesNewRoute
   '/shops/$id/inventory/new': typeof ShopsIdInventoryNewRoute
+  '/manage/shops/$id': typeof AuthenticatedShop_ownerManageShopsIdRoute
   '/shops/$id/inventory/$productId/edit': typeof ShopsIdInventoryProductIdEditRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/cart': typeof CartRoute
-  '/explore': typeof ExploreRoute
   '/search': typeof SearchRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
   '/orders': typeof AuthenticatedOrdersRouteWithChildren
+  '/settings': typeof AuthenticatedSettingsRoute
   '/stats': typeof AuthenticatedStatsRoute
   '/auth/login': typeof AuthLoginRoute
   '/auth/register': typeof AuthRegisterRoute
   '/checkout/confirmed': typeof CheckoutConfirmedRoute
-  '/events/$id': typeof EventsIdRouteWithChildren
   '/events/new': typeof EventsNewRoute
-  '/products/$productId': typeof ProductsProductIdRouteWithChildren
-  '/products/new': typeof ProductsNewRoute
-  '/shops/$id': typeof ShopsIdRouteWithChildren
+  '/products/$productId': typeof ProductsProductIdRoute
   '/shops/new': typeof ShopsNewRoute
-  '/winemakers/$id': typeof WinemakersIdRouteWithChildren
   '/wines/$id': typeof WinesIdRouteWithChildren
   '/wines/new': typeof WinesNewRoute
-  '/events': typeof AuthenticatedAdminEventsRoute
+  '/events': typeof EventsIndexRoute
   '/products': typeof AuthenticatedAdminProductsRoute
   '/shops': typeof AuthenticatedAdminShopsRoute
   '/winemakers': typeof AuthenticatedAdminWinemakersRoute
@@ -428,7 +417,6 @@ export interface FileRoutesByTo {
   '/events/$id/edit': typeof EventsIdEditRoute
   '/events/$id/images': typeof EventsIdImagesRoute
   '/events/$id/invitations': typeof EventsIdInvitationsRoute
-  '/products/$productId/edit': typeof ProductsProductIdEditRoute
   '/shops/$id/availability': typeof ShopsIdAvailabilityRoute
   '/shops/$id/edit': typeof ShopsIdEditRoute
   '/shops/$id/images': typeof ShopsIdImagesRoute
@@ -440,9 +428,14 @@ export interface FileRoutesByTo {
   '/winemakers/$id/images': typeof WinemakersIdImagesRoute
   '/wines/$id/edit': typeof WinesIdEditRoute
   '/wines/$id/images': typeof WinesIdImagesRoute
+  '/events/$id': typeof EventsIdIndexRoute
+  '/shops/$id': typeof ShopsIdIndexRoute
+  '/winemakers/$id': typeof WinemakersIdIndexRoute
   '/role-requests/$id': typeof AuthenticatedAdminRoleRequestsIdRoute
   '/users/$id': typeof AuthenticatedAdminUsersIdRoute
+  '/shops/$id/bundles/new': typeof ShopsIdBundlesNewRoute
   '/shops/$id/inventory/new': typeof ShopsIdInventoryNewRoute
+  '/manage/shops/$id': typeof AuthenticatedShop_ownerManageShopsIdRoute
   '/shops/$id/inventory/$productId/edit': typeof ShopsIdInventoryProductIdEditRoute
 }
 export interface FileRoutesById {
@@ -450,22 +443,18 @@ export interface FileRoutesById {
   '/': typeof IndexRoute
   '/_authenticated': typeof AuthenticatedRouteWithChildren
   '/cart': typeof CartRoute
-  '/explore': typeof ExploreRoute
   '/search': typeof SearchRoute
   '/_authenticated/_admin': typeof AuthenticatedAdminRouteWithChildren
   '/_authenticated/dashboard': typeof AuthenticatedDashboardRoute
   '/_authenticated/orders': typeof AuthenticatedOrdersRouteWithChildren
+  '/_authenticated/settings': typeof AuthenticatedSettingsRoute
   '/_authenticated/stats': typeof AuthenticatedStatsRoute
   '/auth/login': typeof AuthLoginRoute
   '/auth/register': typeof AuthRegisterRoute
   '/checkout/confirmed': typeof CheckoutConfirmedRoute
-  '/events/$id': typeof EventsIdRouteWithChildren
   '/events/new': typeof EventsNewRoute
-  '/products/$productId': typeof ProductsProductIdRouteWithChildren
-  '/products/new': typeof ProductsNewRoute
-  '/shops/$id': typeof ShopsIdRouteWithChildren
+  '/products/$productId': typeof ProductsProductIdRoute
   '/shops/new': typeof ShopsNewRoute
-  '/winemakers/$id': typeof WinemakersIdRouteWithChildren
   '/wines/$id': typeof WinesIdRouteWithChildren
   '/wines/new': typeof WinesNewRoute
   '/events/': typeof EventsIndexRoute
@@ -474,7 +463,6 @@ export interface FileRoutesById {
   '/winemakers/': typeof WinemakersIndexRoute
   '/wines/': typeof WinesIndexRoute
   '/_authenticated/_admin/admin': typeof AuthenticatedAdminAdminRoute
-  '/_authenticated/_admin/events': typeof AuthenticatedAdminEventsRoute
   '/_authenticated/_admin/moderation': typeof AuthenticatedAdminModerationRoute
   '/_authenticated/_admin/products': typeof AuthenticatedAdminProductsRoute
   '/_authenticated/_admin/role-requests': typeof AuthenticatedAdminRoleRequestsRouteWithChildren
@@ -485,7 +473,6 @@ export interface FileRoutesById {
   '/events/$id/edit': typeof EventsIdEditRoute
   '/events/$id/images': typeof EventsIdImagesRoute
   '/events/$id/invitations': typeof EventsIdInvitationsRoute
-  '/products/$productId/edit': typeof ProductsProductIdEditRoute
   '/shops/$id/availability': typeof ShopsIdAvailabilityRoute
   '/shops/$id/edit': typeof ShopsIdEditRoute
   '/shops/$id/images': typeof ShopsIdImagesRoute
@@ -497,9 +484,14 @@ export interface FileRoutesById {
   '/winemakers/$id/images': typeof WinemakersIdImagesRoute
   '/wines/$id/edit': typeof WinesIdEditRoute
   '/wines/$id/images': typeof WinesIdImagesRoute
+  '/events/$id/': typeof EventsIdIndexRoute
+  '/shops/$id/': typeof ShopsIdIndexRoute
+  '/winemakers/$id/': typeof WinemakersIdIndexRoute
   '/_authenticated/_admin/role-requests/$id': typeof AuthenticatedAdminRoleRequestsIdRoute
   '/_authenticated/_admin/users/$id': typeof AuthenticatedAdminUsersIdRoute
+  '/shops/$id/bundles/new': typeof ShopsIdBundlesNewRoute
   '/shops/$id/inventory/new': typeof ShopsIdInventoryNewRoute
+  '/_authenticated/_shop_owner/manage/shops/$id': typeof AuthenticatedShop_ownerManageShopsIdRoute
   '/shops/$id/inventory/$productId/edit': typeof ShopsIdInventoryProductIdEditRoute
 }
 export interface FileRouteTypes {
@@ -507,21 +499,17 @@ export interface FileRouteTypes {
   fullPaths:
     | '/'
     | '/cart'
-    | '/explore'
     | '/search'
     | '/dashboard'
     | '/orders'
+    | '/settings'
     | '/stats'
     | '/auth/login'
     | '/auth/register'
     | '/checkout/confirmed'
-    | '/events/$id'
     | '/events/new'
     | '/products/$productId'
-    | '/products/new'
-    | '/shops/$id'
     | '/shops/new'
-    | '/winemakers/$id'
     | '/wines/$id'
     | '/wines/new'
     | '/events/'
@@ -530,7 +518,6 @@ export interface FileRouteTypes {
     | '/winemakers/'
     | '/wines/'
     | '/admin'
-    | '/events'
     | '/moderation'
     | '/products'
     | '/role-requests'
@@ -541,7 +528,6 @@ export interface FileRouteTypes {
     | '/events/$id/edit'
     | '/events/$id/images'
     | '/events/$id/invitations'
-    | '/products/$productId/edit'
     | '/shops/$id/availability'
     | '/shops/$id/edit'
     | '/shops/$id/images'
@@ -553,29 +539,30 @@ export interface FileRouteTypes {
     | '/winemakers/$id/images'
     | '/wines/$id/edit'
     | '/wines/$id/images'
+    | '/events/$id/'
+    | '/shops/$id/'
+    | '/winemakers/$id/'
     | '/role-requests/$id'
     | '/users/$id'
+    | '/shops/$id/bundles/new'
     | '/shops/$id/inventory/new'
+    | '/manage/shops/$id'
     | '/shops/$id/inventory/$productId/edit'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
     | '/cart'
-    | '/explore'
     | '/search'
     | '/dashboard'
     | '/orders'
+    | '/settings'
     | '/stats'
     | '/auth/login'
     | '/auth/register'
     | '/checkout/confirmed'
-    | '/events/$id'
     | '/events/new'
     | '/products/$productId'
-    | '/products/new'
-    | '/shops/$id'
     | '/shops/new'
-    | '/winemakers/$id'
     | '/wines/$id'
     | '/wines/new'
     | '/events'
@@ -591,7 +578,6 @@ export interface FileRouteTypes {
     | '/events/$id/edit'
     | '/events/$id/images'
     | '/events/$id/invitations'
-    | '/products/$productId/edit'
     | '/shops/$id/availability'
     | '/shops/$id/edit'
     | '/shops/$id/images'
@@ -603,31 +589,32 @@ export interface FileRouteTypes {
     | '/winemakers/$id/images'
     | '/wines/$id/edit'
     | '/wines/$id/images'
+    | '/events/$id'
+    | '/shops/$id'
+    | '/winemakers/$id'
     | '/role-requests/$id'
     | '/users/$id'
+    | '/shops/$id/bundles/new'
     | '/shops/$id/inventory/new'
+    | '/manage/shops/$id'
     | '/shops/$id/inventory/$productId/edit'
   id:
     | '__root__'
     | '/'
     | '/_authenticated'
     | '/cart'
-    | '/explore'
     | '/search'
     | '/_authenticated/_admin'
     | '/_authenticated/dashboard'
     | '/_authenticated/orders'
+    | '/_authenticated/settings'
     | '/_authenticated/stats'
     | '/auth/login'
     | '/auth/register'
     | '/checkout/confirmed'
-    | '/events/$id'
     | '/events/new'
     | '/products/$productId'
-    | '/products/new'
-    | '/shops/$id'
     | '/shops/new'
-    | '/winemakers/$id'
     | '/wines/$id'
     | '/wines/new'
     | '/events/'
@@ -636,7 +623,6 @@ export interface FileRouteTypes {
     | '/winemakers/'
     | '/wines/'
     | '/_authenticated/_admin/admin'
-    | '/_authenticated/_admin/events'
     | '/_authenticated/_admin/moderation'
     | '/_authenticated/_admin/products'
     | '/_authenticated/_admin/role-requests'
@@ -647,7 +633,6 @@ export interface FileRouteTypes {
     | '/events/$id/edit'
     | '/events/$id/images'
     | '/events/$id/invitations'
-    | '/products/$productId/edit'
     | '/shops/$id/availability'
     | '/shops/$id/edit'
     | '/shops/$id/images'
@@ -659,9 +644,14 @@ export interface FileRouteTypes {
     | '/winemakers/$id/images'
     | '/wines/$id/edit'
     | '/wines/$id/images'
+    | '/events/$id/'
+    | '/shops/$id/'
+    | '/winemakers/$id/'
     | '/_authenticated/_admin/role-requests/$id'
     | '/_authenticated/_admin/users/$id'
+    | '/shops/$id/bundles/new'
     | '/shops/$id/inventory/new'
+    | '/_authenticated/_shop_owner/manage/shops/$id'
     | '/shops/$id/inventory/$productId/edit'
   fileRoutesById: FileRoutesById
 }
@@ -669,18 +659,13 @@ export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AuthenticatedRoute: typeof AuthenticatedRouteWithChildren
   CartRoute: typeof CartRoute
-  ExploreRoute: typeof ExploreRoute
   SearchRoute: typeof SearchRoute
   AuthLoginRoute: typeof AuthLoginRoute
   AuthRegisterRoute: typeof AuthRegisterRoute
   CheckoutConfirmedRoute: typeof CheckoutConfirmedRoute
-  EventsIdRoute: typeof EventsIdRouteWithChildren
   EventsNewRoute: typeof EventsNewRoute
-  ProductsProductIdRoute: typeof ProductsProductIdRouteWithChildren
-  ProductsNewRoute: typeof ProductsNewRoute
-  ShopsIdRoute: typeof ShopsIdRouteWithChildren
+  ProductsProductIdRoute: typeof ProductsProductIdRoute
   ShopsNewRoute: typeof ShopsNewRoute
-  WinemakersIdRoute: typeof WinemakersIdRouteWithChildren
   WinesIdRoute: typeof WinesIdRouteWithChildren
   WinesNewRoute: typeof WinesNewRoute
   EventsIndexRoute: typeof EventsIndexRoute
@@ -688,6 +673,22 @@ export interface RootRouteChildren {
   ShopsIndexRoute: typeof ShopsIndexRoute
   WinemakersIndexRoute: typeof WinemakersIndexRoute
   WinesIndexRoute: typeof WinesIndexRoute
+  EventsIdEditRoute: typeof EventsIdEditRoute
+  EventsIdImagesRoute: typeof EventsIdImagesRoute
+  EventsIdInvitationsRoute: typeof EventsIdInvitationsRoute
+  ShopsIdAvailabilityRoute: typeof ShopsIdAvailabilityRoute
+  ShopsIdEditRoute: typeof ShopsIdEditRoute
+  ShopsIdImagesRoute: typeof ShopsIdImagesRoute
+  ShopsIdInventoryRoute: typeof ShopsIdInventoryRouteWithChildren
+  ShopsIdOrdersRoute: typeof ShopsIdOrdersRoute
+  ShopsIdSupplyBrowseRoute: typeof ShopsIdSupplyBrowseRoute
+  ShopsIdSupplyIncomingRoute: typeof ShopsIdSupplyIncomingRoute
+  WinemakersIdEditRoute: typeof WinemakersIdEditRoute
+  WinemakersIdImagesRoute: typeof WinemakersIdImagesRoute
+  EventsIdIndexRoute: typeof EventsIdIndexRoute
+  ShopsIdIndexRoute: typeof ShopsIdIndexRoute
+  WinemakersIdIndexRoute: typeof WinemakersIdIndexRoute
+  ShopsIdBundlesNewRoute: typeof ShopsIdBundlesNewRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -697,13 +698,6 @@ declare module '@tanstack/react-router' {
       path: '/search'
       fullPath: '/search'
       preLoaderRoute: typeof SearchRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/explore': {
-      id: '/explore'
-      path: '/explore'
-      fullPath: '/explore'
-      preLoaderRoute: typeof ExploreRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/cart': {
@@ -776,32 +770,11 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof WinesIdRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/winemakers/$id': {
-      id: '/winemakers/$id'
-      path: '/winemakers/$id'
-      fullPath: '/winemakers/$id'
-      preLoaderRoute: typeof WinemakersIdRouteImport
-      parentRoute: typeof rootRouteImport
-    }
     '/shops/new': {
       id: '/shops/new'
       path: '/shops/new'
       fullPath: '/shops/new'
       preLoaderRoute: typeof ShopsNewRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/shops/$id': {
-      id: '/shops/$id'
-      path: '/shops/$id'
-      fullPath: '/shops/$id'
-      preLoaderRoute: typeof ShopsIdRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/products/new': {
-      id: '/products/new'
-      path: '/products/new'
-      fullPath: '/products/new'
-      preLoaderRoute: typeof ProductsNewRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/products/$productId': {
@@ -816,13 +789,6 @@ declare module '@tanstack/react-router' {
       path: '/events/new'
       fullPath: '/events/new'
       preLoaderRoute: typeof EventsNewRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/events/$id': {
-      id: '/events/$id'
-      path: '/events/$id'
-      fullPath: '/events/$id'
-      preLoaderRoute: typeof EventsIdRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/checkout/confirmed': {
@@ -853,6 +819,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedStatsRouteImport
       parentRoute: typeof AuthenticatedRoute
     }
+    '/_authenticated/settings': {
+      id: '/_authenticated/settings'
+      path: '/settings'
+      fullPath: '/settings'
+      preLoaderRoute: typeof AuthenticatedSettingsRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
     '/_authenticated/orders': {
       id: '/_authenticated/orders'
       path: '/orders'
@@ -874,6 +847,27 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAdminRouteImport
       parentRoute: typeof AuthenticatedRoute
     }
+    '/winemakers/$id/': {
+      id: '/winemakers/$id/'
+      path: '/winemakers/$id'
+      fullPath: '/winemakers/$id/'
+      preLoaderRoute: typeof WinemakersIdIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/shops/$id/': {
+      id: '/shops/$id/'
+      path: '/shops/$id'
+      fullPath: '/shops/$id/'
+      preLoaderRoute: typeof ShopsIdIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/events/$id/': {
+      id: '/events/$id/'
+      path: '/events/$id'
+      fullPath: '/events/$id/'
+      preLoaderRoute: typeof EventsIdIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/wines/$id/images': {
       id: '/wines/$id/images'
       path: '/images'
@@ -890,94 +884,87 @@ declare module '@tanstack/react-router' {
     }
     '/winemakers/$id/images': {
       id: '/winemakers/$id/images'
-      path: '/images'
+      path: '/winemakers/$id/images'
       fullPath: '/winemakers/$id/images'
       preLoaderRoute: typeof WinemakersIdImagesRouteImport
-      parentRoute: typeof WinemakersIdRoute
+      parentRoute: typeof rootRouteImport
     }
     '/winemakers/$id/edit': {
       id: '/winemakers/$id/edit'
-      path: '/edit'
+      path: '/winemakers/$id/edit'
       fullPath: '/winemakers/$id/edit'
       preLoaderRoute: typeof WinemakersIdEditRouteImport
-      parentRoute: typeof WinemakersIdRoute
+      parentRoute: typeof rootRouteImport
     }
     '/shops/$id/supply-incoming': {
       id: '/shops/$id/supply-incoming'
-      path: '/supply-incoming'
+      path: '/shops/$id/supply-incoming'
       fullPath: '/shops/$id/supply-incoming'
       preLoaderRoute: typeof ShopsIdSupplyIncomingRouteImport
-      parentRoute: typeof ShopsIdRoute
+      parentRoute: typeof rootRouteImport
     }
     '/shops/$id/supply-browse': {
       id: '/shops/$id/supply-browse'
-      path: '/supply-browse'
+      path: '/shops/$id/supply-browse'
       fullPath: '/shops/$id/supply-browse'
       preLoaderRoute: typeof ShopsIdSupplyBrowseRouteImport
-      parentRoute: typeof ShopsIdRoute
+      parentRoute: typeof rootRouteImport
     }
     '/shops/$id/orders': {
       id: '/shops/$id/orders'
-      path: '/orders'
+      path: '/shops/$id/orders'
       fullPath: '/shops/$id/orders'
       preLoaderRoute: typeof ShopsIdOrdersRouteImport
-      parentRoute: typeof ShopsIdRoute
+      parentRoute: typeof rootRouteImport
     }
     '/shops/$id/inventory': {
       id: '/shops/$id/inventory'
-      path: '/inventory'
+      path: '/shops/$id/inventory'
       fullPath: '/shops/$id/inventory'
       preLoaderRoute: typeof ShopsIdInventoryRouteImport
-      parentRoute: typeof ShopsIdRoute
+      parentRoute: typeof rootRouteImport
     }
     '/shops/$id/images': {
       id: '/shops/$id/images'
-      path: '/images'
+      path: '/shops/$id/images'
       fullPath: '/shops/$id/images'
       preLoaderRoute: typeof ShopsIdImagesRouteImport
-      parentRoute: typeof ShopsIdRoute
+      parentRoute: typeof rootRouteImport
     }
     '/shops/$id/edit': {
       id: '/shops/$id/edit'
-      path: '/edit'
+      path: '/shops/$id/edit'
       fullPath: '/shops/$id/edit'
       preLoaderRoute: typeof ShopsIdEditRouteImport
-      parentRoute: typeof ShopsIdRoute
+      parentRoute: typeof rootRouteImport
     }
     '/shops/$id/availability': {
       id: '/shops/$id/availability'
-      path: '/availability'
+      path: '/shops/$id/availability'
       fullPath: '/shops/$id/availability'
       preLoaderRoute: typeof ShopsIdAvailabilityRouteImport
-      parentRoute: typeof ShopsIdRoute
-    }
-    '/products/$productId/edit': {
-      id: '/products/$productId/edit'
-      path: '/edit'
-      fullPath: '/products/$productId/edit'
-      preLoaderRoute: typeof ProductsProductIdEditRouteImport
-      parentRoute: typeof ProductsProductIdRoute
+      parentRoute: typeof rootRouteImport
     }
     '/events/$id/invitations': {
       id: '/events/$id/invitations'
-      path: '/invitations'
+      path: '/events/$id/invitations'
       fullPath: '/events/$id/invitations'
       preLoaderRoute: typeof EventsIdInvitationsRouteImport
-      parentRoute: typeof EventsIdRoute
+      parentRoute: typeof rootRouteImport
     }
     '/events/$id/images': {
       id: '/events/$id/images'
-      path: '/images'
+      path: '/events/$id/images'
       fullPath: '/events/$id/images'
       preLoaderRoute: typeof EventsIdImagesRouteImport
-      parentRoute: typeof EventsIdRoute
+      parentRoute: typeof rootRouteImport
     }
     '/events/$id/edit': {
       id: '/events/$id/edit'
-      path: '/edit'
+      path: '/events/$id/edit'
       fullPath: '/events/$id/edit'
       preLoaderRoute: typeof EventsIdEditRouteImport
-      parentRoute: typeof EventsIdRoute
+      parentRoute: typeof rootRouteImport
     }
     '/_authenticated/orders/$id': {
       id: '/_authenticated/orders/$id'
@@ -1028,13 +1015,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAdminModerationRouteImport
       parentRoute: typeof AuthenticatedAdminRoute
     }
-    '/_authenticated/_admin/events': {
-      id: '/_authenticated/_admin/events'
-      path: '/events'
-      fullPath: '/events'
-      preLoaderRoute: typeof AuthenticatedAdminEventsRouteImport
-      parentRoute: typeof AuthenticatedAdminRoute
-    }
     '/_authenticated/_admin/admin': {
       id: '/_authenticated/_admin/admin'
       path: '/admin'
@@ -1048,6 +1028,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/shops/$id/inventory/new'
       preLoaderRoute: typeof ShopsIdInventoryNewRouteImport
       parentRoute: typeof ShopsIdInventoryRoute
+    }
+    '/shops/$id/bundles/new': {
+      id: '/shops/$id/bundles/new'
+      path: '/shops/$id/bundles/new'
+      fullPath: '/shops/$id/bundles/new'
+      preLoaderRoute: typeof ShopsIdBundlesNewRouteImport
+      parentRoute: typeof rootRouteImport
     }
     '/_authenticated/_admin/users/$id': {
       id: '/_authenticated/_admin/users/$id'
@@ -1069,6 +1056,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/shops/$id/inventory/$productId/edit'
       preLoaderRoute: typeof ShopsIdInventoryProductIdEditRouteImport
       parentRoute: typeof ShopsIdInventoryRoute
+    }
+    '/_authenticated/_shop_owner/manage/shops/$id': {
+      id: '/_authenticated/_shop_owner/manage/shops/$id'
+      path: '/manage/shops/$id'
+      fullPath: '/manage/shops/$id'
+      preLoaderRoute: typeof AuthenticatedShop_ownerManageShopsIdRouteImport
+      parentRoute: typeof AuthenticatedRoute
     }
   }
 }
@@ -1104,7 +1098,6 @@ const AuthenticatedAdminUsersRouteWithChildren =
 
 interface AuthenticatedAdminRouteChildren {
   AuthenticatedAdminAdminRoute: typeof AuthenticatedAdminAdminRoute
-  AuthenticatedAdminEventsRoute: typeof AuthenticatedAdminEventsRoute
   AuthenticatedAdminModerationRoute: typeof AuthenticatedAdminModerationRoute
   AuthenticatedAdminProductsRoute: typeof AuthenticatedAdminProductsRoute
   AuthenticatedAdminRoleRequestsRoute: typeof AuthenticatedAdminRoleRequestsRouteWithChildren
@@ -1115,7 +1108,6 @@ interface AuthenticatedAdminRouteChildren {
 
 const AuthenticatedAdminRouteChildren: AuthenticatedAdminRouteChildren = {
   AuthenticatedAdminAdminRoute: AuthenticatedAdminAdminRoute,
-  AuthenticatedAdminEventsRoute: AuthenticatedAdminEventsRoute,
   AuthenticatedAdminModerationRoute: AuthenticatedAdminModerationRoute,
   AuthenticatedAdminProductsRoute: AuthenticatedAdminProductsRoute,
   AuthenticatedAdminRoleRequestsRoute:
@@ -1143,95 +1135,23 @@ interface AuthenticatedRouteChildren {
   AuthenticatedAdminRoute: typeof AuthenticatedAdminRouteWithChildren
   AuthenticatedDashboardRoute: typeof AuthenticatedDashboardRoute
   AuthenticatedOrdersRoute: typeof AuthenticatedOrdersRouteWithChildren
+  AuthenticatedSettingsRoute: typeof AuthenticatedSettingsRoute
   AuthenticatedStatsRoute: typeof AuthenticatedStatsRoute
+  AuthenticatedShop_ownerManageShopsIdRoute: typeof AuthenticatedShop_ownerManageShopsIdRoute
 }
 
 const AuthenticatedRouteChildren: AuthenticatedRouteChildren = {
   AuthenticatedAdminRoute: AuthenticatedAdminRouteWithChildren,
   AuthenticatedDashboardRoute: AuthenticatedDashboardRoute,
   AuthenticatedOrdersRoute: AuthenticatedOrdersRouteWithChildren,
+  AuthenticatedSettingsRoute: AuthenticatedSettingsRoute,
   AuthenticatedStatsRoute: AuthenticatedStatsRoute,
+  AuthenticatedShop_ownerManageShopsIdRoute:
+    AuthenticatedShop_ownerManageShopsIdRoute,
 }
 
 const AuthenticatedRouteWithChildren = AuthenticatedRoute._addFileChildren(
   AuthenticatedRouteChildren,
-)
-
-interface EventsIdRouteChildren {
-  EventsIdEditRoute: typeof EventsIdEditRoute
-  EventsIdImagesRoute: typeof EventsIdImagesRoute
-  EventsIdInvitationsRoute: typeof EventsIdInvitationsRoute
-}
-
-const EventsIdRouteChildren: EventsIdRouteChildren = {
-  EventsIdEditRoute: EventsIdEditRoute,
-  EventsIdImagesRoute: EventsIdImagesRoute,
-  EventsIdInvitationsRoute: EventsIdInvitationsRoute,
-}
-
-const EventsIdRouteWithChildren = EventsIdRoute._addFileChildren(
-  EventsIdRouteChildren,
-)
-
-interface ProductsProductIdRouteChildren {
-  ProductsProductIdEditRoute: typeof ProductsProductIdEditRoute
-}
-
-const ProductsProductIdRouteChildren: ProductsProductIdRouteChildren = {
-  ProductsProductIdEditRoute: ProductsProductIdEditRoute,
-}
-
-const ProductsProductIdRouteWithChildren =
-  ProductsProductIdRoute._addFileChildren(ProductsProductIdRouteChildren)
-
-interface ShopsIdInventoryRouteChildren {
-  ShopsIdInventoryNewRoute: typeof ShopsIdInventoryNewRoute
-  ShopsIdInventoryProductIdEditRoute: typeof ShopsIdInventoryProductIdEditRoute
-}
-
-const ShopsIdInventoryRouteChildren: ShopsIdInventoryRouteChildren = {
-  ShopsIdInventoryNewRoute: ShopsIdInventoryNewRoute,
-  ShopsIdInventoryProductIdEditRoute: ShopsIdInventoryProductIdEditRoute,
-}
-
-const ShopsIdInventoryRouteWithChildren =
-  ShopsIdInventoryRoute._addFileChildren(ShopsIdInventoryRouteChildren)
-
-interface ShopsIdRouteChildren {
-  ShopsIdAvailabilityRoute: typeof ShopsIdAvailabilityRoute
-  ShopsIdEditRoute: typeof ShopsIdEditRoute
-  ShopsIdImagesRoute: typeof ShopsIdImagesRoute
-  ShopsIdInventoryRoute: typeof ShopsIdInventoryRouteWithChildren
-  ShopsIdOrdersRoute: typeof ShopsIdOrdersRoute
-  ShopsIdSupplyBrowseRoute: typeof ShopsIdSupplyBrowseRoute
-  ShopsIdSupplyIncomingRoute: typeof ShopsIdSupplyIncomingRoute
-}
-
-const ShopsIdRouteChildren: ShopsIdRouteChildren = {
-  ShopsIdAvailabilityRoute: ShopsIdAvailabilityRoute,
-  ShopsIdEditRoute: ShopsIdEditRoute,
-  ShopsIdImagesRoute: ShopsIdImagesRoute,
-  ShopsIdInventoryRoute: ShopsIdInventoryRouteWithChildren,
-  ShopsIdOrdersRoute: ShopsIdOrdersRoute,
-  ShopsIdSupplyBrowseRoute: ShopsIdSupplyBrowseRoute,
-  ShopsIdSupplyIncomingRoute: ShopsIdSupplyIncomingRoute,
-}
-
-const ShopsIdRouteWithChildren =
-  ShopsIdRoute._addFileChildren(ShopsIdRouteChildren)
-
-interface WinemakersIdRouteChildren {
-  WinemakersIdEditRoute: typeof WinemakersIdEditRoute
-  WinemakersIdImagesRoute: typeof WinemakersIdImagesRoute
-}
-
-const WinemakersIdRouteChildren: WinemakersIdRouteChildren = {
-  WinemakersIdEditRoute: WinemakersIdEditRoute,
-  WinemakersIdImagesRoute: WinemakersIdImagesRoute,
-}
-
-const WinemakersIdRouteWithChildren = WinemakersIdRoute._addFileChildren(
-  WinemakersIdRouteChildren,
 )
 
 interface WinesIdRouteChildren {
@@ -1247,22 +1167,30 @@ const WinesIdRouteChildren: WinesIdRouteChildren = {
 const WinesIdRouteWithChildren =
   WinesIdRoute._addFileChildren(WinesIdRouteChildren)
 
+interface ShopsIdInventoryRouteChildren {
+  ShopsIdInventoryNewRoute: typeof ShopsIdInventoryNewRoute
+  ShopsIdInventoryProductIdEditRoute: typeof ShopsIdInventoryProductIdEditRoute
+}
+
+const ShopsIdInventoryRouteChildren: ShopsIdInventoryRouteChildren = {
+  ShopsIdInventoryNewRoute: ShopsIdInventoryNewRoute,
+  ShopsIdInventoryProductIdEditRoute: ShopsIdInventoryProductIdEditRoute,
+}
+
+const ShopsIdInventoryRouteWithChildren =
+  ShopsIdInventoryRoute._addFileChildren(ShopsIdInventoryRouteChildren)
+
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AuthenticatedRoute: AuthenticatedRouteWithChildren,
   CartRoute: CartRoute,
-  ExploreRoute: ExploreRoute,
   SearchRoute: SearchRoute,
   AuthLoginRoute: AuthLoginRoute,
   AuthRegisterRoute: AuthRegisterRoute,
   CheckoutConfirmedRoute: CheckoutConfirmedRoute,
-  EventsIdRoute: EventsIdRouteWithChildren,
   EventsNewRoute: EventsNewRoute,
-  ProductsProductIdRoute: ProductsProductIdRouteWithChildren,
-  ProductsNewRoute: ProductsNewRoute,
-  ShopsIdRoute: ShopsIdRouteWithChildren,
+  ProductsProductIdRoute: ProductsProductIdRoute,
   ShopsNewRoute: ShopsNewRoute,
-  WinemakersIdRoute: WinemakersIdRouteWithChildren,
   WinesIdRoute: WinesIdRouteWithChildren,
   WinesNewRoute: WinesNewRoute,
   EventsIndexRoute: EventsIndexRoute,
@@ -1270,6 +1198,22 @@ const rootRouteChildren: RootRouteChildren = {
   ShopsIndexRoute: ShopsIndexRoute,
   WinemakersIndexRoute: WinemakersIndexRoute,
   WinesIndexRoute: WinesIndexRoute,
+  EventsIdEditRoute: EventsIdEditRoute,
+  EventsIdImagesRoute: EventsIdImagesRoute,
+  EventsIdInvitationsRoute: EventsIdInvitationsRoute,
+  ShopsIdAvailabilityRoute: ShopsIdAvailabilityRoute,
+  ShopsIdEditRoute: ShopsIdEditRoute,
+  ShopsIdImagesRoute: ShopsIdImagesRoute,
+  ShopsIdInventoryRoute: ShopsIdInventoryRouteWithChildren,
+  ShopsIdOrdersRoute: ShopsIdOrdersRoute,
+  ShopsIdSupplyBrowseRoute: ShopsIdSupplyBrowseRoute,
+  ShopsIdSupplyIncomingRoute: ShopsIdSupplyIncomingRoute,
+  WinemakersIdEditRoute: WinemakersIdEditRoute,
+  WinemakersIdImagesRoute: WinemakersIdImagesRoute,
+  EventsIdIndexRoute: EventsIdIndexRoute,
+  ShopsIdIndexRoute: ShopsIdIndexRoute,
+  WinemakersIdIndexRoute: WinemakersIdIndexRoute,
+  ShopsIdBundlesNewRoute: ShopsIdBundlesNewRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

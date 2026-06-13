@@ -64,6 +64,14 @@ export class AvailabilityService {
     if (data.validTo !== undefined && data.validTo <= data.validFrom)
       throw new InvalidTimeRangeError();
 
+    // Cap or soft-delete any existing open-ended entries for the same day so
+    // the new one cleanly supersedes them.
+    await availabilityRepo.supersedeOpenEndedRegular(db, {
+      dow: data.dow,
+      newValidFrom: data.validFrom,
+      shopId,
+    });
+
     return availabilityRepo.insertRegular(db, {
       dow: data.dow,
       endTime: end,

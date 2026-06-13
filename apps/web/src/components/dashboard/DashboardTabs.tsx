@@ -1,87 +1,117 @@
-import { Calendar, Package, ShoppingBag, Wine } from "lucide-react";
-import { Card, CardContent } from "@/components/ui/card";
+import type { ReactNode } from "react";
+import { useState } from "react";
+import { AdminRoleRequestsTab } from "@/components/dashboard/tabs/AdminRoleRequestsTab";
+import { AdminUsersTab } from "@/components/dashboard/tabs/AdminUsersTab";
+import { CustomerEventsTab } from "@/components/dashboard/tabs/CustomerEventsTab";
+import { CustomerOrdersTab } from "@/components/dashboard/tabs/CustomerOrdersTab";
+import { ShopOwnerBundlesTab } from "@/components/dashboard/tabs/ShopOwnerBundlesTab";
+import { ShopOwnerOrdersTab } from "@/components/dashboard/tabs/ShopOwnerOrdersTab";
+import { ShopOwnerShopsTab } from "@/components/dashboard/tabs/ShopOwnerShopsTab";
+import { ShopSelector } from "@/components/dashboard/tabs/ShopSelector";
+import { WinemakerEventsTab } from "@/components/dashboard/tabs/WinemakerEventsTab";
+import { WinemakerWinesTab } from "@/components/dashboard/tabs/WinemakerWinesTab";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { useUser } from "@/context/UserContext";
 import { Role } from "@/types/roles";
 
-import { EventsTab } from "./tabs/EventsTab";
-import { MyBundlesTab } from "./tabs/MyBundlesTab";
-// We will create these 3 skeletons next!
-import { WinesTab } from "./tabs/WinesTab";
-
-interface DashboardTabsProps {
-  role?: Role;
+interface TabSpec {
+  value: string;
+  label: string;
+  content: ReactNode;
 }
 
-export function DashboardTabs({ role = Role.winemaker }: DashboardTabsProps) {
-  const isCustomer = role === Role.customer;
+export function DashboardTabs() {
+  const { activeRole } = useUser();
+  const [selectedShopId, setSelectedShopId] = useState<string | "all">("all");
+
+  const tabs: TabSpec[] = (() => {
+    if (activeRole === Role.winemaker) {
+      return [
+        {
+          content: <WinemakerWinesTab />,
+          label: "My Wines",
+          value: "wines",
+        },
+        {
+          content: <WinemakerEventsTab />,
+          label: "My Events",
+          value: "events",
+        },
+      ];
+    }
+
+    if (activeRole === Role.shopOwner) {
+      const shopId = selectedShopId === "all" ? undefined : selectedShopId;
+      return [
+        {
+          content: <ShopOwnerShopsTab shopId={shopId} />,
+          label: "My Shops",
+          value: "shops",
+        },
+        {
+          content: <ShopOwnerBundlesTab shopId={shopId} />,
+          label: "Bundles",
+          value: "bundles",
+        },
+        {
+          content: <ShopOwnerOrdersTab shopId={shopId} />,
+          label: "Orders",
+          value: "orders",
+        },
+      ];
+    }
+
+    if (activeRole === Role.admin) {
+      return [
+        {
+          content: <AdminRoleRequestsTab />,
+          label: "Role Requests",
+          value: "role-requests",
+        },
+        {
+          content: <AdminUsersTab />,
+          label: "Users",
+          value: "users",
+        },
+      ];
+    }
+
+    return [
+      {
+        content: <CustomerOrdersTab />,
+        label: "My Orders",
+        value: "orders",
+      },
+      {
+        content: <CustomerEventsTab />,
+        label: "My Events",
+        value: "events",
+      },
+    ];
+  })();
 
   return (
-    <div className="flex flex-col gap-6 space-y-6 mt-6">
-      <Tabs className="flex flex-col w-full" defaultValue="main">
-        {/* THE NAVBAR (TabsList) */}
-        <TabsList className="w-full justify-start h-14 bg-secondary/40 rounded-2xl p-1 gap-2">
-          <TabsTrigger
-            className="flex-1 rounded-xl data-[state=active]:bg-background data-[state=active]:shadow-sm"
-            value="main"
-          >
-            {isCustomer ? (
-              <ShoppingBag className="h-4 w-4 mr-2" />
-            ) : (
-              <Wine className="h-4 w-4 mr-2" />
-            )}
-            {isCustomer ? "Order History" : "My Wines"}
+    <Tabs defaultValue={tabs[0]?.value}>
+      {activeRole === Role.shopOwner && (
+        <div className="flex justify-end">
+          <ShopSelector onChange={setSelectedShopId} value={selectedShopId} />
+        </div>
+      )}
+
+      <TabsList className="w-full">
+        {tabs.map((t) => (
+          <TabsTrigger key={t.value} value={t.value}>
+            {t.label}
           </TabsTrigger>
+        ))}
+      </TabsList>
 
-          {/* Hide Bundles tab entirely if the user is a Customer */}
-          {!isCustomer && (
-            <TabsTrigger
-              className="flex-1 rounded-xl data-[state=active]:bg-background data-[state=active]:shadow-sm"
-              value="bundles"
-            >
-              <Package className="h-4 w-4 mr-2" />
-              Bundles
-            </TabsTrigger>
-          )}
-
-          <TabsTrigger
-            className="flex-1 rounded-xl data-[state=active]:bg-background data-[state=active]:shadow-sm"
-            value="events"
-          >
-            <Calendar className="h-4 w-4 mr-2" />
-            Events
-          </TabsTrigger>
-        </TabsList>
-
-        {/* THE CONTENT AREAS */}
-        <TabsContent className="mt-6" value="main">
-          <Card className="bg-secondary/40 border-none shadow-none rounded-3xl">
-            <CardContent className="p-6 md:p-8">
-              {/* Inject the separated Wines component and pass the role down */}
-              <WinesTab role={role} />
-            </CardContent>
-          </Card>
+      {tabs.map((t) => (
+        <TabsContent className="pt-4" key={t.value} value={t.value}>
+          {t.content}
         </TabsContent>
-
-        {!isCustomer && (
-          <TabsContent className="mt-6" value="bundles">
-            <Card className="bg-secondary/40 border-none shadow-none rounded-3xl">
-              <CardContent className="p-6 md:p-8">
-                {/* Inject the separated Bundles component */}
-                <MyBundlesTab role={role} />
-              </CardContent>
-            </Card>
-          </TabsContent>
-        )}
-
-        <TabsContent className="mt-6" value="events">
-          {/* Note: Events usually has its own background styling in your design, so we skip the Card wrapper here */}
-          <div className="space-y-6">
-            {/* Inject the separated Events component */}
-
-            <EventsTab role={role} />
-          </div>
-        </TabsContent>
-      </Tabs>
-    </div>
+      ))}
+    </Tabs>
   );
 }
+

@@ -1,15 +1,16 @@
-import { Elysia, t } from "elysia";
+import { Elysia } from "elysia";
+import { z } from "zod";
 import { errorResponse } from "../../utils/error-plugin";
 import { authPlugin } from "../auth";
 import { supplyAgreementsService } from "./supply-agreements.service";
 
-const agreementResponse = t.Object({
-  createdAt: t.Date(),
-  id: t.String(),
-  respondedAt: t.Union([t.Date(), t.Null()]),
-  shopId: t.String(),
-  status: t.String(),
-  winemakerId: t.String(),
+const agreementResponse = z.object({
+  createdAt: z.date(),
+  id: z.string(),
+  respondedAt: z.date().nullable(),
+  shopId: z.string(),
+  status: z.string(),
+  winemakerId: z.string(),
 });
 
 export const supplyAgreementsRoutes = new Elysia({
@@ -23,9 +24,9 @@ export const supplyAgreementsRoutes = new Elysia({
     ({ dbUser, body }) =>
       supplyAgreementsService.createRequest(dbUser.id, body.winemakerId, body.shopId),
     {
-      body: t.Object({
-        shopId: t.String(),
-        winemakerId: t.String(),
+      body: z.object({
+        shopId: z.string(),
+        winemakerId: z.string(),
       }),
       detail: {
         description: "A shop owner requests a supply agreement from a winemaker.",
@@ -42,15 +43,15 @@ export const supplyAgreementsRoutes = new Elysia({
     ({ dbUser, params, body }) =>
       supplyAgreementsService.respondToRequest(dbUser.id, params.id, body.status),
     {
-      body: t.Object({
-        status: t.Union([t.Literal("approved"), t.Literal("rejected")]),
+      body: z.object({
+        status: z.enum(["approved", "rejected"]),
       }),
       detail: {
         description: "A winemaker approves or rejects a supply agreement request.",
         security: [{ bearerAuth: [] }],
         summary: "Respond to a supply agreement request",
       },
-      params: t.Object({ id: t.String() }),
+      params: z.object({ id: z.string() }),
       requireRoles: ["winemaker"],
       response: {
         200: agreementResponse,
@@ -69,9 +70,9 @@ export const supplyAgreementsRoutes = new Elysia({
         security: [{ bearerAuth: [] }],
         summary: "List supply agreements for a shop",
       },
-      params: t.Object({ shopId: t.String() }),
+      params: z.object({ shopId: z.string() }),
       requireRoles: ["shop_owner"],
-      response: { 200: t.Array(agreementResponse), 403: errorResponse },
+      response: { 200: z.array(agreementResponse), 403: errorResponse },
     }
   )
 
@@ -81,5 +82,5 @@ export const supplyAgreementsRoutes = new Elysia({
       summary: "List supply agreements for the authenticated winemaker",
     },
     requireRoles: ["winemaker"],
-    response: { 200: t.Array(agreementResponse), 403: errorResponse },
+    response: { 200: z.array(agreementResponse), 403: errorResponse },
   });

@@ -277,4 +277,106 @@ describe("orders routes", () => {
 
     expect(response.status).toBe(400);
   });
+
+  describe("GET /orders/:id", () => {
+    beforeEach(() => {
+      vi.mocked(verifyClerkToken).mockResolvedValue({ roles: ["customer"], sub: "u1" } as any);
+      vi.mocked(usersService.lazyGetOrCreate).mockResolvedValue({ id: "u1" } as any);
+    });
+
+    afterEach(() => {
+      vi.mocked(verifyClerkToken).mockResolvedValue(null);
+    });
+
+    it("returns order confirmation with items and addresses on success", async () => {
+      const mockOrderWithDetails = {
+        ...mockOrder,
+        billingAddress: {
+          city: "Brno",
+          country: "CZ",
+          houseNumber: "1",
+          id: "addr-1",
+          postalCode: "61200",
+          street: "Main St",
+        },
+        items: [
+          {
+            id: "item1",
+            orderId: "o1",
+            product: { id: "p1", name: "Cabernet Sauvignon" },
+            productId: "p1",
+            quantity: 2,
+            shopId: "shop1",
+            unitPriceAtPurchase: "30.00",
+          },
+        ],
+        shippingAddress: {
+          city: "Brno",
+          country: "CZ",
+          houseNumber: "1",
+          id: "addr-1",
+          postalCode: "61200",
+          street: "Main St",
+        },
+      };
+
+      const { ordersService } = await import("./orders.service");
+      vi.mocked(ordersService.getOrder).mockResolvedValueOnce(mockOrderWithDetails);
+
+      const response = await app.handle(
+        new Request("http://localhost/orders/o1", {
+          headers: { Authorization: "Bearer test" },
+          method: "GET",
+        })
+      );
+
+      expect(response.status).toBe(200);
+      const data = (await response.json()) as any;
+      expect(data.id).toBe("o1");
+      expect(data.items).toHaveLength(1);
+      expect(data.items[0].product.name).toBe("Cabernet Sauvignon");
+      expect(data.billingAddress.city).toBe("Brno");
+      expect(data.shippingAddress.country).toBe("CZ");
+    });
+
+    it("returns 401 when no auth token provided", async () => {
+      vi.mocked(verifyClerkToken).mockResolvedValue(null);
+
+      const response = await app.handle(
+        new Request("http://localhost/orders/o1", {
+          method: "GET",
+        })
+      );
+
+      expect(response.status).toBe(401);
+    });
+
+    it("returns 403 when service throws FORBIDDEN", async () => {
+      const { ordersService } = await import("./orders.service");
+      vi.mocked(ordersService.getOrder).mockRejectedValueOnce(new Error("FORBIDDEN"));
+
+      const response = await app.handle(
+        new Request("http://localhost/orders/o1", {
+          headers: { Authorization: "Bearer test" },
+          method: "GET",
+        })
+      );
+
+      expect(response.status).toBe(403);
+    });
+
+    it("returns 404 when order not found", async () => {
+      const { ordersService } = await import("./orders.service");
+      vi.mocked(ordersService.getOrder).mockRejectedValueOnce(new Error("NOT_FOUND"));
+
+      const response = await app.handle(
+        new Request("http://localhost/orders/o999", {
+          headers: { Authorization: "Bearer test" },
+          method: "GET",
+        })
+      );
+
+      expect(response.status).toBe(404);
+    });
+  });
 });

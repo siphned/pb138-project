@@ -1,42 +1,24 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { StubGet } from "@/components/dev/StubGet";
-import { StubPage } from "@/components/dev/StubPage";
-import { useGetEvents } from "@/generated/hooks/useGetEvents";
-import { useGetWinemakers } from "@/generated/hooks/useGetWinemakers";
-import { useGetWines } from "@/generated/hooks/useGetWines";
+import { HomeFeaturedEvents } from "@/components/home/HomeFeaturedEvents";
+import { HomeFeaturedWinemakers } from "@/components/home/HomeFeaturedWinemakers";
+import { HomeFeaturedWines } from "@/components/home/HomeFeaturedWines";
+import { HomeHero } from "@/components/home/HomeHero";
+import { HomeSellCta } from "@/components/home/HomeSellCta";
 
 export const Route = createFileRoute("/")({
-  component: HomeStub,
+  component: HomePage,
 });
 
-function HomeStub() {
-  const winesQuery = useGetWines();
-  const winemakersQuery = useGetWinemakers();
-  const eventsQuery = useGetEvents();
+function HomePage() {
   return (
-    <StubPage
-      actorRole="guest+"
-      hookName="useGetWines + useGetWinemakers + useGetEvents (limited)"
-      title="Home / Featured"
-    >
-      <StubGet
-        actorRole="guest+"
-        hookName="useGetWines"
-        query={winesQuery}
-        title="Featured wines"
-      />
-      <StubGet
-        actorRole="guest+"
-        hookName="useGetWinemakers"
-        query={winemakersQuery}
-        title="Featured winemakers"
-      />
-      <StubGet
-        actorRole="guest+"
-        hookName="useGetEvents"
-        query={eventsQuery}
-        title="Featured events"
-      />
-    </StubPage>
+    <div className="container mx-auto space-y-16 px-6 py-8 lg:px-12">
+      <HomeHero />
+
+      <HomeFeaturedWines />
+      <HomeFeaturedWinemakers />
+      <HomeFeaturedEvents />
+
+      <HomeSellCta />
+    </div>
   );
 }

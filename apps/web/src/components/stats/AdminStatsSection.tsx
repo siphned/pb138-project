@@ -1,8 +1,9 @@
 import { DataGrid } from "@/components/primitives/data-grid";
 import { Section } from "@/components/primitives/section";
 import { useGetStats } from "@/generated/hooks/useGetStats";
-import { StatTile } from "./StatTile";
+import { formatEur } from "@/lib/utils";
 import { is403, StatsErrorState, StatTilesSkeleton } from "./StatsSectionScaffold";
+import { StatTile } from "./StatTile";
 
 const toNumber = (n: unknown): number => {
   if (typeof n === "number") return n;
@@ -13,10 +14,9 @@ const toNumber = (n: unknown): number => {
   return 0;
 };
 
-const eur = (n: number) =>
-  n.toLocaleString("en-IE", { currency: "EUR", maximumFractionDigits: 0, style: "currency" });
+const eur = (n: number) => formatEur(n, { decimals: 0 });
 
-const TILE_COUNT = 8;
+const TILE_COUNT = 7;
 
 export function AdminStatsSection() {
   const { data, isLoading, isError, error, refetch } = useGetStats({ role: "admin" });
@@ -48,7 +48,6 @@ export function AdminStatsSection() {
       <DataGrid variant="gallery">
         <StatTile label="Users (total)" value={totalUsers} />
         <StatTile label="Pending role requests" value={toNumber(admin.pendingRoleRequests)} />
-        <StatTile label="Pending events" value={toNumber(admin.pendingEvents)} />
         <StatTile label="Deleted reviews" value={toNumber(admin.deletedReviews)} />
         <StatTile label="Total products" value={toNumber(admin.totalProducts)} />
         <StatTile label="Total shops" value={toNumber(admin.totalShops)} />

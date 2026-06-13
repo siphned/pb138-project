@@ -3,6 +3,7 @@ import { products, productWines, reviews, shops, wines } from "@repo/shared/sche
 import type { SQL } from "drizzle-orm";
 import { and, asc, desc, eq, ilike, inArray, isNull, or, sql } from "drizzle-orm";
 import type { Database } from "../../db";
+import { primaryImageUrlSql } from "../images/images.sql";
 import { InsufficientStockError } from "./products.errors";
 
 export type WineInfo = Pick<
@@ -52,6 +53,7 @@ export type CatalogRow = {
   shopName: string;
   avgRating: string | null;
   reviewCount: number;
+  imageUrl: string | null;
 };
 
 export async function create(db: Database, data: NewProduct): Promise<Product> {
@@ -273,6 +275,7 @@ export async function findAll(
     .select({
       avgRating: sql<string | null>`AVG(${reviews.rating})`,
       id: products.id,
+      imageUrl: primaryImageUrlSql("product", products.id),
       isBundle: products.isBundle,
       name: products.name,
       price: products.price,
