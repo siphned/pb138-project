@@ -7,7 +7,6 @@ import { buttonVariants } from "@/components/ui/button";
 import { useTheme, useUser } from "@/context";
 import { useGetCarts } from "@/generated/hooks/useGetCarts";
 import { cn } from "@/lib/utils";
-import { isCustomerView } from "@/types/roles";
 import { HeaderSearch } from "./HeaderSearch";
 import { Sidebar } from "./Sidebar";
 
@@ -20,7 +19,6 @@ export function Header() {
 
   const { data: cart } = useGetCarts();
   const cartCount = cart?.items.reduce((acc, item) => acc + Number(item.quantity || 0), 0) ?? 0;
-  const customerView = isCustomerView(activeRole);
 
   return (
     <header className="h-16 border-b bg-background flex items-center justify-between px-6 lg:px-12">
@@ -35,27 +33,30 @@ export function Header() {
       <div className="flex items-center gap-4">
         <HeaderSearch />
 
+        <Link
+          aria-label={cartCount > 0 ? `Shopping cart (${cartCount} items)` : "Shopping cart"}
+          className={cn(
+            buttonVariants({ size: "icon", variant: "ghost" }),
+            "relative hidden sm:flex"
+          )}
+          to="/cart"
+        >
+          <HugeiconsIcon className="h-5 w-5" icon={ShoppingCart02Icon} strokeWidth={2} />
+          {cartCount > 0 && (
+            <span className="absolute -right-1 -top-1 flex h-5 min-w-5 items-center justify-center rounded-full bg-primary px-1 text-xs font-semibold text-primary-foreground">
+              {cartCount > 99 ? "99+" : cartCount}
+            </span>
+          )}
+        </Link>
+
+        <Show when="signed-out">
           <Link
-            aria-label={cartCount > 0 ? `Shopping cart (${cartCount} items)` : "Shopping cart"}
             className={cn(
               buttonVariants({ size: "icon", variant: "ghost" }),
               "relative hidden sm:flex"
             )}
-            to="/cart"
+            to="/auth/login"
           >
-            <HugeiconsIcon className="h-5 w-5" icon={ShoppingCart02Icon} strokeWidth={2} />
-            {cartCount > 0 && (
-              <span className="absolute -right-1 -top-1 flex h-5 min-w-5 items-center justify-center rounded-full bg-primary px-1 text-xs font-semibold text-primary-foreground">
-                {cartCount > 99 ? "99+" : cartCount}
-              </span>
-            )}
-          </Link>
-
-        <Show when="signed-out">
-          <Link to="/auth/login" className={cn(
-              buttonVariants({ size: "icon", variant: "ghost" }),
-              "relative hidden sm:flex"
-            )}>
             <HugeiconsIcon className="h-5 w-5" icon={User02Icon} strokeWidth={2} />
           </Link>
         </Show>
