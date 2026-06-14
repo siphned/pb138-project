@@ -2,6 +2,8 @@ import { z } from "zod";
 
 export const winemakerFiltersQuery = z.object({
   city: z.string().max(255).optional(),
+  limit: z.coerce.number().int().min(1).max(100).optional(),
+  page: z.coerce.number().int().min(1).optional(),
   q: z.string().max(255).optional(),
 });
 
@@ -73,4 +75,11 @@ export const winemakerProfileResponse = z.object({
   updatedAt: z.any().nullable(),
   websiteUrl: z.string().nullable(),
   wines: z.array(wineInProfile),
+});
+
+export const winemakerListResponse = z.object({
+  data: z.array(winemakerListItemResponse),
+  limit: z.number().int(),
+  page: z.number().int(),
+  total: z.number().int(),
 });

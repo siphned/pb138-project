@@ -1,10 +1,5 @@
 import { useState } from "react";
-import {
-  FormControl,
-  FormDescription,
-  FormItem,
-  FormLabel,
-} from "@/components/ui/form";
+import { FormControl, FormDescription, FormItem, FormLabel } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 
 const IMAGE_ACCEPT = "image/png,image/jpeg,image/webp,image/avif";

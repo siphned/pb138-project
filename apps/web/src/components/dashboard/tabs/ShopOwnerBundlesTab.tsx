@@ -16,10 +16,7 @@ interface ShopOwnerBundlesTabProps {
 }
 
 export function ShopOwnerBundlesTab({ shopId }: ShopOwnerBundlesTabProps) {
-  const query = useGetProducts(
-    { isBundle: true, shopId },
-    { query: { enabled: !!shopId } }
-  );
+  const query = useGetProducts({ isBundle: true, shopId }, { query: { enabled: !!shopId } });
 
   if (!shopId) {
     return (
@@ -48,12 +45,7 @@ export function ShopOwnerBundlesTab({ shopId }: ShopOwnerBundlesTabProps) {
       viewAllTo="/products"
     >
       <div className="flex justify-end">
-        <Button
-          render={
-            <Link params={{ id: shopId }} to="/shops/$id/bundles/new" />
-          }
-          size="sm"
-        >
+        <Button render={<Link params={{ id: shopId }} to="/shops/$id/bundles/new" />} size="sm">
           + Create bundle
         </Button>
       </div>

@@ -16,18 +16,18 @@ import { useUser } from "@/context/UserContext";
 import { usePostRoleRequests } from "@/generated/hooks/usePostRoleRequests";
 
 const roleRequestSchema = z.object({
-  type: z.enum(["winemaker", "shop_owner"]),
   businessName: z
     .string()
     .refine((v) => v.trim().length > 0, { message: "Business name is required" }),
   details: z.string().optional(),
+  type: z.enum(["winemaker", "shop_owner"]),
 });
 
 type RoleRequestValues = z.infer<typeof roleRequestSchema>;
 
 const TYPE_OPTIONS: { value: RoleRequestValues["type"]; label: string }[] = [
-  { value: "winemaker", label: "Winemaker" },
-  { value: "shop_owner", label: "Shop owner" },
+  { label: "Winemaker", value: "winemaker" },
+  { label: "Shop owner", value: "shop_owner" },
 ];
 
 function buildResolver(): Resolver<RoleRequestValues> {
@@ -67,8 +67,8 @@ export function DashboardRoleSection() {
   } = useForm<RoleRequestValues>({
     defaultValues: { businessName: "", details: "", type: "winemaker" },
     mode: "onSubmit",
-    reValidateMode: "onChange",
     resolver,
+    reValidateMode: "onChange",
   });
 
   const type = watch("type");

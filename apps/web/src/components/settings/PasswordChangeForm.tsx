@@ -1,4 +1,4 @@
-import { useReverification, useUser as useClerkUser } from "@clerk/react";
+import { useUser as useClerkUser, useReverification } from "@clerk/react";
 import { LockPasswordIcon } from "@hugeicons/core-free-icons";
 import { HugeiconsIcon } from "@hugeicons/react";
 import { useMemo, useState } from "react";

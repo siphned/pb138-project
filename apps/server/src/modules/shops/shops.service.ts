@@ -1,5 +1,7 @@
 import type { Shop } from "@repo/shared/schemas";
 import { db } from "../../db";
+import type { PaginatedResult } from "../../utils/pagination";
+import { parsePagination } from "../../utils/pagination";
 import { ForbiddenShopActionError, ShopNotFoundError } from "./shops.errors";
 import type { ShopWithAddress } from "./shops.repository";
 import * as shopsRepo from "./shops.repository";
@@ -51,10 +53,13 @@ export class ShopsService {
     return shopsRepo.findAllByOwnerUserId(db, ownerUserId) as Promise<ShopWithAddress[]>;
   }
 
-  listShops(
-    filters: { q?: string; city?: string; ownerUserId?: string } = {}
-  ): Promise<ShopWithAddress[]> {
-    return shopsRepo.findAll(db, filters);
+  async listShops(
+    query: { q?: string; city?: string; ownerUserId?: string; page?: number; limit?: number } = {}
+  ): Promise<PaginatedResult<ShopWithAddress>> {
+    const { page, limit: limitParam, ...filters } = query;
+    const { limit, offset } = parsePagination({ limit: limitParam, page });
+    const { rows, total } = await shopsRepo.findAll(db, filters, { limit, offset });
+    return { data: rows, limit, page: Math.max(1, page ?? 1), total };
   }
 
   async deleteShop(shopId: string, requesterId: string): Promise<void> {

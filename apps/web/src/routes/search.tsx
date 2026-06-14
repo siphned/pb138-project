@@ -97,8 +97,8 @@ function SearchPage() {
 
   // Client-side filtering for entities without BE search support
   const filteredWines = matchesByName(winesQuery.data, q);
-  const filteredWinemakers = matchesByName(winemakersQuery.data, q);
-  const filteredShops = matchesShop(shopsQuery.data, q);
+  const filteredWinemakers = matchesByName(winemakersQuery.data?.data, q);
+  const filteredShops = matchesShop(shopsQuery.data?.data, q);
 
   const wineCount = filteredWines.length;
   const products = productsQuery.data?.data || [];

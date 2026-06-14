@@ -5,8 +5,8 @@ import {
   AddressFields,
   ImageUploadField,
   SubmitButton,
-  TextField,
   TextareaField,
+  TextField,
 } from "@/components/forms";
 import { DateTimePicker } from "@/components/primitives/date-time-picker";
 import {
@@ -27,22 +27,22 @@ import {
 
 const eventFormSchema = z
   .object({
-    name: z.string().refine((v) => v.trim().length > 0, { message: "Name is required" }),
-    description: z.string().optional().default(""),
     capacity: z.coerce.number().int().min(1, { message: "Capacity must be at least 1" }),
-    startTime: z.string().refine((v) => v.trim().length > 0, { message: "Start time is required" }),
+    city: z.string().refine((v) => v.trim().length > 0, { message: "City is required" }),
+    country: z.string().refine((v) => v.trim().length > 0, { message: "Country is required" }),
+    description: z.string().optional().default(""),
     endTime: z.string().refine((v) => v.trim().length > 0, { message: "End time is required" }),
-    inviteType: z.enum(["open", "invite_only"]),
-    visibility: z.enum(["public", "private"]),
-    street: z.string().refine((v) => v.trim().length > 0, { message: "Street is required" }),
     houseNumber: z
       .string()
       .refine((v) => v.trim().length > 0, { message: "House number is required" }),
-    city: z.string().refine((v) => v.trim().length > 0, { message: "City is required" }),
+    inviteType: z.enum(["open", "invite_only"]),
+    name: z.string().refine((v) => v.trim().length > 0, { message: "Name is required" }),
     postalCode: z
       .string()
       .refine((v) => v.trim().length > 0, { message: "Postal code is required" }),
-    country: z.string().refine((v) => v.trim().length > 0, { message: "Country is required" }),
+    startTime: z.string().refine((v) => v.trim().length > 0, { message: "Start time is required" }),
+    street: z.string().refine((v) => v.trim().length > 0, { message: "Street is required" }),
+    visibility: z.enum(["public", "private"]),
   })
   .superRefine((data, ctx) => {
     if (!data.startTime || !data.endTime) return;
@@ -119,8 +119,8 @@ export function EventForm({
       ...defaultValues,
     },
     mode: "onSubmit",
-    reValidateMode: "onChange",
     resolver,
+    reValidateMode: "onChange",
   });
 
   const handleFormSubmit = (values: EventFormValues) => {

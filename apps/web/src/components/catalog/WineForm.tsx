@@ -1,12 +1,7 @@
 import { useMemo, useState } from "react";
 import { type Resolver, useForm } from "react-hook-form";
 import { z } from "zod";
-import {
-  ImageUploadField,
-  SubmitButton,
-  TextField,
-  TextareaField,
-} from "@/components/forms";
+import { ImageUploadField, SubmitButton, TextareaField, TextField } from "@/components/forms";
 import {
   Form,
   FormControl,
@@ -112,19 +107,9 @@ export function WineForm({
   return (
     <Form {...form}>
       <form className="space-y-6" onSubmit={form.handleSubmit(handleFormSubmit)}>
-        <TextField
-          control={form.control}
-          label="Wine name"
-          name="name"
-          placeholder="Pálava 2024"
-        />
+        <TextField control={form.control} label="Wine name" name="name" placeholder="Pálava 2024" />
 
-        <TextareaField
-          control={form.control}
-          label="Description"
-          name="description"
-          rows={3}
-        />
+        <TextareaField control={form.control} label="Description" name="description" rows={3} />
 
         {!hideAttribution && (
           <TextField
@@ -189,12 +174,7 @@ export function WineForm({
         </div>
 
         <div className="grid gap-4 sm:grid-cols-2">
-          <TextField
-            control={form.control}
-            label="Region"
-            name="region"
-            placeholder="Moravia"
-          />
+          <TextField control={form.control} label="Region" name="region" placeholder="Moravia" />
           <TextField
             control={form.control}
             label="Composition"
@@ -204,12 +184,7 @@ export function WineForm({
         </div>
 
         <div className="grid gap-4 sm:grid-cols-3">
-          <TextField
-            control={form.control}
-            label="Vintage year"
-            name="vintageYear"
-            type="number"
-          />
+          <TextField control={form.control} label="Vintage year" name="vintageYear" type="number" />
           <TextField
             control={form.control}
             label="Alcohol %"

@@ -1,10 +1,7 @@
 import { useQueryClient } from "@tanstack/react-query";
 import { Link } from "@tanstack/react-router";
 import { Button } from "@/components/ui/button";
-import {
-  getRoleRequestsQueryKey,
-  useGetRoleRequests,
-} from "@/generated/hooks/useGetRoleRequests";
+import { getRoleRequestsQueryKey, useGetRoleRequests } from "@/generated/hooks/useGetRoleRequests";
 import { usePatchRoleRequestsByIdApprove } from "@/generated/hooks/usePatchRoleRequestsByIdApprove";
 import { usePatchRoleRequestsByIdReject } from "@/generated/hooks/usePatchRoleRequestsByIdReject";
 import { TabPreviewShell } from "./TabPreviewShell";
@@ -34,15 +31,14 @@ export function AdminRoleRequestsTab() {
   const reject = usePatchRoleRequestsByIdReject();
 
   const raw = query.data;
-  const list = (Array.isArray(raw)
-    ? raw
-    : ((raw as { data?: RoleRequestRow[] } | undefined)?.data ?? [])) as RoleRequestRow[];
+  const list = (
+    Array.isArray(raw) ? raw : ((raw as { data?: RoleRequestRow[] } | undefined)?.data ?? [])
+  ) as RoleRequestRow[];
   const pending = list.filter((r) => r.status === "pending" || !r.status);
   const requests = pending.slice(0, 10);
   const hasMore = pending.length > 10;
 
-  const invalidate = () =>
-    queryClient.invalidateQueries({ queryKey: getRoleRequestsQueryKey() });
+  const invalidate = () => queryClient.invalidateQueries({ queryKey: getRoleRequestsQueryKey() });
 
   const isBusy = (id: string) =>
     (approve.isPending && approve.variables?.id === id) ||

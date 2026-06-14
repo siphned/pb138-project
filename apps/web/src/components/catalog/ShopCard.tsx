@@ -3,7 +3,7 @@ import type { GetShops200 } from "@/generated/types/GetShops";
 import { CatalogCard, catalogCardLinkClass } from "./CatalogCard";
 import { ShopImage } from "./ShopImage";
 
-export type GetShops200Item = GetShops200[number];
+export type GetShops200Item = GetShops200["data"][number];
 
 interface ShopCardProps {
   shop: GetShops200Item;

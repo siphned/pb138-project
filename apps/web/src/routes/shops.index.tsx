@@ -2,6 +2,7 @@ import { FilterIcon } from "@hugeicons/core-free-icons";
 import { HugeiconsIcon } from "@hugeicons/react";
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { CatalogFilters } from "@/components/catalog/CatalogFilters";
+import { CatalogPagination } from "@/components/catalog/CatalogPagination";
 import { CatalogResults } from "@/components/catalog/CatalogResults";
 import { CatalogState } from "@/components/catalog/CatalogState";
 import { ShopCard } from "@/components/catalog/ShopCard";
@@ -11,10 +12,13 @@ import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { useGetShops } from "@/generated/hooks/useGetShops";
 
+type ShopsSearch = ShopSearch & { page?: number };
+
 export const Route = createFileRoute("/shops/")({
   component: ShopsPage,
-  validateSearch: (raw): ShopSearch => ({
+  validateSearch: (raw): ShopsSearch => ({
     city: asString(raw.city),
+    page: typeof raw.page === "number" && raw.page > 0 ? raw.page : undefined,
     q: asString(raw.q),
   }),
 });
@@ -22,16 +26,21 @@ export const Route = createFileRoute("/shops/")({
 function ShopsPage() {
   const search = Route.useSearch();
   const navigate = useNavigate({ from: Route.fullPath });
-  const query = useGetShops({ city: search.city, q: search.q });
+
+  const query = useGetShops({ city: search.city, page: search.page, q: search.q });
 
   const handleSearchChange = (next: ShopSearch) => {
-    navigate({ replace: true, search: next });
+    navigate({ replace: true, search: { ...next, page: undefined } });
   };
 
-  const shops = query.data || [];
+  const handlePageChange = (newPage: number) => {
+    navigate({ replace: true, search: { ...search, page: newPage > 1 ? newPage : undefined } });
+  };
 
-  // TODO(WINE-XXX): cap at 20 until BE adds pagination
-  const displayedShops = shops.slice(0, 20);
+  const shops = query.data?.data ?? [];
+  const total = query.data?.total ?? 0;
+  const page = search.page ?? 1;
+  const limit = query.data?.limit ?? 24;
 
   return (
     <div className="container mx-auto space-y-8 px-6 py-8 lg:px-12">
@@ -60,21 +69,28 @@ function ShopsPage() {
           <CatalogFilters entity="shops" onSearchChange={handleSearchChange} search={search} />
         </aside>
 
-        <main>
+        <main className="space-y-6">
           <CatalogState
             emptyDescription="Try adjusting your filters to find what you're looking for."
             emptyTitle="No shops found"
-            isEmpty={displayedShops.length === 0}
+            isEmpty={shops.length === 0}
             isError={query.isError}
             isLoading={query.isLoading}
             onRetry={() => query.refetch()}
           >
-            <CatalogResults count={shops.length}>
-              {displayedShops.map((shop) => (
+            <CatalogResults count={total}>
+              {shops.map((shop) => (
                 <ShopCard key={shop.id} shop={shop} />
               ))}
             </CatalogResults>
           </CatalogState>
+
+          <CatalogPagination
+            limit={limit}
+            onPageChange={handlePageChange}
+            page={page}
+            total={total}
+          />
         </main>
       </div>
     </div>

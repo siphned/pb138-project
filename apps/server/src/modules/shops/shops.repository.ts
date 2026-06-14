@@ -1,6 +1,6 @@
 import type { Address, Shop } from "@repo/shared/schemas";
 import { addresses, shops } from "@repo/shared/schemas";
-import { and, eq, ilike, isNull } from "drizzle-orm";
+import { and, eq, ilike, isNull, sql } from "drizzle-orm";
 import type { Database } from "../../db";
 import { primaryImageUrlSql } from "../images/images.sql";
 
@@ -31,24 +31,37 @@ export async function insertAddress(db: Database, data: AddressData): Promise<Ad
 
 export async function findAll(
   db: Database,
-  filters: { q?: string; city?: string; ownerUserId?: string } = {}
-): Promise<ShopWithAddress[]> {
+  filters: { q?: string; city?: string; ownerUserId?: string },
+  pagination: { limit: number; offset: number }
+): Promise<{ rows: ShopWithAddress[]; total: number }> {
   const conditions = [isNull(shops.deletedAt)];
   if (filters.q) conditions.push(ilike(shops.name, `%${filters.q}%`));
   if (filters.ownerUserId) conditions.push(eq(shops.ownerUserId, filters.ownerUserId));
 
-  const results = await db.query.shops.findMany({
-    extras: { imageUrl: primaryImageUrlSql("shop", shops.id).as("image_url") },
-    where: and(...conditions),
-    with: { address: true },
-  });
-
-  const filtered = results.filter((s) => s.address && !s.address.deletedAt) as ShopWithAddress[];
+  // Filter by city and address non-deleted at the DB level so pagination counts are accurate.
   if (filters.city) {
-    const city = filters.city.toLowerCase();
-    return filtered.filter((s) => s.address.city.toLowerCase().includes(city));
+    const pattern = `%${filters.city}%`;
+    conditions.push(
+      sql`${shops.addressId} IN (SELECT id FROM addresses WHERE city ILIKE ${pattern} AND deleted_at IS NULL)`
+    );
+  } else {
+    conditions.push(sql`${shops.addressId} IN (SELECT id FROM addresses WHERE deleted_at IS NULL)`);
   }
-  return filtered;
+
+  const where = and(...conditions);
+
+  const [rows, [countResult]] = await Promise.all([
+    db.query.shops.findMany({
+      extras: { imageUrl: primaryImageUrlSql("shop", shops.id).as("image_url") },
+      limit: pagination.limit,
+      offset: pagination.offset,
+      where,
+      with: { address: true },
+    }),
+    db.select({ total: sql<number>`COUNT(*)::int` }).from(shops).where(where),
+  ]);
+
+  return { rows: rows as ShopWithAddress[], total: countResult?.total ?? 0 };
 }
 
 export async function findAllByOwnerUserId(

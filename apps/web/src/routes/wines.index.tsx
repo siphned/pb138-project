@@ -1,8 +1,9 @@
-import { ArrowLeft02Icon, ArrowRight02Icon, FilterIcon } from "@hugeicons/core-free-icons";
+import { FilterIcon } from "@hugeicons/core-free-icons";
 import { HugeiconsIcon } from "@hugeicons/react";
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useMemo } from "react";
 import { CatalogFilters } from "@/components/catalog/CatalogFilters";
+import { CatalogPagination } from "@/components/catalog/CatalogPagination";
 import { CatalogResults } from "@/components/catalog/CatalogResults";
 import { CatalogState } from "@/components/catalog/CatalogState";
 import { asNumOrStr, type WineSearch } from "@/components/catalog/types";
@@ -118,34 +119,12 @@ function WinesListPage() {
             </CatalogResults>
           </CatalogState>
 
-          {filteredWines.length > PAGE_SIZE && (
-            <nav
-              aria-label="Pagination"
-              className="flex items-center justify-between gap-4 border-t border-border pt-4"
-            >
-              <Button
-                disabled={safePage <= 1}
-                onClick={() => handlePageChange(safePage - 1)}
-                size="sm"
-                variant="outline"
-              >
-                <HugeiconsIcon className="mr-1 h-4 w-4" icon={ArrowLeft02Icon} />
-                Previous
-              </Button>
-              <span className="text-sm text-muted-foreground">
-                Page {safePage} of {totalPages}
-              </span>
-              <Button
-                disabled={safePage >= totalPages}
-                onClick={() => handlePageChange(safePage + 1)}
-                size="sm"
-                variant="outline"
-              >
-                Next
-                <HugeiconsIcon className="ml-1 h-4 w-4" icon={ArrowRight02Icon} />
-              </Button>
-            </nav>
-          )}
+          <CatalogPagination
+            limit={PAGE_SIZE}
+            onPageChange={handlePageChange}
+            page={safePage}
+            total={filteredWines.length}
+          />
         </main>
       </div>
     </div>

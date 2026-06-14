@@ -26,9 +26,7 @@ export function ShopSelector({ value, onChange }: ShopSelectorProps) {
   return (
     <Select onValueChange={(v) => v && onChange(v)} value={value}>
       <SelectTrigger className="w-[220px]">
-        <SelectValue placeholder="Select a shop">
-          {(v: string | null) => labelFor(v)}
-        </SelectValue>
+        <SelectValue placeholder="Select a shop">{(v: string | null) => labelFor(v)}</SelectValue>
       </SelectTrigger>
       <SelectContent>
         <SelectItem value="all">All shops</SelectItem>
