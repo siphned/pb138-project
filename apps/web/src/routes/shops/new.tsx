@@ -2,11 +2,11 @@ import { ArrowLeft02Icon, CheckmarkCircle02Icon } from "@hugeicons/core-free-ico
 import { HugeiconsIcon } from "@hugeicons/react";
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { PageHeader } from "@/components/primitives/page-header";
-import { ShopForm, type ShopFormValues } from "@/components/shops/ShopForm";
-import { ShopMoreSetupCards } from "@/components/shops/ShopMoreSetupCards";
 import { Button } from "@/components/ui/button";
 import { useGetShopsById } from "@/generated/hooks/useGetShopsById";
 import { usePostShops } from "@/generated/hooks/usePostShops";
+import { ShopForm, type ShopFormValues } from "@/routes/shops/-components/ShopForm";
+import { ShopMoreSetupCards } from "@/routes/shops/-components/ShopMoreSetupCards";
 
 interface ShopNewSearch {
   /** When set, the page is showing the post-create success state for this shop. */

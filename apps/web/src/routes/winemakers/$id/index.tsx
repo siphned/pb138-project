@@ -1,10 +1,6 @@
 import { ArrowLeft02Icon } from "@hugeicons/core-free-icons";
 import { HugeiconsIcon } from "@hugeicons/react";
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { CatalogState } from "@/components/catalog/CatalogState";
-import { WineCard } from "@/components/catalog/WineCard";
-import { WinemakerDetailsCard } from "@/components/catalog/WinemakerDetailsCard";
-import { EventCard } from "@/components/events/EventCard";
 import { DataGrid } from "@/components/primitives/data-grid";
 import { ErrorState } from "@/components/primitives/error-state";
 import { LoadingState } from "@/components/primitives/loading-state";
@@ -13,6 +9,10 @@ import { Separator } from "@/components/ui/separator";
 import { useGetEvents } from "@/generated/hooks/useGetEvents";
 import { useGetWinemakersById } from "@/generated/hooks/useGetWinemakersById";
 import { useGetWines } from "@/generated/hooks/useGetWines";
+import { CatalogState } from "@/routes/-components/CatalogState";
+import { EventCard } from "@/routes/-components/EventCard";
+import { WineCard } from "@/routes/-components/WineCard";
+import { WinemakerDetailsCard } from "@/routes/winemakers/$id/-components/WinemakerDetailsCard";
 import { EntityReviewsSection } from "../../-components/EntityReviewsSection";
 
 export const Route = createFileRoute("/winemakers/$id/")({

@@ -1,15 +1,15 @@
 import { ArrowLeft02Icon } from "@hugeicons/core-free-icons";
 import { HugeiconsIcon } from "@hugeicons/react";
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { WineDetailsCard } from "@/components/catalog/WineDetailsCard";
 import { ErrorState } from "@/components/primitives/error-state";
 import { LoadingState } from "@/components/primitives/loading-state";
 import { PageHeader } from "@/components/primitives/page-header";
 import { Separator } from "@/components/ui/separator";
 import { useGetWinesById } from "@/generated/hooks/useGetWinesById";
 import { useGetWinesByIdImages } from "@/generated/hooks/useGetWinesByIdImages";
-import { WineGallery } from "../-components/WineGallery";
-import { WinesAvailableInShops } from "../-components/WinesAvailableInShops";
+import { WineDetailsCard } from "@/routes/wines/-components/WineDetailsCard";
+import { WineGallery } from "@/routes/wines/-components/WineGallery";
+import { WinesAvailableInShops } from "@/routes/wines/-components/WinesAvailableInShops";
 
 export const Route = createFileRoute("/wines/$id")({
   component: WineDetailPage,

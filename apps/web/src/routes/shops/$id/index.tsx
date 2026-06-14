@@ -4,14 +4,14 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { ErrorState } from "@/components/primitives/error-state";
 import { LoadingState } from "@/components/primitives/loading-state";
 import { Section } from "@/components/primitives/section";
-import { ShopDetailsCard } from "@/components/shops/ShopDetailsCard";
-import { ShopHero } from "@/components/shops/ShopHero";
-import { ShopProductsRow } from "@/components/shops/ShopProductsRow";
 import { useGetShopsById } from "@/generated/hooks/useGetShopsById";
 import { useGetShopsByIdImages } from "@/generated/hooks/useGetShopsByIdImages";
+import { ShopDetailsCard } from "@/routes/shops/$id/-components/ShopDetailsCard";
+import { ShopHero } from "@/routes/shops/$id/-components/ShopHero";
+import { ShopHeroGallery } from "@/routes/shops/$id/-components/ShopHeroGallery";
+import { ShopMapEmbed } from "@/routes/shops/$id/-components/ShopMapEmbed";
+import { ShopProductsRow } from "@/routes/shops/$id/-components/ShopProductsRow";
 import { EntityReviewsSection } from "../../-components/EntityReviewsSection";
-import { ShopHeroGallery } from "../../-components/ShopHeroGallery";
-import { ShopMapEmbed } from "../../-components/ShopMapEmbed";
 
 export const Route = createFileRoute("/shops/$id/")({
   component: ShopDetailPage,

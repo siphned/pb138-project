@@ -1,10 +1,10 @@
 import { ArrowRight02Icon } from "@hugeicons/core-free-icons";
 import { HugeiconsIcon } from "@hugeicons/react";
 import { Link } from "@tanstack/react-router";
-import { BundleCard } from "@/components/catalog/BundleCard";
-import { ProductCard } from "@/components/catalog/ProductCard";
 import { buttonVariants } from "@/components/ui/button";
 import { useGetProducts } from "@/generated/hooks/useGetProducts";
+import { ProductCard } from "@/routes/-components/ProductCard";
+import { BundleCard } from "@/routes/products/-components/BundleCard";
 
 interface ExploreSectionProps {
   mode: "wines" | "bundles";

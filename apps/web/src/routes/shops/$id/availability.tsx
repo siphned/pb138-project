@@ -7,8 +7,6 @@ import { ErrorState } from "@/components/primitives/error-state";
 import { LoadingState } from "@/components/primitives/loading-state";
 import { PageHeader } from "@/components/primitives/page-header";
 import { Section } from "@/components/primitives/section";
-import { AvailabilityExceptionForm } from "@/components/shops/AvailabilityExceptionForm";
-import { AvailabilityRegularForm } from "@/components/shops/AvailabilityRegularForm";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import {
@@ -24,6 +22,8 @@ import {
   getShopsByIdAvailabilityQueryKey,
   useGetShopsByIdAvailability,
 } from "@/generated/hooks/useGetShopsByIdAvailability";
+import { AvailabilityExceptionForm } from "@/routes/shops/$id/-components/AvailabilityExceptionForm";
+import { AvailabilityRegularForm } from "@/routes/shops/$id/-components/AvailabilityRegularForm";
 
 export const Route = createFileRoute("/shops/$id/availability")({
   component: AvailabilityPage,

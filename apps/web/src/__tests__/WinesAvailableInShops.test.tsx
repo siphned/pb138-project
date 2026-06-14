@@ -1,6 +1,6 @@
 import { render, screen } from "@testing-library/react";
 import { beforeEach, describe, expect, it, vi } from "vitest";
-import { WinesAvailableInShops } from "../routes/-components/WinesAvailableInShops";
+import { WinesAvailableInShops } from "@/routes/wines/-components/WinesAvailableInShops";
 
 vi.mock("@tanstack/react-router", () => ({
   Link: ({ children }: any) => <a href="/">{children}</a>,
@@ -10,7 +10,7 @@ vi.mock("@/generated/hooks/useGetProducts", () => ({
   useGetProducts: vi.fn(),
 }));
 
-vi.mock("@/components/catalog/ProductCard", () => ({
+vi.mock("@/routes/-components/ProductCard", () => ({
   ProductCard: ({ product }: any) => <div data-testid="product-card">{product.name}</div>,
 }));
 

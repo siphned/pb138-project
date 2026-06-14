@@ -1,11 +1,11 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { EmptyState } from "@/components/primitives/empty-state";
 import { PageHeader } from "@/components/primitives/page-header";
-import { AdminStatsSection } from "@/components/stats/AdminStatsSection";
-import { CustomerStatsSection } from "@/components/stats/CustomerStatsSection";
-import { ShopOwnerStatsSection } from "@/components/stats/ShopOwnerStatsSection";
-import { WinemakerStatsSection } from "@/components/stats/WinemakerStatsSection";
 import { useUser } from "@/context/UserContext";
+import { AdminStatsSection } from "@/routes/_authenticated/-components/AdminStatsSection";
+import { CustomerStatsSection } from "@/routes/_authenticated/-components/CustomerStatsSection";
+import { ShopOwnerStatsSection } from "@/routes/_authenticated/-components/ShopOwnerStatsSection";
+import { WinemakerStatsSection } from "@/routes/_authenticated/-components/WinemakerStatsSection";
 import { Role } from "@/types/roles";
 
 export const Route = createFileRoute("/_authenticated/stats")({

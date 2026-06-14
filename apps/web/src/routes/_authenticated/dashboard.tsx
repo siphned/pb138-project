@@ -1,8 +1,8 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { DashboardProfileCard } from "@/components/dashboard/DashboardProfileCard";
-import { DashboardQuickStats } from "@/components/dashboard/DashboardQuickStats";
-import { DashboardTabs } from "@/components/dashboard/DashboardTabs";
 import { Section } from "@/components/primitives/section";
+import { DashboardProfileCard } from "@/routes/_authenticated/-components/DashboardProfileCard";
+import { DashboardQuickStats } from "@/routes/_authenticated/-components/DashboardQuickStats";
+import { DashboardTabs } from "@/routes/_authenticated/-components/DashboardTabs";
 
 export const Route = createFileRoute("/_authenticated/dashboard")({
   component: DashboardPage,

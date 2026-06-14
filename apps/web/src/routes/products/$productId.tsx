@@ -2,18 +2,18 @@ import { ArrowLeft02Icon } from "@hugeicons/core-free-icons";
 import { HugeiconsIcon } from "@hugeicons/react";
 import { useQueryClient } from "@tanstack/react-query";
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { ProductDetailsCard } from "@/components/catalog/ProductDetailsCard";
 import { ErrorState } from "@/components/primitives/error-state";
 import { LoadingState } from "@/components/primitives/loading-state";
 import { getCartsQueryKey } from "@/generated/hooks/useGetCarts";
 import { useGetProductsById } from "@/generated/hooks/useGetProductsById";
 import { useGetProductsByIdImages } from "@/generated/hooks/useGetProductsByIdImages";
 import { usePostCartsItems } from "@/generated/hooks/usePostCartsItems";
-import { BundleWinesSection } from "../-components/BundleWinesSection";
-import { ProductGallery } from "../-components/ProductGallery";
-import { ProductRelatedSection } from "../-components/ProductRelatedSection";
-import { ProductReviewsSection } from "../-components/ProductReviewsSection";
-import { ProductSoldAtCard } from "../-components/ProductSoldAtCard";
+import { BundleWinesSection } from "@/routes/products/-components/BundleWinesSection";
+import { ProductDetailsCard } from "@/routes/products/-components/ProductDetailsCard";
+import { ProductGallery } from "@/routes/products/-components/ProductGallery";
+import { ProductRelatedSection } from "@/routes/products/-components/ProductRelatedSection";
+import { ProductReviewsSection } from "@/routes/products/-components/ProductReviewsSection";
+import { ProductSoldAtCard } from "@/routes/products/-components/ProductSoldAtCard";
 
 export const Route = createFileRoute("/products/$productId")({
   component: ProductDetailPage,

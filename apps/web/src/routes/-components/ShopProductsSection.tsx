@@ -1,9 +1,9 @@
 import { ArrowRight02Icon } from "@hugeicons/core-free-icons";
 import { HugeiconsIcon } from "@hugeicons/react";
 import { Link } from "@tanstack/react-router";
-import { ProductCard } from "@/components/catalog/ProductCard";
 import { Button } from "@/components/ui/button";
 import { useGetShopsByIdProducts } from "@/generated/hooks/useGetShopsByIdProducts";
+import { ProductCard } from "@/routes/-components/ProductCard";
 
 // Shape returned by GET /shops/:id/products (no response schema in OpenAPI)
 type ShopProductRaw = {

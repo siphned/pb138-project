@@ -2,12 +2,12 @@ import { ArrowLeft02Icon } from "@hugeicons/core-free-icons";
 import { HugeiconsIcon } from "@hugeicons/react";
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useState } from "react";
-import { WineForm, type WineFormValues } from "@/components/catalog/WineForm";
 import { LoadingState } from "@/components/primitives/loading-state";
 import { PageHeader } from "@/components/primitives/page-header";
 import { useGetWinemakersMe } from "@/generated/hooks/useGetWinemakersMe";
 import { usePostWines } from "@/generated/hooks/usePostWines";
 import { axiosInstance } from "@/lib/axios";
+import { WineForm, type WineFormValues } from "@/routes/wines/-components/WineForm";
 
 export const Route = createFileRoute("/wines/new")({
   component: WineCreatePage,

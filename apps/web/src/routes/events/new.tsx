@@ -2,11 +2,11 @@ import { ArrowLeft02Icon } from "@hugeicons/core-free-icons";
 import { HugeiconsIcon } from "@hugeicons/react";
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useState } from "react";
-import { EventForm, type EventFormValues } from "@/components/events/EventForm";
 import { PageHeader } from "@/components/primitives/page-header";
 import { usePostEvents } from "@/generated/hooks/usePostEvents";
 import { parseApiError } from "@/lib/api-errors";
 import { axiosInstance } from "@/lib/axios";
+import { EventForm, type EventFormValues } from "@/routes/events/-components/EventForm";
 
 export const Route = createFileRoute("/events/new")({
   component: EventCreatePage,

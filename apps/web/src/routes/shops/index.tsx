@@ -1,15 +1,15 @@
 import { FilterIcon } from "@hugeicons/core-free-icons";
 import { HugeiconsIcon } from "@hugeicons/react";
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
-import { CatalogFilters } from "@/components/catalog/CatalogFilters";
-import { CatalogResults } from "@/components/catalog/CatalogResults";
-import { CatalogState } from "@/components/catalog/CatalogState";
-import { ShopCard } from "@/components/catalog/ShopCard";
-import { asString, type ShopSearch } from "@/components/catalog/types";
 import { PageHeader } from "@/components/primitives/page-header";
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { useGetShops } from "@/generated/hooks/useGetShops";
+import { CatalogFilters } from "@/routes/-components/CatalogFilters";
+import { CatalogResults } from "@/routes/-components/CatalogResults";
+import { CatalogState } from "@/routes/-components/CatalogState";
+import { ShopCard } from "@/routes/-components/ShopCard";
+import { asString, type ShopSearch } from "@/routes/-components/types";
 
 export const Route = createFileRoute("/shops/")({
   component: ShopsPage,

@@ -1,16 +1,16 @@
 import { ArrowLeft02Icon } from "@hugeicons/core-free-icons";
 import { HugeiconsIcon } from "@hugeicons/react";
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { DashboardRoleSection } from "@/components/dashboard/DashboardRoleSection";
 import { ErrorState } from "@/components/primitives/error-state";
 import { LoadingState } from "@/components/primitives/loading-state";
 import { PageHeader } from "@/components/primitives/page-header";
 import { Section } from "@/components/primitives/section";
-import { ClerkNameForm } from "@/components/settings/ClerkNameForm";
-import { PasswordChangeForm } from "@/components/settings/PasswordChangeForm";
-import { SettingsAddressForm } from "@/components/settings/SettingsAddressForm";
 import { Card, CardContent } from "@/components/ui/card";
 import { useGetUsersMeAddresses } from "@/generated/hooks/useGetUsersMeAddresses";
+import { ClerkNameForm } from "@/routes/_authenticated/-components/ClerkNameForm";
+import { DashboardRoleSection } from "@/routes/_authenticated/-components/DashboardRoleSection";
+import { PasswordChangeForm } from "@/routes/_authenticated/-components/PasswordChangeForm";
+import { SettingsAddressForm } from "@/routes/_authenticated/-components/SettingsAddressForm";
 
 export const Route = createFileRoute("/_authenticated/settings")({
   component: SettingsPage,

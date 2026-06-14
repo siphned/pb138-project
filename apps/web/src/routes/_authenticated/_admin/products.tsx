@@ -1,6 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { StubGet } from "@/components/dev/StubGet";
 import { useGetProducts } from "@/generated/hooks/useGetProducts";
+import { StubGet } from "@/routes/-components/StubGet";
 
 export const Route = createFileRoute("/_authenticated/_admin/products")({
   component: AdminProductsStub,

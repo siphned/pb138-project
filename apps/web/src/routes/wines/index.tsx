@@ -2,11 +2,6 @@ import { ArrowLeft02Icon, ArrowRight02Icon, FilterIcon } from "@hugeicons/core-f
 import { HugeiconsIcon } from "@hugeicons/react";
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useMemo } from "react";
-import { CatalogFilters } from "@/components/catalog/CatalogFilters";
-import { CatalogResults } from "@/components/catalog/CatalogResults";
-import { CatalogState } from "@/components/catalog/CatalogState";
-import { asNumOrStr, type WineSearch } from "@/components/catalog/types";
-import { WineCard } from "@/components/catalog/WineCard";
 import { PageHeader } from "@/components/primitives/page-header";
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
@@ -17,6 +12,11 @@ import {
   getWinesQueryParamsColorEnum,
   getWinesQueryParamsTypeEnum,
 } from "@/generated/types/GetWines";
+import { CatalogFilters } from "@/routes/-components/CatalogFilters";
+import { CatalogResults } from "@/routes/-components/CatalogResults";
+import { CatalogState } from "@/routes/-components/CatalogState";
+import { asNumOrStr, type WineSearch } from "@/routes/-components/types";
+import { WineCard } from "@/routes/-components/WineCard";
 
 const COLOR_VALUES = Object.values(getWinesQueryParamsColorEnum) as readonly string[];
 const isColor = (v: unknown): v is GetWinesQueryParamsColorEnumKey =>

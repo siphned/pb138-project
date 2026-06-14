@@ -1,15 +1,15 @@
 import { FilterIcon } from "@hugeicons/core-free-icons";
 import { HugeiconsIcon } from "@hugeicons/react";
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
-import { CatalogFilters } from "@/components/catalog/CatalogFilters";
-import { CatalogResults } from "@/components/catalog/CatalogResults";
-import { CatalogState } from "@/components/catalog/CatalogState";
-import { asString, type WinemakerSearch } from "@/components/catalog/types";
-import { WinemakerCard } from "@/components/catalog/WinemakerCard";
 import { PageHeader } from "@/components/primitives/page-header";
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { useGetWinemakers } from "@/generated/hooks/useGetWinemakers";
+import { CatalogFilters } from "@/routes/-components/CatalogFilters";
+import { CatalogResults } from "@/routes/-components/CatalogResults";
+import { CatalogState } from "@/routes/-components/CatalogState";
+import { asString, type WinemakerSearch } from "@/routes/-components/types";
+import { WinemakerCard } from "@/routes/-components/WinemakerCard";
 
 export const Route = createFileRoute("/winemakers/")({
   component: WinemakersPage,

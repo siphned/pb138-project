@@ -1,17 +1,17 @@
 import { ArrowLeft02Icon } from "@hugeicons/core-free-icons";
 import { HugeiconsIcon } from "@hugeicons/react";
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { EventCommentList } from "@/components/events/EventCommentList";
-import { EventDetailsCard } from "@/components/events/EventDetailsCard";
-import { EventHero } from "@/components/events/EventHero";
-import { EventImageCarousel } from "@/components/events/EventImageCarousel";
-import { EventManageMenu } from "@/components/events/EventManageMenu";
 import { ErrorState } from "@/components/primitives/error-state";
 import { LoadingState } from "@/components/primitives/loading-state";
 import { LocationMapEmbed } from "@/components/primitives/location-map-embed";
 import { Section } from "@/components/primitives/section";
 import { Separator } from "@/components/ui/separator";
 import { useGetEventsById } from "@/generated/hooks/useGetEventsById";
+import { EventCommentList } from "@/routes/events/$id/-components/EventCommentList";
+import { EventDetailsCard } from "@/routes/events/$id/-components/EventDetailsCard";
+import { EventHero } from "@/routes/events/$id/-components/EventHero";
+import { EventImageCarousel } from "@/routes/events/$id/-components/EventImageCarousel";
+import { EventManageMenu } from "@/routes/events/$id/-components/EventManageMenu";
 
 export const Route = createFileRoute("/events/$id/")({
   component: EventDetailPage,

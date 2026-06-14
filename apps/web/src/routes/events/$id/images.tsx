@@ -1,10 +1,10 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { StubGet } from "@/components/dev/StubGet";
-import { StubMutation } from "@/components/dev/StubMutation";
-import { StubPage } from "@/components/dev/StubPage";
 import { useDeleteEventsByIdImagesByImageId } from "@/generated/hooks/useDeleteEventsByIdImagesByImageId";
 import { useGetEventsByIdImages } from "@/generated/hooks/useGetEventsByIdImages";
 import { usePostEventsByIdImages } from "@/generated/hooks/usePostEventsByIdImages";
+import { StubGet } from "@/routes/-components/StubGet";
+import { StubMutation } from "@/routes/-components/StubMutation";
+import { StubPage } from "@/routes/-components/StubPage";
 
 export const Route = createFileRoute("/events/$id/images")({
   component: EventsImagesStub,

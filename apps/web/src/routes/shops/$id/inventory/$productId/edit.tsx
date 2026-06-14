@@ -4,8 +4,8 @@ import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { ErrorState } from "@/components/primitives/error-state";
 import { LoadingState } from "@/components/primitives/loading-state";
 import { PageHeader } from "@/components/primitives/page-header";
-import { InventoryEditForm } from "@/components/shops/InventoryEditForm";
 import { useGetProductsById } from "@/generated/hooks/useGetProductsById";
+import { InventoryEditForm } from "@/routes/shops/$id/inventory/$productId/-components/InventoryEditForm";
 
 export const Route = createFileRoute("/shops/$id/inventory/$productId/edit")({
   component: InventoryEditPage,

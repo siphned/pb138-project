@@ -1,9 +1,9 @@
 import { render, screen } from "@testing-library/react";
 import { describe, expect, it, vi } from "vitest";
-import { useEntityReviews } from "@/components/reviews/use-entity-reviews";
+import { useEntityReviews } from "@/routes/-components/use-entity-reviews";
 import { EntityReviewsSection } from "./EntityReviewsSection";
 
-vi.mock("@/components/reviews/use-entity-reviews", () => ({
+vi.mock("@/routes/-components/use-entity-reviews", () => ({
   entityReviewsQueryKey: (...args: unknown[]) => ["reviews", ...args],
   useEntityReviews: vi.fn(),
 }));

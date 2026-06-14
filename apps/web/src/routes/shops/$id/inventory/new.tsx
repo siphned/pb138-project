@@ -2,7 +2,7 @@ import { ArrowLeft02Icon } from "@hugeicons/core-free-icons";
 import { HugeiconsIcon } from "@hugeicons/react";
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { PageHeader } from "@/components/primitives/page-header";
-import { InventoryForm } from "@/components/shops/InventoryForm";
+import { InventoryForm } from "@/routes/shops/$id/inventory/-components/InventoryForm";
 
 export const Route = createFileRoute("/shops/$id/inventory/new")({
   component: InventoryNewPage,

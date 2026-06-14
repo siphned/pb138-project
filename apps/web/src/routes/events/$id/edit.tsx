@@ -1,13 +1,16 @@
 import { ArrowLeft02Icon } from "@hugeicons/core-free-icons";
 import { HugeiconsIcon } from "@hugeicons/react";
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
-import { EventEditForm, type EventEditFormValues } from "@/components/events/EventEditForm";
 import { ErrorState } from "@/components/primitives/error-state";
 import { LoadingState } from "@/components/primitives/loading-state";
 import { PageHeader } from "@/components/primitives/page-header";
 import { useGetEventsById } from "@/generated/hooks/useGetEventsById";
 import { usePatchEventsById } from "@/generated/hooks/usePatchEventsById";
 import { parseApiError } from "@/lib/api-errors";
+import {
+  EventEditForm,
+  type EventEditFormValues,
+} from "@/routes/events/$id/-components/EventEditForm";
 
 export const Route = createFileRoute("/events/$id/edit")({
   component: EventEditPage,

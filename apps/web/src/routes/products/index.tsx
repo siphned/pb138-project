@@ -1,12 +1,6 @@
 import { FilterIcon } from "@hugeicons/core-free-icons";
 import { HugeiconsIcon } from "@hugeicons/react";
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
-import { CatalogFilters } from "@/components/catalog/CatalogFilters";
-import { CatalogPagination } from "@/components/catalog/CatalogPagination";
-import { CatalogResults } from "@/components/catalog/CatalogResults";
-import { CatalogState } from "@/components/catalog/CatalogState";
-import { ProductCard } from "@/components/catalog/ProductCard";
-import { asNumOrStr, asString, type ProductSearch } from "@/components/catalog/types";
 import { PageHeader } from "@/components/primitives/page-header";
 import { Button } from "@/components/ui/button";
 import {
@@ -26,6 +20,12 @@ import {
   getProductsQueryParamsSortEnum,
   getProductsQueryParamsTypeEnum,
 } from "@/generated/types/GetProducts";
+import { CatalogFilters } from "@/routes/-components/CatalogFilters";
+import { CatalogPagination } from "@/routes/-components/CatalogPagination";
+import { CatalogResults } from "@/routes/-components/CatalogResults";
+import { CatalogState } from "@/routes/-components/CatalogState";
+import { ProductCard } from "@/routes/-components/ProductCard";
+import { asNumOrStr, asString, type ProductSearch } from "@/routes/-components/types";
 
 const COLOR_VALUES = Object.values(getProductsQueryParamsColorEnum) as readonly string[];
 const isColor = (v: unknown): v is GetProductsQueryParamsColorEnumKey =>

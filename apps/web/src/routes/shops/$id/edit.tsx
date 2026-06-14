@@ -4,10 +4,10 @@ import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { ErrorState } from "@/components/primitives/error-state";
 import { LoadingState } from "@/components/primitives/loading-state";
 import { PageHeader } from "@/components/primitives/page-header";
-import { ShopForm, type ShopFormValues } from "@/components/shops/ShopForm";
-import { ShopMoreSetupCards } from "@/components/shops/ShopMoreSetupCards";
 import { useGetShopsById } from "@/generated/hooks/useGetShopsById";
 import { usePatchShopsById } from "@/generated/hooks/usePatchShopsById";
+import { ShopForm, type ShopFormValues } from "@/routes/shops/-components/ShopForm";
+import { ShopMoreSetupCards } from "@/routes/shops/-components/ShopMoreSetupCards";
 
 export const Route = createFileRoute("/shops/$id/edit")({
   component: ShopEditPage,

@@ -1,16 +1,16 @@
 import { FilterIcon } from "@hugeicons/core-free-icons";
 import { HugeiconsIcon } from "@hugeicons/react";
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
-import { CatalogFilters } from "@/components/catalog/CatalogFilters";
-import { CatalogPagination } from "@/components/catalog/CatalogPagination";
-import { CatalogResults } from "@/components/catalog/CatalogResults";
-import { CatalogState } from "@/components/catalog/CatalogState";
-import type { EventSearch } from "@/components/catalog/types";
-import { EventCard } from "@/components/events/EventCard";
 import { PageHeader } from "@/components/primitives/page-header";
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { useGetEvents } from "@/generated/hooks/useGetEvents";
+import { CatalogFilters } from "@/routes/-components/CatalogFilters";
+import { CatalogPagination } from "@/routes/-components/CatalogPagination";
+import { CatalogResults } from "@/routes/-components/CatalogResults";
+import { CatalogState } from "@/routes/-components/CatalogState";
+import { EventCard } from "@/routes/-components/EventCard";
+import type { EventSearch } from "@/routes/-components/types";
 
 const toNum = (v: unknown): number | undefined => {
   if (typeof v === "number" && Number.isFinite(v)) return v;
