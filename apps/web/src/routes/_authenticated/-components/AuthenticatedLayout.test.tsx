@@ -16,7 +16,7 @@ vi.mock("@tanstack/react-router", () => ({
 
 import { useAuth } from "@clerk/react";
 // Import AFTER mocks so the module picks up the mocked dependencies
-import { AuthenticatedLayout } from "../routes/_authenticated";
+import { AuthenticatedLayout } from "@/routes/_authenticated";
 
 describe("AuthenticatedLayout", () => {
   beforeEach(() => {
