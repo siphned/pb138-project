@@ -88,7 +88,18 @@
       "Bash(grep -nE 'OrdersIndex|orders/$id|getParentRoute.*Orders|AuthenticatedOrdersRoute ' src/routeTree.gen.ts)",
       "Bash(xargs wc -l)",
       "Bash(grep -nE '\"@/\\\\*\"|paths' tsconfig*.json)",
-      "Bash(grep -nA15 \"test:\" vite.config.ts)"
+      "Bash(grep -nA15 \"test:\" vite.config.ts)",
+      "Bash([ -f \"$F\" ])",
+      "PowerShell(Get-Process *)",
+      "PowerShell($p = Get-Process -Id 17096 -ErrorAction SilentlyContinue; if \\($p\\) { \"alive CPU=$\\([int]$p.CPU\\)s WS=$\\([int]\\($p.WorkingSet64/1MB\\)\\)MB\" } else { \"process exited\" })",
+      "PowerShell(Get-Content *)",
+      "Bash(break)",
+      "PowerShell($p = Get-Process -Id 5312 -ErrorAction SilentlyContinue; if \\($p\\) { \"alive CPU=$\\([int]$p.CPU\\)s WS=$\\([int]\\($p.WorkingSet64/1MB\\)\\)MB\" } else { \"exited\" })",
+      "Bash(echo \"biome exit=$?\")",
+      "Bash(echo \"check-types exit=$?\")",
+      "Bash(echo \"biome=$?\")",
+      "Bash(nohup bun run test)",
+      "Bash(powershell -NoProfile -Command 'Get-Process bun -ErrorAction SilentlyContinue | Where-Object { $_.WorkingSet64 -gt 200MB } | ForEach-Object { '\\\\''alive CPU='\\\\''+[int]$_.CPU+'\\\\''s'\\\\'' }')"
     ]
   }
 }
