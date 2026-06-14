@@ -3,7 +3,10 @@ import { HugeiconsIcon } from "@hugeicons/react";
 import { Link } from "@tanstack/react-router";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
-import { ImageUploadField, SubmitButton, TextareaField, TextField } from "@/components/forms";
+import { ImageUploadField } from "@/components/forms/ImageUploadField";
+import { SubmitButton } from "@/components/forms/SubmitButton";
+import { TextareaField } from "@/components/forms/TextareaField";
+import { TextField } from "@/components/forms/TextField";
 import { Button } from "@/components/ui/button";
 import {
   Form,

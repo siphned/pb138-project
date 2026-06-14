@@ -1,7 +1,10 @@
 import { useMemo, useState } from "react";
 import { type Resolver, useForm } from "react-hook-form";
 import { z } from "zod";
-import { ImageUploadField, SubmitButton, TextareaField, TextField } from "@/components/forms";
+import { ImageUploadField } from "@/components/forms/ImageUploadField";
+import { SubmitButton } from "@/components/forms/SubmitButton";
+import { TextareaField } from "@/components/forms/TextareaField";
+import { TextField } from "@/components/forms/TextField";
 import {
   Form,
   FormControl,
