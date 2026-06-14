@@ -115,9 +115,9 @@ describe("updateEvent", () => {
     vi.mocked(eventsRepo.findById).mockResolvedValue(pastEvent);
     vi.mocked(eventsRepo.findWinemakerByUserId).mockResolvedValue(mockWinemaker as any);
 
-    await expect(
-      eventsService.updateEvent(eventId, userId, { name: "New Name" })
-    ).rejects.toThrow(/EVENT_STATUS_CONFLICT|already/i);
+    await expect(eventsService.updateEvent(eventId, userId, { name: "New Name" })).rejects.toThrow(
+      /EVENT_STATUS_CONFLICT|already/i
+    );
   });
 });
 

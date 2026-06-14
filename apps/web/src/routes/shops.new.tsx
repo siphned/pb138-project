@@ -104,9 +104,7 @@ function ShopCreatedSuccess({ shopId }: { shopId: string }) {
         <div className="flex items-start gap-3">
           <HugeiconsIcon className="mt-1 h-6 w-6 text-primary" icon={CheckmarkCircle02Icon} />
           <div>
-            <h1 className="font-heading text-2xl font-bold text-foreground">
-              {shopName} is live
-            </h1>
+            <h1 className="font-heading text-2xl font-bold text-foreground">{shopName} is live</h1>
             <p className="text-sm text-muted-foreground">
               Finish setting up your shop below so customers can find you.
             </p>
@@ -117,10 +115,7 @@ function ShopCreatedSuccess({ shopId }: { shopId: string }) {
       <ShopMoreSetupCards heading="Finish setup" shopId={shopId} />
 
       <div className="flex justify-end gap-2">
-        <Button
-          render={<Link params={{ id: shopId }} to="/shops/$id/edit" />}
-          variant="outline"
-        >
+        <Button render={<Link params={{ id: shopId }} to="/shops/$id/edit" />} variant="outline">
           Edit shop details
         </Button>
         <Button render={<Link params={{ id: shopId }} to="/shops/$id" />}>View shop</Button>

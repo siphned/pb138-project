@@ -1,8 +1,4 @@
-import {
-  ArrowRight01Icon,
-  Calendar03Icon,
-  Image01Icon,
-} from "@hugeicons/core-free-icons";
+import { ArrowRight01Icon, Calendar03Icon, Image01Icon } from "@hugeicons/core-free-icons";
 import { HugeiconsIcon } from "@hugeicons/react";
 import { Link } from "@tanstack/react-router";
 import { Section } from "@/components/primitives/section";
@@ -18,10 +14,7 @@ interface ShopMoreSetupCardsProps {
  * Two-card grid linking to the shop's images and availability pages. Used on
  * both the edit page and the post-create success state of the new shop page.
  */
-export function ShopMoreSetupCards({
-  shopId,
-  heading = "More setup",
-}: ShopMoreSetupCardsProps) {
+export function ShopMoreSetupCards({ shopId, heading = "More setup" }: ShopMoreSetupCardsProps) {
   return (
     <Section heading={heading}>
       <div className="grid gap-4 sm:grid-cols-2">

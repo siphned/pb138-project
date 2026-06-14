@@ -30,9 +30,7 @@ function BundleNewPage() {
       />
 
       <BundleForm
-        onSuccess={(productId) =>
-          navigate({ params: { productId }, to: "/products/$productId" })
-        }
+        onSuccess={(productId) => navigate({ params: { productId }, to: "/products/$productId" })}
         shopId={id}
       />
     </div>

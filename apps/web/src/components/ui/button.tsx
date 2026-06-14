@@ -44,8 +44,7 @@ function Button({ className, variant = "default", size = "default", ...props }: 
   // non-<button> element (e.g. a TanStack <Link> → <a>). Whenever a custom
   // render is supplied without an explicit `nativeButton`, default it to
   // false so the warning is suppressed.
-  const nativeButton =
-    props.nativeButton ?? (props.render !== undefined ? false : undefined);
+  const nativeButton = props.nativeButton ?? (props.render !== undefined ? false : undefined);
 
   return (
     <ButtonPrimitive

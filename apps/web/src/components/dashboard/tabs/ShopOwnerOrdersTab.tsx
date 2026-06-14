@@ -26,18 +26,16 @@ export function ShopOwnerOrdersTab({ shopId }: ShopOwnerOrdersTabProps) {
   const query = useGetOrders({ shopId });
 
   const raw = query.data;
-  const list = (Array.isArray(raw)
-    ? raw
-    : ((raw as { data?: OrderRow[] } | undefined)?.data ?? [])) as OrderRow[];
+  const list = (
+    Array.isArray(raw) ? raw : ((raw as { data?: OrderRow[] } | undefined)?.data ?? [])
+  ) as OrderRow[];
   const orders = list.slice(0, 10);
   const hasMore = list.length > 10;
 
   return (
     <TabPreviewShell
       emptyDescription={
-        shopId
-          ? "Orders to this shop will appear here."
-          : "Orders to your shops will appear here."
+        shopId ? "Orders to this shop will appear here." : "Orders to your shops will appear here."
       }
       emptyTitle="No orders yet"
       hasMore={hasMore}

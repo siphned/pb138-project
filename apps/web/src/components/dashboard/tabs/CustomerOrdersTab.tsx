@@ -21,9 +21,9 @@ function formatDate(value?: string | number) {
 export function CustomerOrdersTab() {
   const query = useGetOrders();
   const raw = query.data;
-  const list = (Array.isArray(raw)
-    ? raw
-    : ((raw as { data?: OrderRow[] } | undefined)?.data ?? [])) as OrderRow[];
+  const list = (
+    Array.isArray(raw) ? raw : ((raw as { data?: OrderRow[] } | undefined)?.data ?? [])
+  ) as OrderRow[];
   const orders = list.slice(0, 10);
   const hasMore = list.length > 10;
 

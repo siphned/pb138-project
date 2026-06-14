@@ -1,7 +1,7 @@
 import { renderHook } from "@testing-library/react";
 import { describe, expect, it, vi } from "vitest";
-import { Role } from "../types/roles";
 import { useRoles } from "../hooks/useRoles";
+import { Role } from "../types/roles";
 
 vi.mock("@/context/UserContext", () => ({
   useUser: vi.fn(),

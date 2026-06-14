@@ -29,10 +29,7 @@ function StatsPage() {
 
   return (
     <div className="container mx-auto space-y-8 py-8">
-      <PageHeader
-        description={`Showing metrics for your ${activeRole} role.`}
-        title="Statistics"
-      />
+      <PageHeader description={`Showing metrics for your ${activeRole} role.`} title="Statistics" />
       {activeRole === Role.customer && <CustomerStatsSection />}
       {activeRole === Role.winemaker && <WinemakerStatsSection />}
       {activeRole === Role.shopOwner && <ShopOwnerStatsSection />}

@@ -14,9 +14,9 @@ interface UserRow {
 export function AdminUsersTab() {
   const query = useGetAdminUsers();
   const raw = query.data;
-  const list = (Array.isArray(raw)
-    ? raw
-    : ((raw as { data?: UserRow[] } | undefined)?.data ?? [])) as UserRow[];
+  const list = (
+    Array.isArray(raw) ? raw : ((raw as { data?: UserRow[] } | undefined)?.data ?? [])
+  ) as UserRow[];
   const users = list.slice(0, 10);
   const hasMore = list.length > 10;
 
