@@ -9,11 +9,11 @@ import { getCartsQueryKey } from "@/generated/hooks/useGetCarts";
 import { useGetProductsById } from "@/generated/hooks/useGetProductsById";
 import { useGetProductsByIdImages } from "@/generated/hooks/useGetProductsByIdImages";
 import { usePostCartsItems } from "@/generated/hooks/usePostCartsItems";
-import { BundleWinesSection } from "./-components/BundleWinesSection";
-import { ProductGallery } from "./-components/ProductGallery";
-import { ProductRelatedSection } from "./-components/ProductRelatedSection";
-import { ProductReviewsSection } from "./-components/ProductReviewsSection";
-import { ProductSoldAtCard } from "./-components/ProductSoldAtCard";
+import { BundleWinesSection } from "../-components/BundleWinesSection";
+import { ProductGallery } from "../-components/ProductGallery";
+import { ProductRelatedSection } from "../-components/ProductRelatedSection";
+import { ProductReviewsSection } from "../-components/ProductReviewsSection";
+import { ProductSoldAtCard } from "../-components/ProductSoldAtCard";
 
 export const Route = createFileRoute("/products/$productId")({
   component: ProductDetailPage,

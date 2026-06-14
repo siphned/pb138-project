@@ -13,7 +13,7 @@ import { Separator } from "@/components/ui/separator";
 import { useGetEvents } from "@/generated/hooks/useGetEvents";
 import { useGetWinemakersById } from "@/generated/hooks/useGetWinemakersById";
 import { useGetWines } from "@/generated/hooks/useGetWines";
-import { EntityReviewsSection } from "./-components/EntityReviewsSection";
+import { EntityReviewsSection } from "../../-components/EntityReviewsSection";
 
 export const Route = createFileRoute("/winemakers/$id/")({
   component: WinemakerProfilePage,

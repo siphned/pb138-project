@@ -9,9 +9,9 @@ import { ShopHero } from "@/components/shops/ShopHero";
 import { ShopProductsRow } from "@/components/shops/ShopProductsRow";
 import { useGetShopsById } from "@/generated/hooks/useGetShopsById";
 import { useGetShopsByIdImages } from "@/generated/hooks/useGetShopsByIdImages";
-import { EntityReviewsSection } from "./-components/EntityReviewsSection";
-import { ShopHeroGallery } from "./-components/ShopHeroGallery";
-import { ShopMapEmbed } from "./-components/ShopMapEmbed";
+import { EntityReviewsSection } from "../../-components/EntityReviewsSection";
+import { ShopHeroGallery } from "../../-components/ShopHeroGallery";
+import { ShopMapEmbed } from "../../-components/ShopMapEmbed";
 
 export const Route = createFileRoute("/shops/$id/")({
   component: ShopDetailPage,

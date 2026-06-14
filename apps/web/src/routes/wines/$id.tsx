@@ -8,8 +8,8 @@ import { PageHeader } from "@/components/primitives/page-header";
 import { Separator } from "@/components/ui/separator";
 import { useGetWinesById } from "@/generated/hooks/useGetWinesById";
 import { useGetWinesByIdImages } from "@/generated/hooks/useGetWinesByIdImages";
-import { WineGallery } from "./-components/WineGallery";
-import { WinesAvailableInShops } from "./-components/WinesAvailableInShops";
+import { WineGallery } from "../-components/WineGallery";
+import { WinesAvailableInShops } from "../-components/WinesAvailableInShops";
 
 export const Route = createFileRoute("/wines/$id")({
   component: WineDetailPage,
