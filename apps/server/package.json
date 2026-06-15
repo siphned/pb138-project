@@ -4,7 +4,7 @@
     "@elysiajs/cors": "^1.1.0",
     "@elysiajs/openapi": "^1.4.14",
     "@repo/shared": "workspace:*",
-    "@stablelib/base64": "^1.0.1",
+    "@stablelib/base64": "^2.0.1",
     "drizzle-orm": "^0.45.2",
     "elysia": "^1.4.28",
     "pg": "^8.20.0",
