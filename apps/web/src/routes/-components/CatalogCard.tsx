@@ -31,13 +31,13 @@ interface CatalogCardProps {
  */
 export function CatalogCard({ imageSlot, imageOverlay, titleLink, children }: CatalogCardProps) {
   return (
-    <Card className="group relative" data-slot="catalog-card" variant="polaroid">
+    <Card className="group relative h-full" data-slot="catalog-card" variant="polaroid">
       <div className="relative aspect-3/4 w-full overflow-hidden rounded-lg bg-muted shadow-xs">
         {imageSlot}
         {imageOverlay}
       </div>
 
-      <div className="pt-4 text-center space-y-2">
+      <div className="p-4 text-center space-y-2">
         <h3 className="font-heading text-base font-bold leading-tight line-clamp-2">{titleLink}</h3>
         {children}
       </div>

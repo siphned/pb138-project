@@ -7,10 +7,11 @@ import { LocationMapEmbed } from "@/components/primitives/location-map-embed";
 import { Section } from "@/components/primitives/section";
 import { Separator } from "@/components/ui/separator";
 import { useGetEventsById } from "@/generated/hooks/useGetEventsById";
+import { useGetEventsByIdImages } from "@/generated/hooks/useGetEventsByIdImages";
 import { EventCommentList } from "@/routes/events/$id/-components/EventCommentList";
 import { EventDetailsCard } from "@/routes/events/$id/-components/EventDetailsCard";
+import { EventGallery } from "@/routes/events/$id/-components/EventGallery";
 import { EventHero } from "@/routes/events/$id/-components/EventHero";
-import { EventImageCarousel } from "@/routes/events/$id/-components/EventImageCarousel";
 import { EventManageMenu } from "@/routes/events/$id/-components/EventManageMenu";
 
 export const Route = createFileRoute("/events/$id/")({
@@ -20,6 +21,7 @@ export const Route = createFileRoute("/events/$id/")({
 function EventDetailPage() {
   const { id } = Route.useParams();
   const { data: event, isLoading, isError, refetch } = useGetEventsById(id);
+  const { data: eventImages } = useGetEventsByIdImages(id);
 
   if (isLoading) {
     return (
@@ -77,7 +79,9 @@ function EventDetailPage() {
       <EventHero event={heroEvent} />
 
       <div className="grid grid-cols-1 gap-8 lg:grid-cols-[1fr_2fr]">
-        <EventImageCarousel eventId={id} name={title} />
+        <div>
+          <EventGallery eventName={title} images={eventImages?.map((img) => img.url)} />
+        </div>
 
         <EventDetailsCard event={event} />
       </div>

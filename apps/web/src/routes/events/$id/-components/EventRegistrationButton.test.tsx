@@ -120,6 +120,22 @@ describe("EventRegistrationButton", () => {
     expect(screen.getByRole("button")).toHaveTextContent(/cancel registration/i);
   });
 
+  it("renders disabled 'Registration closed' once the start date has passed", () => {
+    vi.mocked(useUser).mockReturnValue({ isLoading: false, user: { id: "u-1" } } as any);
+    mockRegister();
+    mockCancel();
+    renderWithClient(
+      <EventRegistrationButton
+        eventId="evt-1"
+        isRegistered={false}
+        startsAt="2020-01-01T10:00:00Z"
+      />
+    );
+    const button = screen.getByRole("button");
+    expect(button).toHaveTextContent(/registration closed/i);
+    expect(button).toBeDisabled();
+  });
+
   it("renders the friendly message when registration fails", () => {
     vi.mocked(useUser).mockReturnValue({ isLoading: false, user: { id: "u-1" } } as any);
     mockRegister({

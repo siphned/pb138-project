@@ -55,7 +55,7 @@ function ShopDetailPage() {
       <ShopHero shop={shop} />
 
       <div className="grid grid-cols-1 gap-12 lg:grid-cols-2">
-        <div className="overflow-hidden rounded-3xl bg-muted shadow-lg">
+        <div>
           <ShopHeroGallery images={shopImages?.map((img) => img.url)} shopName={shop.name} />
         </div>
 

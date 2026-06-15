@@ -61,10 +61,10 @@ function ProductsPage() {
   const search = Route.useSearch();
   const navigate = useNavigate({ from: Route.fullPath });
 
-  // shopId is a UI-only filter; the products list endpoint scopes by shop via
-  // its own /shops/:id/products route, not a query param.
-  const { shopId: _shopId, ...apiSearchParams } = search;
-  const query = useGetProducts(apiSearchParams);
+  // GET /products accepts shopId (and isBundle) as query params, so pass the
+  // search through directly — this scopes the catalog to a single shop when
+  // arriving from a shop's "View all inventory" link.
+  const query = useGetProducts(search);
 
   // A filter change always returns to page 1: a filtered result set usually has
   // fewer pages, so keeping a deep page (e.g. page 2) would land past the last

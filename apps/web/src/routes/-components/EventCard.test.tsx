@@ -38,7 +38,8 @@ const mockRegister = (overrides: Partial<ReturnType<typeof usePostEventsByIdRegi
 const baseEvent = {
   id: "evt-1",
   location: "Brno, Moravia",
-  startDate: "2026-06-01T10:00:00Z",
+  // Far-future start so registration stays open in these tests regardless of when they run.
+  startTime: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString(),
   title: "Spring Wine Festival",
   winemakerName: "Lechovice",
 };
@@ -99,6 +100,16 @@ describe("EventCard", () => {
     } as unknown as ReturnType<typeof usePostEventsByIdRegister>);
     renderWithClient(<EventCard event={baseEvent} />);
     const btn = screen.getByRole("button", { name: /registered/i });
+    expect(btn).toBeDisabled();
+  });
+
+  it("shows a disabled 'Registration closed' button once the start date has passed", () => {
+    vi.mocked(useUser).mockReturnValue({ user: { id: "u-1" } } as unknown as ReturnType<
+      typeof useUser
+    >);
+    mockRegister();
+    renderWithClient(<EventCard event={{ ...baseEvent, startTime: "2020-01-01T10:00:00Z" }} />);
+    const btn = screen.getByRole("button", { name: /registration closed/i });
     expect(btn).toBeDisabled();
   });
 

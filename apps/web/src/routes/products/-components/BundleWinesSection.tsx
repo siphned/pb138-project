@@ -21,9 +21,15 @@ export function BundleWinesSection({ productWines }: BundleWinesSectionProps) {
             ...pw.wine,
             // biome-ignore lint/suspicious/noExplicitAny: productWines.wine in OpenAPI is narrower than GetWines200Item (BE follow-up)
           } as any;
+          const bottles = Number(pw.quantity) || 0;
           return (
             <div className={DETAIL_CARD_ITEM} key={pw.wine.id}>
-              <WineCard wine={wineWithFallbacks} />
+              <WineCard
+                badge={
+                  bottles > 0 ? `${bottles} ${bottles === 1 ? "bottle" : "bottles"}` : undefined
+                }
+                wine={wineWithFallbacks}
+              />
             </div>
           );
         })}

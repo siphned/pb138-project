@@ -17,6 +17,7 @@ interface EventCardProps {
     title?: string;
     name?: string;
     description?: string | null;
+    startTime?: string | Date;
     startDate?: string | Date;
     endDate?: string | Date;
     location?: string;
@@ -58,14 +59,21 @@ export function EventCard({ event }: EventCardProps) {
   const registerMutation = usePostEventsByIdRegister();
 
   const title = event.title || event.name || "Untitled Event";
-  const dateLabel = formatShortDate(event.startDate);
+  const startValue = event.startTime ?? event.startDate;
+  const dateLabel = formatShortDate(startValue);
+  const hasStarted = startValue ? new Date(startValue).getTime() < Date.now() : false;
 
   const apiError = parseApiError(registerMutation.error);
   const isAlreadyRegistered = apiError?.code === "ALREADY_REGISTERED";
   const isRegistered =
     !!event.isRegisteredByMe || registerMutation.isSuccess || isAlreadyRegistered;
   const pending = registerMutation.isPending;
-  const canRegister = !!user && !isRegistered;
+  const canRegister = !!user && !isRegistered && !hasStarted;
+
+  let buttonLabel = "Register";
+  if (hasStarted) buttonLabel = "Registration closed";
+  else if (isRegistered) buttonLabel = "Registered";
+  else if (pending) buttonLabel = "Registering…";
 
   const handleRegister = () => {
     if (!canRegister) return;
@@ -123,13 +131,12 @@ export function EventCard({ event }: EventCardProps) {
         <div className="relative z-10 mt-auto space-y-1 pt-2">
           <Button
             className="w-full"
-            disabled={isRegistered || pending || !user}
+            disabled={isRegistered || pending || !user || hasStarted}
             onClick={handleRegister}
             size="sm"
-            variant={isRegistered ? "outline" : "default"}
+            variant={isRegistered || hasStarted ? "outline" : "default"}
           >
-            {/* biome-ignore lint/style/noNestedTernary: three registration states need concise inline expression */}
-            {isRegistered ? "Registered" : pending ? "Registering…" : "Register"}
+            {buttonLabel}
           </Button>
           {showError && (
             <p className="text-xs text-destructive" role="alert">

@@ -53,7 +53,7 @@ function WineDetailPage() {
       <PageHeader description={subtitle} title={wine.name} />
 
       <div className="grid grid-cols-1 gap-12 lg:grid-cols-2">
-        <div className="overflow-hidden rounded-3xl bg-muted shadow-lg">
+        <div>
           <WineGallery images={wineImages?.map((img) => img.url)} wineName={wine.name} />
         </div>
 

@@ -14,7 +14,7 @@ export function ShopGalleryMobile({ images, shopName }: ShopGalleryMobileProps) 
             <div className="flex flex-col items-center aspect-shop-hero-mobile w-full overflow-hidden">
               <img
                 alt={`${shopName} — ${i + 1}`}
-                className=" object-cover h-full rounded-2xl"
+                className="h-full rounded-md object-cover"
                 src={src}
               />
             </div>

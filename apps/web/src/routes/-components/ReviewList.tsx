@@ -1,5 +1,6 @@
 import { Skeleton } from "@/components/ui/skeleton";
 import { ReviewCard } from "@/routes/-components/ReviewCard";
+import type { ReviewEntityType } from "@/routes/-components/use-entity-reviews";
 
 interface ReviewListProps {
   reviews: Array<{
@@ -9,15 +10,22 @@ interface ReviewListProps {
     rating: number;
     body: string;
     createdAt: string;
+    userId: string;
+    entityType?: string;
+    entityId?: string;
   }>;
   isLoading?: boolean;
   emptyMessage?: string;
+  entityType?: ReviewEntityType;
+  entityId?: string;
 }
 
 export function ReviewList({
   reviews,
   isLoading,
   emptyMessage = "No reviews yet.",
+  entityType,
+  entityId,
 }: ReviewListProps) {
   if (isLoading) {
     return (
@@ -40,7 +48,7 @@ export function ReviewList({
   return (
     <div className="space-y-3">
       {reviews.map((review) => (
-        <ReviewCard key={review.id} review={review} />
+        <ReviewCard entityId={entityId} entityType={entityType} key={review.id} review={review} />
       ))}
     </div>
   );
