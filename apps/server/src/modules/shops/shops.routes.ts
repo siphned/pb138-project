@@ -2,7 +2,13 @@ import { Elysia, status } from "elysia";
 import { z } from "zod";
 import { errorResponse } from "../../utils/error-plugin";
 import { authPlugin } from "../auth";
-import { createShopBody, shopFiltersQuery, shopResponse, updateShopBody } from "./shops.schema";
+import {
+  createShopBody,
+  shopFiltersQuery,
+  shopListResponse,
+  shopResponse,
+  updateShopBody,
+} from "./shops.schema";
 import { shopsService } from "./shops.service";
 
 const idParams = z.object({ id: z.string() });
@@ -10,16 +16,27 @@ const idParams = z.object({ id: z.string() });
 export const shopsRoutes = new Elysia()
   .use(authPlugin)
 
-  .get("/shops", ({ query }) => shopsService.listShops(query), {
-    detail: {
-      description:
-        "Returns all non-deleted shops with their addresses. Filterable by q, city, ownerUserId.",
-      summary: "List all shops",
-      tags: ["shops"],
-    },
-    query: shopFiltersQuery,
-    response: { 200: z.array(shopResponse) },
-  })
+  .get(
+    "/shops",
+    ({ query }) =>
+      shopsService.listShops({
+        city: query.city,
+        limit: query.limit,
+        ownerUserId: query.ownerUserId,
+        page: query.page,
+        q: query.q,
+      }),
+    {
+      detail: {
+        description:
+          "Returns all non-deleted shops with their addresses. Filterable by q, city, ownerUserId.",
+        summary: "List all shops",
+        tags: ["shops"],
+      },
+      query: shopFiltersQuery,
+      response: { 200: shopListResponse },
+    }
+  )
 
   .get("/shops/me", ({ dbUser }) => shopsService.listMyShops(dbUser.id), {
     detail: {

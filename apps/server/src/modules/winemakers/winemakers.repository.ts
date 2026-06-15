@@ -1,6 +1,6 @@
 import type { Address, Wine, Winemaker } from "@repo/shared/schemas";
 import { events, winemakers, wines } from "@repo/shared/schemas";
-import { and, eq, ilike, isNull } from "drizzle-orm";
+import { and, eq, ilike, isNull, sql } from "drizzle-orm";
 import type { Database } from "../../db";
 import { primaryImageUrlSql } from "../images/images.sql";
 
@@ -33,25 +33,38 @@ export type UpdateWinemakerData = {
 
 export async function findAll(
   db: Database,
-  filters: { q?: string; city?: string }
-): Promise<WinemakerListItem[]> {
+  filters: { q?: string; city?: string },
+  pagination: { limit: number; offset: number }
+): Promise<{ rows: WinemakerListItem[]; total: number }> {
   const conditions = [isNull(winemakers.deletedAt)];
   if (filters.q) conditions.push(ilike(winemakers.name, `%${filters.q}%`));
 
-  const results = await db.query.winemakers.findMany({
-    extras: { imageUrl: primaryImageUrlSql("winemaker", winemakers.id).as("image_url") },
-    where: and(...conditions),
-    with: {
-      address: true,
-    },
-  });
-
-  const filtered = results.filter((w) => w.address && !w.address.deletedAt) as WinemakerListItem[];
+  // Filter by city and address non-deleted at the DB level so pagination counts are accurate.
   if (filters.city) {
-    const city = filters.city.toLowerCase();
-    return filtered.filter((w) => w.address.city.toLowerCase().includes(city));
+    const pattern = `%${filters.city}%`;
+    conditions.push(
+      sql`${winemakers.addressId} IN (SELECT id FROM addresses WHERE city ILIKE ${pattern} AND deleted_at IS NULL)`
+    );
+  } else {
+    conditions.push(
+      sql`${winemakers.addressId} IN (SELECT id FROM addresses WHERE deleted_at IS NULL)`
+    );
   }
-  return filtered;
+
+  const where = and(...conditions);
+
+  const [rows, [countResult]] = await Promise.all([
+    db.query.winemakers.findMany({
+      extras: { imageUrl: primaryImageUrlSql("winemaker", winemakers.id).as("image_url") },
+      limit: pagination.limit,
+      offset: pagination.offset,
+      where,
+      with: { address: true },
+    }),
+    db.select({ total: sql<number>`COUNT(*)::int` }).from(winemakers).where(where),
+  ]);
+
+  return { rows: rows as WinemakerListItem[], total: countResult?.total ?? 0 };
 }
 
 export async function findById(

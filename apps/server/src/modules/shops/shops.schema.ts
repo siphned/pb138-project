@@ -2,7 +2,9 @@ import { z } from "zod";
 
 export const shopFiltersQuery = z.object({
   city: z.string().max(255).optional(),
+  limit: z.coerce.number().int().min(1).max(100).optional(),
   ownerUserId: z.string().optional(),
+  page: z.coerce.number().int().min(1).optional(),
   q: z.string().max(255).optional(),
 });
 
@@ -44,4 +46,11 @@ export const shopResponse = z.object({
   name: z.string(),
   ownerUserId: z.string(),
   updatedAt: z.date().nullable(),
+});
+
+export const shopListResponse = z.object({
+  data: z.array(shopResponse),
+  limit: z.number().int(),
+  page: z.number().int(),
+  total: z.number().int(),
 });

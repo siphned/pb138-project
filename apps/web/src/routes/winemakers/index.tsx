@@ -6,15 +6,19 @@ import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { useGetWinemakers } from "@/generated/hooks/useGetWinemakers";
 import { CatalogFilters } from "@/routes/-components/CatalogFilters";
+import { CatalogPagination } from "@/routes/-components/CatalogPagination";
 import { CatalogResults } from "@/routes/-components/CatalogResults";
 import { CatalogState } from "@/routes/-components/CatalogState";
 import { asString, type WinemakerSearch } from "@/routes/-components/types";
 import { WinemakerCard } from "@/routes/-components/WinemakerCard";
 
+type WinemakersSearch = WinemakerSearch & { page?: number };
+
 export const Route = createFileRoute("/winemakers/")({
   component: WinemakersPage,
-  validateSearch: (raw): WinemakerSearch => ({
+  validateSearch: (raw): WinemakersSearch => ({
     city: asString(raw.city),
+    page: typeof raw.page === "number" && raw.page > 0 ? raw.page : undefined,
     q: asString(raw.q),
   }),
 });
@@ -22,16 +26,21 @@ export const Route = createFileRoute("/winemakers/")({
 function WinemakersPage() {
   const search = Route.useSearch();
   const navigate = useNavigate({ from: Route.fullPath });
-  const query = useGetWinemakers({ city: search.city, q: search.q });
+
+  const query = useGetWinemakers({ city: search.city, page: search.page, q: search.q });
 
   const handleSearchChange = (next: WinemakerSearch) => {
-    navigate({ replace: true, search: next });
+    navigate({ replace: true, search: { ...next, page: undefined } });
   };
 
-  const winemakers = query.data || [];
+  const handlePageChange = (newPage: number) => {
+    navigate({ replace: true, search: { ...search, page: newPage > 1 ? newPage : undefined } });
+  };
 
-  // TODO(WINE-XXX): cap at 20 until BE adds pagination
-  const displayedWinemakers = winemakers.slice(0, 20);
+  const winemakers = query.data?.data ?? [];
+  const total = query.data?.total ?? 0;
+  const page = search.page ?? 1;
+  const limit = query.data?.limit ?? 24;
 
   return (
     <div className="container mx-auto space-y-8 px-6 py-8 lg:px-12">
@@ -60,21 +69,28 @@ function WinemakersPage() {
           <CatalogFilters entity="winemakers" onSearchChange={handleSearchChange} search={search} />
         </aside>
 
-        <main>
+        <main className="space-y-6">
           <CatalogState
             emptyDescription="Try adjusting your filters to find what you're looking for."
             emptyTitle="No winemakers found"
-            isEmpty={displayedWinemakers.length === 0}
+            isEmpty={winemakers.length === 0}
             isError={query.isError}
             isLoading={query.isLoading}
             onRetry={() => query.refetch()}
           >
-            <CatalogResults count={winemakers.length}>
-              {displayedWinemakers.map((winemaker) => (
+            <CatalogResults count={total}>
+              {winemakers.map((winemaker) => (
                 <WinemakerCard key={winemaker.id} winemaker={winemaker} />
               ))}
             </CatalogResults>
           </CatalogState>
+
+          <CatalogPagination
+            limit={limit}
+            onPageChange={handlePageChange}
+            page={page}
+            total={total}
+          />
         </main>
       </div>
     </div>

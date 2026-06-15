@@ -30,7 +30,7 @@ export const reviewResponse = z.object({
   body: z.string().nullable(),
   createdAt: z.date(),
   entityId: z.string(),
-  entityType: z.enum(["product", "winemaker", "wine"]),
+  entityType: z.string(),
   id: z.string(),
   rating: z.number().int(),
   user: reviewUserInfo,

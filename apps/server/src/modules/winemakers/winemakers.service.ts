@@ -1,6 +1,8 @@
 import { ForbiddenError } from "@repo/shared";
 import type { Wine } from "@repo/shared/schemas";
 import { db } from "../../db";
+import type { PaginatedResult } from "../../utils/pagination";
+import { parsePagination } from "../../utils/pagination";
 import { WinemakerNotFoundError } from "../wines/wines.errors";
 import type {
   EventRow,
@@ -29,8 +31,13 @@ export class WinemakersService {
     return winemakersRepo.findWinesByWinemakerId(db, id);
   }
 
-  listWinemakers(filters: { q?: string; city?: string } = {}): Promise<WinemakerListItem[]> {
-    return winemakersRepo.findAll(db, filters);
+  async listWinemakers(
+    query: { q?: string; city?: string; page?: number; limit?: number } = {}
+  ): Promise<PaginatedResult<WinemakerListItem>> {
+    const { page, limit: limitParam, ...filters } = query;
+    const { limit, offset } = parsePagination({ limit: limitParam, page });
+    const { rows, total } = await winemakersRepo.findAll(db, filters, { limit, offset });
+    return { data: rows, limit, page: Math.max(1, page ?? 1), total };
   }
 
   async getMyProfile(userId: string): Promise<WinemakerListItem> {

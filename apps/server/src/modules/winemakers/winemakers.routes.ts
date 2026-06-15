@@ -6,6 +6,7 @@ import {
   updateWinemakerBody,
   winemakerFiltersQuery,
   winemakerListItemResponse,
+  winemakerListResponse,
   winemakerProfileResponse,
 } from "./winemakers.schema";
 import { winemakersService } from "./winemakers.service";
@@ -15,11 +16,21 @@ const idParams = z.object({ id: z.string() });
 export const winemakersRoutes = new Elysia({ prefix: "/winemakers", tags: ["winemakers"] })
   .use(authPlugin)
 
-  .get("/", ({ query }) => winemakersService.listWinemakers({ city: query.city, q: query.q }), {
-    detail: { summary: "List all winemakers" },
-    query: winemakerFiltersQuery,
-    response: { 200: z.array(winemakerListItemResponse) },
-  })
+  .get(
+    "/",
+    ({ query }) =>
+      winemakersService.listWinemakers({
+        city: query.city,
+        limit: query.limit,
+        page: query.page,
+        q: query.q,
+      }),
+    {
+      detail: { summary: "List all winemakers" },
+      query: winemakerFiltersQuery,
+      response: { 200: winemakerListResponse },
+    }
+  )
 
   .get("/me", ({ dbUser }) => winemakersService.getMyProfile(dbUser.id), {
     detail: {

@@ -3,7 +3,7 @@ import type { GetWinemakers200 } from "@/generated/types/GetWinemakers";
 import { CatalogCard, catalogCardLinkClass } from "@/routes/-components/CatalogCard";
 import { WinemakerImage } from "@/routes/-components/WinemakerImage";
 
-type WinemakerItem = GetWinemakers200[number];
+type WinemakerItem = GetWinemakers200["data"][number];
 
 interface WinemakerCardProps {
   winemaker: WinemakerItem;
