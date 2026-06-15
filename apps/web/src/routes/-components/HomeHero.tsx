@@ -10,14 +10,20 @@ export function HomeHero() {
       className="rounded-3xl bg-secondary/20 px-6 py-16 text-center md:px-12 md:py-24"
       data-slot="home-hero"
     >
-      <h1
-        className="mx-auto max-w-4xl bg-[position:50%_62%] bg-cover bg-clip-text font-heading text-5xl font-black uppercase leading-[0.95] tracking-tight text-transparent drop-shadow-sm md:text-7xl lg:text-9xl"
-        style={{
-          backgroundImage: `linear-gradient(rgba(24,10,14,0.45), rgba(24,10,14,0.1)), url(${vineyardText})`,
-        }}
-      >
-        Wine just for you
-      </h1>
+      <div className="relative mx-auto w-fit">
+        <div
+          aria-hidden
+          className="pointer-events-none absolute inset-0 -z-10 scale-110 bg-[radial-gradient(50%_50%_at_50%_50%,rgba(140,28,48,0.2),transparent_70%)] blur-2xl dark:bg-[radial-gradient(55%_55%_at_50%_50%,rgba(196,38,64,0.45),transparent_72%)]"
+        />
+        <h1
+          className="mx-auto max-w-4xl bg-[position:50%_62%] bg-cover bg-clip-text font-heading text-5xl font-black uppercase leading-[0.95] tracking-tight text-transparent drop-shadow-[0_2px_10px_rgba(0,0,0,0.5)] md:text-7xl lg:text-9xl dark:[filter:drop-shadow(0_0_6px_rgba(225,45,75,0.65))_drop-shadow(0_0_30px_rgba(196,38,64,0.5))]"
+          style={{
+            backgroundImage: `linear-gradient(rgba(140,28,48,0.18), rgba(60,16,26,0.04)), url(${vineyardText})`,
+          }}
+        >
+          Wine just for you
+        </h1>
+      </div>
       <p
         className="mx-auto mt-6 max-w-2xl text-base text-muted-foreground md:text-2xl"
         data-slot="home-hero-tagline"
