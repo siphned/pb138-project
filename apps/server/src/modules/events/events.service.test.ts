@@ -14,6 +14,7 @@ vi.mock("./events.repository", async (importOriginal) => {
     createRegistration: vi.fn(),
     findActiveRegistration: vi.fn(),
     findById: vi.fn(),
+    findCommentById: vi.fn(),
     findComments: vi.fn(),
     findInvitationsByEventId: vi.fn(),
     findMany: vi.fn(),
@@ -22,6 +23,7 @@ vi.mock("./events.repository", async (importOriginal) => {
     insertAddress: vi.fn(),
     resolveWinemakerIdsByName: vi.fn(),
     softDelete: vi.fn(),
+    softDeleteComment: vi.fn(),
     softDeleteRegistration: vi.fn(),
     update: vi.fn(),
   };
@@ -115,9 +117,9 @@ describe("updateEvent", () => {
     vi.mocked(eventsRepo.findById).mockResolvedValue(pastEvent);
     vi.mocked(eventsRepo.findWinemakerByUserId).mockResolvedValue(mockWinemaker as any);
 
-    await expect(
-      eventsService.updateEvent(eventId, userId, { name: "New Name" })
-    ).rejects.toThrow(/EVENT_STATUS_CONFLICT|already/i);
+    await expect(eventsService.updateEvent(eventId, userId, { name: "New Name" })).rejects.toThrow(
+      /EVENT_STATUS_CONFLICT|already/i
+    );
   });
 });
 
@@ -282,5 +284,65 @@ describe("listComments", () => {
     const result = await eventsService.listComments(eventId, { limit: 10, page: 1 });
 
     expect(result).toEqual({ data: [], limit: 10, page: 1, total: 0 });
+  });
+});
+
+describe("deleteComment", () => {
+  const mockComment = {
+    body: "Test comment",
+    createdAt: new Date(),
+    deletedAt: null,
+    eventId,
+    id: commentId,
+    userId,
+  };
+
+  it("soft deletes own comment", async () => {
+    vi.mocked(eventsRepo.findCommentById).mockResolvedValue(mockComment as any);
+
+    await eventsService.deleteComment(eventId, commentId, userId, false);
+
+    expect(eventsRepo.softDeleteComment).toHaveBeenCalledWith(expect.anything(), commentId);
+  });
+
+  it("throws COMMENT_NOT_FOUND when comment does not exist", async () => {
+    vi.mocked(eventsRepo.findCommentById).mockResolvedValue(undefined);
+
+    await expect(eventsService.deleteComment(eventId, commentId, userId, false)).rejects.toThrow(
+      /COMMENT_NOT_FOUND/
+    );
+  });
+
+  it("throws COMMENT_NOT_FOUND when comment belongs to a different event", async () => {
+    vi.mocked(eventsRepo.findCommentById).mockResolvedValue({
+      ...mockComment,
+      eventId: "other-event-id",
+    } as any);
+
+    await expect(eventsService.deleteComment(eventId, commentId, userId, false)).rejects.toThrow(
+      /COMMENT_NOT_FOUND/
+    );
+  });
+
+  it("throws FORBIDDEN_COMMENT_ACTION when requester is not the author and not admin", async () => {
+    vi.mocked(eventsRepo.findCommentById).mockResolvedValue({
+      ...mockComment,
+      userId: "another-user-id",
+    } as any);
+
+    await expect(eventsService.deleteComment(eventId, commentId, userId, false)).rejects.toThrow(
+      /FORBIDDEN_COMMENT_ACTION/
+    );
+  });
+
+  it("succeeds when requester is admin even if not the author", async () => {
+    vi.mocked(eventsRepo.findCommentById).mockResolvedValue({
+      ...mockComment,
+      userId: "another-user-id",
+    } as any);
+
+    await eventsService.deleteComment(eventId, commentId, userId, true);
+
+    expect(eventsRepo.softDeleteComment).toHaveBeenCalledWith(expect.anything(), commentId);
   });
 });

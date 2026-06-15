@@ -227,6 +227,12 @@ export async function findComments(
   }) as Promise<CommentWithUser[]>;
 }
 
+export async function findCommentById(db: Database, id: string): Promise<EventComment | undefined> {
+  return db.query.eventComments.findFirst({
+    where: and(eq(eventComments.id, id), isNull(eventComments.deletedAt)),
+  });
+}
+
 export async function findMany(
   db: Database,
   filters: RepoFilters,
@@ -301,6 +307,13 @@ export async function softDeleteRegistration(db: Database, id: string): Promise<
     .update(eventRegistrations)
     .set({ deletedAt: new Date() })
     .where(eq(eventRegistrations.id, id));
+}
+
+export async function softDeleteComment(db: Database, commentId: string): Promise<void> {
+  await db
+    .update(eventComments)
+    .set({ deletedAt: new Date() })
+    .where(eq(eventComments.id, commentId));
 }
 
 export async function update(

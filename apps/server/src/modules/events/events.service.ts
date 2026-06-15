@@ -12,9 +12,11 @@ import {
   AlreadyRegisteredError,
   CapacityFullError,
   CapacityTooLowError,
+  CommentNotFoundError,
   EventNotAvailableError,
   EventNotFoundError,
   EventStatusConflictError,
+  ForbiddenCommentActionError,
   InvalidDatesError,
 } from "./events.errors";
 import type { CommentWithUser, EventWithDetails } from "./events.repository";
@@ -34,6 +36,19 @@ export class EventsService {
     const event = await eventsRepo.findById(db, eventId);
     if (event?.status !== "approved") throw new EventNotAvailableError();
     return eventsRepo.createComment(db, eventId, userId, body);
+  }
+
+  async deleteComment(
+    eventId: string,
+    commentId: string,
+    userId: string,
+    isAdmin: boolean
+  ): Promise<void> {
+    const comment = await eventsRepo.findCommentById(db, commentId);
+    if (!comment) throw new CommentNotFoundError();
+    if (comment.eventId !== eventId) throw new CommentNotFoundError();
+    if (comment.userId !== userId && !isAdmin) throw new ForbiddenCommentActionError();
+    await eventsRepo.softDeleteComment(db, commentId);
   }
 
   async createEvent(
