@@ -1119,6 +1119,15 @@ async function main() {
       url: url ?? "/uploads/wine/wine_placeholder.webp",
     })),
   ];
+  // Stamp a monotonically increasing createdAt so insertion order == sort order.
+  // A single batch insert gives every row the same now() (tx start time); the
+  // primary-image / gallery queries then order by created_at, id and the random
+  // UUID tiebreak makes the "primary" image random. An explicit per-row offset
+  // makes the first-pushed image of each entity (the nice bottle) win.
+  const imageBase = Date.now();
+  imageInputs.forEach((img, i) => {
+    img.createdAt = new Date(imageBase + i);
+  });
   await insertImages(imageInputs);
   logger.info(`Inserted ${imageInputs.length} images`);
 

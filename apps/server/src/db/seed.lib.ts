@@ -321,6 +321,7 @@ export type ImageInput = {
   entityType: string;
   entityId: string;
   url: string;
+  createdAt?: Date;
 };
 
 export async function insertImages(data: ImageInput[]) {
