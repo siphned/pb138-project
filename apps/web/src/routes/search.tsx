@@ -2,19 +2,6 @@ import { FilterIcon } from "@hugeicons/core-free-icons";
 import { HugeiconsIcon } from "@hugeicons/react";
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import type React from "react";
-import { ProductCard } from "@/components/catalog/ProductCard";
-import { SearchPageFilters } from "@/components/catalog/SearchPageFilters";
-import { SearchSection } from "@/components/catalog/SearchSection";
-import { ShopCard } from "@/components/catalog/ShopCard";
-import {
-  asNumOrStr,
-  asString,
-  type ProductSearch,
-  type SearchPageSearch,
-  type WineSearch,
-} from "@/components/catalog/types";
-import { WineCard } from "@/components/catalog/WineCard";
-import { WinemakerCard } from "@/components/catalog/WinemakerCard";
 import { EmptyState } from "@/components/primitives/empty-state";
 import { LoadingState } from "@/components/primitives/loading-state";
 import { PageHeader } from "@/components/primitives/page-header";
@@ -28,6 +15,19 @@ import {
   type GetWinesQueryParamsColorEnumKey,
   getWinesQueryParamsColorEnum,
 } from "@/generated/types/GetWines";
+import { ProductCard } from "@/routes/-components/ProductCard";
+import { SearchPageFilters } from "@/routes/-components/SearchPageFilters";
+import { SearchSection } from "@/routes/-components/SearchSection";
+import { ShopCard } from "@/routes/-components/ShopCard";
+import {
+  asNumOrStr,
+  asString,
+  type ProductSearch,
+  type SearchPageSearch,
+  type WineSearch,
+} from "@/routes/-components/types";
+import { WineCard } from "@/routes/-components/WineCard";
+import { WinemakerCard } from "@/routes/-components/WinemakerCard";
 
 const COLOR_VALUES = Object.values(getWinesQueryParamsColorEnum) as readonly string[];
 const isColor = (v: unknown): v is GetWinesQueryParamsColorEnumKey =>

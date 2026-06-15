@@ -1,8 +1,8 @@
 import { Link } from "@tanstack/react-router";
 import { ArrowRight } from "lucide-react";
-import { BundleCard } from "@/components/catalog/BundleCard";
 import { Button } from "@/components/ui/button";
 import { useGetShopsByIdProducts } from "@/generated/hooks/useGetShopsByIdProducts";
+import { BundleCard } from "@/routes/products/-components/BundleCard";
 
 // Shape returned by GET /shops/:id/products (no response schema in OpenAPI)
 type ShopProductRaw = {

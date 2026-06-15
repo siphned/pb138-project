@@ -49,6 +49,8 @@ export const createCommentBody = z.object({
 
 export const eventParams = z.object({ id: z.string() });
 
+export const commentParams = z.object({ id: z.string(), commentId: z.string() });
+
 const addressResponse = z.object({
   city: z.string(),
   country: z.string(),

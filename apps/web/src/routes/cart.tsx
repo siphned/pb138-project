@@ -4,8 +4,8 @@ import { ErrorState } from "@/components/primitives/error-state";
 import { LoadingState } from "@/components/primitives/loading-state";
 import { PageHeader } from "@/components/primitives/page-header";
 import { useGetCarts } from "@/generated/hooks/useGetCarts";
-import { CartSection } from "./-components/cart/CartSection";
-import { CheckoutSection } from "./-components/cart/CheckoutSection";
+import { CartSection } from "@/routes/-components/CartSection";
+import { CheckoutSection } from "@/routes/-components/CheckoutSection";
 
 export const Route = createFileRoute("/cart")({
   component: CartPage,

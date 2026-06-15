@@ -1,9 +1,9 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { HomeFeaturedEvents } from "@/components/home/HomeFeaturedEvents";
-import { HomeFeaturedWinemakers } from "@/components/home/HomeFeaturedWinemakers";
-import { HomeFeaturedWines } from "@/components/home/HomeFeaturedWines";
-import { HomeHero } from "@/components/home/HomeHero";
-import { HomeSellCta } from "@/components/home/HomeSellCta";
+import { HomeFeaturedEvents } from "@/routes/-components/HomeFeaturedEvents";
+import { HomeFeaturedWinemakers } from "@/routes/-components/HomeFeaturedWinemakers";
+import { HomeFeaturedWines } from "@/routes/-components/HomeFeaturedWines";
+import { HomeHero } from "@/routes/-components/HomeHero";
+import { HomeSellCta } from "@/routes/-components/HomeSellCta";
 
 export const Route = createFileRoute("/")({
   component: HomePage,
