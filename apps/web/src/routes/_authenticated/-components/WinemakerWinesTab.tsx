@@ -1,6 +1,7 @@
 import { Link } from "@tanstack/react-router";
 import { useGetWinemakersMe } from "@/generated/hooks/useGetWinemakersMe";
 import { useGetWines } from "@/generated/hooks/useGetWines";
+import { WineRowMenu } from "@/routes/-components/WineRowMenu";
 import { TabPreviewShell } from "@/routes/_authenticated/-components/TabPreviewShell";
 
 interface WineRow {
@@ -53,6 +54,7 @@ export function WinemakerWinesTab() {
                 {[wine.color, wine.region, wine.vintageYear].filter(Boolean).join(" · ")}
               </p>
             </div>
+            <WineRowMenu onDeleted={() => query.refetch()} wineId={wine.id} wineName={wine.name} />
           </li>
         ))}
       </ul>

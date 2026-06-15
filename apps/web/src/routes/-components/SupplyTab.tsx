@@ -52,8 +52,12 @@ export function SupplyTab({ shopId }: SupplyTabProps) {
 
   // biome-ignore lint/suspicious/noExplicitAny: API response is untyped
   const supplyAgreements = (agreements || []) as any[];
+  // GET /winemakers returns a paginated envelope ({ data, total, ... }), not a
+  // bare array — unwrap .data so the winemaker list actually renders.
   // biome-ignore lint/suspicious/noExplicitAny: API response is untyped
-  const winemakersData = (winemakers || []) as any[];
+  const winemakersData = (
+    Array.isArray(winemakers) ? winemakers : ((winemakers as { data?: any[] })?.data ?? [])
+  ) as any[];
 
   const handleCreateAgreement = async () => {
     if (!selectedWinemaker) return;

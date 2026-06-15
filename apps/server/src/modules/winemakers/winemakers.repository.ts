@@ -1,5 +1,5 @@
 import type { Address, Wine, Winemaker } from "@repo/shared/schemas";
-import { events, winemakers, wines } from "@repo/shared/schemas";
+import { addresses, events, winemakers, wines } from "@repo/shared/schemas";
 import { and, eq, ilike, isNull, sql } from "drizzle-orm";
 import type { Database } from "../../db";
 import { primaryImageUrlSql } from "../images/images.sql";
@@ -30,6 +30,37 @@ export type UpdateWinemakerData = {
   email?: string;
   phone?: string;
 };
+
+type AddressData = {
+  country: string;
+  city: string;
+  postalCode: string;
+  street: string;
+  houseNumber: string;
+};
+
+export async function insertAddress(db: Database, data: AddressData): Promise<Address> {
+  const [address] = await db.insert(addresses).values(data).returning();
+  if (!address) throw new Error("Address insert returned no rows");
+  return address;
+}
+
+export async function createWinemaker(
+  db: Database,
+  data: {
+    userId: string;
+    name: string;
+    description: string;
+    addressId: string;
+    email?: string;
+    phone?: string;
+    websiteUrl?: string;
+  }
+): Promise<Winemaker> {
+  const [winemaker] = await db.insert(winemakers).values(data).returning();
+  if (!winemaker) throw new Error("Winemaker insert returned no rows");
+  return winemaker;
+}
 
 export async function findAll(
   db: Database,

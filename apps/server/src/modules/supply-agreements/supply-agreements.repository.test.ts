@@ -54,6 +54,19 @@ describe("supplyAgreementsRepository", () => {
     });
   });
 
+  describe("listApprovedWinemakerIdsForShop", () => {
+    it("selects approved agreements for the shop and returns winemaker IDs", async () => {
+      const where = vi.fn().mockResolvedValue([{ winemakerId: "wm1" }, { winemakerId: "wm2" }]);
+      const from = vi.fn().mockReturnValue({ where });
+      vi.mocked(mockDb.select).mockReturnValue({ from });
+
+      const result = await supplyAgreementsRepository.listApprovedWinemakerIdsForShop(db, "s1");
+
+      expect(result).toEqual(["wm1", "wm2"]);
+      expect(from).toHaveBeenCalledWith(supplyAgreements);
+    });
+  });
+
   describe("updateStatus", () => {
     it("updates status and respondedAt", async () => {
       vi.mocked(mockDb.update).mockReturnValue({

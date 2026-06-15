@@ -344,4 +344,24 @@ describe("productsRepository", () => {
       expect(result.total).toBe(1);
     });
   });
+
+  describe("getWinemakerIdsForWines", () => {
+    it("returns distinct winemaker IDs for the given wines", async () => {
+      vi.mocked(db.query.wines.findMany).mockResolvedValue([
+        { winemakerId: "wm1" },
+        { winemakerId: "wm1" },
+        { winemakerId: "wm2" },
+      ] as never);
+
+      const result = await productsRepo.getWinemakerIdsForWines(db, ["wine1", "wine2", "wine3"]);
+
+      expect(result.sort()).toEqual(["wm1", "wm2"]);
+    });
+
+    it("returns an empty array when no wines match", async () => {
+      vi.mocked(db.query.wines.findMany).mockResolvedValue([] as never);
+      const result = await productsRepo.getWinemakerIdsForWines(db, ["nope"]);
+      expect(result).toEqual([]);
+    });
+  });
 });

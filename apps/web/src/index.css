@@ -56,8 +56,8 @@
   --chart-5: oklch(0.269 0 0);
 
   /* Your Custom Status & Review Colors */
-  --success: hsl(150 96% 45%); /* Check - LM */
-  --success-bg: hsl(141 68% 91%); /* Check bc - LM */
+  --success: hsl(150, 100%, 17%); /* Check - LM */
+  --success-bg: hsl(141, 46%, 50%); /* Check bc - LM */
   --warning: hsl(24 100% 30%); /* Approval text - LM */
   --warning-bg: hsl(48 93% 89%); /* Approval bc - LM */
   --star: hsl(18 35% 45%); /* review star - LM */

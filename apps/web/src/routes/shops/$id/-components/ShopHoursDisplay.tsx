@@ -13,6 +13,8 @@ interface RegularEntry {
   dow: string | number;
   startTime: string | number;
   endTime: string | number;
+  validFrom?: string;
+  validTo?: string | null;
 }
 
 interface HourGroup {
@@ -37,6 +39,30 @@ const formatTime = (timeString: string) => {
 };
 
 const getAdjustedDow = (dow: number) => (dow === 0 ? 7 : dow);
+
+// validFrom/validTo are "YYYY-MM-DD" strings, so lexicographic comparison
+// against today's date is correct. Hide entries that haven't started yet or
+// whose end date has already passed, so only the current week's hours show.
+const isCurrentlyValid = (entry: RegularEntry): boolean => {
+  const today = new Date().toISOString().split("T")[0];
+  if (entry.validFrom && entry.validFrom > today) return false;
+  if (entry.validTo && entry.validTo < today) return false;
+  return true;
+};
+
+// If a day has more than one active entry, keep the most recently effective one
+// (latest validFrom) so we never show two conflicting rows for the same day.
+const pickCurrentPerDow = (entries: RegularEntry[]): RegularEntry[] => {
+  const byDow = new Map<number, RegularEntry>();
+  for (const entry of entries) {
+    const dow = Number(entry.dow);
+    const existing = byDow.get(dow);
+    if (!existing || (entry.validFrom ?? "") > (existing.validFrom ?? "")) {
+      byDow.set(dow, entry);
+    }
+  }
+  return [...byDow.values()];
+};
 
 const toGroup = (entry: RegularEntry): HourGroup => {
   const dow = Number(entry.dow);
@@ -90,14 +116,14 @@ export function ShopHoursDisplay({ shopId }: ShopHoursDisplayProps) {
     return <Skeleton className="h-24 w-full rounded-lg" />;
   }
 
-  const regular = data?.regular ?? [];
+  const regular = (data?.regular ?? []).filter(isCurrentlyValid);
   const exceptions = data?.exceptions ?? [];
 
   if (regular.length === 0 && exceptions.length === 0) {
     return <p className="text-muted-foreground italic text-xs">No hours listed.</p>;
   }
 
-  const groupedHours = groupRegularHours(regular);
+  const groupedHours = groupRegularHours(pickCurrentPerDow(regular));
 
   return (
     <div className="flex items-baseline space-x-5">

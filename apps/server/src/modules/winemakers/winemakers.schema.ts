@@ -15,6 +15,23 @@ export const updateWinemakerBody = z.object({
   websiteUrl: z.string().nullable().optional(),
 });
 
+const addressBody = z.object({
+  city: z.string().min(1).max(255),
+  country: z.string().min(1).max(50),
+  houseNumber: z.string().min(1).max(20),
+  postalCode: z.string().min(1).max(20),
+  street: z.string().min(1).max(255),
+});
+
+export const createWinemakerBody = z.object({
+  address: addressBody,
+  description: z.string().min(1),
+  email: z.string().email().max(255).optional(),
+  name: z.string().min(1).max(255),
+  phone: z.string().min(1).max(30).optional(),
+  websiteUrl: z.string().optional(),
+});
+
 const addressResponse = z.object({
   city: z.string(),
   country: z.string(),

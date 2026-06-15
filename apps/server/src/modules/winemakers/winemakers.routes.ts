@@ -3,6 +3,7 @@ import { z } from "zod";
 import { errorResponse } from "../../utils/error-plugin";
 import { authPlugin } from "../auth";
 import {
+  createWinemakerBody,
   updateWinemakerBody,
   winemakerFiltersQuery,
   winemakerListItemResponse,
@@ -31,6 +32,16 @@ export const winemakersRoutes = new Elysia({ prefix: "/winemakers", tags: ["wine
       response: { 200: winemakerListResponse },
     }
   )
+
+  .post("/", ({ dbUser, body }) => winemakersService.createMyProfile(dbUser.id, body), {
+    body: createWinemakerBody,
+    detail: {
+      security: [{ bearerAuth: [] }],
+      summary: "Create own winemaker profile",
+    },
+    requireRoles: ["winemaker"],
+    response: { 200: winemakerListItemResponse, 409: errorResponse },
+  })
 
   .get("/me", ({ dbUser }) => winemakersService.getMyProfile(dbUser.id), {
     detail: {

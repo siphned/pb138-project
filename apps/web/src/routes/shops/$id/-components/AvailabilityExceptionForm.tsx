@@ -51,15 +51,33 @@ export function AvailabilityExceptionForm({ shopId, onSuccess }: AvailabilityExc
   });
 
   const onSubmit = async (data: PostShopsByIdAvailabilityExceptionsMutationRequest) => {
+    // The day is spanned 00:00 → 23:59, so same-day is valid; only a strictly
+    // earlier end date is wrong. Catch it here for a clear message instead of
+    // letting the API reject it with a generic 400.
+    form.clearErrors("endsAt");
+    if (data.endsAt < data.startsAt) {
+      form.setError("endsAt", {
+        message: "End date can't be before the start date.",
+        type: "manual",
+      });
+      return;
+    }
+
     setIsSubmitting(true);
     try {
+      // The date inputs yield "YYYY-MM-DD", but the API requires full ISO
+      // datetimes (z.string().datetime()). Span the whole selected day in UTC.
       await mutation.mutateAsync({
-        data,
+        data: {
+          ...data,
+          endsAt: new Date(`${data.endsAt}T23:59:59.999Z`).toISOString(),
+          startsAt: new Date(`${data.startsAt}T00:00:00.000Z`).toISOString(),
+        },
         id: shopId,
       });
       onSuccess();
     } catch (_error) {
-      // Error handling is delegated to the mutation hook's error state
+      // Surfaced below via mutation.error
     } finally {
       setIsSubmitting(false);
     }
@@ -140,6 +158,14 @@ export function AvailabilityExceptionForm({ shopId, onSuccess }: AvailabilityExc
             </FormItem>
           )}
         />
+
+        {mutation.isError && (
+          <p className="text-sm text-destructive">
+            {mutation.error instanceof Error
+              ? mutation.error.message
+              : "Could not add the exception. Please try again."}
+          </p>
+        )}
 
         <Button className="w-full" disabled={isSubmitting || mutation.isPending} type="submit">
           {isSubmitting || mutation.isPending ? "Adding..." : "Add Exception"}

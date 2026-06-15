@@ -1,9 +1,7 @@
 import { Link } from "@tanstack/react-router";
 import { DescriptionList, PropertyRow } from "@/components/primitives/description-list";
 import { Section } from "@/components/primitives/section";
-import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
-import { useGetWinemakersMe } from "@/generated/hooks/useGetWinemakersMe";
 import type { GetWinesById200 } from "@/generated/types/GetWinesById";
 
 interface WineDetailsCardProps {
@@ -11,11 +9,6 @@ interface WineDetailsCardProps {
 }
 
 export function WineDetailsCard({ wine }: WineDetailsCardProps) {
-  const { data: myWinemaker } = useGetWinemakersMe({
-    query: { enabled: !!wine.winemaker?.id },
-  });
-  const isOwner = !!myWinemaker?.id && myWinemaker.id === wine.winemaker?.id;
-
   return (
     <div className="space-y-8">
       <Section heading="About this wine">
@@ -23,6 +16,20 @@ export function WineDetailsCard({ wine }: WineDetailsCardProps) {
           <CardContent>
             <div className="space-y-6">
               <DescriptionList>
+                {wine.winemaker?.id && wine.winemaker.name && (
+                  <PropertyRow
+                    label="Winemaker"
+                    value={
+                      <Link
+                        className="text-primary hover:underline"
+                        params={{ id: wine.winemaker.id }}
+                        to="/winemakers/$id"
+                      >
+                        {wine.winemaker.name}
+                      </Link>
+                    }
+                  />
+                )}
                 <PropertyRow label="Color" value={wine.color} />
                 <PropertyRow label="Region" value={wine.region} />
                 <PropertyRow label="Vintage" value={wine.vintageYear} />
@@ -36,14 +43,6 @@ export function WineDetailsCard({ wine }: WineDetailsCardProps) {
           </CardContent>
         </Card>
       </Section>
-
-      {isOwner && (
-        <div className="flex flex-wrap gap-4">
-          <Button render={<Link params={{ id: wine.id }} to="/wines/$id/edit" />} variant="outline">
-            Edit Wine
-          </Button>
-        </div>
-      )}
     </div>
   );
 }

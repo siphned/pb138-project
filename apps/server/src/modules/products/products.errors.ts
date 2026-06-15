@@ -38,3 +38,12 @@ export class InconsistentDataError extends AppError {
     super("Internal data inconsistency detected", 500, "INCONSISTENT_DATA");
   }
 }
+
+export class NoSupplyAgreementError extends BadRequestError {
+  constructor() {
+    super(
+      "You need an approved supply agreement with this winemaker before stocking their wines",
+      "NO_SUPPLY_AGREEMENT"
+    );
+  }
+}

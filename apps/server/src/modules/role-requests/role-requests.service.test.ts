@@ -1,10 +1,12 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { db } from "../../db";
 import * as usersRepo from "../users/users.repository";
+import { usersService } from "../users/users.service";
 import * as roleRequestsRepo from "./role-requests.repository";
 import { roleRequestsService } from "./role-requests.service";
 
-const { mockUpdateUserMetadata } = vi.hoisted(() => ({
+const { mockUpdateUserMetadata, mockGetUser } = vi.hoisted(() => ({
+  mockGetUser: vi.fn(),
   mockUpdateUserMetadata: vi.fn(),
 }));
 
@@ -31,9 +33,16 @@ vi.mock("../users/users.repository", async (importOriginal) => {
 vi.mock("@clerk/backend", () => ({
   createClerkClient: () => ({
     users: {
+      getUser: mockGetUser,
       updateUserMetadata: mockUpdateUserMetadata,
     },
   }),
+}));
+
+vi.mock("../users/users.service", () => ({
+  usersService: {
+    syncRolesToDatabase: vi.fn(),
+  },
 }));
 
 vi.mock("../email/email.service", () => ({
@@ -46,6 +55,7 @@ vi.mock("../email/email.service", () => ({
 describe("roleRequestsService", () => {
   beforeEach(() => {
     vi.clearAllMocks();
+    mockGetUser.mockResolvedValue({ publicMetadata: { roles: ["customer"] } });
   });
 
   const userId = "user-123";
@@ -130,13 +140,17 @@ describe("roleRequestsService", () => {
         type: "winemaker",
         userId,
       } as any);
-      vi.mocked(usersRepo.findById).mockResolvedValue({ clerkId } as any);
+      vi.mocked(usersRepo.findById).mockResolvedValue({ clerkId, id: userId } as any);
 
       await roleRequestsService.approve(requestId, adminId);
 
       expect(mockUpdateUserMetadata).toHaveBeenCalledWith(clerkId, {
-        publicMetadata: { is_winemaker: true },
+        publicMetadata: { roles: ["customer", "winemaker"] },
       });
+      expect(usersService.syncRolesToDatabase).toHaveBeenCalledWith(userId, [
+        "customer",
+        "winemaker",
+      ]);
       expect(roleRequestsRepo.updateStatus).toHaveBeenCalledWith(
         db,
         requestId,
@@ -152,13 +166,17 @@ describe("roleRequestsService", () => {
         type: "shop_owner",
         userId,
       } as any);
-      vi.mocked(usersRepo.findById).mockResolvedValue({ clerkId } as any);
+      vi.mocked(usersRepo.findById).mockResolvedValue({ clerkId, id: userId } as any);
 
       await roleRequestsService.approve(requestId, adminId);
 
       expect(mockUpdateUserMetadata).toHaveBeenCalledWith(clerkId, {
-        publicMetadata: { is_shop_owner: true },
+        publicMetadata: { roles: ["customer", "shop_owner"] },
       });
+      expect(usersService.syncRolesToDatabase).toHaveBeenCalledWith(userId, [
+        "customer",
+        "shop_owner",
+      ]);
     });
 
     it("throws ROLE_REQUEST_NOT_FOUND if request doesn't exist", async () => {

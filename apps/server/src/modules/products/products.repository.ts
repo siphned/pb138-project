@@ -353,6 +353,19 @@ export async function winesExist(db: Database, wineIds: string[]): Promise<boole
   return found.length === uniqueIds.length;
 }
 
+export async function getWinemakerIdsForWines(
+  db: Database,
+  wineIds: string[]
+): Promise<string[]> {
+  const uniqueIds = [...new Set(wineIds)];
+  if (uniqueIds.length === 0) return [];
+  const rows = await db.query.wines.findMany({
+    columns: { winemakerId: true },
+    where: and(inArray(wines.id, uniqueIds), isNull(wines.deletedAt)),
+  });
+  return [...new Set(rows.map((r) => r.winemakerId))];
+}
+
 export const productsRepository = {
   create,
   createProductWines,
@@ -362,6 +375,7 @@ export const productsRepository = {
   findById,
   findByIds,
   getWineQuantityForUpdate,
+  getWinemakerIdsForWines,
   productsExist,
   update,
   updateWineQuantity,

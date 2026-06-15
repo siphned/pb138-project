@@ -5,11 +5,13 @@ import type { PaginatedResult } from "../../utils/pagination";
 import { parsePagination } from "../../utils/pagination";
 import { ForbiddenShopActionError, ShopNotFoundError } from "../shops/shops.errors";
 import * as shopsRepo from "../shops/shops.repository";
+import * as supplyAgreementsRepo from "../supply-agreements/supply-agreements.repository";
 import {
   BundleMinWinesError,
   DuplicateWineError,
   InsufficientStockError,
   InvalidWineError,
+  NoSupplyAgreementError,
   ProductNotFoundError,
 } from "./products.errors";
 import type { ProductCatalogFilters, ProductWithWines } from "./products.repository";
@@ -41,6 +43,19 @@ export class ProductsService {
     const shop = await shopsRepo.findById(db, shopId);
     if (!shop) throw new ShopNotFoundError(shopId);
     if (shop.ownerUserId !== requesterId) throw new ForbiddenShopActionError();
+  }
+
+  private async assertWinesUnderApprovedSupply(
+    shopId: string,
+    wineIds: string[]
+  ): Promise<void> {
+    const winemakerIds = await productsRepo.getWinemakerIdsForWines(db, wineIds);
+    const approved = new Set(
+      await supplyAgreementsRepo.listApprovedWinemakerIdsForShop(db, shopId)
+    );
+    for (const winemakerId of winemakerIds) {
+      if (!approved.has(winemakerId)) throw new NoSupplyAgreementError();
+    }
   }
 
   private async applyBundleAllocations(
@@ -141,6 +156,8 @@ export class ProductsService {
       const winesExist = await productsRepo.winesExist(db, wineIds);
       if (!winesExist) throw new InvalidWineError();
 
+      await this.assertWinesUnderApprovedSupply(shopId, wineIds);
+
       return db.transaction(async (tx) => {
         await this.applyBundleAllocations(tx, data.wines, data.quantity);
 
@@ -168,6 +185,8 @@ export class ProductsService {
 
     const winesExist = await productsRepo.winesExist(db, [data.wineId]);
     if (!winesExist) throw new InvalidWineError();
+
+    await this.assertWinesUnderApprovedSupply(shopId, [data.wineId]);
 
     return db.transaction(async (tx) => {
       const currentQty = await productsRepo.getWineQuantityForUpdate(tx, data.wineId);

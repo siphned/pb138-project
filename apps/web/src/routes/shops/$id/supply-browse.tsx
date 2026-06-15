@@ -2,6 +2,7 @@ import { ArrowLeft02Icon } from "@hugeicons/core-free-icons";
 import { HugeiconsIcon } from "@hugeicons/react";
 import { useQueryClient } from "@tanstack/react-query";
 import { createFileRoute, Link } from "@tanstack/react-router";
+import { useState } from "react";
 import { EmptyState } from "@/components/primitives/empty-state";
 import { ErrorState } from "@/components/primitives/error-state";
 import { LoadingState } from "@/components/primitives/loading-state";
@@ -9,6 +10,7 @@ import { PageHeader } from "@/components/primitives/page-header";
 import { Section } from "@/components/primitives/section";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 import {
   getSupplyAgreementsShopByShopIdQueryKey,
   useGetSupplyAgreementsShopByShopId,
@@ -41,12 +43,18 @@ function statusBadgeVariant(status?: string): "secondary" | "outline" | "destruc
 function ShopSupplyBrowsePage() {
   const { id } = Route.useParams();
   const queryClient = useQueryClient();
+  const [winemakerSearch, setWinemakerSearch] = useState("");
   const winemakersQuery = useGetWinemakers();
   const agreementsQuery = useGetSupplyAgreementsShopByShopId(id);
   const propose = usePostSupplyAgreements();
 
+  // GET /winemakers returns a paginated envelope ({ data, total, ... }), not a
+  // bare array — unwrap .data so winemakers actually render.
+  const winemakersRaw = winemakersQuery.data;
   const winemakers = (
-    Array.isArray(winemakersQuery.data) ? winemakersQuery.data : []
+    Array.isArray(winemakersRaw)
+      ? winemakersRaw
+      : ((winemakersRaw as { data?: WinemakerRow[] } | undefined)?.data ?? [])
   ) as WinemakerRow[];
   const agreementsRaw = agreementsQuery.data;
   const agreements = (
@@ -130,9 +138,16 @@ function ShopSupplyBrowsePage() {
     if (winemakers.length === 0) {
       return <EmptyState title="No winemakers on the platform yet" />;
     }
+    const query = winemakerSearch.trim().toLowerCase();
+    const filtered = query
+      ? winemakers.filter((wm) => wm.name.toLowerCase().includes(query))
+      : winemakers;
+    if (filtered.length === 0) {
+      return <EmptyState title={`No winemakers match "${winemakerSearch.trim()}"`} />;
+    }
     return (
       <ul className="divide-y divide-border rounded-md border border-border">
-        {winemakers.map((wm) => {
+        {filtered.map((wm) => {
           const existing = agreementByWinemaker.get(wm.id);
           const pending = propose.isPending && propose.variables?.data?.winemakerId === wm.id;
           return (
@@ -185,7 +200,17 @@ function ShopSupplyBrowsePage() {
 
       <Section heading={`Existing agreements (${agreements.length})`}>{renderAgreements()}</Section>
 
-      <Section heading={`All winemakers (${winemakers.length})`}>{renderWinemakers()}</Section>
+      <Section heading={`All winemakers (${winemakers.length})`}>
+        <div className="space-y-4">
+          <Input
+            aria-label="Search winemakers by name"
+            onChange={(e) => setWinemakerSearch(e.target.value)}
+            placeholder="Search winemakers by name…"
+            value={winemakerSearch}
+          />
+          {renderWinemakers()}
+        </div>
+      </Section>
     </div>
   );
 }
