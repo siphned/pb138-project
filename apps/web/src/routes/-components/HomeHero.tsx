@@ -13,10 +13,10 @@ export function HomeHero() {
       <div className="relative mx-auto w-fit">
         <div
           aria-hidden
-          className="pointer-events-none absolute inset-0 -z-10 scale-110 rounded-full bg-primary/20 blur-3xl dark:bg-primary/35"
+          className="pointer-events-none absolute inset-0 -z-10 scale-110 bg-[radial-gradient(50%_50%_at_50%_50%,rgba(140,28,48,0.2),transparent_70%)] blur-2xl dark:bg-[radial-gradient(55%_55%_at_50%_50%,rgba(196,38,64,0.45),transparent_72%)]"
         />
         <h1
-          className="mx-auto max-w-4xl bg-[position:50%_62%] bg-cover bg-clip-text font-heading text-5xl font-black uppercase leading-[0.95] tracking-tight text-transparent drop-shadow-[0_2px_10px_rgba(0,0,0,0.45)] [-webkit-text-stroke:1px_rgba(120,30,45,0.25)] md:text-7xl lg:text-9xl dark:drop-shadow-[0_0_26px_rgba(196,38,64,0.45)] dark:[-webkit-text-stroke:1px_rgba(255,235,238,0.22)]"
+          className="mx-auto max-w-4xl bg-[position:50%_62%] bg-cover bg-clip-text font-heading text-5xl font-black uppercase leading-[0.95] tracking-tight text-transparent drop-shadow-[0_2px_10px_rgba(0,0,0,0.5)] md:text-7xl lg:text-9xl dark:[filter:drop-shadow(0_0_6px_rgba(225,45,75,0.65))_drop-shadow(0_0_30px_rgba(196,38,64,0.5))]"
           style={{
             backgroundImage: `linear-gradient(rgba(140,28,48,0.18), rgba(60,16,26,0.04)), url(${vineyardText})`,
           }}
