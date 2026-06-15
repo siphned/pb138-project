@@ -64,7 +64,7 @@ function ProductDetailPage() {
       </Link>
 
       <div className="grid grid-cols-1 gap-12 lg:grid-cols-2">
-        <div className="overflow-hidden rounded-3xl bg-muted shadow-lg">
+        <div>
           <ProductGallery
             images={productImages?.map((img) => img.url)}
             productName={product.name}

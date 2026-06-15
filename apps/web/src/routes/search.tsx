@@ -7,6 +7,7 @@ import { LoadingState } from "@/components/primitives/loading-state";
 import { PageHeader } from "@/components/primitives/page-header";
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
+import { useGetEvents } from "@/generated/hooks/useGetEvents";
 import { useGetProducts } from "@/generated/hooks/useGetProducts";
 import { useGetShops } from "@/generated/hooks/useGetShops";
 import { useGetWinemakers } from "@/generated/hooks/useGetWinemakers";
@@ -15,6 +16,7 @@ import {
   type GetWinesQueryParamsColorEnumKey,
   getWinesQueryParamsColorEnum,
 } from "@/generated/types/GetWines";
+import { EventCard } from "@/routes/-components/EventCard";
 import { ProductCard } from "@/routes/-components/ProductCard";
 import { SearchPageFilters } from "@/routes/-components/SearchPageFilters";
 import { SearchSection } from "@/routes/-components/SearchSection";
@@ -62,6 +64,18 @@ const matchesShop = <T extends { name: string; address: { city: string } }>(
   );
 };
 
+// GetEvents200 is typed as `any` in the OpenAPI spec; normalise array vs { data }.
+type SearchEvent = { id: string; name?: string; title?: string };
+const asEventList = (raw: unknown): SearchEvent[] => {
+  if (Array.isArray(raw)) return raw as SearchEvent[];
+  return ((raw as { data?: SearchEvent[] } | undefined)?.data ?? []) as SearchEvent[];
+};
+const matchesEvent = (items: SearchEvent[], needle: string): SearchEvent[] => {
+  if (!needle) return items;
+  const lower = needle.toLowerCase();
+  return items.filter((e) => `${e.name ?? ""} ${e.title ?? ""}`.toLowerCase().includes(lower));
+};
+
 function SearchPage() {
   const search = Route.useSearch();
   const { q = "" } = search;
@@ -81,9 +95,11 @@ function SearchPage() {
     region: search.region,
   });
 
-  // Note: Winemakers and Shops don't support query params in current BE
+  // Note: Winemakers, Shops, and Events don't reliably support text query
+  // params in the current BE, so they're filtered client-side below.
   const winemakersQuery = useGetWinemakers();
   const shopsQuery = useGetShops();
+  const eventsQuery = useGetEvents();
 
   const handleSearchChange = (next: WineSearch) => {
     navigate({ replace: true, search: next });
@@ -93,20 +109,23 @@ function SearchPage() {
     winesQuery.isLoading ||
     productsQuery.isLoading ||
     winemakersQuery.isLoading ||
-    shopsQuery.isLoading;
+    shopsQuery.isLoading ||
+    eventsQuery.isLoading;
 
   // Client-side filtering for entities without BE search support
   const filteredWines = matchesByName(winesQuery.data, q);
   const filteredWinemakers = matchesByName(winemakersQuery.data?.data, q);
   const filteredShops = matchesShop(shopsQuery.data?.data, q);
+  const filteredEvents = matchesEvent(asEventList(eventsQuery.data), q);
 
   const wineCount = filteredWines.length;
   const products = productsQuery.data?.data || [];
   const productCount = Number(productsQuery.data?.total || 0);
   const winemakerCount = filteredWinemakers.length;
   const shopCount = filteredShops.length;
+  const eventCount = filteredEvents.length;
 
-  const hasResults = wineCount + productCount + winemakerCount + shopCount > 0;
+  const hasResults = wineCount + productCount + winemakerCount + shopCount + eventCount > 0;
 
   let content: React.ReactNode;
   if (isLoading) {
@@ -157,6 +176,17 @@ function SearchPage() {
         <SearchSection count={shopCount} heading="Shops" viewAllHref="/shops" viewAllSearch={{ q }}>
           {filteredShops.slice(0, 3).map((shop) => (
             <ShopCard key={shop.id} shop={shop} />
+          ))}
+        </SearchSection>
+
+        <SearchSection
+          count={eventCount}
+          heading="Events"
+          viewAllHref="/events"
+          viewAllSearch={{ q: q || undefined }}
+        >
+          {filteredEvents.slice(0, 3).map((event) => (
+            <EventCard event={event} key={event.id} />
           ))}
         </SearchSection>
       </>

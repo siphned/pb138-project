@@ -17,9 +17,9 @@ export function ShopGalleryThumbnailStrip({
       {images.map((src, i) => (
         <Button
           className={cn(
-            "h-20 shrink-0 overflow-hidden rounded-lg border-2 p-0",
+            "h-20 shrink-0 overflow-hidden rounded-lg border-2 bg-muted p-0",
             i === selectedIndex
-              ? "border-primary"
+              ? "border-foreground/40"
               : "border-transparent opacity-70 hover:opacity-100"
           )}
           key={src}

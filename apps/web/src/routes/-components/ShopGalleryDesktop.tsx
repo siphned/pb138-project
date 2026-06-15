@@ -12,10 +12,10 @@ export function ShopGalleryDesktop({ images, shopName }: ShopGalleryDesktopProps
 
   return (
     <div className="flex flex-col gap-3">
-      <div className="flex flex-col items-center h-120 overflow-hidden ">
+      <div className="flex h-120 items-center justify-center overflow-hidden">
         <img
           alt={shopName}
-          className="h-full object-cover transition-all rounded-2xl duration-300"
+          className="h-full w-full rounded-md object-contain transition-all duration-300"
           src={mainSrc}
         />
       </div>

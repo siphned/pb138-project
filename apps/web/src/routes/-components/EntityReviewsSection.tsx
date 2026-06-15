@@ -54,8 +54,11 @@ export function EntityReviewsSection({
     authorName: authorName(r.user),
     body: r.body ?? "",
     createdAt: String(r.createdAt),
+    entityId: r.entityId,
+    entityType: r.entityType,
     id: r.id,
     rating: Number(r.rating),
+    userId: r.userId,
   }));
 
   return (
@@ -86,7 +89,13 @@ export function EntityReviewsSection({
       )}
 
       {isLoading || reviews.length === 0 ? (
-        <ReviewList emptyMessage={emptyMessage} isLoading={isLoading} reviews={reviews} />
+        <ReviewList
+          emptyMessage={emptyMessage}
+          entityId={entityId}
+          entityType={entityType}
+          isLoading={isLoading}
+          reviews={reviews}
+        />
       ) : (
         <InfiniteScrollArea
           className="h-[28rem]"
@@ -95,7 +104,7 @@ export function EntityReviewsSection({
           isFetchingNextPage={isFetchingNextPage}
           itemCount={reviews.length}
         >
-          <ReviewList reviews={reviews} />
+          <ReviewList entityId={entityId} entityType={entityType} reviews={reviews} />
         </InfiniteScrollArea>
       )}
     </Section>

@@ -16,6 +16,8 @@ interface EventRegistrationButtonProps {
    * route can pass `undefined` and the button falls back to "Register".
    */
   isRegistered?: boolean;
+  /** Event start; once it's in the past, registration is closed. */
+  startsAt?: string | Date;
 }
 
 function friendlyMessage(code?: string, fallback?: string): string {
@@ -33,7 +35,11 @@ function friendlyMessage(code?: string, fallback?: string): string {
   }
 }
 
-export function EventRegistrationButton({ eventId, isRegistered }: EventRegistrationButtonProps) {
+export function EventRegistrationButton({
+  eventId,
+  isRegistered,
+  startsAt,
+}: EventRegistrationButtonProps) {
   const queryClient = useQueryClient();
   const { user, isLoading } = useUser();
   const registerMutation = usePostEventsByIdRegister();
@@ -43,6 +49,15 @@ export function EventRegistrationButton({ eventId, isRegistered }: EventRegistra
     return (
       <Button className="w-full" disabled>
         Loading…
+      </Button>
+    );
+  }
+
+  const hasStarted = startsAt ? new Date(startsAt).getTime() < Date.now() : false;
+  if (hasStarted) {
+    return (
+      <Button className="w-full" disabled variant="outline">
+        Registration closed
       </Button>
     );
   }

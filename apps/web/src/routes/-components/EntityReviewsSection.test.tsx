@@ -1,4 +1,6 @@
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { render, screen } from "@testing-library/react";
+import type { ReactElement } from "react";
 import { describe, expect, it, vi } from "vitest";
 import { useEntityReviews } from "@/routes/-components/use-entity-reviews";
 import { EntityReviewsSection } from "./EntityReviewsSection";
@@ -8,11 +10,21 @@ vi.mock("@/routes/-components/use-entity-reviews", () => ({
   useEntityReviews: vi.fn(),
 }));
 
+vi.mock("@/context/UserContext", () => ({
+  useUser: () => ({ user: null }),
+}));
+
+function renderWithClient(ui: ReactElement) {
+  const client = new QueryClient({ defaultOptions: { queries: { retry: false } } });
+  return render(<QueryClientProvider client={client}>{ui}</QueryClientProvider>);
+}
+
 type ReviewRow = {
   id: string;
   body: string | null;
   rating: number;
   createdAt: string;
+  userId: string;
   user: { fname: string; lname: string };
 };
 
@@ -41,13 +53,13 @@ const mockReviews = (
 describe("EntityReviewsSection", () => {
   it("renders skeletons while loading", () => {
     mockReviews({ isLoading: true });
-    render(<EntityReviewsSection entityId="p-1" entityType="product" />);
+    renderWithClient(<EntityReviewsSection entityId="p-1" entityType="product" />);
     expect(document.querySelector('[data-slot="skeleton"]')).toBeInTheDocument();
   });
 
   it("renders the empty message when there are no reviews", () => {
     mockReviews({ reviews: [] });
-    render(
+    renderWithClient(
       <EntityReviewsSection emptyMessage="No reviews here." entityId="p-1" entityType="product" />
     );
     expect(screen.getByText("No reviews here.")).toBeInTheDocument();
@@ -63,11 +75,12 @@ describe("EntityReviewsSection", () => {
           id: "r-1",
           rating: 5,
           user: { fname: "Radek", lname: "Pospíšil" },
+          userId: "u-1",
         },
       ],
       totalCount: 5,
     });
-    render(<EntityReviewsSection entityId="p-1" entityType="product" />);
+    renderWithClient(<EntityReviewsSection entityId="p-1" entityType="product" />);
     expect(screen.getByText("Radek Pospíšil")).toBeInTheDocument();
     expect(screen.getByText("Skvelé víno.")).toBeInTheDocument();
     expect(screen.getByText("4.8")).toBeInTheDocument();

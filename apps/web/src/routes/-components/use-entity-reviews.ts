@@ -14,6 +14,12 @@ export interface EntityReview {
   body: string | null;
   rating: number;
   createdAt: string;
+  userId: string;
+  // Per-review entity the review belongs to. The shop page aggregates product
+  // reviews, so a review's own entity can differ from the section's entity.
+  // Optional until the backend adds these to the review response (BE TODO).
+  entityType?: string;
+  entityId?: string;
   user?: { fname: string | null; lname: string | null } | null;
 }
 

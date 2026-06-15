@@ -148,7 +148,11 @@ export function EventDetailsCard({ event }: EventDetailsCardProps) {
         )}
       </div>
 
-      <EventRegistrationButton eventId={event.id} isRegistered={event.isRegisteredByMe} />
+      <EventRegistrationButton
+        eventId={event.id}
+        isRegistered={event.isRegisteredByMe}
+        startsAt={event.startTime ?? event.startDate}
+      />
     </div>
   );
 }

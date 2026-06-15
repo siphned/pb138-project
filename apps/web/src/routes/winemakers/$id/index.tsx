@@ -8,11 +8,13 @@ import { Section } from "@/components/primitives/section";
 import { Separator } from "@/components/ui/separator";
 import { useGetEvents } from "@/generated/hooks/useGetEvents";
 import { useGetWinemakersById } from "@/generated/hooks/useGetWinemakersById";
+import { useGetWinemakersByIdImages } from "@/generated/hooks/useGetWinemakersByIdImages";
 import { useGetWines } from "@/generated/hooks/useGetWines";
 import { CatalogState } from "@/routes/-components/CatalogState";
 import { EventCard } from "@/routes/-components/EventCard";
 import { WineCard } from "@/routes/-components/WineCard";
 import { WinemakerDetailsCard } from "@/routes/winemakers/$id/-components/WinemakerDetailsCard";
+import { WinemakerGallery } from "@/routes/winemakers/$id/-components/WinemakerGallery";
 import { EntityReviewsSection } from "../../-components/EntityReviewsSection";
 
 export const Route = createFileRoute("/winemakers/$id/")({
@@ -22,6 +24,7 @@ export const Route = createFileRoute("/winemakers/$id/")({
 function WinemakerProfilePage() {
   const { id } = Route.useParams();
   const { data: winemaker, isLoading, isError, refetch } = useGetWinemakersById(id);
+  const { data: winemakerImages } = useGetWinemakersByIdImages(id);
   const winesQuery = useGetWines({ winemakerId: id });
   const eventsQuery = useGetEvents(
     { winemakerName: winemaker?.name },
@@ -64,57 +67,62 @@ function WinemakerProfilePage() {
         Back to winemakers
       </Link>
 
-      <div className="grid grid-cols-1 gap-12 lg:grid-cols-[1fr_400px]">
-        <div className="space-y-12">
-          <WinemakerDetailsCard winemaker={winemaker} />
-
-          <Separator />
-
-          <Section heading="Wines">
-            <CatalogState
-              emptyTitle="No wines listed yet"
-              isEmpty={wines.length === 0}
-              isLoading={winesQuery.isLoading}
-            >
-              <DataGrid variant="catalog">
-                {wines.map((wine) => (
-                  <WineCard key={wine.id} wine={wine} />
-                ))}
-              </DataGrid>
-            </CatalogState>
-          </Section>
-
-          <Separator />
-
-          <Section heading="Upcoming Events">
-            <CatalogState
-              emptyTitle="No upcoming events"
-              isEmpty={events.length === 0}
-              isLoading={eventsQuery.isLoading}
-              loadingVariant="list"
-            >
-              <DataGrid variant="catalog">
-                {events.map((event) => (
-                  <EventCard
-                    event={{
-                      ...event,
-                      endDate: event.endTime,
-                      startDate: event.startTime,
-                      winemakerId: id,
-                      winemakerName: winemaker.name,
-                    }}
-                    key={event.id}
-                  />
-                ))}
-              </DataGrid>
-            </CatalogState>
-          </Section>
+      <div className="grid grid-cols-1 gap-12 lg:grid-cols-2">
+        <div>
+          <WinemakerGallery
+            images={winemakerImages?.map((img) => img.url)}
+            winemakerName={winemaker.name}
+          />
         </div>
 
-        <aside className="space-y-12">
-          <EntityReviewsSection entityId={id} entityType="winemaker" />
-        </aside>
+        <WinemakerDetailsCard winemaker={winemaker} />
       </div>
+
+      <Separator />
+
+      <Section heading="Wines">
+        <CatalogState
+          emptyTitle="No wines listed yet"
+          isEmpty={wines.length === 0}
+          isLoading={winesQuery.isLoading}
+        >
+          <DataGrid variant="catalog">
+            {wines.map((wine) => (
+              <WineCard key={wine.id} wine={wine} />
+            ))}
+          </DataGrid>
+        </CatalogState>
+      </Section>
+
+      <Separator />
+
+      <Section heading="Upcoming Events">
+        <CatalogState
+          emptyTitle="No upcoming events"
+          isEmpty={events.length === 0}
+          isLoading={eventsQuery.isLoading}
+          loadingVariant="list"
+        >
+          <DataGrid variant="catalog">
+            {events.map((event) => (
+              <EventCard
+                event={{
+                  ...event,
+                  endDate: event.endTime,
+                  startDate: event.startTime,
+                  winemakerId: id,
+                  winemakerName: winemaker.name,
+                }}
+                key={event.id}
+              />
+            ))}
+          </DataGrid>
+        </CatalogState>
+      </Section>
+
+      <Separator />
+
+      <EntityReviewsSection entityId={id} entityType="winemaker" />
     </div>
   );
 }

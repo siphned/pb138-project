@@ -51,6 +51,7 @@ export const Route = createFileRoute("/events/")({
     from: typeof raw.from === "string" ? raw.from : undefined,
     limit: toNum(raw.limit),
     page: toNum(raw.page),
+    q: typeof raw.q === "string" && raw.q.trim() !== "" ? raw.q : undefined,
     registeredByMe: raw.registeredByMe === true || raw.registeredByMe === "true" ? true : undefined,
     to: typeof raw.to === "string" ? raw.to : undefined,
     winemakerId: typeof raw.winemakerId === "string" ? raw.winemakerId : undefined,

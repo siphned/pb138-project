@@ -305,8 +305,15 @@ function EventFilters({
   search: EventSearch;
   onSearchChange: (next: EventSearch) => void;
 }) {
+  const handleSearchChange = useCallback(
+    (q: string) => onSearchChange({ ...search, q: q || undefined }),
+    [onSearchChange, search]
+  );
+
   return (
     <div className="space-y-8">
+      <SearchInput onChange={handleSearchChange} serverSearch={true} value={search.q || ""} />
+
       <div className="space-y-2">
         <SectionLabel>Winemaker</SectionLabel>
         <Input
