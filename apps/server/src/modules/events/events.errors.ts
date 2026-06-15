@@ -1,4 +1,4 @@
-import { BadRequestError, ConflictError, NotFoundError } from "@repo/shared";
+import { BadRequestError, ConflictError, ForbiddenError, NotFoundError } from "@repo/shared";
 
 export class EventNotFoundError extends NotFoundError {
   constructor() {
@@ -39,5 +39,17 @@ export class CapacityTooLowError extends BadRequestError {
 export class EventStatusConflictError extends ConflictError {
   constructor() {
     super("Event cannot be edited in its current status", "EVENT_STATUS_CONFLICT");
+  }
+}
+
+export class CommentNotFoundError extends NotFoundError {
+  constructor() {
+    super("Comment not found", "COMMENT_NOT_FOUND");
+  }
+}
+
+export class ForbiddenCommentActionError extends ForbiddenError {
+  constructor() {
+    super("You are not allowed to delete this comment", "FORBIDDEN_COMMENT_ACTION");
   }
 }
