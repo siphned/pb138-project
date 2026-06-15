@@ -78,7 +78,28 @@
       "Bash(bunx --bun vitest run src/components/stats --coverage.enabled=false)",
       "Bash(bunx --bun vitest run src/components/stats/StatTile.test.tsx --coverage.enabled=false --pool=forks)",
       "Bash(echo \"tsc exit: $?\")",
-      "Bash(bunx biome *)"
+      "Bash(bunx biome *)",
+      "Bash(grep -iE 'products\\\\.\\\\$|wines\\\\.\\\\$|shops\\\\.\\\\$id\\\\.index|shops\\\\.\\\\$id\\\\.tsx')",
+      "Bash(grep -nA6 \"type ReviewEntityType\" src/components/reviews/use-entity-reviews.ts)",
+      "Bash(grep -nA4 \"export function formatEur\\\\|export const formatEur\" src/lib/utils.ts)",
+      "Bash(grep -iE 'shops\\\\.\\(tsx|index|\\\\$id\\)')",
+      "Bash(grep -vE 'shops\\\\.\\\\$id')",
+      "Bash(grep -vE 'events\\\\.\\\\$id')",
+      "Bash(grep -nE 'OrdersIndex|orders/$id|getParentRoute.*Orders|AuthenticatedOrdersRoute ' src/routeTree.gen.ts)",
+      "Bash(xargs wc -l)",
+      "Bash(grep -nE '\"@/\\\\*\"|paths' tsconfig*.json)",
+      "Bash(grep -nA15 \"test:\" vite.config.ts)",
+      "Bash([ -f \"$F\" ])",
+      "PowerShell(Get-Process *)",
+      "PowerShell($p = Get-Process -Id 17096 -ErrorAction SilentlyContinue; if \\($p\\) { \"alive CPU=$\\([int]$p.CPU\\)s WS=$\\([int]\\($p.WorkingSet64/1MB\\)\\)MB\" } else { \"process exited\" })",
+      "PowerShell(Get-Content *)",
+      "Bash(break)",
+      "PowerShell($p = Get-Process -Id 5312 -ErrorAction SilentlyContinue; if \\($p\\) { \"alive CPU=$\\([int]$p.CPU\\)s WS=$\\([int]\\($p.WorkingSet64/1MB\\)\\)MB\" } else { \"exited\" })",
+      "Bash(echo \"biome exit=$?\")",
+      "Bash(echo \"check-types exit=$?\")",
+      "Bash(echo \"biome=$?\")",
+      "Bash(nohup bun run test)",
+      "Bash(powershell -NoProfile -Command 'Get-Process bun -ErrorAction SilentlyContinue | Where-Object { $_.WorkingSet64 -gt 200MB } | ForEach-Object { '\\\\''alive CPU='\\\\''+[int]$_.CPU+'\\\\''s'\\\\'' }')"
     ]
   }
 }

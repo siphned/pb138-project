@@ -1,9 +1,5 @@
 import { Resend } from "resend";
-import type {
-  OrderConfirmationData,
-  OrderStatusData,
-  RoleRequestData,
-} from "./email.templates";
+import type { OrderConfirmationData, OrderStatusData, RoleRequestData } from "./email.templates";
 import {
   orderConfirmationTemplate,
   orderStatusUpdateTemplate,

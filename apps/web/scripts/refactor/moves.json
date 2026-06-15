@@ -1,0 +1,606 @@
+[
+  {
+    "from": "components/catalog/__tests__/describeEntityImageWrapper.tsx",
+    "to": "routes/-components/describeEntityImageWrapper.tsx"
+  },
+  {
+    "from": "components/catalog/BundleCard.tsx",
+    "to": "routes/products/-components/BundleCard.tsx"
+  },
+  {
+    "from": "components/catalog/CatalogCard.test.tsx",
+    "to": "routes/-components/CatalogCard.test.tsx"
+  },
+  {
+    "from": "components/catalog/CatalogCard.tsx",
+    "to": "routes/-components/CatalogCard.tsx"
+  },
+  {
+    "from": "components/catalog/CatalogFilters.test.tsx",
+    "to": "routes/-components/CatalogFilters.test.tsx"
+  },
+  {
+    "from": "components/catalog/CatalogFilters.tsx",
+    "to": "routes/-components/CatalogFilters.tsx"
+  },
+  {
+    "from": "components/catalog/CatalogPagination.tsx",
+    "to": "routes/-components/CatalogPagination.tsx"
+  },
+  {
+    "from": "components/catalog/CatalogPlaceholder.tsx",
+    "to": "routes/-components/CatalogPlaceholder.tsx"
+  },
+  {
+    "from": "components/catalog/CatalogResults.test.tsx",
+    "to": "routes/-components/CatalogResults.test.tsx"
+  },
+  {
+    "from": "components/catalog/CatalogResults.tsx",
+    "to": "routes/-components/CatalogResults.tsx"
+  },
+  {
+    "from": "components/catalog/CatalogState.tsx",
+    "to": "routes/-components/CatalogState.tsx"
+  },
+  {
+    "from": "components/catalog/EntityImage.test.tsx",
+    "to": "routes/-components/EntityImage.test.tsx"
+  },
+  {
+    "from": "components/catalog/EntityImage.tsx",
+    "to": "routes/-components/EntityImage.tsx"
+  },
+  {
+    "from": "components/catalog/EventImage.test.tsx",
+    "to": "routes/-components/EventImage.test.tsx"
+  },
+  {
+    "from": "components/catalog/EventImage.tsx",
+    "to": "routes/-components/EventImage.tsx"
+  },
+  {
+    "from": "components/catalog/ProductCard.test.tsx",
+    "to": "routes/-components/ProductCard.test.tsx"
+  },
+  {
+    "from": "components/catalog/ProductCard.tsx",
+    "to": "routes/-components/ProductCard.tsx"
+  },
+  {
+    "from": "components/catalog/ProductDetailsCard.test.tsx",
+    "to": "routes/products/-components/ProductDetailsCard.test.tsx"
+  },
+  {
+    "from": "components/catalog/ProductDetailsCard.tsx",
+    "to": "routes/products/-components/ProductDetailsCard.tsx"
+  },
+  {
+    "from": "components/catalog/ProductImage.test.tsx",
+    "to": "routes/-components/ProductImage.test.tsx"
+  },
+  {
+    "from": "components/catalog/ProductImage.tsx",
+    "to": "routes/-components/ProductImage.tsx"
+  },
+  {
+    "from": "components/catalog/SearchPageFilters.tsx",
+    "to": "routes/-components/SearchPageFilters.tsx"
+  },
+  {
+    "from": "components/catalog/SearchSection.test.tsx",
+    "to": "routes/-components/SearchSection.test.tsx"
+  },
+  {
+    "from": "components/catalog/SearchSection.tsx",
+    "to": "routes/-components/SearchSection.tsx"
+  },
+  {
+    "from": "components/catalog/ShopCard.tsx",
+    "to": "routes/-components/ShopCard.tsx"
+  },
+  {
+    "from": "components/catalog/ShopImage.test.tsx",
+    "to": "routes/-components/ShopImage.test.tsx"
+  },
+  {
+    "from": "components/catalog/ShopImage.tsx",
+    "to": "routes/-components/ShopImage.tsx"
+  },
+  {
+    "from": "components/catalog/StarRating.tsx",
+    "to": "routes/-components/StarRating.tsx"
+  },
+  {
+    "from": "components/catalog/types.ts",
+    "to": "routes/-components/types.ts"
+  },
+  {
+    "from": "components/catalog/WineCard.test.tsx",
+    "to": "routes/-components/WineCard.test.tsx"
+  },
+  {
+    "from": "components/catalog/WineCard.tsx",
+    "to": "routes/-components/WineCard.tsx"
+  },
+  {
+    "from": "components/catalog/WineDetailsCard.test.tsx",
+    "to": "routes/wines/-components/WineDetailsCard.test.tsx"
+  },
+  {
+    "from": "components/catalog/WineDetailsCard.tsx",
+    "to": "routes/wines/-components/WineDetailsCard.tsx"
+  },
+  {
+    "from": "components/catalog/WineForm.tsx",
+    "to": "routes/wines/-components/WineForm.tsx"
+  },
+  {
+    "from": "components/catalog/WineImage.test.tsx",
+    "to": "routes/-components/WineImage.test.tsx"
+  },
+  {
+    "from": "components/catalog/WineImage.tsx",
+    "to": "routes/-components/WineImage.tsx"
+  },
+  {
+    "from": "components/catalog/WinemakerCard.test.tsx",
+    "to": "routes/-components/WinemakerCard.test.tsx"
+  },
+  {
+    "from": "components/catalog/WinemakerCard.tsx",
+    "to": "routes/-components/WinemakerCard.tsx"
+  },
+  {
+    "from": "components/catalog/WinemakerDetailsCard.test.tsx",
+    "to": "routes/winemakers/$id/-components/WinemakerDetailsCard.test.tsx"
+  },
+  {
+    "from": "components/catalog/WinemakerDetailsCard.tsx",
+    "to": "routes/winemakers/$id/-components/WinemakerDetailsCard.tsx"
+  },
+  {
+    "from": "components/catalog/WinemakerImage.test.tsx",
+    "to": "routes/-components/WinemakerImage.test.tsx"
+  },
+  {
+    "from": "components/catalog/WinemakerImage.tsx",
+    "to": "routes/-components/WinemakerImage.tsx"
+  },
+  {
+    "from": "components/dashboard/DashboardProfileCard.tsx",
+    "to": "routes/_authenticated/-components/DashboardProfileCard.tsx"
+  },
+  {
+    "from": "components/dashboard/DashboardQuickLinks.test.tsx",
+    "to": "routes/-components/DashboardQuickLinks.test.tsx"
+  },
+  {
+    "from": "components/dashboard/DashboardQuickLinks.tsx",
+    "to": "routes/-components/DashboardQuickLinks.tsx"
+  },
+  {
+    "from": "components/dashboard/DashboardQuickStats.test.tsx",
+    "to": "routes/_authenticated/-components/DashboardQuickStats.test.tsx"
+  },
+  {
+    "from": "components/dashboard/DashboardQuickStats.tsx",
+    "to": "routes/_authenticated/-components/DashboardQuickStats.tsx"
+  },
+  {
+    "from": "components/dashboard/DashboardRoleSection.test.tsx",
+    "to": "routes/_authenticated/-components/DashboardRoleSection.test.tsx"
+  },
+  {
+    "from": "components/dashboard/DashboardRoleSection.tsx",
+    "to": "routes/_authenticated/-components/DashboardRoleSection.tsx"
+  },
+  {
+    "from": "components/dashboard/DashboardTabs.tsx",
+    "to": "routes/_authenticated/-components/DashboardTabs.tsx"
+  },
+  {
+    "from": "components/dashboard/ProfileEditForm.tsx",
+    "to": "routes/-components/ProfileEditForm.tsx"
+  },
+  {
+    "from": "components/dashboard/tabs/AdminRoleRequestsTab.tsx",
+    "to": "routes/_authenticated/-components/AdminRoleRequestsTab.tsx"
+  },
+  {
+    "from": "components/dashboard/tabs/AdminUsersTab.tsx",
+    "to": "routes/_authenticated/-components/AdminUsersTab.tsx"
+  },
+  {
+    "from": "components/dashboard/tabs/CustomerEventsTab.tsx",
+    "to": "routes/_authenticated/-components/CustomerEventsTab.tsx"
+  },
+  {
+    "from": "components/dashboard/tabs/CustomerOrdersTab.tsx",
+    "to": "routes/_authenticated/-components/CustomerOrdersTab.tsx"
+  },
+  {
+    "from": "components/dashboard/tabs/ShopOwnerBundlesTab.tsx",
+    "to": "routes/_authenticated/-components/ShopOwnerBundlesTab.tsx"
+  },
+  {
+    "from": "components/dashboard/tabs/ShopOwnerOrdersTab.tsx",
+    "to": "routes/_authenticated/-components/ShopOwnerOrdersTab.tsx"
+  },
+  {
+    "from": "components/dashboard/tabs/ShopOwnerShopsTab.tsx",
+    "to": "routes/_authenticated/-components/ShopOwnerShopsTab.tsx"
+  },
+  {
+    "from": "components/dashboard/tabs/ShopRowMenu.tsx",
+    "to": "routes/_authenticated/-components/ShopRowMenu.tsx"
+  },
+  {
+    "from": "components/dashboard/tabs/ShopSelector.tsx",
+    "to": "routes/_authenticated/-components/ShopSelector.tsx"
+  },
+  {
+    "from": "components/dashboard/tabs/TabPreviewShell.tsx",
+    "to": "routes/_authenticated/-components/TabPreviewShell.tsx"
+  },
+  {
+    "from": "components/dashboard/tabs/WinemakerEventsTab.tsx",
+    "to": "routes/_authenticated/-components/WinemakerEventsTab.tsx"
+  },
+  {
+    "from": "components/dashboard/tabs/WinemakerWinesTab.tsx",
+    "to": "routes/_authenticated/-components/WinemakerWinesTab.tsx"
+  },
+  {
+    "from": "components/dev/StubGet.tsx",
+    "to": "routes/-components/StubGet.tsx"
+  },
+  {
+    "from": "components/dev/StubMutation.tsx",
+    "to": "routes/-components/StubMutation.tsx"
+  },
+  {
+    "from": "components/dev/StubPage.tsx",
+    "to": "routes/-components/StubPage.tsx"
+  },
+  {
+    "from": "components/events/EventCard.test.tsx",
+    "to": "routes/-components/EventCard.test.tsx"
+  },
+  {
+    "from": "components/events/EventCard.tsx",
+    "to": "routes/-components/EventCard.tsx"
+  },
+  {
+    "from": "components/events/EventCommentList.test.tsx",
+    "to": "routes/events/$id/-components/EventCommentList.test.tsx"
+  },
+  {
+    "from": "components/events/EventCommentList.tsx",
+    "to": "routes/events/$id/-components/EventCommentList.tsx"
+  },
+  {
+    "from": "components/events/EventDetailsCard.test.tsx",
+    "to": "routes/events/$id/-components/EventDetailsCard.test.tsx"
+  },
+  {
+    "from": "components/events/EventDetailsCard.tsx",
+    "to": "routes/events/$id/-components/EventDetailsCard.tsx"
+  },
+  {
+    "from": "components/events/EventEditForm.tsx",
+    "to": "routes/events/$id/-components/EventEditForm.tsx"
+  },
+  {
+    "from": "components/events/EventForm.tsx",
+    "to": "routes/events/-components/EventForm.tsx"
+  },
+  {
+    "from": "components/events/EventHero.test.tsx",
+    "to": "routes/events/$id/-components/EventHero.test.tsx"
+  },
+  {
+    "from": "components/events/EventHero.tsx",
+    "to": "routes/events/$id/-components/EventHero.tsx"
+  },
+  {
+    "from": "components/events/EventImageCarousel.tsx",
+    "to": "routes/events/$id/-components/EventImageCarousel.tsx"
+  },
+  {
+    "from": "components/events/EventManageMenu.test.tsx",
+    "to": "routes/events/$id/-components/EventManageMenu.test.tsx"
+  },
+  {
+    "from": "components/events/EventManageMenu.tsx",
+    "to": "routes/events/$id/-components/EventManageMenu.tsx"
+  },
+  {
+    "from": "components/events/EventRegistrationButton.test.tsx",
+    "to": "routes/events/$id/-components/EventRegistrationButton.test.tsx"
+  },
+  {
+    "from": "components/events/EventRegistrationButton.tsx",
+    "to": "routes/events/$id/-components/EventRegistrationButton.tsx"
+  },
+  {
+    "from": "components/events/use-event-comments.ts",
+    "to": "routes/events/$id/-components/use-event-comments.ts"
+  },
+  {
+    "from": "components/forms/AddressFields.tsx",
+    "to": "routes/-components/AddressFields.tsx"
+  },
+  {
+    "from": "components/forms/AddressForm.tsx",
+    "to": "routes/-components/AddressForm.tsx"
+  },
+  {
+    "from": "components/forms/FormSection.tsx",
+    "to": "routes/-components/FormSection.tsx"
+  },
+  {
+    "from": "components/forms/ImageUploadField.tsx",
+    "to": "routes/-components/ImageUploadField.tsx"
+  },
+  {
+    "from": "components/forms/SubmitButton.tsx",
+    "to": "routes/-components/SubmitButton.tsx"
+  },
+  {
+    "from": "components/forms/TextareaField.tsx",
+    "to": "routes/-components/TextareaField.tsx"
+  },
+  {
+    "from": "components/forms/TextField.tsx",
+    "to": "routes/-components/TextField.tsx"
+  },
+  {
+    "from": "components/home/HomeFeaturedEvents.test.tsx",
+    "to": "routes/-components/HomeFeaturedEvents.test.tsx"
+  },
+  {
+    "from": "components/home/HomeFeaturedEvents.tsx",
+    "to": "routes/-components/HomeFeaturedEvents.tsx"
+  },
+  {
+    "from": "components/home/HomeFeaturedWinemakers.test.tsx",
+    "to": "routes/-components/HomeFeaturedWinemakers.test.tsx"
+  },
+  {
+    "from": "components/home/HomeFeaturedWinemakers.tsx",
+    "to": "routes/-components/HomeFeaturedWinemakers.tsx"
+  },
+  {
+    "from": "components/home/HomeFeaturedWines.test.tsx",
+    "to": "routes/-components/HomeFeaturedWines.test.tsx"
+  },
+  {
+    "from": "components/home/HomeFeaturedWines.tsx",
+    "to": "routes/-components/HomeFeaturedWines.tsx"
+  },
+  {
+    "from": "components/home/HomeHero.test.tsx",
+    "to": "routes/-components/HomeHero.test.tsx"
+  },
+  {
+    "from": "components/home/HomeHero.tsx",
+    "to": "routes/-components/HomeHero.tsx"
+  },
+  {
+    "from": "components/home/HomeSellCta.tsx",
+    "to": "routes/-components/HomeSellCta.tsx"
+  },
+  {
+    "from": "components/reviews/ReviewCard.tsx",
+    "to": "routes/-components/ReviewCard.tsx"
+  },
+  {
+    "from": "components/reviews/ReviewList.tsx",
+    "to": "routes/-components/ReviewList.tsx"
+  },
+  {
+    "from": "components/reviews/ReviewsSummary.tsx",
+    "to": "routes/-components/ReviewsSummary.tsx"
+  },
+  {
+    "from": "components/reviews/use-entity-reviews.ts",
+    "to": "routes/-components/use-entity-reviews.ts"
+  },
+  {
+    "from": "components/settings/ClerkNameForm.tsx",
+    "to": "routes/_authenticated/-components/ClerkNameForm.tsx"
+  },
+  {
+    "from": "components/settings/PasswordChangeForm.tsx",
+    "to": "routes/_authenticated/-components/PasswordChangeForm.tsx"
+  },
+  {
+    "from": "components/settings/SettingsAddressForm.tsx",
+    "to": "routes/_authenticated/-components/SettingsAddressForm.tsx"
+  },
+  {
+    "from": "components/shops/AvailabilityExceptionForm.tsx",
+    "to": "routes/shops/$id/-components/AvailabilityExceptionForm.tsx"
+  },
+  {
+    "from": "components/shops/AvailabilityRegularForm.tsx",
+    "to": "routes/shops/$id/-components/AvailabilityRegularForm.tsx"
+  },
+  {
+    "from": "components/shops/BundleForm.tsx",
+    "to": "routes/shops/$id/bundles/-components/BundleForm.tsx"
+  },
+  {
+    "from": "components/shops/InventoryEditForm.tsx",
+    "to": "routes/shops/$id/inventory/$productId/-components/InventoryEditForm.tsx"
+  },
+  {
+    "from": "components/shops/InventoryForm.tsx",
+    "to": "routes/shops/$id/inventory/-components/InventoryForm.tsx"
+  },
+  {
+    "from": "components/shops/ShopCard.test.tsx",
+    "to": "routes/-components/shops/ShopCard.test.tsx"
+  },
+  {
+    "from": "components/shops/ShopCard.tsx",
+    "to": "routes/-components/shops/ShopCard.tsx"
+  },
+  {
+    "from": "components/shops/ShopDetailsCard.test.tsx",
+    "to": "routes/shops/$id/-components/ShopDetailsCard.test.tsx"
+  },
+  {
+    "from": "components/shops/ShopDetailsCard.tsx",
+    "to": "routes/shops/$id/-components/ShopDetailsCard.tsx"
+  },
+  {
+    "from": "components/shops/ShopForm.tsx",
+    "to": "routes/shops/-components/ShopForm.tsx"
+  },
+  {
+    "from": "components/shops/ShopHero.test.tsx",
+    "to": "routes/shops/$id/-components/ShopHero.test.tsx"
+  },
+  {
+    "from": "components/shops/ShopHero.tsx",
+    "to": "routes/shops/$id/-components/ShopHero.tsx"
+  },
+  {
+    "from": "components/shops/ShopManageMenu.test.tsx",
+    "to": "routes/shops/$id/-components/ShopManageMenu.test.tsx"
+  },
+  {
+    "from": "components/shops/ShopManageMenu.tsx",
+    "to": "routes/shops/$id/-components/ShopManageMenu.tsx"
+  },
+  {
+    "from": "components/shops/ShopMoreSetupCards.tsx",
+    "to": "routes/shops/-components/ShopMoreSetupCards.tsx"
+  },
+  {
+    "from": "components/shops/ShopProductsRow.test.tsx",
+    "to": "routes/shops/$id/-components/ShopProductsRow.test.tsx"
+  },
+  {
+    "from": "components/shops/ShopProductsRow.tsx",
+    "to": "routes/shops/$id/-components/ShopProductsRow.tsx"
+  },
+  {
+    "from": "components/stats/AdminStatsSection.test.tsx",
+    "to": "routes/_authenticated/-components/AdminStatsSection.test.tsx"
+  },
+  {
+    "from": "components/stats/AdminStatsSection.tsx",
+    "to": "routes/_authenticated/-components/AdminStatsSection.tsx"
+  },
+  {
+    "from": "components/stats/CustomerStatsSection.test.tsx",
+    "to": "routes/_authenticated/-components/CustomerStatsSection.test.tsx"
+  },
+  {
+    "from": "components/stats/CustomerStatsSection.tsx",
+    "to": "routes/_authenticated/-components/CustomerStatsSection.tsx"
+  },
+  {
+    "from": "components/stats/ShopOwnerStatsSection.test.tsx",
+    "to": "routes/_authenticated/-components/ShopOwnerStatsSection.test.tsx"
+  },
+  {
+    "from": "components/stats/ShopOwnerStatsSection.tsx",
+    "to": "routes/_authenticated/-components/ShopOwnerStatsSection.tsx"
+  },
+  {
+    "from": "components/stats/StatsSectionScaffold.tsx",
+    "to": "routes/_authenticated/-components/StatsSectionScaffold.tsx"
+  },
+  {
+    "from": "components/stats/StatTile.test.tsx",
+    "to": "routes/_authenticated/-components/StatTile.test.tsx"
+  },
+  {
+    "from": "components/stats/StatTile.tsx",
+    "to": "routes/_authenticated/-components/StatTile.tsx"
+  },
+  {
+    "from": "components/stats/WinemakerStatsSection.test.tsx",
+    "to": "routes/_authenticated/-components/WinemakerStatsSection.test.tsx"
+  },
+  {
+    "from": "components/stats/WinemakerStatsSection.tsx",
+    "to": "routes/_authenticated/-components/WinemakerStatsSection.tsx"
+  },
+  {
+    "from": "routes/-components/BundlesContainingWine.tsx",
+    "to": "routes/products/-components/BundlesContainingWine.tsx"
+  },
+  {
+    "from": "routes/-components/BundleWinesSection.tsx",
+    "to": "routes/products/-components/BundleWinesSection.tsx"
+  },
+  {
+    "from": "routes/-components/cart/CartItemRow.tsx",
+    "to": "routes/-components/CartItemRow.tsx"
+  },
+  {
+    "from": "routes/-components/cart/CartSection.tsx",
+    "to": "routes/-components/CartSection.tsx"
+  },
+  {
+    "from": "routes/-components/cart/CartSummary.tsx",
+    "to": "routes/-components/CartSummary.tsx"
+  },
+  {
+    "from": "routes/-components/cart/CheckoutSection.tsx",
+    "to": "routes/-components/CheckoutSection.tsx"
+  },
+  {
+    "from": "routes/-components/cart/DeliveryMethodToggle.tsx",
+    "to": "routes/-components/DeliveryMethodToggle.tsx"
+  },
+  {
+    "from": "routes/-components/cart/QuantityControl.tsx",
+    "to": "routes/-components/QuantityControl.tsx"
+  },
+  {
+    "from": "routes/-components/ProductGallery.tsx",
+    "to": "routes/products/-components/ProductGallery.tsx"
+  },
+  {
+    "from": "routes/-components/ProductRelatedSection.tsx",
+    "to": "routes/products/-components/ProductRelatedSection.tsx"
+  },
+  {
+    "from": "routes/-components/ProductReviewsSection.tsx",
+    "to": "routes/products/-components/ProductReviewsSection.tsx"
+  },
+  {
+    "from": "routes/-components/ProductSoldAtCard.tsx",
+    "to": "routes/products/-components/ProductSoldAtCard.tsx"
+  },
+  {
+    "from": "routes/-components/ShopHeroGallery.tsx",
+    "to": "routes/shops/$id/-components/ShopHeroGallery.tsx"
+  },
+  {
+    "from": "routes/-components/ShopHoursDisplay.tsx",
+    "to": "routes/shops/$id/-components/ShopHoursDisplay.tsx"
+  },
+  {
+    "from": "routes/-components/ShopMapEmbed.tsx",
+    "to": "routes/shops/$id/-components/ShopMapEmbed.tsx"
+  },
+  {
+    "from": "routes/-components/WineGallery.tsx",
+    "to": "routes/wines/-components/WineGallery.tsx"
+  },
+  {
+    "from": "routes/-components/WinemakerCard.tsx",
+    "to": "routes/-components/shared/WinemakerCard.tsx"
+  },
+  {
+    "from": "routes/-components/WinesAvailableInShops.tsx",
+    "to": "routes/wines/-components/WinesAvailableInShops.tsx"
+  }
+]

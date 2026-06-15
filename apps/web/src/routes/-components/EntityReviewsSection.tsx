@@ -1,13 +1,6 @@
 import { useState } from "react";
 import { InfiniteScrollArea } from "@/components/primitives/infinite-scroll-area";
 import { Section } from "@/components/primitives/section";
-import { ReviewList } from "@/components/reviews/ReviewList";
-import { ReviewsSummary } from "@/components/reviews/ReviewsSummary";
-import {
-  type ReviewEntityType,
-  type ReviewSort,
-  useEntityReviews,
-} from "@/components/reviews/use-entity-reviews";
 import {
   Select,
   SelectContent,
@@ -15,6 +8,13 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { ReviewList } from "@/routes/-components/ReviewList";
+import { ReviewsSummary } from "@/routes/-components/ReviewsSummary";
+import {
+  type ReviewEntityType,
+  type ReviewSort,
+  useEntityReviews,
+} from "@/routes/-components/use-entity-reviews";
 
 const SORT_LABELS: Record<ReviewSort, string> = {
   highest: "Highest rated",
