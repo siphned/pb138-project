@@ -4,6 +4,7 @@ import { authPlugin } from "../auth";
 import { verifyClerkToken } from "../auth/auth.utils";
 import { usersService } from "../users/users.service";
 import {
+  commentParams,
   createCommentBody,
   createEventBody,
   eventParams,
@@ -170,6 +171,28 @@ export const eventsRoutes = new Elysia()
         tags: ["events"],
       },
       params: eventParams,
+      requireAuth: true,
+    }
+  )
+
+  .delete(
+    "/events/:id/comments/:commentId",
+    async ({ params, dbUser, clerkPayload, set }) => {
+      await eventsService.deleteComment(
+        params.id,
+        params.commentId,
+        dbUser.id,
+        clerkPayload.roles.includes("admin")
+      );
+      set.status = 204;
+    },
+    {
+      detail: {
+        security: [{ bearerAuth: [] }],
+        summary: "Delete a comment on an event",
+        tags: ["events"],
+      },
+      params: commentParams,
       requireAuth: true,
     }
   );
