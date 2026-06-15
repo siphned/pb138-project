@@ -29,6 +29,8 @@ const reviewUserInfo = z.object({
 export const reviewResponse = z.object({
   body: z.string().nullable(),
   createdAt: z.date(),
+  entityId: z.string(),
+  entityType: z.enum(["product", "winemaker", "wine"]),
   id: z.string(),
   rating: z.number().int(),
   user: reviewUserInfo,

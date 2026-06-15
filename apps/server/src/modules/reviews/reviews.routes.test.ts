@@ -8,6 +8,8 @@ vi.mock("./reviews.service", () => ({
     createProductReview: vi.fn().mockResolvedValue({
       body: null,
       createdAt: new Date(),
+      entityId: "p1",
+      entityType: "product",
       id: "r1",
       rating: 5,
       user: { fname: "Test", id: "u1", lname: "User" },
@@ -16,6 +18,8 @@ vi.mock("./reviews.service", () => ({
     createWinemakerReview: vi.fn().mockResolvedValue({
       body: null,
       createdAt: new Date(),
+      entityId: "wm1",
+      entityType: "winemaker",
       id: "r3",
       rating: 5,
       user: { fname: "Test", id: "u1", lname: "User" },
@@ -24,6 +28,8 @@ vi.mock("./reviews.service", () => ({
     createWineReview: vi.fn().mockResolvedValue({
       body: null,
       createdAt: new Date(),
+      entityId: "w1",
+      entityType: "wine",
       id: "r2",
       rating: 5,
       user: { fname: "Test", id: "u1", lname: "User" },
