@@ -1,6 +1,7 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import * as shopsRepo from "../shops/shops.repository";
-import { ProductNotFoundError } from "./products.errors";
+import * as supplyAgreementsRepo from "../supply-agreements/supply-agreements.repository";
+import { NoSupplyAgreementError, ProductNotFoundError } from "./products.errors";
 import * as productsRepo from "./products.repository";
 import { productsService } from "./products.service";
 
@@ -15,6 +16,7 @@ vi.mock("./products.repository", async (importOriginal) => {
     findById: vi.fn(),
     findByIds: vi.fn(),
     getWineQuantityForUpdate: vi.fn(),
+    getWinemakerIdsForWines: vi.fn(),
     update: vi.fn(),
     updateWineQuantity: vi.fn(),
     winesExist: vi.fn(),
@@ -26,6 +28,10 @@ vi.mock("../shops/shops.repository", async (importOriginal) => {
   return { ...actual, findById: vi.fn() };
 });
 
+vi.mock("../supply-agreements/supply-agreements.repository", () => ({
+  listApprovedWinemakerIdsForShop: vi.fn(),
+}));
+
 vi.mock("../../db", () => {
   const m = {
     transaction: vi.fn((cb) => cb(m)),
@@ -36,11 +42,56 @@ vi.mock("../../db", () => {
 describe("productsService", () => {
   beforeEach(() => {
     vi.clearAllMocks();
+    // Default: the wine's winemaker has an approved agreement, so existing
+    // creation tests are unaffected by the supply gate.
+    vi.mocked(productsRepo.getWinemakerIdsForWines).mockResolvedValue(["wm1"]);
+    vi.mocked(supplyAgreementsRepo.listApprovedWinemakerIdsForShop).mockResolvedValue(["wm1"]);
   });
 
   const shopId = "s1";
   const requesterId = "u1";
   const productId = "p1";
+
+  describe("createProductOrBundle supply gating", () => {
+    const baseSingle = {
+      name: "P",
+      price: "10.00",
+      quantity: 1,
+      wineId: "wine1",
+    };
+
+    it("rejects a single product when the winemaker has no approved agreement", async () => {
+      vi.mocked(shopsRepo.findById).mockResolvedValue({
+        id: shopId,
+        ownerUserId: requesterId,
+      } as never);
+      vi.mocked(productsRepo.winesExist).mockResolvedValue(true);
+      vi.mocked(productsRepo.getWinemakerIdsForWines).mockResolvedValue(["wm1"]);
+      vi.mocked(supplyAgreementsRepo.listApprovedWinemakerIdsForShop).mockResolvedValue([]);
+
+      await expect(
+        productsService.createProductOrBundle(shopId, requesterId, baseSingle)
+      ).rejects.toBeInstanceOf(NoSupplyAgreementError);
+
+      expect(productsRepo.create).not.toHaveBeenCalled();
+    });
+
+    it("allows a single product when the winemaker is approved", async () => {
+      vi.mocked(shopsRepo.findById).mockResolvedValue({
+        id: shopId,
+        ownerUserId: requesterId,
+      } as never);
+      vi.mocked(productsRepo.winesExist).mockResolvedValue(true);
+      vi.mocked(productsRepo.getWinemakerIdsForWines).mockResolvedValue(["wm1"]);
+      vi.mocked(supplyAgreementsRepo.listApprovedWinemakerIdsForShop).mockResolvedValue(["wm1"]);
+      vi.mocked(productsRepo.getWineQuantityForUpdate).mockResolvedValue(100);
+      vi.mocked(productsRepo.create).mockResolvedValue({ id: "p1" } as never);
+
+      const result = await productsService.createProductOrBundle(shopId, requesterId, baseSingle);
+
+      expect(result.id).toBe("p1");
+    });
+  });
 
   describe("getAllProducts", () => {
     it("maps imageUrl from catalog rows into response items", async () => {

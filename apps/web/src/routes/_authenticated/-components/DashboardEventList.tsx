@@ -1,4 +1,5 @@
 import { Link } from "@tanstack/react-router";
+import { EventRowMenu } from "@/routes/-components/EventRowMenu";
 
 export interface DashboardEventRow {
   id: string;
@@ -33,7 +34,15 @@ function endMs(ev: DashboardEventRow) {
   return v ? new Date(v).getTime() : 0;
 }
 
-function EventItem({ ev }: { ev: DashboardEventRow }) {
+function EventItem({
+  ev,
+  manageable,
+  onChanged,
+}: {
+  ev: DashboardEventRow;
+  manageable?: boolean;
+  onChanged?: () => void;
+}) {
   const title = ev.title ?? ev.name ?? "Untitled event";
   const date = formatDate(ev.startTime ?? ev.startDate);
   return (
@@ -48,6 +57,7 @@ function EventItem({ ev }: { ev: DashboardEventRow }) {
         </Link>
         {date && <p className="text-xs text-muted-foreground">{date}</p>}
       </div>
+      {manageable && <EventRowMenu eventId={ev.id} eventName={title} onDeleted={onChanged} />}
     </li>
   );
 }
@@ -57,7 +67,17 @@ function EventItem({ ev }: { ev: DashboardEventRow }) {
  * within a single bordered list (no separate table). Upcoming events sort
  * soonest-first; past events most-recent-first.
  */
-export function DashboardEventList({ events }: { events: DashboardEventRow[] }) {
+export function DashboardEventList({
+  events,
+  manageable,
+  onChanged,
+}: {
+  events: DashboardEventRow[];
+  /** When true, each row shows a "…" menu to edit/delete the event. */
+  manageable?: boolean;
+  /** Called after an event is deleted so the parent can refetch. */
+  onChanged?: () => void;
+}) {
   const now = Date.now();
   const upcoming = events
     .filter((e) => endMs(e) >= now)
@@ -76,7 +96,7 @@ export function DashboardEventList({ events }: { events: DashboardEventRow[] }) 
             Upcoming
           </li>
           {upcoming.map((ev) => (
-            <EventItem ev={ev} key={ev.id} />
+            <EventItem ev={ev} key={ev.id} manageable={manageable} onChanged={onChanged} />
           ))}
         </>
       )}
@@ -86,7 +106,7 @@ export function DashboardEventList({ events }: { events: DashboardEventRow[] }) 
             Past
           </li>
           {past.map((ev) => (
-            <EventItem ev={ev} key={ev.id} />
+            <EventItem ev={ev} key={ev.id} manageable={manageable} onChanged={onChanged} />
           ))}
         </>
       )}

@@ -39,6 +39,23 @@ export async function listForShop(db: Database, shopId: string): Promise<SupplyA
     .where(and(eq(supplyAgreements.shopId, shopId), isNull(supplyAgreements.deletedAt)));
 }
 
+export async function listApprovedWinemakerIdsForShop(
+  db: Database,
+  shopId: string
+): Promise<string[]> {
+  const rows = await db
+    .select({ winemakerId: supplyAgreements.winemakerId })
+    .from(supplyAgreements)
+    .where(
+      and(
+        eq(supplyAgreements.shopId, shopId),
+        eq(supplyAgreements.status, "approved"),
+        isNull(supplyAgreements.deletedAt)
+      )
+    );
+  return rows.map((r) => r.winemakerId);
+}
+
 export async function listForWinemaker(
   db: Database,
   winemakerId: string

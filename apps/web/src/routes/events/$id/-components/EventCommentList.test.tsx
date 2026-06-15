@@ -22,6 +22,14 @@ vi.mock("@/generated/hooks/usePostEventsByIdComments", () => ({
   usePostEventsByIdComments: vi.fn(),
 }));
 
+vi.mock("@/generated/hooks/useDeleteEventsByIdCommentsByCommentId", () => ({
+  useDeleteEventsByIdCommentsByCommentId: () => ({ isPending: false, mutate: vi.fn() }),
+}));
+
+vi.mock("@/hooks/useRoles", () => ({
+  useRoles: () => [],
+}));
+
 type CommentRow = {
   id: string;
   body: string;

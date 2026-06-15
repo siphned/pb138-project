@@ -1,4 +1,4 @@
-import { ForbiddenError } from "@repo/shared";
+import { ConflictError, ForbiddenError } from "@repo/shared";
 import type { Wine } from "@repo/shared/schemas";
 import { db } from "../../db";
 import type { PaginatedResult } from "../../utils/pagination";
@@ -11,6 +11,21 @@ import type {
   WinemakerWithRelations,
 } from "./winemakers.repository";
 import * as winemakersRepo from "./winemakers.repository";
+
+type CreateWinemakerData = {
+  name: string;
+  description: string;
+  email?: string;
+  phone?: string;
+  websiteUrl?: string;
+  address: {
+    country: string;
+    city: string;
+    postalCode: string;
+    street: string;
+    houseNumber: string;
+  };
+};
 
 export class WinemakersService {
   async getWinemaker(id: string): Promise<WinemakerWithRelations> {
@@ -38,6 +53,30 @@ export class WinemakersService {
     const { limit, offset } = parsePagination({ limit: limitParam, page });
     const { rows, total } = await winemakersRepo.findAll(db, filters, { limit, offset });
     return { data: rows, limit, page: Math.max(1, page ?? 1), total };
+  }
+
+  async createMyProfile(userId: string, data: CreateWinemakerData): Promise<WinemakerListItem> {
+    const existing = await winemakersRepo.findByUserId(db, userId);
+    if (existing) {
+      throw new ConflictError("You already have a winemaker profile", "WINEMAKER_PROFILE_EXISTS");
+    }
+
+    const winemaker = await db.transaction(async (tx) => {
+      const address = await winemakersRepo.insertAddress(tx, data.address);
+      return winemakersRepo.createWinemaker(tx, {
+        addressId: address.id,
+        description: data.description,
+        email: data.email,
+        name: data.name,
+        phone: data.phone,
+        userId,
+        websiteUrl: data.websiteUrl,
+      });
+    });
+
+    const created = await winemakersRepo.findByIdWithAddress(db, winemaker.id);
+    if (!created) throw new WinemakerNotFoundError();
+    return created;
   }
 
   async getMyProfile(userId: string): Promise<WinemakerListItem> {

@@ -20,6 +20,8 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { Link } from "@tanstack/react-router";
+import { useGetSupplyAgreementsShopByShopId } from "@/generated/hooks/useGetSupplyAgreementsShopByShopId";
 import { useGetWines } from "@/generated/hooks/useGetWines";
 import { usePostShopsByIdProducts } from "@/generated/hooks/usePostShopsByIdProducts";
 import type { PostShopsByIdProductsMutationRequest } from "@/generated/types/PostShopsByIdProducts";
@@ -61,6 +63,8 @@ function friendlyProductError(code?: string, fallback?: string): string {
       return "Each wine in a bundle must be unique.";
     case "WINE_NOT_FOUND":
       return "One of the selected wines no longer exists.";
+    case "NO_SUPPLY_AGREEMENT":
+      return "You need an approved supply agreement with that winemaker first.";
     case "INSUFFICIENT_STOCK":
       return "Not enough winemaker stock to allocate this product.";
     default:
@@ -94,7 +98,15 @@ export function InventoryForm({ shopId, onSuccess }: InventoryFormProps) {
     name: "wines",
   });
 
-  const wines = Array.isArray(winesData) ? winesData : [];
+  const { data: agreementsData } = useGetSupplyAgreementsShopByShopId(shopId);
+  const approvedWinemakerIds = new Set(
+    (Array.isArray(agreementsData) ? agreementsData : [])
+      .filter((a) => (a as { status?: string }).status === "approved")
+      .map((a) => (a as { winemakerId: string }).winemakerId)
+  );
+  const allWines = Array.isArray(winesData) ? winesData : [];
+  const wines = allWines.filter((w) => approvedWinemakerIds.has(w.winemaker.id));
+  const hasApprovedSupply = wines.length > 0;
 
   const validateProduct = (data: FormData): string | null => {
     if (isBundle) {
@@ -138,6 +150,13 @@ export function InventoryForm({ shopId, onSuccess }: InventoryFormProps) {
   };
 
   const onSubmit = async (data: FormData) => {
+    // Block before the create mutation so an invalid image selection (too many
+    // / too large) never leaves a created product behind.
+    if (imageError) {
+      setSubmitError(imageError);
+      return;
+    }
+
     const validationError = validateProduct(data);
     if (validationError) {
       setSubmitError(validationError);
@@ -165,6 +184,24 @@ export function InventoryForm({ shopId, onSuccess }: InventoryFormProps) {
       setIsSubmitting(false);
     }
   };
+
+  if (!hasApprovedSupply) {
+    return (
+      <div className="rounded-md border border-border bg-muted/50 p-6 text-center">
+        <p className="text-sm text-muted-foreground">
+          You don't have any approved supply agreements yet. Request supply from a winemaker
+          before adding their wines to your shop.
+        </p>
+        <Button
+          className="mt-4"
+          render={<Link params={{ id: shopId }} to="/shops/$id/supply-browse" />}
+          variant="outline"
+        >
+          Browse winemakers
+        </Button>
+      </div>
+    );
+  }
 
   return (
     <Form {...form}>
@@ -246,8 +283,13 @@ export function InventoryForm({ shopId, onSuccess }: InventoryFormProps) {
                 <FormLabel>Select Wine</FormLabel>
                 <Select onValueChange={field.onChange} value={field.value || ""}>
                   <FormControl>
-                    <SelectTrigger>
-                      <SelectValue placeholder="Choose a wine..." />
+                    <SelectTrigger className="w-full">
+                      <SelectValue placeholder="Choose a wine...">
+                        {(v: string | null) => {
+                          const w = wines.find((x) => x.id === v);
+                          return w ? `${w.name} (${w.winemaker.name})` : "Choose a wine...";
+                        }}
+                      </SelectValue>
                     </SelectTrigger>
                   </FormControl>
                   <SelectContent>
@@ -297,8 +339,12 @@ export function InventoryForm({ shopId, onSuccess }: InventoryFormProps) {
                           <FormLabel className="text-xs">Wine</FormLabel>
                           <Select onValueChange={field.onChange} value={field.value || ""}>
                             <FormControl>
-                              <SelectTrigger>
-                                <SelectValue placeholder="Choose a wine..." />
+                              <SelectTrigger className="w-full">
+                                <SelectValue placeholder="Choose a wine...">
+                                  {(v: string | null) =>
+                                    wines.find((x) => x.id === v)?.name ?? "Choose a wine..."
+                                  }
+                                </SelectValue>
                               </SelectTrigger>
                             </FormControl>
                             <SelectContent>

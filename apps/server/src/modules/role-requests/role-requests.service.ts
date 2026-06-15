@@ -6,6 +6,7 @@ import { logger } from "../../utils/logger";
 import { emailService } from "../email/email.service";
 import { UserNotFoundError } from "../users/users.errors";
 import * as usersRepo from "../users/users.repository";
+import { usersService } from "../users/users.service";
 import {
   AlreadyHasPendingRequestError,
   AlreadyRespondedError,
@@ -26,11 +27,22 @@ export class RoleRequestsService {
     const user = await usersRepo.findById(db, request.userId);
     if (!user) throw new UserNotFoundError(request.userId);
 
-    const metadataKey = request.type === "winemaker" ? "is_winemaker" : "is_shop_owner";
+    // RBAC reads roles from `public_metadata.roles` (an array) everywhere —
+    // see users.service syncRolesToDatabase and the auth plugin. Append the
+    // granted role to that array (read-modify-write so we don't clobber the
+    // existing roles such as "customer"), then sync our DB immediately rather
+    // than waiting on the Clerk webhook (which isn't wired up in local dev).
+    const clerkUser = await clerkClient.users.getUser(user.clerkId);
+    const currentRoles = (clerkUser.publicMetadata?.roles as string[] | undefined) ?? [];
+    const nextRoles = currentRoles.includes(request.type)
+      ? currentRoles
+      : [...currentRoles, request.type];
 
     await clerkClient.users.updateUserMetadata(user.clerkId, {
-      publicMetadata: { [metadataKey]: true },
+      publicMetadata: { roles: nextRoles },
     });
+
+    await usersService.syncRolesToDatabase(user.id, nextRoles);
 
     const result = await roleRequestsRepo.updateStatus(db, requestId, "approved", adminUserId);
 

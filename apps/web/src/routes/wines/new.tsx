@@ -81,6 +81,27 @@ function WineCreatePage() {
 
   const winemakerName = winemakerQuery.data?.name ?? "";
 
+  // Attribution is pre-filled from the winemaker profile and hidden in the form.
+  // Without a profile it would be empty and the (required) hidden field would
+  // fail validation silently — so block here with a clear message instead.
+  if (winemakerQuery.isError || !winemakerName) {
+    return (
+      <div className="container mx-auto space-y-6 px-6 py-8 lg:px-12">
+        <Link
+          className="inline-flex items-center gap-2 text-sm text-muted-foreground transition-colors hover:text-foreground"
+          to="/wines"
+        >
+          <HugeiconsIcon className="h-4 w-4" icon={ArrowLeft02Icon} />
+          Back to wines
+        </Link>
+        <PageHeader
+          description="You need a winemaker profile before you can add wines. Set one up from your dashboard first."
+          title="Winemaker profile required"
+        />
+      </div>
+    );
+  }
+
   return (
     <div className="container mx-auto space-y-8 px-6 py-8 lg:px-12">
       <Link
@@ -95,6 +116,14 @@ function WineCreatePage() {
         description="Add a wine to your catalog. Shop owners can then request supply for retail."
         title="Add a new wine"
       />
+
+      {mutation.isError && (
+        <div className="max-w-3xl rounded-md bg-destructive/10 p-4 text-sm text-destructive">
+          {mutation.error instanceof Error
+            ? mutation.error.message
+            : "Could not create the wine. Please try again."}
+        </div>
+      )}
 
       <div className="max-w-3xl">
         <WineForm

@@ -1,7 +1,10 @@
+import { Link } from "@tanstack/react-router";
 import type { ReactNode } from "react";
 import { useState } from "react";
+import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useUser } from "@/context/UserContext";
+import { useGetWinemakersMe } from "@/generated/hooks/useGetWinemakersMe";
 import { AdminRoleRequestsTab } from "@/routes/_authenticated/-components/AdminRoleRequestsTab";
 import { AdminUsersTab } from "@/routes/_authenticated/-components/AdminUsersTab";
 import { CustomerEventsTab } from "@/routes/_authenticated/-components/CustomerEventsTab";
@@ -11,6 +14,7 @@ import { ShopOwnerOrdersTab } from "@/routes/_authenticated/-components/ShopOwne
 import { ShopOwnerShopsTab } from "@/routes/_authenticated/-components/ShopOwnerShopsTab";
 import { ShopSelector } from "@/routes/_authenticated/-components/ShopSelector";
 import { WinemakerEventsTab } from "@/routes/_authenticated/-components/WinemakerEventsTab";
+import { WinemakerSupplyTab } from "@/routes/_authenticated/-components/WinemakerSupplyTab";
 import { WinemakerWinesTab } from "@/routes/_authenticated/-components/WinemakerWinesTab";
 import { Role } from "@/types/roles";
 
@@ -24,6 +28,26 @@ export function DashboardTabs() {
   const { activeRole } = useUser();
   const [selectedShopId, setSelectedShopId] = useState<string | "all">("all");
 
+  // A user can hold the winemaker role without yet having a winemaker profile
+  // (profiles aren't auto-created on approval). Without one, every winemaker
+  // view 500s, so prompt them to set it up first.
+  const isWinemaker = activeRole === Role.winemaker;
+  const winemakerProfile = useGetWinemakersMe({ query: { enabled: isWinemaker } });
+
+  if (isWinemaker && !winemakerProfile.isLoading && !winemakerProfile.data) {
+    return (
+      <div className="rounded-md border border-border bg-muted/50 p-6 text-center">
+        <p className="text-sm text-muted-foreground">
+          You don't have a winemaker profile yet. Set one up to list wines and receive supply
+          requests.
+        </p>
+        <Button className="mt-4" render={<Link to="/winemakers/new" />}>
+          Set up winemaker profile
+        </Button>
+      </div>
+    );
+  }
+
   const tabs: TabSpec[] = (() => {
     if (activeRole === Role.winemaker) {
       return [
@@ -36,6 +60,11 @@ export function DashboardTabs() {
           content: <WinemakerEventsTab />,
           label: "My Events",
           value: "events",
+        },
+        {
+          content: <WinemakerSupplyTab />,
+          label: "Supply Requests",
+          value: "supply",
         },
       ];
     }

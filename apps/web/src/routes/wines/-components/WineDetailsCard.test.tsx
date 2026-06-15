@@ -1,20 +1,10 @@
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { render, screen } from "@testing-library/react";
-import { beforeEach, describe, expect, it, vi } from "vitest";
-import { useUser } from "@/context/UserContext";
-import { useGetWinemakersMe } from "@/generated/hooks/useGetWinemakersMe";
+import { describe, expect, it, vi } from "vitest";
 import { WineDetailsCard } from "@/routes/wines/-components/WineDetailsCard";
-
-vi.mock("@/context/UserContext", () => ({
-  useUser: vi.fn(),
-}));
 
 vi.mock("@tanstack/react-router", () => ({
   Link: ({ children, to }: any) => <a href={to}>{children}</a>,
-}));
-
-vi.mock("@/generated/hooks/useGetWinemakersMe", () => ({
-  useGetWinemakersMe: vi.fn(),
 }));
 
 const mockWine = {
@@ -29,13 +19,7 @@ const mockWine = {
 } as any;
 
 describe("WineDetailsCard", () => {
-  beforeEach(() => {
-    vi.clearAllMocks();
-    vi.mocked(useGetWinemakersMe).mockReturnValue({ data: null, isLoading: false } as any);
-  });
-
   it("renders wine details", () => {
-    vi.mocked(useUser).mockReturnValue({ user: null } as any);
     render(
       <QueryClientProvider client={new QueryClient()}>
         <WineDetailsCard wine={mockWine} />
@@ -46,31 +30,12 @@ describe("WineDetailsCard", () => {
     expect(screen.getByText("12.5%")).toBeInTheDocument();
   });
 
-  it("shows owner actions when user is winemaker", () => {
-    vi.mocked(useUser).mockReturnValue({ user: { id: "user-1" } } as any);
-    vi.mocked(useGetWinemakersMe).mockReturnValue({
-      data: { id: "wm-1" },
-      isLoading: false,
-    } as any);
+  it("links the winemaker name", () => {
     render(
       <QueryClientProvider client={new QueryClient()}>
         <WineDetailsCard wine={mockWine} />
       </QueryClientProvider>
     );
-    expect(screen.getByText(/edit/i)).toBeInTheDocument();
-  });
-
-  it("hides owner actions when user is NOT winemaker", () => {
-    vi.mocked(useUser).mockReturnValue({ user: { id: "user-2" } } as any);
-    vi.mocked(useGetWinemakersMe).mockReturnValue({
-      data: { id: "wm-2" },
-      isLoading: false,
-    } as any);
-    render(
-      <QueryClientProvider client={new QueryClient()}>
-        <WineDetailsCard wine={mockWine} />
-      </QueryClientProvider>
-    );
-    expect(screen.queryByText(/edit/i)).not.toBeInTheDocument();
+    expect(screen.getByText("Lechovice")).toBeInTheDocument();
   });
 });

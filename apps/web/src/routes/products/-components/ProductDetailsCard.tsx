@@ -75,6 +75,11 @@ export function ProductDetailsCard({
   const shopName: string | undefined = product.shop?.name ?? fetchedShop?.name;
   const shopOwnerUserId: string | undefined = product.shop?.ownerUserId ?? fetchedShop?.ownerUserId;
 
+  // For a single-wine product (not a bundle), surface the winemaker behind it.
+  const primaryWinemaker: { id?: string; name?: string } | undefined = product.isBundle
+    ? undefined
+    : product.productWines?.[0]?.wine?.winemaker;
+
   const price = formatEur(product.price);
 
   const outOfStock = product.quantity === 0;
@@ -105,6 +110,17 @@ export function ProductDetailsCard({
                     to="/shops/$id"
                   >
                     Sold by {shopName}
+                  </Link>
+                </p>
+              )}
+              {primaryWinemaker?.id && primaryWinemaker.name && (
+                <p className="text-sm">
+                  <Link
+                    className="text-muted-foreground transition-colors hover:text-primary hover:underline"
+                    params={{ id: primaryWinemaker.id }}
+                    to="/winemakers/$id"
+                  >
+                    By {primaryWinemaker.name}
                   </Link>
                 </p>
               )}

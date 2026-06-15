@@ -1,15 +1,28 @@
+import { Delete01Icon } from "@hugeicons/core-free-icons";
+import { HugeiconsIcon } from "@hugeicons/react";
 import { useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
 import { EmptyState } from "@/components/primitives/empty-state";
 import { ErrorState } from "@/components/primitives/error-state";
 import { InfiniteScrollArea } from "@/components/primitives/infinite-scroll-area";
 import { LoadingState } from "@/components/primitives/loading-state";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
 import { Textarea } from "@/components/ui/textarea";
 import { useUser } from "@/context/UserContext";
+import { useDeleteEventsByIdCommentsByCommentId } from "@/generated/hooks/useDeleteEventsByIdCommentsByCommentId";
 import { usePostEventsByIdComments } from "@/generated/hooks/usePostEventsByIdComments";
+import { useRoles } from "@/hooks/useRoles";
 import {
   type EventComment,
   eventCommentsQueryKey,
@@ -34,8 +47,10 @@ function commentDate(c: EventComment) {
 
 export function EventCommentList({ eventId }: EventCommentListProps) {
   const { user } = useUser();
+  const isAdmin = useRoles().includes("admin");
   const queryClient = useQueryClient();
   const [draft, setDraft] = useState("");
+  const [confirmDeleteId, setConfirmDeleteId] = useState<string | null>(null);
 
   const { data, isLoading, isError, refetch, hasNextPage, isFetchingNextPage, fetchNextPage } =
     useEventComments(eventId);
@@ -44,6 +59,15 @@ export function EventCommentList({ eventId }: EventCommentListProps) {
     mutation: {
       onSuccess: () => {
         setDraft("");
+        queryClient.invalidateQueries({ queryKey: eventCommentsQueryKey(eventId) });
+      },
+    },
+  });
+
+  const deleteMutation = useDeleteEventsByIdCommentsByCommentId({
+    mutation: {
+      onSuccess: () => {
+        setConfirmDeleteId(null);
         queryClient.invalidateQueries({ queryKey: eventCommentsQueryKey(eventId) });
       },
     },
@@ -103,22 +127,66 @@ export function EventCommentList({ eventId }: EventCommentListProps) {
           itemCount={comments.length}
         >
           <ul className="space-y-4 pb-2">
-            {comments.map((c) => (
-              <li key={c.id}>
-                <Card variant="section">
-                  <CardContent className="space-y-2 pt-6">
-                    <div className="flex items-baseline justify-between gap-4">
-                      <span className="font-medium text-foreground">{commentAuthor(c)}</span>
-                      <span className="text-xs text-muted-foreground">{commentDate(c)}</span>
-                    </div>
-                    <p className="whitespace-pre-line text-sm text-muted-foreground">{c.body}</p>
-                  </CardContent>
-                </Card>
-              </li>
-            ))}
+            {comments.map((c) => {
+              const canDelete = isAdmin || (!!user && user.id === c.userId);
+              return (
+                <li key={c.id}>
+                  <Card variant="section">
+                    <CardContent className="space-y-2 py-4">
+                      <div className="flex items-baseline justify-between gap-4">
+                        <span className="font-medium text-foreground">{commentAuthor(c)}</span>
+                        <div className="flex items-center gap-2">
+                          <span className="text-xs text-muted-foreground">{commentDate(c)}</span>
+                          {canDelete && (
+                            <Button
+                              aria-label="Delete comment"
+                              className="h-7 w-7 text-muted-foreground hover:text-destructive"
+                              onClick={() => setConfirmDeleteId(c.id)}
+                              size="icon"
+                              variant="ghost"
+                            >
+                              <HugeiconsIcon className="h-4 w-4" icon={Delete01Icon} />
+                            </Button>
+                          )}
+                        </div>
+                      </div>
+                      <p className="whitespace-pre-line text-sm text-muted-foreground">{c.body}</p>
+                    </CardContent>
+                  </Card>
+                </li>
+              );
+            })}
           </ul>
         </InfiniteScrollArea>
       )}
+
+      <AlertDialog
+        onOpenChange={(open) => !open && setConfirmDeleteId(null)}
+        open={confirmDeleteId !== null}
+      >
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Delete this comment?</AlertDialogTitle>
+            <AlertDialogDescription>
+              This action cannot be undone. The comment will be permanently removed.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <div className="flex justify-end gap-2">
+            <AlertDialogCancel onClick={() => setConfirmDeleteId(null)} />
+            <AlertDialogAction
+              className="bg-destructive text-white hover:bg-destructive/90"
+              disabled={deleteMutation.isPending}
+              onClick={() => {
+                if (confirmDeleteId) {
+                  deleteMutation.mutate({ commentId: confirmDeleteId, id: eventId });
+                }
+              }}
+            >
+              {deleteMutation.isPending ? "Deleting…" : "Delete"}
+            </AlertDialogAction>
+          </div>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 }

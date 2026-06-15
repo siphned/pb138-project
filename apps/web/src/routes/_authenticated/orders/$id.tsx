@@ -1,6 +1,6 @@
 import { ArrowLeft02Icon } from "@hugeicons/core-free-icons";
 import { HugeiconsIcon } from "@hugeicons/react";
-import { createFileRoute, Link } from "@tanstack/react-router";
+import { createFileRoute, Link, useCanGoBack, useRouter } from "@tanstack/react-router";
 import { DescriptionList, PropertyRow } from "@/components/primitives/description-list";
 import { ErrorState } from "@/components/primitives/error-state";
 import { LoadingState } from "@/components/primitives/loading-state";
@@ -76,6 +76,8 @@ function SummaryRow({ label, value }: { label: string; value: string }) {
 
 function OrderDetailPage() {
   const { id } = Route.useParams();
+  const router = useRouter();
+  const canGoBack = useCanGoBack();
   const { data: order, isLoading, isError, refetch } = useGetOrdersById(id);
 
   if (isLoading) {
@@ -106,13 +108,24 @@ function OrderDetailPage() {
 
   return (
     <div className="container mx-auto max-w-4xl space-y-10 px-6 py-8 lg:px-12">
-      <Link
-        className="inline-flex items-center gap-2 text-sm text-muted-foreground transition-colors hover:text-foreground"
-        to="/orders"
-      >
-        <HugeiconsIcon className="h-4 w-4" icon={ArrowLeft02Icon} />
-        Back to orders
-      </Link>
+      {canGoBack ? (
+        <button
+          className="inline-flex items-center gap-2 text-sm text-muted-foreground transition-colors hover:text-foreground"
+          onClick={() => router.history.back()}
+          type="button"
+        >
+          <HugeiconsIcon className="h-4 w-4" icon={ArrowLeft02Icon} />
+          Back
+        </button>
+      ) : (
+        <Link
+          className="inline-flex items-center gap-2 text-sm text-muted-foreground transition-colors hover:text-foreground"
+          to="/orders"
+        >
+          <HugeiconsIcon className="h-4 w-4" icon={ArrowLeft02Icon} />
+          Back to orders
+        </Link>
+      )}
 
       <div className="flex flex-wrap items-start justify-between gap-4">
         <PageHeader description={`Placed ${formatDate(order.createdAt)}`} title="Order details" />
