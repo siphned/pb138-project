@@ -623,6 +623,118 @@ async function main() {
   }
   logger.info(`Inserted ${fakerShopKeys.length} faker shops`);
 
+  // ── Filler entities (lightweight — no wines/products) ────────────────────────
+  // Bulk-inserted purely to push winemaker/shop/event lists onto page 2.
+  // Everything here uses batched inserts (a handful of round-trips total) and
+  // deliberately skips wines, products and reviews to stay cheap.
+  const FILLER_WM_COUNT = 20; // 10 custom + 2 faker + 20 filler = 32 winemakers
+  const FILLER_SHOP_COUNT = 25; // 5 custom + 2 faker + 25 filler = 32 shops
+  const FILLER_EVENT_COUNT = 18; // pushes events past the 10/page threshold
+
+  logger.info("Inserting filler winemakers, shops and events (no products)...");
+
+  // Filler winemakers
+  const fillerWmCities = Array.from({ length: FILLER_WM_COUNT }, () => pick(CZECH_WINERY_CITIES));
+  const fillerWmOwnerAddrs = await insertAddresses(fillerWmCities.map((c) => czechAddress(c)));
+  const fillerWmOwners = await insertUsers(
+    fillerWmOwnerAddrs.map((a) => ({
+      clerkId: fakeClerkId(),
+      email: faker.internet.email().slice(0, 60),
+      fname: faker.person.firstName().slice(0, 30),
+      lname: faker.person.lastName().slice(0, 30),
+      shippingAddressId: a.id,
+    })),
+  );
+  const fillerWmAddrs = await insertAddresses(fillerWmCities.map((c) => czechAddress(c)));
+  const fillerWmRows = await insertWinemakers(
+    fillerWmOwners.map((o, i) => {
+      const lastName = faker.person.lastName();
+      const city = fillerWmCities[i]!;
+      const domain = faker.internet.domainName();
+      return {
+        userId: o.id,
+        name: pick([
+          `Vinařství ${lastName}`,
+          `Rodinné vinařství ${lastName}`,
+          `Sklepy ${city}`,
+          `Winery ${lastName}`,
+        ]),
+        description: faker.lorem.sentences({ min: 2, max: 3 }),
+        addressId: fillerWmAddrs[i]!.id,
+        email: `info@${domain}`,
+        phone: `+420 ${faker.string.numeric(3)} ${faker.string.numeric(3)} ${faker.string.numeric(3)}`,
+        websiteUrl: `https://${domain}`,
+      };
+    }),
+  );
+  fillerWmRows.forEach((_w, i) => {
+    fakerOwnerRoles.push({ userId: fillerWmOwners[i]!.id, role: "winemaker" });
+    // No image rows on purpose — FE falls back to its placeholder.
+  });
+
+  // Filler shops
+  const fillerShopCities = Array.from({ length: FILLER_SHOP_COUNT }, () => pick(CZECH_SHOP_CITIES));
+  const fillerShopOwnerAddrs = await insertAddresses(fillerShopCities.map((c) => czechAddress(c)));
+  const fillerShopOwners = await insertUsers(
+    fillerShopOwnerAddrs.map((a) => ({
+      clerkId: fakeClerkId(),
+      email: faker.internet.email().slice(0, 60),
+      fname: faker.person.firstName().slice(0, 30),
+      lname: faker.person.lastName().slice(0, 30),
+      shippingAddressId: a.id,
+    })),
+  );
+  const fillerShopAddrs = await insertAddresses(fillerShopCities.map((c) => czechAddress(c)));
+  const fillerShopRows = await insertShops(
+    fillerShopOwners.map((o, i) => {
+      const city = fillerShopCities[i]!;
+      return {
+        ownerUserId: o.id,
+        name: pick([
+          `Vinotéka ${faker.person.lastName()}`,
+          `Vinárna ${city}`,
+          `Víno ${faker.person.lastName()}`,
+          `${city} Wine`,
+          `Sklep ${faker.person.lastName()}`,
+        ]),
+        description: faker.lorem.sentences({ min: 2, max: 3 }),
+        addressId: fillerShopAddrs[i]!.id,
+      };
+    }),
+  );
+  fillerShopRows.forEach((_s, i) => {
+    fakerOwnerRoles.push({ userId: fillerShopOwners[i]!.id, role: "shop_owner" });
+    // No image rows on purpose — FE falls back to its placeholder.
+  });
+
+  // Filler events — hosted by filler winemakers, far-future so custom/faker
+  // events stay first in the startTime-asc list.
+  const fillerEventCities = Array.from({ length: FILLER_EVENT_COUNT }, () =>
+    pick(CZECH_WINERY_CITIES),
+  );
+  const fillerEventAddrs = await insertAddresses(fillerEventCities.map((c) => czechAddress(c)));
+  const fillerEventRows = await insertEvents(
+    fillerEventAddrs.map((a, i) => {
+      const startTime = new Date(Date.now() + faker.number.int({ min: 100, max: 300 }) * 86_400_000);
+      return {
+        winemakerId: fillerWmRows[i % fillerWmRows.length]!.id,
+        addressId: a.id,
+        name: `${faker.helpers.arrayElement(["Premium", "Classic", "Harvest", "Seasonal", "Regional", "Heritage", "Sunset"])} Wine Experience`,
+        description: faker.lorem.sentences(2),
+        startTime,
+        endTime: new Date(startTime.getTime() + 3 * 3_600_000),
+        capacity: faker.number.int({ min: 20, max: 60 }),
+        visibility: "public" as const,
+        inviteType: "open" as const,
+        status: "approved" as const,
+      };
+    }),
+  );
+  // No image rows on filler events on purpose — FE falls back to its placeholder.
+  logger.info(
+    `Inserted ${fillerWmRows.length} filler winemakers, ${fillerShopRows.length} filler shops, ${fillerEventRows.length} filler events`,
+  );
+
   // Assign images to all products:
   // — custom wines: reuse the wine's own images (same visual as wine detail)
   // — faker wines: cycle through the bottle photo pool
