@@ -35,7 +35,9 @@ export function InventoryEditForm({
 
   const form = useForm<PatchShopsByIdProductsByProductIdMutationRequest>({
     defaultValues: {
-      description: "",
+      // The list-item type omits description, but the edit page passes the full
+      // product (which has it), so prefill it to avoid wiping it on save.
+      description: (product as { description?: string | null }).description ?? "",
       name: product.name,
       price: product.price,
       quantity: Number(product.quantity),
@@ -45,8 +47,15 @@ export function InventoryEditForm({
   const onSubmit = async (data: PatchShopsByIdProductsByProductIdMutationRequest) => {
     setIsSubmitting(true);
     try {
+      // Number inputs hand back strings, and the backend rejects an empty
+      // description (it must be omitted/null), so normalize before sending.
+      const description = typeof data.description === "string" ? data.description.trim() : "";
       await mutation.mutateAsync({
-        data,
+        data: {
+          ...data,
+          description: description.length > 0 ? description : null,
+          quantity: Number(data.quantity),
+        },
         id: shopId,
         productId: product.id,
       });
