@@ -45,10 +45,7 @@ export class ProductsService {
     if (shop.ownerUserId !== requesterId) throw new ForbiddenShopActionError();
   }
 
-  private async assertWinesUnderApprovedSupply(
-    shopId: string,
-    wineIds: string[]
-  ): Promise<void> {
+  private async assertWinesUnderApprovedSupply(shopId: string, wineIds: string[]): Promise<void> {
     const winemakerIds = await productsRepo.getWinemakerIdsForWines(db, wineIds);
     const approved = new Set(
       await supplyAgreementsRepo.listApprovedWinemakerIdsForShop(db, shopId)
