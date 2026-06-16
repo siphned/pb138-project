@@ -32,7 +32,9 @@ vi.mock("./winemakers.service", () => ({
   winemakersService: {
     getMyProfile: vi.fn().mockResolvedValue(defaultWinemaker),
     getWinemaker: vi.fn().mockResolvedValue(defaultWinemaker),
-    listWinemakers: vi.fn().mockResolvedValue([defaultWinemaker]),
+    listWinemakers: vi
+      .fn()
+      .mockResolvedValue({ data: [defaultWinemaker], limit: 24, page: 1, total: 1 }),
     updateMyProfile: vi.fn().mockResolvedValue(defaultWinemaker),
     updateWinemakerById: vi.fn().mockResolvedValue(defaultWinemaker),
   },
@@ -58,13 +60,15 @@ describe("winemakers routes", () => {
       const response = await app.handle(get("/winemakers"));
       expect(response.status).toBe(200);
       const data = await response.json();
-      expect(Array.isArray(data)).toBe(true);
+      expect(Array.isArray(data.data)).toBe(true);
     });
 
     it("forwards the city filter to the service", async () => {
       const response = await app.handle(get("/winemakers?city=Brno&q=acme"));
       expect(response.status).toBe(200);
-      expect(winemakersService.listWinemakers).toHaveBeenCalledWith({ city: "Brno", q: "acme" });
+      expect(winemakersService.listWinemakers).toHaveBeenCalledWith(
+        expect.objectContaining({ city: "Brno", q: "acme" })
+      );
     });
   });
 

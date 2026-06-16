@@ -17,6 +17,7 @@ vi.mock("../../db", () => {
       },
     },
     returning: vi.fn().mockReturnThis(),
+    select: vi.fn(),
     set: vi.fn().mockReturnThis(),
     transaction: vi.fn((cb) => cb(m)),
     update: vi.fn().mockReturnThis(),
@@ -67,16 +68,36 @@ describe("shopsRepository", () => {
   });
 
   describe("findAll with filters", () => {
+    const pagination = { limit: 24, offset: 0 };
+
+    // findAll runs the row query and a COUNT query (db.select().from().where()) in
+    // parallel. Stub the count chain to resolve to [{ total }].
+    const stubCount = (total: number) => {
+      vi.mocked(mockDb.select).mockReturnValue({
+        from: vi.fn().mockReturnValue({ where: vi.fn().mockResolvedValue([{ total }]) }),
+      });
+    };
+
     it("accepts q filter", async () => {
       vi.mocked(db.query.shops.findMany).mockResolvedValue([]);
-      await shopsRepository.findAll(db, { q: "boutique" });
+      stubCount(0);
+      await shopsRepository.findAll(db, { q: "boutique" }, pagination);
       expect(db.query.shops.findMany).toHaveBeenCalled();
     });
 
     it("accepts ownerUserId filter", async () => {
       vi.mocked(db.query.shops.findMany).mockResolvedValue([]);
-      await shopsRepository.findAll(db, { ownerUserId: "u1" });
+      stubCount(0);
+      await shopsRepository.findAll(db, { ownerUserId: "u1" }, pagination);
       expect(db.query.shops.findMany).toHaveBeenCalled();
+    });
+
+    it("returns rows and total", async () => {
+      const mockShops = [{ address: { deletedAt: null, id: "a1" }, id: "s1" }];
+      vi.mocked(db.query.shops.findMany).mockResolvedValue(mockShops as any);
+      stubCount(1);
+      const result = await shopsRepository.findAll(db, {}, pagination);
+      expect(result).toStrictEqual({ rows: mockShops, total: 1 });
     });
   });
 

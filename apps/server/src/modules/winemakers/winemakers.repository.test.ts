@@ -20,6 +20,7 @@ vi.mock("../../db", () => {
       },
     },
     returning: vi.fn().mockReturnThis(),
+    select: vi.fn(),
     set: vi.fn().mockReturnThis(),
     update: vi.fn().mockReturnThis(),
     where: vi.fn().mockReturnThis(),
@@ -33,27 +34,38 @@ describe("winemakersRepository", () => {
   });
 
   describe("findAll", () => {
-    it("delegates to db.query.findMany", async () => {
+    const pagination = { limit: 24, offset: 0 };
+
+    // findAll runs the row query and a COUNT query (db.select().from().where()) in
+    // parallel. Stub the count chain to resolve to [{ total }].
+    const stubCount = (total: number) => {
+      vi.mocked(mockDb.select).mockReturnValue({
+        from: vi.fn().mockReturnValue({ where: vi.fn().mockResolvedValue([{ total }]) }),
+      });
+    };
+
+    it("returns rows and total from db.query.findMany", async () => {
       const mockList = [{ address: { deletedAt: null, id: "a1" }, id: "wm1" }];
       vi.mocked(db.query.winemakers.findMany).mockResolvedValue(mockList as any);
-      const result = await winemakersRepository.findAll(db, {});
-      expect(result).toStrictEqual(mockList);
+      stubCount(1);
+      const result = await winemakersRepository.findAll(db, {}, pagination);
+      expect(result).toStrictEqual({ rows: mockList, total: 1 });
     });
 
     it("accepts q filter for name search", async () => {
       vi.mocked(db.query.winemakers.findMany).mockResolvedValue([]);
-      await winemakersRepository.findAll(db, { q: "chateau" });
+      stubCount(0);
+      await winemakersRepository.findAll(db, { q: "chateau" }, pagination);
       expect(db.query.winemakers.findMany).toHaveBeenCalled();
     });
 
-    it("filters by city case-insensitively", async () => {
-      const mockList = [
-        { address: { city: "Brno", deletedAt: null, id: "a1" }, id: "wm1" },
-        { address: { city: "Praha", deletedAt: null, id: "a2" }, id: "wm2" },
-      ];
-      vi.mocked(db.query.winemakers.findMany).mockResolvedValue(mockList as any);
-      const result = await winemakersRepository.findAll(db, { city: "brn" });
-      expect(result).toStrictEqual([mockList[0]]);
+    it("passes limit and offset through to findMany", async () => {
+      vi.mocked(db.query.winemakers.findMany).mockResolvedValue([]);
+      stubCount(0);
+      await winemakersRepository.findAll(db, { city: "brn" }, { limit: 5, offset: 10 });
+      expect(db.query.winemakers.findMany).toHaveBeenCalledWith(
+        expect.objectContaining({ limit: 5, offset: 10 })
+      );
     });
   });
 

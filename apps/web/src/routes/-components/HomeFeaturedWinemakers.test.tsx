@@ -41,7 +41,7 @@ describe("HomeFeaturedWinemakers", () => {
 
   it("renders at most three winemakers from the list", () => {
     vi.mocked(useGetWinemakers).mockReturnValue({
-      data: Array.from({ length: 7 }, (_, i) => ({ id: `m${i}`, name: `Maker ${i}` })),
+      data: { data: Array.from({ length: 7 }, (_, i) => ({ id: `m${i}`, name: `Maker ${i}` })) },
       isLoading: false,
     } as ReturnType<typeof useGetWinemakers>);
     render(<HomeFeaturedWinemakers />);
@@ -51,7 +51,7 @@ describe("HomeFeaturedWinemakers", () => {
 
   it("renders a View all link to /winemakers", () => {
     vi.mocked(useGetWinemakers).mockReturnValue({
-      data: [{ id: "m1", name: "Maker 1" }],
+      data: { data: [{ id: "m1", name: "Maker 1" }] },
       isLoading: false,
     } as ReturnType<typeof useGetWinemakers>);
     render(<HomeFeaturedWinemakers />);

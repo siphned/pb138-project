@@ -28,7 +28,7 @@ vi.mock("./shops.service", () => ({
     deleteShop: vi.fn().mockResolvedValue(undefined),
     getShop: vi.fn().mockResolvedValue(defaultShop),
     listMyShops: vi.fn().mockResolvedValue([defaultShop]),
-    listShops: vi.fn().mockResolvedValue([defaultShop]),
+    listShops: vi.fn().mockResolvedValue({ data: [defaultShop], limit: 24, page: 1, total: 1 }),
     updateShop: vi.fn().mockResolvedValue(defaultShop),
   },
 }));
@@ -53,7 +53,7 @@ describe("shops routes", () => {
       const response = await app.handle(get("/shops"));
       expect(response.status).toBe(200);
       const data = await response.json();
-      expect(Array.isArray(data)).toBe(true);
+      expect(Array.isArray(data.data)).toBe(true);
     });
   });
 

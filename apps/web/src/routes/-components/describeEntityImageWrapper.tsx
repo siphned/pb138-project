@@ -45,11 +45,14 @@ export function describeEntityImageWrapper({
       expect(container.querySelector('[data-slot="skeleton"]')).toBeInTheDocument();
     });
 
-    it("renders the placeholder when no images are attached", () => {
+    it("renders the placeholder image when no images are attached", () => {
       setQuery([]);
       render(renderWrapper());
-      expect(screen.queryByAltText(alt)).not.toBeInTheDocument();
-      expect(screen.getByText(fallbackText)).toBeInTheDocument();
+      // Each wrapper passes an entityType, so the empty state is a per-type
+      // placeholder <img> (alt = the entity name), not a text caption.
+      const placeholder = screen.getByAltText(alt);
+      expect(placeholder.getAttribute("src")).toContain("/placeholders/");
+      expect(screen.queryByText(fallbackText)).not.toBeInTheDocument();
     });
   });
 }

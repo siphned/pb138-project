@@ -7,6 +7,12 @@ vi.mock("@tanstack/react-router", () => ({
   Link: ({ children, to, params }: any) => <a href={`${to}/${params?.id || ""}`}>{children}</a>,
 }));
 
+// WinemakerCard renders WinemakerImage, which fetches via this generated hook.
+// Mock it so the card renders without a QueryClientProvider; empty data -> placeholder.
+vi.mock("@/generated/hooks/useGetWinemakersByIdImages", () => ({
+  useGetWinemakersByIdImages: vi.fn(() => ({ data: undefined, isLoading: false })),
+}));
+
 const mockWinemaker = {
   address: { city: "Velké Bílovice", country: "Czech Republic" },
   id: "wm-1",
