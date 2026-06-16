@@ -1,6 +1,6 @@
 import { Separator } from "@/components/ui/separator";
 import type { GetCarts200 } from "@/generated/types/GetCarts";
-import { formatEur } from "@/lib/utils";
+import { formatEur, toCents } from "@/lib/utils";
 
 type CartItem = NonNullable<GetCarts200>["items"][number];
 
@@ -11,11 +11,12 @@ type CartSummaryProps = {
 
 export function CartSummary({ items, deliveryType = "shipping" }: CartSummaryProps) {
   const deliveryCost = deliveryType === "pickup" ? 0.0 : 15.0;
-  const subtotal = items.reduce((acc, item) => {
-    const price = Number.parseFloat(item.product.price);
-    const quantity = Number(item.quantity);
-    return acc + price * quantity;
-  }, 0);
+  // Accumulate in integer cents to avoid float drift across line items.
+  const subtotalCents = items.reduce(
+    (acc, item) => acc + toCents(item.product.price) * Number(item.quantity),
+    0
+  );
+  const subtotal = subtotalCents / 100;
 
   const deliveryLabel = deliveryType === "pickup" ? "Pickup" : "Shipping";
 

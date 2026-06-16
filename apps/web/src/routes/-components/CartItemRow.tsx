@@ -2,7 +2,7 @@ import { Cancel01Icon } from "@hugeicons/core-free-icons";
 import { HugeiconsIcon } from "@hugeicons/react";
 import { Button } from "@/components/ui/button";
 import type { GetCarts200 } from "@/generated/types/GetCarts";
-import { formatEur } from "@/lib/utils";
+import { formatEur, lineTotalEur } from "@/lib/utils";
 import { ProductImage } from "@/routes/-components/ProductImage";
 import { QuantityControl } from "@/routes/-components/QuantityControl";
 
@@ -17,7 +17,7 @@ type CartItemRowProps = {
 export function CartItemRow({ item, onQuantityChange, onRemove }: CartItemRowProps) {
   const quantity = Number(item.quantity);
   const price = Number.parseFloat(item.product.price);
-  const lineTotal = price * quantity;
+  const lineTotal = lineTotalEur(item.product.price, quantity);
 
   return (
     <div className="flex flex-wrap items-start gap-4 rounded-lg border border-border p-4 sm:flex-nowrap">
