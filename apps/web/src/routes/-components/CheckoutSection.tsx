@@ -1,5 +1,5 @@
 import { useQueryClient } from "@tanstack/react-query";
-import { useNavigate } from "@tanstack/react-router";
+import { Link, useNavigate } from "@tanstack/react-router";
 import { useMemo, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -36,7 +36,7 @@ export function CheckoutSection({
   const checkout = usePostOrdersCheckout<unknown>();
   const [checkoutError, setCheckoutError] = useState<string | null>(null);
 
-  const { data: addresses } = useGetUsersMeAddresses();
+  const { data: addresses } = useGetUsersMeAddresses({ query: { enabled: !!user } });
 
   const total = useMemo(() => {
     if (!cart) return 0;
@@ -116,6 +116,39 @@ export function CheckoutSection({
   };
 
   const isCartEmpty = !cart || cart.items.length === 0;
+
+  // Guests can't check out directly: prompt them to authenticate. The guest cart
+  // merges into their account automatically on the first signed-in request
+  // (carts.routes.ts derive → mergeOnLogin), so their items carry over.
+  if (!user) {
+    return (
+      <Card>
+        <CardHeader>
+          <CardTitle>Checkout</CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <p className="text-sm text-muted-foreground">
+            Log in or create an account to finish your order. Your cart will be saved.
+          </p>
+          <div className="flex flex-col gap-2 sm:flex-row">
+            <Button
+              className="flex-1"
+              render={<Link search={{ redirect: "/cart" }} to="/auth/login" />}
+            >
+              Log in
+            </Button>
+            <Button
+              className="flex-1"
+              render={<Link search={{ redirect: "/cart" }} to="/auth/register" />}
+              variant="outline"
+            >
+              Create account
+            </Button>
+          </div>
+        </CardContent>
+      </Card>
+    );
+  }
 
   const formFooter = (
     <div className="space-y-4 border-t border-border pt-4">
