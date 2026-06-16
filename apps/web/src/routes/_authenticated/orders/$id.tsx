@@ -5,6 +5,7 @@ import { DescriptionList, PropertyRow } from "@/components/primitives/descriptio
 import { ErrorState } from "@/components/primitives/error-state";
 import { LoadingState } from "@/components/primitives/loading-state";
 import { PageHeader } from "@/components/primitives/page-header";
+import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
 import {
@@ -15,8 +16,11 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import { useUser } from "@/context";
 import { useGetOrdersById } from "@/generated/hooks/useGetOrdersById";
+import { usePatchOrdersByIdStatus } from "@/generated/hooks/usePatchOrdersByIdStatus";
 import { cn, formatEur } from "@/lib/utils";
+import { Role } from "@/types/roles";
 
 export const Route = createFileRoute("/_authenticated/orders/$id")({
   component: OrderDetailPage,
@@ -74,8 +78,77 @@ function SummaryRow({ label, value }: { label: string; value: string }) {
   );
 }
 
+type OrderStatus = "pending" | "confirmed" | "shipped" | "delivered" | "cancelled";
+
+// Mirrors the backend's allowed transitions (orders.routes.ts): pending→confirmed,
+// confirmed→shipped, shipped→delivered, and any non-terminal status → cancelled.
+const NEXT_STATUSES: Record<OrderStatus, { status: OrderStatus; label: string }[]> = {
+  cancelled: [],
+  confirmed: [
+    { label: "Mark as shipped", status: "shipped" },
+    { label: "Cancel order", status: "cancelled" },
+  ],
+  delivered: [],
+  pending: [
+    { label: "Confirm order", status: "confirmed" },
+    { label: "Cancel order", status: "cancelled" },
+  ],
+  shipped: [
+    { label: "Mark as delivered", status: "delivered" },
+    { label: "Cancel order", status: "cancelled" },
+  ],
+};
+
+function OrderStatusActions({
+  orderId,
+  currentStatus,
+  onUpdated,
+}: {
+  orderId: string;
+  currentStatus: string;
+  onUpdated: () => void;
+}) {
+  const { mutate, isPending, error } = usePatchOrdersByIdStatus({
+    mutation: { onSuccess: () => onUpdated() },
+  });
+  const transitions = NEXT_STATUSES[currentStatus as OrderStatus] ?? [];
+
+  if (transitions.length === 0) return null;
+
+  const errorMessage =
+    error &&
+    (typeof error.response?.data === "string"
+      ? error.response.data
+      : "Couldn't update the order status. Please try again.");
+
+  return (
+    <Card variant="default">
+      <CardHeader>
+        <CardTitle className="text-lg font-bold">Update status</CardTitle>
+      </CardHeader>
+      <CardContent className="space-y-3">
+        <div className="flex flex-wrap gap-2">
+          {transitions.map((t) => (
+            <Button
+              disabled={isPending}
+              key={t.status}
+              onClick={() => mutate({ data: { status: t.status }, id: orderId })}
+              variant={t.status === "cancelled" ? "destructive" : "default"}
+            >
+              {t.label}
+            </Button>
+          ))}
+        </div>
+        {errorMessage && <p className="text-sm text-destructive">{errorMessage}</p>}
+      </CardContent>
+    </Card>
+  );
+}
+
 function OrderDetailPage() {
   const { id } = Route.useParams();
+  const { activeRole } = useUser();
+  const canManageStatus = activeRole === Role.shopOwner || activeRole === Role.admin;
   const router = useRouter();
   const canGoBack = useCanGoBack();
   const { data: order, isLoading, isError, refetch } = useGetOrdersById(id);
@@ -212,6 +285,10 @@ function OrderDetailPage() {
           </div>
         </CardContent>
       </Card>
+
+      {canManageStatus && (
+        <OrderStatusActions currentStatus={order.status} onUpdated={() => refetch()} orderId={id} />
+      )}
     </div>
   );
 }

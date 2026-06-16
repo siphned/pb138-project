@@ -33,6 +33,9 @@ interface UserContextType {
   user: UserProfile | null;
   updateUser: (newData: Partial<Pick<UserProfile, "fname" | "lname">>) => Promise<UserProfile>;
   isLoading: boolean;
+  // True once we can fetch the cart without a 400: Clerk has loaded (so the axios
+  // interceptor can attach the token for signed-in users) or a guest session exists.
+  isCartReady: boolean;
   activeRole: Role;
   setActiveRole: (role: Role) => void;
 }
@@ -48,6 +51,7 @@ export function UserProvider({ children }: { children: ReactNode }) {
     enabled: isLoaded && isSignedIn,
   });
   const queryClient = useQueryClient();
+  const [guestSessionReady, setGuestSessionReady] = useState(false);
   const updateMutation = usePutUsersMe({
     mutation: {
       onSuccess: () => {
@@ -59,6 +63,7 @@ export function UserProvider({ children }: { children: ReactNode }) {
   const { mutate: ensureGuestSession } = usePostGuestSessions({
     mutation: {
       onSuccess: () => {
+        setGuestSessionReady(true);
         queryClient.invalidateQueries({ queryKey: getCartsQueryKey() });
       },
     },
@@ -110,9 +115,12 @@ export function UserProvider({ children }: { children: ReactNode }) {
   };
 
   const isLoading = !isLoaded || (isSignedIn && isQueryLoading);
+  const isCartReady = Boolean(isLoaded && (isSignedIn || guestSessionReady));
 
   return (
-    <UserContext.Provider value={{ activeRole, isLoading, setActiveRole, updateUser, user }}>
+    <UserContext.Provider
+      value={{ activeRole, isCartReady, isLoading, setActiveRole, updateUser, user }}
+    >
       {children}
     </UserContext.Provider>
   );

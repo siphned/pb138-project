@@ -49,13 +49,25 @@ const mockWinemakerWithRelations = {
 beforeEach(() => vi.clearAllMocks());
 
 describe("listWinemakers", () => {
-  it("returns all winemakers from repository", async () => {
-    vi.mocked(winemakersRepo.findAll).mockResolvedValue([mockWinemakerWithAddress] as never);
+  it("returns a paginated envelope of winemakers from repository", async () => {
+    vi.mocked(winemakersRepo.findAll).mockResolvedValue({
+      rows: [mockWinemakerWithAddress],
+      total: 1,
+    } as never);
 
     const result = await winemakersService.listWinemakers();
 
-    expect(result).toEqual([mockWinemakerWithAddress]);
-    expect(winemakersRepo.findAll).toHaveBeenCalledWith(expect.anything(), expect.any(Object));
+    expect(result).toEqual({
+      data: [mockWinemakerWithAddress],
+      limit: expect.any(Number),
+      page: 1,
+      total: 1,
+    });
+    expect(winemakersRepo.findAll).toHaveBeenCalledWith(
+      expect.anything(),
+      expect.any(Object),
+      expect.objectContaining({ limit: expect.any(Number), offset: expect.any(Number) })
+    );
   });
 });
 

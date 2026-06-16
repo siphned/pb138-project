@@ -27,12 +27,21 @@ interface ProductRowMenuProps {
   shopId: string;
   productId: string;
   productName: string;
+  /** When true, the Edit link returns to the product detail page after save/cancel
+   * (used on the product page). Otherwise it returns to the shop inventory. */
+  returnToProduct?: boolean;
   /** Called after a successful delete. The product lists are refreshed
    * automatically via query invalidation. */
   onDeleted?: () => void;
 }
 
-export function ProductRowMenu({ shopId, productId, productName, onDeleted }: ProductRowMenuProps) {
+export function ProductRowMenu({
+  shopId,
+  productId,
+  productName,
+  returnToProduct,
+  onDeleted,
+}: ProductRowMenuProps) {
   const queryClient = useQueryClient();
   const [confirmOpen, setConfirmOpen] = useState(false);
   const { mutate, isPending } = useDeleteShopsByIdProductsByProductId();
@@ -66,7 +75,7 @@ export function ProductRowMenu({ shopId, productId, productName, onDeleted }: Pr
             render={
               <Link
                 params={{ id: shopId, productId }}
-                search={{ isBundle: undefined }}
+                search={{ returnTo: returnToProduct ? "product" : undefined }}
                 to="/shops/$id/inventory/$productId/edit"
               />
             }

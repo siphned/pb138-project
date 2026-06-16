@@ -120,7 +120,10 @@ export function DashboardTabs() {
   })();
 
   return (
-    <Tabs defaultValue={tabs[0]?.value}>
+    // Remount per role: the tab set (and so the first tab) changes when the
+    // active role changes, which would otherwise mutate an uncontrolled Tabs'
+    // defaultValue after init (Base UI warning) and leave a stale selected tab.
+    <Tabs defaultValue={tabs[0]?.value} key={activeRole}>
       {activeRole === Role.shopOwner && (
         <div className="flex justify-end">
           <ShopSelector onChange={setSelectedShopId} value={selectedShopId} />

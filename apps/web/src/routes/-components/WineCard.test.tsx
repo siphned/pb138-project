@@ -9,6 +9,12 @@ vi.mock("@tanstack/react-router", () => ({
   ),
 }));
 
+// WineCard renders WineImage, which fetches via this generated react-query hook.
+// Mock it so the card renders without a QueryClientProvider; empty data -> placeholder.
+vi.mock("@/generated/hooks/useGetWinesByIdImages", () => ({
+  useGetWinesByIdImages: vi.fn(() => ({ data: undefined, isLoading: false })),
+}));
+
 const mockWine = {
   color: "white",
   id: "wine-1",
@@ -46,10 +52,10 @@ describe("WineCard", () => {
     expect(screen.getAllByText(/white/i).length).toBeGreaterThan(0);
   });
 
-  it("renders image when provided", () => {
+  it("renders image when an inline imageUrl is provided", () => {
     const wineWithImage = {
       ...mockWine,
-      images: [{ url: "https://example.com/wine.jpg" }],
+      imageUrl: "https://example.com/wine.jpg",
     };
     render(<WineCard wine={wineWithImage} />);
     const img = screen.getByRole("img");

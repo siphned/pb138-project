@@ -22,6 +22,12 @@ vi.mock("@/generated/hooks/usePutUsersMe", () => ({
   usePutUsersMe: () => ({ mutateAsync: mockMutateAsync }),
 }));
 
+// UserProvider also ensures a guest session via this generated mutation hook.
+// Mock it so its module (which imports `mutationOptions`) is never evaluated.
+vi.mock("@/generated/hooks/usePostGuestSessions", () => ({
+  usePostGuestSessions: () => ({ mutate: vi.fn() }),
+}));
+
 import { useQuery } from "@tanstack/react-query";
 import { UserProvider, useUser } from "../context/UserContext";
 

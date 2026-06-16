@@ -39,7 +39,9 @@ const makeFile = (type = "image/jpeg") => new File(["content"], "test.jpg", { ty
 
 beforeEach(() => {
   vi.clearAllMocks();
-  vi.stubGlobal("Bun", { write: vi.fn().mockResolvedValue(0) });
+  // The `Bun` global is non-configurable under the Bun runtime, so vi.stubGlobal
+  // can't replace it. Spy on Bun.write instead to avoid touching the real disk.
+  vi.spyOn(Bun, "write").mockResolvedValue(0 as never);
 });
 
 afterEach(() => {

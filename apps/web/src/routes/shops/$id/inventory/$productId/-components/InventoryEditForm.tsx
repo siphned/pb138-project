@@ -1,5 +1,6 @@
 "use client";
 
+import { useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { Button } from "@/components/ui/button";
@@ -13,6 +14,9 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
+import { getProductsQueryKey } from "@/generated/hooks/useGetProducts";
+import { getProductsByIdQueryKey } from "@/generated/hooks/useGetProductsById";
+import { getShopsByIdProductsQueryKey } from "@/generated/hooks/useGetShopsByIdProducts";
 import { usePatchShopsByIdProductsByProductId } from "@/generated/hooks/usePatchShopsByIdProductsByProductId";
 import type { GetShopsByIdProducts200 } from "@/generated/types/GetShopsByIdProducts";
 import type { PatchShopsByIdProductsByProductIdMutationRequest } from "@/generated/types/PatchShopsByIdProductsByProductId";
@@ -21,15 +25,24 @@ interface InventoryEditFormProps {
   shopId: string;
   product: GetShopsByIdProducts200["data"][number];
   onSuccess: () => void;
+  onCancel: () => void;
 }
 
-export function InventoryEditForm({ shopId, product, onSuccess }: InventoryEditFormProps) {
+export function InventoryEditForm({
+  shopId,
+  product,
+  onSuccess,
+  onCancel,
+}: InventoryEditFormProps) {
+  const queryClient = useQueryClient();
   const mutation = usePatchShopsByIdProductsByProductId();
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const form = useForm<PatchShopsByIdProductsByProductIdMutationRequest>({
     defaultValues: {
-      description: "",
+      // The list-item type omits description, but the edit page passes the full
+      // product (which has it), so prefill it to avoid wiping it on save.
+      description: (product as { description?: string | null }).description ?? "",
       name: product.name,
       price: product.price,
       quantity: Number(product.quantity),
@@ -39,11 +52,25 @@ export function InventoryEditForm({ shopId, product, onSuccess }: InventoryEditF
   const onSubmit = async (data: PatchShopsByIdProductsByProductIdMutationRequest) => {
     setIsSubmitting(true);
     try {
+      // Number inputs hand back strings, and the backend rejects an empty
+      // description (it must be omitted/null), so normalize before sending.
+      const description = typeof data.description === "string" ? data.description.trim() : "";
       await mutation.mutateAsync({
-        data,
+        data: {
+          ...data,
+          description: description.length > 0 ? description : null,
+          quantity: Number(data.quantity),
+        },
         id: shopId,
         productId: product.id,
       });
+      // Refresh the product detail and list caches so the updated values show
+      // without a manual page reload.
+      await Promise.all([
+        queryClient.invalidateQueries({ queryKey: getProductsByIdQueryKey(product.id) }),
+        queryClient.invalidateQueries({ queryKey: getShopsByIdProductsQueryKey(shopId) }),
+        queryClient.invalidateQueries({ queryKey: getProductsQueryKey() }),
+      ]);
       onSuccess();
     } catch (_error) {
       // Error handling is delegated to the mutation hook's error state
@@ -113,9 +140,14 @@ export function InventoryEditForm({ shopId, product, onSuccess }: InventoryEditF
           )}
         />
 
-        <Button className="w-full" disabled={isSubmitting || mutation.isPending} type="submit">
-          {isSubmitting || mutation.isPending ? "Saving..." : "Save Changes"}
-        </Button>
+        <div className="flex gap-3">
+          <Button className="flex-1" onClick={onCancel} type="button" variant="outline">
+            Cancel
+          </Button>
+          <Button className="flex-1" disabled={isSubmitting || mutation.isPending} type="submit">
+            {isSubmitting || mutation.isPending ? "Saving..." : "Save Changes"}
+          </Button>
+        </div>
       </form>
     </Form>
   );
