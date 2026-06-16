@@ -1,6 +1,6 @@
 import { MinusSignIcon, PlusSignIcon, ShoppingCart02Icon } from "@hugeicons/core-free-icons";
 import { HugeiconsIcon } from "@hugeicons/react";
-import { Link } from "@tanstack/react-router";
+import { Link, useNavigate } from "@tanstack/react-router";
 import { useState } from "react";
 import { ShowOwner } from "@/components/primitives/show-owner";
 import { Badge } from "@/components/ui/badge";
@@ -10,6 +10,7 @@ import { Separator } from "@/components/ui/separator";
 import { useGetShopsById } from "@/generated/hooks/useGetShopsById";
 import type { GetProductsById200 } from "@/generated/types/GetProductsById";
 import { formatEur } from "@/lib/utils";
+import { ProductRowMenu } from "@/routes/-components/ProductRowMenu";
 
 interface ProductDetailsCardProps {
   product: GetProductsById200;
@@ -67,6 +68,7 @@ export function ProductDetailsCard({
   isAddingToCart,
 }: ProductDetailsCardProps) {
   const [quantity, setQuantity] = useState(1);
+  const navigate = useNavigate();
 
   const shopId: string | undefined = product.shop?.id ?? product.shopId;
   const { data: fetchedShop } = useGetShopsById(shopId ?? "", {
@@ -91,9 +93,22 @@ export function ProductDetailsCard({
       <Card variant="default">
         <CardContent>
           <div className="flex flex-col gap-5">
-            <div className="flex flex-wrap items-center gap-2">
-              {product.isBundle && <Badge variant="secondary">Bundle</Badge>}
-              <Badge variant={stock.variant}>{stock.label}</Badge>
+            <div className="flex items-start justify-between gap-2">
+              <div className="flex flex-wrap items-center gap-2">
+                {product.isBundle && <Badge variant="secondary">Bundle</Badge>}
+                <Badge variant={stock.variant}>{stock.label}</Badge>
+              </div>
+              {shopId && (
+                <ShowOwner ownerUserId={shopOwnerUserId}>
+                  <ProductRowMenu
+                    onDeleted={() => navigate({ to: "/products" })}
+                    productId={product.id}
+                    productName={product.name}
+                    returnToProduct
+                    shopId={shopId}
+                  />
+                </ShowOwner>
+              )}
             </div>
 
             <h1 className="font-heading text-3xl font-bold leading-tight tracking-tight text-foreground sm:text-4xl">
@@ -159,25 +174,6 @@ export function ProductDetailsCard({
           </div>
         </CardContent>
       </Card>
-
-      {shopId && (
-        <ShowOwner ownerUserId={shopOwnerUserId}>
-          <div className="flex flex-wrap gap-4">
-            <Button
-              render={
-                <Link
-                  params={{ id: shopId, productId: product.id }}
-                  search={{ isBundle: undefined }}
-                  to="/shops/$id/inventory/$productId/edit"
-                />
-              }
-              variant="outline"
-            >
-              Edit Product
-            </Button>
-          </div>
-        </ShowOwner>
-      )}
     </div>
   );
 }

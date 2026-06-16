@@ -10,6 +10,7 @@ vi.mock("@/context/UserContext", () => ({
 
 vi.mock("@tanstack/react-router", () => ({
   Link: ({ children, to }: any) => <a href={to}>{children}</a>,
+  useNavigate: () => vi.fn(),
 }));
 
 const mockProduct = {
@@ -95,6 +96,6 @@ describe("ProductDetailsCard", () => {
         />
       </QueryClientProvider>
     );
-    expect(screen.getByText(/edit product/i)).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: /manage/i })).toBeInTheDocument();
   });
 });

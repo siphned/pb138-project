@@ -21,9 +21,15 @@ interface InventoryEditFormProps {
   shopId: string;
   product: GetShopsByIdProducts200["data"][number];
   onSuccess: () => void;
+  onCancel: () => void;
 }
 
-export function InventoryEditForm({ shopId, product, onSuccess }: InventoryEditFormProps) {
+export function InventoryEditForm({
+  shopId,
+  product,
+  onSuccess,
+  onCancel,
+}: InventoryEditFormProps) {
   const mutation = usePatchShopsByIdProductsByProductId();
   const [isSubmitting, setIsSubmitting] = useState(false);
 
@@ -113,9 +119,14 @@ export function InventoryEditForm({ shopId, product, onSuccess }: InventoryEditF
           )}
         />
 
-        <Button className="w-full" disabled={isSubmitting || mutation.isPending} type="submit">
-          {isSubmitting || mutation.isPending ? "Saving..." : "Save Changes"}
-        </Button>
+        <div className="flex gap-3">
+          <Button className="flex-1" onClick={onCancel} type="button" variant="outline">
+            Cancel
+          </Button>
+          <Button className="flex-1" disabled={isSubmitting || mutation.isPending} type="submit">
+            {isSubmitting || mutation.isPending ? "Saving..." : "Save Changes"}
+          </Button>
+        </div>
       </form>
     </Form>
   );
