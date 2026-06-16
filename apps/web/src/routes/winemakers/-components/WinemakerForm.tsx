@@ -1,4 +1,4 @@
-import { useMemo } from "react";
+import { standardSchemaResolver } from "@hookform/resolvers/standard-schema";
 import { type Resolver, useForm } from "react-hook-form";
 import { z } from "zod";
 
@@ -37,20 +37,6 @@ export function WinemakerForm({
   isPending,
   submitLabel,
 }: WinemakerFormProps) {
-  const resolver = useMemo<Resolver<WinemakerFormValues>>(
-    () => async (values) => {
-      const result = winemakerFormSchema.safeParse(values);
-      if (result.success) return { errors: {}, values: result.data };
-      const errors: Record<string, { type: string; message: string }> = {};
-      for (const issue of result.error.issues) {
-        const path = issue.path[0] as string;
-        if (path && !errors[path]) errors[path] = { message: issue.message, type: "manual" };
-      }
-      return { errors: errors as never, values: {} };
-    },
-    []
-  );
-
   const form = useForm<WinemakerFormValues>({
     defaultValues: {
       city: "",
@@ -63,7 +49,7 @@ export function WinemakerForm({
       ...defaultValues,
     },
     mode: "onSubmit",
-    resolver,
+    resolver: standardSchemaResolver(winemakerFormSchema) as Resolver<WinemakerFormValues>,
     reValidateMode: "onChange",
   });
 

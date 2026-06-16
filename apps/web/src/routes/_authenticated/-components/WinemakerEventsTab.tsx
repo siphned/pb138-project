@@ -32,7 +32,7 @@ export function WinemakerEventsTab() {
       onRetry={() => query.refetch()}
       viewAllTo="/events"
     >
-      <DashboardEventList events={list} manageable onChanged={() => query.refetch()} />
+      <DashboardEventList events={list} manageable />
     </TabPreviewShell>
   );
 }

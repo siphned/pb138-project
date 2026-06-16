@@ -1,5 +1,6 @@
 import { MoreHorizontalCircle01Icon } from "@hugeicons/core-free-icons";
 import { HugeiconsIcon } from "@hugeicons/react";
+import { useQueryClient } from "@tanstack/react-query";
 import { Link } from "@tanstack/react-router";
 import { useState } from "react";
 import {
@@ -19,16 +20,20 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { useDeleteShopsByIdProductsByProductId } from "@/generated/hooks/useDeleteShopsByIdProductsByProductId";
+import { getProductsQueryKey } from "@/generated/hooks/useGetProducts";
+import { getShopsByIdProductsQueryKey } from "@/generated/hooks/useGetShopsByIdProducts";
 
 interface ProductRowMenuProps {
   shopId: string;
   productId: string;
   productName: string;
-  /** Called after a successful delete (e.g. refetch the inventory list). */
+  /** Called after a successful delete. The product lists are refreshed
+   * automatically via query invalidation. */
   onDeleted?: () => void;
 }
 
 export function ProductRowMenu({ shopId, productId, productName, onDeleted }: ProductRowMenuProps) {
+  const queryClient = useQueryClient();
   const [confirmOpen, setConfirmOpen] = useState(false);
   const { mutate, isPending } = useDeleteShopsByIdProductsByProductId();
 
@@ -38,6 +43,8 @@ export function ProductRowMenu({ shopId, productId, productName, onDeleted }: Pr
       {
         onSuccess: () => {
           setConfirmOpen(false);
+          queryClient.invalidateQueries({ queryKey: getShopsByIdProductsQueryKey(shopId) });
+          queryClient.invalidateQueries({ queryKey: getProductsQueryKey() });
           onDeleted?.();
         },
       }

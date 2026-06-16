@@ -17,12 +17,40 @@ type CartSectionProps = {
   deliveryType?: "pickup" | "shipping";
 };
 
+type CartUpdateContext = { previous: GetCarts200 | undefined };
+
 export function CartSection({ cart, deliveryType }: CartSectionProps) {
   const queryClient = useQueryClient();
 
   const updateQuantity = usePutCartsItemsByProductId({
     mutation: {
-      onSuccess: () => {
+      // context is cast explicitly because Biome sorts onError before onMutate,
+      // which defeats TS's inference of the mutation context from onMutate's return.
+      onError: (_err, _vars, context) => {
+        const previous = (context as CartUpdateContext | undefined)?.previous;
+        if (previous) {
+          queryClient.setQueryData(getCartsQueryKey(), previous);
+        }
+      },
+      // Optimistically patch the quantity in the cache so the number moves the
+      // instant the user clicks, instead of waiting for the round-trip + refetch.
+      // onError rolls back from the snapshot; onSettled reconciles with the server.
+      onMutate: async ({ data, productId }): Promise<CartUpdateContext> => {
+        await queryClient.cancelQueries({ queryKey: getCartsQueryKey() });
+        const previous = queryClient.getQueryData<GetCarts200>(getCartsQueryKey());
+        queryClient.setQueryData<GetCarts200>(getCartsQueryKey(), (old) =>
+          old
+            ? {
+                ...old,
+                items: old.items.map((item) =>
+                  item.product.id === productId ? { ...item, quantity: data.quantity } : item
+                ),
+              }
+            : old
+        );
+        return { previous };
+      },
+      onSettled: () => {
         queryClient.invalidateQueries({ queryKey: getCartsQueryKey() });
       },
     },

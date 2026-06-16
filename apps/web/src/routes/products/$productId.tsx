@@ -23,7 +23,7 @@ function ProductDetailPage() {
   const { productId } = Route.useParams();
   const queryClient = useQueryClient();
   const { data: product, isLoading, isError, refetch } = useGetProductsById(productId);
-  const { data: productImages } = useGetProductsByIdImages(productId);
+  const { data: productImages, isLoading: imagesLoading } = useGetProductsByIdImages(productId);
   const addToCartMutation = usePostCartsItems();
 
   const handleAddToCart = (quantity: number) => {
@@ -37,10 +37,10 @@ function ProductDetailPage() {
     );
   };
 
-  if (isLoading) {
+  if (isLoading || imagesLoading) {
     return (
       <div className="container mx-auto px-6 py-8 lg:px-12">
-        <LoadingState variant="detail" />
+        <LoadingState variant="detail-media" />
       </div>
     );
   }

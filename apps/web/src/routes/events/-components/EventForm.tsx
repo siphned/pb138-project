@@ -1,4 +1,5 @@
-import { useMemo, useState } from "react";
+import { standardSchemaResolver } from "@hookform/resolvers/standard-schema";
+import { useState } from "react";
 import { type Resolver, useForm } from "react-hook-form";
 import { z } from "zod";
 
@@ -80,20 +81,6 @@ export function EventForm({
   const [imageFiles, setImageFiles] = useState<File[]>([]);
   const [imageError, setImageError] = useState<string | null>(null);
 
-  const resolver = useMemo<Resolver<EventFormValues>>(
-    () => async (values) => {
-      const result = eventFormSchema.safeParse(values);
-      if (result.success) return { errors: {}, values: result.data };
-      const errors: Record<string, { type: string; message: string }> = {};
-      for (const issue of result.error.issues) {
-        const path = issue.path[0] as string;
-        if (path && !errors[path]) errors[path] = { message: issue.message, type: "manual" };
-      }
-      return { errors: errors as never, values: {} };
-    },
-    []
-  );
-
   const form = useForm<EventFormValues>({
     defaultValues: {
       capacity: 30,
@@ -111,7 +98,10 @@ export function EventForm({
       ...defaultValues,
     },
     mode: "onSubmit",
-    resolver,
+    // Cast keeps useForm on the schema's output type; the resolver's input/output
+    // split (from z.coerce/.default) would otherwise force a 3-generic form that
+    // the shared field components don't accept.
+    resolver: standardSchemaResolver(eventFormSchema) as Resolver<EventFormValues>,
     reValidateMode: "onChange",
   });
 

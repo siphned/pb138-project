@@ -67,12 +67,10 @@ function ShopImagesPage() {
   });
   const deleteMutation = useDeleteShopsByIdImagesByImageId();
 
-  // Invalidate + force a refetch so the grid updates immediately. Plain
-  // invalidate() didn't always trigger a refetch (depends on observer state),
-  // so chain refetch() after to guarantee the new list lands in cache.
+  // Invalidate the images query so the active grid observer refetches and the
+  // new list lands in cache.
   const refresh = async () => {
     await queryClient.invalidateQueries({ queryKey });
-    await refetch();
   };
 
   // Upload each file in turn, continuing past failures so one bad file doesn't

@@ -38,7 +38,7 @@ type SupplyStatus = "pending" | "active" | "expired" | "rejected";
 
 const statusColors: Record<SupplyStatus, string> = {
   active: "bg-green-100/30 text-green-700 dark:text-green-400",
-  expired: "bg-gray-100/30 text-gray-700 dark:text-gray-400",
+  expired: "bg-muted text-muted-foreground",
   pending: "bg-yellow-100/30 text-yellow-700 dark:text-yellow-400",
   rejected: "bg-destructive/30 text-destructive dark:text-red-400",
 };

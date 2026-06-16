@@ -1,7 +1,8 @@
 import { useUser as useClerkUser } from "@clerk/react";
+import { standardSchemaResolver } from "@hookform/resolvers/standard-schema";
 import { Mail01Icon, User02Icon } from "@hugeicons/core-free-icons";
 import { HugeiconsIcon } from "@hugeicons/react";
-import { useMemo, useState } from "react";
+import { useState } from "react";
 import { type Resolver, useForm } from "react-hook-form";
 import z from "zod";
 import { Button } from "@/components/ui/button";
@@ -23,26 +24,8 @@ const nameFormSchema = z.object({
 
 type NameFormValues = z.infer<typeof nameFormSchema>;
 
-function buildResolver(): Resolver<NameFormValues> {
-  return (values) => {
-    const result = nameFormSchema.safeParse(values);
-    if (result.success) {
-      return { errors: {}, values: result.data };
-    }
-    const fieldErrors: Record<string, { type: string; message: string }> = {};
-    for (const issue of result.error.issues) {
-      const key = issue.path.map(String).join(".");
-      if (key && !fieldErrors[key]) {
-        fieldErrors[key] = { message: issue.message, type: issue.code };
-      }
-    }
-    return { errors: fieldErrors as never, values: {} as NameFormValues };
-  };
-}
-
 export function ClerkNameForm() {
   const { user } = useClerkUser();
-  const resolver = useMemo(() => buildResolver(), []);
   const [saved, setSaved] = useState(false);
 
   const {
@@ -53,7 +36,7 @@ export function ClerkNameForm() {
     formState: { errors, isSubmitting },
   } = useForm<NameFormValues>({
     mode: "onSubmit",
-    resolver,
+    resolver: standardSchemaResolver(nameFormSchema) as Resolver<NameFormValues>,
     reValidateMode: "onChange",
     values: {
       firstName: user?.firstName ?? "",

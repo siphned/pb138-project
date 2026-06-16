@@ -23,15 +23,15 @@ function WineDetailPage() {
   const navigate = useNavigate();
   const roles = useRoles();
   const { data: wine, isLoading, isError, refetch } = useGetWinesById(id);
-  const { data: wineImages } = useGetWinesByIdImages(id);
+  const { data: wineImages, isLoading: imagesLoading } = useGetWinesByIdImages(id);
   const { data: myWinemaker } = useGetWinemakersMe({
     query: { enabled: roles.includes("winemaker") },
   });
 
-  if (isLoading) {
+  if (isLoading || imagesLoading) {
     return (
       <div className="container mx-auto px-6 py-8 lg:px-12">
-        <LoadingState variant="detail" />
+        <LoadingState variant="detail-media" />
       </div>
     );
   }

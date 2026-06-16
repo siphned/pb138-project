@@ -20,12 +20,12 @@ export const Route = createFileRoute("/shops/$id/")({
 function ShopDetailPage() {
   const { id } = Route.useParams();
   const { data: shop, isLoading, isError, refetch } = useGetShopsById(id);
-  const { data: shopImages } = useGetShopsByIdImages(id);
+  const { data: shopImages, isLoading: imagesLoading } = useGetShopsByIdImages(id);
 
-  if (isLoading) {
+  if (isLoading || imagesLoading) {
     return (
       <div className="container mx-auto px-6 py-8 lg:px-12">
-        <LoadingState variant="detail" />
+        <LoadingState variant="detail-media" />
       </div>
     );
   }
