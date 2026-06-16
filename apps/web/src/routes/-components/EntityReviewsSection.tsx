@@ -15,6 +15,7 @@ import {
   type ReviewSort,
   useEntityReviews,
 } from "@/routes/-components/use-entity-reviews";
+import { WriteReviewForm } from "@/routes/-components/WriteReviewForm";
 
 const SORT_LABELS: Record<ReviewSort, string> = {
   highest: "Highest rated",
@@ -63,6 +64,10 @@ export function EntityReviewsSection({
 
   return (
     <Section heading={title}>
+      {(entityType === "product" || entityType === "winemaker") && entityId && (
+        <WriteReviewForm entityId={entityId} entityType={entityType} />
+      )}
+
       {reviews.length > 0 && (
         <div className="flex items-center justify-between gap-4">
           {firstPage?.averageRating != null ? (
