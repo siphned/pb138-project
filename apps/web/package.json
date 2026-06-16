@@ -4,7 +4,7 @@
     "@clerk/react": "^6.4.5",
     "@fontsource-variable/playfair-display": "^5.2.8",
     "@fontsource-variable/source-sans-3": "^5.2.9",
-    "@hookform/resolvers": "^3.3.4",
+    "@hookform/resolvers": "^5.2.2",
     "@hugeicons/core-free-icons": "^4.1.1",
     "@hugeicons/react": "^1.1.6",
     "@radix-ui/react-label": "*",

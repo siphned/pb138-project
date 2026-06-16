@@ -1,4 +1,4 @@
-import { useMemo } from "react";
+import { standardSchemaResolver } from "@hookform/resolvers/standard-schema";
 import { type Resolver, useForm } from "react-hook-form";
 import { z } from "zod";
 import { DateTimePicker } from "@/components/primitives/date-time-picker";
@@ -59,20 +59,6 @@ export function EventEditForm({
   isPending,
   serverError,
 }: EventEditFormProps) {
-  const resolver = useMemo<Resolver<EventEditFormValues>>(
-    () => async (values) => {
-      const result = eventEditFormSchema.safeParse(values);
-      if (result.success) return { errors: {}, values: result.data };
-      const errors: Record<string, { type: string; message: string }> = {};
-      for (const issue of result.error.issues) {
-        const path = issue.path[0] as string;
-        if (path && !errors[path]) errors[path] = { message: issue.message, type: "manual" };
-      }
-      return { errors: errors as never, values: {} };
-    },
-    []
-  );
-
   const form = useForm<EventEditFormValues>({
     defaultValues: {
       capacity: 30,
@@ -83,7 +69,7 @@ export function EventEditForm({
       ...defaultValues,
     },
     mode: "onSubmit",
-    resolver,
+    resolver: standardSchemaResolver(eventEditFormSchema) as Resolver<EventEditFormValues>,
     reValidateMode: "onChange",
   });
 

@@ -1,4 +1,5 @@
-import { useMemo, useState } from "react";
+import { standardSchemaResolver } from "@hookform/resolvers/standard-schema";
+import { useState } from "react";
 import { type Resolver, useForm } from "react-hook-form";
 import { z } from "zod";
 
@@ -69,20 +70,6 @@ export function WineForm({
 }: WineFormProps) {
   const [imageFiles, setImageFiles] = useState<File[]>([]);
   const [imageError, setImageError] = useState<string | null>(null);
-  const resolver = useMemo<Resolver<WineFormValues>>(
-    () => async (values) => {
-      const result = wineFormSchema.safeParse(values);
-      if (result.success) return { errors: {}, values: result.data };
-      const errors: Record<string, { type: string; message: string }> = {};
-      for (const issue of result.error.issues) {
-        const path = issue.path[0] as string;
-        if (path && !errors[path]) errors[path] = { message: issue.message, type: "manual" };
-      }
-      return { errors: errors as never, values: {} };
-    },
-    []
-  );
-
   const form = useForm<WineFormValues>({
     defaultValues: {
       alcoholContent: "12.5",
@@ -99,7 +86,7 @@ export function WineForm({
       ...defaultValues,
     },
     mode: "onSubmit",
-    resolver,
+    resolver: standardSchemaResolver(wineFormSchema) as Resolver<WineFormValues>,
     reValidateMode: "onChange",
   });
 

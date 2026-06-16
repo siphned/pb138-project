@@ -1,4 +1,5 @@
 import { useUser as useClerkUser, useReverification } from "@clerk/react";
+import { standardSchemaResolver } from "@hookform/resolvers/standard-schema";
 import { LockPasswordIcon } from "@hugeicons/core-free-icons";
 import { HugeiconsIcon } from "@hugeicons/react";
 import { useMemo, useState } from "react";
@@ -47,24 +48,6 @@ function buildSchema(requireCurrent: boolean) {
     });
 }
 
-function buildResolver(requireCurrent: boolean): Resolver<PasswordFormValues> {
-  const schema = buildSchema(requireCurrent);
-  return (values) => {
-    const result = schema.safeParse(values);
-    if (result.success) {
-      return { errors: {}, values: result.data };
-    }
-    const fieldErrors: Record<string, { type: string; message: string }> = {};
-    for (const issue of result.error.issues) {
-      const key = issue.path.map(String).join(".");
-      if (key && !fieldErrors[key]) {
-        fieldErrors[key] = { message: issue.message, type: issue.code };
-      }
-    }
-    return { errors: fieldErrors as never, values: {} as PasswordFormValues };
-  };
-}
-
 // Clerk throws a ClerkAPIResponseError whose `errors` array carries the
 // human-readable reason (wrong password, breached password, etc.).
 function clerkErrorMessage(err: unknown): string {
@@ -88,7 +71,7 @@ export function PasswordChangeForm() {
       user!.updatePassword(...args)
   );
   const requireCurrent = user?.passwordEnabled ?? false;
-  const resolver = useMemo(() => buildResolver(requireCurrent), [requireCurrent]);
+  const schema = useMemo(() => buildSchema(requireCurrent), [requireCurrent]);
   const [saved, setSaved] = useState(false);
 
   const {
@@ -101,7 +84,7 @@ export function PasswordChangeForm() {
   } = useForm<PasswordFormValues>({
     defaultValues: { confirmPassword: "", currentPassword: "", newPassword: "" },
     mode: "onSubmit",
-    resolver,
+    resolver: standardSchemaResolver(schema) as Resolver<PasswordFormValues>,
     reValidateMode: "onChange",
   });
 

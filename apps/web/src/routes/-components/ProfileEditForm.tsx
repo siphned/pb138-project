@@ -1,6 +1,6 @@
+import { standardSchemaResolver } from "@hookform/resolvers/standard-schema";
 import { User02Icon } from "@hugeicons/core-free-icons";
 import { HugeiconsIcon } from "@hugeicons/react";
-import { useMemo } from "react";
 import { type Resolver, useForm } from "react-hook-form";
 import z from "zod";
 import { Button } from "@/components/ui/button";
@@ -23,23 +23,6 @@ const profileFormSchema = z.object({
 
 type ProfileFormValues = z.infer<typeof profileFormSchema>;
 
-function buildResolver(): Resolver<ProfileFormValues> {
-  return (values) => {
-    const result = profileFormSchema.safeParse(values);
-    if (result.success) {
-      return { errors: {}, values: result.data };
-    }
-    const fieldErrors: Record<string, { type: string; message: string }> = {};
-    for (const issue of result.error.issues) {
-      const key = issue.path.map(String).join(".");
-      if (key && !fieldErrors[key]) {
-        fieldErrors[key] = { message: issue.message, type: issue.code };
-      }
-    }
-    return { errors: fieldErrors as never, values: {} as ProfileFormValues };
-  };
-}
-
 interface ProfileEditFormProps {
   onSuccess?: () => void;
   onCancel?: () => void;
@@ -47,7 +30,6 @@ interface ProfileEditFormProps {
 
 export function ProfileEditForm({ onSuccess, onCancel }: ProfileEditFormProps) {
   const { user, updateUser } = useUser();
-  const resolver = useMemo(() => buildResolver(), []);
 
   const {
     register,
@@ -57,7 +39,7 @@ export function ProfileEditForm({ onSuccess, onCancel }: ProfileEditFormProps) {
     formState: { errors, isSubmitting },
   } = useForm<ProfileFormValues>({
     mode: "onSubmit",
-    resolver,
+    resolver: standardSchemaResolver(profileFormSchema) as Resolver<ProfileFormValues>,
     reValidateMode: "onChange",
     values: {
       fname: user?.fname ?? "",

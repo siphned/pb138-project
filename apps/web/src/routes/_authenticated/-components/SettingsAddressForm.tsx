@@ -1,4 +1,4 @@
-import { useMemo } from "react";
+import { standardSchemaResolver } from "@hookform/resolvers/standard-schema";
 import { type Resolver, useForm } from "react-hook-form";
 import { z } from "zod";
 import { Button } from "@/components/ui/button";
@@ -34,20 +34,6 @@ interface SettingsAddressFormProps {
 export function SettingsAddressForm({ type, defaultValues, onSaved }: SettingsAddressFormProps) {
   const mutation = usePostUsersMeAddresses();
 
-  const resolver = useMemo<Resolver<AddressFormValues>>(
-    () => async (values) => {
-      const result = addressSchema.safeParse(values);
-      if (result.success) return { errors: {}, values: result.data };
-      const errors: Record<string, { type: string; message: string }> = {};
-      for (const issue of result.error.issues) {
-        const path = issue.path[0] as string;
-        if (path && !errors[path]) errors[path] = { message: issue.message, type: "manual" };
-      }
-      return { errors: errors as never, values: {} };
-    },
-    []
-  );
-
   const form = useForm<AddressFormValues>({
     defaultValues: {
       city: "",
@@ -58,7 +44,7 @@ export function SettingsAddressForm({ type, defaultValues, onSaved }: SettingsAd
       ...defaultValues,
     },
     mode: "onSubmit",
-    resolver,
+    resolver: standardSchemaResolver(addressSchema) as Resolver<AddressFormValues>,
     reValidateMode: "onChange",
   });
 
