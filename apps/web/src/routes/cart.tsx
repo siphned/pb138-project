@@ -3,6 +3,7 @@ import { useState } from "react";
 import { ErrorState } from "@/components/primitives/error-state";
 import { LoadingState } from "@/components/primitives/loading-state";
 import { PageHeader } from "@/components/primitives/page-header";
+import { useUser } from "@/context";
 import { useGetCarts } from "@/generated/hooks/useGetCarts";
 import { CartSection } from "@/routes/-components/CartSection";
 import { CheckoutSection } from "@/routes/-components/CheckoutSection";
@@ -12,8 +13,18 @@ export const Route = createFileRoute("/cart")({
 });
 
 function CartPage() {
-  const { data: cart, isLoading, isError, error, refetch } = useGetCarts();
+  const { isCartReady } = useUser();
+  const {
+    data: cart,
+    isLoading: isCartLoading,
+    isError,
+    error,
+    refetch,
+  } = useGetCarts({ query: { enabled: isCartReady } });
   const cartData = cart ?? null;
+  // The query stays disabled (and thus not "loading") until auth is resolved;
+  // treat that wait as loading so we don't flash an empty cart.
+  const isLoading = !isCartReady || isCartLoading;
   const [deliveryType, setDeliveryType] = useState<"pickup" | "shipping">("shipping");
 
   return (

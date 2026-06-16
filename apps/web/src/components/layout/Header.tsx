@@ -14,11 +14,11 @@ import { Sidebar } from "./Sidebar";
 export function Header() {
   const { user: clerkUser } = useClerk();
   const initials = clerkUser ? (clerkUser.fullName || "User").substring(0, 2).toUpperCase() : "GU";
-  const { user, activeRole, setActiveRole, isLoading } = useUser();
+  const { user, activeRole, setActiveRole, isLoading, isCartReady } = useUser();
   const { theme } = useTheme();
   const roles = user?.roles ?? [];
 
-  const { data: cart } = useGetCarts();
+  const { data: cart } = useGetCarts({ query: { enabled: isCartReady } });
   const cartCount = cart?.items.reduce((acc, item) => acc + Number(item.quantity || 0), 0) ?? 0;
 
   return (
