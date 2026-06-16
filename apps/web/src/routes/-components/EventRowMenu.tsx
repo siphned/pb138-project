@@ -1,5 +1,6 @@
 import { MoreHorizontalCircle01Icon } from "@hugeicons/core-free-icons";
 import { HugeiconsIcon } from "@hugeicons/react";
+import { useQueryClient } from "@tanstack/react-query";
 import { Link } from "@tanstack/react-router";
 import { useState } from "react";
 import {
@@ -19,15 +20,18 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { useDeleteEventsById } from "@/generated/hooks/useDeleteEventsById";
+import { getEventsQueryKey } from "@/generated/hooks/useGetEvents";
 
 interface EventRowMenuProps {
   eventId: string;
   eventName: string;
-  /** Called after a successful delete (e.g. navigate away or refetch a list). */
+  /** Called after a successful delete (e.g. navigate away). The event list is
+   * refreshed automatically via query invalidation. */
   onDeleted?: () => void;
 }
 
 export function EventRowMenu({ eventId, eventName, onDeleted }: EventRowMenuProps) {
+  const queryClient = useQueryClient();
   const [confirmOpen, setConfirmOpen] = useState(false);
   const { mutate, isPending } = useDeleteEventsById();
 
@@ -37,6 +41,7 @@ export function EventRowMenu({ eventId, eventName, onDeleted }: EventRowMenuProp
       {
         onSuccess: () => {
           setConfirmOpen(false);
+          queryClient.invalidateQueries({ queryKey: getEventsQueryKey() });
           onDeleted?.();
         },
       }

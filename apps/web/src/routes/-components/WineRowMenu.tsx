@@ -1,5 +1,6 @@
 import { MoreHorizontalCircle01Icon } from "@hugeicons/core-free-icons";
 import { HugeiconsIcon } from "@hugeicons/react";
+import { useQueryClient } from "@tanstack/react-query";
 import { Link } from "@tanstack/react-router";
 import { useState } from "react";
 import {
@@ -19,15 +20,18 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { useDeleteWinesById } from "@/generated/hooks/useDeleteWinesById";
+import { getWinesQueryKey } from "@/generated/hooks/useGetWines";
 
 interface WineRowMenuProps {
   wineId: string;
   wineName: string;
-  /** Called after a successful delete (e.g. navigate away or refetch a list). */
+  /** Called after a successful delete (e.g. navigate away). The wine list is
+   * refreshed automatically via query invalidation. */
   onDeleted?: () => void;
 }
 
 export function WineRowMenu({ wineId, wineName, onDeleted }: WineRowMenuProps) {
+  const queryClient = useQueryClient();
   const [confirmOpen, setConfirmOpen] = useState(false);
   const { mutate, isPending } = useDeleteWinesById();
 
@@ -37,6 +41,7 @@ export function WineRowMenu({ wineId, wineName, onDeleted }: WineRowMenuProps) {
       {
         onSuccess: () => {
           setConfirmOpen(false);
+          queryClient.invalidateQueries({ queryKey: getWinesQueryKey() });
           onDeleted?.();
         },
       }

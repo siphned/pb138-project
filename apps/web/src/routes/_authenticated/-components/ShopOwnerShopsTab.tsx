@@ -3,9 +3,9 @@ import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import { useGetShopsByIdProducts } from "@/generated/hooks/useGetShopsByIdProducts";
 import { useGetShopsMe } from "@/generated/hooks/useGetShopsMe";
-import { ProductRowMenu } from "@/routes/-components/ProductRowMenu";
 import { ShopRowMenu } from "@/routes/_authenticated/-components/ShopRowMenu";
 import { TabPreviewShell } from "@/routes/_authenticated/-components/TabPreviewShell";
+import { ProductRowMenu } from "@/routes/-components/ProductRowMenu";
 
 interface ShopRow {
   id: string;
@@ -136,12 +136,7 @@ export function ShopOwnerShopsTab({ shopId }: ShopOwnerShopsTabProps) {
                         {p.quantity !== undefined && ` · ${p.quantity} in stock`}
                       </p>
                     </div>
-                    <ProductRowMenu
-                      onDeleted={() => inventoryQuery.refetch()}
-                      productId={p.id}
-                      productName={p.name}
-                      shopId={shopId}
-                    />
+                    <ProductRowMenu productId={p.id} productName={p.name} shopId={shopId} />
                   </li>
                 ))}
               </ul>
