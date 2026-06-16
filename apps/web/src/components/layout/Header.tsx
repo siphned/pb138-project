@@ -4,6 +4,7 @@ import { HugeiconsIcon } from "@hugeicons/react";
 import { Link } from "@tanstack/react-router";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { buttonVariants } from "@/components/ui/button";
+import { Skeleton } from "@/components/ui/skeleton";
 import { useTheme, useUser } from "@/context";
 import { useGetCarts } from "@/generated/hooks/useGetCarts";
 import { cn } from "@/lib/utils";
@@ -13,7 +14,7 @@ import { Sidebar } from "./Sidebar";
 export function Header() {
   const { user: clerkUser } = useClerk();
   const initials = clerkUser ? (clerkUser.fullName || "User").substring(0, 2).toUpperCase() : "GU";
-  const { user, activeRole, setActiveRole } = useUser();
+  const { user, activeRole, setActiveRole, isLoading } = useUser();
   const { theme } = useTheme();
   const roles = user?.roles ?? [];
 
@@ -49,28 +50,36 @@ export function Header() {
           )}
         </Link>
 
-        <Show when="signed-out">
-          <Link
-            className={cn(
-              buttonVariants({ size: "icon", variant: "ghost" }),
-              "relative hidden sm:flex"
-            )}
-            to="/auth/login"
-          >
-            <HugeiconsIcon className="h-5 w-5" icon={User02Icon} strokeWidth={2} />
-          </Link>
-        </Show>
+        {isLoading ? (
+          // Reserve the avatar slot until auth + profile resolve, so the icon
+          // doesn't pop in (and shift layout) after a beat.
+          <Skeleton className="h-8 w-8 rounded-full" />
+        ) : (
+          <>
+            <Show when="signed-out">
+              <Link
+                className={cn(
+                  buttonVariants({ size: "icon", variant: "ghost" }),
+                  "relative hidden sm:flex"
+                )}
+                to="/auth/login"
+              >
+                <HugeiconsIcon className="h-5 w-5" icon={User02Icon} strokeWidth={2} />
+              </Link>
+            </Show>
 
-        <Show when="signed-in">
-          <Link to="/dashboard">
-            <Avatar className="h-8 w-8">
-              <AvatarImage alt={clerkUser?.fullName || "User"} src={clerkUser?.imageUrl} />
-              <AvatarFallback className="bg-primary text-primary-foreground font-heading text-xs">
-                {initials}
-              </AvatarFallback>
-            </Avatar>
-          </Link>
-        </Show>
+            <Show when="signed-in">
+              <Link to="/dashboard">
+                <Avatar className="h-8 w-8">
+                  <AvatarImage alt={clerkUser?.fullName || "User"} src={clerkUser?.imageUrl} />
+                  <AvatarFallback className="bg-primary text-primary-foreground font-heading text-xs">
+                    {initials}
+                  </AvatarFallback>
+                </Avatar>
+              </Link>
+            </Show>
+          </>
+        )}
 
         <Sidebar activeRole={activeRole} onRoleChange={setActiveRole} userRoles={roles} />
       </div>

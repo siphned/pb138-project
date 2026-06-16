@@ -22,7 +22,30 @@ export function CartSection({ cart, deliveryType }: CartSectionProps) {
 
   const updateQuantity = usePutCartsItemsByProductId({
     mutation: {
-      onSuccess: () => {
+      onError: (_err, _vars, context) => {
+        if (context?.previous) {
+          queryClient.setQueryData(getCartsQueryKey(), context.previous);
+        }
+      },
+      // Optimistically patch the quantity in the cache so the number moves the
+      // instant the user clicks, instead of waiting for the round-trip + refetch.
+      // onError rolls back from the snapshot; onSettled reconciles with the server.
+      onMutate: async ({ data, productId }) => {
+        await queryClient.cancelQueries({ queryKey: getCartsQueryKey() });
+        const previous = queryClient.getQueryData<GetCarts200>(getCartsQueryKey());
+        queryClient.setQueryData<GetCarts200>(getCartsQueryKey(), (old) =>
+          old
+            ? {
+                ...old,
+                items: old.items.map((item) =>
+                  item.product.id === productId ? { ...item, quantity: data.quantity } : item
+                ),
+              }
+            : old
+        );
+        return { previous };
+      },
+      onSettled: () => {
         queryClient.invalidateQueries({ queryKey: getCartsQueryKey() });
       },
     },
