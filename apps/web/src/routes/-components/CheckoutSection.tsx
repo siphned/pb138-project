@@ -1,14 +1,14 @@
 import { useQueryClient } from "@tanstack/react-query";
 import { useNavigate } from "@tanstack/react-router";
 import { useMemo, useState } from "react";
-import { buttonVariants } from "@/components/ui/button";
+import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useUser } from "@/context/UserContext";
 import { getCartsQueryKey } from "@/generated/hooks/useGetCarts";
 import { useGetUsersMeAddresses } from "@/generated/hooks/useGetUsersMeAddresses";
 import { usePostOrdersCheckout } from "@/generated/hooks/usePostOrdersCheckout";
 import type { GetCarts200 } from "@/generated/types/GetCarts";
-import { cn, formatEur } from "@/lib/utils";
+import { formatEur } from "@/lib/utils";
 import { AddressForm, type AddressFormValues } from "@/routes/-components/AddressForm";
 import { CartSummary } from "@/routes/-components/CartSummary";
 
@@ -128,13 +128,9 @@ export function CheckoutSection({
           {checkoutError}
         </div>
       )}
-      <button
-        className={cn(buttonVariants(), "w-full")}
-        disabled={isCartEmpty || checkout.isPending}
-        type="submit"
-      >
+      <Button className="w-full" disabled={isCartEmpty || checkout.isPending} type="submit">
         {checkout.isPending ? "Processing..." : `Confirm Order — ${formatEur(total)}`}
-      </button>
+      </Button>
       <p className="text-xs text-center text-muted-foreground">
         By purchasing you agree to our Terms of Service and Privacy Policy.
       </p>
