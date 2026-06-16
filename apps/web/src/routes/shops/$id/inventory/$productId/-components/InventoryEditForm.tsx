@@ -1,5 +1,6 @@
 "use client";
 
+import { useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { Button } from "@/components/ui/button";
@@ -13,6 +14,9 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
+import { getProductsQueryKey } from "@/generated/hooks/useGetProducts";
+import { getProductsByIdQueryKey } from "@/generated/hooks/useGetProductsById";
+import { getShopsByIdProductsQueryKey } from "@/generated/hooks/useGetShopsByIdProducts";
 import { usePatchShopsByIdProductsByProductId } from "@/generated/hooks/usePatchShopsByIdProductsByProductId";
 import type { GetShopsByIdProducts200 } from "@/generated/types/GetShopsByIdProducts";
 import type { PatchShopsByIdProductsByProductIdMutationRequest } from "@/generated/types/PatchShopsByIdProductsByProductId";
@@ -30,6 +34,7 @@ export function InventoryEditForm({
   onSuccess,
   onCancel,
 }: InventoryEditFormProps) {
+  const queryClient = useQueryClient();
   const mutation = usePatchShopsByIdProductsByProductId();
   const [isSubmitting, setIsSubmitting] = useState(false);
 
@@ -59,6 +64,13 @@ export function InventoryEditForm({
         id: shopId,
         productId: product.id,
       });
+      // Refresh the product detail and list caches so the updated values show
+      // without a manual page reload.
+      await Promise.all([
+        queryClient.invalidateQueries({ queryKey: getProductsByIdQueryKey(product.id) }),
+        queryClient.invalidateQueries({ queryKey: getShopsByIdProductsQueryKey(shopId) }),
+        queryClient.invalidateQueries({ queryKey: getProductsQueryKey() }),
+      ]);
       onSuccess();
     } catch (_error) {
       // Error handling is delegated to the mutation hook's error state
