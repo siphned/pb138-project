@@ -56,9 +56,7 @@ export function DashboardProfileCard() {
                 {fullName}
               </h2>
               <p className="text-sm text-muted-foreground">{user.email}</p>
-              {roleName && (
-                <p className="text-sm font-medium text-foreground">{roleName}</p>
-              )}
+              {roleName && <p className="text-sm font-medium text-foreground">{roleName}</p>}
               <div className="flex flex-wrap items-center gap-2 pt-1">
                 <Badge variant="secondary">{activeRole}</Badge>
                 {user.roles.length > 1 && (

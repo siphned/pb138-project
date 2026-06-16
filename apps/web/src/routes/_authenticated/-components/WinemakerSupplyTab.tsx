@@ -107,7 +107,11 @@ export function WinemakerSupplyTab() {
                   >
                     Reject
                   </Button>
-                  <Button disabled={pending} onClick={() => handleDecision(a.id, "approved")} size="sm">
+                  <Button
+                    disabled={pending}
+                    onClick={() => handleDecision(a.id, "approved")}
+                    size="sm"
+                  >
                     Approve
                   </Button>
                 </>

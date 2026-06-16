@@ -353,10 +353,7 @@ export async function winesExist(db: Database, wineIds: string[]): Promise<boole
   return found.length === uniqueIds.length;
 }
 
-export async function getWinemakerIdsForWines(
-  db: Database,
-  wineIds: string[]
-): Promise<string[]> {
+export async function getWinemakerIdsForWines(db: Database, wineIds: string[]): Promise<string[]> {
   const uniqueIds = [...new Set(wineIds)];
   if (uniqueIds.length === 0) return [];
   const rows = await db.query.wines.findMany({

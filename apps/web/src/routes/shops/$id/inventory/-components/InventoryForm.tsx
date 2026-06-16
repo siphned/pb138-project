@@ -189,8 +189,8 @@ export function InventoryForm({ shopId, onSuccess }: InventoryFormProps) {
     return (
       <div className="rounded-md border border-border bg-muted/50 p-6 text-center">
         <p className="text-sm text-muted-foreground">
-          You don't have any approved supply agreements yet. Request supply from a winemaker
-          before adding their wines to your shop.
+          You don't have any approved supply agreements yet. Request supply from a winemaker before
+          adding their wines to your shop.
         </p>
         <Button
           className="mt-4"

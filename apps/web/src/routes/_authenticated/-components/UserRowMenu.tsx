@@ -106,7 +106,10 @@ export function UserRowMenu({ userId, userName, status }: UserRowMenuProps) {
         </DropdownMenuContent>
       </DropdownMenu>
 
-      <AlertDialog onOpenChange={(open) => !open && setPendingAction(null)} open={pendingAction !== null}>
+      <AlertDialog
+        onOpenChange={(open) => !open && setPendingAction(null)}
+        open={pendingAction !== null}
+      >
         <AlertDialogContent>
           <AlertDialogHeader>
             <AlertDialogTitle>{copy?.title}</AlertDialogTitle>
