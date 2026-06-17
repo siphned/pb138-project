@@ -20,7 +20,7 @@ export function AdminUserRowMenu({ userId, status }: AdminUserRowMenuProps) {
   const queryClient = useQueryClient();
   const { mutate, isPending } = usePatchAdminUsersByIdStatus();
 
-  const setStatus = (next: "active" | "suspended" | "banned") => {
+  const setStatus = (next: "active" | "banned") => {
     mutate(
       { data: { status: next }, id: userId },
       {
@@ -39,9 +39,6 @@ export function AdminUserRowMenu({ userId, status }: AdminUserRowMenuProps) {
         }
       />
       <DropdownMenuContent align="end">
-        {status !== "suspended" && (
-          <DropdownMenuItem onClick={() => setStatus("suspended")}>Suspend</DropdownMenuItem>
-        )}
         {status !== "banned" && (
           <DropdownMenuItem onClick={() => setStatus("banned")} variant="destructive">
             Ban

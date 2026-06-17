@@ -21,7 +21,7 @@ import {
 import { getAdminUsersQueryKey } from "@/generated/hooks/useGetAdminUsers";
 import { usePatchAdminUsersByIdStatus } from "@/generated/hooks/usePatchAdminUsersByIdStatus";
 
-type Action = "suspend" | "ban" | "reactivate";
+type Action = "ban" | "reactivate";
 
 interface UserRowMenuProps {
   userId: string;
@@ -29,10 +29,9 @@ interface UserRowMenuProps {
   status?: string;
 }
 
-const ACTION_TO_STATUS: Record<Action, "active" | "suspended" | "banned"> = {
+const ACTION_TO_STATUS: Record<Action, "active" | "banned"> = {
   ban: "banned",
   reactivate: "active",
-  suspend: "suspended",
 };
 
 const ACTION_COPY: Record<Action, { title: string; description: string; confirm: string }> = {
@@ -45,11 +44,6 @@ const ACTION_COPY: Record<Action, { title: string; description: string; confirm:
     confirm: "Reactivate account",
     description: "will be able to log in and use the platform again.",
     title: "Reactivate user account",
-  },
-  suspend: {
-    confirm: "Suspend account",
-    description: "will not be able to log in or perform any actions.",
-    title: "Suspend user account",
   },
 };
 
@@ -86,14 +80,9 @@ export function UserRowMenu({ userId, userName, status }: UserRowMenuProps) {
         />
         <DropdownMenuContent align="end">
           {isActive ? (
-            <>
-              <DropdownMenuItem onClick={() => setPendingAction("suspend")}>
-                Suspend account
-              </DropdownMenuItem>
-              <DropdownMenuItem onClick={() => setPendingAction("ban")} variant="destructive">
-                Ban account
-              </DropdownMenuItem>
-            </>
+            <DropdownMenuItem onClick={() => setPendingAction("ban")} variant="destructive">
+              Ban account
+            </DropdownMenuItem>
           ) : (
             <DropdownMenuItem onClick={() => setPendingAction("reactivate")}>
               Reactivate account
