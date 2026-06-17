@@ -11,6 +11,7 @@ vi.mock("@tanstack/react-query", () => ({
 
 vi.mock("@clerk/react", () => ({
   useAuth: () => ({ isLoaded: true, isSignedIn: true }),
+  useClerk: () => ({ signOut: vi.fn() }),
 }));
 
 vi.mock("@/generated/hooks/useGetUsersMe", () => ({
