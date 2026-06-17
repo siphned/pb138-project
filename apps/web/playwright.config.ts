@@ -25,22 +25,23 @@ const config = defineConfig({
     screenshot: "only-on-failure",
     trace: "on-first-retry",
   },
-  webServer: process.env.SHARD || process.env.CI
-    ? undefined
-    : [
-        {
-          command: `bun run --cwd "${root}" dev:server`,
-          reuseExistingServer: true,
-          timeout: 120_000,
-          url: "http://localhost:3000/swagger/json",
-        },
-        {
-          command: `bun run --cwd "${root}" dev:web`,
-          reuseExistingServer: true,
-          timeout: 120_000,
-          url: "http://localhost:5173",
-        },
-      ],
+  webServer:
+    process.env.SHARD || process.env.CI
+      ? undefined
+      : [
+          {
+            command: `bun run --cwd "${root}" dev:server`,
+            reuseExistingServer: true,
+            timeout: 120_000,
+            url: "http://localhost:3000/swagger/json",
+          },
+          {
+            command: `bun run --cwd "${root}" dev:web`,
+            reuseExistingServer: true,
+            timeout: 120_000,
+            url: "http://localhost:5173",
+          },
+        ],
   workers: process.env.CI ? 1 : undefined,
 });
 

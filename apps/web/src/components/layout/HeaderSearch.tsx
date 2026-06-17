@@ -37,14 +37,20 @@ export function HeaderSearch() {
 
   if (!open) {
     return (
-      <Button aria-label="Open search" onClick={() => setOpen(true)} size="icon" variant="ghost">
+      <Button
+        aria-label="Open search"
+        className="hidden sm:flex"
+        onClick={() => setOpen(true)}
+        size="icon"
+        variant="ghost"
+      >
         <HugeiconsIcon className="h-5 w-5" icon={Search01Icon} strokeWidth={2} />
       </Button>
     );
   }
 
   return (
-    <form className="flex items-center" onSubmit={handleSubmit}>
+    <form className="flex items-center hidden sm:flex" onSubmit={handleSubmit}>
       <Input
         aria-label="Search the catalog"
         className="w-36 sm:w-48 lg:w-64"
