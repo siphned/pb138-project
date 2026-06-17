@@ -17,8 +17,8 @@ export function HomeHero() {
           className="mx-auto max-w-4xl bg-[image:var(--hero-text-light)] bg-[position:50%_62%] bg-cover bg-clip-text font-heading text-5xl font-black uppercase leading-[0.95] tracking-tight text-transparent drop-shadow-[0_2px_10px_rgba(0,0,0,0.5)] md:text-7xl lg:text-9xl dark:bg-[image:var(--hero-text-dark)]"
           style={
             {
-              "--hero-text-light": `linear-gradient(rgba(140,28,48,0.18), rgba(60,16,26,0.04)), url(${vineyardText})`,
               "--hero-text-dark": `url(${vineyardTextDark})`,
+              "--hero-text-light": `linear-gradient(rgba(140,28,48,0.18), rgba(60,16,26,0.04)), url(${vineyardText})`,
             } as CSSProperties
           }
         >
