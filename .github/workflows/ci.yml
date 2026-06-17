@@ -350,9 +350,13 @@ jobs:
       - name: Migrate Database
         run: cd apps/server && bun run db:push
       - name: Start backend server
-        run: bun run apps/server/src/index.ts &
-      - name: Wait for server to be ready
-        run: until curl -sf http://localhost:3000/swagger/json > /dev/null; do sleep 1; done
+        run: bun run apps/server/src/index.ts > /tmp/server.log 2>&1 &
+      - name: Start frontend dev server
+        run: bun run apps/web/src/main.tsx > /tmp/web.log 2>&1 &
+      - name: Wait for servers to be ready
+        run: |
+          until curl -sf http://localhost:3000/swagger/json > /dev/null; do sleep 1; done
+          until curl -sf http://localhost:5173 > /dev/null; do sleep 1; done
       - name: Run E2E tests
         run: cd apps/web && bunx playwright test --reporter=html
       - name: Upload E2E report
