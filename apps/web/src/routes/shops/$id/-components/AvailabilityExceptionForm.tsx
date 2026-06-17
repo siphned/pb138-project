@@ -27,6 +27,19 @@ interface AvailabilityExceptionFormProps {
   onSuccess: () => void;
 }
 
+// `datetime-local` inputs use a zone-less "YYYY-MM-DDTHH:mm" string. Build the
+// default value from local time so the picker pre-fills with the shop's wall-clock.
+function toDateTimeLocal(date: Date): string {
+  const pad = (n: number) => String(n).padStart(2, "0");
+  return `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())}T${pad(date.getHours())}:${pad(date.getMinutes())}`;
+}
+
+function defaultAt(hour: number): string {
+  const d = new Date();
+  d.setHours(hour, 0, 0, 0);
+  return toDateTimeLocal(d);
+}
+
 export function AvailabilityExceptionForm({ shopId, onSuccess }: AvailabilityExceptionFormProps) {
   const mutation = usePostShopsByIdAvailabilityExceptions();
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -44,20 +57,17 @@ export function AvailabilityExceptionForm({ shopId, onSuccess }: AvailabilityExc
   const form = useForm<PostShopsByIdAvailabilityExceptionsMutationRequest>({
     defaultValues: {
       action: "closed" as const,
-      endsAt: new Date().toISOString().split("T")[0],
+      endsAt: defaultAt(17),
       reason: "",
-      startsAt: new Date().toISOString().split("T")[0],
+      startsAt: defaultAt(9),
     },
   });
 
   const onSubmit = async (data: PostShopsByIdAvailabilityExceptionsMutationRequest) => {
-    // The day is spanned 00:00 → 23:59, so same-day is valid; only a strictly
-    // earlier end date is wrong. Catch it here for a clear message instead of
-    // letting the API reject it with a generic 400.
     form.clearErrors("endsAt");
-    if (data.endsAt < data.startsAt) {
+    if (data.endsAt <= data.startsAt) {
       form.setError("endsAt", {
-        message: "End date can't be before the start date.",
+        message: "End must be after the start.",
         type: "manual",
       });
       return;
@@ -65,13 +75,13 @@ export function AvailabilityExceptionForm({ shopId, onSuccess }: AvailabilityExc
 
     setIsSubmitting(true);
     try {
-      // The date inputs yield "YYYY-MM-DD", but the API requires full ISO
-      // datetimes (z.string().datetime()). Span the whole selected day in UTC.
+      // The datetime-local inputs yield zone-less "YYYY-MM-DDTHH:mm"; the API
+      // requires full ISO datetimes. Parse as local time and convert to UTC.
       await mutation.mutateAsync({
         data: {
           ...data,
-          endsAt: new Date(`${data.endsAt}T23:59:59.999Z`).toISOString(),
-          startsAt: new Date(`${data.startsAt}T00:00:00.000Z`).toISOString(),
+          endsAt: new Date(data.endsAt).toISOString(),
+          startsAt: new Date(data.startsAt).toISOString(),
         },
         id: shopId,
       });
@@ -117,9 +127,9 @@ export function AvailabilityExceptionForm({ shopId, onSuccess }: AvailabilityExc
             <FormItem>
               <FormLabel>Starts At</FormLabel>
               <FormControl>
-                <Input type="date" {...field} />
+                <Input type="datetime-local" {...field} />
               </FormControl>
-              <FormDescription>When the exception begins</FormDescription>
+              <FormDescription>Date and time the exception begins</FormDescription>
               <FormMessage />
             </FormItem>
           )}
@@ -132,9 +142,9 @@ export function AvailabilityExceptionForm({ shopId, onSuccess }: AvailabilityExc
             <FormItem>
               <FormLabel>Ends At</FormLabel>
               <FormControl>
-                <Input type="date" {...field} />
+                <Input type="datetime-local" {...field} />
               </FormControl>
-              <FormDescription>When the exception ends</FormDescription>
+              <FormDescription>Date and time the exception ends</FormDescription>
               <FormMessage />
             </FormItem>
           )}
