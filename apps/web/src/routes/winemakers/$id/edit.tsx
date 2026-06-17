@@ -1,5 +1,6 @@
 import { ArrowLeft02Icon } from "@hugeicons/core-free-icons";
 import { HugeiconsIcon } from "@hugeicons/react";
+import { useQueryClient } from "@tanstack/react-query";
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useForm } from "react-hook-form";
 import { ErrorState } from "@/components/primitives/error-state";
@@ -9,7 +10,11 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-import { useGetWinemakersById } from "@/generated/hooks/useGetWinemakersById";
+import { getWinemakersQueryKey } from "@/generated/hooks/useGetWinemakers";
+import {
+  getWinemakersByIdQueryKey,
+  useGetWinemakersById,
+} from "@/generated/hooks/useGetWinemakersById";
 import { usePatchWinemakersById } from "@/generated/hooks/usePatchWinemakersById";
 
 export const Route = createFileRoute("/winemakers/$id/edit")({
@@ -27,6 +32,7 @@ type WinemakerEditFormValues = {
 function WinemakerEditPage() {
   const { id } = Route.useParams();
   const navigate = useNavigate();
+  const queryClient = useQueryClient();
   const { data: winemaker, isLoading, isError, refetch } = useGetWinemakersById(id);
   const mutation = usePatchWinemakersById();
 
@@ -73,7 +79,13 @@ function WinemakerEditPage() {
         id,
       },
       {
-        onSuccess: () => navigate({ params: { id }, to: "/winemakers/$id" }),
+        onSuccess: async () => {
+          await Promise.all([
+            queryClient.invalidateQueries({ queryKey: getWinemakersByIdQueryKey(id) }),
+            queryClient.invalidateQueries({ queryKey: getWinemakersQueryKey() }),
+          ]);
+          navigate({ params: { id }, to: "/winemakers/$id" });
+        },
       }
     );
   });

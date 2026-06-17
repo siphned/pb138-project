@@ -1,4 +1,4 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
+import { createFileRoute } from "@tanstack/react-router";
 import { Skeleton } from "@/components/ui/skeleton";
 import {
   Table,
@@ -9,6 +9,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { useGetRoleRequests } from "@/generated/hooks/useGetRoleRequests";
+import { AdminRoleRequestRowMenu } from "@/routes/_authenticated/_admin/-components/AdminRoleRequestRowMenu";
 
 export const Route = createFileRoute("/_authenticated/_admin/role-requests")({
   component: RoleRequestsPage,
@@ -78,7 +79,7 @@ function RoleRequestsPage() {
                     <TableCell className="font-medium">{request.businessName}</TableCell>
                     <TableCell>
                       <span className="inline-flex rounded-full px-2 py-1 text-xs font-semibold bg-blue-100/30 text-blue-700 dark:text-blue-400">
-                        {request.type === "winemaker" ? "Winemaker" : "Shop Owner"}
+                        {request.requestedRole === "winemaker" ? "Winemaker" : "Shop Owner"}
                       </span>
                     </TableCell>
                     <TableCell className="max-w-xs truncate text-sm">
@@ -95,13 +96,7 @@ function RoleRequestsPage() {
                       {new Date(request.submittedAt).toLocaleDateString()}
                     </TableCell>
                     <TableCell>
-                      <Link
-                        className="text-primary hover:underline text-sm"
-                        params={{ id: request.id }}
-                        to="/role-requests/$id"
-                      >
-                        Review
-                      </Link>
+                      <AdminRoleRequestRowMenu requestId={request.id} status={request.status} />
                     </TableCell>
                   </TableRow>
                 ))

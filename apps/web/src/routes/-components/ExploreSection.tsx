@@ -2,6 +2,7 @@ import { ArrowRight02Icon } from "@hugeicons/core-free-icons";
 import { HugeiconsIcon } from "@hugeicons/react";
 import { Link } from "@tanstack/react-router";
 import { buttonVariants } from "@/components/ui/button";
+import { Skeleton } from "@/components/ui/skeleton";
 import { useGetProducts } from "@/generated/hooks/useGetProducts";
 import { ProductCard } from "@/routes/-components/ProductCard";
 import { BundleCard } from "@/routes/products/-components/BundleCard";
@@ -26,10 +27,7 @@ export function ExploreSection({ mode }: ExploreSectionProps) {
         <h2 className="font-heading text-2xl font-bold">{title}</h2>
         <div className="flex gap-4 overflow-x-auto pb-2">
           {[1, 2, 3, 4].map((i) => (
-            <div
-              className="h-[300px] w-[200px] shrink-0 animate-pulse rounded-2xl bg-secondary/20"
-              key={i}
-            />
+            <Skeleton className="h-[300px] w-[200px] shrink-0 rounded-2xl" key={i} />
           ))}
         </div>
       </section>

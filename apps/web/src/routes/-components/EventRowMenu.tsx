@@ -62,6 +62,9 @@ export function EventRowMenu({ eventId, eventName, onDeleted }: EventRowMenuProp
           <DropdownMenuItem render={<Link params={{ id: eventId }} to="/events/$id/edit" />}>
             Edit event
           </DropdownMenuItem>
+          <DropdownMenuItem render={<Link params={{ id: eventId }} to="/events/$id/images" />}>
+            Manage images
+          </DropdownMenuItem>
           <DropdownMenuItem onClick={() => setConfirmOpen(true)} variant="destructive">
             Delete event
           </DropdownMenuItem>

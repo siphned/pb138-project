@@ -73,6 +73,7 @@ function tilesFor(stats: any): StatTile[] {
       ];
     case "admin":
       return [
+        { label: "Total revenue", value: formatCurrency(asNumber(stats.totalRevenue)) },
         { label: "Pending role requests", value: String(asNumber(stats.pendingRoleRequests)) },
         { label: "Total events", value: String(asNumber(stats.totalEvents)) },
         { label: "Total products", value: String(asNumber(stats.totalProducts)) },

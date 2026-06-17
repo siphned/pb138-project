@@ -9,7 +9,7 @@ import { Button } from "@/components/ui/button";
 export function HomeHero() {
   return (
     <section
-      className="rounded-3xl bg-secondary/20 px-6 py-16 text-center md:px-12 md:py-24"
+      className="rounded-3xl bg-secondary/80 px-6 py-16 text-center md:px-12 md:py-24"
       data-slot="home-hero"
     >
       <div className="relative mx-auto w-fit">

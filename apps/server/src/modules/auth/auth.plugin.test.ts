@@ -13,7 +13,9 @@ vi.mock("./auth.utils", () => ({
 
 vi.mock("../users/users.service", () => ({
   usersService: {
-    lazyGetOrCreate: vi.fn().mockResolvedValue({ email: "test@test.com", id: "u1" }),
+    lazyGetOrCreate: vi
+      .fn()
+      .mockResolvedValue({ email: "test@test.com", id: "u1", status: "active" }),
   },
 }));
 
@@ -64,6 +66,7 @@ describe("authPlugin macros", () => {
     vi.mocked(usersService.lazyGetOrCreate).mockResolvedValue({
       email: "test@test.com",
       id: "u1",
+      status: "active",
     } as never);
     vi.mocked(cartsService.mergeOnLogin).mockResolvedValue(undefined);
   });
@@ -100,6 +103,28 @@ describe("authPlugin macros", () => {
         clerkId: "clerk-user-1",
         dbUserId: "u1",
       });
+    });
+
+    it("returns 403 when the user is banned or suspended", async () => {
+      mockVerifyClerkToken.mockResolvedValue({
+        roles: ["customer"],
+        sub: "clerk-user-1",
+      });
+      vi.mocked(usersService.lazyGetOrCreate).mockResolvedValue({
+        email: "test@test.com",
+        id: "u1",
+        status: "banned",
+      } as never);
+
+      const app = createTestApp();
+      const res = await app.handle(
+        new Request("http://localhost/test-auth", {
+          headers: { Authorization: "Bearer valid-token" },
+          method: "GET",
+        })
+      );
+
+      expect(res.status).toBe(403);
     });
 
     it("calls lazyGetOrCreate with the clerk sub", async () => {

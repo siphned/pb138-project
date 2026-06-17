@@ -17,6 +17,7 @@ import {
 } from "@hugeicons/core-free-icons";
 import { HugeiconsIcon } from "@hugeicons/react";
 import { Link, useNavigate } from "@tanstack/react-router";
+// hugeicons' free set has no wine-glass icon; lucide's Wine is used here intentionally.
 import { Wine } from "lucide-react";
 import { useState } from "react";
 import { NavItem } from "@/components/primitives/nav-item";
@@ -97,7 +98,7 @@ export function Sidebar({ userRoles = [Role.customer], activeRole, onRoleChange 
         }
       />
 
-      <SheetContent className="flex flex-col w-80 p-0" side="right">
+      <SheetContent className="flex flex-col w-80 p-0 bg-background" side="right">
         <Show when="signed-in">
           <div className="flex-none border-b bg-background z-10">
             <SheetHeader className="text-left">
@@ -348,9 +349,26 @@ function RoleNavItems({ role, closeSheet, userId, winemakerId, firstShopId }: Ro
 
   if (role === Role.admin) {
     return (
-      <NavItem onClick={closeSheet} render={<Link to="/role-requests" />} variant="active">
-        <HugeiconsIcon icon={UserGroupIcon} /> Role Requests
-      </NavItem>
+      <>
+        <NavItem onClick={closeSheet} render={<Link to="/users" />} variant="active">
+          <HugeiconsIcon icon={User02Icon} /> Users
+        </NavItem>
+        <NavItem onClick={closeSheet} render={<Link to="/winemakers" />} variant="active">
+          <HugeiconsIcon icon={UserGroupIcon} /> Winemakers
+        </NavItem>
+        <NavItem onClick={closeSheet} render={<Link to="/shops" />} variant="active">
+          <HugeiconsIcon icon={Store01Icon} /> Shops
+        </NavItem>
+        <NavItem onClick={closeSheet} render={<Link to="/products" />} variant="active">
+          <HugeiconsIcon icon={Package01Icon} /> Products
+        </NavItem>
+        <NavItem onClick={closeSheet} render={<Link to="/moderation" />} variant="active">
+          <HugeiconsIcon icon={InboxIcon} /> Moderation
+        </NavItem>
+        <NavItem onClick={closeSheet} render={<Link to="/role-requests" />} variant="active">
+          <HugeiconsIcon icon={UserGroupIcon} /> Role Requests
+        </NavItem>
+      </>
     );
   }
 

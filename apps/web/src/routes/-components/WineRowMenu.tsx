@@ -62,6 +62,9 @@ export function WineRowMenu({ wineId, wineName, onDeleted }: WineRowMenuProps) {
           <DropdownMenuItem render={<Link params={{ id: wineId }} to="/wines/$id/edit" />}>
             Edit wine
           </DropdownMenuItem>
+          <DropdownMenuItem render={<Link params={{ id: wineId }} to="/wines/$id/images" />}>
+            Manage images
+          </DropdownMenuItem>
           <DropdownMenuItem onClick={() => setConfirmOpen(true)} variant="destructive">
             Delete wine
           </DropdownMenuItem>

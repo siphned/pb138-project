@@ -9,25 +9,15 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { useGetWinemakers } from "@/generated/hooks/useGetWinemakers";
+import { formatDate } from "@/utils/date-formatter";
 
 export const Route = createFileRoute("/_authenticated/_admin/winemakers")({
   component: AdminWinemakersPage,
 });
 
-function getStatusBadgeClass(status: string): string {
-  if (status === "active") {
-    return "bg-green-100/30 text-green-700 dark:text-green-400";
-  }
-  if (status === "suspended") {
-    return "bg-yellow-100/30 text-yellow-700 dark:text-yellow-400";
-  }
-  return "bg-destructive/30 text-destructive dark:text-red-400";
-}
-
 function AdminWinemakersPage() {
   const { data, isLoading, error } = useGetWinemakers();
-  // biome-ignore lint/suspicious/noExplicitAny: API response is untyped
-  const winemakers = (data || []) as any[];
+  const winemakers = data?.data ?? [];
 
   if (error) {
     return (
@@ -59,8 +49,7 @@ function AdminWinemakersPage() {
               <TableRow>
                 <TableHead>Name</TableHead>
                 <TableHead>Email</TableHead>
-                <TableHead>Status</TableHead>
-                <TableHead>Wines</TableHead>
+                <TableHead>City</TableHead>
                 <TableHead>Created</TableHead>
                 <TableHead>Actions</TableHead>
               </TableRow>
@@ -68,32 +57,24 @@ function AdminWinemakersPage() {
             <TableBody>
               {winemakers.length === 0 ? (
                 <TableRow>
-                  <TableCell className="text-center text-muted-foreground" colSpan={6}>
+                  <TableCell className="text-center text-muted-foreground" colSpan={5}>
                     No winemakers found
                   </TableCell>
                 </TableRow>
               ) : (
-                // biome-ignore lint/suspicious/noExplicitAny: API response is untyped
-                winemakers.map((winemaker: any) => (
+                winemakers.map((winemaker) => (
                   <TableRow key={winemaker.id}>
-                    <TableCell className="font-medium">{winemaker.name || "—"}</TableCell>
-                    <TableCell className="font-mono text-sm">
-                      {winemaker.user?.email || "—"}
+                    <TableCell className="font-medium">{winemaker.name}</TableCell>
+                    <TableCell className="font-mono text-sm">{winemaker.email || "—"}</TableCell>
+                    <TableCell className="text-sm text-muted-foreground">
+                      {winemaker.address.city}
                     </TableCell>
-                    <TableCell>
-                      <span
-                        className={`inline-flex rounded-full px-2 py-1 text-xs font-semibold ${getStatusBadgeClass(winemaker.status || "pending")}`}
-                      >
-                        {winemaker.status || "pending"}
-                      </span>
-                    </TableCell>
-                    <TableCell className="text-sm">{winemaker.wineCount || "0"} wines</TableCell>
                     <TableCell className="text-sm">
-                      {new Date(winemaker.createdAt).toLocaleDateString()}
+                      {winemaker.createdAt ? formatDate(winemaker.createdAt) : "—"}
                     </TableCell>
                     <TableCell>
                       <Link
-                        className="text-primary hover:underline text-sm"
+                        className="text-sm text-primary hover:underline"
                         params={{ id: winemaker.id }}
                         to="/winemakers/$id"
                       >

@@ -30,7 +30,7 @@ vi.mock("./users.service", () => ({
   usersService: {
     getAddresses: vi.fn().mockResolvedValue({ billing: null, shipping: defaultAddress }),
     getUserWithRoles: vi.fn().mockResolvedValue(defaultUser),
-    lazyGetOrCreate: vi.fn().mockResolvedValue({ id: "u1" }),
+    lazyGetOrCreate: vi.fn().mockResolvedValue({ id: "u1", status: "active" }),
     updateProfileById: vi.fn().mockResolvedValue(undefined),
     upsertAddress: vi.fn().mockResolvedValue(defaultAddress),
   },
