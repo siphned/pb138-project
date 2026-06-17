@@ -1,3 +1,4 @@
+import { standardSchemaResolver } from "@hookform/resolvers/standard-schema";
 import { type ReactNode, useMemo } from "react";
 import {
   type Resolver,
@@ -145,22 +146,6 @@ const BILLING_KEYS: AddressFieldGroupKeys = {
   street: "billingStreet",
 };
 
-function buildResolver(schema: ReturnType<typeof buildSchema>): Resolver<AddressFormValues> {
-  return async (values) => {
-    const result = await schema.safeParseAsync(values);
-    if (result.success) {
-      return { errors: {}, values: result.data as AddressFormValues };
-    }
-    const fieldErrors: Record<string, { type: string; message: string }> = {};
-    for (const issue of result.error.issues) {
-      const key = issue.path.map(String).join(".");
-      if (key && !fieldErrors[key]) {
-        fieldErrors[key] = { message: issue.message, type: issue.code };
-      }
-    }
-    return { errors: fieldErrors as never, values: {} as AddressFormValues };
-  };
-}
 
 type FormErrors = UseFormReturn<AddressFormValues>["formState"]["errors"];
 
@@ -284,7 +269,6 @@ export function AddressForm({
   footer,
 }: AddressFormProps) {
   const schema = useMemo(() => buildSchema(showGuestFields), [showGuestFields]);
-  const resolver = useMemo(() => buildResolver(schema), [schema]);
 
   const {
     register,

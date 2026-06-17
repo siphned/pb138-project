@@ -1,3 +1,4 @@
+import { standardSchemaResolver } from "@hookform/resolvers/standard-schema";
 import { useMemo } from "react";
 import { type Resolver, useForm } from "react-hook-form";
 import z from "zod";
@@ -30,22 +31,6 @@ const TYPE_OPTIONS: { value: RoleRequestValues["type"]; label: string }[] = [
   { label: "Shop owner", value: "shop_owner" },
 ];
 
-function buildResolver(): Resolver<RoleRequestValues> {
-  return (values) => {
-    const result = roleRequestSchema.safeParse(values);
-    if (result.success) {
-      return { errors: {}, values: result.data };
-    }
-    const fieldErrors: Record<string, { type: string; message: string }> = {};
-    for (const issue of result.error.issues) {
-      const key = issue.path.map(String).join(".");
-      if (key && !fieldErrors[key]) {
-        fieldErrors[key] = { message: issue.message, type: issue.code };
-      }
-    }
-    return { errors: fieldErrors as never, values: {} as RoleRequestValues };
-  };
-}
 
 function is409Error(error: unknown): boolean {
   if (!error || typeof error !== "object") return false;
@@ -55,7 +40,6 @@ function is409Error(error: unknown): boolean {
 
 export function DashboardRoleSection() {
   const { user } = useUser();
-  const resolver = useMemo(() => buildResolver(), []);
   const mutation = usePostRoleRequests();
 
   const {
@@ -67,7 +51,7 @@ export function DashboardRoleSection() {
   } = useForm<RoleRequestValues>({
     defaultValues: { businessName: "", details: "", type: "winemaker" },
     mode: "onSubmit",
-    resolver,
+    resolver: standardSchemaResolver(roleRequestSchema) as Resolver<RoleRequestValues>,
     reValidateMode: "onChange",
   });
 
