@@ -45,6 +45,10 @@
       "cache": false,
       "outputs": ["coverage/**"]
     },
+    "test:coverage": {
+      "cache": false,
+      "outputs": ["coverage/**"]
+    },
     "test:e2e": {
       "cache": false,
       "outputs": ["test-results/**"]
