@@ -1,5 +1,4 @@
 import { standardSchemaResolver } from "@hookform/resolvers/standard-schema";
-import { useMemo } from "react";
 import { type Resolver, useForm } from "react-hook-form";
 import z from "zod";
 import { Badge } from "@/components/ui/badge";
@@ -30,7 +29,6 @@ const TYPE_OPTIONS: { value: RoleRequestValues["type"]; label: string }[] = [
   { label: "Winemaker", value: "winemaker" },
   { label: "Shop owner", value: "shop_owner" },
 ];
-
 
 function is409Error(error: unknown): boolean {
   if (!error || typeof error !== "object") return false;

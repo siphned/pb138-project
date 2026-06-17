@@ -8,8 +8,8 @@ import { describe, expect, it } from "vitest";
 describe("API Response Types", () => {
   it("validates successful response structure", () => {
     const response = {
-      status: 200,
       data: { id: 1, name: "test" },
+      status: 200,
     };
     expect(response.status).toBe(200);
     expect(response.data).toBeDefined();
@@ -18,9 +18,9 @@ describe("API Response Types", () => {
 
   it("validates error response structure", () => {
     const response = {
-      status: 400,
       error: "Bad request",
       message: "Invalid input",
+      status: 400,
     };
     expect(response.status).toBe(400);
     expect(response.error).toBeDefined();
@@ -28,13 +28,13 @@ describe("API Response Types", () => {
 
   it("validates paginated response structure", () => {
     const response = {
-      status: 200,
       data: [{ id: 1 }, { id: 2 }],
       pagination: {
-        total: 100,
         limit: 20,
         offset: 0,
+        total: 100,
       },
+      status: 200,
     };
     expect(response.pagination.total).toBe(100);
     expect(response.data).toHaveLength(2);
@@ -42,7 +42,6 @@ describe("API Response Types", () => {
 
   it("validates nested response structure", () => {
     const response = {
-      status: 200,
       data: {
         user: {
           id: 1,
@@ -52,6 +51,7 @@ describe("API Response Types", () => {
           },
         },
       },
+      status: 200,
     };
     expect(response.data.user.profile.bio).toBe("test bio");
   });
@@ -144,8 +144,7 @@ describe("Request Validation", () => {
 
   it("validates UUID format", () => {
     const uuid = "550e8400-e29b-41d4-a716-446655440000";
-    const uuidRegex =
-      /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+    const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
     expect(uuidRegex.test(uuid)).toBe(true);
   });
 
@@ -174,7 +173,7 @@ describe("Request Validation", () => {
 
 describe("Data Transformation", () => {
   it("transforms user data", () => {
-    const user = { id: 1, firstName: "John", lastName: "Doe" };
+    const user = { firstName: "John", id: 1, lastName: "Doe" };
     const transformed = {
       ...user,
       fullName: `${user.firstName} ${user.lastName}`,
@@ -206,9 +205,9 @@ describe("Data Transformation", () => {
 
   it("groups data by property", () => {
     const items = [
-      { type: "wine", name: "item1" },
-      { type: "wine", name: "item2" },
-      { type: "product", name: "item3" },
+      { name: "item1", type: "wine" },
+      { name: "item2", type: "wine" },
+      { name: "item3", type: "product" },
     ];
     const grouped = items.reduce(
       (acc, item) => {
@@ -277,7 +276,7 @@ describe("Error Handling", () => {
 
   it("handles duplicate entry", () => {
     const items = [{ id: 1 }];
-    const add = (item: typeof items[0]) => {
+    const add = (item: (typeof items)[0]) => {
       if (items.find((i) => i.id === item.id)) {
         throw new Error("Duplicate ID");
       }
@@ -363,9 +362,9 @@ describe("Filtering", () => {
 
   it("filters by date range", () => {
     const items = [
-      { id: 1, date: "2026-01-01" },
-      { id: 2, date: "2026-06-17" },
-      { id: 3, date: "2026-12-31" },
+      { date: "2026-01-01", id: 1 },
+      { date: "2026-06-17", id: 2 },
+      { date: "2026-12-31", id: 3 },
     ];
     const start = "2026-06-01";
     const end = "2026-12-31";
@@ -375,9 +374,9 @@ describe("Filtering", () => {
 
   it("filters by multiple criteria", () => {
     const items = [
-      { id: 1, status: "active", role: "admin" },
-      { id: 2, status: "active", role: "user" },
-      { id: 3, status: "inactive", role: "admin" },
+      { id: 1, role: "admin", status: "active" },
+      { id: 2, role: "user", status: "active" },
+      { id: 3, role: "admin", status: "inactive" },
     ];
     const filtered = items.filter((i) => i.status === "active" && i.role === "admin");
     expect(filtered).toHaveLength(1);

@@ -19,7 +19,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { DeliveryMethodToggle } from "@/routes/-components/cart/DeliveryMethodToggle";
+import { DeliveryMethodToggle } from "@/routes/-components/DeliveryMethodToggle";
 
 const requiredString = (label: string) => z.string().min(1, `${label} is required`);
 
@@ -145,7 +145,6 @@ const BILLING_KEYS: AddressFieldGroupKeys = {
   postalCode: "billingPostalCode",
   street: "billingStreet",
 };
-
 
 type FormErrors = UseFormReturn<AddressFormValues>["formState"]["errors"];
 
@@ -295,7 +294,7 @@ export function AddressForm({
       street: "",
       ...defaultValues,
     },
-    resolver,
+    resolver: standardSchemaResolver(schema) as Resolver<AddressFormValues>,
   });
 
   const deliveryType = watch("deliveryType");
@@ -315,7 +314,8 @@ export function AddressForm({
   const billingSameLabel = deliveryType === "pickup" ? "contact" : "shipping";
 
   return (
-    <form className="space-y-6" noValidate onSubmit={handleSubmit(onSubmit)}>
+    // biome-ignore lint/suspicious/noExplicitAny: dynamic schema based on showGuestFields
+    <form className="space-y-6" noValidate onSubmit={handleSubmit(onSubmit as any)}>
       <ErrorBanner count={errorCount} />
 
       {showGuestFields && <GuestFields errors={errors} register={register} />}
@@ -323,7 +323,7 @@ export function AddressForm({
       <div>
         <Label className="mb-2 block">Delivery Method</Label>
         <DeliveryMethodToggle
-          onChange={(value) => {
+          onChange={(value: "pickup" | "shipping") => {
             setValue("deliveryType", value);
             onDeliveryTypeChange?.(value);
           }}

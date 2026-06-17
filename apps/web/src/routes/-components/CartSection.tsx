@@ -60,12 +60,12 @@ export function CartSection({ cart, deliveryType }: CartSectionProps) {
 
   const removeItem = useDeleteCartsItemsByProductId({
     mutation: {
+      onError: () => {
+        toast.error("Failed to remove item. Please try again.");
+      },
       onSuccess: () => {
         queryClient.invalidateQueries({ queryKey: getCartsQueryKey() });
         toast.success("Item removed from cart");
-      },
-      onError: () => {
-        toast.error("Failed to remove item. Please try again.");
       },
     },
   });
@@ -105,9 +105,9 @@ export function CartSection({ cart, deliveryType }: CartSectionProps) {
           <div className="flex flex-col gap-4">
             {cart.items.map((item) => (
               <CartItemRow
-                item={item}
-                isUpdatingQuantity={updateQuantity.isPending}
                 isRemoving={removeItem.isPending}
+                isUpdatingQuantity={updateQuantity.isPending}
+                item={item}
                 key={item.id}
                 onQuantityChange={handleQuantityChange}
                 onRemove={handleRemove}

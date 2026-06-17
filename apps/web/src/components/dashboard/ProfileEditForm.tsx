@@ -1,6 +1,6 @@
+import { standardSchemaResolver } from "@hookform/resolvers/standard-schema";
 import { User02Icon } from "@hugeicons/core-free-icons";
 import { HugeiconsIcon } from "@hugeicons/react";
-import { standardSchemaResolver } from "@hookform/resolvers/standard-schema";
 import { type Resolver, useForm } from "react-hook-form";
 import z from "zod";
 import { Button } from "@/components/ui/button";

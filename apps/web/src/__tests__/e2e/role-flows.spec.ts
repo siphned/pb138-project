@@ -217,8 +217,7 @@ test.describe("Public user flows", () => {
     await page.goto("/explore");
     await page.waitForLoadState("networkidle");
     // Explore may redirect to wines
-    const isOnValidPage =
-      page.url().includes("/explore") || page.url().includes("/wines");
+    const isOnValidPage = page.url().includes("/explore") || page.url().includes("/wines");
     expect(isOnValidPage).toBeTruthy();
   });
 
