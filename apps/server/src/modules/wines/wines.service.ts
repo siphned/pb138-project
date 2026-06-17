@@ -9,7 +9,7 @@ import * as winesRepo from "./wines.repository";
 
 export class WinesService {
   async createWine(userId: string, data: WineData): Promise<WineWithWinemaker> {
-    const winemaker = await winesRepo.findWinemakerByUserId(db, userId);
+    const winemaker = await winesRepo.findWinemakerByUserId(userId);
     if (!winemaker) throw new WinemakerNotFoundError();
 
     const inserted = await winesRepo.insert(db, winemaker.id, data);
@@ -23,7 +23,7 @@ export class WinesService {
     if (!wine) throw new WineNotFoundError(id);
 
     if (!roles.includes("admin")) {
-      const winemaker = await winesRepo.findWinemakerByUserId(db, userId);
+      const winemaker = await winesRepo.findWinemakerByUserId(userId);
       if (!winemaker || wine.winemakerId !== winemaker.id) throw new ForbiddenWineActionError();
     }
 
@@ -50,7 +50,7 @@ export class WinesService {
     if (!wine) throw new WineNotFoundError(id);
 
     if (!roles.includes("admin")) {
-      const winemaker = await winesRepo.findWinemakerByUserId(db, userId);
+      const winemaker = await winesRepo.findWinemakerByUserId(userId);
       if (!winemaker || wine.winemakerId !== winemaker.id) throw new ForbiddenWineActionError();
     }
 
