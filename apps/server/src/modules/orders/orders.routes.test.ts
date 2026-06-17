@@ -91,7 +91,10 @@ describe("orders routes", () => {
 
     it("returns customer order list when authenticated", async () => {
       vi.mocked(verifyClerkToken).mockResolvedValue({ roles: ["customer"], sub: "u1" } as any);
-      vi.mocked(usersService.lazyGetOrCreate).mockResolvedValue({ id: "u1", status: "active" } as any);
+      vi.mocked(usersService.lazyGetOrCreate).mockResolvedValue({
+        id: "u1",
+        status: "active",
+      } as any);
 
       const response = await app.handle(
         new Request("http://localhost/orders", {
@@ -109,7 +112,10 @@ describe("orders routes", () => {
 
     it("returns 403 when shopId provided but user lacks shop_owner/admin role", async () => {
       vi.mocked(verifyClerkToken).mockResolvedValue({ roles: ["customer"], sub: "u1" } as any);
-      vi.mocked(usersService.lazyGetOrCreate).mockResolvedValue({ id: "u1", status: "active" } as any);
+      vi.mocked(usersService.lazyGetOrCreate).mockResolvedValue({
+        id: "u1",
+        status: "active",
+      } as any);
 
       const response = await app.handle(
         new Request("http://localhost/orders?shopId=shop1", {
@@ -128,7 +134,10 @@ describe("orders routes", () => {
         roles: ["shop_owner"],
         sub: "u1",
       } as any);
-      vi.mocked(usersService.lazyGetOrCreate).mockResolvedValue({ id: "u1", status: "active" } as any);
+      vi.mocked(usersService.lazyGetOrCreate).mockResolvedValue({
+        id: "u1",
+        status: "active",
+      } as any);
 
       const response = await app.handle(
         new Request("http://localhost/orders?shopId=shop1", {
@@ -149,7 +158,10 @@ describe("orders routes", () => {
         roles: ["shop_owner"],
         sub: "u1",
       } as any);
-      vi.mocked(usersService.lazyGetOrCreate).mockResolvedValue({ id: "u1", status: "active" } as any);
+      vi.mocked(usersService.lazyGetOrCreate).mockResolvedValue({
+        id: "u1",
+        status: "active",
+      } as any);
       const { ordersService } = await import("./orders.service");
       vi.mocked(ordersService.listForShop).mockRejectedValueOnce(new Error("FORBIDDEN"));
 
@@ -172,7 +184,10 @@ describe("orders routes", () => {
         roles: ["shop_owner"],
         sub: "u1",
       } as any);
-      vi.mocked(usersService.lazyGetOrCreate).mockResolvedValue({ id: "u1", status: "active" } as any);
+      vi.mocked(usersService.lazyGetOrCreate).mockResolvedValue({
+        id: "u1",
+        status: "active",
+      } as any);
     });
 
     afterEach(() => {
@@ -281,7 +296,10 @@ describe("orders routes", () => {
   describe("GET /orders/:id", () => {
     beforeEach(() => {
       vi.mocked(verifyClerkToken).mockResolvedValue({ roles: ["customer"], sub: "u1" } as any);
-      vi.mocked(usersService.lazyGetOrCreate).mockResolvedValue({ id: "u1", status: "active" } as any);
+      vi.mocked(usersService.lazyGetOrCreate).mockResolvedValue({
+        id: "u1",
+        status: "active",
+      } as any);
     });
 
     afterEach(() => {
