@@ -168,9 +168,9 @@ test.describe("Shop owner role flows", () => {
 test.describe("Admin role flows", () => {
   test("admin can access user management", async ({ page, authenticateUser }) => {
     await authenticateUser();
-    await page.goto("/admin/users");
+    await page.goto("/users");
     await page.waitForLoadState("networkidle");
-    expect(page.url()).toContain("/admin/users");
+    expect(page.url()).toContain("/users");
   });
 
   test("admin can access winemaker management", async ({ page, authenticateUser }) => {
@@ -196,16 +196,16 @@ test.describe("Admin role flows", () => {
 
   test("admin can access moderation panel", async ({ page, authenticateUser }) => {
     await authenticateUser();
-    await page.goto("/admin/moderation");
+    await page.goto("/moderation");
     await page.waitForLoadState("networkidle");
-    expect(page.url()).toContain("/admin/moderation");
+    expect(page.url()).toContain("/moderation");
   });
 
   test("admin can access role requests", async ({ page, authenticateUser }) => {
     await authenticateUser();
-    await page.goto("/admin/role-requests");
+    await page.goto("/role-requests");
     await page.waitForLoadState("networkidle");
-    expect(page.url()).toContain("/admin/role-requests");
+    expect(page.url()).toContain("/role-requests");
   });
 
   test("admin can access dashboard", async ({ page, authenticateUser }) => {
