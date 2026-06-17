@@ -345,8 +345,8 @@ jobs:
         with:
           name: generated-code
           path: apps/web/src/generated/
-      - name: Install Playwright
-        run: bunx playwright install --with-deps chromium
+      - name: Install Playwright browsers
+        run: cd apps/web && bunx playwright install --with-deps chromium
       - name: Migrate Database
         run: cd apps/server && bun run db:push
       - name: Start backend server
