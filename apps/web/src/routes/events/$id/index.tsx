@@ -78,7 +78,7 @@ function EventDetailPage() {
 
       <EventHero event={heroEvent} />
 
-      <div className="grid grid-cols-1 gap-8 lg:grid-cols-[1fr_2fr]">
+      <div className="grid grid-cols-1 gap-12 lg:grid-cols-2">
         <div>
           <EventGallery eventName={title} images={eventImages?.map((img) => img.url)} />
         </div>

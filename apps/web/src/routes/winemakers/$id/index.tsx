@@ -9,7 +9,9 @@ import { Separator } from "@/components/ui/separator";
 import { useGetEvents } from "@/generated/hooks/useGetEvents";
 import { useGetWinemakersById } from "@/generated/hooks/useGetWinemakersById";
 import { useGetWinemakersByIdImages } from "@/generated/hooks/useGetWinemakersByIdImages";
+import { useGetWinemakersMe } from "@/generated/hooks/useGetWinemakersMe";
 import { useGetWines } from "@/generated/hooks/useGetWines";
+import { useRoles } from "@/hooks/useRoles";
 import { CatalogState } from "@/routes/-components/CatalogState";
 import { EventCard } from "@/routes/-components/EventCard";
 import { WineCard } from "@/routes/-components/WineCard";
@@ -23,8 +25,12 @@ export const Route = createFileRoute("/winemakers/$id/")({
 
 function WinemakerProfilePage() {
   const { id } = Route.useParams();
+  const roles = useRoles();
   const { data: winemaker, isLoading, isError, refetch } = useGetWinemakersById(id);
   const { data: winemakerImages } = useGetWinemakersByIdImages(id);
+  const { data: myWinemaker } = useGetWinemakersMe({
+    query: { enabled: roles.includes("winemaker") },
+  });
   const winesQuery = useGetWines({ winemakerId: id });
   const eventsQuery = useGetEvents(
     { winemakerName: winemaker?.name },
@@ -47,6 +53,8 @@ function WinemakerProfilePage() {
     );
   }
 
+  const canManage =
+    roles.includes("admin") || (!!myWinemaker?.id && myWinemaker.id === winemaker.id);
   const wines = winesQuery.data || [];
   // GetEvents200 is `any` per OpenAPI; BE may return a raw array or a paginated
   // envelope. Normalise to an array here (track typed fix in WINE-XXX).
@@ -75,7 +83,7 @@ function WinemakerProfilePage() {
           />
         </div>
 
-        <WinemakerDetailsCard winemaker={winemaker} />
+        <WinemakerDetailsCard canManage={canManage} winemaker={winemaker} />
       </div>
 
       <Separator />
