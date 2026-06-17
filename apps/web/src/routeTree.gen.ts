@@ -46,7 +46,6 @@ import { Route as ShopsIdInventoryRouteImport } from './routes/shops/$id/invento
 import { Route as ShopsIdImagesRouteImport } from './routes/shops/$id/images'
 import { Route as ShopsIdEditRouteImport } from './routes/shops/$id/edit'
 import { Route as ShopsIdAvailabilityRouteImport } from './routes/shops/$id/availability'
-import { Route as EventsIdInvitationsRouteImport } from './routes/events/$id/invitations'
 import { Route as EventsIdImagesRouteImport } from './routes/events/$id/images'
 import { Route as EventsIdEditRouteImport } from './routes/events/$id/edit'
 import { Route as AuthenticatedOrdersIdRouteImport } from './routes/_authenticated/orders/$id'
@@ -248,11 +247,6 @@ const ShopsIdAvailabilityRoute = ShopsIdAvailabilityRouteImport.update({
   path: '/shops/$id/availability',
   getParentRoute: () => rootRouteImport,
 } as any)
-const EventsIdInvitationsRoute = EventsIdInvitationsRouteImport.update({
-  id: '/events/$id/invitations',
-  path: '/events/$id/invitations',
-  getParentRoute: () => rootRouteImport,
-} as any)
 const EventsIdImagesRoute = EventsIdImagesRouteImport.update({
   id: '/events/$id/images',
   path: '/events/$id/images',
@@ -372,7 +366,6 @@ export interface FileRoutesByFullPath {
   '/orders/$id': typeof AuthenticatedOrdersIdRoute
   '/events/$id/edit': typeof EventsIdEditRoute
   '/events/$id/images': typeof EventsIdImagesRoute
-  '/events/$id/invitations': typeof EventsIdInvitationsRoute
   '/shops/$id/availability': typeof ShopsIdAvailabilityRoute
   '/shops/$id/edit': typeof ShopsIdEditRoute
   '/shops/$id/images': typeof ShopsIdImagesRoute
@@ -423,7 +416,6 @@ export interface FileRoutesByTo {
   '/orders/$id': typeof AuthenticatedOrdersIdRoute
   '/events/$id/edit': typeof EventsIdEditRoute
   '/events/$id/images': typeof EventsIdImagesRoute
-  '/events/$id/invitations': typeof EventsIdInvitationsRoute
   '/shops/$id/availability': typeof ShopsIdAvailabilityRoute
   '/shops/$id/edit': typeof ShopsIdEditRoute
   '/shops/$id/images': typeof ShopsIdImagesRoute
@@ -480,7 +472,6 @@ export interface FileRoutesById {
   '/_authenticated/orders/$id': typeof AuthenticatedOrdersIdRoute
   '/events/$id/edit': typeof EventsIdEditRoute
   '/events/$id/images': typeof EventsIdImagesRoute
-  '/events/$id/invitations': typeof EventsIdInvitationsRoute
   '/shops/$id/availability': typeof ShopsIdAvailabilityRoute
   '/shops/$id/edit': typeof ShopsIdEditRoute
   '/shops/$id/images': typeof ShopsIdImagesRoute
@@ -536,7 +527,6 @@ export interface FileRouteTypes {
     | '/orders/$id'
     | '/events/$id/edit'
     | '/events/$id/images'
-    | '/events/$id/invitations'
     | '/shops/$id/availability'
     | '/shops/$id/edit'
     | '/shops/$id/images'
@@ -587,7 +577,6 @@ export interface FileRouteTypes {
     | '/orders/$id'
     | '/events/$id/edit'
     | '/events/$id/images'
-    | '/events/$id/invitations'
     | '/shops/$id/availability'
     | '/shops/$id/edit'
     | '/shops/$id/images'
@@ -643,7 +632,6 @@ export interface FileRouteTypes {
     | '/_authenticated/orders/$id'
     | '/events/$id/edit'
     | '/events/$id/images'
-    | '/events/$id/invitations'
     | '/shops/$id/availability'
     | '/shops/$id/edit'
     | '/shops/$id/images'
@@ -688,7 +676,6 @@ export interface RootRouteChildren {
   WinesIndexRoute: typeof WinesIndexRoute
   EventsIdEditRoute: typeof EventsIdEditRoute
   EventsIdImagesRoute: typeof EventsIdImagesRoute
-  EventsIdInvitationsRoute: typeof EventsIdInvitationsRoute
   ShopsIdAvailabilityRoute: typeof ShopsIdAvailabilityRoute
   ShopsIdEditRoute: typeof ShopsIdEditRoute
   ShopsIdImagesRoute: typeof ShopsIdImagesRoute
@@ -968,13 +955,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ShopsIdAvailabilityRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/events/$id/invitations': {
-      id: '/events/$id/invitations'
-      path: '/events/$id/invitations'
-      fullPath: '/events/$id/invitations'
-      preLoaderRoute: typeof EventsIdInvitationsRouteImport
-      parentRoute: typeof rootRouteImport
-    }
     '/events/$id/images': {
       id: '/events/$id/images'
       path: '/events/$id/images'
@@ -1201,7 +1181,6 @@ const rootRouteChildren: RootRouteChildren = {
   WinesIndexRoute: WinesIndexRoute,
   EventsIdEditRoute: EventsIdEditRoute,
   EventsIdImagesRoute: EventsIdImagesRoute,
-  EventsIdInvitationsRoute: EventsIdInvitationsRoute,
   ShopsIdAvailabilityRoute: ShopsIdAvailabilityRoute,
   ShopsIdEditRoute: ShopsIdEditRoute,
   ShopsIdImagesRoute: ShopsIdImagesRoute,
