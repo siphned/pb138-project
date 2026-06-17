@@ -1141,6 +1141,26 @@ async function main() {
   logger.info("  Willy the Kid: willy@winery.demo");
   logger.info("  (Controls: Lavicka winery, Vecerka Posledná Záchrana shop, Admin access)");
   logger.info("─────────────────────────────────────────────────────────────────");
+
+  // ── Test environment: log stable IDs for .env.local ─────────────────────────
+  const testWinemakerId = wmIdMap.get("lavicka");
+  const testShopId = shopIdMap.get("wine_enjoyers");
+  // First wine inserted for the lavicka winemaker
+  const testWineId = [...wineIdMap.entries()]
+    .find(([key]) => key.startsWith("lavicka::"))
+    ?.[1];
+  // First event inserted for the lavicka winemaker
+  const testEventId = [...eventIdMap.entries()]
+    .find(([key]) => key.startsWith("lavicka-"))
+    ?.[1];
+
+  logger.info("─────────────────────────────────────────────────────────────────");
+  logger.info("E2E TEST ENV VARS — paste into apps/server/.env.local:");
+  logger.info(`TEST_WINEMAKER_ID=${testWinemakerId ?? "NOT_FOUND"}`);
+  logger.info(`TEST_SHOP_ID=${testShopId ?? "NOT_FOUND"}`);
+  logger.info(`TEST_WINE_ID=${testWineId ?? "NOT_FOUND"}`);
+  logger.info(`TEST_EVENT_ID=${testEventId ?? "NOT_FOUND"}`);
+  logger.info("─────────────────────────────────────────────────────────────────");
 }
 
 main().catch((err) => {
