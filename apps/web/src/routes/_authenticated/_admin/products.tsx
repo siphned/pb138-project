@@ -11,6 +11,7 @@ import {
 } from "@/components/ui/table";
 import { useGetProducts } from "@/generated/hooks/useGetProducts";
 import { formatEur } from "@/lib/utils";
+import { AdminProductDeleteButton } from "@/routes/_authenticated/_admin/-components/AdminProductDeleteButton";
 
 export const Route = createFileRoute("/_authenticated/_admin/products")({
   component: AdminProductsPage,
@@ -82,13 +83,20 @@ function AdminProductsPage() {
                         : `${product.rating.toFixed(1)} (${product.reviewCount})`}
                     </TableCell>
                     <TableCell>
-                      <Link
-                        className="text-sm text-primary hover:underline"
-                        params={{ productId: product.id }}
-                        to="/products/$productId"
-                      >
-                        View
-                      </Link>
+                      <div className="flex items-center gap-2">
+                        <Link
+                          className="text-sm text-primary hover:underline"
+                          params={{ productId: product.id }}
+                          to="/products/$productId"
+                        >
+                          View
+                        </Link>
+                        <AdminProductDeleteButton
+                          productId={product.id}
+                          productName={product.name}
+                          shopId={product.shop.id}
+                        />
+                      </div>
                     </TableCell>
                   </TableRow>
                 ))
