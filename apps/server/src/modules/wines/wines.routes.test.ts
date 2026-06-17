@@ -35,7 +35,7 @@ vi.mock("./wines.service", () => ({
 }));
 
 vi.mock("../users/users.service", () => ({
-  usersService: { lazyGetOrCreate: vi.fn().mockResolvedValue({ id: "u1" }) },
+  usersService: { lazyGetOrCreate: vi.fn().mockResolvedValue({ id: "u1", status: "active" }) },
 }));
 
 vi.mock("../auth/auth.utils", () => ({
