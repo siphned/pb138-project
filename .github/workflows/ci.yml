@@ -349,6 +349,10 @@ jobs:
         run: bunx playwright install --with-deps chromium
       - name: Migrate Database
         run: cd apps/server && bun run db:push
+      - name: Start backend server
+        run: bun run apps/server/src/index.ts &
+      - name: Wait for server to be ready
+        run: until curl -sf http://localhost:3000/swagger/json > /dev/null; do sleep 1; done
       - name: Run E2E tests
         run: cd apps/web && bunx playwright test --reporter=html
       - name: Upload E2E report

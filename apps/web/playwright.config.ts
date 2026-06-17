@@ -25,7 +25,7 @@ const config = defineConfig({
     screenshot: "only-on-failure",
     trace: "on-first-retry",
   },
-  webServer: process.env.SHARD
+  webServer: process.env.SHARD || process.env.CI
     ? undefined
     : [
         {
