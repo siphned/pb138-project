@@ -79,7 +79,7 @@ function RoleRequestsPage() {
                     <TableCell className="font-medium">{request.businessName}</TableCell>
                     <TableCell>
                       <span className="inline-flex rounded-full px-2 py-1 text-xs font-semibold bg-blue-100/30 text-blue-700 dark:text-blue-400">
-                        {request.type === "winemaker" ? "Winemaker" : "Shop Owner"}
+                        {request.requestedRole === "winemaker" ? "Winemaker" : "Shop Owner"}
                       </span>
                     </TableCell>
                     <TableCell className="max-w-xs truncate text-sm">

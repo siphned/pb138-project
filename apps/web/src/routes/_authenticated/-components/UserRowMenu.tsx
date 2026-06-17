@@ -1,7 +1,6 @@
 import { MoreHorizontalCircle01Icon } from "@hugeicons/core-free-icons";
 import { HugeiconsIcon } from "@hugeicons/react";
 import { useQueryClient } from "@tanstack/react-query";
-import { Link } from "@tanstack/react-router";
 import { useState } from "react";
 import {
   AlertDialog,
@@ -86,9 +85,6 @@ export function UserRowMenu({ userId, userName, status }: UserRowMenuProps) {
           }
         />
         <DropdownMenuContent align="end">
-          <DropdownMenuItem render={<Link params={{ id: userId }} to="/users/$id" />}>
-            View details
-          </DropdownMenuItem>
           {isActive ? (
             <>
               <DropdownMenuItem onClick={() => setPendingAction("suspend")}>
