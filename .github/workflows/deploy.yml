@@ -49,7 +49,9 @@ jobs:
       - name: Generate API hooks
         run: bun run generate --filter=web
       - name: Build frontend
-        run: bun run build --filter=web
+        run: cd apps/web && bunx vite build
+        env:
+          NODE_ENV: production
       - name: Deploy to Vercel
         uses: amondnet/vercel-action@v25
         with:
