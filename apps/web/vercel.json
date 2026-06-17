@@ -1,11 +1,5 @@
 {
-  "buildCommand": "bun run build",
-  "env": {
-    "FRONTEND_URL": "@FRONTEND_URL",
-    "VITE_CLERK_PUBLISHABLE_KEY": "@VITE_CLERK_PUBLISHABLE_KEY"
-  },
   "framework": "vite",
-  "installCommand": "bun install --frozen-lockfile",
   "outputDirectory": "dist",
   "rewrites": [
     {
