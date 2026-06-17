@@ -36,6 +36,7 @@ export const authPlugin = new Elysia({ name: "auth" }).macro({
       if (!payload) return status(401);
 
       const dbUser = await usersService.lazyGetOrCreate(payload.sub);
+      if (dbUser.status !== "active") return status(403);
       const callerRoles = await resolveCallerRoles(payload.roles, dbUser.id);
 
       const sessionId = guestSessionId?.value;
@@ -58,6 +59,7 @@ export const authPlugin = new Elysia({ name: "auth" }).macro({
       if (!payload) return status(401);
 
       const dbUser = await usersService.lazyGetOrCreate(payload.sub);
+      if (dbUser.status !== "active") return status(403);
       const callerRoles = await resolveCallerRoles(payload.roles, dbUser.id);
       if (!callerRoles.includes(capability)) return status(403);
 
@@ -81,6 +83,7 @@ export const authPlugin = new Elysia({ name: "auth" }).macro({
       if (!payload) return status(401);
 
       const dbUser = await usersService.lazyGetOrCreate(payload.sub);
+      if (dbUser.status !== "active") return status(403);
       const callerRoles = await resolveCallerRoles(payload.roles, dbUser.id);
       const hasRole = roles.some((role) => callerRoles.includes(role));
       if (!hasRole) return status(403);

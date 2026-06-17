@@ -11,6 +11,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { useGetAdminUsers } from "@/generated/hooks/useGetAdminUsers";
+import { AdminUserRowMenu } from "@/routes/_authenticated/_admin/-components/AdminUserRowMenu";
 
 export const Route = createFileRoute("/_authenticated/_admin/users")({
   component: AdminUsersPage,
@@ -82,12 +83,13 @@ function AdminUsersPage() {
                 <TableHead>Roles</TableHead>
                 <TableHead>Status</TableHead>
                 <TableHead>Created</TableHead>
+                <TableHead>Actions</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
               {filteredUsers.length === 0 ? (
                 <TableRow>
-                  <TableCell className="text-center text-muted-foreground" colSpan={5}>
+                  <TableCell className="text-center text-muted-foreground" colSpan={6}>
                     No users found
                   </TableCell>
                 </TableRow>
@@ -111,6 +113,9 @@ function AdminUsersPage() {
                       </span>
                     </TableCell>
                     <TableCell>{new Date(user.createdAt).toLocaleDateString()}</TableCell>
+                    <TableCell>
+                      <AdminUserRowMenu status={user.status} userId={user.id} />
+                    </TableCell>
                   </TableRow>
                 ))
               )}
