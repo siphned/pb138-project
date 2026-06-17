@@ -10,11 +10,19 @@ type CartItem = NonNullable<GetCarts200>["items"][number];
 
 type CartItemRowProps = {
   item: CartItem;
+  isUpdatingQuantity?: boolean;
+  isRemoving?: boolean;
   onQuantityChange: (productId: string, quantity: number) => void;
   onRemove: (productId: string) => void;
 };
 
-export function CartItemRow({ item, onQuantityChange, onRemove }: CartItemRowProps) {
+export function CartItemRow({
+  item,
+  isUpdatingQuantity,
+  isRemoving,
+  onQuantityChange,
+  onRemove,
+}: CartItemRowProps) {
   const quantity = Number(item.quantity);
   const price = Number.parseFloat(item.product.price);
   const lineTotal = lineTotalEur(item.product.price, quantity);
@@ -40,6 +48,7 @@ export function CartItemRow({ item, onQuantityChange, onRemove }: CartItemRowPro
         <p className="text-sm text-muted-foreground">{formatEur(price)} each</p>
         <div className="mt-1">
           <QuantityControl
+            disabled={isUpdatingQuantity}
             onDecrement={() => onQuantityChange(item.product.id, quantity - 1)}
             onIncrement={() => onQuantityChange(item.product.id, quantity + 1)}
             value={quantity}
@@ -51,6 +60,7 @@ export function CartItemRow({ item, onQuantityChange, onRemove }: CartItemRowPro
         <span className="font-semibold text-foreground">{formatEur(lineTotal)}</span>
         <Button
           className="h-8 w-8 text-muted-foreground hover:text-destructive"
+          disabled={isRemoving}
           onClick={() => onRemove(item.product.id)}
           size="icon"
           variant="ghost"
