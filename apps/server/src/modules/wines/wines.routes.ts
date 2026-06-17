@@ -1,5 +1,6 @@
 import { Elysia, status } from "elysia";
 import { z } from "zod";
+import { db } from "../../db";
 import { errorResponse } from "../../utils/error-plugin";
 import { authPlugin } from "../auth";
 import { verifyClerkToken } from "../auth/auth.utils";

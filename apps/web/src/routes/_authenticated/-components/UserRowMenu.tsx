@@ -105,13 +105,9 @@ export function UserRowMenu({ userId, userName, status }: UserRowMenuProps) {
           <div className="flex justify-end gap-2 pt-2">
             <AlertDialogCancel>Cancel</AlertDialogCancel>
             <AlertDialogAction
-              className={
-                pendingAction === "reactivate"
-                  ? ""
-                  : "bg-destructive text-destructive-foreground hover:bg-destructive/90"
-              }
               disabled={isPending}
               onClick={handleConfirm}
+              variant={pendingAction === "reactivate" ? undefined : "solid-destructive"}
             >
               {isPending ? "Processing…" : (copy?.confirm ?? "Confirm")}
             </AlertDialogAction>

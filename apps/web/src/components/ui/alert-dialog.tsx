@@ -1,5 +1,6 @@
+import type { VariantProps } from "class-variance-authority";
 import type { ReactNode } from "react";
-import { Button } from "@/components/ui/button";
+import { Button, type buttonVariants } from "@/components/ui/button";
 import {
   Dialog,
   DialogContent,
@@ -34,7 +35,7 @@ interface AlertDialogDescriptionProps {
   className?: string;
 }
 
-interface AlertDialogActionProps {
+interface AlertDialogActionProps extends VariantProps<typeof buttonVariants> {
   children: ReactNode;
   onClick?: () => void;
   disabled?: boolean;
@@ -71,9 +72,22 @@ function AlertDialogDescription({ children, className }: AlertDialogDescriptionP
   return <DialogDescription className={className}>{children}</DialogDescription>;
 }
 
-function AlertDialogAction({ children, onClick, disabled, className }: AlertDialogActionProps) {
+function AlertDialogAction({
+  children,
+  onClick,
+  disabled,
+  className,
+  variant,
+  size,
+}: AlertDialogActionProps) {
   return (
-    <Button className={className} disabled={disabled} onClick={onClick}>
+    <Button
+      className={className}
+      disabled={disabled}
+      onClick={onClick}
+      size={size}
+      variant={variant}
+    >
       {children}
     </Button>
   );
