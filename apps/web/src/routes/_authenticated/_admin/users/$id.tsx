@@ -99,16 +99,9 @@ function ProfileCard({ user }: { user: AdminUser }) {
   );
 }
 
-interface UserShop {
-  id: string;
-  name: string;
-  description?: string;
-  address?: { city?: string; country?: string };
-}
-
 function UserShopsSection({ userId }: { userId: string }) {
   const query = useGetShops({ ownerUserId: userId });
-  const shops = (Array.isArray(query.data) ? query.data : []) as UserShop[];
+  const shops = query.data?.data ?? [];
 
   const renderShops = () => {
     if (query.isLoading) {

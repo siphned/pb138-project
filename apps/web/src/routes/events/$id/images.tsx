@@ -1,46 +1,47 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { ArrowLeft02Icon } from "@hugeicons/core-free-icons";
+import { HugeiconsIcon } from "@hugeicons/react";
+import { createFileRoute, Link } from "@tanstack/react-router";
 import { useDeleteEventsByIdImagesByImageId } from "@/generated/hooks/useDeleteEventsByIdImagesByImageId";
-import { useGetEventsByIdImages } from "@/generated/hooks/useGetEventsByIdImages";
-import { usePostEventsByIdImages } from "@/generated/hooks/usePostEventsByIdImages";
-import { StubGet } from "@/routes/-components/StubGet";
-import { StubMutation } from "@/routes/-components/StubMutation";
-import { StubPage } from "@/routes/-components/StubPage";
+import {
+  getEventsByIdImagesQueryKey,
+  useGetEventsByIdImages,
+} from "@/generated/hooks/useGetEventsByIdImages";
+import { EntityImagesManager } from "@/routes/-components/EntityImagesManager";
 
 export const Route = createFileRoute("/events/$id/images")({
-  component: EventsImagesStub,
+  component: EventImagesPage,
 });
 
-function EventsImagesStub() {
+function EventImagesPage() {
   const { id } = Route.useParams();
   const query = useGetEventsByIdImages(id);
-  const uploadMutation = usePostEventsByIdImages();
   const deleteMutation = useDeleteEventsByIdImagesByImageId();
+
   return (
-    <StubPage
-      actorRole="winemaker (owner)"
-      hookName="useGetEventsByIdImages + upload/delete"
-      title={`Event ${id} images`}
-    >
-      <StubGet
-        actorRole="winemaker (owner)"
-        hookName="useGetEventsByIdImages"
-        query={query}
-        title="Existing images"
-      />
-      <StubMutation
-        actorRole="winemaker (owner)"
-        hookName="usePostEventsByIdImages"
-        mutation={uploadMutation}
-        payloadExample={{ data: { file: new Blob(["BLOB_PLACEHOLDER"]) }, id }}
-        title="Upload image"
-      />
-      <StubMutation
-        actorRole="winemaker (owner)"
-        hookName="useDeleteEventsByIdImagesByImageId"
-        mutation={deleteMutation}
-        payloadExample={{ id, imageId: "REPLACE_WITH_IMAGE_ID" }}
-        title="Delete image"
-      />
-    </StubPage>
+    <EntityImagesManager
+      backLink={
+        <Link
+          className="inline-flex items-center gap-2 text-sm text-muted-foreground transition-colors hover:text-foreground"
+          params={{ id }}
+          to="/events/$id/edit"
+        >
+          <HugeiconsIcon className="h-4 w-4" icon={ArrowLeft02Icon} />
+          Back to event
+        </Link>
+      }
+      data={query.data}
+      deletingImageId={deleteMutation.variables?.imageId}
+      description="Upload photos for this event. PNG, JPEG, WebP, or AVIF up to 10 MB."
+      doneHref={`/events/${id}/edit`}
+      isDeleting={deleteMutation.isPending}
+      isError={query.isError}
+      isLoading={query.isLoading}
+      loadErrorMessage="Could not load images for this event."
+      onDelete={(imageId, options) => deleteMutation.mutate({ id, imageId }, options)}
+      onRetry={() => query.refetch()}
+      queryKey={getEventsByIdImagesQueryKey(id)}
+      title="Event images"
+      uploadUrl={`/events/${id}/images`}
+    />
   );
 }
