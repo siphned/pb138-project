@@ -98,7 +98,7 @@ export function Sidebar({ userRoles = [Role.customer], activeRole, onRoleChange 
         }
       />
 
-      <SheetContent className="flex flex-col w-80 p-0" side="right">
+      <SheetContent className="flex flex-col w-80 p-0 bg-background" side="right">
         <Show when="signed-in">
           <div className="flex-none border-b bg-background z-10">
             <SheetHeader className="text-left">
