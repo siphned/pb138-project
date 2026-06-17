@@ -1,5 +1,5 @@
 import { Button } from "@/components/ui/button";
-import { cn } from "@/lib/utils";
+import { cn, resolveImageUrl } from "@/lib/utils";
 
 interface ShopGalleryThumbnailStripProps {
   images: string[];
@@ -26,7 +26,11 @@ export function ShopGalleryThumbnailStrip({
           onClick={() => onSelect(i)}
           variant="ghost"
         >
-          <img alt={`Shop ${i + 1}`} className="h-full w-full object-cover" src={src} />
+          <img
+            alt={`Shop ${i + 1}`}
+            className="h-full w-full object-cover"
+            src={resolveImageUrl(src)}
+          />
         </Button>
       ))}
     </div>
