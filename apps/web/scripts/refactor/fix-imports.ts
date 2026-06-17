@@ -13,7 +13,7 @@ const noExt = (p: string) => p.replace(/\.(tsx|ts)$/, "");
 const byOld = new Map(moves.map((m) => [`@/${noExt(m.from)}`, `@/${noExt(m.to)}`]));
 
 const project = makeProject();
-let changed = 0;
+let _changed = 0;
 for (const sf of project.getSourceFiles()) {
   let touched = false;
   for (const decl of [...sf.getImportDeclarations(), ...sf.getExportDeclarations()]) {
@@ -23,7 +23,6 @@ for (const sf of project.getSourceFiles()) {
     decl.setModuleSpecifier(byOld.get(spec) as string);
     touched = true;
   }
-  if (touched) changed++;
+  if (touched) _changed++;
 }
 await project.save();
-console.log(`fix-imports: rewrote ${changed} files with unresolved specifiers`);

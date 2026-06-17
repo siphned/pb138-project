@@ -35,7 +35,7 @@ export function describeEntityImageWrapper({
     it("renders the first attached image URL", () => {
       setQuery([{ url: sampleUrl }]);
       render(renderWrapper());
-      expect(screen.getByAltText(alt)).toHaveAttribute("src", sampleUrl);
+      expect(screen.getByAltText(alt)).toHaveAttribute("src", `http://localhost:3000${sampleUrl}`);
     });
 
     it("renders the placeholder while the hook is loading", () => {

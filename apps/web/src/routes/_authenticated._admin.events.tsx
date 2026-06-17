@@ -10,9 +10,9 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { useGetAdminEvents } from "@/generated/hooks/useGetAdminEvents";
-import { usePostAdminEventsByIdApprove } from "@/generated/hooks/usePostAdminEventsByIdApprove";
-import { usePostAdminEventsByIdReject } from "@/generated/hooks/usePostAdminEventsByIdReject";
+import { useGetAdminEvents } from "@/hooks/useGetAdminEvents";
+import { usePostAdminEventsByIdApprove } from "@/hooks/usePostAdminEventsByIdApprove";
+import { usePostAdminEventsByIdReject } from "@/hooks/usePostAdminEventsByIdReject";
 
 export const Route = createFileRoute("/_authenticated/_admin/events")({
   component: AdminEventsPage,

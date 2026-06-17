@@ -1,6 +1,16 @@
 import { type ClassValue, clsx } from "clsx";
 import { twMerge } from "tailwind-merge";
 
+const API_BASE = (import.meta.env.VITE_API_URL as string | undefined) || "http://localhost:3000";
+
+// Converts a relative /uploads/... path from the API into an absolute URL
+// pointing at the backend. Absolute URLs (http/https) are returned unchanged.
+export function resolveImageUrl(url: string | null | undefined): string | undefined {
+  if (!url) return undefined;
+  if (url.startsWith("http")) return url;
+  return `${API_BASE}${url}`;
+}
+
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
 }

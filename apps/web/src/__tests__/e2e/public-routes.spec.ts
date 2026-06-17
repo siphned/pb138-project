@@ -4,7 +4,6 @@ test.describe("Public routes", () => {
   const publicRoutes = [
     "/",
     "/wines",
-    "/wines",
     "/shops",
     "/shops/1",
     "/products/1",

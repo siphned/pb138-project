@@ -36,7 +36,7 @@ export function AvailabilityRegularForm({ shopId, onSuccess }: AvailabilityRegul
 
   const form = useForm<PostShopsByIdAvailabilityRegularMutationRequest>({
     defaultValues: {
-      dow: "0",
+      dow: 0,
       endTime: "17:00",
       startTime: "09:00",
       type: "open",

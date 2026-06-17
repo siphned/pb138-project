@@ -19,6 +19,7 @@ import { useGetProductsByIdImages } from "@/generated/hooks/useGetProductsByIdIm
 import { useGetShopsById } from "@/generated/hooks/useGetShopsById";
 import type { GetProductsById200 } from "@/generated/types/GetProductsById";
 import { DETAIL_CARD_GRID, DETAIL_CARD_ITEM } from "@/lib/detail-card-grid";
+import { resolveImageUrl } from "@/lib/utils";
 import { CatalogPlaceholder } from "./CatalogPlaceholder";
 import { WineCard } from "./WineCard";
 
@@ -51,7 +52,11 @@ function ProductImageCarousel({
   if (photos.length === 1) {
     return (
       <div className="aspect-square w-full overflow-hidden rounded-lg bg-muted shadow-xs">
-        <img alt={name} className="h-full w-full object-cover" src={photos[0].url} />
+        <img
+          alt={name}
+          className="h-full w-full object-cover"
+          src={resolveImageUrl(photos[0].url)}
+        />
       </div>
     );
   }
@@ -65,7 +70,7 @@ function ProductImageCarousel({
               <img
                 alt={`${name} — ${i + 1}`}
                 className="h-full w-full object-cover"
-                src={img.url}
+                src={resolveImageUrl(img.url)}
               />
             </div>
           </CarouselItem>
@@ -241,7 +246,16 @@ export function ProductDetailsCard({
       <ShowOwner ownerUserId={shopOwnerUserId}>
         <div className="flex flex-wrap gap-4">
           <Button
-            render={<Link params={{ productId: product.id }} to="/products/$productId/edit" />}
+            render={
+              shopId ? (
+                <Link
+                  params={{ id: shopId, productId: product.id }}
+                  to="/shops/$id/inventory/$productId/edit"
+                />
+              ) : (
+                <span className="cursor-not-allowed opacity-50">Edit Product</span>
+              )
+            }
             variant="outline"
           >
             Edit Product

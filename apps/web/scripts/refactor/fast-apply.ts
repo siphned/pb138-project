@@ -43,7 +43,7 @@ const aliasOf = (abs: string) =>
     .replace(/\.(tsx|ts|jsx|js)$/, "")}`;
 
 const project = makeProject();
-let rewrites = 0;
+let _rewrites = 0;
 for (const sf of project.getSourceFiles()) {
   const importerOld = norm(sf.getFilePath());
   for (const decl of [...sf.getImportDeclarations(), ...sf.getExportDeclarations()]) {
@@ -53,14 +53,14 @@ for (const sf of project.getSourceFiles()) {
     if (!targetOld) continue; // external / unresolved
     if (!moveMap.has(importerOld) && !moveMap.has(targetOld)) continue; // nothing moved
     decl.setModuleSpecifier(aliasOf(newAbsOf(targetOld)));
-    rewrites++;
+    _rewrites++;
   }
 }
 await project.save();
 
 // Order renames topologically: if A's destination is occupied by B's source, move B first
 // (vacate-before-occupy), so a name-swap doesn't clobber the file moving into the slot.
-const ordered: Array<[string, string]> = [];
+const ordered: [string, string][] = [];
 const seen = new Set<string>();
 const visit = (oldAbs: string, newAbs: string, stack = new Set<string>()) => {
   if (seen.has(oldAbs)) return;
@@ -74,14 +74,12 @@ const visit = (oldAbs: string, newAbs: string, stack = new Set<string>()) => {
 };
 for (const [oldAbs, newAbs] of moveMap) visit(oldAbs, newAbs);
 
-let moved = 0;
+let _moved = 0;
 for (const [oldAbs, newAbs] of ordered) {
   if (!existsSync(oldAbs)) {
-    console.warn(`missing (already moved?): ${oldAbs}`);
     continue;
   }
   mkdirSync(path.dirname(newAbs), { recursive: true });
   renameSync(oldAbs, newAbs);
-  moved++;
+  _moved++;
 }
-console.log(`fast-apply: rewrote ${rewrites} specifiers, moved ${moved} files`);

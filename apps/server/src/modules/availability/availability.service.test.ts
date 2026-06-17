@@ -16,6 +16,7 @@ vi.mock("./availability.repository", async (importOriginal) => {
     findShopById: vi.fn(),
     insertException: vi.fn(),
     insertRegular: vi.fn(),
+    supersedeOpenEndedRegular: vi.fn(),
   };
 });
 

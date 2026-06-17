@@ -32,16 +32,22 @@ describe("HomeFeaturedWinemakers", () => {
   });
 
   it("renders nothing when the winemaker list is empty", () => {
-    vi.mocked(useGetWinemakers).mockReturnValue({ data: [], isLoading: false } as ReturnType<
-      typeof useGetWinemakers
-    >);
+    vi.mocked(useGetWinemakers).mockReturnValue({
+      data: { data: [], limit: 0, page: 1, total: 0 },
+      isLoading: false,
+    } as ReturnType<typeof useGetWinemakers>);
     const { container } = render(<HomeFeaturedWinemakers />);
     expect(container).toBeEmptyDOMElement();
   });
 
   it("renders at most three winemakers from the list", () => {
     vi.mocked(useGetWinemakers).mockReturnValue({
-      data: Array.from({ length: 7 }, (_, i) => ({ id: `m${i}`, name: `Maker ${i}` })),
+      data: {
+        data: Array.from({ length: 7 }, (_, i) => ({ id: `m${i}`, name: `Maker ${i}` })),
+        limit: 0,
+        page: 1,
+        total: 7,
+      },
       isLoading: false,
     } as ReturnType<typeof useGetWinemakers>);
     render(<HomeFeaturedWinemakers />);
@@ -51,7 +57,7 @@ describe("HomeFeaturedWinemakers", () => {
 
   it("renders a View all link to /winemakers", () => {
     vi.mocked(useGetWinemakers).mockReturnValue({
-      data: [{ id: "m1", name: "Maker 1" }],
+      data: { data: [{ id: "m1", name: "Maker 1" }], limit: 0, page: 1, total: 1 },
       isLoading: false,
     } as ReturnType<typeof useGetWinemakers>);
     render(<HomeFeaturedWinemakers />);

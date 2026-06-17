@@ -8,10 +8,10 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { useGetWinemakers } from "@/generated/hooks/useGetWinemakers";
+import { useGetAdminUsers } from "@/generated/hooks/useGetAdminUsers";
 
-export const Route = createFileRoute("/_authenticated/_admin/winemakers")({
-  component: AdminWinemakersPage,
+export const Route = createFileRoute("/_authenticated/_admin/users/")({
+  component: AdminUsersPage,
 });
 
 function getStatusBadgeClass(status: string): string {
@@ -24,19 +24,17 @@ function getStatusBadgeClass(status: string): string {
   return "bg-destructive/30 text-destructive dark:text-red-400";
 }
 
-function AdminWinemakersPage() {
-  const { data, isLoading, error } = useGetWinemakers();
+function AdminUsersPage() {
+  const { data, isLoading, error } = useGetAdminUsers();
   // biome-ignore lint/suspicious/noExplicitAny: API response is untyped
-  const winemakers = (data || []) as any[];
+  const users = (data as any)?.data || [];
 
   if (error) {
     return (
       <main className="mx-auto max-w-6xl space-y-4 p-6">
-        <h1 className="text-2xl font-semibold">Winemaker Moderation</h1>
+        <h1 className="text-2xl font-semibold">User Management</h1>
         <div className="rounded-md bg-destructive/10 p-4 text-destructive">
-          <p>
-            Failed to load winemakers: {error instanceof Error ? error.message : "Unknown error"}
-          </p>
+          <p>Failed to load users: {error instanceof Error ? error.message : "Unknown error"}</p>
         </div>
       </main>
     );
@@ -44,7 +42,7 @@ function AdminWinemakersPage() {
 
   return (
     <main className="mx-auto max-w-6xl space-y-4 p-6">
-      <h1 className="text-2xl font-semibold">Winemaker Moderation</h1>
+      <h1 className="text-2xl font-semibold">User Management</h1>
 
       {isLoading ? (
         <div className="space-y-2">
@@ -57,45 +55,46 @@ function AdminWinemakersPage() {
           <Table>
             <TableHeader>
               <TableRow>
-                <TableHead>Name</TableHead>
                 <TableHead>Email</TableHead>
+                <TableHead>Name</TableHead>
+                <TableHead>Roles</TableHead>
                 <TableHead>Status</TableHead>
-                <TableHead>Wines</TableHead>
                 <TableHead>Created</TableHead>
                 <TableHead>Actions</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
-              {winemakers.length === 0 ? (
+              {users.length === 0 ? (
                 <TableRow>
                   <TableCell className="text-center text-muted-foreground" colSpan={6}>
-                    No winemakers found
+                    No users found
                   </TableCell>
                 </TableRow>
               ) : (
                 // biome-ignore lint/suspicious/noExplicitAny: API response is untyped
-                winemakers.map((winemaker: any) => (
-                  <TableRow key={winemaker.id}>
-                    <TableCell className="font-medium">{winemaker.name || "—"}</TableCell>
-                    <TableCell className="font-mono text-sm">
-                      {winemaker.user?.email || "—"}
+                users.map((user: any) => (
+                  <TableRow key={user.id}>
+                    <TableCell className="font-mono text-sm">{user.email}</TableCell>
+                    <TableCell>{user.fname || user.name || "—"}</TableCell>
+                    <TableCell>
+                      {user.roles && user.roles.length > 0
+                        ? // biome-ignore lint/suspicious/noExplicitAny: API response is untyped
+                          user.roles.map((r: any) => r.role).join(", ")
+                        : "—"}
                     </TableCell>
                     <TableCell>
                       <span
-                        className={`inline-flex rounded-full px-2 py-1 text-xs font-semibold ${getStatusBadgeClass(winemaker.status || "pending")}`}
+                        className={`inline-flex rounded-full px-2 py-1 text-xs font-semibold ${getStatusBadgeClass(user.status)}`}
                       >
-                        {winemaker.status || "pending"}
+                        {user.status}
                       </span>
                     </TableCell>
-                    <TableCell className="text-sm">{winemaker.wineCount || "0"} wines</TableCell>
-                    <TableCell className="text-sm">
-                      {new Date(winemaker.createdAt).toLocaleDateString()}
-                    </TableCell>
+                    <TableCell>{new Date(user.createdAt).toLocaleDateString()}</TableCell>
                     <TableCell>
                       <Link
                         className="text-primary hover:underline text-sm"
-                        params={{ id: winemaker.id }}
-                        to="/winemakers/$id"
+                        params={{ id: user.id }}
+                        to="/users/$id"
                       >
                         View
                       </Link>

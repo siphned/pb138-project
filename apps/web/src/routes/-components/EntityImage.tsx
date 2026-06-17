@@ -1,5 +1,5 @@
 import { Skeleton } from "@/components/ui/skeleton";
-import { cn } from "@/lib/utils";
+import { cn, resolveImageUrl } from "@/lib/utils";
 import { CatalogPlaceholder } from "@/routes/-components/CatalogPlaceholder";
 
 export function firstImageUrl(data: unknown): string | undefined {
@@ -30,7 +30,8 @@ export function EntityImage({
     return <Skeleton className={cn("h-full w-full", className)} />;
   }
 
-  if (imageUrl) {
+  const resolvedUrl = resolveImageUrl(imageUrl);
+  if (resolvedUrl) {
     return (
       <img
         alt={alt}
@@ -38,7 +39,7 @@ export function EntityImage({
           "h-full w-full object-cover transition-transform duration-300 group-hover:scale-105",
           className
         )}
-        src={imageUrl}
+        src={resolvedUrl}
       />
     );
   }

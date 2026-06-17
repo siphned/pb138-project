@@ -12,7 +12,13 @@ import {
 import { Label } from "@/components/ui/label";
 import { cn } from "@/lib/utils";
 
-const Form = FormProvider;
+const Form = <
+  TFieldValues extends FieldValues,
+  TContext = unknown,
+  TTransformedValues extends FieldValues | undefined = undefined,
+>(
+  props: React.ComponentProps<typeof FormProvider<TFieldValues, TContext, TTransformedValues>>
+) => <FormProvider {...props} />;
 
 type FormFieldContextValue<
   TFieldValues extends FieldValues = FieldValues,

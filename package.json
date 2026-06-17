@@ -40,7 +40,7 @@
     "test": "turbo run test -- --run",
     "test:coverage": "turbo run test:coverage -- --run",
     "test:e2e": "turbo run test:e2e",
-    "validate": "echo 'Running mandatory pre-push validation...' && bun run lint && bun run check && bun run generate && bun run check-types && bun run test && bun run test:e2e && bun run build"
+    "validate": "echo 'Running mandatory pre-push validation...' && bun run lint && bun run check && bun run generate && bun run build && bun run check-types && bun run test && bun run test:e2e"
   },
   "workspaces": [
     "apps/*",

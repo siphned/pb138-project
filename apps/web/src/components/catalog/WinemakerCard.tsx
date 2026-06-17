@@ -1,9 +1,10 @@
 import { Link } from "@tanstack/react-router";
 import { Card } from "@/components/ui/card";
 import type { GetWinemakers200 } from "@/generated/types/GetWinemakers";
+import { resolveImageUrl } from "@/lib/utils";
 import { CatalogPlaceholder } from "./CatalogPlaceholder";
 
-export type GetWinemakers200Item = GetWinemakers200[number] & {
+export type GetWinemakers200Item = GetWinemakers200["data"][number] & {
   images?: { url: string }[];
 };
 
@@ -21,7 +22,7 @@ export function WinemakerCard({ winemaker }: WinemakerCardProps) {
           <img
             alt={winemaker.name}
             className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-105"
-            src={imageUrl}
+            src={resolveImageUrl(imageUrl)}
           />
         ) : (
           <CatalogPlaceholder text={winemaker.name} />

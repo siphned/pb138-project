@@ -13,7 +13,7 @@ export function HomeFeaturedWinemakers() {
 
   if (isLoading) return <LoadingState variant="catalog" />;
 
-  const winemakers = (data ?? []).slice(0, 3);
+  const winemakers = (data?.data ?? []).slice(0, 3);
   if (winemakers.length === 0) return null;
 
   return (

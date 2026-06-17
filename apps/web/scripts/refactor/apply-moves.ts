@@ -28,15 +28,13 @@ function visit(m: { from: string; to: string }) {
 }
 for (const m of planned) visit(m);
 
-let n = 0;
+let _n = 0;
 for (const m of order) {
   const sf = project.getSourceFile(path.resolve("src", m.from));
   if (!sf) {
-    console.warn(`skip (already moved?): ${m.from}`);
     continue;
   }
   sf.move(path.resolve("src", m.to));
-  n++;
+  _n++;
 }
 await project.save();
-console.log(`Applied ${n} moves${filter ? ` (filter: ${filter})` : ""}`);

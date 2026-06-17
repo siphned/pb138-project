@@ -19,6 +19,7 @@ import {
   useGetShopsByIdImages,
 } from "@/generated/hooks/useGetShopsByIdImages";
 import { axiosInstance } from "@/lib/axios";
+import { resolveImageUrl } from "@/lib/utils";
 
 export const Route = createFileRoute("/shops/$id/images")({
   component: ShopImagesPage,
@@ -187,7 +188,7 @@ function ShopImagesPage() {
                       alt=""
                       className="h-full w-full object-cover"
                       loading="lazy"
-                      src={img.url}
+                      src={resolveImageUrl(img.url)}
                     />
                     <div className="absolute inset-x-0 bottom-0 flex justify-end gap-1 bg-gradient-to-t from-black/60 to-transparent p-2 opacity-0 transition-opacity group-hover:opacity-100">
                       <Button

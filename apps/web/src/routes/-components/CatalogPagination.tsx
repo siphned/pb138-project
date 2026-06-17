@@ -63,7 +63,6 @@ function PageJumpEllipsis({
         <p className="text-xs text-muted-foreground">
           Go to page ({rangeStart}–{rangeEnd})
         </p>
-        {/* biome-ignore lint/a11y/noAutofocus: focus the field when the jump popover opens */}
         <Input
           autoFocus
           className="h-8"

@@ -1,4 +1,4 @@
-import { cn } from "@/lib/utils";
+import { cn, resolveImageUrl } from "@/lib/utils";
 import { CatalogPlaceholder } from "./CatalogPlaceholder";
 
 interface ImagesQueryLike {
@@ -43,7 +43,7 @@ export function EntityImage({
           "h-full w-full object-cover transition-transform duration-300 group-hover:scale-105",
           className
         )}
-        src={url}
+        src={resolveImageUrl(url)}
       />
     );
   }

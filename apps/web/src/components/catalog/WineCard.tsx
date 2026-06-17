@@ -1,6 +1,7 @@
 import { Link } from "@tanstack/react-router";
 import { Card } from "@/components/ui/card";
 import type { GetWines200 } from "@/generated/types/GetWines";
+import { resolveImageUrl } from "@/lib/utils";
 import { CatalogPlaceholder } from "./CatalogPlaceholder";
 
 export type GetWines200Item = GetWines200[number] & {
@@ -22,7 +23,7 @@ export function WineCard({ wine, minPrice }: WineCardProps) {
           <img
             alt={wine.name}
             className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-105"
-            src={imageUrl}
+            src={resolveImageUrl(imageUrl)}
           />
         ) : (
           <CatalogPlaceholder color={wine.color} text={wine.name} />

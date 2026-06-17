@@ -1,6 +1,7 @@
 import { Link } from "@tanstack/react-router";
 import { Card } from "@/components/ui/card";
 import type { GetProducts200 } from "@/generated/types/GetProducts";
+import { resolveImageUrl } from "@/lib/utils";
 import { CatalogPlaceholder } from "./CatalogPlaceholder";
 
 export type GetProducts200Item = GetProducts200["data"][number] & {
@@ -27,7 +28,7 @@ export function ProductCard({ product }: ProductCardProps) {
           <img
             alt={product.name}
             className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-105"
-            src={imageUrl}
+            src={resolveImageUrl(imageUrl)}
           />
         ) : (
           <CatalogPlaceholder color={firstWineColor} text={product.name} />

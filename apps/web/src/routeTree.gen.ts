@@ -51,12 +51,15 @@ import { Route as EventsIdImagesRouteImport } from './routes/events/$id/images'
 import { Route as EventsIdEditRouteImport } from './routes/events/$id/edit'
 import { Route as AuthenticatedOrdersIdRouteImport } from './routes/_authenticated/orders/$id'
 import { Route as AuthenticatedAdminWinemakersRouteImport } from './routes/_authenticated/_admin/winemakers'
-import { Route as AuthenticatedAdminUsersRouteImport } from './routes/_authenticated/_admin/users'
+import { Route as AuthenticatedAdminUsersRouteImport } from './routes/_authenticated._admin.users'
 import { Route as AuthenticatedAdminShopsRouteImport } from './routes/_authenticated/_admin/shops'
-import { Route as AuthenticatedAdminRoleRequestsRouteImport } from './routes/_authenticated/_admin/role-requests'
+import { Route as AuthenticatedAdminRoleRequestsRouteImport } from './routes/_authenticated._admin.role-requests'
 import { Route as AuthenticatedAdminProductsRouteImport } from './routes/_authenticated/_admin/products'
 import { Route as AuthenticatedAdminModerationRouteImport } from './routes/_authenticated/_admin/moderation'
+import { Route as AuthenticatedAdminEventsRouteImport } from './routes/_authenticated._admin.events'
 import { Route as AuthenticatedAdminAdminRouteImport } from './routes/_authenticated/_admin/admin'
+import { Route as AuthenticatedAdminUsersIndexRouteImport } from './routes/_authenticated/_admin/users/index'
+import { Route as AuthenticatedAdminRoleRequestsIndexRouteImport } from './routes/_authenticated/_admin/role-requests/index'
 import { Route as ShopsIdInventoryNewRouteImport } from './routes/shops/$id/inventory/new'
 import { Route as ShopsIdBundlesNewRouteImport } from './routes/shops/$id/bundles/new'
 import { Route as AuthenticatedAdminUsersIdRouteImport } from './routes/_authenticated/_admin/users/$id'
@@ -302,11 +305,29 @@ const AuthenticatedAdminModerationRoute =
     path: '/moderation',
     getParentRoute: () => AuthenticatedAdminRoute,
   } as any)
+const AuthenticatedAdminEventsRoute =
+  AuthenticatedAdminEventsRouteImport.update({
+    id: '/events',
+    path: '/events',
+    getParentRoute: () => AuthenticatedAdminRoute,
+  } as any)
 const AuthenticatedAdminAdminRoute = AuthenticatedAdminAdminRouteImport.update({
   id: '/admin',
   path: '/admin',
   getParentRoute: () => AuthenticatedAdminRoute,
 } as any)
+const AuthenticatedAdminUsersIndexRoute =
+  AuthenticatedAdminUsersIndexRouteImport.update({
+    id: '/',
+    path: '/',
+    getParentRoute: () => AuthenticatedAdminUsersRoute,
+  } as any)
+const AuthenticatedAdminRoleRequestsIndexRoute =
+  AuthenticatedAdminRoleRequestsIndexRouteImport.update({
+    id: '/',
+    path: '/',
+    getParentRoute: () => AuthenticatedAdminRoleRequestsRoute,
+  } as any)
 const ShopsIdInventoryNewRoute = ShopsIdInventoryNewRouteImport.update({
   id: '/new',
   path: '/new',
@@ -363,6 +384,7 @@ export interface FileRoutesByFullPath {
   '/winemakers/': typeof WinemakersIndexRoute
   '/wines/': typeof WinesIndexRoute
   '/admin': typeof AuthenticatedAdminAdminRoute
+  '/events': typeof AuthenticatedAdminEventsRoute
   '/moderation': typeof AuthenticatedAdminModerationRoute
   '/products': typeof AuthenticatedAdminProductsRoute
   '/role-requests': typeof AuthenticatedAdminRoleRequestsRouteWithChildren
@@ -393,6 +415,8 @@ export interface FileRoutesByFullPath {
   '/users/$id': typeof AuthenticatedAdminUsersIdRoute
   '/shops/$id/bundles/new': typeof ShopsIdBundlesNewRoute
   '/shops/$id/inventory/new': typeof ShopsIdInventoryNewRoute
+  '/role-requests/': typeof AuthenticatedAdminRoleRequestsIndexRoute
+  '/users/': typeof AuthenticatedAdminUsersIndexRoute
   '/manage/shops/$id': typeof AuthenticatedShop_ownerManageShopsIdRoute
   '/shops/$id/inventory/$productId/edit': typeof ShopsIdInventoryProductIdEditRoute
 }
@@ -411,15 +435,13 @@ export interface FileRoutesByTo {
   '/shops/new': typeof ShopsNewRoute
   '/winemakers/new': typeof WinemakersNewRoute
   '/wines/new': typeof WinesNewRoute
-  '/events': typeof EventsIndexRoute
+  '/events': typeof AuthenticatedAdminEventsRoute
   '/products': typeof AuthenticatedAdminProductsRoute
   '/shops': typeof AuthenticatedAdminShopsRoute
   '/winemakers': typeof AuthenticatedAdminWinemakersRoute
   '/wines': typeof WinesIndexRoute
   '/admin': typeof AuthenticatedAdminAdminRoute
   '/moderation': typeof AuthenticatedAdminModerationRoute
-  '/role-requests': typeof AuthenticatedAdminRoleRequestsRouteWithChildren
-  '/users': typeof AuthenticatedAdminUsersRouteWithChildren
   '/orders/$id': typeof AuthenticatedOrdersIdRoute
   '/events/$id/edit': typeof EventsIdEditRoute
   '/events/$id/images': typeof EventsIdImagesRoute
@@ -444,6 +466,8 @@ export interface FileRoutesByTo {
   '/users/$id': typeof AuthenticatedAdminUsersIdRoute
   '/shops/$id/bundles/new': typeof ShopsIdBundlesNewRoute
   '/shops/$id/inventory/new': typeof ShopsIdInventoryNewRoute
+  '/role-requests': typeof AuthenticatedAdminRoleRequestsIndexRoute
+  '/users': typeof AuthenticatedAdminUsersIndexRoute
   '/manage/shops/$id': typeof AuthenticatedShop_ownerManageShopsIdRoute
   '/shops/$id/inventory/$productId/edit': typeof ShopsIdInventoryProductIdEditRoute
 }
@@ -471,6 +495,7 @@ export interface FileRoutesById {
   '/winemakers/': typeof WinemakersIndexRoute
   '/wines/': typeof WinesIndexRoute
   '/_authenticated/_admin/admin': typeof AuthenticatedAdminAdminRoute
+  '/_authenticated/_admin/events': typeof AuthenticatedAdminEventsRoute
   '/_authenticated/_admin/moderation': typeof AuthenticatedAdminModerationRoute
   '/_authenticated/_admin/products': typeof AuthenticatedAdminProductsRoute
   '/_authenticated/_admin/role-requests': typeof AuthenticatedAdminRoleRequestsRouteWithChildren
@@ -501,6 +526,8 @@ export interface FileRoutesById {
   '/_authenticated/_admin/users/$id': typeof AuthenticatedAdminUsersIdRoute
   '/shops/$id/bundles/new': typeof ShopsIdBundlesNewRoute
   '/shops/$id/inventory/new': typeof ShopsIdInventoryNewRoute
+  '/_authenticated/_admin/role-requests/': typeof AuthenticatedAdminRoleRequestsIndexRoute
+  '/_authenticated/_admin/users/': typeof AuthenticatedAdminUsersIndexRoute
   '/_authenticated/_shop_owner/manage/shops/$id': typeof AuthenticatedShop_ownerManageShopsIdRoute
   '/shops/$id/inventory/$productId/edit': typeof ShopsIdInventoryProductIdEditRoute
 }
@@ -527,6 +554,7 @@ export interface FileRouteTypes {
     | '/winemakers/'
     | '/wines/'
     | '/admin'
+    | '/events'
     | '/moderation'
     | '/products'
     | '/role-requests'
@@ -557,6 +585,8 @@ export interface FileRouteTypes {
     | '/users/$id'
     | '/shops/$id/bundles/new'
     | '/shops/$id/inventory/new'
+    | '/role-requests/'
+    | '/users/'
     | '/manage/shops/$id'
     | '/shops/$id/inventory/$productId/edit'
   fileRoutesByTo: FileRoutesByTo
@@ -582,8 +612,6 @@ export interface FileRouteTypes {
     | '/wines'
     | '/admin'
     | '/moderation'
-    | '/role-requests'
-    | '/users'
     | '/orders/$id'
     | '/events/$id/edit'
     | '/events/$id/images'
@@ -608,6 +636,8 @@ export interface FileRouteTypes {
     | '/users/$id'
     | '/shops/$id/bundles/new'
     | '/shops/$id/inventory/new'
+    | '/role-requests'
+    | '/users'
     | '/manage/shops/$id'
     | '/shops/$id/inventory/$productId/edit'
   id:
@@ -634,6 +664,7 @@ export interface FileRouteTypes {
     | '/winemakers/'
     | '/wines/'
     | '/_authenticated/_admin/admin'
+    | '/_authenticated/_admin/events'
     | '/_authenticated/_admin/moderation'
     | '/_authenticated/_admin/products'
     | '/_authenticated/_admin/role-requests'
@@ -664,6 +695,8 @@ export interface FileRouteTypes {
     | '/_authenticated/_admin/users/$id'
     | '/shops/$id/bundles/new'
     | '/shops/$id/inventory/new'
+    | '/_authenticated/_admin/role-requests/'
+    | '/_authenticated/_admin/users/'
     | '/_authenticated/_shop_owner/manage/shops/$id'
     | '/shops/$id/inventory/$productId/edit'
   fileRoutesById: FileRoutesById
@@ -1038,12 +1071,33 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAdminModerationRouteImport
       parentRoute: typeof AuthenticatedAdminRoute
     }
+    '/_authenticated/_admin/events': {
+      id: '/_authenticated/_admin/events'
+      path: '/events'
+      fullPath: '/events'
+      preLoaderRoute: typeof AuthenticatedAdminEventsRouteImport
+      parentRoute: typeof AuthenticatedAdminRoute
+    }
     '/_authenticated/_admin/admin': {
       id: '/_authenticated/_admin/admin'
       path: '/admin'
       fullPath: '/admin'
       preLoaderRoute: typeof AuthenticatedAdminAdminRouteImport
       parentRoute: typeof AuthenticatedAdminRoute
+    }
+    '/_authenticated/_admin/users/': {
+      id: '/_authenticated/_admin/users/'
+      path: '/'
+      fullPath: '/users/'
+      preLoaderRoute: typeof AuthenticatedAdminUsersIndexRouteImport
+      parentRoute: typeof AuthenticatedAdminUsersRoute
+    }
+    '/_authenticated/_admin/role-requests/': {
+      id: '/_authenticated/_admin/role-requests/'
+      path: '/'
+      fullPath: '/role-requests/'
+      preLoaderRoute: typeof AuthenticatedAdminRoleRequestsIndexRouteImport
+      parentRoute: typeof AuthenticatedAdminRoleRequestsRoute
     }
     '/shops/$id/inventory/new': {
       id: '/shops/$id/inventory/new'
@@ -1092,12 +1146,15 @@ declare module '@tanstack/react-router' {
 
 interface AuthenticatedAdminRoleRequestsRouteChildren {
   AuthenticatedAdminRoleRequestsIdRoute: typeof AuthenticatedAdminRoleRequestsIdRoute
+  AuthenticatedAdminRoleRequestsIndexRoute: typeof AuthenticatedAdminRoleRequestsIndexRoute
 }
 
 const AuthenticatedAdminRoleRequestsRouteChildren: AuthenticatedAdminRoleRequestsRouteChildren =
   {
     AuthenticatedAdminRoleRequestsIdRoute:
       AuthenticatedAdminRoleRequestsIdRoute,
+    AuthenticatedAdminRoleRequestsIndexRoute:
+      AuthenticatedAdminRoleRequestsIndexRoute,
   }
 
 const AuthenticatedAdminRoleRequestsRouteWithChildren =
@@ -1107,11 +1164,13 @@ const AuthenticatedAdminRoleRequestsRouteWithChildren =
 
 interface AuthenticatedAdminUsersRouteChildren {
   AuthenticatedAdminUsersIdRoute: typeof AuthenticatedAdminUsersIdRoute
+  AuthenticatedAdminUsersIndexRoute: typeof AuthenticatedAdminUsersIndexRoute
 }
 
 const AuthenticatedAdminUsersRouteChildren: AuthenticatedAdminUsersRouteChildren =
   {
     AuthenticatedAdminUsersIdRoute: AuthenticatedAdminUsersIdRoute,
+    AuthenticatedAdminUsersIndexRoute: AuthenticatedAdminUsersIndexRoute,
   }
 
 const AuthenticatedAdminUsersRouteWithChildren =
@@ -1121,6 +1180,7 @@ const AuthenticatedAdminUsersRouteWithChildren =
 
 interface AuthenticatedAdminRouteChildren {
   AuthenticatedAdminAdminRoute: typeof AuthenticatedAdminAdminRoute
+  AuthenticatedAdminEventsRoute: typeof AuthenticatedAdminEventsRoute
   AuthenticatedAdminModerationRoute: typeof AuthenticatedAdminModerationRoute
   AuthenticatedAdminProductsRoute: typeof AuthenticatedAdminProductsRoute
   AuthenticatedAdminRoleRequestsRoute: typeof AuthenticatedAdminRoleRequestsRouteWithChildren
@@ -1131,6 +1191,7 @@ interface AuthenticatedAdminRouteChildren {
 
 const AuthenticatedAdminRouteChildren: AuthenticatedAdminRouteChildren = {
   AuthenticatedAdminAdminRoute: AuthenticatedAdminAdminRoute,
+  AuthenticatedAdminEventsRoute: AuthenticatedAdminEventsRoute,
   AuthenticatedAdminModerationRoute: AuthenticatedAdminModerationRoute,
   AuthenticatedAdminProductsRoute: AuthenticatedAdminProductsRoute,
   AuthenticatedAdminRoleRequestsRoute:

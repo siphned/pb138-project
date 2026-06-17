@@ -11,7 +11,10 @@ describe("EntityImage", () => {
         imagesQuery={{ data: [{ url: "/uploads/x/foo.webp" }], isLoading: false }}
       />
     );
-    expect(screen.getByAltText("Foo")).toHaveAttribute("src", "/uploads/x/foo.webp");
+    expect(screen.getByAltText("Foo")).toHaveAttribute(
+      "src",
+      "http://localhost:3000/uploads/x/foo.webp"
+    );
   });
 
   it("renders the placeholder while loading", () => {

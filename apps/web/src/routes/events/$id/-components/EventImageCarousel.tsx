@@ -6,6 +6,7 @@ import {
   CarouselPrevious,
 } from "@/components/ui/carousel";
 import { useGetEventsByIdImages } from "@/generated/hooks/useGetEventsByIdImages";
+import { resolveImageUrl } from "@/lib/utils";
 
 interface EventImageCarouselProps {
   eventId: string;
@@ -31,7 +32,11 @@ export function EventImageCarousel({ eventId, name }: EventImageCarouselProps) {
   if (photos.length === 1) {
     return (
       <div className="aspect-square w-full overflow-hidden rounded-lg bg-muted shadow-xs">
-        <img alt={name} className="h-full w-full object-cover" src={photos[0].url} />
+        <img
+          alt={name}
+          className="h-full w-full object-cover"
+          src={resolveImageUrl(photos[0].url)}
+        />
       </div>
     );
   }
@@ -45,7 +50,7 @@ export function EventImageCarousel({ eventId, name }: EventImageCarouselProps) {
               <img
                 alt={`${name} — ${i + 1}`}
                 className="h-full w-full object-cover"
-                src={img.url}
+                src={resolveImageUrl(img.url)}
               />
             </div>
           </CarouselItem>

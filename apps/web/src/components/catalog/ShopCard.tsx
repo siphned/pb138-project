@@ -1,9 +1,10 @@
 import { Link } from "@tanstack/react-router";
 import { Card } from "@/components/ui/card";
 import type { GetShops200 } from "@/generated/types/GetShops";
+import { resolveImageUrl } from "@/lib/utils";
 import { CatalogPlaceholder } from "./CatalogPlaceholder";
 
-export type GetShops200Item = GetShops200[number] & {
+export type GetShops200Item = GetShops200["data"][number] & {
   images?: { url: string }[];
 };
 
@@ -21,7 +22,7 @@ export function ShopCard({ shop }: ShopCardProps) {
           <img
             alt={shop.name}
             className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-105"
-            src={imageUrl}
+            src={resolveImageUrl(imageUrl)}
           />
         ) : (
           <CatalogPlaceholder text={shop.name} />

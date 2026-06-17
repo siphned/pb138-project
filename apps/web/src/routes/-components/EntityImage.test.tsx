@@ -6,7 +6,10 @@ import { EntityImage, firstImageUrl } from "@/routes/-components/EntityImage";
 describe("EntityImage", () => {
   it("renders the provided image URL", () => {
     render(<EntityImage alt="Foo" fallbackText="Foo" imageUrl="/uploads/x/foo.webp" />);
-    expect(screen.getByAltText("Foo")).toHaveAttribute("src", "/uploads/x/foo.webp");
+    expect(screen.getByAltText("Foo")).toHaveAttribute(
+      "src",
+      "http://localhost:3000/uploads/x/foo.webp"
+    );
   });
 
   it("renders a skeleton while loading", () => {

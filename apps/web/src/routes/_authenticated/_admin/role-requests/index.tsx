@@ -10,7 +10,7 @@ import {
 } from "@/components/ui/table";
 import { useGetRoleRequests } from "@/generated/hooks/useGetRoleRequests";
 
-export const Route = createFileRoute("/_authenticated/_admin/role-requests")({
+export const Route = createFileRoute("/_authenticated/_admin/role-requests/")({
   component: RoleRequestsPage,
 });
 
