@@ -10,6 +10,7 @@ const config = defineConfig({
   },
   forbidOnly: !!process.env.CI,
   fullyParallel: true,
+  globalSetup: "./playwright.global-setup.ts",
   projects: [
     {
       name: "chromium",
