@@ -97,7 +97,7 @@ describe("Coverage enhancement tests", () => {
   it("handles object key access", () => {
     const obj = { name: "test", value: 123 };
     expect(obj.name).toBe("test");
-    expect(obj["value"]).toBe(123);
+    expect(obj.value).toBe(123);
     expect(Object.keys(obj)).toHaveLength(2);
   });
 
@@ -246,7 +246,7 @@ describe("Coverage enhancement tests", () => {
   });
 
   it("handles number edge cases", () => {
-    expect(Number.isNaN(NaN)).toBe(true);
+    expect(Number.isNaN(Number.NaN)).toBe(true);
     expect(Number.isFinite(42)).toBe(true);
     expect(Number.isInteger(42.5)).toBe(false);
   });
