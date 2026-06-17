@@ -4,8 +4,12 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { ErrorState } from "@/components/primitives/error-state";
 import { LoadingState } from "@/components/primitives/loading-state";
 import { Section } from "@/components/primitives/section";
-import { useGetShopsById } from "@/generated/hooks/useGetShopsById";
-import { useGetShopsByIdImages } from "@/generated/hooks/useGetShopsByIdImages";
+import { getShopsByIdQueryOptions, useGetShopsById } from "@/generated/hooks/useGetShopsById";
+import {
+  getShopsByIdImagesQueryOptions,
+  useGetShopsByIdImages,
+} from "@/generated/hooks/useGetShopsByIdImages";
+import { getQueryClient } from "@/lib/query-client";
 import { ShopDetailsCard } from "@/routes/shops/$id/-components/ShopDetailsCard";
 import { ShopHero } from "@/routes/shops/$id/-components/ShopHero";
 import { ShopHeroGallery } from "@/routes/shops/$id/-components/ShopHeroGallery";
@@ -14,6 +18,16 @@ import { ShopProductsRow } from "@/routes/shops/$id/-components/ShopProductsRow"
 import { EntityReviewsSection } from "../../-components/EntityReviewsSection";
 
 export const Route = createFileRoute("/shops/$id/")({
+  beforeLoad: async ({ params }) => {
+    const queryClient = getQueryClient();
+    // Prefetch shop and images data to avoid loading state
+    await Promise.all([
+      queryClient.prefetchQuery(getShopsByIdQueryOptions(params.id)),
+      queryClient.prefetchQuery(getShopsByIdImagesQueryOptions(params.id)),
+    ]).catch(() => {
+      // Silently fail - component will handle loading state if prefetch fails
+    });
+  },
   component: ShopDetailPage,
 });
 

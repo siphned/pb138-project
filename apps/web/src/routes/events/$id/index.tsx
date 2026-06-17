@@ -6,10 +6,14 @@ import { LoadingState } from "@/components/primitives/loading-state";
 import { LocationMapEmbed } from "@/components/primitives/location-map-embed";
 import { Section } from "@/components/primitives/section";
 import { Separator } from "@/components/ui/separator";
-import { useGetEventsById } from "@/generated/hooks/useGetEventsById";
-import { useGetEventsByIdImages } from "@/generated/hooks/useGetEventsByIdImages";
+import { getEventsByIdQueryOptions, useGetEventsById } from "@/generated/hooks/useGetEventsById";
+import {
+  getEventsByIdImagesQueryOptions,
+  useGetEventsByIdImages,
+} from "@/generated/hooks/useGetEventsByIdImages";
 import { useGetWinemakersMe } from "@/generated/hooks/useGetWinemakersMe";
 import { useRoles } from "@/hooks/useRoles";
+import { getQueryClient } from "@/lib/query-client";
 import { EventCommentList } from "@/routes/events/$id/-components/EventCommentList";
 import { EventDetailsCard } from "@/routes/events/$id/-components/EventDetailsCard";
 import { EventGallery } from "@/routes/events/$id/-components/EventGallery";
@@ -17,6 +21,16 @@ import { EventHero } from "@/routes/events/$id/-components/EventHero";
 import { EventManageMenu } from "@/routes/events/$id/-components/EventManageMenu";
 
 export const Route = createFileRoute("/events/$id/")({
+  beforeLoad: async ({ params }) => {
+    const queryClient = getQueryClient();
+    // Prefetch event and images data to avoid loading state
+    await Promise.all([
+      queryClient.prefetchQuery(getEventsByIdQueryOptions(params.id)),
+      queryClient.prefetchQuery(getEventsByIdImagesQueryOptions(params.id)),
+    ]).catch(() => {
+      // Silently fail - component will handle loading state if prefetch fails
+    });
+  },
   component: EventDetailPage,
 });
 
