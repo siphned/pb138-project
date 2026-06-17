@@ -44,17 +44,8 @@ jobs:
           bun-version: 1.3.11
       - name: Install dependencies
         run: bun install --frozen-lockfile
-      - name: Generate OpenAPI spec
-        run: bun run generate --filter=server
-      - name: Generate API hooks
-        run: bun run generate --filter=web
-      - name: Build frontend
-        run: cd apps/web && bunx vite build
-        env:
-          NODE_ENV: production
       - name: Deploy to Vercel
-        run: npx vercel@latest --prod --prebuilt --token=${{ secrets.VERCEL_TOKEN }} --yes
-        working-directory: apps/web
+        run: npx vercel@latest --prod --token=${{ secrets.VERCEL_TOKEN }} --yes
         env:
           VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
           VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}

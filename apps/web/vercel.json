@@ -1,6 +1,8 @@
 {
   "framework": "vite",
   "outputDirectory": "dist",
+  "installCommand": "cd ../.. && bun install --frozen-lockfile",
+  "buildCommand": "cd ../.. && bun run generate --filter=server && bun run generate --filter=web && cd apps/web && bunx vite build",
   "rewrites": [
     {
       "destination": "/index.html",
