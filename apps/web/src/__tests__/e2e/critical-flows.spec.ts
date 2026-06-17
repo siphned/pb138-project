@@ -93,7 +93,7 @@ test.describe("Critical flows", () => {
       await page.waitForLoadState("networkidle");
 
       // Check for either items list or empty message
-      const emptyMessage = page.locator("[class*='empty'], text=/empty|no items/i").first();
+      const emptyMessage = page.locator("text=/empty|no items/i").first();
       const itemsList = page.locator("[class*='item'], [role='list']").first();
 
       if (await emptyMessage.isVisible()) {
