@@ -1,0 +1,12 @@
+{
+  "buildCommand": "cd ../.. && bun run generate --filter=server && bun run generate --filter=web && cd apps/web && bunx vite build",
+  "framework": "vite",
+  "installCommand": "cd ../.. && bun install --frozen-lockfile",
+  "outputDirectory": "dist",
+  "rewrites": [
+    {
+      "destination": "/index.html",
+      "source": "/:path((?!_next/static|_next/image|favicon.ico).*)"
+    }
+  ]
+}

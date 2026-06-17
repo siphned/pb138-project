@@ -49,7 +49,8 @@ import {
   teardown,
 } from "./seed.lib";
 
-faker.seed(42); // deterministic demo data
+const fakerSeed = process.env.SEED_FAKER_SEED ? Number(process.env.SEED_FAKER_SEED) : 42;
+faker.seed(fakerSeed); // deterministic by default; override with SEED_FAKER_SEED
 
 function requireEnv(key: string): string {
   const val = process.env[key];
@@ -108,8 +109,8 @@ const CZECH_SHOP_CITIES = [
   "Liberec", "Hradec Králové", "České Budějovice", "Zlín", "Pardubice",
 ] as const;
 
-const FAKER_WM_COUNT = 2;
-const FAKER_SHOP_COUNT = 2;
+const FAKER_WM_COUNT   = Number(process.env.SEED_DEMO_FAKER_WM_COUNT)   || 2;
+const FAKER_SHOP_COUNT = Number(process.env.SEED_DEMO_FAKER_SHOP_COUNT) || 2;
 
 const FAKER_WM_PRIMARY_IMAGES   = ["/uploads/winemaker/wm_s10.webp", "/uploads/winemaker/wm_s11.webp"] as const;
 const FAKER_WM_SECONDARY_IMAGES = ["/uploads/winemaker/wm_s12.webp", "/uploads/winemaker/wm_s13.webp"] as const;
@@ -156,7 +157,10 @@ const FAKER_WINE_SECONDARY_IMAGES = [
 
 async function main() {
   await teardown();
-  logger.info("Demo seed started");
+  logger.info(
+    { FAKER_WM_COUNT, FAKER_SHOP_COUNT, fakerSeed },
+    "Demo seed started",
+  );
 
   // ── Resolve real Clerk IDs ───────────────────────────────────────────────────
   const CLERK = {
@@ -627,11 +631,11 @@ async function main() {
   // Bulk-inserted purely to push winemaker/shop/event lists onto page 2.
   // Everything here uses batched inserts (a handful of round-trips total) and
   // deliberately skips wines, products and reviews to stay cheap.
-  const FILLER_WM_COUNT = 20; // 10 custom + 2 faker + 20 filler = 32 winemakers
-  const FILLER_SHOP_COUNT = 25; // 5 custom + 2 faker + 25 filler = 32 shops
-  const FILLER_EVENT_COUNT = 18; // pushes events past the 10/page threshold
+  const FILLER_WM_COUNT    = Number(process.env.SEED_DEMO_FILLER_WM_COUNT)    || 20;
+  const FILLER_SHOP_COUNT  = Number(process.env.SEED_DEMO_FILLER_SHOP_COUNT)  || 25;
+  const FILLER_EVENT_COUNT = Number(process.env.SEED_DEMO_FILLER_EVENT_COUNT) || 18;
 
-  logger.info("Inserting filler winemakers, shops and events (no products)...");
+  logger.info({ FILLER_WM_COUNT, FILLER_SHOP_COUNT, FILLER_EVENT_COUNT }, "Inserting filler winemakers, shops and events (no products)...");
 
   // Filler winemakers
   const fillerWmCities = Array.from({ length: FILLER_WM_COUNT }, () => pick(CZECH_WINERY_CITIES));

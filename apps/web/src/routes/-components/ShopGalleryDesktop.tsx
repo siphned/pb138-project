@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { resolveImageUrl } from "@/lib/utils";
 import { ShopGalleryThumbnailStrip } from "./ShopGalleryThumbnailStrip";
 
 interface ShopGalleryDesktopProps {
@@ -16,7 +17,7 @@ export function ShopGalleryDesktop({ images, shopName }: ShopGalleryDesktopProps
         <img
           alt={shopName}
           className="h-full w-full rounded-md object-contain transition-all duration-300"
-          src={mainSrc}
+          src={resolveImageUrl(mainSrc)}
         />
       </div>
       <ShopGalleryThumbnailStrip

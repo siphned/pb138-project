@@ -1,4 +1,5 @@
 import { Carousel, CarouselContent, CarouselItem } from "@/components/ui/carousel";
+import { resolveImageUrl } from "@/lib/utils";
 
 interface ShopGalleryMobileProps {
   images: string[];
@@ -15,7 +16,7 @@ export function ShopGalleryMobile({ images, shopName }: ShopGalleryMobileProps) 
               <img
                 alt={`${shopName} — ${i + 1}`}
                 className="h-full rounded-md object-cover"
-                src={src}
+                src={resolveImageUrl(src)}
               />
             </div>
           </CarouselItem>

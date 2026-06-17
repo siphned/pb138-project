@@ -117,5 +117,3 @@ for (const sf of project.getSourceFiles()) {
 
 moves.sort((a, b) => a.from.localeCompare(b.from));
 writeFileSync("scripts/refactor/moves.json", JSON.stringify(moves, null, 2));
-console.log(`Computed ${moves.length} moves -> scripts/refactor/moves.json`);
-for (const m of moves) console.log(`  ${m.from}  ->  ${m.to}`);

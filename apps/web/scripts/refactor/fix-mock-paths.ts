@@ -14,7 +14,7 @@ const noExt = (p: string) => p.replace(/\.(tsx|ts)$/, "");
 const byOld = new Map(moves.map((m) => [`@/${noExt(m.from)}`, `@/${noExt(m.to)}`]));
 
 const project = makeProject();
-let changed = 0;
+let _changed = 0;
 for (const sf of project.getSourceFiles()) {
   let touched = false;
   for (const lit of sf.getDescendantsOfKind(SyntaxKind.StringLiteral)) {
@@ -28,7 +28,6 @@ for (const sf of project.getSourceFiles()) {
       touched = true;
     }
   }
-  if (touched) changed++;
+  if (touched) _changed++;
 }
 await project.save();
-console.log(`fix-mock-paths: rewrote module string literals in ${changed} files`);

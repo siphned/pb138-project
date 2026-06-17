@@ -15,7 +15,7 @@ concurrency:
 
 jobs:
   install:
-    runs-on: self-hosted
+    runs-on: ubuntu-latest
     outputs:
       cache-hit: ${{ steps.cache.outputs.cache-hit }}
     steps:
@@ -40,7 +40,21 @@ jobs:
 
   generate:
     needs: install
-    runs-on: self-hosted
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: winemarket
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+        ports:
+          - 5432:5432
     env:
       DATABASE_URL: postgresql://postgres:postgres@localhost:5432/winemarket
       FRONTEND_URL: http://localhost:5173
@@ -86,7 +100,7 @@ jobs:
 
   lint:
     needs: install
-    runs-on: self-hosted
+    runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
       - name: Setup Bun
@@ -109,7 +123,7 @@ jobs:
 
   typecheck:
     needs: generate
-    runs-on: self-hosted
+    runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
       - name: Setup Bun
@@ -137,7 +151,7 @@ jobs:
 
   security-fast:
     needs: install
-    runs-on: self-hosted
+    runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
       - name: Setup Bun
@@ -162,7 +176,7 @@ jobs:
 
   build:
     needs: [lint, typecheck, generate]
-    runs-on: self-hosted
+    runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
       - name: Setup Bun
@@ -197,7 +211,21 @@ jobs:
 
   test:
     needs: [install, generate]
-    runs-on: self-hosted
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: winemarket
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+        ports:
+          - 5432:5432
     env:
       DATABASE_URL: postgresql://postgres:postgres@localhost:5432/winemarket
     steps:
@@ -247,7 +275,7 @@ jobs:
 
   compliance:
     needs: install
-    runs-on: self-hosted
+    runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
       - name: Generate SBOM
@@ -264,7 +292,21 @@ jobs:
   # E2E tests — required CI gate. Failure blocks PR merge.
   e2e:
     needs: [install, generate]
-    runs-on: self-hosted
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: winemarket
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+        ports:
+          - 5432:5432
     env:
       DATABASE_URL: postgresql://postgres:postgres@localhost:5432/winemarket
       FRONTEND_URL: http://localhost:5173

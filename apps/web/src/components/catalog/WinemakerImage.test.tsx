@@ -1,0 +1,18 @@
+import { vi } from "vitest";
+import { describeEntityImageWrapper } from "./__tests__/describeEntityImageWrapper";
+import { WinemakerImage } from "./WinemakerImage";
+
+vi.mock("@/generated/hooks/useGetWinemakersByIdImages", () => ({
+  useGetWinemakersByIdImages: vi.fn(),
+}));
+
+import { useGetWinemakersByIdImages } from "@/generated/hooks/useGetWinemakersByIdImages";
+
+describeEntityImageWrapper({
+  alt: "Acme",
+  fallbackText: "Acme Winery",
+  mockHook: vi.mocked(useGetWinemakersByIdImages),
+  name: "WinemakerImage",
+  renderWrapper: () => <WinemakerImage alt="Acme" fallbackText="Acme Winery" winemakerId="wm1" />,
+  sampleUrl: "/uploads/winemaker/a.webp",
+});

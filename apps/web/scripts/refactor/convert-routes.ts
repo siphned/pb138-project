@@ -19,7 +19,3 @@ for (const sf of project.getSourceFiles("src/routes/*.tsx")) {
 }
 
 await project.save();
-console.log(`Moved ${moves.length} route files:`);
-for (const m of moves) {
-  console.log(`  ${path.relative(routesDir, m.from)} -> ${path.relative(routesDir, m.to)}`);
-}

@@ -11,7 +11,7 @@ const map: Record<string, string> = {
   TextField: "@/components/forms/TextField",
 };
 
-let count = 0;
+let _count = 0;
 for (const sf of project.getSourceFiles()) {
   const decl = sf.getImportDeclaration((d) => d.getModuleSpecifierValue() === "@/components/forms");
   if (!decl) continue;
@@ -20,7 +20,6 @@ for (const sf of project.getSourceFiles()) {
   for (const name of named) {
     sf.addImportDeclaration({ moduleSpecifier: map[name], namedImports: [name] });
   }
-  count++;
+  _count++;
 }
 await project.save();
-console.log(`De-barreled @/components/forms in ${count} files`);
