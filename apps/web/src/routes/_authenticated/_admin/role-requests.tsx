@@ -1,4 +1,4 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
+import { createFileRoute } from "@tanstack/react-router";
 import { Skeleton } from "@/components/ui/skeleton";
 import {
   Table,
@@ -9,6 +9,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { useGetRoleRequests } from "@/generated/hooks/useGetRoleRequests";
+import { AdminRoleRequestRowMenu } from "@/routes/_authenticated/_admin/-components/AdminRoleRequestRowMenu";
 
 export const Route = createFileRoute("/_authenticated/_admin/role-requests")({
   component: RoleRequestsPage,
@@ -95,13 +96,7 @@ function RoleRequestsPage() {
                       {new Date(request.submittedAt).toLocaleDateString()}
                     </TableCell>
                     <TableCell>
-                      <Link
-                        className="text-primary hover:underline text-sm"
-                        params={{ id: request.id }}
-                        to="/role-requests/$id"
-                      >
-                        Review
-                      </Link>
+                      <AdminRoleRequestRowMenu requestId={request.id} status={request.status} />
                     </TableCell>
                   </TableRow>
                 ))
