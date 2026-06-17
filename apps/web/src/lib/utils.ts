@@ -8,7 +8,7 @@ const API_BASE = (import.meta.env.VITE_API_URL as string | undefined) || "http:/
 export function resolveImageUrl(url: string | null | undefined): string | undefined {
   if (!url) return undefined;
   if (url.startsWith("http")) return url;
-  return `${API_BASE}${url}`;
+  return `${API_BASE.replace(/\/$/, "")}${url}`;
 }
 
 export function cn(...inputs: ClassValue[]) {
