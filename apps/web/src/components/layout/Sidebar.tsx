@@ -33,7 +33,7 @@ import { useTheme, useUser } from "@/context";
 import { useGetShopsMe } from "@/generated/hooks/useGetShopsMe";
 import { useGetWinemakersMe } from "@/generated/hooks/useGetWinemakersMe";
 
-import { isCustomerView, Role } from "@/types/roles";
+import { Role } from "@/types/roles";
 
 interface SidebarProps {
   userRoles?: Role[];
@@ -75,7 +75,6 @@ export function Sidebar({ userRoles = [Role.customer], activeRole, onRoleChange 
     : "Guest";
   const initials = fullName === "Guest" ? "G" : fullName.substring(0, 2).toUpperCase() || "U";
   const hasMultipleRoles = userRoles.length > 1;
-  const customerView = isCustomerView(currentActiveRole);
 
   const handleLogout = async () => {
     closeSheet();
