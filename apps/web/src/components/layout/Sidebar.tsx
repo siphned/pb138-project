@@ -349,9 +349,26 @@ function RoleNavItems({ role, closeSheet, userId, winemakerId, firstShopId }: Ro
 
   if (role === Role.admin) {
     return (
-      <NavItem onClick={closeSheet} render={<Link to="/role-requests" />} variant="active">
-        <HugeiconsIcon icon={UserGroupIcon} /> Role Requests
-      </NavItem>
+      <>
+        <NavItem onClick={closeSheet} render={<Link to="/users" />} variant="active">
+          <HugeiconsIcon icon={User02Icon} /> Users
+        </NavItem>
+        <NavItem onClick={closeSheet} render={<Link to="/winemakers" />} variant="active">
+          <HugeiconsIcon icon={UserGroupIcon} /> Winemakers
+        </NavItem>
+        <NavItem onClick={closeSheet} render={<Link to="/shops" />} variant="active">
+          <HugeiconsIcon icon={Store01Icon} /> Shops
+        </NavItem>
+        <NavItem onClick={closeSheet} render={<Link to="/products" />} variant="active">
+          <HugeiconsIcon icon={Package01Icon} /> Products
+        </NavItem>
+        <NavItem onClick={closeSheet} render={<Link to="/moderation" />} variant="active">
+          <HugeiconsIcon icon={InboxIcon} /> Moderation
+        </NavItem>
+        <NavItem onClick={closeSheet} render={<Link to="/role-requests" />} variant="active">
+          <HugeiconsIcon icon={UserGroupIcon} /> Role Requests
+        </NavItem>
+      </>
     );
   }
 

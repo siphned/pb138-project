@@ -1,4 +1,6 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
+import { createFileRoute } from "@tanstack/react-router";
+import { useState } from "react";
+import { Input } from "@/components/ui/input";
 import { Skeleton } from "@/components/ui/skeleton";
 import {
   Table,
@@ -26,8 +28,19 @@ function getStatusBadgeClass(status: string): string {
 
 function AdminUsersPage() {
   const { data, isLoading, error } = useGetAdminUsers();
+  const [search, setSearch] = useState("");
   // biome-ignore lint/suspicious/noExplicitAny: API response is untyped
   const users = (data as any)?.data || [];
+
+  const query = search.trim().toLowerCase();
+  const filteredUsers = query
+    ? // biome-ignore lint/suspicious/noExplicitAny: API response is untyped
+      users.filter((user: any) =>
+        [user.email, user.fname, user.name]
+          .filter(Boolean)
+          .some((field: string) => field.toLowerCase().includes(query))
+      )
+    : users;
 
   if (error) {
     return (
@@ -43,6 +56,15 @@ function AdminUsersPage() {
   return (
     <main className="mx-auto max-w-6xl space-y-4 p-6">
       <h1 className="text-2xl font-semibold">User Management</h1>
+
+      <Input
+        aria-label="Search users"
+        className="max-w-sm"
+        onChange={(e) => setSearch(e.target.value)}
+        placeholder="Search by email or name…"
+        type="search"
+        value={search}
+      />
 
       {isLoading ? (
         <div className="space-y-2">
@@ -60,19 +82,18 @@ function AdminUsersPage() {
                 <TableHead>Roles</TableHead>
                 <TableHead>Status</TableHead>
                 <TableHead>Created</TableHead>
-                <TableHead>Actions</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
-              {users.length === 0 ? (
+              {filteredUsers.length === 0 ? (
                 <TableRow>
-                  <TableCell className="text-center text-muted-foreground" colSpan={6}>
+                  <TableCell className="text-center text-muted-foreground" colSpan={5}>
                     No users found
                   </TableCell>
                 </TableRow>
               ) : (
                 // biome-ignore lint/suspicious/noExplicitAny: API response is untyped
-                users.map((user: any) => (
+                filteredUsers.map((user: any) => (
                   <TableRow key={user.id}>
                     <TableCell className="font-mono text-sm">{user.email}</TableCell>
                     <TableCell>{user.fname || user.name || "—"}</TableCell>
@@ -90,15 +111,6 @@ function AdminUsersPage() {
                       </span>
                     </TableCell>
                     <TableCell>{new Date(user.createdAt).toLocaleDateString()}</TableCell>
-                    <TableCell>
-                      <Link
-                        className="text-primary hover:underline text-sm"
-                        params={{ id: user.id }}
-                        to="/users/$id"
-                      >
-                        View
-                      </Link>
-                    </TableCell>
                   </TableRow>
                 ))
               )}
