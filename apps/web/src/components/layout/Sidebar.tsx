@@ -183,16 +183,14 @@ export function Sidebar({ userRoles = [Role.customer], activeRole, onRoleChange 
               <HugeiconsIcon icon={Search01Icon} /> Search
             </NavItem>
 
-            {customerView && (
-              <NavItem
-                className="sm:hidden"
-                onClick={closeSheet}
-                render={<Link to="/cart" />}
-                variant="active"
-              >
-                <HugeiconsIcon icon={ShoppingCart02Icon} /> Shopping cart
-              </NavItem>
-            )}
+            <NavItem
+              className="sm:hidden"
+              onClick={closeSheet}
+              render={<Link to="/cart" />}
+              variant="active"
+            >
+              <HugeiconsIcon icon={ShoppingCart02Icon} /> Shopping Cart
+            </NavItem>
 
             <NavItem onClick={closeSheet} render={<Link to="/wines" />} variant="active">
               <HugeiconsIcon icon={GrapesIcon} /> Explore Wines
