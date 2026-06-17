@@ -45,8 +45,6 @@ const config = defineConfig({
   workers: process.env.CI ? 1 : undefined,
 });
 
-// Enable test sharding via SHARD environment variable (e.g., SHARD=1/3 for shard 1 of 3)
-// Usage: SHARD=1/3 bun run test:e2e
 if (process.env.SHARD) {
   const [shardCurrent, shardTotal] = process.env.SHARD.split("/").map(Number);
   if (!Number.isNaN(shardCurrent) && !Number.isNaN(shardTotal)) {

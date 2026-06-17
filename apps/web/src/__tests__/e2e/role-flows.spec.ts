@@ -1,9 +1,12 @@
-import { expect, test } from "@playwright/test";
+import { expect, test } from "../../../playwright.fixtures";
 
 /**
  * Role-based E2E tests for happy path flows.
  * These tests verify core functionality for each user role.
  * Focus: pages load, navigation works, no console errors
+ *
+ * Protected route tests use the authenticateUser fixture which logs in
+ * with the test user (email: palahap384@gzeos.com) that has all roles.
  */
 
 test.describe("Customer role flows", () => {
@@ -31,7 +34,8 @@ test.describe("Customer role flows", () => {
     expect(page.url()).toContain("/checkout");
   });
 
-  test("customer can view their orders", async ({ page }) => {
+  test("customer can view their orders", async ({ page, authenticateUser }) => {
+    await authenticateUser();
     await page.goto("/orders");
     await page.waitForLoadState("networkidle");
     expect(page.url()).toContain("/orders");
@@ -75,7 +79,8 @@ test.describe("Winemaker role flows", () => {
     expect(page.url()).toContain("/wines");
   });
 
-  test("winemaker can access dashboard", async ({ page }) => {
+  test("winemaker can access dashboard", async ({ page, authenticateUser }) => {
+    await authenticateUser();
     await page.goto("/dashboard");
     await page.waitForLoadState("networkidle");
     expect(page.url()).toContain("/dashboard");
@@ -93,7 +98,8 @@ test.describe("Winemaker role flows", () => {
     expect(page.url()).toContain("/shops");
   });
 
-  test("winemaker can access statistics", async ({ page }) => {
+  test("winemaker can access statistics", async ({ page, authenticateUser }) => {
+    await authenticateUser();
     await page.goto("/stats");
     await page.waitForLoadState("networkidle");
     expect(page.url()).toContain("/stats");
@@ -119,7 +125,8 @@ test.describe("Shop owner role flows", () => {
     expect(page.url()).toContain("/shops");
   });
 
-  test("shop owner can access inventory", async ({ page }) => {
+  test("shop owner can access inventory", async ({ page, authenticateUser }) => {
+    await authenticateUser();
     await page.goto("/shops/1/inventory");
     await page.waitForLoadState("networkidle");
     expect(page.url()).toContain("/inventory");
@@ -131,13 +138,15 @@ test.describe("Shop owner role flows", () => {
     expect(page.url()).toContain("/products");
   });
 
-  test("shop owner can access dashboard", async ({ page }) => {
+  test("shop owner can access dashboard", async ({ page, authenticateUser }) => {
+    await authenticateUser();
     await page.goto("/dashboard");
     await page.waitForLoadState("networkidle");
     expect(page.url()).toContain("/dashboard");
   });
 
-  test("shop owner can view statistics", async ({ page }) => {
+  test("shop owner can view statistics", async ({ page, authenticateUser }) => {
+    await authenticateUser();
     await page.goto("/stats");
     await page.waitForLoadState("networkidle");
     expect(page.url()).toContain("/stats");
@@ -157,49 +166,57 @@ test.describe("Shop owner role flows", () => {
 });
 
 test.describe("Admin role flows", () => {
-  test("admin can access user management", async ({ page }) => {
+  test("admin can access user management", async ({ page, authenticateUser }) => {
+    await authenticateUser();
     await page.goto("/users");
     await page.waitForLoadState("networkidle");
     expect(page.url()).toContain("/users");
   });
 
-  test("admin can access winemaker management", async ({ page }) => {
+  test("admin can access winemaker management", async ({ page, authenticateUser }) => {
+    await authenticateUser();
     await page.goto("/winemakers");
     await page.waitForLoadState("networkidle");
     expect(page.url()).toContain("/winemakers");
   });
 
-  test("admin can access shop management", async ({ page }) => {
+  test("admin can access shop management", async ({ page, authenticateUser }) => {
+    await authenticateUser();
     await page.goto("/shops");
     await page.waitForLoadState("networkidle");
     expect(page.url()).toContain("/shops");
   });
 
-  test("admin can access product management", async ({ page }) => {
+  test("admin can access product management", async ({ page, authenticateUser }) => {
+    await authenticateUser();
     await page.goto("/products");
     await page.waitForLoadState("networkidle");
     expect(page.url()).toContain("/products");
   });
 
-  test("admin can access moderation panel", async ({ page }) => {
+  test("admin can access moderation panel", async ({ page, authenticateUser }) => {
+    await authenticateUser();
     await page.goto("/moderation");
     await page.waitForLoadState("networkidle");
     expect(page.url()).toContain("/moderation");
   });
 
-  test("admin can access role requests", async ({ page }) => {
+  test("admin can access role requests", async ({ page, authenticateUser }) => {
+    await authenticateUser();
     await page.goto("/role-requests");
     await page.waitForLoadState("networkidle");
     expect(page.url()).toContain("/role-requests");
   });
 
-  test("admin can access dashboard", async ({ page }) => {
+  test("admin can access dashboard", async ({ page, authenticateUser }) => {
+    await authenticateUser();
     await page.goto("/dashboard");
     await page.waitForLoadState("networkidle");
     expect(page.url()).toContain("/dashboard");
   });
 
-  test("admin can access statistics", async ({ page }) => {
+  test("admin can access statistics", async ({ page, authenticateUser }) => {
+    await authenticateUser();
     await page.goto("/stats");
     await page.waitForLoadState("networkidle");
     expect(page.url()).toContain("/stats");
