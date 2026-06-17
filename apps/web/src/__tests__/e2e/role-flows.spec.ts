@@ -210,7 +210,7 @@ test.describe("Public user flows", () => {
   test("public user can view homepage", async ({ page }) => {
     await page.goto("/");
     await page.waitForLoadState("networkidle");
-    expect(page.url()).toBe("/");
+    expect(page.url()).toMatch(/\/$|localhost:5173\/$/);
   });
 
   test("public user can browse explore page", async ({ page }) => {
