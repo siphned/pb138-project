@@ -128,15 +128,30 @@ export function UserProvider({ children }: { children: ReactNode }) {
   const isLoading = !isLoaded || (isSignedIn && isQueryLoading);
   const isCartReady = Boolean(isLoaded && (isSignedIn || guestSessionReady));
 
+  // Hold the app behind a loader while a signed-in user's profile resolves, so a
+  // suspended/banned account never flashes the real page before the blocked screen.
+  const showAuthGate = isSignedIn === true && isQueryLoading;
+
+  let content: ReactNode = children;
+  if (isBlocked) {
+    content = <AccountBlockedScreen onSignOut={() => signOut({ redirectUrl: "/" })} />;
+  } else if (showAuthGate) {
+    content = (
+      <div
+        aria-label="Loading"
+        className="flex min-h-screen items-center justify-center bg-background"
+        role="status"
+      >
+        <div className="h-8 w-8 animate-spin rounded-full border-2 border-muted border-t-primary" />
+      </div>
+    );
+  }
+
   return (
     <UserContext.Provider
       value={{ activeRole, isCartReady, isLoading, setActiveRole, updateUser, user }}
     >
-      {isBlocked ? (
-        <AccountBlockedScreen onSignOut={() => signOut({ redirectUrl: "/" })} />
-      ) : (
-        children
-      )}
+      {content}
     </UserContext.Provider>
   );
 }

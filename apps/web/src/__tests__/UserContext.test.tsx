@@ -56,10 +56,12 @@ function renderWithProvider() {
 }
 
 describe("UserContext", () => {
-  it("shows loading state while fetching", () => {
+  it("shows the auth gate loader while the profile is fetching", () => {
     vi.mocked(useQuery).mockReturnValue({ data: undefined, isLoading: true } as never);
     renderWithProvider();
-    expect(screen.getByText("Loading...")).toBeInTheDocument();
+    // The provider holds children behind a loader so a blocked account can't flash the page.
+    expect(screen.getByRole("status", { name: /loading/i })).toBeInTheDocument();
+    expect(screen.queryByText("Loading...")).not.toBeInTheDocument();
   });
 
   it("shows 'No user' when query returns nothing", () => {
