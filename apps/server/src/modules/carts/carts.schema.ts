@@ -1,13 +1,6 @@
-import { t } from "elysia";
-<<<<<<< HEAD
-import z from "zod";
+import { z } from "zod";
 
-/**
- * Request/response schemas for carts module.
- * Zod for shared types, TypeBox for Elysia route validation.
- */
-
-const cartProductResponseSchema = z.object({
+const cartProductResponse = z.object({
   id: z.string(),
   name: z.string(),
   price: z.string(),
@@ -15,34 +8,34 @@ const cartProductResponseSchema = z.object({
   shopId: z.string(),
 });
 
-export const cartItemResponseSchema = z.object({
+export const cartItemResponse = z.object({
   cartId: z.string(),
   createdAt: z.date(),
   id: z.string(),
-  product: cartProductResponseSchema,
+  product: cartProductResponse,
   productId: z.string(),
   quantity: z.number().int(),
   updatedAt: z.date(),
 });
 
-export const cartResponseSchema = z.object({
+export const cartResponse = z.object({
   createdAt: z.date(),
   id: z.string(),
-  items: z.array(cartItemResponseSchema),
+  items: z.array(cartItemResponse),
   updatedAt: z.date(),
   userId: z.string(),
 });
 
-export const addItemBodySchema = z.object({
+export const addItemBody = z.object({
   productId: z.string().uuid(),
   quantity: z.number().int().min(1),
 });
 
-export const updateItemBodySchema = z.object({
+export const updateItemBody = z.object({
   quantity: z.number().int().min(1),
 });
 
-export const mergeBodySchema = z.object({
+export const mergeBody = z.object({
   items: z
     .array(
       z.object({
@@ -51,51 +44,4 @@ export const mergeBodySchema = z.object({
       })
     )
     .min(1),
-});
-=======
->>>>>>> origin/main
-
-const cartProductResponse = t.Object({
-  id: t.String(),
-  name: t.String(),
-  price: t.String(),
-  quantity: t.Integer(),
-  shopId: t.String(),
-});
-
-export const cartItemResponse = t.Object({
-  cartId: t.String(),
-  createdAt: t.Date(),
-  id: t.String(),
-  product: cartProductResponse,
-  productId: t.String(),
-  quantity: t.Integer(),
-  updatedAt: t.Date(),
-});
-
-export const cartResponse = t.Object({
-  createdAt: t.Date(),
-  id: t.String(),
-  items: t.Array(cartItemResponse),
-  updatedAt: t.Date(),
-  userId: t.String(),
-});
-
-export const addItemBody = t.Object({
-  productId: t.String({ format: "uuid" }),
-  quantity: t.Integer({ minimum: 1 }),
-});
-
-export const updateItemBody = t.Object({
-  quantity: t.Integer({ minimum: 1 }),
-});
-
-export const mergeBody = t.Object({
-  items: t.Array(
-    t.Object({
-      productId: t.String({ format: "uuid" }),
-      quantity: t.Integer({ minimum: 1 }),
-    }),
-    { minItems: 1 }
-  ),
 });

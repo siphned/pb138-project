@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 import { useAuth, useUser as useClerkUser } from "@clerk/react";
 import { render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
@@ -11,19 +10,10 @@ import { Role } from "../types/roles";
 const mockSignOut = vi.fn();
 const mockNavigate = vi.fn();
 const mockOpenUserProfile = vi.fn();
-=======
-import { render, screen } from "@testing-library/react";
-import userEvent from "@testing-library/user-event";
-import { describe, expect, it, vi } from "vitest";
-
-const mockSignOut = vi.fn();
-const mockNavigate = vi.fn();
->>>>>>> origin/main
 
 vi.mock("@clerk/react", () => ({
   Show: ({ children, when }: { children: React.ReactNode; when: string }) =>
     when === "signed-in" ? children : null,
-<<<<<<< HEAD
   useAuth: vi.fn(),
   useClerk: () => ({ openUserProfile: mockOpenUserProfile, signOut: mockSignOut }),
   useUser: vi.fn(),
@@ -39,25 +29,10 @@ vi.mock("@tanstack/react-router", () => ({
     <a className={className} href={to} onClick={onClick}>
       {children}
     </a>
-=======
-  useAuth: () => ({ isLoaded: true, isSignedIn: true }),
-  useClerk: () => ({ openUserProfile: vi.fn(), signOut: mockSignOut }),
-  useUser: () => ({ user: { fullName: "Test User", imageUrl: undefined } }),
-}));
-
-vi.mock("@/context/UserContext", () => ({
-  useUser: () => ({ isLoading: false, user: { fname: "Test", lname: "User", roles: [] } }),
-}));
-
-vi.mock("@tanstack/react-router", () => ({
-  Link: ({ to, children }: { to: string; children: React.ReactNode }) => (
-    <a href={to}>{children}</a>
->>>>>>> origin/main
   ),
   useNavigate: () => mockNavigate,
 }));
 
-<<<<<<< HEAD
 vi.mock("@/generated/hooks/useGetWinemakersMe", () => ({
   useGetWinemakersMe: vi.fn(() => ({ data: undefined, isLoading: false })),
 }));
@@ -67,9 +42,6 @@ vi.mock("@/generated/hooks/useGetShopsMe", () => ({
 }));
 
 // Stub shadcn components so sidebar content is always visible
-=======
-// Stub shadcn Sheet so the sidebar content is always visible
->>>>>>> origin/main
 vi.mock("@/components/ui/sheet", () => ({
   Sheet: ({ children }: { children: React.ReactNode }) => <div>{children}</div>,
   SheetContent: ({ children }: { children: React.ReactNode }) => <div>{children}</div>,
@@ -90,27 +62,17 @@ vi.mock("@/components/ui/accordion", () => ({
 vi.mock("@/components/ui/avatar", () => ({
   Avatar: ({ children }: { children: React.ReactNode }) => <div>{children}</div>,
   AvatarFallback: ({ children }: { children: React.ReactNode }) => <span>{children}</span>,
-<<<<<<< HEAD
   AvatarImage: ({ alt }: { alt: string }) => <img alt={alt} />,
 }));
 
 vi.mock("@/components/ui/button", () => ({
   Button: ({ children, onClick, className }: any) => (
     <button className={className} onClick={onClick} type="button">
-=======
-  AvatarImage: () => null,
-}));
-
-vi.mock("@/components/ui/button", () => ({
-  Button: ({ children, onClick }: { children: React.ReactNode; onClick?: () => void }) => (
-    <button onClick={onClick} type="button">
->>>>>>> origin/main
       {children}
     </button>
   ),
 }));
 
-<<<<<<< HEAD
 vi.mock("@/components/primitives/nav-item", () => ({
   NavItem: ({ children, onClick, render: renderProp }: any) => {
     if (React.isValidElement(renderProp)) {
@@ -131,8 +93,10 @@ describe("Sidebar", () => {
 
     vi.mocked(useClerkUser).mockReturnValue({
       user: {
+        firstName: "Clerk",
         fullName: "Clerk User",
         imageUrl: "https://example.com/avatar.jpg",
+        lastName: "User",
       },
     } as never);
 
@@ -155,7 +119,7 @@ describe("Sidebar", () => {
 
     it("displays user initials in avatar fallback", () => {
       render(<Sidebar />);
-      expect(screen.getByText("JO")).toBeInTheDocument();
+      expect(screen.getByText("CL")).toBeInTheDocument();
     });
 
     it("shows Explore Wines link", () => {
@@ -171,32 +135,32 @@ describe("Sidebar", () => {
 
   describe("User Information Display", () => {
     it("handles missing last name gracefully", () => {
-      vi.mocked(useUser).mockReturnValue({
-        user: { fname: "John", id: "user-123", lname: null },
-      } as any);
+      vi.mocked(useClerkUser).mockReturnValue({
+        user: { firstName: "John", imageUrl: "", lastName: null },
+      } as never);
       render(<Sidebar />);
       expect(screen.getByText("John")).toBeInTheDocument();
     });
 
-    it("shows Guest when user is null", () => {
-      vi.mocked(useUser).mockReturnValue({ user: null } as any);
+    it("shows Guest when signed out", () => {
+      vi.mocked(useClerkUser).mockReturnValue({ user: null } as never);
       vi.mocked(useAuth).mockReturnValue({ isSignedIn: false } as any);
       render(<Sidebar />);
-      expect(screen.getAllByText("Guest")).toHaveLength(2);
+      expect(screen.getAllByText("Guest")).toHaveLength(1);
     });
 
     it("displays full name trimmed correctly", () => {
-      vi.mocked(useUser).mockReturnValue({
-        user: { fname: "  John  ", id: "user-123", lname: "  Doe  " },
-      } as any);
+      vi.mocked(useClerkUser).mockReturnValue({
+        user: { firstName: "  John  ", imageUrl: "", lastName: "  Doe  " },
+      } as never);
       render(<Sidebar />);
       expect(screen.getByText("John Doe")).toBeInTheDocument();
     });
 
     it("handles special characters in names", () => {
-      vi.mocked(useUser).mockReturnValue({
-        user: { fname: "François", id: "user-123", lname: "O'Reilly" },
-      } as any);
+      vi.mocked(useClerkUser).mockReturnValue({
+        user: { firstName: "François", imageUrl: "", lastName: "O'Reilly" },
+      } as never);
       render(<Sidebar />);
       expect(screen.getByText("François O'Reilly")).toBeInTheDocument();
     });
@@ -205,7 +169,6 @@ describe("Sidebar", () => {
   describe("Authentication", () => {
     it("shows signed-in content when authenticated", () => {
       render(<Sidebar />);
-      expect(screen.getByText("John Doe")).toBeInTheDocument();
       expect(screen.getByText("Clerk User")).toBeInTheDocument();
     });
   });
@@ -248,17 +211,34 @@ describe("Sidebar", () => {
     it("renders Explore Wines link with correct href", () => {
       render(<Sidebar />);
       const link = screen.getByText(/Explore Wines/i).closest("a");
-      expect(link).toHaveAttribute("href", "/explore");
+      expect(link).toHaveAttribute("href", "/wines");
     });
 
     it("renders correct links for customer role", () => {
       render(<Sidebar activeRole={Role.customer} />);
-      expect(screen.getByText(/Order History/i)).toBeInTheDocument();
+      expect(screen.getByText(/My Orders/i)).toBeInTheDocument();
     });
 
     it("renders correct links for winemaker role", () => {
       render(<Sidebar activeRole={Role.winemaker} />);
       expect(screen.getByText(/My Wines/i)).toBeInTheDocument();
+    });
+
+    it("shows My Events for the customer role", () => {
+      render(<Sidebar activeRole={Role.customer} />);
+      expect(screen.getByText(/My Events/i)).toBeInTheDocument();
+    });
+
+    it("renders My Shops and My Bundles for the shop owner role", () => {
+      render(<Sidebar activeRole={Role.shopOwner} />);
+      expect(screen.getByText(/My Shops/i)).toBeInTheDocument();
+      expect(screen.getByText(/My Bundles/i)).toBeInTheDocument();
+    });
+
+    it("shows discovery for all roles but hides cart outside the customer view", () => {
+      render(<Sidebar activeRole={Role.winemaker} />);
+      expect(screen.getByText(/Explore Wines/i)).toBeInTheDocument();
+      expect(screen.queryByText(/Shopping cart/i)).not.toBeInTheDocument();
     });
 
     it("shows Products link pointing to /products", () => {
@@ -292,63 +272,18 @@ describe("Sidebar", () => {
   describe("Multiple Renders", () => {
     it("maintains state across re-renders", () => {
       const { rerender } = render(<Sidebar />);
-      expect(screen.getByText("John Doe")).toBeInTheDocument();
+      expect(screen.getByText("Clerk User")).toBeInTheDocument();
       rerender(<Sidebar />);
-      expect(screen.getByText("John Doe")).toBeInTheDocument();
+      expect(screen.getByText("Clerk User")).toBeInTheDocument();
     });
 
     it("updates display name when user changes", () => {
       const { rerender } = render(<Sidebar />);
-      vi.mocked(useUser).mockReturnValue({
-        user: { fname: "Jane", id: "user-123", lname: "Smith" },
-      } as any);
+      vi.mocked(useClerkUser).mockReturnValue({
+        user: { firstName: "Jane", imageUrl: "", lastName: "Smith" },
+      } as never);
       rerender(<Sidebar />);
       expect(screen.getByText("Jane Smith")).toBeInTheDocument();
     });
-=======
-import { Sidebar } from "../components/layout/Sidebar";
-import { Role } from "../types/roles";
-
-describe("Sidebar", () => {
-  it("shows Log out button", () => {
-    render(<Sidebar />);
-    expect(screen.getByText("Log out")).toBeInTheDocument();
-  });
-
-  it("calls signOut and navigates to / when Log out is clicked", async () => {
-    const user = userEvent.setup();
-    mockSignOut.mockResolvedValue(undefined);
-    mockNavigate.mockReturnValue(undefined);
-    render(<Sidebar />);
-    await user.click(screen.getByText("Log out"));
-    expect(mockSignOut).toHaveBeenCalled();
-  });
-
-  it("shows Explore Wines link", () => {
-    render(<Sidebar />);
-    expect(screen.getByText("Explore Wines")).toBeInTheDocument();
-  });
-
-  it("shows Bundles link pointing to /bundles", () => {
-    render(<Sidebar />);
-    const bundlesLink = screen.getByText("Bundles").closest("a");
-    expect(bundlesLink).toHaveAttribute("href", "/bundles");
-  });
-
-  it("shows Events link", () => {
-    render(<Sidebar />);
-    expect(screen.getByText("Events")).toBeInTheDocument();
-  });
-
-  it("shows active role for single-role user", () => {
-    render(<Sidebar activeRole={Role.customer} userRoles={[Role.customer]} />);
-    expect(screen.getByText(Role.customer)).toBeInTheDocument();
-  });
-
-  it("Log out is a button not a navigation link", () => {
-    render(<Sidebar />);
-    const logoutEl = screen.getByText("Log out");
-    expect(logoutEl.tagName).toBe("BUTTON");
->>>>>>> origin/main
   });
 });

@@ -30,10 +30,7 @@ dist
 # Generated code (Kubb, code generation)
 apps/web/src/generated/
 apps/server/openapi.json
-<<<<<<< HEAD
 /openapi.json
-=======
->>>>>>> origin/main
 
 # Test results
 test-results/
@@ -62,27 +59,19 @@ credentials*.json
 
 # LLM resources (not tracked - may contain embedded repos/files)
 raw/
-<<<<<<< HEAD
 docs/raw/
-=======
->>>>>>> origin/main
 .claude/
 CLAUDE.md
 GEMINI.md
 .claude/settings.local.json
 apps/server/src/db/seed.ts
-<<<<<<< HEAD
 apps/server/src/db/seed.demo.ts
 
 docs/plans/
-=======
-
->>>>>>> origin/main
 docs/figma/
 
 # Git Worktrees
 .worktrees/
-<<<<<<< HEAD
 .claude/worktrees/
 
 # local image uploads (subdirs and user-uploaded files ignored, seed assets temporarly committed)
@@ -93,6 +82,7 @@ apps/server/uploads/*
 !apps/server/uploads/shop/
 !apps/server/uploads/event/
 !apps/server/uploads/user/
+!apps/server/uploads/product/
 apps/server/uploads/wine/*
 apps/server/uploads/winemaker/*
 apps/server/uploads/shop/*
@@ -108,12 +98,15 @@ apps/server/uploads/user/*
 docs/UI_AUDIT_hooks.txt
 docs/UI_AUDIT.md
 
+# Personal FE cleanup TODOs (Adam, local-only)
+LATER.md
+
+# TanStack Router temp files
+apps/web/.tanstack/
+
+# Temporary local docs / scratch
+docs/tmp/
+
 
 #Ignore vscode AI rules
 .github\instructions\codacy.instructions.md
-=======
-
-
-.claude/worktrees/
-
->>>>>>> origin/main

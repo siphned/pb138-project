@@ -13,15 +13,17 @@ export const asString = (v: unknown): string | undefined => (typeof v === "strin
 export const asNumOrStr = (v: unknown): string | number | undefined =>
   typeof v === "string" || typeof v === "number" ? v : undefined;
 
-export type WineSearch = GetWinesQueryParams & { q?: string };
-export type ProductSearch = GetProductsQueryParams;
+export type WineSearch = GetWinesQueryParams & { q?: string; sort?: string };
+// `isBundle` and `shopId` aren't in the OpenAPI list endpoint yet; we keep
+// them as UI-only fields and strip before passing to the hook. Track in
+// WINE-XXX BE follow-up.
+export type ProductSearch = GetProductsQueryParams & {
+  isBundle?: boolean | "true" | "false";
+  shopId?: string;
+};
 export type EventSearch = GetEventsQueryParams;
 export type WinemakerSearch = { q?: string };
-export interface ShopSearch {
-  q?: string;
-  city?: string;
-  ownerUserId?: string;
-}
+export type ShopSearch = { q?: string };
 
 // Aggregated search-page state — spans wines + products + winemakers + shops.
 // Each sub-query strips the fields its endpoint doesn't accept.

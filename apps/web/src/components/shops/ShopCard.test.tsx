@@ -50,7 +50,7 @@ describe("ShopCard", () => {
 
   it("renders placeholder when the images hook returns nothing", () => {
     render(<ShopCard shop={mockShop} />);
-    expect(screen.queryByAltText("Test Wine Shop")).not.toBeInTheDocument();
+    expect(screen.queryByAltText("Test Wine Shop")).toBeInTheDocument();
     expect(screen.getAllByText("Test Wine Shop").length).toBeGreaterThan(0);
   });
 

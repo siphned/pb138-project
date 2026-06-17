@@ -1,8 +1,5 @@
 import { numeric, pgTable, smallint, text, uuid } from "drizzle-orm/pg-core";
-<<<<<<< HEAD
 import { createInsertSchema, createSelectSchema } from "drizzle-zod";
-=======
->>>>>>> origin/main
 import { addresses } from "./addresses";
 import { products } from "./catalog";
 import { deliveryTypeEnum, orderStatusEnum, paymentMethodEnum, paymentStatusEnum } from "./enums";
@@ -52,7 +49,6 @@ export const orderItems = pgTable("order_items", {
   unitPriceAtPurchase: numeric("unit_price_at_purchase", { precision: 10, scale: 2 }).notNull(),
   updatedAt: timestamptz("updated_at"),
 });
-<<<<<<< HEAD
 
 export const orderSelectSchema = createSelectSchema(orders);
 export const orderInsertSchema = createInsertSchema(orders);
@@ -61,5 +57,3 @@ export type OrderModel = typeof orders.$inferSelect;
 export const orderItemSelectSchema = createSelectSchema(orderItems);
 export const orderItemInsertSchema = createInsertSchema(orderItems);
 export type OrderItemModel = typeof orderItems.$inferSelect;
-=======
->>>>>>> origin/main

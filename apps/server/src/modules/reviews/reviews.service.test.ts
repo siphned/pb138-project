@@ -1,5 +1,4 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
-<<<<<<< HEAD
 import { db } from "../../db";
 import * as reviewsRepo from "./reviews.repository";
 import { reviewsService } from "./reviews.service";
@@ -9,18 +8,14 @@ vi.mock("./reviews.repository", async (importOriginal) => {
   return {
     ...actual,
     averageRating: vi.fn(),
+    averageShopRating: vi.fn(),
     countReviews: vi.fn(),
-=======
-
-vi.mock("./reviews.repository", () => ({
-  reviewsRepository: {
-    averageRating: vi.fn(),
->>>>>>> origin/main
+    countShopReviews: vi.fn(),
     findById: vi.fn(),
     findReviews: vi.fn(),
     findReviewWithUser: vi.fn(),
+    findShopReviews: vi.fn(),
     findUserReview: vi.fn(),
-<<<<<<< HEAD
     hasPurchasedFromWinemaker: vi.fn(),
     hasPurchasedProduct: vi.fn(),
     hasPurchasedWine: vi.fn(),
@@ -28,16 +23,6 @@ vi.mock("./reviews.repository", () => ({
     softDelete: vi.fn(),
   };
 });
-=======
-    hasPurchasedProduct: vi.fn(),
-    insertReview: vi.fn(),
-    softDelete: vi.fn(),
-  },
-}));
-
-import { reviewsRepository } from "./reviews.repository";
-import { reviewsService } from "./reviews.service";
->>>>>>> origin/main
 
 describe("reviewsService", () => {
   beforeEach(() => {
@@ -46,7 +31,6 @@ describe("reviewsService", () => {
 
   const userId = "u1";
   const productId = "p1";
-<<<<<<< HEAD
   const winemakerId = "w1";
   const reviewId = "r1";
 
@@ -95,63 +79,56 @@ describe("reviewsService", () => {
         offset: 5,
         sort: "highest",
       });
-=======
-  const reviewId = "r1";
+    });
+  });
 
-  describe("listProductReviews", () => {
-    it("returns reviews and averageRating together", async () => {
-      const mockReviews = [{ id: "r1" }];
-      vi.mocked(reviewsRepository.findReviews).mockResolvedValue(mockReviews as never);
-      vi.mocked(reviewsRepository.averageRating).mockResolvedValue(4.5);
+  describe("listShopReviews", () => {
+    it("aggregates reviews, totalCount, and averageRating across the shop's products", async () => {
+      const shopId = "s1";
+      const mockReviews = [{ id: "r3" }];
+      vi.mocked(reviewsRepo.findShopReviews).mockResolvedValue(mockReviews as any);
+      vi.mocked(reviewsRepo.averageShopRating).mockResolvedValue(4.2);
+      vi.mocked(reviewsRepo.countShopReviews).mockResolvedValue(15);
 
-      const result = await reviewsService.listProductReviews(productId);
+      const result = await reviewsService.listShopReviews(shopId, {
+        limit: 10,
+        page: 2,
+        sort: "lowest",
+      });
 
       expect(result.reviews).toBe(mockReviews);
-      expect(result.averageRating).toBe(4.5);
-      expect(reviewsRepository.findReviews).toHaveBeenCalledWith(productId, "product");
->>>>>>> origin/main
+      expect(result.averageRating).toBe(4.2);
+      expect(result.totalCount).toBe(15);
+      expect(reviewsRepo.findShopReviews).toHaveBeenCalledWith(db, shopId, {
+        limit: 10,
+        offset: 10,
+        sort: "lowest",
+      });
     });
   });
 
   describe("createProductReview", () => {
     it("creates review for verified purchaser with no prior review", async () => {
-<<<<<<< HEAD
       vi.mocked(reviewsRepo.hasPurchasedProduct).mockResolvedValue(true);
       vi.mocked(reviewsRepo.findUserReview).mockResolvedValue(undefined);
       vi.mocked(reviewsRepo.insertReview).mockResolvedValue({ id: reviewId } as any);
       vi.mocked(reviewsRepo.findReviewWithUser).mockResolvedValue({ id: reviewId } as any);
-=======
-      vi.mocked(reviewsRepository.hasPurchasedProduct).mockResolvedValue(true);
-      vi.mocked(reviewsRepository.findUserReview).mockResolvedValue(undefined);
-      vi.mocked(reviewsRepository.insertReview).mockResolvedValue({ id: reviewId } as never);
-      vi.mocked(reviewsRepository.findReviewWithUser).mockResolvedValue({ id: reviewId } as never);
->>>>>>> origin/main
 
       const result = await reviewsService.createProductReview(userId, productId, { rating: 5 });
 
       expect(result.id).toBe(reviewId);
-<<<<<<< HEAD
       expect(reviewsRepo.insertReview).toHaveBeenCalledWith(db, userId, productId, "product", {
-=======
-      expect(reviewsRepository.insertReview).toHaveBeenCalledWith(userId, productId, "product", {
->>>>>>> origin/main
         rating: 5,
       });
     });
 
-<<<<<<< HEAD
     it("throws NOT_PURCHASED if user hasn't purchased the product", async () => {
       vi.mocked(reviewsRepo.hasPurchasedProduct).mockResolvedValue(false);
-=======
-    it("throws NOT_PURCHASED if no order found", async () => {
-      vi.mocked(reviewsRepository.hasPurchasedProduct).mockResolvedValue(false);
->>>>>>> origin/main
 
       await expect(
         reviewsService.createProductReview(userId, productId, { rating: 5 })
       ).rejects.toThrow("NOT_PURCHASED");
     });
-<<<<<<< HEAD
 
     it("throws ALREADY_REVIEWED if user already has a review", async () => {
       vi.mocked(reviewsRepo.hasPurchasedProduct).mockResolvedValue(true);
@@ -248,13 +225,10 @@ describe("reviewsService", () => {
         "ALREADY_REVIEWED"
       );
     });
-=======
->>>>>>> origin/main
   });
 
   describe("deleteReview", () => {
     it("allows owner to delete their own review", async () => {
-<<<<<<< HEAD
       vi.mocked(reviewsRepo.findUserReview).mockResolvedValue({ id: reviewId } as any);
 
       await reviewsService.deleteReview(reviewId, userId, "user", productId, "product");
@@ -342,22 +316,6 @@ describe("reviewsService", () => {
         offset: 10,
         sort: "lowest",
       });
-=======
-      vi.mocked(reviewsRepository.findUserReview).mockResolvedValue({ id: reviewId } as never);
-
-      await reviewsService.deleteReview(reviewId, userId, "user", productId, "product");
-
-      expect(reviewsRepository.softDelete).toHaveBeenCalledWith(reviewId);
-    });
-
-    it("allows admin to delete any review", async () => {
-      vi.mocked(reviewsRepository.findUserReview).mockResolvedValue(undefined);
-      vi.mocked(reviewsRepository.findById).mockResolvedValue({ id: reviewId } as never);
-
-      await reviewsService.deleteReview(reviewId, userId, "admin", productId, "product");
-
-      expect(reviewsRepository.softDelete).toHaveBeenCalledWith(reviewId);
->>>>>>> origin/main
     });
   });
 });

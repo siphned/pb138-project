@@ -1,100 +1,92 @@
-import { Elysia, status, t } from "elysia";
+import { Elysia, status } from "elysia";
+import { z } from "zod";
 import { authPlugin } from "../auth";
+import { resolveCallerRoles } from "../auth/auth.plugin";
 import { verifyClerkToken } from "../auth/auth.utils";
 import { cartsService } from "../carts/carts.service";
 import { usersService } from "../users/users.service";
 import type { CheckoutData } from "./orders.service";
 import { ordersService } from "./orders.service";
 
-const addressSchema = t.Object({
-  city: t.String(),
-  country: t.String(),
-  houseNumber: t.String(),
-  postalCode: t.String(),
-  street: t.String(),
+const addressSchema = z.object({
+  city: z.string(),
+  country: z.string(),
+  houseNumber: z.string(),
+  postalCode: z.string(),
+  street: z.string(),
 });
 
-<<<<<<< HEAD
-const addressWithIdSchema = t.Object({
-  city: t.String(),
-  country: t.String(),
-  houseNumber: t.String(),
-  id: t.String(),
-  postalCode: t.String(),
-  street: t.String(),
+const addressWithIdSchema = z.object({
+  city: z.string(),
+  country: z.string(),
+  houseNumber: z.string(),
+  id: z.string(),
+  postalCode: z.string(),
+  street: z.string(),
 });
 
-const orderItemSchema = t.Object({
-  id: t.String(),
-  orderId: t.String(),
-  product: t.Object({
-    id: t.String(),
-    name: t.String(),
+const orderItemSchema = z.object({
+  id: z.string(),
+  orderId: z.string(),
+  product: z.object({
+    id: z.string(),
+    name: z.string(),
   }),
-  productId: t.String(),
-  quantity: t.Number(),
-  shopId: t.String(),
-  unitPriceAtPurchase: t.String(),
+  productId: z.string(),
+  quantity: z.number(),
+  shopId: z.string(),
+  unitPriceAtPurchase: z.string(),
 });
 
-=======
->>>>>>> origin/main
-const orderResponse = t.Object({
-  billingAddressId: t.String(),
-  createdAt: t.Date(),
-  deletedAt: t.Union([t.Date(), t.Null()]),
-  deliveryType: t.String(),
-  discount: t.String(),
-  guestEmail: t.Union([t.String(), t.Null()]),
-  guestName: t.Union([t.String(), t.Null()]),
-  guestSessionId: t.Union([t.String(), t.Null()]),
-  id: t.String(),
-  paymentMethod: t.String(),
-  paymentStatus: t.String(),
-  shippingAddressId: t.String(),
-  shippingFee: t.String(),
-  status: t.String(),
-  totalPrice: t.String(),
-  updatedAt: t.Union([t.Date(), t.Null()]),
-  userId: t.Union([t.String(), t.Null()]),
+const orderResponse = z.object({
+  billingAddressId: z.string(),
+  createdAt: z.date(),
+  deletedAt: z.date().nullable(),
+  deliveryType: z.string(),
+  discount: z.string(),
+  guestEmail: z.string().nullable(),
+  guestName: z.string().nullable(),
+  guestSessionId: z.string().nullable(),
+  id: z.string(),
+  paymentMethod: z.string(),
+  paymentStatus: z.string(),
+  shippingAddressId: z.string(),
+  shippingFee: z.string(),
+  status: z.string(),
+  totalPrice: z.string(),
+  updatedAt: z.date().nullable(),
+  userId: z.string().nullable(),
 });
 
-<<<<<<< HEAD
-const orderDetailedResponse = t.Object({
+const orderDetailedResponse = z.object({
   billingAddress: addressWithIdSchema,
-  billingAddressId: t.String(),
-  createdAt: t.Date(),
-  deletedAt: t.Union([t.Date(), t.Null()]),
-  deliveryType: t.String(),
-  discount: t.String(),
-  guestEmail: t.Union([t.String(), t.Null()]),
-  guestName: t.Union([t.String(), t.Null()]),
-  guestSessionId: t.Union([t.String(), t.Null()]),
-  id: t.String(),
-  items: t.Array(orderItemSchema),
-  paymentMethod: t.String(),
-  paymentStatus: t.String(),
+  billingAddressId: z.string(),
+  createdAt: z.date(),
+  deletedAt: z.date().nullable(),
+  deliveryType: z.string(),
+  discount: z.string(),
+  guestEmail: z.string().nullable(),
+  guestName: z.string().nullable(),
+  guestSessionId: z.string().nullable(),
+  id: z.string(),
+  items: z.array(orderItemSchema),
+  paymentMethod: z.string(),
+  paymentStatus: z.string(),
   shippingAddress: addressWithIdSchema,
-  shippingAddressId: t.String(),
-  shippingFee: t.String(),
-  status: t.String(),
-  totalPrice: t.String(),
-  updatedAt: t.Union([t.Date(), t.Null()]),
-  userId: t.Union([t.String(), t.Null()]),
+  shippingAddressId: z.string(),
+  shippingFee: z.string(),
+  status: z.string(),
+  totalPrice: z.string(),
+  updatedAt: z.date().nullable(),
+  userId: z.string().nullable(),
 });
 
-=======
->>>>>>> origin/main
-const checkoutBody = t.Object({
-  billingAddress: t.Optional(addressSchema),
-  deliveryType: t.Union([t.Literal("pickup"), t.Literal("shipping")]),
-  guestEmail: t.Optional(t.String()),
-  guestName: t.Optional(t.String()),
-  paymentMethod: t.Union([
-    t.Literal("card"),
-    t.Literal("bank_transfer"),
-    t.Literal("cash_on_delivery"),
-  ]),
+const checkoutBody = z.object({
+  billingAddress: addressSchema.optional(),
+  deliveryType: z.enum(["pickup", "shipping"]),
+  guestEmail: z.string().optional(),
+  guestName: z.string().optional(),
+  paymentMethod: z.enum(["card", "bank_transfer", "cash_on_delivery"]),
   shippingAddress: addressSchema,
 });
 
@@ -103,20 +95,23 @@ export const ordersRoutes = new Elysia({ prefix: "/orders", tags: ["orders"] })
   .derive(async ({ headers, cookie: { guest_session_id } }) => {
     const payload = await verifyClerkToken(headers.authorization);
     if (payload) {
-<<<<<<< HEAD
       const dbUser = await usersService.lazyGetOrCreate(payload.sub);
-=======
-      const dbUser = await usersService.lazyGetOrCreate(payload.sub, payload);
->>>>>>> origin/main
+      // Resolve roles from DB if the JWT didn't include the `roles` claim
+      // — see auth.plugin.ts for the rationale.
+      const callerRoles = await resolveCallerRoles(payload.roles, dbUser.id);
+      const enrichedPayload = {
+        ...payload,
+        roles: callerRoles as ("customer" | "winemaker" | "shop_owner" | "admin")[],
+      };
+
       const guestSessionId = guest_session_id?.value;
       if (typeof guestSessionId === "string") {
         await cartsService.mergeOnLogin(dbUser.id, guestSessionId);
         guest_session_id?.remove();
       }
-<<<<<<< HEAD
       return {
-        clerkPayload: payload,
-        isAdmin: payload.roles?.includes("admin") ?? false,
+        clerkPayload: enrichedPayload,
+        isAdmin: callerRoles.includes("admin"),
         sessionId: undefined as string | undefined,
         user: dbUser,
       };
@@ -155,18 +150,11 @@ export const ordersRoutes = new Elysia({ prefix: "/orders", tags: ["orders"] })
           "Without shopId: returns the authenticated customer's order history. With shopId: returns all orders for that shop (shop_owner or admin only).",
         summary: "List orders",
       },
-      query: t.Object({ shopId: t.Optional(t.String()) }),
-      response: { 200: t.Array(orderResponse), 401: t.String(), 403: t.String(), 404: t.String() },
+      query: z.object({ shopId: z.string().optional() }),
+      response: { 200: z.array(orderResponse), 401: z.string(), 403: z.string(), 404: z.string() },
     }
   )
 
-=======
-      return { sessionId: undefined as string | undefined, user: dbUser };
-    }
-    return { sessionId: guest_session_id?.value as string | undefined, user: undefined };
-  })
-
->>>>>>> origin/main
   .post(
     "/checkout",
     async ({ user, sessionId, body }) => {
@@ -195,23 +183,16 @@ export const ordersRoutes = new Elysia({ prefix: "/orders", tags: ["orders"] })
           "Create an order from the current cart. Works for both authenticated users and guests.",
         summary: "Checkout",
       },
-      response: { 200: orderResponse, 400: t.String(), 410: t.String(), 422: t.String() },
+      response: { 200: orderResponse, 400: z.string(), 410: z.string(), 422: z.string() },
     }
   )
 
   .get(
     "/:id",
-<<<<<<< HEAD
     async ({ user, params, isAdmin }) => {
       if (!user) return status(401, "Auth required");
       try {
         return await ordersService.getOrder(params.id, user.id, isAdmin);
-=======
-    async ({ user, params }) => {
-      if (!user) return status(401, "Auth required");
-      try {
-        return await ordersService.getOrder(params.id, user.id);
->>>>>>> origin/main
       } catch (e: unknown) {
         if (e instanceof Error) {
           if (e.message === "NOT_FOUND") return status(404, "Not found");
@@ -222,13 +203,12 @@ export const ordersRoutes = new Elysia({ prefix: "/orders", tags: ["orders"] })
     },
     {
       detail: {
-<<<<<<< HEAD
         description:
           "Returns an order by ID with items and addresses. The owning user or an admin can access it.",
         summary: "Get order by ID",
       },
-      params: t.Object({ id: t.String() }),
-      response: { 200: orderDetailedResponse, 401: t.String(), 403: t.String(), 404: t.String() },
+      params: z.object({ id: z.string() }),
+      response: { 200: orderDetailedResponse, 401: z.string(), 403: z.string(), 404: z.string() },
     }
   )
 
@@ -248,14 +228,8 @@ export const ordersRoutes = new Elysia({ prefix: "/orders", tags: ["orders"] })
       }
     },
     {
-      body: t.Object({
-        status: t.Union([
-          t.Literal("pending"),
-          t.Literal("confirmed"),
-          t.Literal("shipped"),
-          t.Literal("delivered"),
-          t.Literal("cancelled"),
-        ]),
+      body: z.object({
+        status: z.enum(["pending", "confirmed", "shipped", "delivered", "cancelled"]),
       }),
       detail: {
         description:
@@ -263,20 +237,13 @@ export const ordersRoutes = new Elysia({ prefix: "/orders", tags: ["orders"] })
         security: [{ bearerAuth: [] }],
         summary: "Update order status",
       },
-      params: t.Object({ id: t.String() }),
+      params: z.object({ id: z.string() }),
       requireRoles: ["shop_owner", "admin"],
       response: {
         200: orderResponse,
-        403: t.String(),
-        404: t.String(),
-        422: t.String(),
+        403: z.string(),
+        404: z.string(),
+        422: z.string(),
       },
-=======
-        description: "Returns an order by ID. Only the owning user can access it.",
-        summary: "Get order by ID",
-      },
-      params: t.Object({ id: t.String() }),
-      response: { 200: orderResponse, 401: t.String(), 403: t.String(), 404: t.String() },
->>>>>>> origin/main
     }
   );

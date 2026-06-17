@@ -1,66 +1,34 @@
-<<<<<<< HEAD
-import { Elysia, status, t } from "elysia";
-=======
 import { Elysia, status } from "elysia";
->>>>>>> origin/main
+import { z } from "zod";
 import { authPlugin } from "../auth";
+import { verifyClerkToken } from "../auth/auth.utils";
+import { usersService } from "../users/users.service";
 import {
+  commentParams,
   createCommentBody,
   createEventBody,
   eventParams,
-<<<<<<< HEAD
   invitationResponse,
-=======
->>>>>>> origin/main
   listEventsQuery,
   paginationQuery,
   updateEventBody,
 } from "./events.schema";
 import { eventsService } from "./events.service";
 
-<<<<<<< HEAD
-=======
-const errorMessages: Record<string, [number, string]> = {
-  ALREADY_REGISTERED: [409, "Already registered for this event"],
-  CAPACITY_FULL: [409, "Event is at full capacity"],
-  CAPACITY_TOO_LOW: [409, "Capacity cannot be lower than current registration count"],
-  CONFLICT: [409, "Event cannot be edited in its current status"],
-  EVENT_NOT_AVAILABLE: [409, "Event is not available for this action"],
-  FORBIDDEN: [403, "Forbidden"],
-  INVALID_DATES: [422, "Invalid dates: start must be in future, end must be after start"],
-  NOT_FOUND: [404, "Not found"],
-};
-
-function handleError(e: unknown) {
-  if (e instanceof Error) {
-    const errorData = errorMessages[e.message];
-    if (errorData) {
-      const [code, message] = errorData;
-      return status(code, message);
-    }
-  }
-  throw e;
-}
-
->>>>>>> origin/main
 export const eventsRoutes = new Elysia()
   .use(authPlugin)
+  .derive(async ({ headers }) => {
+    const payload = await verifyClerkToken(headers.authorization);
+    if (!payload) return { currentUserId: undefined as string | undefined };
+    const dbUser = await usersService.lazyGetOrCreate(payload.sub);
+    return { currentUserId: dbUser.id as string | undefined };
+  })
 
   .get(
     "/events",
-<<<<<<< HEAD
-    ({ query }) => {
+    ({ query, currentUserId }) => {
       const { page, limit, ...filters } = query;
-      return eventsService.listEvents(filters, { limit, page });
-=======
-    async ({ query }) => {
-      try {
-        const { page, limit, ...filters } = query;
-        return await eventsService.listEvents(filters, { limit, page });
-      } catch (e) {
-        return handleError(e);
-      }
->>>>>>> origin/main
+      return eventsService.listEvents(filters, { limit, page }, currentUserId);
     },
     {
       detail: { summary: "List approved events", tags: ["events"] },
@@ -68,25 +36,9 @@ export const eventsRoutes = new Elysia()
     }
   )
 
-<<<<<<< HEAD
-  .get("/events/:id", ({ params }) => eventsService.getEvent(params.id), {
-    detail: { summary: "Get event by ID", tags: ["events"] },
-    params: eventParams,
-  })
-
-  .post(
-    "/events",
-    async ({ body, dbUser }) => status(201, await eventsService.createEvent(dbUser.id, body)),
-=======
   .get(
     "/events/:id",
-    async ({ params }) => {
-      try {
-        return await eventsService.getEvent(params.id);
-      } catch (e) {
-        return handleError(e);
-      }
-    },
+    ({ params, currentUserId }) => eventsService.getEvent(params.id, currentUserId),
     {
       detail: { summary: "Get event by ID", tags: ["events"] },
       params: eventParams,
@@ -95,14 +47,7 @@ export const eventsRoutes = new Elysia()
 
   .post(
     "/events",
-    async ({ body, dbUser }) => {
-      try {
-        return status(201, await eventsService.createEvent(dbUser.id, body));
-      } catch (e) {
-        return handleError(e);
-      }
-    },
->>>>>>> origin/main
+    async ({ body, dbUser }) => status(201, await eventsService.createEvent(dbUser.id, body)),
     {
       body: createEventBody,
       detail: {
@@ -116,22 +61,12 @@ export const eventsRoutes = new Elysia()
 
   .patch(
     "/events/:id",
-<<<<<<< HEAD
     ({ params, body, dbUser }) => eventsService.updateEvent(params.id, dbUser.id, body),
-=======
-    async ({ params, body, dbUser }) => {
-      try {
-        return await eventsService.updateEvent(params.id, dbUser.id, body);
-      } catch (e) {
-        return handleError(e);
-      }
-    },
->>>>>>> origin/main
     {
       body: updateEventBody,
       detail: {
         security: [{ bearerAuth: [] }],
-        summary: "Update own pending event",
+        summary: "Update own upcoming event",
         tags: ["events"],
       },
       params: eventParams,
@@ -141,18 +76,9 @@ export const eventsRoutes = new Elysia()
 
   .delete(
     "/events/:id",
-    async ({ params, dbUser }) => {
-<<<<<<< HEAD
+    async ({ params, dbUser, set }) => {
       await eventsService.deleteEvent(params.id, dbUser.id);
-      return status(204, "");
-=======
-      try {
-        await eventsService.deleteEvent(params.id, dbUser.id);
-        return status(204, null);
-      } catch (e) {
-        return handleError(e);
-      }
->>>>>>> origin/main
+      set.status = 204;
     },
     {
       detail: {
@@ -167,18 +93,8 @@ export const eventsRoutes = new Elysia()
 
   .post(
     "/events/:id/register",
-<<<<<<< HEAD
     async ({ params, dbUser }) =>
       status(201, await eventsService.registerForEvent(params.id, dbUser.id)),
-=======
-    async ({ params, dbUser }) => {
-      try {
-        return status(201, await eventsService.registerForEvent(params.id, dbUser.id));
-      } catch (e) {
-        return handleError(e);
-      }
-    },
->>>>>>> origin/main
     {
       detail: {
         security: [{ bearerAuth: [] }],
@@ -192,18 +108,9 @@ export const eventsRoutes = new Elysia()
 
   .delete(
     "/events/:id/register",
-    async ({ params, dbUser }) => {
-<<<<<<< HEAD
+    async ({ params, dbUser, set }) => {
       await eventsService.unregisterFromEvent(params.id, dbUser.id);
-      return status(204, "");
-=======
-      try {
-        await eventsService.unregisterFromEvent(params.id, dbUser.id);
-        return status(204, null);
-      } catch (e) {
-        return handleError(e);
-      }
->>>>>>> origin/main
+      set.status = 204;
     },
     {
       detail: {
@@ -218,21 +125,8 @@ export const eventsRoutes = new Elysia()
 
   .get(
     "/events/:id/comments",
-<<<<<<< HEAD
     ({ params, query }) =>
       eventsService.listComments(params.id, { limit: query.limit, page: query.page }),
-=======
-    async ({ params, query }) => {
-      try {
-        return await eventsService.listComments(params.id, {
-          limit: query.limit,
-          page: query.page,
-        });
-      } catch (e) {
-        return handleError(e);
-      }
-    },
->>>>>>> origin/main
     {
       detail: { summary: "List event comments", tags: ["events"] },
       params: eventParams,
@@ -240,7 +134,6 @@ export const eventsRoutes = new Elysia()
     }
   )
 
-<<<<<<< HEAD
   .get(
     "/events/:id/invitations",
     async ({ params, dbUser }) => {
@@ -262,7 +155,7 @@ export const eventsRoutes = new Elysia()
       },
       params: eventParams,
       requireCapability: "winemaker",
-      response: { 200: t.Array(invitationResponse), 403: t.String(), 404: t.String() },
+      response: { 200: z.array(invitationResponse), 403: z.string(), 404: z.string() },
     }
   )
 
@@ -270,17 +163,6 @@ export const eventsRoutes = new Elysia()
     "/events/:id/comments",
     async ({ params, body, dbUser }) =>
       status(201, await eventsService.addComment(params.id, dbUser.id, body.body)),
-=======
-  .post(
-    "/events/:id/comments",
-    async ({ params, body, dbUser }) => {
-      try {
-        return status(201, await eventsService.addComment(params.id, dbUser.id, body.body));
-      } catch (e) {
-        return handleError(e);
-      }
-    },
->>>>>>> origin/main
     {
       body: createCommentBody,
       detail: {
@@ -289,6 +171,28 @@ export const eventsRoutes = new Elysia()
         tags: ["events"],
       },
       params: eventParams,
+      requireAuth: true,
+    }
+  )
+
+  .delete(
+    "/events/:id/comments/:commentId",
+    async ({ params, dbUser, clerkPayload, set }) => {
+      await eventsService.deleteComment(
+        params.id,
+        params.commentId,
+        dbUser.id,
+        clerkPayload.roles.includes("admin")
+      );
+      set.status = 204;
+    },
+    {
+      detail: {
+        security: [{ bearerAuth: [] }],
+        summary: "Delete a comment on an event",
+        tags: ["events"],
+      },
+      params: commentParams,
       requireAuth: true,
     }
   );

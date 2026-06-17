@@ -1,7 +1,6 @@
 import type { AvailabilityException, AvailabilityRegular } from "@repo/shared/schemas";
 import { availabilityExceptions, availabilityRegular, shops } from "@repo/shared/schemas";
-import { and, eq, isNull } from "drizzle-orm";
-<<<<<<< HEAD
+import { and, eq, gte, isNull, lt } from "drizzle-orm";
 import type { Database } from "../../db";
 
 export async function deleteException(db: Database, id: string): Promise<void> {
@@ -64,25 +63,11 @@ export async function findShopById(db: Database, id: string) {
 export async function insertException(
   db: Database,
   data: {
-=======
-import { db } from "../../db";
-
-export interface IAvailabilityRepository {
-  deleteException(id: string): Promise<void>;
-  deleteRegular(id: string): Promise<void>;
-  findExceptionById(id: string): Promise<AvailabilityException | undefined>;
-  findExceptionsByShopId(shopId: string): Promise<AvailabilityException[]>;
-  findRegularById(id: string): Promise<AvailabilityRegular | undefined>;
-  findRegularByShopId(shopId: string): Promise<AvailabilityRegular[]>;
-  findShopById(id: string): Promise<{ id: string; ownerUserId: string } | undefined>;
-  insertException(data: {
->>>>>>> origin/main
     shopId: string;
     startsAt: Date;
     endsAt: Date;
     action: string;
     reason?: string;
-<<<<<<< HEAD
   }
 ): Promise<AvailabilityException> {
   const [entry] = await db.insert(availabilityExceptions).values(data).returning();
@@ -93,10 +78,6 @@ export interface IAvailabilityRepository {
 export async function insertRegular(
   db: Database,
   data: {
-=======
-  }): Promise<AvailabilityException>;
-  insertRegular(data: {
->>>>>>> origin/main
     shopId: string;
     dow: number;
     startTime: Date;
@@ -104,81 +85,60 @@ export async function insertRegular(
     validFrom: string;
     validTo?: string;
     type: string;
-<<<<<<< HEAD
   }
 ): Promise<AvailabilityRegular> {
   const [entry] = await db.insert(availabilityRegular).values(data).returning();
   if (!entry) throw new Error("Insert returned no rows");
   return entry;
 }
-=======
-  }): Promise<AvailabilityRegular>;
+
+/**
+ * When a new regular entry is added for a shop/dow, any existing open-ended
+ * entries for the same shop+dow must give way to it:
+ *  - if they started before the new validFrom → cap their validTo at the day
+ *    before the new entry starts, so the old hours remain visible until then.
+ *  - if they started on/after the new validFrom → soft-delete, since they'd
+ *    never actually apply (the new one supersedes them from day one).
+ *
+ * Entries that already have a validTo set are bounded explicitly by the user
+ * and are left alone.
+ */
+export async function supersedeOpenEndedRegular(
+  db: Database,
+  params: { shopId: string; dow: number; newValidFrom: string }
+): Promise<void> {
+  const capDate = previousDay(params.newValidFrom);
+
+  await db
+    .update(availabilityRegular)
+    .set({ validTo: capDate })
+    .where(
+      and(
+        eq(availabilityRegular.shopId, params.shopId),
+        eq(availabilityRegular.dow, params.dow),
+        isNull(availabilityRegular.deletedAt),
+        isNull(availabilityRegular.validTo),
+        lt(availabilityRegular.validFrom, params.newValidFrom)
+      )
+    );
+
+  await db
+    .update(availabilityRegular)
+    .set({ deletedAt: new Date() })
+    .where(
+      and(
+        eq(availabilityRegular.shopId, params.shopId),
+        eq(availabilityRegular.dow, params.dow),
+        isNull(availabilityRegular.deletedAt),
+        isNull(availabilityRegular.validTo),
+        gte(availabilityRegular.validFrom, params.newValidFrom)
+      )
+    );
 }
 
-export const availabilityRepository: IAvailabilityRepository = {
-  async deleteException(id: string): Promise<void> {
-    await db.delete(availabilityExceptions).where(eq(availabilityExceptions.id, id));
-  },
-
-  async deleteRegular(id: string): Promise<void> {
-    await db.delete(availabilityRegular).where(eq(availabilityRegular.id, id));
-  },
-
-  findExceptionById(id: string): Promise<AvailabilityException | undefined> {
-    return db.query.availabilityExceptions.findFirst({
-      where: and(eq(availabilityExceptions.id, id), isNull(availabilityExceptions.deletedAt)),
-    });
-  },
-
-  findExceptionsByShopId(shopId: string): Promise<AvailabilityException[]> {
-    return db.query.availabilityExceptions.findMany({
-      where: eq(availabilityExceptions.shopId, shopId),
-    });
-  },
-
-  findRegularById(id: string): Promise<AvailabilityRegular | undefined> {
-    return db.query.availabilityRegular.findFirst({
-      where: and(eq(availabilityRegular.id, id), isNull(availabilityRegular.deletedAt)),
-    });
-  },
-
-  findRegularByShopId(shopId: string): Promise<AvailabilityRegular[]> {
-    return db.query.availabilityRegular.findMany({
-      where: eq(availabilityRegular.shopId, shopId),
-    });
-  },
-
-  findShopById(id: string) {
-    return db.query.shops.findFirst({
-      columns: { id: true, ownerUserId: true },
-      where: and(eq(shops.id, id), isNull(shops.deletedAt)),
-    });
-  },
-
-  async insertException(data: {
-    shopId: string;
-    startsAt: Date;
-    endsAt: Date;
-    action: string;
-    reason?: string;
-  }): Promise<AvailabilityException> {
-    const [entry] = await db.insert(availabilityExceptions).values(data).returning();
-    if (!entry) throw new Error("Insert returned no rows");
-    return entry;
-  },
-
-  async insertRegular(data: {
-    shopId: string;
-    dow: number;
-    startTime: Date;
-    endTime: Date;
-    validFrom: string;
-    validTo?: string;
-    type: string;
-  }): Promise<AvailabilityRegular> {
-    const [entry] = await db.insert(availabilityRegular).values(data).returning();
-    if (!entry) throw new Error("Insert returned no rows");
-    return entry;
-  },
-};
->>>>>>> origin/main
+function previousDay(dateStr: string): string {
+  // Parse as UTC midnight so the subtraction doesn't drift across timezones.
+  const d = new Date(`${dateStr}T00:00:00Z`);
+  d.setUTCDate(d.getUTCDate() - 1);
+  return d.toISOString().slice(0, 10);
+}

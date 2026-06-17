@@ -1,11 +1,6 @@
-<<<<<<< HEAD
 import { afterEach, describe, expect, it, vi } from "vitest";
 import { app } from "../../app";
 import { verifyClerkToken } from "../auth/auth.utils";
-=======
-import { describe, expect, it, vi } from "vitest";
-import { app } from "../../app";
->>>>>>> origin/main
 
 vi.mock("./supply-agreements.service", () => ({
   supplyAgreementsService: {
@@ -49,7 +44,6 @@ vi.mock("./supply-agreements.service", () => ({
 }));
 
 vi.mock("../auth/auth.utils", () => ({
-<<<<<<< HEAD
   verifyClerkToken: vi.fn().mockResolvedValue(null),
 }));
 
@@ -88,28 +82,6 @@ describe("supply-agreements routes", () => {
     const response = await app.handle(
       new Request("http://localhost/supply-agreements", {
         body: JSON.stringify({ shopId: "s1", winemakerId: "wm1" }),
-=======
-  verifyClerkToken: vi.fn().mockResolvedValue({
-    roles: ["shop_owner", "winemaker"],
-    sub: "user_1",
-  }),
-}));
-
-vi.mock("../users/users.service", () => ({
-  usersService: {
-    lazyGetOrCreate: vi.fn().mockResolvedValue({ id: "db_user_1" }),
-  },
-}));
-
-describe("supply-agreements routes", () => {
-  it("POST /supply-agreements creates a request", async () => {
-    const response = await app.handle(
-      new Request("http://localhost/supply-agreements", {
-        body: JSON.stringify({
-          shopId: "s1",
-          winemakerId: "wm1",
-        }),
->>>>>>> origin/main
         headers: {
           Authorization: "Bearer token",
           "Content-Type": "application/json",
@@ -117,7 +89,6 @@ describe("supply-agreements routes", () => {
         method: "POST",
       })
     );
-<<<<<<< HEAD
     expect(response.status).toBe(200);
   });
 
@@ -148,26 +119,5 @@ describe("supply-agreements routes", () => {
       })
     );
     expect(response.status).toBe(200);
-=======
-
-    expect(response.status).toBe(200);
-    const data = (await response.json()) as unknown as { id: string };
-    expect(data.id).toBe("a1");
-  });
-
-  it("GET /supply-agreements/winemaker lists agreements", async () => {
-    const response = await app.handle(
-      new Request("http://localhost/supply-agreements/winemaker", {
-        headers: {
-          Authorization: "Bearer token",
-        },
-        method: "GET",
-      })
-    );
-
-    expect(response.status).toBe(200);
-    const data = (await response.json()) as unknown as { id: string };
-    expect(Array.isArray(data)).toBe(true);
->>>>>>> origin/main
   });
 });

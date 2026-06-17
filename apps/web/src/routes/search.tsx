@@ -1,23 +1,10 @@
-<<<<<<< HEAD
 import { FilterIcon } from "@hugeicons/core-free-icons";
 import { HugeiconsIcon } from "@hugeicons/react";
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import type React from "react";
-import { ProductCard } from "@/components/catalog/ProductCard";
-import { SearchPageFilters } from "@/components/catalog/SearchPageFilters";
-import { SearchSection } from "@/components/catalog/SearchSection";
-import {
-  asNumOrStr,
-  asString,
-  type SearchPageSearch,
-  type WineSearch,
-} from "@/components/catalog/types";
-import { WineCard } from "@/components/catalog/WineCard";
-import { WinemakerCard } from "@/components/catalog/WinemakerCard";
 import { EmptyState } from "@/components/primitives/empty-state";
 import { LoadingState } from "@/components/primitives/loading-state";
 import { PageHeader } from "@/components/primitives/page-header";
-import { ShopCard } from "@/components/shops/ShopCard";
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { useGetEvents } from "@/generated/hooks/useGetEvents";
@@ -30,6 +17,19 @@ import {
   getWinesQueryParamsColorEnum,
 } from "@/generated/types/GetWines";
 import { EventCard } from "@/routes/-components/EventCard";
+import { ProductCard } from "@/routes/-components/ProductCard";
+import { SearchPageFilters } from "@/routes/-components/SearchPageFilters";
+import { SearchSection } from "@/routes/-components/SearchSection";
+import { ShopCard } from "@/routes/-components/ShopCard";
+import {
+  asNumOrStr,
+  asString,
+  type ProductSearch,
+  type SearchPageSearch,
+  type WineSearch,
+} from "@/routes/-components/types";
+import { WineCard } from "@/routes/-components/WineCard";
+import { WinemakerCard } from "@/routes/-components/WinemakerCard";
 
 const COLOR_VALUES = Object.values(getWinesQueryParamsColorEnum) as readonly string[];
 const isColor = (v: unknown): v is GetWinesQueryParamsColorEnumKey =>
@@ -64,6 +64,18 @@ const matchesShop = <T extends { name: string; address: { city: string } }>(
   );
 };
 
+// GetEvents200 is typed as `any` in the OpenAPI spec; normalise array vs { data }.
+type SearchEvent = { id: string; name?: string; title?: string };
+const asEventList = (raw: unknown): SearchEvent[] => {
+  if (Array.isArray(raw)) return raw as SearchEvent[];
+  return ((raw as { data?: SearchEvent[] } | undefined)?.data ?? []) as SearchEvent[];
+};
+const matchesEvent = (items: SearchEvent[], needle: string): SearchEvent[] => {
+  if (!needle) return items;
+  const lower = needle.toLowerCase();
+  return items.filter((e) => `${e.name ?? ""} ${e.title ?? ""}`.toLowerCase().includes(lower));
+};
+
 function SearchPage() {
   const search = Route.useSearch();
   const { q = "" } = search;
@@ -83,12 +95,11 @@ function SearchPage() {
     region: search.region,
   });
 
-  // Note: Winemakers and Shops don't support query params in current BE
+  // Note: Winemakers, Shops, and Events don't reliably support text query
+  // params in the current BE, so they're filtered client-side below.
   const winemakersQuery = useGetWinemakers();
   const shopsQuery = useGetShops();
-
-  // BE supports `q` against event.name; everything else stays default.
-  const eventsQuery = useGetEvents({ q: q || undefined });
+  const eventsQuery = useGetEvents();
 
   const handleSearchChange = (next: WineSearch) => {
     navigate({ replace: true, search: next });
@@ -103,36 +114,16 @@ function SearchPage() {
 
   // Client-side filtering for entities without BE search support
   const filteredWines = matchesByName(winesQuery.data, q);
-  const filteredWinemakers = matchesByName(winemakersQuery.data, q);
-  const filteredShops = matchesShop(shopsQuery.data, q);
-
-  // GetEvents200 is typed `any` in the spec, and may be a raw array or a
-  // paginated envelope `{ data, total }`. Normalise here and shape for EventCard.
-  type EventLike = {
-    id: string;
-    name?: string;
-    title?: string;
-    description?: string | null;
-    startTime?: string;
-    endTime?: string;
-    location?: string;
-    winemakerName?: string;
-    winemakerId?: string;
-  };
-  const eventsRaw = eventsQuery.data as
-    | EventLike[]
-    | { data?: EventLike[]; total?: number }
-    | undefined;
-  const eventsList = (
-    Array.isArray(eventsRaw) ? eventsRaw : (eventsRaw?.data ?? [])
-  ) as EventLike[];
+  const filteredWinemakers = matchesByName(winemakersQuery.data?.data, q);
+  const filteredShops = matchesShop(shopsQuery.data?.data, q);
+  const filteredEvents = matchesEvent(asEventList(eventsQuery.data), q);
 
   const wineCount = filteredWines.length;
   const products = productsQuery.data?.data || [];
   const productCount = Number(productsQuery.data?.total || 0);
   const winemakerCount = filteredWinemakers.length;
   const shopCount = filteredShops.length;
-  const eventCount = eventsList.length;
+  const eventCount = filteredEvents.length;
 
   const hasResults = wineCount + productCount + winemakerCount + shopCount + eventCount > 0;
 
@@ -152,7 +143,7 @@ function SearchPage() {
         <SearchSection
           count={wineCount}
           heading="Wines"
-          viewAllHref="/explore"
+          viewAllHref="/wines"
           viewAllSearch={{ ...search }}
         >
           {filteredWines.slice(0, 3).map((wine) => (
@@ -164,7 +155,7 @@ function SearchPage() {
           count={productCount}
           heading="Products"
           viewAllHref="/products"
-          viewAllSearch={{ ...search, q: q || undefined }}
+          viewAllSearch={{ ...search, q: q || undefined, sort: undefined } as ProductSearch}
         >
           {products.slice(0, 3).map((product) => (
             <ProductCard key={product.id} product={product} />
@@ -194,7 +185,7 @@ function SearchPage() {
           viewAllHref="/events"
           viewAllSearch={{ q: q || undefined }}
         >
-          {eventsList.slice(0, 3).map((event) => (
+          {filteredEvents.slice(0, 3).map((event) => (
             <EventCard event={event} key={event.id} />
           ))}
         </SearchSection>
@@ -232,15 +223,4 @@ function SearchPage() {
       </div>
     </div>
   );
-=======
-import { createFileRoute } from "@tanstack/react-router";
-import { RouteStub } from "./-components/RouteStub";
-
-export const Route = createFileRoute("/search")({
-  component: SearchPage,
-});
-
-function SearchPage() {
-  return <RouteStub title="Search" />;
->>>>>>> origin/main
 }

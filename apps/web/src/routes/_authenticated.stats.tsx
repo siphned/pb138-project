@@ -1,6 +1,4 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { EmptyState } from "@/components/primitives/empty-state";
-import { PageHeader } from "@/components/primitives/page-header";
 import { AdminStatsSection } from "@/components/stats/AdminStatsSection";
 import { CustomerStatsSection } from "@/components/stats/CustomerStatsSection";
 import { ShopOwnerStatsSection } from "@/components/stats/ShopOwnerStatsSection";
@@ -13,27 +11,21 @@ export const Route = createFileRoute("/_authenticated/stats")({
 });
 
 function StatsPage() {
-  const { activeRole, user } = useUser();
-
-  if (!user) {
-    return (
-      <div className="container mx-auto space-y-8 py-8">
-        <PageHeader title="Statistics" />
-        <EmptyState
-          description="Sign in and pick an active role to see your stats."
-          title="Sign in to see your stats"
-        />
-      </div>
-    );
-  }
+  const { user } = useUser();
+  const roles = user?.roles ?? [];
 
   return (
-    <div className="container mx-auto space-y-8 py-8">
-      <PageHeader description={`Showing metrics for your ${activeRole} role.`} title="Statistics" />
-      {activeRole === Role.customer && <CustomerStatsSection />}
-      {activeRole === Role.winemaker && <WinemakerStatsSection />}
-      {activeRole === Role.shopOwner && <ShopOwnerStatsSection />}
-      {activeRole === Role.admin && <AdminStatsSection />}
+    <div className="container py-8 space-y-8">
+      <h1 className="text-3xl font-bold tracking-tight">Dashboard</h1>
+      {roles.includes(Role.customer) && <CustomerStatsSection />}
+      {roles.includes(Role.winemaker) && <WinemakerStatsSection />}
+      {roles.includes(Role.shopOwner) && <ShopOwnerStatsSection />}
+      {roles.includes(Role.admin) && <AdminStatsSection />}
+      {roles.length === 0 && (
+        <p className="text-muted-foreground">
+          No roles assigned yet. Contact an admin to get started.
+        </p>
+      )}
     </div>
   );
 }

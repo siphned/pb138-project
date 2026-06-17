@@ -1,3 +1,4 @@
+import { faker } from "@faker-js/faker";
 import {
   addresses,
   availabilityExceptions,
@@ -60,6 +61,54 @@ export type AddressInput = {
 export async function insertAddresses(data: AddressInput[]) {
   if (data.length === 0) return [];
   return await db.insert(addresses).values(data).returning();
+}
+
+// Real, central street names per city — each verified to resolve in OpenStreetMap
+// (Nominatim) when queried as "<street> 1, <city>, Czech Republic". The map embeds
+// on the shop and event pages geocode the stored address at render time, so seeded
+// addresses must point at places that actually exist or the map stays blank.
+const STREETS_BY_CITY: Record<string, readonly string[]> = {
+  Brno: ["náměstí Svobody", "Masarykova", "Zelný trh"],
+  Bzenec: ["náměstí Svobody"],
+  "Hradec Králové": ["Velké náměstí"],
+  Hustopeče: ["Nádražní", "Mrštíkova"],
+  Liberec: ["náměstí Dr. E. Beneše", "Pražská", "Moskevská"],
+  Litoměřice: ["Mírové náměstí"],
+  Mikulov: ["Náměstí"],
+  Mělník: ["náměstí Míru"],
+  Nymburk: ["náměstí Přemyslovců"],
+  Olomouc: ["Horní náměstí", "Dolní náměstí"],
+  Ostrava: ["Masarykovo náměstí", "Stodolní", "Nádražní"],
+  Pardubice: ["Pernštýnské náměstí"],
+  Pavlov: ["Klentnická", "Na Návsi"],
+  Plzeň: ["náměstí Republiky", "Klatovská třída", "Americká"],
+  Praha: ["Václavské náměstí", "Staroměstské náměstí", "Národní"],
+  "Roudnice nad Labem": ["Karlovo náměstí"],
+  "Uherské Hradiště": ["Masarykovo náměstí"],
+  Valtice: ["náměstí Svobody"],
+  "Velké Bílovice": ["Fabián"],
+  Zlín: ["náměstí Míru"],
+  Znojmo: ["Václavské náměstí"],
+  "České Budějovice": ["náměstí Přemysla Otakara II."],
+};
+
+// Cities outside the verified set (e.g. customer-only towns that never render a map)
+// fall back to a generic central street so addresses stay plausible.
+const FALLBACK_STREETS = ["Hlavní", "Náměstí"] as const;
+
+// Builds a geocodable Czech address for a city. The city is normalised first
+// ("Brno - Spielberk Tower" → "Brno") because some demo entries tack a venue label
+// onto the city, which both breaks geocoding and is wrong for an address field.
+export function realCzechAddress(rawCity: string): AddressInput {
+  const city = (rawCity.split(" - ")[0] ?? rawCity).trim();
+  const streets = STREETS_BY_CITY[city] ?? FALLBACK_STREETS;
+  return {
+    city,
+    country: "Czech Republic",
+    houseNumber: "1",
+    postalCode: `${faker.string.numeric(3)} ${faker.string.numeric(2)}`,
+    street: faker.helpers.arrayElement([...streets]),
+  };
 }
 
 export type UserInput = {
@@ -272,6 +321,7 @@ export type ImageInput = {
   entityType: string;
   entityId: string;
   url: string;
+  createdAt?: Date;
 };
 
 export async function insertImages(data: ImageInput[]) {

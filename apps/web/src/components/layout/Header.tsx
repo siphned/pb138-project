@@ -1,100 +1,87 @@
-<<<<<<< HEAD
 import { Show, useClerk } from "@clerk/react";
+import { ShoppingCart02Icon, User02Icon } from "@hugeicons/core-free-icons";
+import { HugeiconsIcon } from "@hugeicons/react";
 import { Link } from "@tanstack/react-router";
-import { ShoppingBag01Icon, UserIcon } from "hugeicons-react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Button } from "@/components/ui/button";
-import { useUser } from "@/context/UserContext";
+import { buttonVariants } from "@/components/ui/button";
+import { Skeleton } from "@/components/ui/skeleton";
+import { useTheme, useUser } from "@/context";
+import { useGetCarts } from "@/generated/hooks/useGetCarts";
+import { cn } from "@/lib/utils";
 import { HeaderSearch } from "./HeaderSearch";
 import { Sidebar } from "./Sidebar";
 
 export function Header() {
   const { user: clerkUser } = useClerk();
   const initials = clerkUser ? (clerkUser.fullName || "User").substring(0, 2).toUpperCase() : "GU";
-  const { user, activeRole, setActiveRole } = useUser();
+  const { user, activeRole, setActiveRole, isLoading, isCartReady } = useUser();
+  const { theme } = useTheme();
   const roles = user?.roles ?? [];
 
-=======
-﻿import { Show, useClerk } from "@clerk/react";
-import { Link } from "@tanstack/react-router";
-import { Search, ShoppingCart, User } from "lucide-react";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Button } from "@/components/ui/button";
-import { Role } from "@/types/roles";
-import { Sidebar } from "./Sidebar";
+  const { data: cart } = useGetCarts({ query: { enabled: isCartReady } });
+  const cartCount = cart?.items.reduce((acc, item) => acc + Number(item.quantity || 0), 0) ?? 0;
 
-interface HeaderProps {
-  activeRole?: Role;
-  onRoleChange?: (role: Role) => void;
-}
-
-export function Header({ activeRole, onRoleChange }: HeaderProps) {
-  const { user: clerkUser } = useClerk();
-  const initials = clerkUser ? (clerkUser.fullName || "User").substring(0, 2).toUpperCase() : "GU";
->>>>>>> origin/main
   return (
     <header className="h-16 border-b bg-background flex items-center justify-between px-6 lg:px-12">
-      {/* Left: Logo Area */}
       <Link to="/">
-<<<<<<< HEAD
-        <img alt="Wine Enjoyers" className="h-10 w-auto" src="/logo.png" />
-=======
-        <div className="flex items-center gap-2 font-heading font-bold text-xl">
-          <img alt="Wine Enjoyers Logo" className="h-8 w-8 rounded-full" src="/logo.png" />
-          Wine Enjoyers
-        </div>
->>>>>>> origin/main
+        <img
+          alt="Wine Enjoyers"
+          className="h-10 w-auto"
+          src={theme === "dark" ? "/logo_dark.webp" : "/logo.png"}
+        />
       </Link>
 
-      {/* Right: Icons & Menus */}
       <div className="flex items-center gap-4">
-<<<<<<< HEAD
         <HeaderSearch />
-        <Button className="hidden sm:flex" size="icon" variant="ghost">
-          <Link to="/cart">
-            <ShoppingBag01Icon className="h-5 w-5" />
-          </Link>
-=======
-        <Button className="hidden sm:flex" size="icon" variant="ghost">
-          <Search className="h-5 w-5" />
-        </Button>
-        <Button className="hidden sm:flex" size="icon" variant="ghost">
-          <ShoppingCart className="h-5 w-5" />
->>>>>>> origin/main
-        </Button>
 
-        <Show when="signed-out">
-          <Link to="/auth/login">
-            <Button className="rounded-full" size="icon" variant="ghost">
-<<<<<<< HEAD
-              <UserIcon className="h-5 w-5" />
-=======
-              <User className="h-5 w-5" />
->>>>>>> origin/main
-            </Button>
-          </Link>
-        </Show>
+        <Link
+          aria-label={cartCount > 0 ? `Shopping cart (${cartCount} items)` : "Shopping cart"}
+          className={cn(
+            buttonVariants({ size: "icon", variant: "ghost" }),
+            "relative hidden sm:flex"
+          )}
+          to="/cart"
+        >
+          <HugeiconsIcon className="h-5 w-5" icon={ShoppingCart02Icon} strokeWidth={2} />
+          {cartCount > 0 && (
+            <span className="absolute -right-1 -top-1 flex h-5 min-w-5 items-center justify-center rounded-full bg-primary px-1 text-xs font-semibold text-primary-foreground">
+              {cartCount > 99 ? "99+" : cartCount}
+            </span>
+          )}
+        </Link>
 
-        <Show when="signed-in">
-          <Link to="/dashboard">
-            <Avatar className="h-8 w-8">
-              <AvatarImage alt={clerkUser?.fullName || "User"} src={clerkUser?.imageUrl} />
-              <AvatarFallback className="bg-primary text-primary-foreground font-heading text-xs">
-                {initials}
-              </AvatarFallback>
-            </Avatar>
-          </Link>
-        </Show>
+        {isLoading ? (
+          // Reserve the avatar slot until auth + profile resolve, so the icon
+          // doesn't pop in (and shift layout) after a beat.
+          <Skeleton className="h-8 w-8 rounded-full" />
+        ) : (
+          <>
+            <Show when="signed-out">
+              <Link
+                className={cn(
+                  buttonVariants({ size: "icon", variant: "ghost" }),
+                  "relative hidden sm:flex"
+                )}
+                to="/auth/login"
+              >
+                <HugeiconsIcon className="h-5 w-5" icon={User02Icon} strokeWidth={2} />
+              </Link>
+            </Show>
 
-<<<<<<< HEAD
+            <Show when="signed-in">
+              <Link to="/dashboard">
+                <Avatar className="h-8 w-8">
+                  <AvatarImage alt={clerkUser?.fullName || "User"} src={clerkUser?.imageUrl} />
+                  <AvatarFallback className="bg-primary text-primary-foreground font-heading text-xs">
+                    {initials}
+                  </AvatarFallback>
+                </Avatar>
+              </Link>
+            </Show>
+          </>
+        )}
+
         <Sidebar activeRole={activeRole} onRoleChange={setActiveRole} userRoles={roles} />
-=======
-        <Sidebar
-          activeRole={activeRole}
-          onRoleChange={onRoleChange}
-          userRoles={[Role.winemaker, Role.shopOwner, Role.customer]}
-        />
->>>>>>> origin/main
       </div>
     </header>
   );

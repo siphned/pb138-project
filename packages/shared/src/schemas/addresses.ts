@@ -1,8 +1,5 @@
 import { pgTable, uuid, varchar } from "drizzle-orm/pg-core";
-<<<<<<< HEAD
 import { createInsertSchema, createSelectSchema } from "drizzle-zod";
-=======
->>>>>>> origin/main
 import { timestamptz } from "./helpers";
 
 export const addresses = pgTable("addresses", {
@@ -16,10 +13,7 @@ export const addresses = pgTable("addresses", {
   street: varchar("street", { length: 255 }).notNull(),
   updatedAt: timestamptz("updated_at"),
 });
-<<<<<<< HEAD
 
 export const addressSelectSchema = createSelectSchema(addresses);
 export const addressInsertSchema = createInsertSchema(addresses);
 export type AddressModel = typeof addresses.$inferSelect;
-=======
->>>>>>> origin/main

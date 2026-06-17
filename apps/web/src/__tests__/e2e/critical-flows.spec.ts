@@ -1,13 +1,13 @@
 import { expect, test } from "@playwright/test";
 
 test.describe("Critical flows", () => {
-  test("homepage → explore link navigates to /explore", async ({ page }) => {
+  test("homepage → explore link navigates to /wines", async ({ page }) => {
     await page.goto("/");
     await page.waitForLoadState("networkidle");
-    const exploreLink = page.locator('a[href="/explore"]').first();
+    const exploreLink = page.locator('a[href="/wines"]').first();
     if (await exploreLink.isVisible()) {
       await exploreLink.click();
-      await expect(page).toHaveURL(/\/explore/);
+      await expect(page).toHaveURL(/\/wines/);
     }
   });
 
@@ -124,7 +124,7 @@ test.describe("Critical flows", () => {
 
   test.describe("Product browsing flow", () => {
     test("explore page displays products", async ({ page }) => {
-      await page.goto("/explore");
+      await page.goto("/wines");
       await page.waitForLoadState("networkidle");
 
       // Look for product list or grid
@@ -137,7 +137,7 @@ test.describe("Critical flows", () => {
     });
 
     test("can navigate to product detail from explore", async ({ page }) => {
-      await page.goto("/explore");
+      await page.goto("/wines");
       await page.waitForLoadState("networkidle");
 
       // Click on first product link

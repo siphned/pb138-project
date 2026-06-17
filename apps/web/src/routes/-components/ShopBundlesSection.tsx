@@ -1,8 +1,8 @@
 import { Link } from "@tanstack/react-router";
 import { ArrowRight } from "lucide-react";
-import { BundleCard } from "@/components/catalog/BundleCard";
 import { Button } from "@/components/ui/button";
 import { useGetShopsByIdProducts } from "@/generated/hooks/useGetShopsByIdProducts";
+import { BundleCard } from "@/routes/products/-components/BundleCard";
 
 // Shape returned by GET /shops/:id/products (no response schema in OpenAPI)
 type ShopProductRaw = {
@@ -18,8 +18,12 @@ interface ShopBundlesSectionProps {
 }
 
 export function ShopBundlesSection({ shopId }: ShopBundlesSectionProps) {
-  const { data, isLoading } = useGetShopsByIdProducts(shopId, { isBundle: "true" });
-  const products = data as ShopProductRaw[] | undefined;
+  const { data, isLoading } = useGetShopsByIdProducts(shopId, { isBundle: true });
+  // BE returns { data: [...], limit, page, total } — keep a fallback for callers
+  // that may receive a bare array.
+  const products: ShopProductRaw[] = Array.isArray(data)
+    ? (data as ShopProductRaw[])
+    : ((data as { data?: ShopProductRaw[] } | undefined)?.data ?? []);
 
   if (isLoading) {
     return (
@@ -37,7 +41,7 @@ export function ShopBundlesSection({ shopId }: ShopBundlesSectionProps) {
     );
   }
 
-  if (!products || products.length === 0) {
+  if (products.length === 0) {
     return (
       <div className="space-y-4">
         <h2 className="font-heading text-2xl font-bold">Exclusive Bundles</h2>
@@ -60,8 +64,8 @@ export function ShopBundlesSection({ shopId }: ShopBundlesSectionProps) {
         <Button variant="outline">
           <Link
             className="flex items-center gap-2 text-sm "
-            search={{ page: 1, sort: "newest" }}
-            to="/bundles"
+            search={{ isBundle: "true", page: 1, shopId: shopId, sort: "newest" }}
+            to="/products"
           >
             Show Inventory
             <ArrowRight className="h-4 w-4" />

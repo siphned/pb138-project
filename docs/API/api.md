@@ -162,7 +162,6 @@ This document specifies all REST API endpoints for the WineMarket platform. Each
 | GET | `/admin/users` | List users (filterable by status/role) | ✅ (Admin) |
 | PATCH | `/admin/users/:id/status` | Set user status (active/suspended/banned) | ✅ (Admin) |
 | GET | `/admin/events` | List events by status (default: pending) | ✅ (Admin) |
-<<<<<<< HEAD
 | POST | `/admin/events/:id/approve` | Approve a pending event | ✅ (Admin) |
 | POST | `/admin/events/:id/reject` | Reject a pending event | ✅ (Admin) |
 | GET | `/admin/reviews` | List all reviews (product + winemaker) | ✅ (Admin) |
@@ -216,11 +215,6 @@ This document specifies all REST API endpoints for the WineMarket platform. Each
 | POST | `/images` | Upload image (multipart/form-data) | ✅ |
 | GET | `/images/:id` | Download image by ID | ❌ |
 | DELETE | `/images/:id` | Delete image | ✅ (own) |
-=======
-| PATCH | `/admin/events/:id/status` | Approve or reject a pending event | ✅ (Admin) |
-| GET | `/admin/reviews` | List all reviews (product + winemaker) | ✅ (Admin) |
-| DELETE | `/admin/reviews/:id` | Soft-delete a review (?type=product\|winemaker) | ✅ (Admin) |
->>>>>>> origin/main
 
 ---
 
@@ -276,13 +270,7 @@ curl -X POST http://localhost:3000/wines \
 
 ## Revision History
 - **v1.0** (Week 6) — Initial API design from PRD requirements
-<<<<<<< HEAD
 - **v1.1** (Week 9) — Admin module restructured; event approval moved to /admin/events; role-requests separated
 - **v1.2** (Week 10) — Carts & Orders implemented with server-side guest sessions
 - **v1.3** (Week 10) — Synchronized with actual implementation (Clerk auth, /users/me, etc.)
 - **v1.4** (Week 12) — Complete endpoint inventory; added supply-agreements, stats, guest-sessions, images modules
-=======
-- **v1.1** (Week 9, WINE-79) — Admin module: event moderation moved from /events to /admin/events; user deactivate replaced with full status lifecycle (active/suspended/banned); review admin endpoints added under /admin/reviews; role-request admin routes removed (live at /role-requests without prefix); GET /admin/statistics deferred
-- **v1.2** (Week 10, WINE-65) — Carts & Orders implemented: paths changed from /cart to /carts/me; PUT replaces PATCH for item updates; guest cart is localStorage-only (no server sessions) with POST /carts/merge for login sync; order status update is per-item (PUT /orders/:id/items/:itemId/status) not per-order; /shops/:id/orders and DELETE /cart (clear) not implemented
-- **v1.3** (Week 10, WINE-148) — Synchronized with actual implementation: removed outdated AUTH module (using Clerk); moved /auth/me to /users/me; updated /carts to support server-side guest sessions; added /winemakers/me; added /role-requests root routes.
->>>>>>> origin/main

@@ -1,11 +1,14 @@
 import { useQueryClient } from "@tanstack/react-query";
+import { Link } from "@tanstack/react-router";
+import { EmptyState } from "@/components/primitives/empty-state";
+import { buttonVariants } from "@/components/ui/button";
 import {
   getCartsQueryKey,
   useDeleteCartsItemsByProductId,
   usePutCartsItemsByProductId,
 } from "@/generated";
 import type { GetCarts200 } from "@/generated/types/GetCarts";
-import { CartEmpty } from "./CartEmpty";
+import { cn } from "@/lib/utils";
 import { CartItemRow } from "./CartItemRow";
 import { CartSummary } from "./CartSummary";
 
@@ -54,7 +57,15 @@ export function CartSection({ cart, deliveryType }: CartSectionProps) {
         )}
       </div>
       {isEmpty ? (
-        <CartEmpty />
+        <EmptyState
+          action={
+            <Link className={cn(buttonVariants({ variant: "outline" }))} to="/wines">
+              Browse wines
+            </Link>
+          }
+          description="Looks like you haven't added any wines to your cart yet."
+          title="Your cart is empty"
+        />
       ) : (
         <>
           <div className="flex flex-col gap-4">

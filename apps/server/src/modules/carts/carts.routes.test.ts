@@ -1,9 +1,6 @@
 import { describe, expect, it, vi } from "vitest";
 import { app } from "../../app";
-<<<<<<< HEAD
 import { verifyClerkToken } from "../auth/auth.utils";
-=======
->>>>>>> origin/main
 
 const { mockCart } = vi.hoisted(() => ({
   mockCart: {
@@ -24,12 +21,9 @@ vi.mock("./carts.service", () => ({
     getCartForUser: vi
       .fn()
       .mockResolvedValue({ ...mockCart, id: "c1", sessionId: null, userId: "u1" }),
-<<<<<<< HEAD
     mergeOnLogin: vi.fn().mockResolvedValue(undefined),
     removeItem: vi.fn().mockResolvedValue(undefined),
     updateItemQuantity: vi.fn().mockResolvedValue(undefined),
-=======
->>>>>>> origin/main
   },
 }));
 
@@ -37,7 +31,6 @@ vi.mock("../auth/auth.utils", () => ({
   verifyClerkToken: vi.fn().mockResolvedValue(null),
 }));
 
-<<<<<<< HEAD
 vi.mock("../users/users.service", () => ({
   usersService: { lazyGetOrCreate: vi.fn().mockResolvedValue({ id: "u1" }) },
 }));
@@ -46,8 +39,6 @@ vi.mock("../../utils/logger", () => ({
   logger: { debug: vi.fn(), error: vi.fn(), info: vi.fn(), warn: vi.fn() },
 }));
 
-=======
->>>>>>> origin/main
 describe("carts routes", () => {
   it("GET /carts returns guest cart if no auth but session cookie", async () => {
     const response = await app.handle(
@@ -88,7 +79,6 @@ describe("carts routes", () => {
 
     expect(response.status).toBe(400);
   });
-<<<<<<< HEAD
 
   it("POST /carts/items returns 422 when body is missing productId", async () => {
     const response = await app.handle(
@@ -140,6 +130,4 @@ describe("carts routes", () => {
     expect(response.status).toBe(200);
     vi.mocked(verifyClerkToken).mockResolvedValue(null);
   });
-=======
->>>>>>> origin/main
 });

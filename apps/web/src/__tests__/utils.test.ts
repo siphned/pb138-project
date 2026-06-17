@@ -1,13 +1,7 @@
 import { describe, expect, it } from "vitest";
-<<<<<<< HEAD
 import { formatDate, formatDatetime } from "../utils/date-formatter";
 import { getStockStatus } from "../utils/stock";
 import { capitalize, capitalizeFirst, slugify, truncateString } from "../utils/string-utils";
-=======
-import { formatDate, formatDatetime } from "../utils/dateFormatter";
-import { getStockStatus } from "../utils/stock";
-import { capitalize, capitalizeFirst, slugify, truncateString } from "../utils/stringUtils";
->>>>>>> origin/main
 import { validateEmail, validatePassword, validatePhoneNumber } from "../utils/validators";
 
 describe("Utility functions", () => {

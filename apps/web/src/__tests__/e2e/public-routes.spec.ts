@@ -3,7 +3,7 @@ import { expect, test } from "@playwright/test";
 test.describe("Public routes", () => {
   const publicRoutes = [
     "/",
-    "/explore",
+    "/wines",
     "/wines",
     "/shops",
     "/shops/1",

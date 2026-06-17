@@ -1,19 +1,14 @@
-<<<<<<< HEAD
 import { AlertCircleIcon } from "@hugeicons/core-free-icons";
 import { HugeiconsIcon } from "@hugeicons/react";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useGetShopsByIdAvailability } from "@/generated/hooks/useGetShopsByIdAvailability";
 import { cn } from "@/lib/utils";
-=======
-import { useGetShopsByIdAvailability } from "@/generated/hooks/useGetShopsByIdAvailability";
->>>>>>> origin/main
 
 interface ShopHoursDisplayProps {
   shopId: string;
 }
 
-<<<<<<< HEAD
 interface RegularEntry {
   dow: string | number;
   startTime: string | number;
@@ -88,15 +83,10 @@ const formatDayLabel = (group: HourGroup) =>
     ? DOW_NAMES[group.startDow]
     : `${DOW_NAMES[group.startDow].slice(0, 3)} – ${DOW_NAMES[group.endDow].slice(0, 3)}`;
 
-=======
-const DOW_NAMES = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
-
->>>>>>> origin/main
 export function ShopHoursDisplay({ shopId }: ShopHoursDisplayProps) {
   const { data, isLoading } = useGetShopsByIdAvailability(shopId);
 
   if (isLoading) {
-<<<<<<< HEAD
     return <Skeleton className="h-24 w-full rounded-lg" />;
   }
 
@@ -187,28 +177,6 @@ export function ShopHoursDisplay({ shopId }: ShopHoursDisplayProps) {
           </Popover>
         </div>
       )}
-=======
-    return <div className="h-20 w-full animate-pulse rounded-lg bg-secondary/20" />;
-  }
-
-  if (!data?.regular || data.regular.length === 0) {
-    return <p className="text-muted-foreground italic">No regular hours listed.</p>;
-  }
-
-  // Sort by day of week
-  const sortedHours = [...data.regular].sort((a, b) => Number(a.dow) - Number(b.dow));
-
-  return (
-    <div className="space-y-1">
-      {sortedHours.map((entry) => (
-        <div className="flex justify-between text-xs" key={entry.id}>
-          <span className="font-medium">{DOW_NAMES[Number(entry.dow)]}</span>
-          <span>
-            {entry.startTime} – {entry.endTime}
-          </span>
-        </div>
-      ))}
->>>>>>> origin/main
     </div>
   );
 }

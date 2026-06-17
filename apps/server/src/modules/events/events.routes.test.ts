@@ -2,6 +2,7 @@ import { afterEach, describe, expect, it, vi } from "vitest";
 import { resetAuth } from "../../__tests__/helpers/auth";
 import { del, get, patch, post } from "../../__tests__/helpers/request";
 import { app } from "../../app";
+import { eventsService } from "./events.service";
 
 const { defaultEvent } = vi.hoisted(() => ({
   defaultEvent: {
@@ -27,6 +28,7 @@ vi.mock("./events.service", () => ({
   eventsService: {
     addComment: vi.fn().mockResolvedValue(defaultEvent),
     createEvent: vi.fn().mockResolvedValue(defaultEvent),
+    deleteComment: vi.fn().mockResolvedValue(undefined),
     deleteEvent: vi.fn().mockResolvedValue(undefined),
     getEvent: vi.fn().mockResolvedValue(defaultEvent),
     listComments: vi.fn().mockResolvedValue({ data: [], limit: 24, page: 1, total: 0 }),
@@ -59,6 +61,16 @@ describe("events routes", () => {
       expect(response.status).toBe(200);
       const data = await response.json();
       expect(Array.isArray((data as { data: unknown[] }).data)).toBe(true);
+    });
+
+    it("forwards the registeredByMe filter to the service", async () => {
+      const response = await app.handle(get("/events?registeredByMe=true"));
+      expect(response.status).toBe(200);
+      expect(eventsService.listEvents).toHaveBeenCalledWith(
+        expect.objectContaining({ registeredByMe: true }),
+        expect.any(Object),
+        undefined
+      );
     });
   });
 
@@ -155,8 +167,7 @@ describe("events routes", () => {
 
     it("returns 204 when authenticated as winemaker", async () => {
       const response = await app.handle(del("/events/e1", { auth: { roles: ["winemaker"] } }));
-      // TODO: Elysia status(204, null) → Bun Response constructor throws.
-      // Route changed to status(204, "") — verify after dependency bump.
+      // TODO: Elysia 204 responses can still surface as 500s. Verify after dependency bump.
       expect([204, 500]).toContain(response.status);
     });
   });
@@ -212,6 +223,33 @@ describe("events routes", () => {
         })
       );
       expect(response.status).toBe(201);
+    });
+  });
+
+  describe("DELETE /events/:id/comments/:commentId", () => {
+    it("returns 401 when no auth token provided", async () => {
+      const response = await app.handle(del("/events/e1/comments/c1"));
+      expect(response.status).toBe(401);
+    });
+
+    it("calls deleteComment with isAdmin=false for a regular user", async () => {
+      await app.handle(del("/events/e1/comments/c1", { auth: { roles: ["customer"] } }));
+      expect(eventsService.deleteComment).toHaveBeenCalledWith(
+        "e1",
+        "c1",
+        expect.any(String),
+        false
+      );
+    });
+
+    it("calls deleteComment with isAdmin=true for an admin", async () => {
+      await app.handle(del("/events/e1/comments/c1", { auth: { roles: ["admin"] } }));
+      expect(eventsService.deleteComment).toHaveBeenCalledWith(
+        "e1",
+        "c1",
+        expect.any(String),
+        true
+      );
     });
   });
 

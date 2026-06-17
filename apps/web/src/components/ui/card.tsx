@@ -1,12 +1,8 @@
-<<<<<<< HEAD
 import { cva, type VariantProps } from "class-variance-authority";
-=======
->>>>>>> origin/main
 import type * as React from "react";
 
 import { cn } from "@/lib/utils";
 
-<<<<<<< HEAD
 const cardVariants = cva(
   "group/card flex flex-col overflow-hidden rounded-2xl text-sm text-card-foreground has-[>img:first-child]:pt-0 *:[img:first-child]:rounded-t-xl *:[img:last-child]:rounded-b-xl",
   {
@@ -34,19 +30,6 @@ function Card({ className, size = "default", variant, ...props }: CardProps) {
   return (
     <div
       className={cn(cardVariants({ variant }), className)}
-=======
-function Card({
-  className,
-  size = "default",
-  ...props
-}: React.ComponentProps<"div"> & { size?: "default" | "sm" }) {
-  return (
-    <div
-      className={cn(
-        "group/card flex flex-col gap-6 overflow-hidden rounded-2xl bg-card py-6 text-sm text-card-foreground ring-1 ring-foreground/10 has-[>img:first-child]:pt-0 data-[size=sm]:gap-4 data-[size=sm]:py-4 *:[img:first-child]:rounded-t-xl *:[img:last-child]:rounded-b-xl",
-        className
-      )}
->>>>>>> origin/main
       data-size={size}
       data-slot="card"
       {...props}
@@ -120,7 +103,6 @@ function CardFooter({ className, ...props }: React.ComponentProps<"div">) {
   );
 }
 
-<<<<<<< HEAD
 export {
   Card,
   CardAction,
@@ -131,6 +113,3 @@ export {
   CardTitle,
   cardVariants,
 };
-=======
-export { Card, CardHeader, CardFooter, CardTitle, CardAction, CardDescription, CardContent };
->>>>>>> origin/main

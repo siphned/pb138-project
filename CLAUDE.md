@@ -14,7 +14,6 @@ A multi-vendor wine marketplace platform with event management, multi-shop order
 Multi-actor marketplace:
 - **Guests** → **Customers** (register) → **Winemakers** (manage catalog/supply) + **Shop Owners** (retail products/orders) → **Admins**
 - Wine catalog, B2B supply agreements, multi-vendor orders, server-side guest sessions.
-<<<<<<< HEAD
 
 ## Development Workflow (MANDATORY — established May 2026, WINE-215)
 
@@ -35,8 +34,6 @@ Examples: `WINE-61-api-test-suite`, `WINE-171-page-stubs-and-backend-audit`
 - `project-manager` — Creates/updates Jira tickets before work begins
 - Agent working on the task — Creates branch, implements, opens PR
 - `reviewer` — Reviews PR before merge
-=======
->>>>>>> origin/main
 
 ## Quick Start Commands
 
@@ -108,11 +105,7 @@ winery/
 - Repository methods are typed and transactions are handled in services.
 
 ---
-<<<<<<< HEAD
 Last updated: May 2026
-=======
-Last updated: April 2026
->>>>>>> origin/main
 Maintained by: Matej Šinogl
 
 ## Agent skills

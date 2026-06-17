@@ -1,142 +1,150 @@
-import { Location01Icon, UserGroupIcon } from "@hugeicons/core-free-icons";
+import { Location01Icon } from "@hugeicons/core-free-icons";
 import { HugeiconsIcon } from "@hugeicons/react";
+import { useQueryClient } from "@tanstack/react-query";
 import { Link } from "@tanstack/react-router";
-import type { MouseEvent } from "react";
-import { CatalogCard, catalogCardLinkClass } from "@/components/catalog/CatalogCard";
-import { EventImage } from "@/components/catalog/EventImage";
 import { Button } from "@/components/ui/button";
+import { Card } from "@/components/ui/card";
+import { useUser } from "@/context/UserContext";
+import { getEventsQueryKey } from "@/generated/hooks/useGetEvents";
+import { getEventsByIdQueryKey } from "@/generated/hooks/useGetEventsById";
 import { usePostEventsByIdRegister } from "@/generated/hooks/usePostEventsByIdRegister";
-
-interface EventLike {
-  id: string;
-  /** Preferred BE field. `title` is a legacy alias from earlier stubs. */
-  name?: string;
-  title?: string;
-  description?: string | null;
-  /** BE returns `startTime` / `endTime` as ISO strings; legacy callers pass `startDate` / `endDate`. */
-  startTime?: string | Date;
-  endTime?: string | Date;
-  startDate?: string | Date;
-  endDate?: string | Date;
-  /** BE relation; legacy callers may flatten to `location`. */
-  address?: { city?: string; country?: string; street?: string; houseNumber?: string } | null;
-  location?: string;
-  /** BE relation; legacy callers may flatten to `winemakerName` + `winemakerId`. */
-  winemaker?: { id?: string; name?: string } | null;
-  winemakerName?: string;
-  winemakerId?: string;
-  attendees?: number;
-  capacity?: number;
-}
+import { parseApiError } from "@/lib/api-errors";
+import { EventImage } from "@/routes/-components/EventImage";
 
 interface EventCardProps {
-  event: EventLike;
+  event: {
+    id: string;
+    title?: string;
+    name?: string;
+    description?: string | null;
+    startTime?: string | Date;
+    startDate?: string | Date;
+    endDate?: string | Date;
+    location?: string;
+    winemakerName?: string;
+    winemakerId?: string;
+    isRegisteredByMe?: boolean;
+    imageUrl?: string | null;
+  };
 }
 
-function is409(error: unknown): boolean {
-  if (!error || typeof error !== "object") return false;
-  const maybe = error as { response?: { status?: number }; status?: number };
-  return maybe.response?.status === 409 || maybe.status === 409;
-}
-
-function formatLocation(event: EventLike): string | undefined {
-  if (event.location) return event.location;
-  const a = event.address;
-  if (!a) return undefined;
-  return [a.city, a.country].filter(Boolean).join(", ") || undefined;
-}
-
-function renderCapacityLabel(attendees?: number, capacity?: number): string | null {
-  if (attendees !== undefined && capacity !== undefined) return `${attendees}/${capacity}`;
-  if (attendees !== undefined) return `${attendees}`;
-  if (capacity !== undefined) return `max ${capacity}`;
-  return null;
-}
-
-export function EventCard({ event }: EventCardProps) {
-  const title = event.name || event.title || "Untitled Event";
-  const start = event.startTime ?? event.startDate;
-  const startDate = start ? new Date(start) : null;
-  const formattedDate = startDate?.toLocaleDateString("en-US", {
+function formatShortDate(value?: string | Date) {
+  if (!value) return null;
+  return new Date(value).toLocaleDateString("en-US", {
     day: "numeric",
     month: "short",
     year: "numeric",
   });
+}
 
-  const winemakerName = event.winemaker?.name || event.winemakerName;
-  const locationLabel = formatLocation(event);
-  const capacityLabel = renderCapacityLabel(event.attendees, event.capacity);
+function friendlyMessage(code?: string, fallback?: string): string {
+  switch (code) {
+    case "ALREADY_REGISTERED":
+      return "You're already registered.";
+    case "CAPACITY_FULL":
+      return "Event is full.";
+    case "EVENT_NOT_AVAILABLE":
+      return "Registration closed.";
+    case "EVENT_NOT_FOUND":
+      return "Event not found.";
+    default:
+      return fallback ?? "Something went wrong.";
+  }
+}
 
-  const mutation = usePostEventsByIdRegister();
-  const alreadyRegistered = mutation.isSuccess || is409(mutation.error);
+// biome-ignore lint/complexity/noExcessiveCognitiveComplexity: event card handles registration state, error display, and conditional rendering in one component
+export function EventCard({ event }: EventCardProps) {
+  const queryClient = useQueryClient();
+  const { user } = useUser();
+  const registerMutation = usePostEventsByIdRegister();
 
-  const handleRegister = (e: MouseEvent<HTMLButtonElement>) => {
-    e.preventDefault();
-    e.stopPropagation();
-    if (mutation.isPending) return;
-    mutation.mutate({ id: event.id });
+  const title = event.title || event.name || "Untitled Event";
+  const startValue = event.startTime ?? event.startDate;
+  const dateLabel = formatShortDate(startValue);
+  const hasStarted = startValue ? new Date(startValue).getTime() < Date.now() : false;
+
+  const apiError = parseApiError(registerMutation.error);
+  const isAlreadyRegistered = apiError?.code === "ALREADY_REGISTERED";
+  const isRegistered =
+    !!event.isRegisteredByMe || registerMutation.isSuccess || isAlreadyRegistered;
+  const pending = registerMutation.isPending;
+  const canRegister = !!user && !isRegistered && !hasStarted;
+
+  let buttonLabel = "Register";
+  if (hasStarted) buttonLabel = "Registration closed";
+  else if (isRegistered) buttonLabel = "Registered";
+  else if (pending) buttonLabel = "Registering…";
+
+  const handleRegister = () => {
+    if (!canRegister) return;
+    registerMutation.mutate(
+      { id: event.id },
+      {
+        onSuccess: () => {
+          queryClient.invalidateQueries({ queryKey: getEventsQueryKey() });
+          queryClient.invalidateQueries({ queryKey: getEventsByIdQueryKey(event.id) });
+        },
+      }
+    );
   };
 
-  const registeredCta = (
-    <Button
-      className="relative z-10 mt-1 w-full"
-      render={<Link params={{ id: event.id }} to="/events/$id" />}
-      size="sm"
-      variant="secondary"
-    >
-      Already registered — view details
-    </Button>
-  );
-
-  const registerCta = (
-    <Button
-      className="relative z-10 mt-1 w-full"
-      disabled={mutation.isPending}
-      onClick={handleRegister}
-      size="sm"
-      type="button"
-    >
-      {mutation.isPending ? "Registering..." : "Register for event"}
-    </Button>
-  );
+  const showError = !!apiError && !isRegistered;
 
   return (
-    <CatalogCard
-      imageSlot={<EventImage alt={title} eventId={event.id} fallbackText={title} />}
-      titleLink={
-        <Link className={catalogCardLinkClass} params={{ id: event.id }} to="/events/$id">
-          {title}
-        </Link>
-      }
-    >
-      {(formattedDate || capacityLabel) && (
-        <div className="flex flex-wrap items-center justify-center gap-2">
-          {formattedDate && (
-            <span className="rounded-md bg-primary/10 px-2 py-0.5 text-[10px] font-semibold tracking-wide text-primary">
-              {formattedDate}
+    <Card className="group relative" variant="polaroid">
+      <div className="relative aspect-3/4 w-full overflow-hidden rounded-lg bg-muted shadow-xs">
+        <EventImage alt={title} eventId={event.id} fallbackText={title} imageUrl={event.imageUrl} />
+
+        {dateLabel && (
+          <div className="absolute top-2 left-2 z-10">
+            <span className="rounded-md bg-background/90 px-2 py-1 text-[10px] font-semibold uppercase tracking-wider text-foreground shadow-sm backdrop-blur">
+              {dateLabel}
             </span>
-          )}
-          {capacityLabel && (
-            <span className="inline-flex items-center gap-1 rounded-md bg-muted px-2 py-0.5 text-[10px] font-semibold tracking-wide text-muted-foreground">
-              <HugeiconsIcon className="h-3 w-3" icon={UserGroupIcon} />
-              {capacityLabel}
-            </span>
+          </div>
+        )}
+      </div>
+
+      <div className="flex flex-1 flex-col space-y-2 pt-4 text-center">
+        <h3 className="font-heading text-base font-bold leading-tight line-clamp-2">
+          <Link
+            className="stretched-link transition-colors hover:text-primary focus:outline-none"
+            params={{ id: event.id }}
+            to="/events/$id"
+          >
+            {title}
+          </Link>
+        </h3>
+
+        {(event.location || event.winemakerName) && (
+          <p className="flex flex-wrap items-center justify-center gap-x-1 gap-y-0.5 text-xs text-muted-foreground">
+            {event.location && (
+              <span className="inline-flex items-center gap-1">
+                <HugeiconsIcon aria-hidden className="h-3 w-3" icon={Location01Icon} />
+                <span className="line-clamp-1">{event.location}</span>
+              </span>
+            )}
+            {event.location && event.winemakerName && <span>·</span>}
+            {event.winemakerName && <span className="line-clamp-1">{event.winemakerName}</span>}
+          </p>
+        )}
+
+        <div className="relative z-10 mt-auto space-y-1 pt-2">
+          <Button
+            className="w-full"
+            disabled={isRegistered || pending || !user || hasStarted}
+            onClick={handleRegister}
+            size="sm"
+            variant={isRegistered || hasStarted ? "outline" : "default"}
+          >
+            {buttonLabel}
+          </Button>
+          {showError && (
+            <p className="text-xs text-destructive" role="alert">
+              {friendlyMessage(apiError.code, apiError.message)}
+            </p>
           )}
         </div>
-      )}
-
-      {locationLabel && (
-        <div className="flex items-center justify-center gap-1.5 text-xs text-muted-foreground">
-          <HugeiconsIcon className="h-3 w-3" icon={Location01Icon} />
-          <span className="line-clamp-1">{locationLabel}</span>
-        </div>
-      )}
-
-      {winemakerName && (
-        <p className="text-xs text-muted-foreground line-clamp-1">By {winemakerName}</p>
-      )}
-
-      {alreadyRegistered ? registeredCta : registerCta}
-    </CatalogCard>
+      </div>
+    </Card>
   );
 }

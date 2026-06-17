@@ -1,7 +1,6 @@
 import { availabilityExceptions, availabilityRegular } from "@repo/shared/schemas";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { db } from "../../db";
-<<<<<<< HEAD
 import * as availabilityRepository from "./availability.repository";
 
 interface MockChained {
@@ -22,28 +21,6 @@ interface MockDatabase {
     };
   };
   returning: () => Promise<unknown[]>;
-=======
-import { availabilityRepository } from "./availability.repository";
-
-interface MockChained {
-  from: () => MockChained;
-  where: () => MockChained;
-  returning: () => Promise<unknown[]>;
-}
-
-interface MockDatabase {
-  insert: () => MockChained;
-  delete: () => MockChained;
-  returning: () => Promise<unknown[]>;
-  query: {
-    availabilityRegular: {
-      findMany: unknown;
-    };
-    availabilityExceptions: {
-      findMany: unknown;
-    };
-  };
->>>>>>> origin/main
 }
 
 const mockDb = db as unknown as MockDatabase;
@@ -77,11 +54,7 @@ describe("availabilityRepository", () => {
       const mockRecord = { id: "r1" };
       vi.mocked(mockDb.returning).mockResolvedValueOnce([mockRecord]);
 
-<<<<<<< HEAD
       const result = await availabilityRepository.insertRegular(db, {
-=======
-      const result = await availabilityRepository.insertRegular({
->>>>>>> origin/main
         dow: 1,
         endTime: new Date(),
         shopId: "s1",
@@ -100,11 +73,7 @@ describe("availabilityRepository", () => {
       const mockRecord = { id: "e1" };
       vi.mocked(mockDb.returning).mockResolvedValueOnce([mockRecord]);
 
-<<<<<<< HEAD
       const result = await availabilityRepository.insertException(db, {
-=======
-      const result = await availabilityRepository.insertException({
->>>>>>> origin/main
         action: "close",
         endsAt: new Date(),
         shopId: "s1",

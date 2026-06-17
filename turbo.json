@@ -15,7 +15,6 @@
     "db:check": {
       "cache": false
     },
-<<<<<<< HEAD
     "db:generate": {
       "cache": false
     },
@@ -31,11 +30,6 @@
     "db:studio": {
       "cache": false
     },
-=======
-    "db:seed": {
-      "cache": false
-    },
->>>>>>> origin/main
     "dev": {
       "cache": false,
       "persistent": true
@@ -44,12 +38,9 @@
       "cache": false,
       "dependsOn": ["^generate"],
       "outputs": ["openapi.json", "src/generated/**"]
-<<<<<<< HEAD
     },
     "lint": {
       "cache": true
-=======
->>>>>>> origin/main
     },
     "test": {
       "cache": false,

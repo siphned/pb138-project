@@ -1,9 +1,5 @@
 {
-<<<<<<< HEAD
-  "$schema": "https://biomejs.dev/schemas/2.4.15/schema.json",
-=======
-  "$schema": "https://biomejs.dev/schemas/2.0.6/schema.json",
->>>>>>> origin/main
+  "$schema": "https://biomejs.dev/schemas/2.4.16/schema.json",
   "assist": {
     "actions": {
       "source": {
@@ -55,7 +51,6 @@
       "!**/.env",
       "!**/.env.*",
       "!**/bun.lock",
-<<<<<<< HEAD
       "!**/.worktrees",
       "!**/raw",
       "!**/tsconfig*.json",
@@ -63,12 +58,6 @@
       "!**/routeTree.gen.ts",
       "!openapi.json",
       "!conductor/**/*"
-=======
-      "!**/raw",
-      "!**/tsconfig*.json",
-      "!**/src/generated/**",
-      "!**/routeTree.gen.ts"
->>>>>>> origin/main
     ]
   },
   "formatter": {
@@ -85,10 +74,7 @@
       "trailingCommas": "es5"
     },
     "globals": [
-<<<<<<< HEAD
       "Bun",
-=======
->>>>>>> origin/main
       "Cypress",
       "assert",
       "before",
@@ -107,11 +93,7 @@
   "css": {
     "linter": { "enabled": true },
     "formatter": { "enabled": true, "indentStyle": "space", "lineWidth": 100 },
-<<<<<<< HEAD
     "parser": { "allowWrongLineComments": true, "cssModules": true, "tailwindDirectives": true }
-=======
-    "parser": { "allowWrongLineComments": true, "cssModules": true }
->>>>>>> origin/main
   },
   "html": {
     "formatter": { "enabled": true, "selfCloseVoidElements": "always" }
@@ -284,11 +266,7 @@
       "includes": ["**/*.spec.ts", "**/*.spec.tsx", "**/*.test.ts", "**/*.test.tsx"],
       "linter": {
         "rules": {
-<<<<<<< HEAD
           "suspicious": { "noExplicitAny": "off", "noThenProperty": "off" },
-=======
-          "suspicious": { "noExplicitAny": "off" },
->>>>>>> origin/main
           "complexity": { "noForEach": "off" }
         }
       }
@@ -315,13 +293,10 @@
       "linter": { "enabled": false },
       "formatter": { "enabled": false },
       "assist": { "enabled": false }
-<<<<<<< HEAD
     },
     {
       "includes": ["**/index.css"],
       "css": { "linter": { "enabled": false }, "formatter": { "enabled": false } }
-=======
->>>>>>> origin/main
     }
   ],
   "vcs": {

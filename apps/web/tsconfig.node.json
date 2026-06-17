@@ -15,10 +15,6 @@
     "noEmit": true,
 
     /* Path aliases */
-<<<<<<< HEAD
-=======
-    "baseUrl": ".",
->>>>>>> origin/main
     "paths": {
       "@/*": ["./src/*"],
       "@repo/shared": ["../../packages/shared/src/index.ts"]

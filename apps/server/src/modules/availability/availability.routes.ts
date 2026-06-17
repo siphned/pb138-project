@@ -1,24 +1,14 @@
-import { Elysia, status, t } from "elysia";
+import { Elysia, status } from "elysia";
+import { z } from "zod";
 import { authPlugin } from "../auth";
 import { addExceptionBody, addRegularBody, getAvailabilityResponse } from "./availability.schema";
 import { availabilityService } from "./availability.service";
 
-const shopParams = t.Object({ id: t.String() });
-const shopEntryParams = t.Object({ entryId: t.String(), id: t.String() });
+const shopParams = z.object({ id: z.string() });
+const shopEntryParams = z.object({ entryId: z.string(), id: z.string() });
 
 export const availabilityRoutes = new Elysia()
   .use(authPlugin)
-<<<<<<< HEAD
-=======
-  .onError(({ error }) => {
-    if (error instanceof Error) {
-      if (error.message === "NOT_FOUND") return new Response("Shop not found", { status: 404 });
-      if (error.message === "FORBIDDEN") return new Response("Forbidden", { status: 403 });
-      if (error.message === "INVALID_TIME_RANGE")
-        return new Response("Invalid time range", { status: 422 });
-    }
-  })
->>>>>>> origin/main
 
   .get(
     "/shops/:id/availability",
@@ -49,11 +39,7 @@ export const availabilityRoutes = new Elysia()
         tags: ["availability"],
       },
       params: shopParams,
-<<<<<<< HEAD
       requireRoles: ["shop_owner", "admin"],
-=======
-      requireAuth: true,
->>>>>>> origin/main
     }
   )
 
@@ -70,11 +56,7 @@ export const availabilityRoutes = new Elysia()
         tags: ["availability"],
       },
       params: shopEntryParams,
-<<<<<<< HEAD
       requireRoles: ["shop_owner", "admin"],
-=======
-      requireAuth: true,
->>>>>>> origin/main
     }
   )
 
@@ -91,11 +73,7 @@ export const availabilityRoutes = new Elysia()
         tags: ["availability"],
       },
       params: shopParams,
-<<<<<<< HEAD
       requireRoles: ["shop_owner", "admin"],
-=======
-      requireAuth: true,
->>>>>>> origin/main
     }
   )
 
@@ -112,10 +90,6 @@ export const availabilityRoutes = new Elysia()
         tags: ["availability"],
       },
       params: shopEntryParams,
-<<<<<<< HEAD
       requireRoles: ["shop_owner", "admin"],
-=======
-      requireAuth: true,
->>>>>>> origin/main
     }
   );

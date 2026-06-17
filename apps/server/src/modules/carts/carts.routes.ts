@@ -1,46 +1,47 @@
-import { Elysia, status, t } from "elysia";
+import { Elysia, status } from "elysia";
+import { z } from "zod";
 import { authPlugin } from "../auth";
 import { verifyClerkToken } from "../auth/auth.utils";
 import { usersService } from "../users/users.service";
 import { cartsService } from "./carts.service";
 
-const cartItemSchema = t.Object({
-  productId: t.String(),
-  quantity: t.Integer(),
+const cartItemSchema = z.object({
+  productId: z.string(),
+  quantity: z.number().int(),
 });
 
-const productInCart = t.Object({
-  createdAt: t.Date(),
-  deletedAt: t.Union([t.Date(), t.Null()]),
-  description: t.Union([t.String(), t.Null()]),
-  id: t.String(),
-  isBundle: t.Boolean(),
-  name: t.String(),
-  price: t.String(),
-  quantity: t.Integer(),
-  shopId: t.String(),
-  updatedAt: t.Union([t.Date(), t.Null()]),
+const productInCart = z.object({
+  createdAt: z.date(),
+  deletedAt: z.date().nullable(),
+  description: z.string().nullable(),
+  id: z.string(),
+  isBundle: z.boolean(),
+  name: z.string(),
+  price: z.string(),
+  quantity: z.number().int(),
+  shopId: z.string(),
+  updatedAt: z.date().nullable(),
 });
 
-const cartItemResponse = t.Object({
-  cartId: t.String(),
-  createdAt: t.Date(),
-  deletedAt: t.Union([t.Date(), t.Null()]),
-  id: t.String(),
+const cartItemResponse = z.object({
+  cartId: z.string(),
+  createdAt: z.date(),
+  deletedAt: z.date().nullable(),
+  id: z.string(),
   product: productInCart,
-  productId: t.String(),
-  quantity: t.Integer(),
-  updatedAt: t.Date(),
+  productId: z.string(),
+  quantity: z.number().int(),
+  updatedAt: z.date(),
 });
 
-const cartResponse = t.Object({
-  createdAt: t.Date(),
-  deletedAt: t.Union([t.Date(), t.Null()]),
-  id: t.String(),
-  items: t.Array(cartItemResponse),
-  sessionId: t.Union([t.String(), t.Null()]),
-  updatedAt: t.Date(),
-  userId: t.Union([t.String(), t.Null()]),
+const cartResponse = z.object({
+  createdAt: z.date(),
+  deletedAt: z.date().nullable(),
+  id: z.string(),
+  items: z.array(cartItemResponse),
+  sessionId: z.string().nullable(),
+  updatedAt: z.date(),
+  userId: z.string().nullable(),
 });
 
 export const cartsRoutes = new Elysia({ prefix: "/carts", tags: ["carts"] })
@@ -48,11 +49,7 @@ export const cartsRoutes = new Elysia({ prefix: "/carts", tags: ["carts"] })
   .derive(async ({ headers, cookie: { guest_session_id } }) => {
     const payload = await verifyClerkToken(headers.authorization);
     if (payload) {
-<<<<<<< HEAD
       const dbUser = await usersService.lazyGetOrCreate(payload.sub);
-=======
-      const dbUser = await usersService.lazyGetOrCreate(payload.sub, payload);
->>>>>>> origin/main
       const guestSessionId = guest_session_id?.value;
       if (typeof guestSessionId === "string") {
         await cartsService.mergeOnLogin(dbUser.id, guestSessionId);
@@ -75,38 +72,22 @@ export const cartsRoutes = new Elysia({ prefix: "/carts", tags: ["carts"] })
         description: "Returns the cart for the authenticated user or guest session.",
         summary: "Get current cart",
       },
-      response: { 200: t.Union([cartResponse, t.Null()]), 400: t.String() },
+      response: { 200: cartResponse.nullable(), 400: z.string() },
     }
   )
 
   .post(
     "/items",
     async ({ user, sessionId, body }) => {
-<<<<<<< HEAD
       await cartsService.addItem({ sessionId, userId: user?.id }, body.productId, body.quantity);
       return status(201, "Item added");
-=======
-      try {
-        await cartsService.addItem({ sessionId, userId: user?.id }, body.productId, body.quantity);
-        return status(201, "Item added");
-      } catch (e: unknown) {
-        if (e instanceof Error && e.message === "PRODUCT_DELETED") {
-          return status(410, "Product is no longer available");
-        }
-        throw e;
-      }
->>>>>>> origin/main
     },
     {
       body: cartItemSchema,
       detail: {
         summary: "Add item to cart",
       },
-<<<<<<< HEAD
-      response: { 201: t.String() },
-=======
-      response: { 201: t.String(), 410: t.String() },
->>>>>>> origin/main
+      response: { 201: z.string() },
     }
   )
 
@@ -121,30 +102,25 @@ export const cartsRoutes = new Elysia({ prefix: "/carts", tags: ["carts"] })
       return "Quantity updated";
     },
     {
-      body: t.Object({ quantity: t.Integer() }),
+      body: z.object({ quantity: z.number().int() }),
       detail: {
         summary: "Update item quantity",
       },
-      params: t.Object({ productId: t.String() }),
-      response: { 200: t.String() },
+      params: z.object({ productId: z.string() }),
+      response: { 200: z.string() },
     }
   )
 
   .delete(
     "/items/:productId",
-    async ({ user, sessionId, params }) => {
+    async ({ user, sessionId, params, set }) => {
       await cartsService.removeItem({ sessionId, userId: user?.id }, params.productId);
-<<<<<<< HEAD
-      return status(204, "");
-=======
-      return status(204, null);
->>>>>>> origin/main
+      set.status = 204;
     },
     {
       detail: {
         summary: "Remove item from cart",
       },
-      params: t.Object({ productId: t.String() }),
-      response: { 204: t.Null() },
+      params: z.object({ productId: z.string() }),
     }
   );

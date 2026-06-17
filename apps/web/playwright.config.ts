@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 import { defineConfig, devices } from "@playwright/test";
@@ -9,17 +8,11 @@ const config = defineConfig({
   expect: {
     timeout: 5_000,
   },
-=======
-import { defineConfig, devices } from "@playwright/test";
-
-export default defineConfig({
->>>>>>> origin/main
   forbidOnly: !!process.env.CI,
   fullyParallel: true,
   projects: [
     {
       name: "chromium",
-<<<<<<< HEAD
       use: { ...devices["Desktop Chrome"] },
     },
   ],
@@ -61,23 +54,3 @@ if (process.env.SHARD) {
 }
 
 export default config;
-=======
-      use: { ...devices["iPhone 11"] },
-    },
-  ],
-  reporter: "html",
-  retries: process.env.CI ? 2 : 0,
-  testDir: "./src/__tests__/e2e",
-  use: {
-    baseURL: "http://localhost:5173",
-    trace: "on-first-retry",
-  },
-  webServer: {
-    command: "bun run dev",
-    reuseExistingServer: !process.env.CI,
-    timeout: 30_000,
-    url: "http://localhost:5173",
-  },
-  workers: process.env.CI ? 1 : undefined,
-});
->>>>>>> origin/main

@@ -1,11 +1,7 @@
 import { addresses, users } from "@repo/shared/schemas";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { db } from "../../db";
-<<<<<<< HEAD
 import * as usersRepo from "./users.repository";
-=======
-import { usersRepository } from "./users.repository";
->>>>>>> origin/main
 
 interface MockChained {
   from: () => MockChained;
@@ -52,11 +48,7 @@ describe("usersRepository", () => {
     it("delegates to db.query", async () => {
       const mockUser = { id: "u1" };
       vi.mocked(db.query.users.findFirst).mockResolvedValue(mockUser as never);
-<<<<<<< HEAD
       const result = await usersRepo.findById(db, "u1");
-=======
-      const result = await usersRepository.findById("u1");
->>>>>>> origin/main
       expect(result).toBe(mockUser);
     });
   });
@@ -66,11 +58,7 @@ describe("usersRepository", () => {
       const mockUser = { id: "new-u" };
       vi.mocked(mockDb.returning).mockResolvedValueOnce([mockUser]);
 
-<<<<<<< HEAD
       const result = await usersRepo.create(db, {
-=======
-      const result = await usersRepository.create({
->>>>>>> origin/main
         clerkId: "c1",
         email: "a@b.com",
         fname: "A",
@@ -87,11 +75,7 @@ describe("usersRepository", () => {
       const mockAddr = { id: "a1" };
       vi.mocked(mockDb.returning).mockResolvedValueOnce([mockAddr]);
 
-<<<<<<< HEAD
       const result = await usersRepo.createAddress(db, {
-=======
-      const result = await usersRepository.createAddress({
->>>>>>> origin/main
         city: "B",
         country: "CZ",
         houseNumber: "1",

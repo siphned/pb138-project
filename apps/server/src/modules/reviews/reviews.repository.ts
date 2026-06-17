@@ -1,21 +1,21 @@
-<<<<<<< HEAD
 import { NotFoundError } from "@repo/shared";
 import type { Review } from "@repo/shared/schemas";
-import { orderItems, orders, productWines, reviews, wines } from "@repo/shared/schemas";
+import {
+  orderItems,
+  orders,
+  products,
+  productWines,
+  reviews,
+  users,
+  wines,
+} from "@repo/shared/schemas";
 import { and, asc, avg, count, desc, eq, isNull } from "drizzle-orm";
 import type { Database } from "../../db";
-=======
-import type { Review } from "@repo/shared/schemas";
-import { orderItems, orders, reviews } from "@repo/shared/schemas";
-import { and, avg, eq, isNull } from "drizzle-orm";
-import { db } from "../../db";
->>>>>>> origin/main
 
 export type ReviewWithUser = Review & {
   user: { id: string; fname: string; lname: string };
 };
 
-<<<<<<< HEAD
 export async function averageRating(
   db: Database,
   entityId: string,
@@ -82,6 +82,73 @@ export async function findReviews(
     ),
     with: { user: { columns: { fname: true, id: true, lname: true } } },
   }) as Promise<ReviewWithUser[]>;
+}
+
+export async function averageShopRating(db: Database, shopId: string): Promise<number | null> {
+  const [row] = await db
+    .select({ avg: avg(reviews.rating) })
+    .from(reviews)
+    .innerJoin(products, eq(reviews.entityId, products.id))
+    .where(
+      and(
+        eq(reviews.entityType, "product"),
+        eq(products.shopId, shopId),
+        isNull(reviews.deletedAt),
+        isNull(products.deletedAt)
+      )
+    );
+  return row?.avg !== null && row?.avg !== undefined ? Number.parseFloat(row.avg) : null;
+}
+
+export async function countShopReviews(db: Database, shopId: string): Promise<number> {
+  const [row] = await db
+    .select({ count: count() })
+    .from(reviews)
+    .innerJoin(products, eq(reviews.entityId, products.id))
+    .where(
+      and(
+        eq(reviews.entityType, "product"),
+        eq(products.shopId, shopId),
+        isNull(reviews.deletedAt),
+        isNull(products.deletedAt)
+      )
+    );
+  return row?.count ?? 0;
+}
+
+export async function findShopReviews(
+  db: Database,
+  shopId: string,
+  opts: { limit: number; offset: number; sort: "newest" | "highest" | "lowest" }
+): Promise<ReviewWithUser[]> {
+  let orderBy = [desc(reviews.createdAt)];
+  if (opts.sort === "highest") {
+    orderBy = [desc(reviews.rating), desc(reviews.createdAt)];
+  } else if (opts.sort === "lowest") {
+    orderBy = [asc(reviews.rating), desc(reviews.createdAt)];
+  }
+
+  const rows = await db
+    .select({
+      review: reviews,
+      user: { fname: users.fname, id: users.id, lname: users.lname },
+    })
+    .from(reviews)
+    .innerJoin(products, eq(reviews.entityId, products.id))
+    .innerJoin(users, eq(reviews.userId, users.id))
+    .where(
+      and(
+        eq(reviews.entityType, "product"),
+        eq(products.shopId, shopId),
+        isNull(reviews.deletedAt),
+        isNull(products.deletedAt)
+      )
+    )
+    .orderBy(...orderBy)
+    .limit(opts.limit)
+    .offset(opts.offset);
+
+  return rows.map((row) => ({ ...row.review, user: row.user }));
 }
 
 export async function findReviewWithUser(
@@ -200,126 +267,17 @@ export async function softDelete(db: Database, reviewId: string): Promise<void> 
 
 export const reviewsRepository = {
   averageRating,
+  averageShopRating,
   countReviews,
+  countShopReviews,
   findById,
   findReviews,
   findReviewWithUser,
+  findShopReviews,
   findUserReview,
   hasPurchasedFromWinemaker,
   hasPurchasedProduct,
   hasPurchasedWine,
   insertReview,
   softDelete,
-=======
-export interface IReviewsRepository {
-  averageRating(entityId: string, entityType: "product" | "winemaker"): Promise<number | null>;
-  findById(id: string): Promise<Review | undefined>;
-  findReviews(entityId: string, entityType: "product" | "winemaker"): Promise<ReviewWithUser[]>;
-  findReviewWithUser(reviewId: string): Promise<ReviewWithUser | undefined>;
-  findUserReview(
-    userId: string,
-    entityId: string,
-    entityType: "product" | "winemaker"
-  ): Promise<Review | undefined>;
-  hasPurchasedProduct(userId: string, productId: string): Promise<boolean>;
-  insertReview(
-    userId: string,
-    entityId: string,
-    entityType: "product" | "winemaker",
-    data: { rating: number; body?: string }
-  ): Promise<Review>;
-  softDelete(reviewId: string): Promise<void>;
-}
-
-export const reviewsRepository: IReviewsRepository = {
-  async averageRating(
-    entityId: string,
-    entityType: "product" | "winemaker"
-  ): Promise<number | null> {
-    const [row] = await db
-      .select({ avg: avg(reviews.rating) })
-      .from(reviews)
-      .where(
-        and(
-          eq(reviews.entityId, entityId),
-          eq(reviews.entityType, entityType),
-          isNull(reviews.deletedAt)
-        )
-      );
-    return row?.avg !== null && row?.avg !== undefined ? Number.parseFloat(row.avg) : null;
-  },
-
-  findById(id: string): Promise<Review | undefined> {
-    return db.query.reviews.findFirst({
-      where: and(eq(reviews.id, id), isNull(reviews.deletedAt)),
-    });
-  },
-
-  findReviews(entityId: string, entityType: "product" | "winemaker"): Promise<ReviewWithUser[]> {
-    return db.query.reviews.findMany({
-      where: and(
-        eq(reviews.entityId, entityId),
-        eq(reviews.entityType, entityType),
-        isNull(reviews.deletedAt)
-      ),
-      with: { user: { columns: { fname: true, id: true, lname: true } } },
-    }) as Promise<ReviewWithUser[]>;
-  },
-
-  findReviewWithUser(reviewId: string): Promise<ReviewWithUser | undefined> {
-    return db.query.reviews.findFirst({
-      where: and(eq(reviews.id, reviewId), isNull(reviews.deletedAt)),
-      with: { user: { columns: { fname: true, id: true, lname: true } } },
-    }) as Promise<ReviewWithUser | undefined>;
-  },
-
-  findUserReview(
-    userId: string,
-    entityId: string,
-    entityType: "product" | "winemaker"
-  ): Promise<Review | undefined> {
-    return db.query.reviews.findFirst({
-      where: and(
-        eq(reviews.userId, userId),
-        eq(reviews.entityId, entityId),
-        eq(reviews.entityType, entityType),
-        isNull(reviews.deletedAt)
-      ),
-    });
-  },
-
-  async hasPurchasedProduct(userId: string, productId: string): Promise<boolean> {
-    const rows = await db
-      .select({ id: orderItems.id })
-      .from(orderItems)
-      .innerJoin(orders, eq(orderItems.orderId, orders.id))
-      .where(and(eq(orders.userId, userId), eq(orderItems.productId, productId)))
-      .limit(1);
-    return rows.length > 0;
-  },
-
-  async insertReview(
-    userId: string,
-    entityId: string,
-    entityType: "product" | "winemaker",
-    data: { rating: number; body?: string }
-  ): Promise<Review> {
-    const [review] = await db
-      .insert(reviews)
-      .values({
-        body: data.body ?? null,
-        entityId,
-        entityType,
-        rating: data.rating,
-        userId,
-      })
-      .returning();
-    if (!review) throw new Error("Review insert returned no rows");
-    return review;
-  },
-
-  async softDelete(reviewId: string): Promise<void> {
-    await db.update(reviews).set({ deletedAt: new Date() }).where(eq(reviews.id, reviewId));
-  },
->>>>>>> origin/main
 };

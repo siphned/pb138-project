@@ -1,17 +1,13 @@
-import { useAuth } from "@clerk/react";
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { CalendarIcon, MapPinIcon, ShareIcon, Users2Icon } from "hugeicons-react";
-import { useCallback, useState } from "react";
-import { Avatar, AvatarFallback } from "@/components/ui/avatar";
-import { Badge } from "@/components/ui/badge";
+import { ArrowLeft, Calendar, MapPin, Share2, Users } from "lucide-react";
+import { StubGet } from "@/components/dev/StubGet";
+import { StubMutation } from "@/components/dev/StubMutation";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
-import { Skeleton } from "@/components/ui/skeleton";
-import { Textarea } from "@/components/ui/textarea";
-import { useUser } from "@/context/UserContext";
 import { useDeleteEventsByIdRegister } from "@/generated/hooks/useDeleteEventsByIdRegister";
 import { useGetEventsById } from "@/generated/hooks/useGetEventsById";
 import { useGetEventsByIdComments } from "@/generated/hooks/useGetEventsByIdComments";
+import { useGetEventsByIdImages } from "@/generated/hooks/useGetEventsByIdImages";
 import { usePostEventsByIdComments } from "@/generated/hooks/usePostEventsByIdComments";
 import { usePostEventsByIdRegister } from "@/generated/hooks/usePostEventsByIdRegister";
 
@@ -26,12 +22,12 @@ function EventDetailPage() {
   if (isLoading) {
     return (
       <div className="container mx-auto px-6 py-8 lg:px-12 space-y-8">
-        <Skeleton className="h-6 w-32" />
+        <div className="h-6 w-32 animate-pulse rounded-md bg-secondary/20" />
         <div className="space-y-6">
-          <Skeleton className="h-12 w-1/2" />
+          <div className="h-12 w-1/2 animate-pulse rounded-md bg-secondary/20" />
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            <Skeleton className="h-40 col-span-2 rounded-2xl" />
-            <Skeleton className="h-40 rounded-2xl" />
+            <div className="h-40 col-span-2 animate-pulse rounded-2xl bg-secondary/20" />
+            <div className="h-40 animate-pulse rounded-2xl bg-secondary/20" />
           </div>
         </div>
       </div>
@@ -50,8 +46,8 @@ function EventDetailPage() {
   }
 
   const title = event?.title || event?.name || "Untitled Event";
-  const startDate = event?.startTime ? new Date(event.startTime) : null;
-  const endDate = event?.endTime ? new Date(event.endTime) : null;
+  const startDate = event?.startDate ? new Date(event.startDate) : null;
+  const endDate = event?.endDate ? new Date(event.endDate) : null;
 
   return (
     <div className="container mx-auto px-6 py-8 lg:px-12 space-y-8">
@@ -59,7 +55,7 @@ function EventDetailPage() {
         className="flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground"
         to="/events"
       >
-        <div className="h-4 w-4" />
+        <ArrowLeft className="h-4 w-4" />
         Back to events
       </Link>
 
@@ -68,7 +64,7 @@ function EventDetailPage() {
           <h1 className="font-heading text-4xl font-bold lg:text-5xl">{title}</h1>
           {startDate && (
             <div className="flex items-center gap-2 text-muted-foreground">
-              <CalendarIcon className="h-4 w-4" />
+              <Calendar className="h-4 w-4" />
               <span>
                 {startDate.toLocaleDateString("en-US", {
                   day: "numeric",
@@ -108,50 +104,48 @@ function EventDetailPage() {
 
           {/* Details grid */}
           <div className="grid grid-cols-2 gap-6">
-            {event?.address && (
+            {event?.location && (
               <div className="space-y-2">
                 <div className="flex items-center gap-2">
-                  <MapPinIcon className="h-5 w-5 text-primary" />
+                  <MapPin className="h-5 w-5 text-primary" />
                   <h3 className="font-semibold">Location</h3>
                 </div>
-                <p className="text-muted-foreground">
-                  {event.address.street} {event.address.houseNumber}
-                  <br />
-                  {event.address.city}, {event.address.postalCode}
-                </p>
+                <p className="text-muted-foreground">{event.location}</p>
               </div>
             )}
 
-            {event?.capacity !== undefined && (
+            {event?.attendees !== undefined && (
               <div className="space-y-2">
                 <div className="flex items-center gap-2">
-                  <Users2Icon className="h-5 w-5 text-primary" />
-                  <h3 className="font-semibold">Capacity</h3>
+                  <Users className="h-5 w-5 text-primary" />
+                  <h3 className="font-semibold">Attendees</h3>
                 </div>
-                <p className="text-muted-foreground">{event.capacity} spots available</p>
+                <p className="text-muted-foreground">{event.attendees} people attending</p>
               </div>
             )}
           </div>
-
-          <Separator />
-
-          {/* Comments Section */}
-          <EventCommentsSection eventId={id} />
         </div>
 
         {/* Sidebar */}
         <div className="space-y-6">
-          {/* Registration Card */}
-          <EventRegistrationCard eventId={id} />
+          {/* CTA Card */}
+          <div className="rounded-2xl border bg-card p-6">
+            <h3 className="font-heading text-xl font-bold mb-4">Ready to Join?</h3>
+            <Button className="w-full mb-3">Register for Event</Button>
+            <Button className="w-full" variant="outline">
+              <Share2 className="mr-2 h-4 w-4" />
+              Share Event
+            </Button>
+          </div>
 
           {/* Winemaker info */}
-          {event?.winemaker && (
+          {event?.winemakerName && (
             <div className="rounded-2xl border bg-card p-6">
               <h3 className="font-heading text-lg font-bold mb-4">Hosted By</h3>
               <div className="space-y-3">
-                <p className="font-semibold text-primary">{event.winemaker.name}</p>
-                {event.winemaker.id && (
-                  <Link params={{ id: event.winemaker.id }} to="/winemakers/$id">
+                <p className="font-semibold text-primary">{event.winemakerName}</p>
+                {event?.winemakerId && (
+                  <Link params={{ id: event.winemakerId }} to="/winemakers/$id">
                     <Button className="w-full" variant="outline">
                       Visit Winemaker Profile
                     </Button>
@@ -162,248 +156,57 @@ function EventDetailPage() {
           )}
         </div>
       </div>
+
+      {/* [STUB] hook audit */}
+      <details className="container mx-auto p-6">
+        <summary className="cursor-pointer font-mono text-sm">[STUB] hook audit</summary>
+        <EventDetailStubAudit id={id} />
+      </details>
     </div>
   );
 }
 
-function EventRegistrationCard({ eventId }: { eventId: string }) {
-  const { isSignedIn } = useAuth();
-  const [isRegistered, setIsRegistered] = useState(false);
-
-  const registerMutation = usePostEventsByIdRegister({
-    mutation: {
-      onError: (error: Record<string, unknown>) => {
-        const errorData = error?.response as Record<string, unknown>;
-        const message = errorData?.data as Record<string, unknown>;
-        if (typeof message?.message === "string" && message.message.includes("already")) {
-          setIsRegistered(true);
-        }
-      },
-      onSuccess: () => {
-        setIsRegistered(true);
-      },
-    },
-  });
-
-  const unregisterMutation = useDeleteEventsByIdRegister({
-    mutation: {
-      onSuccess: () => {
-        setIsRegistered(false);
-      },
-    },
-  });
-
-  const handleRegister = useCallback(() => {
-    registerMutation.mutate({ id: eventId });
-  }, [eventId, registerMutation]);
-
-  const handleUnregister = useCallback(() => {
-    unregisterMutation.mutate({ id: eventId });
-  }, [eventId, unregisterMutation]);
-
-  if (!isSignedIn) {
-    return (
-      <div className="rounded-2xl border bg-card p-6">
-        <h3 className="font-heading text-xl font-bold mb-4">Ready to Join?</h3>
-        <p className="text-sm text-muted-foreground mb-4">Sign in to register for this event.</p>
-        <Link to="/auth/sign-in">
-          <Button className="w-full">Sign In</Button>
-        </Link>
-      </div>
-    );
-  }
-
-  if (isRegistered) {
-    return (
-      <div className="rounded-2xl border bg-card p-6">
-        <div className="flex items-center gap-2 mb-4">
-          <Badge
-            className="bg-green-50 text-green-700 border-green-200 dark:bg-green-900/20 dark:text-green-400 dark:border-green-800"
-            variant="outline"
-          >
-            ✓ Registered
-          </Badge>
-        </div>
-        <p className="text-sm text-muted-foreground mb-4">You are registered for this event.</p>
-        <Button
-          className="w-full"
-          disabled={unregisterMutation.isPending}
-          onClick={handleUnregister}
-          variant="outline"
-        >
-          {unregisterMutation.isPending ? "Canceling..." : "Cancel Registration"}
-        </Button>
-      </div>
-    );
-  }
-
+function EventDetailStubAudit({ id }: { id: string }) {
+  const commentsQuery = useGetEventsByIdComments(id);
+  const imagesQuery = useGetEventsByIdImages(id);
+  const registerMutation = usePostEventsByIdRegister();
+  const cancelMutation = useDeleteEventsByIdRegister();
+  const commentMutation = usePostEventsByIdComments();
   return (
-    <div className="rounded-2xl border bg-card p-6">
-      <h3 className="font-heading text-xl font-bold mb-4">Ready to Join?</h3>
-      <Button
-        className="w-full mb-3"
-        disabled={registerMutation.isPending}
-        onClick={handleRegister}
-      >
-        {registerMutation.isPending ? "Registering..." : "Register for Event"}
-      </Button>
-      <Button className="w-full" disabled variant="outline">
-        <ShareIcon className="mr-2 h-4 w-4" />
-        Share Event
-      </Button>
-    </div>
-  );
-}
-
-interface CommentWithUser {
-  body: string;
-  createdAt: string;
-  id: string;
-  user: {
-    fname: string;
-    id: string;
-    lname: string;
-  };
-}
-
-function EventCommentsSection({ eventId }: { eventId: string }) {
-  const { isSignedIn } = useAuth();
-  const { user } = useUser();
-  const [commentText, setCommentText] = useState("");
-
-  const {
-    data: commentsResponse,
-    isLoading: isLoadingComments,
-    refetch: refetchComments,
-  } = useGetEventsByIdComments(eventId);
-
-  const commentMutation = usePostEventsByIdComments({
-    mutation: {
-      onSuccess: () => {
-        setCommentText("");
-        refetchComments();
-      },
-    },
-  });
-
-  const handleSubmitComment = useCallback(
-    (e: React.FormEvent) => {
-      e.preventDefault();
-      if (!commentText.trim()) return;
-
-      commentMutation.mutate({
-        data: { body: commentText },
-        id: eventId,
-      });
-    },
-    [commentText, eventId, commentMutation]
-  );
-
-  // Extract comments from paginated response
-  const comments: CommentWithUser[] = commentsResponse?.data ?? [];
-
-  const renderCommentsList = (
-    isLoading: boolean,
-    commentsList: CommentWithUser[]
-  ): React.ReactNode => {
-    if (isLoading) {
-      return (
-        <>
-          <CommentSkeleton />
-          <CommentSkeleton />
-        </>
-      );
-    }
-
-    if (commentsList && commentsList.length > 0) {
-      return commentsList.map((comment) => <CommentItem comment={comment} key={comment.id} />);
-    }
-
-    return (
-      <div className="rounded-lg border border-dashed p-4 text-center">
-        <p className="text-sm text-muted-foreground">No comments yet. Be the first!</p>
-      </div>
-    );
-  };
-
-  return (
-    <div className="space-y-6">
-      <h2 className="font-heading text-2xl font-bold">Comments</h2>
-
-      {/* Comment Form */}
-      {isSignedIn && user ? (
-        <form className="space-y-4" onSubmit={handleSubmitComment}>
-          <div className="space-y-2">
-            <label className="text-sm font-medium" htmlFor="comment-textarea">
-              Add a comment
-            </label>
-            <Textarea
-              className="resize-none"
-              disabled={commentMutation.isPending}
-              id="comment-textarea"
-              onChange={(e) => setCommentText(e.target.value)}
-              placeholder="Share your thoughts about this event..."
-              value={commentText}
-            />
-          </div>
-          <Button disabled={!commentText.trim() || commentMutation.isPending} type="submit">
-            {commentMutation.isPending ? "Posting..." : "Post Comment"}
-          </Button>
-        </form>
-      ) : (
-        <div className="rounded-lg border border-dashed bg-muted/50 p-4 text-center">
-          <p className="text-sm text-muted-foreground mb-3">Sign in to leave a comment</p>
-          <Link to="/auth/sign-in">
-            <Button size="sm" variant="outline">
-              Sign In
-            </Button>
-          </Link>
-        </div>
-      )}
-
-      {/* Comments List */}
-      <div className="space-y-4">{renderCommentsList(isLoadingComments, comments)}</div>
-    </div>
-  );
-}
-
-function CommentItem({ comment }: { comment: CommentWithUser }) {
-  const createdDate = new Date(comment.createdAt);
-  const initials = `${comment.user.fname[0]}${comment.user.lname[0]}`.toUpperCase();
-
-  return (
-    <div className="flex gap-3 rounded-lg border bg-card p-4">
-      <Avatar className="h-10 w-10 flex-shrink-0">
-        <AvatarFallback>{initials}</AvatarFallback>
-      </Avatar>
-      <div className="flex-1 space-y-1">
-        <div className="flex items-center gap-2">
-          <p className="font-semibold text-sm">
-            {comment.user.fname} {comment.user.lname}
-          </p>
-          <span className="text-xs text-muted-foreground">
-            {createdDate.toLocaleDateString("en-US", {
-              day: "numeric",
-              month: "short",
-              year: "numeric",
-            })}
-          </span>
-        </div>
-        <p className="text-sm text-foreground">{comment.body}</p>
-      </div>
-    </div>
-  );
-}
-
-function CommentSkeleton() {
-  return (
-    <div className="flex gap-3 rounded-lg border bg-card p-4">
-      <Skeleton className="h-10 w-10 rounded-full flex-shrink-0" />
-      <div className="flex-1 space-y-2">
-        <Skeleton className="h-4 w-32" />
-        <Skeleton className="h-4 w-full" />
-        <Skeleton className="h-4 w-2/3" />
-      </div>
-    </div>
+    <>
+      <StubGet
+        actorRole="guest+"
+        hookName="useGetEventsByIdComments"
+        query={commentsQuery}
+        title="Comments"
+      />
+      <StubGet
+        actorRole="guest+"
+        hookName="useGetEventsByIdImages"
+        query={imagesQuery}
+        title="Images"
+      />
+      <StubMutation
+        actorRole="customer+"
+        hookName="usePostEventsByIdRegister"
+        mutation={registerMutation}
+        payloadExample={{ id }}
+        title="Register"
+      />
+      <StubMutation
+        actorRole="customer+"
+        hookName="useDeleteEventsByIdRegister"
+        mutation={cancelMutation}
+        payloadExample={{ id }}
+        title="Cancel registration"
+      />
+      <StubMutation
+        actorRole="customer+"
+        hookName="usePostEventsByIdComments"
+        mutation={commentMutation}
+        payloadExample={{ data: { body: "Test comment" }, id }}
+        title="Post comment"
+      />
+    </>
   );
 }

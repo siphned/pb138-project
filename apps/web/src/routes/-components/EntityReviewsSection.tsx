@@ -1,79 +1,117 @@
-import { ReviewList } from "@/components/reviews/ReviewList";
-import { ReviewsSummary } from "@/components/reviews/ReviewsSummary";
-import { useGetProductsByIdReviews } from "@/generated/hooks/useGetProductsByIdReviews";
-import { useGetWinemakersByIdReviews } from "@/generated/hooks/useGetWinemakersByIdReviews";
-import { useGetWinesByIdReviews } from "@/generated/hooks/useGetWinesByIdReviews";
+import { useState } from "react";
+import { InfiniteScrollArea } from "@/components/primitives/infinite-scroll-area";
+import { Section } from "@/components/primitives/section";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { ReviewList } from "@/routes/-components/ReviewList";
+import { ReviewsSummary } from "@/routes/-components/ReviewsSummary";
+import {
+  type ReviewEntityType,
+  type ReviewSort,
+  useEntityReviews,
+} from "@/routes/-components/use-entity-reviews";
+import { WriteReviewForm } from "@/routes/-components/WriteReviewForm";
+
+const SORT_LABELS: Record<ReviewSort, string> = {
+  highest: "Highest rated",
+  lowest: "Lowest rated",
+  newest: "Newest",
+};
+
+type ReviewUser = { fname?: string | null; lname?: string | null } | null | undefined;
 
 interface EntityReviewsSectionProps {
   entityId?: string;
-  entityType?: "wine" | "product" | "winemaker";
-  // biome-ignore lint/suspicious/noExplicitAny: reviewData shapes vary by entity; unified narrowing pending BE consolidation
-  reviewData?: any;
-  isLoading?: boolean;
+  entityType: ReviewEntityType;
   title?: string;
   emptyMessage?: string;
+}
+
+function authorName(user: ReviewUser): string {
+  const full = `${user?.fname?.trim() ?? ""} ${user?.lname?.trim() ?? ""}`.trim();
+  return full || "Anonymous";
 }
 
 export function EntityReviewsSection({
   entityId,
   entityType,
-  reviewData: initialReviewData,
-  isLoading: initialIsLoading,
   title = "Customer Reviews",
   emptyMessage = "Be the first to review.",
 }: EntityReviewsSectionProps) {
-  const wineQuery = useGetWinesByIdReviews(
-    entityType === "wine" ? entityId : undefined,
-    undefined,
-    {
-      query: { enabled: entityType === "wine" && !!entityId },
-    }
-  );
-  const productQuery = useGetProductsByIdReviews(
-    entityType === "product" ? entityId : undefined,
-    undefined,
-    {
-      query: { enabled: entityType === "product" && !!entityId },
-    }
-  );
-  const winemakerQuery = useGetWinemakersByIdReviews(
-    entityType === "winemaker" ? entityId : undefined,
-    undefined,
-    {
-      query: { enabled: entityType === "winemaker" && !!entityId },
-    }
+  const [sort, setSort] = useState<ReviewSort>("newest");
+  const { data, isLoading, hasNextPage, isFetchingNextPage, fetchNextPage } = useEntityReviews(
+    entityType,
+    entityId,
+    sort
   );
 
-  const reviewData =
-    initialReviewData || wineQuery.data || productQuery.data || winemakerQuery.data;
-  const isLoading =
-    initialIsLoading ?? (wineQuery.isLoading || productQuery.isLoading || winemakerQuery.isLoading);
+  const firstPage = data?.pages[0];
+  const reviews = (data?.pages.flatMap((p) => p.reviews) ?? []).map((r) => ({
+    authorName: authorName(r.user),
+    body: r.body ?? "",
+    createdAt: String(r.createdAt),
+    entityId: r.entityId,
+    entityType: r.entityType,
+    id: r.id,
+    rating: Number(r.rating),
+    userId: r.userId,
+  }));
 
   return (
-    <div className="space-y-6">
-      <h2 className="font-heading text-2xl font-bold">{title}</h2>
-
-      {reviewData && reviewData.averageRating !== null && (
-        <ReviewsSummary
-          averageRating={reviewData.averageRating}
-          reviewCount={reviewData.totalCount}
-        />
+    <Section heading={title}>
+      {(entityType === "product" || entityType === "winemaker") && entityId && (
+        <WriteReviewForm entityId={entityId} entityType={entityType} />
       )}
 
-      <ReviewList
-        emptyMessage={emptyMessage}
-        isLoading={isLoading}
-        reviews={
-          // biome-ignore lint/suspicious/noExplicitAny: review row shape varies per BE response (see reviewData prop comment)
-          reviewData?.reviews.map((r: any) => ({
-            authorName: `${r.user.fname} ${r.user.lname}`,
-            body: r.body ?? "",
-            createdAt: String(r.createdAt),
-            id: r.id,
-            rating: Number(r.rating),
-          })) ?? []
-        }
-      />
-    </div>
+      {reviews.length > 0 && (
+        <div className="flex items-center justify-between gap-4">
+          {firstPage?.averageRating != null ? (
+            <ReviewsSummary
+              averageRating={firstPage.averageRating}
+              reviewCount={firstPage.totalCount}
+            />
+          ) : (
+            <span />
+          )}
+          <Select onValueChange={(value) => setSort(value as ReviewSort)} value={sort}>
+            <SelectTrigger className="w-40" size="sm">
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              {(Object.keys(SORT_LABELS) as ReviewSort[]).map((key) => (
+                <SelectItem key={key} value={key}>
+                  {SORT_LABELS[key]}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        </div>
+      )}
+
+      {isLoading || reviews.length === 0 ? (
+        <ReviewList
+          emptyMessage={emptyMessage}
+          entityId={entityId}
+          entityType={entityType}
+          isLoading={isLoading}
+          reviews={reviews}
+        />
+      ) : (
+        <InfiniteScrollArea
+          className="h-[28rem]"
+          fetchNextPage={fetchNextPage}
+          hasNextPage={hasNextPage}
+          isFetchingNextPage={isFetchingNextPage}
+          itemCount={reviews.length}
+        >
+          <ReviewList entityId={entityId} entityType={entityType} reviews={reviews} />
+        </InfiniteScrollArea>
+      )}
+    </Section>
   );
 }

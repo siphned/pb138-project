@@ -80,37 +80,6 @@ export function orderStatusUpdateTemplate(data: OrderStatusData): string {
   `);
 }
 
-export type EventApprovalData = {
-  eventName: string;
-  winemakerName: string;
-  startTime: Date;
-  endTime: Date;
-};
-
-export function eventApprovalTemplate(data: EventApprovalData): string {
-  const fmt = (d: Date) => d.toLocaleString("en-GB", { dateStyle: "medium", timeStyle: "short" });
-  return wrap(`
-    <h2 style="margin-top:0;">Your Event Has Been Approved</h2>
-    <p>Hi <strong>${data.winemakerName}</strong>,</p>
-    <p>Great news! Your event has been reviewed and approved by the WineMarket team.</p>
-    <table style="border-collapse:collapse;margin:16px 0;">
-      <tr>
-        <td style="padding:6px 16px 6px 0;color:#666;">Event</td>
-        <td style="padding:6px 0;"><strong>${data.eventName}</strong></td>
-      </tr>
-      <tr>
-        <td style="padding:6px 16px 6px 0;color:#666;">Starts</td>
-        <td style="padding:6px 0;">${fmt(data.startTime)}</td>
-      </tr>
-      <tr>
-        <td style="padding:6px 16px 6px 0;color:#666;">Ends</td>
-        <td style="padding:6px 0;">${fmt(data.endTime)}</td>
-      </tr>
-    </table>
-    <p>Your event is now visible to customers on the platform.</p>
-  `);
-}
-
 export type RoleRequestData = {
   fname: string;
   role: "winemaker" | "shop_owner";
@@ -140,7 +109,6 @@ export function roleRequestRejectedTemplate(data: RoleRequestData): string {
     <p>If you have questions, please contact our support team.</p>
   `);
 }
-<<<<<<< HEAD
 
 export type WelcomeEmailData = {
   fname: string;
@@ -163,5 +131,3 @@ export function welcomeEmailTemplate(data: WelcomeEmailData): string {
     <p>Cheers,<br>The WineMarket Team</p>
   `);
 }
-=======
->>>>>>> origin/main

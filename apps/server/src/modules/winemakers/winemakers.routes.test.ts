@@ -2,6 +2,7 @@ import { afterEach, describe, expect, it, vi } from "vitest";
 import { resetAuth } from "../../__tests__/helpers/auth";
 import { get, patch } from "../../__tests__/helpers/request";
 import { app } from "../../app";
+import { winemakersService } from "./winemakers.service";
 
 const { defaultWinemaker } = vi.hoisted(() => ({
   defaultWinemaker: {
@@ -31,8 +32,11 @@ vi.mock("./winemakers.service", () => ({
   winemakersService: {
     getMyProfile: vi.fn().mockResolvedValue(defaultWinemaker),
     getWinemaker: vi.fn().mockResolvedValue(defaultWinemaker),
-    listWinemakers: vi.fn().mockResolvedValue([defaultWinemaker]),
+    listWinemakers: vi
+      .fn()
+      .mockResolvedValue({ data: [defaultWinemaker], limit: 24, page: 1, total: 1 }),
     updateMyProfile: vi.fn().mockResolvedValue(defaultWinemaker),
+    updateWinemakerById: vi.fn().mockResolvedValue(defaultWinemaker),
   },
 }));
 
@@ -56,7 +60,15 @@ describe("winemakers routes", () => {
       const response = await app.handle(get("/winemakers"));
       expect(response.status).toBe(200);
       const data = await response.json();
-      expect(Array.isArray(data)).toBe(true);
+      expect(Array.isArray(data.data)).toBe(true);
+    });
+
+    it("forwards the city filter to the service", async () => {
+      const response = await app.handle(get("/winemakers?city=Brno&q=acme"));
+      expect(response.status).toBe(200);
+      expect(winemakersService.listWinemakers).toHaveBeenCalledWith(
+        expect.objectContaining({ city: "Brno", q: "acme" })
+      );
     });
   });
 
@@ -93,6 +105,34 @@ describe("winemakers routes", () => {
     it("returns 200 when authenticated as winemaker", async () => {
       const response = await app.handle(
         patch("/winemakers/me", { auth: { roles: ["winemaker"] }, body: { name: "Updated" } })
+      );
+      expect(response.status).toBe(200);
+    });
+  });
+
+  describe("PATCH /winemakers/:id", () => {
+    it("returns 401 when no auth token provided", async () => {
+      const response = await app.handle(patch("/winemakers/wm1", { body: { name: "Updated" } }));
+      expect(response.status).toBe(401);
+    });
+
+    it("returns 403 when authenticated as customer", async () => {
+      const response = await app.handle(
+        patch("/winemakers/wm1", { auth: { roles: ["customer"] }, body: { name: "Updated" } })
+      );
+      expect(response.status).toBe(403);
+    });
+
+    it("returns 200 when authenticated as winemaker", async () => {
+      const response = await app.handle(
+        patch("/winemakers/wm1", { auth: { roles: ["winemaker"] }, body: { name: "Updated" } })
+      );
+      expect(response.status).toBe(200);
+    });
+
+    it("returns 200 when authenticated as admin", async () => {
+      const response = await app.handle(
+        patch("/winemakers/wm1", { auth: { roles: ["admin"] }, body: { name: "Updated" } })
       );
       expect(response.status).toBe(200);
     });

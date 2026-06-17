@@ -2,18 +2,12 @@ export * from "./addresses";
 export * from "./availability";
 export * from "./carts";
 export * from "./catalog";
-<<<<<<< HEAD
 export * from "./common";
 export * from "./dashboard";
 export * from "./enums";
 export * from "./events";
 export * from "./guest-sessions";
 export * from "./helpers";
-=======
-export * from "./enums";
-export * from "./events";
-export * from "./guest-sessions";
->>>>>>> origin/main
 export * from "./images";
 export * from "./orders";
 export * from "./relations";
@@ -31,10 +25,7 @@ import type { carts } from "./carts";
 import type { products, productWines, wines } from "./catalog";
 import type { eventComments, eventRegistrations, events } from "./events";
 import type { guestSessions } from "./guest-sessions";
-<<<<<<< HEAD
 import type { images } from "./images";
-=======
->>>>>>> origin/main
 import type { orders } from "./orders";
 import type { comments, reviews } from "./reviews";
 import type { roleRequests } from "./role-requests";
@@ -66,8 +57,5 @@ export type EventRegistration = (typeof eventRegistrations)["$inferSelect"];
 export type EventComment = (typeof eventComments)["$inferSelect"];
 export type Review = (typeof reviews)["$inferSelect"];
 export type Comment = (typeof comments)["$inferSelect"];
-<<<<<<< HEAD
 export type Image = (typeof images)["$inferSelect"];
 export type NewImage = (typeof images)["$inferInsert"];
-=======
->>>>>>> origin/main

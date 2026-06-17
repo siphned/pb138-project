@@ -1,0 +1,16 @@
+{
+  "buildCommand": "bun run build",
+  "env": {
+    "FRONTEND_URL": "@FRONTEND_URL",
+    "VITE_CLERK_PUBLISHABLE_KEY": "@VITE_CLERK_PUBLISHABLE_KEY"
+  },
+  "framework": "vite",
+  "installCommand": "bun install --frozen-lockfile",
+  "outputDirectory": "dist",
+  "rewrites": [
+    {
+      "destination": "/index.html",
+      "source": "/:path((?!_next/static|_next/image|favicon.ico).*)"
+    }
+  ]
+}

@@ -1,18 +1,16 @@
 import { Link } from "@tanstack/react-router";
-import { CatalogCard, catalogCardLinkClass } from "@/components/catalog/CatalogCard";
-import { WinemakerImage } from "@/components/catalog/WinemakerImage";
 import type { GetWinemakers200 } from "@/generated/types/GetWinemakers";
+import { CatalogCard, catalogCardLinkClass } from "@/routes/-components/CatalogCard";
+import { WinemakerImage } from "@/routes/-components/WinemakerImage";
 
-type WinemakerItem = GetWinemakers200[number];
+export type GetWinemakers200Item = GetWinemakers200["data"][number];
 
 interface WinemakerCardProps {
-  winemaker: WinemakerItem;
+  winemaker: GetWinemakers200Item;
 }
 
 export function WinemakerCard({ winemaker }: WinemakerCardProps) {
-  const location = winemaker.address
-    ? [winemaker.address.city, winemaker.address.country].filter(Boolean).join(", ")
-    : undefined;
+  const location = [winemaker.address?.city, winemaker.address?.country].filter(Boolean).join(", ");
 
   return (
     <CatalogCard
@@ -20,6 +18,7 @@ export function WinemakerCard({ winemaker }: WinemakerCardProps) {
         <WinemakerImage
           alt={winemaker.name}
           fallbackText={winemaker.name}
+          imageUrl={winemaker.imageUrl}
           winemakerId={winemaker.id}
         />
       }
@@ -29,10 +28,7 @@ export function WinemakerCard({ winemaker }: WinemakerCardProps) {
         </Link>
       }
     >
-      {location && <p className="text-xs text-muted-foreground line-clamp-1">{location}</p>}
-      {winemaker.description && (
-        <p className="line-clamp-2 text-xs text-muted-foreground">{winemaker.description}</p>
-      )}
+      {location && <p className="text-xs text-muted-foreground">{location}</p>}
     </CatalogCard>
   );
 }

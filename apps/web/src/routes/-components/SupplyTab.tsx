@@ -38,7 +38,7 @@ type SupplyStatus = "pending" | "active" | "expired" | "rejected";
 
 const statusColors: Record<SupplyStatus, string> = {
   active: "bg-green-100/30 text-green-700 dark:text-green-400",
-  expired: "bg-gray-100/30 text-gray-700 dark:text-gray-400",
+  expired: "bg-muted text-muted-foreground",
   pending: "bg-yellow-100/30 text-yellow-700 dark:text-yellow-400",
   rejected: "bg-destructive/30 text-destructive dark:text-red-400",
 };
@@ -50,10 +50,10 @@ export function SupplyTab({ shopId }: SupplyTabProps) {
   const [isSheetOpen, setIsSheetOpen] = useState(false);
   const [selectedWinemaker, setSelectedWinemaker] = useState<string>("");
 
-  // biome-ignore lint/suspicious/noExplicitAny: API response is untyped
-  const supplyAgreements = (agreements || []) as any[];
-  // biome-ignore lint/suspicious/noExplicitAny: API response is untyped
-  const winemakersData = (winemakers || []) as any[];
+  const supplyAgreements = agreements ?? [];
+  // GET /winemakers returns a paginated envelope ({ data, total, ... }), not a
+  // bare array — unwrap .data so the winemaker list actually renders.
+  const winemakersData = winemakers?.data ?? [];
 
   const handleCreateAgreement = async () => {
     if (!selectedWinemaker) return;
@@ -104,64 +104,72 @@ export function SupplyTab({ shopId }: SupplyTabProps) {
         </CardHeader>
 
         <CardContent>
-          {isLoading ? (
-            <div className="space-y-2">
-              {Array.from({ length: 3 }).map((_, i) => (
-                <Skeleton className="h-12 w-full" key={i} />
-              ))}
-            </div>
-          ) : supplyAgreements.length === 0 ? (
-            <div className="text-center py-8">
-              <p className="text-muted-foreground mb-4">No active supply agreements yet</p>
-              <Button className="gap-2" onClick={() => setIsSheetOpen(true)} variant="outline">
-                <span className="h-4 w-4">+</span>
-                Create your first agreement
-              </Button>
-            </div>
-          ) : (
-            <div className="rounded-md border border-border overflow-hidden">
-              <Table>
-                <TableHeader>
-                  <TableRow>
-                    <TableHead>Winemaker</TableHead>
-                    <TableHead>Wine</TableHead>
-                    <TableHead>Status</TableHead>
-                    <TableHead>Created Date</TableHead>
-                    <TableHead>Last Updated</TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {supplyAgreements.map((agreement) => {
-                    const status = (agreement.status || "pending").toLowerCase() as SupplyStatus;
+          {(() => {
+            if (isLoading) {
+              return (
+                <div className="space-y-2">
+                  {Array.from({ length: 3 }).map((_, i) => (
+                    <Skeleton className="h-12 w-full" key={i} />
+                  ))}
+                </div>
+              );
+            }
+            if (supplyAgreements.length === 0) {
+              return (
+                <div className="text-center py-8">
+                  <p className="text-muted-foreground mb-4">No active supply agreements yet</p>
+                  <Button className="gap-2" onClick={() => setIsSheetOpen(true)} variant="outline">
+                    <span className="h-4 w-4">+</span>
+                    Create your first agreement
+                  </Button>
+                </div>
+              );
+            }
+            return (
+              <div className="rounded-md border border-border overflow-hidden">
+                <Table>
+                  <TableHeader>
+                    <TableRow>
+                      <TableHead>Winemaker</TableHead>
+                      <TableHead>Wine</TableHead>
+                      <TableHead>Status</TableHead>
+                      <TableHead>Created Date</TableHead>
+                      <TableHead>Last Updated</TableHead>
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
+                    {supplyAgreements.map((agreement) => {
+                      const status = (agreement.status || "pending").toLowerCase() as SupplyStatus;
 
-                    return (
-                      <TableRow key={agreement.id}>
-                        <TableCell className="font-medium">{agreement.winemakerId}</TableCell>
-                        <TableCell className="text-sm">—</TableCell>
-                        <TableCell>
-                          <span
-                            className={`inline-flex rounded-full px-2 py-1 text-xs font-semibold ${
-                              statusColors[status] || statusColors.pending
-                            }`}
-                          >
-                            {status}
-                          </span>
-                        </TableCell>
-                        <TableCell className="text-sm text-muted-foreground">
-                          {new Date(agreement.createdAt).toLocaleDateString()}
-                        </TableCell>
-                        <TableCell className="text-sm text-muted-foreground">
-                          {agreement.respondedAt
-                            ? new Date(agreement.respondedAt).toLocaleDateString()
-                            : "—"}
-                        </TableCell>
-                      </TableRow>
-                    );
-                  })}
-                </TableBody>
-              </Table>
-            </div>
-          )}
+                      return (
+                        <TableRow key={agreement.id}>
+                          <TableCell className="font-medium">{agreement.winemakerId}</TableCell>
+                          <TableCell className="text-sm">—</TableCell>
+                          <TableCell>
+                            <span
+                              className={`inline-flex rounded-full px-2 py-1 text-xs font-semibold ${
+                                statusColors[status] || statusColors.pending
+                              }`}
+                            >
+                              {status}
+                            </span>
+                          </TableCell>
+                          <TableCell className="text-sm text-muted-foreground">
+                            {new Date(agreement.createdAt).toLocaleDateString()}
+                          </TableCell>
+                          <TableCell className="text-sm text-muted-foreground">
+                            {agreement.respondedAt
+                              ? new Date(agreement.respondedAt).toLocaleDateString()
+                              : "—"}
+                          </TableCell>
+                        </TableRow>
+                      );
+                    })}
+                  </TableBody>
+                </Table>
+              </div>
+            );
+          })()}
         </CardContent>
       </Card>
 
@@ -184,21 +192,27 @@ export function SupplyTab({ shopId }: SupplyTabProps) {
                   <SelectValue placeholder="Choose a winemaker..." />
                 </SelectTrigger>
                 <SelectContent>
-                  {winemakersLoading ? (
-                    <SelectItem disabled value="">
-                      Loading winemakers...
-                    </SelectItem>
-                  ) : winemakersData.length === 0 ? (
-                    <SelectItem disabled value="">
-                      No winemakers available
-                    </SelectItem>
-                  ) : (
-                    winemakersData.map((winemaker) => (
+                  {(() => {
+                    if (winemakersLoading) {
+                      return (
+                        <SelectItem disabled value="">
+                          Loading winemakers...
+                        </SelectItem>
+                      );
+                    }
+                    if (winemakersData.length === 0) {
+                      return (
+                        <SelectItem disabled value="">
+                          No winemakers available
+                        </SelectItem>
+                      );
+                    }
+                    return winemakersData.map((winemaker) => (
                       <SelectItem key={winemaker.id} value={winemaker.id}>
                         {winemaker.name || winemaker.id}
                       </SelectItem>
-                    ))
-                  )}
+                    ));
+                  })()}
                 </SelectContent>
               </Select>
               <p className="text-xs text-muted-foreground">

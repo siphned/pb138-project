@@ -55,18 +55,13 @@ winery/
 
 ## Quick Start
 
-<<<<<<< HEAD
 **Prerequisites:** [Bun](https://bun.sh), [Docker](https://www.docker.com/), [Clerk account](https://clerk.com/) for authentication
-=======
-**Prerequisites:** [Bun](https://bun.sh), [Docker](https://www.docker.com/)
->>>>>>> origin/main
 
 ### Step 1: Install Dependencies
 ```bash
 bun install
 ```
 
-<<<<<<< HEAD
 ### Step 2: Configure Environment
 
 Copy `.env.example` files and fill in required values:
@@ -83,11 +78,15 @@ cp .env.example .env.local
 ```
 
 ### Step 3: Start PostgreSQL
+
+For the host dev flow (running `bun dev` on the host), start only the database:
 ```bash
-docker compose up -d
+docker compose up -d db
 ```
 
-Verify: `docker ps` should show `winery_postgres`
+Verify: `docker ps` should show `winemarket-db` (healthy). Host port is **5433** → `postgresql://postgres:postgres@localhost:5433/winemarket`.
+
+> Want the whole stack (API + web) in containers instead? See [Run with Docker](#run-with-docker) below.
 
 ### Step 4: Setup Database
 ```bash
@@ -102,16 +101,6 @@ bun run db:seed
 ### Step 5: Start Development Servers
 ```bash
 # From project root, starts both frontend and backend
-=======
-# 2. Start PostgreSQL
-docker compose up -d
-
-# 3. Setup database
-bun run db:migrate
-bun run db:seed
-
-# 4. Start dev servers
->>>>>>> origin/main
 bun dev
 ```
 
@@ -121,22 +110,61 @@ Or run separately:
 bun run dev:web
 # Visit http://localhost:5173
 
-<<<<<<< HEAD
 # Terminal 2: Backend (Elysia + PostgreSQL)
 bun run dev:server
 # API at http://localhost:3000
 # Swagger docs at http://localhost:3000/swagger
 ```
 
-=======
->>>>>>> origin/main
+---
+
+## Run with Docker
+
+Full stack (Postgres + API + web) in one command — no host Bun/Node needed.
+
+### Prerequisites
+- Docker + Docker Compose
+- A root `.env` (copy from `.env.docker.example`) with your Clerk keys:
+  - `CLERK_SECRET_KEY`, `CLERK_JWT_KEY` (server, runtime)
+  - `VITE_CLERK_PUBLISHABLE_KEY` (baked into the web build)
+
+### Start
+```bash
+cp .env.docker.example .env   # then fill in the Clerk keys
+docker compose up -d --build
+```
+- Web: http://localhost:8080
+- API: http://localhost:3000  (Swagger JSON at `/swagger/json`)
+- Postgres: localhost:**5433** (postgres/postgres, db `winemarket`)
+
+Migrations run automatically via the one-shot `migrate` service before the server starts.
+
+### Seed demo data (on demand)
+```bash
+docker compose run --rm seed
+```
+
+### Optional pgAdmin
+```bash
+docker compose --profile tools up -d pgadmin   # http://localhost:5050
+```
+
+### Stop / reset
+```bash
+docker compose down       # stop, keep data
+docker compose down -v    # stop + drop the DB volume (fresh start)
+```
+
+> **Notes**
+> - `VITE_API_URL` is baked into the web bundle at build time as `http://localhost:3000` (the browser runs on the host, so it cannot use the internal `server` hostname). Change it via the `web` build arg if you expose the API elsewhere, then rebuild.
+> - Optional server vars `CLERK_WEBHOOK_SIGNING_SECRET` and `RESEND_API_KEY` are not wired into compose by default (an empty value fails the server's validation). Add them via `env_file` / the list form in `docker-compose.yml` only when you have real values.
+
 ---
 
 ## Common Commands
 
 ### Development
 ```bash
-<<<<<<< HEAD
 bun dev                 # Start both frontend + backend (hot reload)
 bun run dev:web        # Frontend only (Vite)
 bun run dev:server     # Backend only (Elysia)
@@ -167,15 +195,6 @@ bun run test:coverage  # Generate coverage report
 ```bash
 bun run build:web      # Build production React bundle
 bun run build:server   # Build production server binary
-=======
-bun dev                # Start dev servers (frontend + backend)
-bun run check          # Lint, format, and organize imports (Biome)
-bun run check-types    # TypeScript type checking (tsc)
-bun run generate       # Regenerate Orval API hooks
-bun run test           # Run all unit and integration tests (Vitest)
-bun run db:generate    # Create Drizzle migrations
-bun run db:migrate     # Apply Drizzle migrations
->>>>>>> origin/main
 ```
 
 ---
@@ -191,7 +210,6 @@ bun run db:migrate     # Apply Drizzle migrations
 ### For Developers
 | Document | Description |
 |----------|-------------|
-<<<<<<< HEAD
 | [docs/ARCHITECTURE/architecture.md](docs/ARCHITECTURE/architecture.md) | System design, 3-layer backend, data flow, modules |
 | [docs/API/api.md](docs/API/api.md) | Complete REST API endpoint specification with examples |
 | [docs/ROLES/roles.md](docs/ROLES/roles.md) | Role-permission matrix (RBAC) |
@@ -203,15 +221,6 @@ bun run db:migrate     # Apply Drizzle migrations
 ### For Reference
 - [docs/audit/](docs/audit/) — Architecture audits, redesign decisions
 - [docs/CODING_STANDARDS.md](docs/CODING_STANDARDS.md) — Code quality & conventions |
-=======
-| [docs/ARCHITECTURE/](docs/ARCHITECTURE/) | System design, layer diagrams, and data flow |
-| [docs/API/](docs/API/) | REST API endpoint specification |
-| [docs/ROLES/](docs/ROLES/) | Role-permission matrix (RBAC) |
-| [docs/ROUTES/](docs/ROUTES/) | Frontend route structure and guards |
-| [docs/audit/](docs/audit/) | Architecture audit and redesign logs |
-| [wiki/](wiki/) | Pattern guides (React, Elysia, Drizzle, etc.) |
-| [CLAUDE.md](CLAUDE.md) | Primary source of truth for coding patterns |
->>>>>>> origin/main
 
 ---
 

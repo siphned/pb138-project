@@ -26,6 +26,12 @@ describe("LoadingState", () => {
     expect(wrapper?.className).toMatch(/space-y-3/);
   });
 
+  it("renders detail-media variant with a two-column grid", () => {
+    const { container } = render(<LoadingState variant="detail-media" />);
+    const wrapper = container.querySelector("[data-slot='loading-state']");
+    expect(wrapper?.querySelector(".grid.lg\\:grid-cols-2")).not.toBeNull();
+  });
+
   it("renders form variant", () => {
     const { container } = render(<LoadingState variant="form" />);
     const wrapper = container.querySelector("[data-slot='loading-state']");

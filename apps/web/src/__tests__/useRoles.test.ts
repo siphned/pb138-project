@@ -1,40 +1,65 @@
 import { renderHook } from "@testing-library/react";
 import { describe, expect, it, vi } from "vitest";
 import { useRoles } from "../hooks/useRoles";
+import { Role } from "../types/roles";
 
-vi.mock("@clerk/react", () => ({
-  useAuth: vi.fn(),
+vi.mock("@/context/UserContext", () => ({
+  useUser: vi.fn(),
 }));
 
-import { useAuth } from "@clerk/react";
+import { useUser } from "@/context/UserContext";
 
 describe("useRoles", () => {
-  it("returns roles from sessionClaims", () => {
-    vi.mocked(useAuth).mockReturnValue({
-      sessionClaims: {
-        roles: ["admin", "customer"],
+  it("converts UserContext Title-Case roles into BE/wire AppRole form", () => {
+    vi.mocked(useUser).mockReturnValue({
+      activeRole: Role.admin,
+      isLoading: false,
+      setActiveRole: vi.fn(),
+      updateUser: vi.fn(),
+      user: {
+        clerkId: "clerk_1",
+        email: "a@b.com",
+        fname: "Adam",
+        id: "u1",
+        lname: "M",
+        roles: [Role.admin, Role.customer],
       },
-    } as never);
+    });
 
     const { result } = renderHook(() => useRoles());
 
     expect(result.current).toEqual(["admin", "customer"]);
   });
 
-  it("returns empty array if no sessionClaims", () => {
-    vi.mocked(useAuth).mockReturnValue({
-      sessionClaims: null,
-    } as never);
+  it("returns empty array when user is null (signed out)", () => {
+    vi.mocked(useUser).mockReturnValue({
+      activeRole: Role.customer,
+      isLoading: false,
+      setActiveRole: vi.fn(),
+      updateUser: vi.fn(),
+      user: null,
+    });
 
     const { result } = renderHook(() => useRoles());
 
     expect(result.current).toEqual([]);
   });
 
-  it("returns empty array if roles missing in sessionClaims", () => {
-    vi.mocked(useAuth).mockReturnValue({
-      sessionClaims: {},
-    } as never);
+  it("returns empty array when user has no roles", () => {
+    vi.mocked(useUser).mockReturnValue({
+      activeRole: Role.customer,
+      isLoading: false,
+      setActiveRole: vi.fn(),
+      updateUser: vi.fn(),
+      user: {
+        clerkId: "clerk_1",
+        email: "a@b.com",
+        fname: "Adam",
+        id: "u1",
+        lname: "M",
+        roles: [],
+      },
+    });
 
     const { result } = renderHook(() => useRoles());
 

@@ -1,9 +1,8 @@
-<<<<<<< HEAD
-import { UserIcon } from "hugeicons-react";
-=======
-import { User } from "lucide-react";
->>>>>>> origin/main
-import { type ChangeEvent, type FormEvent, useEffect, useState } from "react";
+import { User02Icon } from "@hugeicons/core-free-icons";
+import { HugeiconsIcon } from "@hugeicons/react";
+import { useMemo } from "react";
+import { type Resolver, useForm } from "react-hook-form";
+import z from "zod";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -17,117 +16,127 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useUser } from "@/context/UserContext";
 
+const profileFormSchema = z.object({
+  fname: z.string().refine((v) => v.trim().length > 0, { message: "First name is required" }),
+  lname: z.string().refine((v) => v.trim().length > 0, { message: "Last name is required" }),
+});
+
+type ProfileFormValues = z.infer<typeof profileFormSchema>;
+
+function buildResolver(): Resolver<ProfileFormValues> {
+  return (values) => {
+    const result = profileFormSchema.safeParse(values);
+    if (result.success) {
+      return { errors: {}, values: result.data };
+    }
+    const fieldErrors: Record<string, { type: string; message: string }> = {};
+    for (const issue of result.error.issues) {
+      const key = issue.path.map(String).join(".");
+      if (key && !fieldErrors[key]) {
+        fieldErrors[key] = { message: issue.message, type: issue.code };
+      }
+    }
+    return { errors: fieldErrors as never, values: {} as ProfileFormValues };
+  };
+}
+
 interface ProfileEditFormProps {
   onSuccess?: () => void;
   onCancel?: () => void;
 }
 
-interface FormData {
-  fname: string;
-  lname: string;
-}
-
 export function ProfileEditForm({ onSuccess, onCancel }: ProfileEditFormProps) {
   const { user, updateUser } = useUser();
-  const [formData, setFormData] = useState<FormData>({ fname: "", lname: "" });
-  const [errors, setErrors] = useState<Partial<Record<keyof FormData, string>>>({});
-  const [isSaving, setIsSaving] = useState(false);
+  const resolver = useMemo(() => buildResolver(), []);
 
-  useEffect(() => {
-    if (user) {
-      setFormData({ fname: user.fname, lname: user.lname });
-    }
-  }, [user]);
+  const {
+    register,
+    handleSubmit,
+    setError,
+    clearErrors,
+    formState: { errors, isSubmitting },
+  } = useForm<ProfileFormValues>({
+    mode: "onSubmit",
+    resolver,
+    reValidateMode: "onChange",
+    values: {
+      fname: user?.fname ?? "",
+      lname: user?.lname ?? "",
+    },
+  });
 
-  const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
-    const { name, value } = e.target;
-    setFormData((prev) => ({ ...prev, [name as keyof FormData]: value }));
-
-    // Clear error when user starts typing
-    if (errors[name as keyof FormData]) {
-      setErrors((prev) => ({ ...prev, [name as keyof FormData]: undefined }));
-    }
+  const clearFieldErrorOnChange = (field: "fname" | "lname") => () => {
+    if (errors[field]) clearErrors(field);
   };
 
-  const handleSubmit = async (e: FormEvent) => {
-    e.preventDefault();
-    setIsSaving(true);
-    setErrors({});
-
-    const newErrors: Partial<Record<keyof FormData, string>> = {};
-    if (!formData.fname.trim()) newErrors.fname = "First name is required";
-    if (!formData.lname.trim()) newErrors.lname = "Last name is required";
-
-    if (Object.keys(newErrors).length > 0) {
-      setErrors(newErrors);
-      setIsSaving(false);
-      return;
-    }
-
+  const onSubmit = async (data: ProfileFormValues) => {
     try {
-      await updateUser(formData);
-      if (onSuccess) onSuccess();
-    } catch {
-      // Error is handled by the form error state
-    } finally {
-      setIsSaving(false);
+      await updateUser(data);
+      onSuccess?.();
+    } catch (err) {
+      const message =
+        err instanceof Error ? err.message : "Failed to save changes. Please try again.";
+      setError("root", { message });
     }
   };
 
   return (
-    <Card className="max-w-2xl mx-auto border-none shadow-none bg-background rounded-3xl">
-      <CardHeader className="px-6 pt-8 pb-4">
+    <Card className="mx-auto max-w-2xl rounded-3xl border-none bg-background shadow-none">
+      <CardHeader className="px-6 pb-4 pt-8">
         <CardTitle className="font-heading text-2xl">Edit Profile</CardTitle>
         <CardDescription>Update your name information.</CardDescription>
       </CardHeader>
-      <form onSubmit={handleSubmit}>
-        <CardContent className="px-6 space-y-6">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+      <form noValidate onSubmit={handleSubmit(onSubmit)}>
+        <CardContent className="space-y-6 px-6">
+          {errors.root?.message && (
+            <p
+              aria-live="polite"
+              className="rounded-md border border-destructive/40 bg-destructive/10 px-4 py-3 text-sm text-destructive"
+            >
+              {errors.root.message}
+            </p>
+          )}
+
+          <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
             <div className="space-y-2">
               <Label className="flex items-center gap-2" htmlFor="fname">
-<<<<<<< HEAD
-                <UserIcon className="h-4 w-4" /> First Name
-=======
-                <User className="h-4 w-4" /> First Name
->>>>>>> origin/main
+                <HugeiconsIcon className="h-4 w-4" icon={User02Icon} /> First Name
               </Label>
               <Input
+                aria-invalid={!!errors.fname || undefined}
                 className={errors.fname ? "border-destructive focus-visible:ring-destructive" : ""}
                 id="fname"
-                name="fname"
-                onChange={handleChange}
                 placeholder="John"
-                value={formData.fname}
+                {...register("fname", { onChange: clearFieldErrorOnChange("fname") })}
               />
-              {errors.fname && <p className="text-xs text-destructive mt-1">{errors.fname}</p>}
+              {errors.fname && (
+                <p className="mt-1 text-xs text-destructive">{errors.fname.message}</p>
+              )}
             </div>
 
             <div className="space-y-2">
               <Label className="flex items-center gap-2" htmlFor="lname">
-<<<<<<< HEAD
-                <UserIcon className="h-4 w-4" /> Last Name
-=======
-                <User className="h-4 w-4" /> Last Name
->>>>>>> origin/main
+                <HugeiconsIcon className="h-4 w-4" icon={User02Icon} /> Last Name
               </Label>
               <Input
+                aria-invalid={!!errors.lname || undefined}
                 className={errors.lname ? "border-destructive focus-visible:ring-destructive" : ""}
                 id="lname"
-                name="lname"
-                onChange={handleChange}
                 placeholder="Doe"
-                value={formData.lname}
+                {...register("lname", { onChange: clearFieldErrorOnChange("lname") })}
               />
-              {errors.lname && <p className="text-xs text-destructive mt-1">{errors.lname}</p>}
+              {errors.lname && (
+                <p className="mt-1 text-xs text-destructive">{errors.lname.message}</p>
+              )}
             </div>
           </div>
         </CardContent>
-        <CardFooter className="px-6 py-8 flex justify-end gap-3 border-t">
-          <Button disabled={isSaving} onClick={onCancel} type="button" variant="outline">
+        <CardFooter className="flex justify-end gap-3 border-t px-6 py-8">
+          <Button disabled={isSubmitting} onClick={onCancel} type="button" variant="outline">
             Cancel
           </Button>
-          <Button disabled={isSaving} type="submit">
-            {isSaving ? "Saving..." : "Save Changes"}
+          <Button disabled={isSubmitting} type="submit">
+            {isSubmitting ? "Saving..." : "Save Changes"}
           </Button>
         </CardFooter>
       </form>

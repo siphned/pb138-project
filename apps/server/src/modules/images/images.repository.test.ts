@@ -66,6 +66,16 @@ describe("findById", () => {
   });
 });
 
+describe("findByEntity", () => {
+  it("queries images ordered by createdAt then id", () => {
+    (mockDb.query.images.findMany as any).mockReturnValue(Promise.resolve([]));
+    imagesRepository.findByEntity(db as any, "product", entityId);
+    const arg = (mockDb.query.images.findMany as any).mock.calls[0][0];
+    expect(Array.isArray(arg.orderBy)).toBe(true);
+    expect(arg.orderBy).toHaveLength(2);
+  });
+});
+
 describe("findOwnerUserId", () => {
   it("returns ownerUserId for shop", async () => {
     vi.mocked(db.query.shops.findFirst).mockResolvedValue({ ownerUserId: userId } as any);

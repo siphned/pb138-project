@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 import { shops } from "@repo/shared/schemas";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { db } from "../../db";
@@ -11,36 +10,6 @@ vi.mock("../../db", () => {
         returning: vi.fn().mockResolvedValue([{ id: "a1" }]),
       }),
     }),
-=======
-import { addresses, shops } from "@repo/shared/schemas";
-import { beforeEach, describe, expect, it, vi } from "vitest";
-import { db } from "../../db";
-import { shopsRepository } from "./shops.repository";
-
-interface MockChained {
-  from: () => MockChained;
-  where: () => MockChained;
-  returning: () => Promise<unknown[]>;
-}
-
-interface MockDatabase {
-  insert: () => MockChained;
-  update: () => MockChained;
-  returning: () => Promise<unknown[]>;
-  query: {
-    shops: {
-      findFirst: unknown;
-      findMany: unknown;
-    };
-  };
-}
-
-const mockDb = db as unknown as MockDatabase;
-
-vi.mock("../../db", () => {
-  const m = {
-    insert: vi.fn().mockReturnThis(),
->>>>>>> origin/main
     query: {
       shops: {
         findFirst: vi.fn(),
@@ -48,6 +17,7 @@ vi.mock("../../db", () => {
       },
     },
     returning: vi.fn().mockReturnThis(),
+    select: vi.fn(),
     set: vi.fn().mockReturnThis(),
     transaction: vi.fn((cb) => cb(m)),
     update: vi.fn().mockReturnThis(),
@@ -57,11 +27,8 @@ vi.mock("../../db", () => {
   return { db: m };
 });
 
-<<<<<<< HEAD
 const mockDb = db as any;
 
-=======
->>>>>>> origin/main
 describe("shopsRepository", () => {
   beforeEach(() => {
     vi.clearAllMocks();
@@ -70,43 +37,67 @@ describe("shopsRepository", () => {
   describe("findById", () => {
     it("delegates to db.query", async () => {
       const mockShop = { address: { deletedAt: null, id: "a1" }, id: "s1" };
-<<<<<<< HEAD
       vi.mocked(db.query.shops.findFirst).mockResolvedValue(mockShop as any);
       const result = await shopsRepository.findById(db, "s1");
-=======
-      vi.mocked(db.query.shops.findFirst).mockResolvedValue(mockShop as never);
-      const result = await shopsRepository.findById("s1");
->>>>>>> origin/main
       expect(result).toBe(mockShop);
     });
   });
 
   describe("findAllByOwnerUserId", () => {
-    it("delegates to db.query.findMany", async () => {
-      const mockShops = [{ id: "s1" }];
-<<<<<<< HEAD
+    it("returns shops with their non-deleted address", async () => {
+      const mockShops = [
+        { address: { deletedAt: null, id: "a1" }, id: "s1" },
+        { address: { deletedAt: null, id: "a2" }, id: "s2" },
+      ];
       vi.mocked(db.query.shops.findMany).mockResolvedValue(mockShops as any);
       const result = await shopsRepository.findAllByOwnerUserId(db, "u1");
-=======
-      vi.mocked(db.query.shops.findMany).mockResolvedValue(mockShops as never);
-      const result = await shopsRepository.findAllByOwnerUserId("u1");
->>>>>>> origin/main
-      expect(result).toBe(mockShops);
+      expect(result).toHaveLength(2);
+      expect(result[0]?.id).toBe("s1");
+    });
+
+    it("filters out shops whose address has been soft-deleted", async () => {
+      const mockShops = [
+        { address: { deletedAt: null, id: "a1" }, id: "s1" },
+        { address: { deletedAt: new Date(), id: "a2" }, id: "s2" },
+      ];
+      vi.mocked(db.query.shops.findMany).mockResolvedValue(mockShops as any);
+      const result = await shopsRepository.findAllByOwnerUserId(db, "u1");
+      expect(result).toHaveLength(1);
+      expect(result[0]?.id).toBe("s1");
     });
   });
 
-<<<<<<< HEAD
   describe("findAll with filters", () => {
+    const pagination = { limit: 24, offset: 0 };
+
+    // findAll runs the row query and a COUNT query (db.select().from().where()) in
+    // parallel. Stub the count chain to resolve to [{ total }].
+    const stubCount = (total: number) => {
+      vi.mocked(mockDb.select).mockReturnValue({
+        from: vi.fn().mockReturnValue({ where: vi.fn().mockResolvedValue([{ total }]) }),
+      });
+    };
+
     it("accepts q filter", async () => {
       vi.mocked(db.query.shops.findMany).mockResolvedValue([]);
-      await shopsRepository.findAll(db, { q: "boutique" });
+      stubCount(0);
+      await shopsRepository.findAll(db, { q: "boutique" }, pagination);
       expect(db.query.shops.findMany).toHaveBeenCalled();
     });
 
     it("accepts ownerUserId filter", async () => {
       vi.mocked(db.query.shops.findMany).mockResolvedValue([]);
-      await shopsRepository.findAll(db, { ownerUserId: "u1" });
+      stubCount(0);
+      await shopsRepository.findAll(db, { ownerUserId: "u1" }, pagination);
       expect(db.query.shops.findMany).toHaveBeenCalled();
+    });
+
+    it("returns rows and total", async () => {
+      const mockShops = [{ address: { deletedAt: null, id: "a1" }, id: "s1" }];
+      vi.mocked(db.query.shops.findMany).mockResolvedValue(mockShops as any);
+      stubCount(1);
+      const result = await shopsRepository.findAll(db, {}, pagination);
+      expect(result).toStrictEqual({ rows: mockShops, total: 1 });
     });
   });
 
@@ -124,22 +115,6 @@ describe("shopsRepository", () => {
         ownerUserId: "u1",
       });
       expect(result.id).toBe("s1");
-=======
-  describe("createShopWithAddress", () => {
-    it("creates address and shop in a transaction", async () => {
-      vi.mocked(mockDb.returning)
-        .mockResolvedValueOnce([{ id: "a1" }]) // address
-        .mockResolvedValueOnce([{ id: "s1" }]); // shop
-
-      const result = await shopsRepository.createShopWithAddress(
-        { description: "Desc", name: "Shop", ownerUserId: "u1" },
-        { city: "B", country: "CZ", houseNumber: "1", postalCode: "1", street: "S" }
-      );
-
-      expect(result.id).toBe("s1");
-      expect(db.transaction).toHaveBeenCalled();
-      expect(db.insert).toHaveBeenCalledWith(addresses);
->>>>>>> origin/main
       expect(db.insert).toHaveBeenCalledWith(shops);
     });
   });

@@ -1,14 +1,12 @@
-<<<<<<< HEAD
 import { FilterIcon } from "@hugeicons/core-free-icons";
 import { HugeiconsIcon } from "@hugeicons/react";
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
-import { useMemo } from "react";
 import { CatalogFilters } from "@/components/catalog/CatalogFilters";
 import { CatalogResults } from "@/components/catalog/CatalogResults";
 import { CatalogState } from "@/components/catalog/CatalogState";
+import { ShopCard } from "@/components/catalog/ShopCard";
 import type { ShopSearch } from "@/components/catalog/types";
 import { PageHeader } from "@/components/primitives/page-header";
-import { ShopCard } from "@/components/shops/ShopCard";
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { useGetShops } from "@/generated/hooks/useGetShops";
@@ -16,8 +14,6 @@ import { useGetShops } from "@/generated/hooks/useGetShops";
 export const Route = createFileRoute("/shops/")({
   component: ShopsPage,
   validateSearch: (raw): ShopSearch => ({
-    city: typeof raw.city === "string" ? raw.city : undefined,
-    ownerUserId: typeof raw.ownerUserId === "string" ? raw.ownerUserId : undefined,
     q: typeof raw.q === "string" ? raw.q : undefined,
   }),
 });
@@ -33,24 +29,14 @@ function ShopsPage() {
 
   const shops = query.data || [];
 
-  // Client-side filtering until BE supports it
-  const filteredShops = useMemo(() => {
-    const cityFilter = search.city?.toLowerCase();
-    const qFilter = search.q?.toLowerCase();
-    return shops.filter((s) => {
-      const city = s.address?.city?.toLowerCase() ?? "";
-      if (qFilter && !s.name.toLowerCase().includes(qFilter) && !city.includes(qFilter)) {
-        return false;
-      }
-      if (cityFilter && !city.includes(cityFilter)) {
-        return false;
-      }
-      if (search.ownerUserId && s.ownerUserId !== search.ownerUserId) {
-        return false;
-      }
-      return true;
-    });
-  }, [shops, search.city, search.ownerUserId, search.q]);
+  // Client-side filtering for 'q' until BE supports it
+  const filteredShops = search.q
+    ? shops.filter(
+        (s) =>
+          s.name.toLowerCase().includes(String(search.q).toLowerCase()) ||
+          s.address.city.toLowerCase().includes(String(search.q).toLowerCase())
+      )
+    : shops;
 
   // TODO(WINE-XXX): cap at 20 until BE adds pagination
   const displayedShops = filteredShops.slice(0, 20);
@@ -100,98 +86,5 @@ function ShopsPage() {
         </main>
       </div>
     </div>
-=======
-import { createFileRoute, useNavigate } from "@tanstack/react-router";
-import { SearchIcon, StoreIcon } from "lucide-react";
-import { useEffect, useState } from "react";
-import { z } from "zod";
-import { ShopCard } from "@/components/catalog/ShopCard";
-import { PublicLayout } from "@/components/layout/PublicLayout";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { useGetShops } from "@/generated/hooks/useGetShops";
-import { useDebounce } from "@/hooks/use-debounce";
-
-const searchSchema = z.object({ search: z.string().optional() });
-
-export const Route = createFileRoute("/shops/")({
-  component: ShopsPage,
-  validateSearch: (s) => searchSchema.parse(s),
-});
-
-function ShopsPage() {
-  const { search } = Route.useSearch();
-  const navigate = useNavigate({ from: Route.fullPath });
-  const [searchValue, setSearchValue] = useState(search ?? "");
-  const debouncedSearch = useDebounce(searchValue, 500);
-
-  const { data: shops, isLoading, isError, refetch } = useGetShops();
-
-  useEffect(() => {
-    navigate({ replace: true, search: { search: debouncedSearch || undefined } });
-  }, [debouncedSearch, navigate]);
-
-  const filteredShops = shops?.filter(
-    (s) =>
-      !debouncedSearch ||
-      s.name.toLowerCase().includes(debouncedSearch.toLowerCase()) ||
-      s.address.city.toLowerCase().includes(debouncedSearch.toLowerCase())
-  );
-
-  return (
-    <PublicLayout>
-      <div className="container mx-auto px-6 py-8 lg:px-12">
-        <h1 className="font-heading text-4xl font-bold mb-8">Explore Shops</h1>
-
-        <div className="relative mb-8 max-w-md">
-          <SearchIcon className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-          <Input
-            className="pl-10 rounded-xl"
-            onChange={(e) => setSearchValue(e.target.value)}
-            placeholder="Search shops..."
-            value={searchValue}
-          />
-        </div>
-
-        {isLoading && (
-          <div className="grid grid-cols-1 md:grid-cols-3 xl:grid-cols-4 gap-6">
-            {[1, 2, 3, 4, 5, 6].map((i) => (
-              <div className="h-[300px] w-full animate-pulse rounded-2xl bg-secondary/20" key={i} />
-            ))}
-          </div>
-        )}
-
-        {!isLoading && isError && (
-          <div className="flex flex-col items-center py-12 text-center">
-            <p className="font-bold text-destructive">Failed to load shops. Please try again.</p>
-            <Button onClick={() => refetch()} variant="link">
-              Retry
-            </Button>
-          </div>
-        )}
-
-        {!isLoading && !isError && filteredShops && filteredShops.length > 0 && (
-          <div className="space-y-6">
-            <p className="text-sm text-muted-foreground">Showing {filteredShops.length} shops</p>
-            <div className="grid grid-cols-1 md:grid-cols-3 xl:grid-cols-4 gap-6">
-              {filteredShops.map((shop) => (
-                <ShopCard key={shop.id} shop={shop} />
-              ))}
-            </div>
-          </div>
-        )}
-
-        {!isLoading && !isError && filteredShops && filteredShops.length === 0 && (
-          <div className="flex flex-col items-center gap-4 py-12 text-center">
-            <div className="flex h-16 w-16 items-center justify-center rounded-full bg-secondary/20">
-              <StoreIcon className="h-8 w-8 text-muted-foreground" />
-            </div>
-            <h3 className="text-xl font-heading font-bold">No shops found</h3>
-            <p className="text-muted-foreground">Try adjusting your search terms.</p>
-          </div>
-        )}
-      </div>
-    </PublicLayout>
->>>>>>> origin/main
   );
 }

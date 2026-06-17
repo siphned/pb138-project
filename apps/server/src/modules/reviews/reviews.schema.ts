@@ -1,39 +1,44 @@
-import { t } from "elysia";
+import { z } from "zod";
 
-export const createReviewBody = t.Object({
-  body: t.Optional(t.String({ maxLength: 2000, minLength: 1 })),
-  rating: t.Integer({ maximum: 5, minimum: 1 }),
+export const reviewParams = z.object({ id: z.string() });
+
+export const createReviewBody = z.object({
+  body: z.string().min(1).max(2000).optional(),
+  rating: z.number().int().min(1).max(5),
 });
 
-<<<<<<< HEAD
-export const listReviewsQuery = t.Object({
-  limit: t.Optional(t.Integer({ maximum: 100, minimum: 1 })),
-  page: t.Optional(t.Integer({ minimum: 1 })),
-  sort: t.Optional(t.Union([t.Literal("newest"), t.Literal("highest"), t.Literal("lowest")])),
+export const listReviewsQuery = z.object({
+  limit: z.coerce.number().int().min(1).max(100).optional(),
+  page: z.coerce.number().int().min(1).optional(),
+  sort: z.enum(["newest", "highest", "lowest"]).optional(),
 });
 
-=======
->>>>>>> origin/main
-const reviewUserInfo = t.Object({
-  fname: t.String(),
-  id: t.String(),
-  lname: t.String(),
+export const deleteReviewQuery = z.object({
+  entityId: z.string(),
+  entityType: z.enum(["product", "winemaker", "wine"]),
 });
 
-export const reviewResponse = t.Object({
-  body: t.Nullable(t.String()),
-  createdAt: t.Date(),
-  id: t.String(),
-  rating: t.Integer(),
+export const deleteReviewResponse = z.object({ success: z.boolean() });
+
+const reviewUserInfo = z.object({
+  fname: z.string(),
+  id: z.string(),
+  lname: z.string(),
+});
+
+export const reviewResponse = z.object({
+  body: z.string().nullable(),
+  createdAt: z.date(),
+  entityId: z.string(),
+  entityType: z.string(),
+  id: z.string(),
+  rating: z.number().int(),
   user: reviewUserInfo,
-  userId: t.String(),
+  userId: z.string(),
 });
 
-export const reviewListResponse = t.Object({
-  averageRating: t.Nullable(t.Number()),
-  reviews: t.Array(reviewResponse),
-<<<<<<< HEAD
-  totalCount: t.Integer(),
-=======
->>>>>>> origin/main
+export const reviewListResponse = z.object({
+  averageRating: z.number().nullable(),
+  reviews: z.array(reviewResponse),
+  totalCount: z.number().int(),
 });

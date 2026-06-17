@@ -1,0 +1,28 @@
+# Dependencies
+node_modules
+**/node_modules
+
+# Build output / caches
+**/dist
+**/build
+.turbo
+**/.turbo
+**/coverage
+apps/web/test-results
+apps/web/playwright-report
+
+# VCS / local
+.git
+.gitignore
+
+# Secrets / local env (compose injects env explicitly)
+.env
+**/.env
+**/.env.local
+
+# Docs not needed in image
+docs
+wiki
+
+# Logs
+*.log

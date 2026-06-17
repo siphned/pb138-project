@@ -13,10 +13,7 @@ export default defineConfig({
   },
   output: {
     clean: true,
-<<<<<<< HEAD
     format: false,
-=======
->>>>>>> origin/main
     path: "./src/generated",
   },
   plugins: [
