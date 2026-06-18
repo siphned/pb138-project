@@ -1,6 +1,5 @@
 import { standardSchemaResolver } from "@hookform/resolvers/standard-schema";
 import { type Resolver, useForm } from "react-hook-form";
-import { z } from "zod";
 import { Button } from "@/components/ui/button";
 import {
   Form,
@@ -12,18 +11,9 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { usePostUsersMeAddresses } from "@/generated/hooks/usePostUsersMeAddresses";
+import { type AddressSchemaValues, addressSchema } from "@/routes/-components/address-schema";
 
-const addressSchema = z.object({
-  city: z.string().refine((v) => v.trim().length > 0, { message: "City is required" }),
-  country: z.string().refine((v) => v.trim().length > 0, { message: "Country is required" }),
-  houseNumber: z
-    .string()
-    .refine((v) => v.trim().length > 0, { message: "House number is required" }),
-  postalCode: z.string().refine((v) => v.trim().length > 0, { message: "Postal code is required" }),
-  street: z.string().refine((v) => v.trim().length > 0, { message: "Street is required" }),
-});
-
-type AddressFormValues = z.infer<typeof addressSchema>;
+type AddressFormValues = AddressSchemaValues;
 
 interface SettingsAddressFormProps {
   type: "shipping" | "billing";

@@ -132,7 +132,7 @@ export function EventCommentList({ eventId }: EventCommentListProps) {
               return (
                 <li key={c.id}>
                   <Card variant="section">
-                    <CardContent className="space-y-2 py-4">
+                    <CardContent className="space-y-0 py-4">
                       <div className="flex items-baseline justify-between gap-4">
                         <span className="font-medium text-foreground">{commentAuthor(c)}</span>
                         <div className="flex items-center gap-2">

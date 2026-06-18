@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useUser } from "@/context/UserContext";
 import { useGetWinemakersMe } from "@/generated/hooks/useGetWinemakersMe";
+import { AdminModerationTab } from "@/routes/_authenticated/-components/AdminModerationTab";
 import { AdminRoleRequestsTab } from "@/routes/_authenticated/-components/AdminRoleRequestsTab";
 import { AdminUsersTab } from "@/routes/_authenticated/-components/AdminUsersTab";
 import { CustomerEventsTab } from "@/routes/_authenticated/-components/CustomerEventsTab";
@@ -101,6 +102,11 @@ export function DashboardTabs() {
           content: <AdminUsersTab />,
           label: "Users",
           value: "users",
+        },
+        {
+          content: <AdminModerationTab />,
+          label: "Content Moderation",
+          value: "moderation",
         },
       ];
     }

@@ -36,7 +36,10 @@ function ShopsPage() {
   });
 
   const handleSearchChange = (next: ShopSearch) => {
-    navigate({ replace: true, search: { ...next, page: undefined } });
+    navigate({
+      replace: true,
+      search: { ...next, ownerUserId: search.ownerUserId, page: undefined },
+    });
   };
 
   const handlePageChange = (newPage: number) => {

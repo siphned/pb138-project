@@ -22,7 +22,7 @@ export function WinemakerDetailsCard({ winemaker, canManage }: WinemakerDetailsC
 
       <Section heading="About">
         <Card variant="default">
-          <CardContent className="space-y-4 pt-6">
+          <CardContent>
             <p className="text-sm leading-relaxed text-muted-foreground">{winemaker.description}</p>
           </CardContent>
         </Card>
@@ -30,7 +30,7 @@ export function WinemakerDetailsCard({ winemaker, canManage }: WinemakerDetailsC
 
       <Section heading="Contact">
         <Card variant="default">
-          <CardContent className="pt-6">
+          <CardContent>
             <DescriptionList>
               {winemaker.email && <PropertyRow label="Email" value={winemaker.email} />}
               {winemaker.phone && <PropertyRow label="Phone" value={winemaker.phone} />}

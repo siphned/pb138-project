@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 type QuantityControlProps = {
   value: number;
   min?: number;
+  max?: number;
   onIncrement: () => void;
   onDecrement: () => void;
   disabled?: boolean;
@@ -13,6 +14,7 @@ type QuantityControlProps = {
 export function QuantityControl({
   value,
   min = 1,
+  max,
   onIncrement,
   onDecrement,
   disabled,
@@ -32,7 +34,7 @@ export function QuantityControl({
       <span className="w-8 text-center text-sm font-medium">{value}</span>
       <Button
         className="h-8 w-8"
-        disabled={disabled}
+        disabled={disabled || (max !== undefined && value >= max)}
         onClick={onIncrement}
         size="icon"
         variant="outline"
