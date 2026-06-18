@@ -156,6 +156,25 @@ export const createReviewsRoutes = (auth = authPlugin) =>
       }
     )
 
+    .post(
+      "/reviews/:id/flag",
+      async ({ params }) => {
+        await reviewsService.flagReview(params.id);
+        return { success: true };
+      },
+      {
+        detail: {
+          description: "Flag a review for admin moderation.",
+          security: [{ bearerAuth: [] }],
+          summary: "Flag review",
+          tags: ["reviews"],
+        },
+        params: reviewParams,
+        requireRoles: ["winemaker", "shop_owner", "admin"],
+        response: { 200: deleteReviewResponse, 404: errorResponse },
+      }
+    )
+
     .delete(
       "/reviews/:id",
       async ({ params, dbUser, clerkPayload, query }) => {

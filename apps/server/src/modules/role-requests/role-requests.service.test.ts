@@ -1,5 +1,6 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { db } from "../../db";
+import * as userRolesRepo from "../users/user-roles.repository";
 import * as usersRepo from "../users/users.repository";
 import { usersService } from "../users/users.service";
 import * as roleRequestsRepo from "./role-requests.repository";
@@ -30,6 +31,14 @@ vi.mock("../users/users.repository", async (importOriginal) => {
   };
 });
 
+vi.mock("../users/user-roles.repository", async (importOriginal) => {
+  const actual = await importOriginal<typeof import("../users/user-roles.repository")>();
+  return {
+    ...actual,
+    findByUserId: vi.fn(),
+  };
+});
+
 vi.mock("@clerk/backend", () => ({
   createClerkClient: () => ({
     users: {
@@ -56,6 +65,7 @@ describe("roleRequestsService", () => {
   beforeEach(() => {
     vi.clearAllMocks();
     mockGetUser.mockResolvedValue({ publicMetadata: { roles: ["customer"] } });
+    vi.mocked(userRolesRepo.findByUserId).mockResolvedValue([]);
   });
 
   const userId = "user-123";

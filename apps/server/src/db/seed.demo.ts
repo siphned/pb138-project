@@ -1,9 +1,11 @@
+import { createClerkClient } from "@clerk/backend";
 import { faker } from "@faker-js/faker";
 import { logger } from "../utils/logger";
 import {
   FALLBACK_EVENT_COMMENTS,
   FALLBACK_REVIEWS,
   FEATURED_USERS,
+  PENDING_APPLICANTS,
   SHOPS,
   STORY,
   SUPPORTING_CUSTOMERS,
@@ -61,6 +63,26 @@ function requireEnv(key: string): string {
 
 function fakeClerkId() {
   return `user_demo_fake_${faker.string.alphanumeric(20)}`;
+}
+
+// Creates (or looks up) a real Clerk account so the approve flow can call
+// clerkClient.users.getUser(clerkId) successfully for demo applicants.
+async function ensureClerkDemoUser(
+  clerkClient: ReturnType<typeof createClerkClient>,
+  email: string,
+  fname: string,
+  lname: string
+): Promise<string> {
+  const list = await clerkClient.users.getUserList({ emailAddress: [email] });
+  if (list.data.length > 0) return list.data[0]!.id;
+  const created = await clerkClient.users.createUser({
+    emailAddress: [email],
+    firstName: fname,
+    lastName: lname,
+    password: "DemoApplicant!2026",
+    publicMetadata: { roles: ["customer"] },
+  });
+  return created.id;
 }
 
 function czechAddress(city: string): AddressInput {
@@ -167,6 +189,14 @@ async function main() {
     test_user: requireEnv("TEST_USER_CLERK_ID"),
   };
 
+  const clerkClient = createClerkClient({ secretKey: requireEnv("CLERK_SECRET_KEY") });
+
+  logger.info("Resolving Clerk accounts for pending applicants...");
+  const applicantClerkIds = await Promise.all(
+    PENDING_APPLICANTS.map((a) => ensureClerkDemoUser(clerkClient, a.email, a.fname, a.lname))
+  );
+  logger.info(`Resolved ${applicantClerkIds.length} applicant Clerk accounts`);
+
   // ── ID resolution maps ───────────────────────────────────────────────────────
   const userIdMap    = new Map<string, string>(); // key → DB user id
   const wmIdMap      = new Map<string, string>(); // wmKey → DB winemaker id
@@ -212,9 +242,25 @@ async function main() {
   insertedSupport.forEach((u, i) => userIdMap.set(`support-${i}`, u.id));
   logger.info(`Inserted ${insertedSupport.length} supporting customers`);
 
+  // ── Pending applicants (real Clerk accounts) ─────────────────────────────────
+  logger.info("Inserting pending applicants...");
+  const applicantAddrRows = await insertAddresses(
+    PENDING_APPLICANTS.map((a) => czechAddress(a.city)),
+  );
+  const applicantUserInputs: UserInput[] = PENDING_APPLICANTS.map((a, i) => ({
+    clerkId: applicantClerkIds[i]!,
+    email: a.email,
+    fname: a.fname,
+    lname: a.lname,
+    shippingAddressId: applicantAddrRows[i]!.id,
+  }));
+  const insertedApplicants = await insertUsers(applicantUserInputs);
+  logger.info(`Inserted ${insertedApplicants.length} applicant users`);
+
   const userAddrMap = new Map<string, string>();
   insertedFeatured.forEach((u, i) => userAddrMap.set(u.id, featuredAddrRows[i]!.id));
   insertedSupport.forEach((u, i) => userAddrMap.set(u.id, supportAddrRows[i]!.id));
+  insertedApplicants.forEach((u, i) => userAddrMap.set(u.id, applicantAddrRows[i]!.id));
 
   // All customer IDs (for random interactions)
   const allCustomerIds = [
@@ -1082,21 +1128,18 @@ async function main() {
   logger.info(`Inserted ${insertedOrders.length} orders with ${orderItemInputs.length} order items`);
 
   // ── Role requests ────────────────────────────────────────────────────────────
+  // Always use the dedicated PENDING_APPLICANTS who have real Clerk accounts,
+  // so the admin approve flow (which calls Clerk API) works in the demo.
   logger.info("Inserting role requests...");
-  const assignedSet = new Set(userRoleEntries.map((r) => `${r.userId}-${r.role}`));
-  const eligible = insertedSupport.filter(
-    (u) => !assignedSet.has(`${u.id}-winemaker`) && !assignedSet.has(`${u.id}-shop_owner`),
-  );
-  const reqPool = faker.helpers.arrayElements(eligible, Math.min(5, eligible.length));
   await insertRoleRequests(
-    reqPool.map((user) => ({
-      userId: user.id,
-      type: pick(["winemaker", "shop_owner"] as const),
-      businessName: faker.company.name(),
-      details: faker.lorem.sentence(),
+    PENDING_APPLICANTS.map((a, i) => ({
+      userId: insertedApplicants[i]!.id,
+      type: a.requestType,
+      businessName: a.businessName,
+      details: a.details,
     })),
   );
-  logger.info(`Inserted ${reqPool.length} role requests`);
+  logger.info(`Inserted ${PENDING_APPLICANTS.length} role requests`);
 
   // ── Images ───────────────────────────────────────────────────────────────────
   // Custom URLs from data file take priority; placeholder is the fallback.
@@ -1138,7 +1181,7 @@ async function main() {
   logger.info("Demo seeding complete!");
   logger.info("─────────────────────────────────────────────────────────────────");
   logger.info("Demo account (log in via Clerk):");
-  logger.info("  Willy the Kid: willy@winery.demo");
+  logger.info("  Willy the Kid: palahap384@gzeos.com");
   logger.info("  (Controls: Lavicka winery, Vecerka Posledná Záchrana shop, Admin access)");
   logger.info("─────────────────────────────────────────────────────────────────");
 

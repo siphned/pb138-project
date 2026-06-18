@@ -9,6 +9,7 @@ export const reviews = pgTable("reviews", {
   deletedAt: timestamptz("deleted_at"),
   entityId: uuid("entity_id").notNull(), // "product", "winemaker"
   entityType: varchar("entity_type", { length: 20 }).notNull(),
+  flaggedAt: timestamptz("flagged_at"),
   id: uuid("id").primaryKey().defaultRandom(),
   rating: smallint("rating").notNull(),
   updatedAt: timestamptz("updated_at"),

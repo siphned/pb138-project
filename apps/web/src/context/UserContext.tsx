@@ -1,6 +1,6 @@
 import { useAuth, useClerk } from "@clerk/react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
-import { createContext, type ReactNode, useContext, useEffect, useState } from "react";
+import { createContext, type ReactNode, useContext, useEffect, useMemo, useState } from "react";
 import { AccountBlockedScreen } from "@/components/AccountBlockedScreen";
 import { getCartsQueryKey } from "@/generated/hooks/useGetCarts";
 import { getUsersMeQueryKey, getUsersMeQueryOptions } from "@/generated/hooks/useGetUsersMe";
@@ -41,8 +41,6 @@ interface UserContextType {
   activeRole: Role;
   setActiveRole: (role: Role) => void;
 }
-
-const defaultUser: UserProfile | null = null;
 
 const UserContext = createContext<UserContextType | undefined>(undefined);
 
@@ -86,22 +84,20 @@ export function UserProvider({ children }: { children: ReactNode }) {
     }
   }, [isLoaded, isSignedIn, ensureGuestSession]);
 
-  const [user, setUser] = useState<UserProfile | null>(defaultUser);
-
-  useEffect(() => {
-    if (profile) {
-      setUser({
-        clerkId: profile.clerkId,
-        email: profile.email,
-        fname: profile.fname,
-        id: profile.id,
-        lname: profile.lname,
-        roles: toRoles(profile.roles),
-      });
-    } else if (isLoaded && !isSignedIn) {
-      setUser(null);
-    }
-  }, [profile, isLoaded, isSignedIn]);
+  // Derive user synchronously from profile so there is no render cycle where
+  // the profile query has resolved but user is still null — that gap caused
+  // the admin guard to see empty roles and redirect prematurely.
+  const user = useMemo<UserProfile | null>(() => {
+    if (!profile) return null;
+    return {
+      clerkId: profile.clerkId,
+      email: profile.email,
+      fname: profile.fname,
+      id: profile.id,
+      lname: profile.lname,
+      roles: toRoles(profile.roles),
+    };
+  }, [profile]);
 
   const [activeRole, setActiveRole] = useState<Role>(Role.customer);
   useEffect(() => {

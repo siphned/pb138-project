@@ -13,8 +13,13 @@ export class AdminService {
   async deleteReview(reviewId: string): Promise<void> {
     const review = await adminRepo.findReviewById(db, reviewId);
     if (!review) throw new AdminReviewNotFoundError();
-
     await adminRepo.softDeleteReview(db, reviewId);
+  }
+
+  async unflagReview(reviewId: string): Promise<void> {
+    const review = await adminRepo.findReviewById(db, reviewId);
+    if (!review) throw new AdminReviewNotFoundError();
+    await adminRepo.unflagReview(db, reviewId);
   }
 
   listAllReviews({ limit = 20, offset = 0 } = {}): Promise<{
