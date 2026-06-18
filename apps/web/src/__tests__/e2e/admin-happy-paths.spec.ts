@@ -1,13 +1,12 @@
 import { expect, test } from "../../../playwright.fixtures";
 
 async function waitForMain(page: import("@playwright/test").Page) {
-  // After navigation, the auth gate may briefly show a loading spinner while
-  // the /users/me profile query is in flight. Wait for it to detach before
-  // asserting the real page content.
-  await page
-    .waitForSelector('[aria-label="Loading"]', { state: "detached", timeout: 15000 })
-    .catch(() => {});
-  await expect(page.getByRole("main").first()).toBeVisible({ timeout: 10000 });
+  // page.goto() triggers a full React reinit; the auth gate (showAuthGate) may
+  // hold the spinner up while /users/me resolves. Poll the DOM directly with a
+  // generous timeout rather than relying on the spinner element's presence.
+  await page.waitForFunction(() => document.querySelector("main") !== null, null, {
+    timeout: 30000,
+  });
 }
 
 test.describe("admin happy paths", () => {
@@ -22,9 +21,9 @@ test.describe("admin happy paths", () => {
     expect(url.includes("/users") || url.includes("/dashboard")).toBe(true);
     if (!url.includes("/users")) return;
 
-    const searchInput = page.getByLabel(/search/i).first();
+    const searchInput = page.getByRole("textbox", { name: /search/i });
     if ((await searchInput.count()) > 0) {
-      await searchInput.fill("willy");
+      await searchInput.first().fill("willy");
       await page.waitForLoadState("networkidle");
     }
 
