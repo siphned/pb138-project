@@ -12,7 +12,7 @@ import {
 } from "@/components/ui/dialog";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useDeleteAdminReviewsById } from "@/generated/hooks/useDeleteAdminReviewsById";
-import { useGetAdminReviews } from "@/generated/hooks/useGetAdminReviews";
+import { getAdminReviewsQueryKey, useGetAdminReviews } from "@/generated/hooks/useGetAdminReviews";
 
 export const Route = createFileRoute("/_authenticated/_admin/moderation")({
   component: ModerationPage,
@@ -114,7 +114,7 @@ function ModerationPage() {
       {
         onSuccess: () => {
           setConfirmDelete(null);
-          queryClient.invalidateQueries({ queryKey: ["admin", "reviews"] });
+          queryClient.invalidateQueries({ queryKey: getAdminReviewsQueryKey() });
         },
       }
     );
