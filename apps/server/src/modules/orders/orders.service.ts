@@ -19,6 +19,10 @@ const VALID_TRANSITIONS: Record<string, string[]> = {
   shipped: ["delivered", "cancelled"],
 };
 
+// Flat shipping fee (EUR). Single source so the stored value and the total stay
+// in sync, and matches the frontend CartSummary estimate.
+const SHIPPING_FEE = 15;
+
 export interface CheckoutData {
   guestEmail?: string;
   guestName?: string;
@@ -132,7 +136,7 @@ export class OrdersService {
         paymentMethod: data.paymentMethod,
         paymentStatus: "pending",
         shippingAddressId: shippingAddr.id,
-        shippingFee: "10.00",
+        shippingFee: SHIPPING_FEE.toFixed(2),
         status: "pending",
         totalPrice,
         userId,
@@ -154,9 +158,11 @@ export class OrdersService {
       return createdOrder;
     });
 
-    // Non-blocking operations
-    this.afterCheckout(order, items, userId, data).catch(() => {
-      /* ignore */
+    // Await background work (email + cart clearing) so it completes on serverless
+    // platforms (e.g. Vercel), where the function is frozen once the response is
+    // sent. A failure here must not fail the order, so log and swallow.
+    await this.afterCheckout(order, items, userId, data).catch((err) => {
+      logger.error({ err, orderId: order.id }, "afterCheckout failed");
     });
 
     return order;
@@ -252,8 +258,7 @@ export class OrdersService {
       subtotal += Number.parseFloat(cartItem.product.price) * cartItem.quantity;
     }
 
-    const shippingFee = 10;
-    const totalPrice = (subtotal + shippingFee).toFixed(2);
+    const totalPrice = (subtotal + SHIPPING_FEE).toFixed(2);
     return { items, totalPrice };
   }
 
