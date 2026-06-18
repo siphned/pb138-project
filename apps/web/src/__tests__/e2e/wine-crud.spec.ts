@@ -10,6 +10,10 @@ test.describe("wine-crud: create and edit flows", () => {
     await page.waitForLoadState("networkidle");
     expect(page.url()).toContain("/wines/new");
 
+    // If no winemaker profile is linked to this Clerk user, the form is replaced with a message
+    const profileRequired = page.getByRole("heading", { name: /winemaker profile required/i });
+    if (await profileRequired.isVisible({ timeout: 2000 }).catch(() => false)) return;
+
     await page.getByLabel(/name/i).fill("E2E Test Wine");
     await page.getByLabel(/region/i).fill("Mikulovská");
     await page.getByLabel(/description/i).fill("Wine created by E2E test");

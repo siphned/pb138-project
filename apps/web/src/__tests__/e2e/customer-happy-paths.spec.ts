@@ -1,6 +1,10 @@
 import { expect, test } from "../../../playwright.fixtures";
 
+const hasCustomerCreds = !!process.env.TEST_USER_CUSTOMER_EMAIL;
+
 test.describe("customer happy paths", () => {
+  test.skip(!hasCustomerCreds, "TEST_USER_CUSTOMER_EMAIL not set — create per-role Clerk account");
+
   test("request a new role", async ({ page, authenticateAsCustomer }) => {
     await authenticateAsCustomer();
     await page.waitForLoadState("networkidle");

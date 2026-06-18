@@ -376,6 +376,8 @@ jobs:
         run: cd apps/web && bunx playwright install --with-deps chromium
       - name: Migrate Database
         run: cd apps/server && bun run db:push
+      - name: Seed Database
+        run: cd apps/server && SEED_NUM_USERS=20 SEED_TOTAL_WINES=60 bun run db:seed
       - name: Start backend server
         run: bun run apps/server/src/index.ts > /tmp/server.log 2>&1 &
       - name: Start frontend dev server
