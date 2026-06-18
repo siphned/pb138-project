@@ -120,7 +120,6 @@ export function ReviewCard({ review, entityType, entityId }: ReviewCardProps) {
             <div className="flex justify-end gap-2">
               <AlertDialogCancel onClick={() => setConfirmOpen(false)} />
               <AlertDialogAction
-                className="bg-destructive text-white hover:bg-destructive/90"
                 disabled={deleteMutation.isPending}
                 onClick={() =>
                   deleteMutation.mutate({
@@ -131,6 +130,7 @@ export function ReviewCard({ review, entityType, entityId }: ReviewCardProps) {
                     },
                   })
                 }
+                variant="solid-destructive"
               >
                 {deleteMutation.isPending ? "Deleting…" : "Delete"}
               </AlertDialogAction>

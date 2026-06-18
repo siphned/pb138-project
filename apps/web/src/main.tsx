@@ -5,8 +5,10 @@ import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
 import "./index.css";
 import { AppErrorBoundary } from "./components/AppErrorBoundary";
+import { NotFound } from "./components/NotFound";
 import { Button } from "./components/ui/button";
 import { ThemeProvider, UserProvider } from "./context";
+import { setQueryClient } from "./lib/query-client";
 import { routeTree } from "./routeTree.gen.ts";
 
 const queryClient = new QueryClient({
@@ -18,7 +20,9 @@ const queryClient = new QueryClient({
   },
 });
 
-const router = createRouter({ routeTree });
+setQueryClient(queryClient);
+
+const router = createRouter({ defaultNotFoundComponent: NotFound, routeTree });
 
 declare module "@tanstack/react-router" {
   interface Register {

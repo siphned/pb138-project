@@ -73,7 +73,7 @@ describe("createWine", () => {
 
     await winesService.createWine(userId, wineData);
 
-    expect(winesRepo.findWinemakerByUserId).toHaveBeenCalledWith(db, userId);
+    expect(winesRepo.findWinemakerByUserId).toHaveBeenCalledWith(userId);
     expect(winesRepo.insert).toHaveBeenCalledWith(db, winemakerId, wineData);
   });
 

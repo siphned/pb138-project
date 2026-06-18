@@ -62,6 +62,9 @@ export function WineRowMenu({ wineId, wineName, onDeleted }: WineRowMenuProps) {
           <DropdownMenuItem render={<Link params={{ id: wineId }} to="/wines/$id/edit" />}>
             Edit wine
           </DropdownMenuItem>
+          <DropdownMenuItem render={<Link params={{ id: wineId }} to="/wines/$id/images" />}>
+            Manage images
+          </DropdownMenuItem>
           <DropdownMenuItem onClick={() => setConfirmOpen(true)} variant="destructive">
             Delete wine
           </DropdownMenuItem>
@@ -79,9 +82,9 @@ export function WineRowMenu({ wineId, wineName, onDeleted }: WineRowMenuProps) {
           <div className="flex justify-end gap-2">
             <AlertDialogCancel onClick={() => setConfirmOpen(false)} />
             <AlertDialogAction
-              className="bg-destructive text-white hover:bg-destructive/90"
               disabled={isPending}
               onClick={handleDelete}
+              variant="solid-destructive"
             >
               {isPending ? "Deleting…" : "Delete"}
             </AlertDialogAction>

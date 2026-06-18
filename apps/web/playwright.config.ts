@@ -10,6 +10,7 @@ const config = defineConfig({
   },
   forbidOnly: !!process.env.CI,
   fullyParallel: true,
+  globalSetup: "./playwright.global-setup.ts",
   projects: [
     {
       name: "chromium",
@@ -25,27 +26,26 @@ const config = defineConfig({
     screenshot: "only-on-failure",
     trace: "on-first-retry",
   },
-  webServer: process.env.SHARD
-    ? undefined
-    : [
-        {
-          command: `bun run --cwd "${root}" dev:server`,
-          reuseExistingServer: true,
-          timeout: 120_000,
-          url: "http://localhost:3000/swagger/json",
-        },
-        {
-          command: `bun run --cwd "${root}" dev:web`,
-          reuseExistingServer: true,
-          timeout: 120_000,
-          url: "http://localhost:5173",
-        },
-      ],
+  webServer:
+    process.env.SHARD || process.env.CI
+      ? undefined
+      : [
+          {
+            command: `bun run --cwd "${root}" dev:server`,
+            reuseExistingServer: true,
+            timeout: 120_000,
+            url: "http://localhost:3000/swagger/json",
+          },
+          {
+            command: `bun run --cwd "${root}" dev:web`,
+            reuseExistingServer: true,
+            timeout: 120_000,
+            url: "http://localhost:5173",
+          },
+        ],
   workers: process.env.CI ? 1 : undefined,
 });
 
-// Enable test sharding via SHARD environment variable (e.g., SHARD=1/3 for shard 1 of 3)
-// Usage: SHARD=1/3 bun run test:e2e
 if (process.env.SHARD) {
   const [shardCurrent, shardTotal] = process.env.SHARD.split("/").map(Number);
   if (!Number.isNaN(shardCurrent) && !Number.isNaN(shardTotal)) {

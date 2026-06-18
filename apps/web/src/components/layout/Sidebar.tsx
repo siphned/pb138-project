@@ -2,6 +2,7 @@ import { Show, useAuth, useClerk, useUser as useClerkUser } from "@clerk/react";
 import {
   Calendar01Icon,
   ChartBarLineIcon,
+  GrapesIcon,
   InboxIcon,
   LogoutSquare02Icon,
   Menu01Icon,
@@ -17,7 +18,6 @@ import {
 } from "@hugeicons/core-free-icons";
 import { HugeiconsIcon } from "@hugeicons/react";
 import { Link, useNavigate } from "@tanstack/react-router";
-import { Wine } from "lucide-react";
 import { useState } from "react";
 import { NavItem } from "@/components/primitives/nav-item";
 import {
@@ -33,7 +33,7 @@ import { useTheme, useUser } from "@/context";
 import { useGetShopsMe } from "@/generated/hooks/useGetShopsMe";
 import { useGetWinemakersMe } from "@/generated/hooks/useGetWinemakersMe";
 
-import { isCustomerView, Role } from "@/types/roles";
+import { Role } from "@/types/roles";
 
 interface SidebarProps {
   userRoles?: Role[];
@@ -75,7 +75,6 @@ export function Sidebar({ userRoles = [Role.customer], activeRole, onRoleChange 
     : "Guest";
   const initials = fullName === "Guest" ? "G" : fullName.substring(0, 2).toUpperCase() || "U";
   const hasMultipleRoles = userRoles.length > 1;
-  const customerView = isCustomerView(currentActiveRole);
 
   const handleLogout = async () => {
     closeSheet();
@@ -97,7 +96,7 @@ export function Sidebar({ userRoles = [Role.customer], activeRole, onRoleChange 
         }
       />
 
-      <SheetContent className="flex flex-col w-80 p-0" side="right">
+      <SheetContent className="flex flex-col w-80 p-0 bg-background" side="right">
         <Show when="signed-in">
           <div className="flex-none border-b bg-background z-10">
             <SheetHeader className="text-left">
@@ -183,19 +182,17 @@ export function Sidebar({ userRoles = [Role.customer], activeRole, onRoleChange 
               <HugeiconsIcon icon={Search01Icon} /> Search
             </NavItem>
 
-            {customerView && (
-              <NavItem
-                className="sm:hidden"
-                onClick={closeSheet}
-                render={<Link to="/cart" />}
-                variant="active"
-              >
-                <HugeiconsIcon icon={ShoppingCart02Icon} /> Shopping cart
-              </NavItem>
-            )}
+            <NavItem
+              className="sm:hidden"
+              onClick={closeSheet}
+              render={<Link to="/cart" />}
+              variant="active"
+            >
+              <HugeiconsIcon icon={ShoppingCart02Icon} /> Shopping Cart
+            </NavItem>
 
             <NavItem onClick={closeSheet} render={<Link to="/wines" />} variant="active">
-              <Wine className="h-5 w-5" /> Explore Wines
+              <HugeiconsIcon icon={GrapesIcon} /> Explore Wines
             </NavItem>
 
             <NavItem onClick={closeSheet} render={<Link to="/products" />} variant="active">
@@ -297,7 +294,7 @@ function RoleNavItems({ role, closeSheet, userId, winemakerId, firstShopId }: Ro
           render={<Link search={winemakerId ? { winemakerId } : undefined} to="/wines" />}
           variant="active"
         >
-          <Wine className="h-4 w-4" /> My Wines
+          <HugeiconsIcon className="h-4 w-4" icon={GrapesIcon} /> My Wines
         </NavItem>
         <NavItem
           onClick={closeSheet}
@@ -348,9 +345,26 @@ function RoleNavItems({ role, closeSheet, userId, winemakerId, firstShopId }: Ro
 
   if (role === Role.admin) {
     return (
-      <NavItem onClick={closeSheet} render={<Link to="/role-requests" />} variant="active">
-        <HugeiconsIcon icon={UserGroupIcon} /> Role Requests
-      </NavItem>
+      <>
+        <NavItem onClick={closeSheet} render={<Link to="/users" />} variant="active">
+          <HugeiconsIcon icon={User02Icon} /> Users
+        </NavItem>
+        <NavItem onClick={closeSheet} render={<Link to="/winemakers" />} variant="active">
+          <HugeiconsIcon icon={UserGroupIcon} /> Winemakers
+        </NavItem>
+        <NavItem onClick={closeSheet} render={<Link to="/shops" />} variant="active">
+          <HugeiconsIcon icon={Store01Icon} /> Shops
+        </NavItem>
+        <NavItem onClick={closeSheet} render={<Link to="/products" />} variant="active">
+          <HugeiconsIcon icon={Package01Icon} /> Products
+        </NavItem>
+        <NavItem onClick={closeSheet} render={<Link to="/moderation" />} variant="active">
+          <HugeiconsIcon icon={InboxIcon} /> Moderation
+        </NavItem>
+        <NavItem onClick={closeSheet} render={<Link to="/role-requests" />} variant="active">
+          <HugeiconsIcon icon={UserGroupIcon} /> Role Requests
+        </NavItem>
+      </>
     );
   }
 

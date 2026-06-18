@@ -11,12 +11,24 @@ import { cn } from "@/lib/utils";
 import { HeaderSearch } from "./HeaderSearch";
 import { Sidebar } from "./Sidebar";
 
+// biome-ignore lint/suspicious/noExplicitAny: clerkUser type from external @clerk/react library
+function getUserInitials(appUser: { fname: string; lname: string } | null, clerkUser: any): string {
+  if (appUser) {
+    return `${appUser.fname[0]}${appUser.lname[0]}`.toUpperCase();
+  }
+  if (clerkUser) {
+    return (clerkUser.fullName || "User").substring(0, 2).toUpperCase();
+  }
+  return "GU";
+}
+
 export function Header() {
   const { user: clerkUser } = useClerk();
-  const initials = clerkUser ? (clerkUser.fullName || "User").substring(0, 2).toUpperCase() : "GU";
   const { user, activeRole, setActiveRole, isLoading, isCartReady } = useUser();
   const { theme } = useTheme();
   const roles = user?.roles ?? [];
+
+  const initials = getUserInitials(user, clerkUser);
 
   const { data: cart } = useGetCarts({ query: { enabled: isCartReady } });
   const cartCount = cart?.items.reduce((acc, item) => acc + Number(item.quantity || 0), 0) ?? 0;
@@ -71,7 +83,10 @@ export function Header() {
             <Show when="signed-in">
               <Link to="/dashboard">
                 <Avatar className="h-8 w-8">
-                  <AvatarImage alt={clerkUser?.fullName || "User"} src={clerkUser?.imageUrl} />
+                  <AvatarImage
+                    alt={user ? `${user.fname} ${user.lname}` : "User"}
+                    src={clerkUser?.imageUrl}
+                  />
                   <AvatarFallback className="bg-primary text-primary-foreground font-heading text-xs">
                     {initials}
                   </AvatarFallback>

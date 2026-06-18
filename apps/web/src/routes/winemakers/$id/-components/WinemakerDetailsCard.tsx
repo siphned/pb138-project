@@ -1,28 +1,16 @@
 import { Link } from "@tanstack/react-router";
-import { useEffect } from "react";
 import { DescriptionList, PropertyRow } from "@/components/primitives/description-list";
 import { Section } from "@/components/primitives/section";
-import { ShowOwner } from "@/components/primitives/show-owner";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import type { GetWinemakersById200 } from "@/generated/types/GetWinemakersById";
 
 interface WinemakerDetailsCardProps {
   winemaker: GetWinemakersById200;
+  canManage: boolean;
 }
 
-export function WinemakerDetailsCard({ winemaker }: WinemakerDetailsCardProps) {
-  useEffect(() => {
-    // @ts-expect-error - checking for BE gap
-    if (winemaker && !winemaker.userId && !winemaker.id) {
-      // biome-ignore lint/suspicious/noConsole: intentional warning for BE gap
-      console.warn("WinemakerDetailsCard: winemaker missing both userId and id.");
-    }
-  }, [winemaker]);
-
-  // @ts-expect-error - plan says userId, types say id
-  const ownerUserId = winemaker.userId;
-
+export function WinemakerDetailsCard({ winemaker, canManage }: WinemakerDetailsCardProps) {
   return (
     <div className="space-y-8">
       <header className="space-y-2">
@@ -70,7 +58,7 @@ export function WinemakerDetailsCard({ winemaker }: WinemakerDetailsCardProps) {
         </Card>
       </Section>
 
-      <ShowOwner ownerUserId={ownerUserId}>
+      {canManage && (
         <div className="flex flex-wrap gap-4">
           <Button
             render={<Link params={{ id: winemaker.id }} to="/winemakers/$id/edit" />}
@@ -85,7 +73,7 @@ export function WinemakerDetailsCard({ winemaker }: WinemakerDetailsCardProps) {
             Manage Images
           </Button>
         </div>
-      </ShowOwner>
+      )}
     </div>
   );
 }

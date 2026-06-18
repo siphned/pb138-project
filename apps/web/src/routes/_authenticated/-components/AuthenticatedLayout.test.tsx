@@ -126,46 +126,7 @@ describe("AuthenticatedLayout", () => {
     });
   });
 
-  describe("State Transitions", () => {
-    it.skip("transitions from loading to authenticated", async () => {
-      const { rerender } = render(<AuthenticatedLayout />);
-      vi.mocked(useAuth).mockReturnValue({ isLoaded: false, isSignedIn: false } as never);
-      expect(screen.getByRole("status")).toBeInTheDocument();
-
-      vi.mocked(useAuth).mockReturnValue({ isLoaded: true, isSignedIn: true } as never);
-      rerender(<AuthenticatedLayout />);
-
-      expect(screen.queryByRole("status")).not.toBeInTheDocument();
-      expect(screen.getByTestId("outlet")).toBeInTheDocument();
-    });
-
-    it.skip("transitions from loading to unauthenticated", async () => {
-      mockNavigate.mockClear();
-      const { rerender } = render(<AuthenticatedLayout />);
-      vi.mocked(useAuth).mockReturnValue({ isLoaded: false, isSignedIn: false } as never);
-      expect(screen.getByRole("status")).toBeInTheDocument();
-
-      vi.mocked(useAuth).mockReturnValue({ isLoaded: true, isSignedIn: false } as never);
-      rerender(<AuthenticatedLayout />);
-
-      expect(screen.queryByRole("status")).not.toBeInTheDocument();
-      expect(mockNavigate).toHaveBeenCalledWith({ to: "/auth/login" });
-    });
-
-    it.skip("transitions from authenticated to unauthenticated (logout)", () => {
-      mockNavigate.mockClear();
-      const { rerender } = render(<AuthenticatedLayout />);
-      vi.mocked(useAuth).mockReturnValue({ isLoaded: true, isSignedIn: true } as never);
-      expect(screen.getByTestId("outlet")).toBeInTheDocument();
-      expect(mockNavigate).not.toHaveBeenCalled();
-
-      vi.mocked(useAuth).mockReturnValue({ isLoaded: true, isSignedIn: false } as never);
-      rerender(<AuthenticatedLayout />);
-
-      expect(screen.queryByTestId("outlet")).not.toBeInTheDocument();
-      expect(mockNavigate).toHaveBeenCalledWith({ to: "/auth/login" });
-    });
-
+  describe("Rapid State Transitions", () => {
     it("handles rapid loading -> authenticated transition", () => {
       mockNavigate.mockClear();
       vi.mocked(useAuth).mockReturnValue({ isLoaded: false, isSignedIn: false } as never);

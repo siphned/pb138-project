@@ -62,6 +62,9 @@ export function EventRowMenu({ eventId, eventName, onDeleted }: EventRowMenuProp
           <DropdownMenuItem render={<Link params={{ id: eventId }} to="/events/$id/edit" />}>
             Edit event
           </DropdownMenuItem>
+          <DropdownMenuItem render={<Link params={{ id: eventId }} to="/events/$id/images" />}>
+            Manage images
+          </DropdownMenuItem>
           <DropdownMenuItem onClick={() => setConfirmOpen(true)} variant="destructive">
             Delete event
           </DropdownMenuItem>
@@ -79,9 +82,9 @@ export function EventRowMenu({ eventId, eventName, onDeleted }: EventRowMenuProp
           <div className="flex justify-end gap-2">
             <AlertDialogCancel onClick={() => setConfirmOpen(false)} />
             <AlertDialogAction
-              className="bg-destructive text-white hover:bg-destructive/90"
               disabled={isPending}
               onClick={handleDelete}
+              variant="solid-destructive"
             >
               {isPending ? "Deleting…" : "Delete"}
             </AlertDialogAction>

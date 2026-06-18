@@ -1,5 +1,6 @@
 import { useQueryClient } from "@tanstack/react-query";
 import { Link } from "@tanstack/react-router";
+import { toast } from "sonner";
 import { EmptyState } from "@/components/primitives/empty-state";
 import { buttonVariants } from "@/components/ui/button";
 import {
@@ -31,6 +32,7 @@ export function CartSection({ cart, deliveryType }: CartSectionProps) {
         if (previous) {
           queryClient.setQueryData(getCartsQueryKey(), previous);
         }
+        toast.error("Failed to update quantity. Please try again.");
       },
       // Optimistically patch the quantity in the cache so the number moves the
       // instant the user clicks, instead of waiting for the round-trip + refetch.
@@ -58,8 +60,12 @@ export function CartSection({ cart, deliveryType }: CartSectionProps) {
 
   const removeItem = useDeleteCartsItemsByProductId({
     mutation: {
+      onError: () => {
+        toast.error("Failed to remove item. Please try again.");
+      },
       onSuccess: () => {
         queryClient.invalidateQueries({ queryKey: getCartsQueryKey() });
+        toast.success("Item removed from cart");
       },
     },
   });
@@ -99,6 +105,8 @@ export function CartSection({ cart, deliveryType }: CartSectionProps) {
           <div className="flex flex-col gap-4">
             {cart.items.map((item) => (
               <CartItemRow
+                isRemoving={removeItem.isPending}
+                isUpdatingQuantity={updateQuantity.isPending}
                 item={item}
                 key={item.id}
                 onQuantityChange={handleQuantityChange}

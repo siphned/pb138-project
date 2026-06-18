@@ -2,6 +2,7 @@ import type { Wine, Winemaker } from "@repo/shared/schemas";
 import { winemakers, wines } from "@repo/shared/schemas";
 import { and, eq, ilike, isNull } from "drizzle-orm";
 import type { Database } from "../../db";
+import { db } from "../../db";
 import { primaryImageUrlSql } from "../images/images.sql";
 
 export type WineWithWinemaker = Wine & {
@@ -70,10 +71,7 @@ export async function findById(db: Database, id: string): Promise<WineWithWinema
   return undefined;
 }
 
-export function findWinemakerByUserId(
-  db: Database,
-  userId: string
-): Promise<Winemaker | undefined> {
+export function findWinemakerByUserId(userId: string): Promise<Winemaker | undefined> {
   return db.query.winemakers.findFirst({
     where: and(eq(winemakers.userId, userId), isNull(winemakers.deletedAt)),
   });

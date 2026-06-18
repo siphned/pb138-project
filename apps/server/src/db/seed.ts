@@ -305,7 +305,9 @@ async function main() {
         capacity: faker.number.int({ min: 10, max: 100 }),
         visibility: pick(["public", "private"] as const),
         inviteType: "open",
-        status: pick(["pending", "approved"] as const),
+        status: process.env.SEED_EVENTS_APPROVED === "1"
+          ? ("approved" as const)
+          : pick(["pending", "approved"] as const),
       };
     }),
   );

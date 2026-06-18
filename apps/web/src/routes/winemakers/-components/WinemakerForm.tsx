@@ -1,9 +1,11 @@
 import { standardSchemaResolver } from "@hookform/resolvers/standard-schema";
+import { useState } from "react";
 import { type Resolver, useForm } from "react-hook-form";
 import { z } from "zod";
 
 import { Form } from "@/components/ui/form";
 import { AddressFields } from "@/routes/-components/AddressFields";
+import { ImageUploadField } from "@/routes/-components/ImageUploadField";
 import { SubmitButton } from "@/routes/-components/SubmitButton";
 import { TextareaField } from "@/routes/-components/TextareaField";
 import { TextField } from "@/routes/-components/TextField";
@@ -26,9 +28,11 @@ export type WinemakerFormValues = z.infer<typeof winemakerFormSchema>;
 
 interface WinemakerFormProps {
   defaultValues: Partial<WinemakerFormValues>;
-  onSubmit: (data: WinemakerFormValues) => void;
+  onSubmit: (data: WinemakerFormValues, images: File[]) => void;
   isPending: boolean;
   submitLabel: string;
+  /** When true, render an optional image picker that bubbles files up via onSubmit. */
+  showImageUpload?: boolean;
 }
 
 export function WinemakerForm({
@@ -36,7 +40,10 @@ export function WinemakerForm({
   onSubmit,
   isPending,
   submitLabel,
+  showImageUpload = false,
 }: WinemakerFormProps) {
+  const [imageFiles, setImageFiles] = useState<File[]>([]);
+  const [imageError, setImageError] = useState<string | null>(null);
   const form = useForm<WinemakerFormValues>({
     defaultValues: {
       city: "",
@@ -53,9 +60,14 @@ export function WinemakerForm({
     reValidateMode: "onChange",
   });
 
+  const handleFormSubmit = (values: WinemakerFormValues) => {
+    if (imageError) return;
+    onSubmit(values, imageFiles);
+  };
+
   return (
     <Form {...form}>
-      <form className="space-y-6" onSubmit={form.handleSubmit(onSubmit)}>
+      <form className="space-y-6" onSubmit={form.handleSubmit(handleFormSubmit)}>
         <TextField
           control={form.control}
           label="Winemaker / vineyard name"
@@ -73,7 +85,17 @@ export function WinemakerForm({
 
         <AddressFields control={form.control} title="Winery address" />
 
-        <SubmitButton isPending={isPending}>{submitLabel}</SubmitButton>
+        {showImageUpload && (
+          <ImageUploadField
+            description="PNG, JPEG, WebP, or AVIF up to 10 MB each. Uploaded after the profile is created."
+            onErrorChange={setImageError}
+            onFilesChange={setImageFiles}
+          />
+        )}
+
+        <SubmitButton disabled={!!imageError} isPending={isPending}>
+          {submitLabel}
+        </SubmitButton>
       </form>
     </Form>
   );

@@ -87,7 +87,7 @@
   --accent: hsl(7 11% 15%);
   --accent-foreground: hsl(11 33% 94%);
 
-  --destructive: hsl(0 63% 20%); /* out of stock-DM */
+  --destructive: hsl(357 72% 54%); /* out of stock-DM */
   --destructive-foreground: hsl(11 33% 94%);
 
   --border: hsl(9 13% 11%); /* Border - DM */

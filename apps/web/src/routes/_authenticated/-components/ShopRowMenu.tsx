@@ -81,9 +81,9 @@ export function ShopRowMenu({ shopId, shopName }: ShopRowMenuProps) {
           <div className="flex justify-end gap-2 pt-2">
             <AlertDialogCancel>Cancel</AlertDialogCancel>
             <AlertDialogAction
-              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
               disabled={deleteMutation.isPending}
               onClick={handleConfirmDelete}
+              variant="solid-destructive"
             >
               {deleteMutation.isPending ? "Deleting…" : "Delete"}
             </AlertDialogAction>

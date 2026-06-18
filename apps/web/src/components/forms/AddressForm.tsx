@@ -1,3 +1,4 @@
+import { standardSchemaResolver } from "@hookform/resolvers/standard-schema";
 import { type ReactNode, useMemo } from "react";
 import {
   type Resolver,
@@ -18,7 +19,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { DeliveryMethodToggle } from "@/routes/-components/cart/DeliveryMethodToggle";
+import { DeliveryMethodToggle } from "@/routes/-components/DeliveryMethodToggle";
 
 const requiredString = (label: string) => z.string().min(1, `${label} is required`);
 
@@ -145,23 +146,6 @@ const BILLING_KEYS: AddressFieldGroupKeys = {
   street: "billingStreet",
 };
 
-function buildResolver(schema: ReturnType<typeof buildSchema>): Resolver<AddressFormValues> {
-  return async (values) => {
-    const result = await schema.safeParseAsync(values);
-    if (result.success) {
-      return { errors: {}, values: result.data as AddressFormValues };
-    }
-    const fieldErrors: Record<string, { type: string; message: string }> = {};
-    for (const issue of result.error.issues) {
-      const key = issue.path.map(String).join(".");
-      if (key && !fieldErrors[key]) {
-        fieldErrors[key] = { message: issue.message, type: issue.code };
-      }
-    }
-    return { errors: fieldErrors as never, values: {} as AddressFormValues };
-  };
-}
-
 type FormErrors = UseFormReturn<AddressFormValues>["formState"]["errors"];
 
 function FieldError({ message }: { message?: string }) {
@@ -284,7 +268,6 @@ export function AddressForm({
   footer,
 }: AddressFormProps) {
   const schema = useMemo(() => buildSchema(showGuestFields), [showGuestFields]);
-  const resolver = useMemo(() => buildResolver(schema), [schema]);
 
   const {
     register,
@@ -311,7 +294,7 @@ export function AddressForm({
       street: "",
       ...defaultValues,
     },
-    resolver,
+    resolver: standardSchemaResolver(schema) as Resolver<AddressFormValues>,
   });
 
   const deliveryType = watch("deliveryType");
@@ -331,7 +314,8 @@ export function AddressForm({
   const billingSameLabel = deliveryType === "pickup" ? "contact" : "shipping";
 
   return (
-    <form className="space-y-6" noValidate onSubmit={handleSubmit(onSubmit)}>
+    // biome-ignore lint/suspicious/noExplicitAny: dynamic schema based on showGuestFields
+    <form className="space-y-6" noValidate onSubmit={handleSubmit(onSubmit as any)}>
       <ErrorBanner count={errorCount} />
 
       {showGuestFields && <GuestFields errors={errors} register={register} />}
@@ -339,7 +323,7 @@ export function AddressForm({
       <div>
         <Label className="mb-2 block">Delivery Method</Label>
         <DeliveryMethodToggle
-          onChange={(value) => {
+          onChange={(value: "pickup" | "shipping") => {
             setValue("deliveryType", value);
             onDeliveryTypeChange?.(value);
           }}

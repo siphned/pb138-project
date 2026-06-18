@@ -1,6 +1,5 @@
 import { Elysia, status } from "elysia";
 import { z } from "zod";
-import { db } from "../../db";
 import { errorResponse } from "../../utils/error-plugin";
 import { authPlugin } from "../auth";
 import { verifyClerkToken } from "../auth/auth.utils";
@@ -22,7 +21,7 @@ export const winesRoutes = new Elysia()
         const payload = await verifyClerkToken(headers.authorization);
         if (!payload) return status(401, "Authentication required");
         const dbUser = await usersService.lazyGetOrCreate(payload.sub);
-        const winemaker = await winesRepo.findWinemakerByUserId(db, dbUser.id);
+        const winemaker = await winesRepo.findWinemakerByUserId(dbUser.id);
         if (!winemaker) return [];
         winemakerId = winemaker.id;
       }

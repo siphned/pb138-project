@@ -1,10 +1,12 @@
-import { useAuth } from "@clerk/react";
+import { useAuth, useClerk } from "@clerk/react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { createContext, type ReactNode, useContext, useEffect, useState } from "react";
+import { AccountBlockedScreen } from "@/components/AccountBlockedScreen";
 import { getCartsQueryKey } from "@/generated/hooks/useGetCarts";
 import { getUsersMeQueryKey, getUsersMeQueryOptions } from "@/generated/hooks/useGetUsersMe";
 import { usePostGuestSessions } from "@/generated/hooks/usePostGuestSessions";
 import { usePutUsersMe } from "@/generated/hooks/usePutUsersMe";
+import { parseApiError } from "@/lib/api-errors";
 import { Role } from "@/types/roles";
 
 export interface UserProfile {
@@ -46,11 +48,20 @@ const UserContext = createContext<UserContextType | undefined>(undefined);
 
 export function UserProvider({ children }: { children: ReactNode }) {
   const { isSignedIn, isLoaded } = useAuth();
-  const { data: profile, isLoading: isQueryLoading } = useQuery({
+  const { signOut } = useClerk();
+  const {
+    data: profile,
+    isLoading: isQueryLoading,
+    error: profileError,
+  } = useQuery({
     ...getUsersMeQueryOptions(),
     enabled: isLoaded && isSignedIn,
   });
   const queryClient = useQueryClient();
+
+  // The auth plugin returns 403 on /users/me for suspended/banned accounts.
+  // Clerk still considers them signed in, so block the app explicitly.
+  const isBlocked = isSignedIn === true && parseApiError(profileError)?.status === 403;
   const [guestSessionReady, setGuestSessionReady] = useState(false);
   const updateMutation = usePutUsersMe({
     mutation: {
@@ -117,11 +128,30 @@ export function UserProvider({ children }: { children: ReactNode }) {
   const isLoading = !isLoaded || (isSignedIn && isQueryLoading);
   const isCartReady = Boolean(isLoaded && (isSignedIn || guestSessionReady));
 
+  // Hold the app behind a loader while a signed-in user's profile resolves, so a
+  // suspended/banned account never flashes the real page before the blocked screen.
+  const showAuthGate = isSignedIn === true && isQueryLoading;
+
+  let content: ReactNode = children;
+  if (isBlocked) {
+    content = <AccountBlockedScreen onSignOut={() => signOut({ redirectUrl: "/" })} />;
+  } else if (showAuthGate) {
+    content = (
+      <div
+        aria-label="Loading"
+        className="flex min-h-screen items-center justify-center bg-background"
+        role="status"
+      >
+        <div className="h-8 w-8 animate-spin rounded-full border-2 border-muted border-t-primary" />
+      </div>
+    );
+  }
+
   return (
     <UserContext.Provider
       value={{ activeRole, isCartReady, isLoading, setActiveRole, updateUser, user }}
     >
-      {children}
+      {content}
     </UserContext.Provider>
   );
 }

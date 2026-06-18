@@ -6,15 +6,29 @@ import { LoadingState } from "@/components/primitives/loading-state";
 import { PageHeader } from "@/components/primitives/page-header";
 import { Separator } from "@/components/ui/separator";
 import { useGetWinemakersMe } from "@/generated/hooks/useGetWinemakersMe";
-import { useGetWinesById } from "@/generated/hooks/useGetWinesById";
-import { useGetWinesByIdImages } from "@/generated/hooks/useGetWinesByIdImages";
+import { getWinesByIdQueryOptions, useGetWinesById } from "@/generated/hooks/useGetWinesById";
+import {
+  getWinesByIdImagesQueryOptions,
+  useGetWinesByIdImages,
+} from "@/generated/hooks/useGetWinesByIdImages";
 import { useRoles } from "@/hooks/useRoles";
+import { getQueryClient } from "@/lib/query-client";
 import { WineRowMenu } from "@/routes/-components/WineRowMenu";
 import { WineDetailsCard } from "@/routes/wines/-components/WineDetailsCard";
 import { WineGallery } from "@/routes/wines/-components/WineGallery";
 import { WinesAvailableInShops } from "@/routes/wines/-components/WinesAvailableInShops";
 
 export const Route = createFileRoute("/wines/$id/")({
+  beforeLoad: async ({ params }) => {
+    const queryClient = getQueryClient();
+    // Prefetch wine and images data to avoid loading state
+    await Promise.all([
+      queryClient.prefetchQuery(getWinesByIdQueryOptions(params.id)),
+      queryClient.prefetchQuery(getWinesByIdImagesQueryOptions(params.id)),
+    ]).catch(() => {
+      // Silently fail - component will handle loading state if prefetch fails
+    });
+  },
   component: WineDetailPage,
 });
 

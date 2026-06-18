@@ -7,7 +7,7 @@ A multi-vendor wine marketplace platform with event management, multi-shop order
 - **Course:** PB138 — Úvod do vývoje webu (FI MUNI)
 - **Team:** 4 developers (Matej lead+FE, Ondra+Johnny BE, Adam FE)
 - **Phase:** Week 8 (implementation), RBAC and core modules complete
-- **Tech Stack Lock:** Bun, Elysia, React + Vite, TanStack Router, PostgreSQL + Drizzle ORM, TypeScript, Orval, Tailwind + shadcn/ui, Clerk
+- **Tech Stack Lock:** Bun, Elysia, React + Vite, TanStack Router, PostgreSQL + Drizzle ORM, TypeScript, Kubb, Tailwind + shadcn/ui, Clerk
 
 ## System Scope
 
@@ -47,7 +47,7 @@ bun run dev:web        # Frontend only
 bun run dev:server     # Backend only
 
 # Code generation & database
-bun run generate       # Regenerate Orval hooks from OpenAPI spec
+bun run generate       # Regenerate Kubb hooks from OpenAPI spec
 bun run db:generate    # Generate migration from schema changes
 bun run db:migrate     # Apply pending migrations
 bun run db:seed        # Seed the database
@@ -68,7 +68,7 @@ winery/
 │   ├── web/                    # React frontend
 │   │   ├── src/routes/         # TanStack Router nested routes with guards
 │   │   ├── src/hooks/          # useRoles RBAC hook
-│   │   ├── src/generated/      # Orval-generated API hooks
+│   │   ├── src/generated/      # Kubb-generated API hooks
 │   │   └── src/lib/            # Axios custom instance
 │   └── server/                 # Elysia backend
 │       ├── src/modules/        # Feature modules (carts, orders, guest-sessions, etc.)

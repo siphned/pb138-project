@@ -19,7 +19,7 @@ vi.mock("./role-requests.service", () => ({
   roleRequestsService: {
     approve: vi.fn().mockResolvedValue({ ...defaultRequest, status: "approved" }),
     getById: vi.fn().mockResolvedValue(defaultRequest),
-    lazyGetOrCreate: vi.fn().mockResolvedValue({ id: "u1" }),
+    lazyGetOrCreate: vi.fn().mockResolvedValue({ id: "u1", status: "active" }),
     listPending: vi.fn().mockResolvedValue([defaultRequest]),
     reject: vi.fn().mockResolvedValue({ ...defaultRequest, status: "rejected" }),
     submitRequest: vi.fn().mockResolvedValue(defaultRequest),
@@ -27,7 +27,7 @@ vi.mock("./role-requests.service", () => ({
 }));
 
 vi.mock("../users/users.service", () => ({
-  usersService: { lazyGetOrCreate: vi.fn().mockResolvedValue({ id: "u1" }) },
+  usersService: { lazyGetOrCreate: vi.fn().mockResolvedValue({ id: "u1", status: "active" }) },
 }));
 
 vi.mock("../auth/auth.utils", () => ({
