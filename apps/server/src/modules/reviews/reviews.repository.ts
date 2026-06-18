@@ -265,6 +265,14 @@ export async function softDelete(db: Database, reviewId: string): Promise<void> 
   await db.update(reviews).set({ deletedAt: new Date() }).where(eq(reviews.id, reviewId));
 }
 
+export async function flagReview(db: Database, reviewId: string): Promise<void> {
+  await db.update(reviews).set({ flaggedAt: new Date() }).where(eq(reviews.id, reviewId));
+}
+
+export async function unflagReview(db: Database, reviewId: string): Promise<void> {
+  await db.update(reviews).set({ flaggedAt: null }).where(eq(reviews.id, reviewId));
+}
+
 export const reviewsRepository = {
   averageRating,
   averageShopRating,
