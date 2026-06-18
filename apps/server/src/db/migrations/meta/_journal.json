@@ -14,6 +14,13 @@
       "tag": "0001_perfect_komodo",
       "version": "7",
       "when": 1778378566540
+    },
+    {
+      "breakpoints": true,
+      "idx": 2,
+      "tag": "0002_eager_wallop",
+      "version": "7",
+      "when": 1781780700950
     }
   ],
   "version": "7"
