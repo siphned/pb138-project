@@ -12,12 +12,13 @@ import { CatalogState } from "@/routes/-components/CatalogState";
 import { ShopCard } from "@/routes/-components/ShopCard";
 import { asString, type ShopSearch } from "@/routes/-components/types";
 
-type ShopsSearch = ShopSearch & { page?: number };
+type ShopsSearch = ShopSearch & { page?: number; ownerUserId?: string };
 
 export const Route = createFileRoute("/shops/")({
   component: ShopsPage,
   validateSearch: (raw): ShopsSearch => ({
     city: asString(raw.city),
+    ownerUserId: asString(raw.ownerUserId),
     page: typeof raw.page === "number" && raw.page > 0 ? raw.page : undefined,
     q: asString(raw.q),
   }),
@@ -27,10 +28,18 @@ function ShopsPage() {
   const search = Route.useSearch();
   const navigate = useNavigate({ from: Route.fullPath });
 
-  const query = useGetShops({ city: search.city, page: search.page, q: search.q });
+  const query = useGetShops({
+    city: search.city,
+    ownerUserId: search.ownerUserId,
+    page: search.page,
+    q: search.q,
+  });
 
   const handleSearchChange = (next: ShopSearch) => {
-    navigate({ replace: true, search: { ...next, page: undefined } });
+    navigate({
+      replace: true,
+      search: { ...next, ownerUserId: search.ownerUserId, page: undefined },
+    });
   };
 
   const handlePageChange = (newPage: number) => {
