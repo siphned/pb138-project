@@ -64,6 +64,12 @@ export class ReviewsService {
     return withUser;
   }
 
+  async flagReview(reviewId: string): Promise<void> {
+    const review = await reviewsRepo.findById(db, reviewId);
+    if (!review) throw new ReviewNotFoundError();
+    await reviewsRepo.flagReview(db, reviewId);
+  }
+
   async deleteReview(
     reviewId: string,
     userId: string,

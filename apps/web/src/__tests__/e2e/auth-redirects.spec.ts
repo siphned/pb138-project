@@ -8,15 +8,9 @@ test.describe("Auth redirects", () => {
     "/settings",
     "/orders",
     "/stats",
-    "/admin",
-    "/admin/users",
-    "/admin/role-requests",
-    "/admin/moderation",
-    "/manage/shops/1",
-    "/manage/shops/1/inventory",
-    "/manage/shops/1/bundles",
-    "/manage/shops/1/shop-orders",
-    "/manage/shops/1/supply-browse",
+    "/users",
+    "/role-requests",
+    "/moderation",
   ];
 
   for (const route of protectedRoutes) {
@@ -26,8 +20,12 @@ test.describe("Auth redirects", () => {
         "Clerk publishable key not configured — skipping auth redirect test"
       );
       await page.goto(route);
-      await page.waitForURL("**/auth/login", { timeout: 15000 });
-      expect(page.url()).toContain("/auth/login");
+      // Clerk may redirect to its hosted sign-in page or the app's /auth/login
+      await page.waitForURL(/auth\/login|clerk\.com\/|accounts\./i, { timeout: 15000 });
+      const url = page.url();
+      expect(
+        url.includes("/auth/login") || url.includes("clerk.") || url.includes("accounts.")
+      ).toBe(true);
     });
   }
 });

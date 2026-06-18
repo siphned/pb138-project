@@ -1,4 +1,4 @@
-# CI Workflow - Optimized for GitHub Actions free tier
+﻿# CI Workflow - Optimized for GitHub Actions free tier
 name: CI
 
 on:
@@ -217,8 +217,9 @@ jobs:
             apps/server/dist/
             apps/web/dist/
 
-  test:
-    needs: [install, generate]
+  # Unit tests split into parallel jobs
+  test-server:
+    needs: [install]
     runs-on: ubuntu-latest
     services:
       postgres:
@@ -253,6 +254,39 @@ jobs:
             packages/*/node_modules
           key: ${{ runner.os }}-bun-${{ hashFiles('**/bun.lock') }}-v4
           fail-on-cache-miss: false
+      - name: Install dependencies
+        run: bun install --frozen-lockfile
+      - name: Migrate Database
+        run: cd apps/server && bun run db:push
+      - name: Run server unit tests
+        run: cd apps/server && bun run test:coverage
+      - name: Upload server coverage
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: coverage-server
+          path: apps/server/coverage/
+
+  test-web:
+    needs: [install, generate]
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Setup Bun
+        uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: 1.3.11
+      - name: Restore cache
+        uses: actions/cache@v4
+        with:
+          path: |
+            .bun-cache
+            node_modules
+            apps/server/node_modules
+            apps/web/node_modules
+            packages/*/node_modules
+          key: ${{ runner.os }}-bun-${{ hashFiles('**/bun.lock') }}-v4
+          fail-on-cache-miss: false
       - name: Download generated code
         uses: actions/download-artifact@v4
         with:
@@ -260,26 +294,14 @@ jobs:
           path: apps/web/src/generated/
       - name: Install dependencies
         run: bun install --frozen-lockfile
-      - name: Migrate Database
-        run: |
-          cd apps/server
-          bun run db:push
-      - name: Run unit tests with coverage enforcement
-        run: bun run test:coverage
-      - name: Upload junit results
+      - name: Run web unit tests
+        run: cd apps/web && bun run test:coverage
+      - name: Upload web coverage
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: junit-results
-          path: apps/*/test-results.xml
-      - name: Upload coverage reports
-        if: always()
-        uses: actions/upload-artifact@v4
-        with:
-          name: coverage-reports
-          path: |
-            apps/server/coverage/
-            apps/web/coverage/
+          name: coverage-web
+          path: apps/web/coverage/
 
   compliance:
     needs: install
@@ -297,10 +319,14 @@ jobs:
           name: sbom
           path: sbom.spdx.json
 
-  # E2E tests — required CI gate. Failure blocks PR merge.
+  # E2E tests - 3 parallel shards. Failure blocks PR merge.
   e2e:
     needs: [install, generate]
     runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        shard: [1, 2, 3]
     services:
       postgres:
         image: postgres:16
@@ -320,7 +346,8 @@ jobs:
       FRONTEND_URL: http://localhost:5173
       CLERK_JWT_KEY: ${{ secrets.CLERK_JWT_KEY || 'ci_placeholder' }}
       CLERK_SECRET_KEY: ${{ secrets.CLERK_SECRET_KEY || 'ci_placeholder' }}
-      VITE_CLERK_PUBLISHABLE_KEY: ${{ secrets.VITE_CLERK_PUBLISHABLE_KEY || 'ci_placeholder' }}
+      # Publishable key is not secret - hardcode test key so auth-redirect tests do not skip in CI
+      VITE_CLERK_PUBLISHABLE_KEY: ${{ secrets.VITE_CLERK_PUBLISHABLE_KEY || 'pk_test_d29uZHJvdXMtaGVyb24tMjkuY2xlcmsuYWNjb3VudHMuZGV2JA' }}
     steps:
       - uses: actions/checkout@v4
       - name: Setup Bun
@@ -349,6 +376,8 @@ jobs:
         run: cd apps/web && bunx playwright install --with-deps chromium
       - name: Migrate Database
         run: cd apps/server && bun run db:push
+      - name: Seed Database
+        run: cd apps/server && SEED_NUM_USERS=20 SEED_TOTAL_WINES=60 SEED_EVENTS_PER_WINEMAKER=3 SEED_EVENTS_APPROVED=1 bun run db:seed
       - name: Start backend server
         run: bun run apps/server/src/index.ts > /tmp/server.log 2>&1 &
       - name: Start frontend dev server
@@ -357,10 +386,48 @@ jobs:
         run: |
           until curl -sf http://localhost:3000/swagger/json > /dev/null 2>&1; do sleep 1; done
           until curl -sf http://localhost:5173 > /dev/null 2>&1; do sleep 1; done
-      - name: Run E2E tests
-        run: cd apps/web && bunx playwright test --reporter=html
-      - name: Upload E2E report
+      - name: Run E2E shard ${{ matrix.shard }}/3
+        run: cd apps/web && SHARD=${{ matrix.shard }}/3 CI=true bunx playwright test --reporter=blob
+      - name: Upload shard blob report
         if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: e2e-blob-${{ matrix.shard }}
+          path: apps/web/blob-report/
+
+  # Merge shard blob reports into one HTML report
+  e2e-report:
+    needs: e2e
+    runs-on: ubuntu-latest
+    if: always()
+    steps:
+      - uses: actions/checkout@v4
+      - name: Setup Bun
+        uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: 1.3.11
+      - name: Restore cache
+        uses: actions/cache@v4
+        with:
+          path: |
+            .bun-cache
+            node_modules
+            apps/server/node_modules
+            apps/web/node_modules
+            packages/*/node_modules
+          key: ${{ runner.os }}-bun-${{ hashFiles('**/bun.lock') }}-v4
+          fail-on-cache-miss: false
+      - name: Install dependencies
+        run: bun install --frozen-lockfile
+      - name: Download all blob reports
+        uses: actions/download-artifact@v4
+        with:
+          pattern: e2e-blob-*
+          path: apps/web/all-blob-reports/
+          merge-multiple: true
+      - name: Merge into HTML report
+        run: cd apps/web && bunx playwright merge-reports --reporter html ./all-blob-reports
+      - name: Upload merged E2E report
         uses: actions/upload-artifact@v4
         with:
           name: e2e-report

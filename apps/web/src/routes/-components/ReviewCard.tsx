@@ -1,7 +1,8 @@
-import { Delete01Icon } from "@hugeicons/core-free-icons";
+import { Delete01Icon, Flag01Icon } from "@hugeicons/core-free-icons";
 import { HugeiconsIcon } from "@hugeicons/react";
 import { useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
+import { toast } from "sonner";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -16,6 +17,7 @@ import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { useUser } from "@/context/UserContext";
 import { useDeleteReviewsById } from "@/generated/hooks/useDeleteReviewsById";
+import { usePostReviewsByIdFlag } from "@/generated/hooks/usePostReviewsByIdFlag";
 import { StarRating } from "@/routes/-components/StarRating";
 import type { ReviewEntityType } from "@/routes/-components/use-entity-reviews";
 import { Role } from "@/types/roles";
@@ -52,6 +54,17 @@ export function ReviewCard({ review, entityType, entityId }: ReviewCardProps) {
   const { user } = useUser();
   const queryClient = useQueryClient();
   const [confirmOpen, setConfirmOpen] = useState(false);
+  const [flagged, setFlagged] = useState(false);
+
+  const flagMutation = usePostReviewsByIdFlag({
+    mutation: {
+      onError: () => toast.error("Failed to flag review"),
+      onSuccess: () => {
+        setFlagged(true);
+        toast.success("Review flagged for moderation");
+      },
+    },
+  });
 
   const deleteMutation = useDeleteReviewsById({
     mutation: {
@@ -75,6 +88,12 @@ export function ReviewCard({ review, entityType, entityId }: ReviewCardProps) {
   const isDeletable = !!deleteEntityId && isDeletableEntityType(deleteEntityType);
   const canDelete =
     isDeletable && !!user && (user.id === review.userId || user.roles.includes(Role.admin));
+  const canFlag =
+    !!user &&
+    user.id !== review.userId &&
+    (user.roles.includes(Role.winemaker) ||
+      user.roles.includes(Role.shopOwner) ||
+      user.roles.includes(Role.admin));
 
   return (
     <Card className="rounded-xl border-none bg-secondary/10 p-4 shadow-none">
@@ -90,6 +109,18 @@ export function ReviewCard({ review, entityType, entityId }: ReviewCardProps) {
               <span className="text-xs text-muted-foreground">
                 {new Date(review.createdAt).toLocaleDateString()}
               </span>
+              {canFlag && !flagged && (
+                <Button
+                  aria-label="Flag review for moderation"
+                  className="h-7 w-7 text-muted-foreground hover:text-amber-500"
+                  disabled={flagMutation.isPending}
+                  onClick={() => flagMutation.mutate({ id: review.id })}
+                  size="icon"
+                  variant="ghost"
+                >
+                  <HugeiconsIcon className="h-4 w-4" icon={Flag01Icon} />
+                </Button>
+              )}
               {canDelete && (
                 <Button
                   aria-label="Delete review"

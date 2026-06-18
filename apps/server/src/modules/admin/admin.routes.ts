@@ -105,4 +105,22 @@ export const adminRoutes = new Elysia({ prefix: "/admin" })
       params: idParams,
       requireRoles: ["admin"],
     }
+  )
+
+  .post(
+    "/reviews/:id/unflag",
+    async ({ params }) => {
+      await adminService.unflagReview(params.id);
+      return { success: true };
+    },
+    {
+      detail: {
+        description: "Clear the flag on a review (approve / dismiss report).",
+        security: [{ bearerAuth: [] }],
+        summary: "Unflag review (admin)",
+        tags: ["admin"],
+      },
+      params: idParams,
+      requireRoles: ["admin"],
+    }
   );
