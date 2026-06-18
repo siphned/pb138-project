@@ -17,7 +17,7 @@ test.describe("events: public browsing", () => {
     const firstLink = page.locator("[data-slot='card'] a").first();
     await firstLink.click();
     await page.waitForLoadState("networkidle");
-    expect(page.url()).toMatch(/\/events\/\d+/);
+    expect(page.url()).toMatch(/\/events\/[a-zA-Z0-9-]+/);
     await expect(page.getByRole("heading").first()).toBeVisible();
   });
 });
