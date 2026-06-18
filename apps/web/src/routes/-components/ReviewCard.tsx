@@ -103,7 +103,7 @@ export function ReviewCard({ review, entityType, entityId }: ReviewCardProps) {
           <AvatarFallback className="text-xs uppercase">{initials}</AvatarFallback>
         </Avatar>
         <div className="flex-1 space-y-1">
-          <div className="flex items-center justify-between">
+          <div className="flex items-start justify-between gap-2">
             <span className="font-medium">{review.authorName}</span>
             <div className="flex items-center gap-2">
               <span className="text-xs text-muted-foreground">
@@ -135,7 +135,7 @@ export function ReviewCard({ review, entityType, entityId }: ReviewCardProps) {
             </div>
           </div>
           <StarRating rating={review.rating} showNumeric={false} size="sm" />
-          <p className="mt-2 text-sm text-foreground/80">{review.body}</p>
+          <p className="text-sm text-foreground/80">{review.body}</p>
         </div>
       </div>
 

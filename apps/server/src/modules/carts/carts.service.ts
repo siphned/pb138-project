@@ -14,7 +14,6 @@ export class CartsService {
   ): Promise<void> {
     const product = await productsRepo.findById(db, productId);
     if (!product) throw new ProductNotFoundError(productId);
-    if (product.quantity < quantity) throw new InsufficientStockError(product.name);
 
     let cart: Cart | undefined;
     if (userId) {
@@ -26,6 +25,12 @@ export class CartsService {
     }
 
     if (!cart) throw new CartNotFoundError();
+
+    // addItem accumulates onto any existing line, so validate the resulting total
+    // against available stock — not just the amount being added.
+    const items = await cartsRepo.getCartItems(db, cart.id);
+    const current = items.find((i) => i.productId === productId)?.quantity ?? 0;
+    if (product.quantity < current + quantity) throw new InsufficientStockError(product.name);
 
     await cartsRepo.addItem(db, cart.id, productId, quantity);
   }
@@ -116,9 +121,14 @@ export class CartsService {
 
     if (quantity <= 0) {
       await cartsRepo.removeItem(db, cart.id, productId);
-    } else {
-      await cartsRepo.setItemQuantity(db, cart.id, productId, quantity);
+      return;
     }
+
+    const product = await productsRepo.findById(db, productId);
+    if (!product) throw new ProductNotFoundError(productId);
+    if (product.quantity < quantity) throw new InsufficientStockError(product.name);
+
+    await cartsRepo.setItemQuantity(db, cart.id, productId, quantity);
   }
 }
 

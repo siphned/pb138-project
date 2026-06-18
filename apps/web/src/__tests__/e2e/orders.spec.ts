@@ -22,7 +22,7 @@ test.describe("orders: authenticated user", () => {
 
     await orderLinks.first().click();
     await page.waitForLoadState("networkidle");
-    expect(page.url()).toMatch(/\/orders\/\d+/);
+    expect(page.url()).toMatch(/\/orders\/[\w-]+/);
     await expect(page.getByRole("main").first()).toBeVisible();
   });
 });

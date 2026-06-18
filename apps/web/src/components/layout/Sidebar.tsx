@@ -229,7 +229,7 @@ export function Sidebar({ userRoles = [Role.customer], activeRole, onRoleChange 
               <NavItem
                 className="mt-2"
                 onClick={closeSheet}
-                render={<Link to="/dashboard" />}
+                render={<Link to="/settings" />}
                 variant="muted"
               >
                 <HugeiconsIcon icon={User02Icon} /> Profile Settings

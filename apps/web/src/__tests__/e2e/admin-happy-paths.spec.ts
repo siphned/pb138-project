@@ -12,7 +12,7 @@ test.describe("admin happy paths", () => {
     expect(url.includes("/users") || url.includes("/dashboard")).toBe(true);
     if (!url.includes("/users")) return;
 
-    const searchInput = page.getByLabel(/search/i);
+    const searchInput = page.getByRole("searchbox", { name: /search/i });
     if ((await searchInput.count()) > 0) {
       await searchInput.fill("willy");
       await page.waitForLoadState("networkidle");
