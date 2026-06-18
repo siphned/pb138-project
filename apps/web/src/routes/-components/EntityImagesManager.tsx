@@ -174,7 +174,7 @@ export function EntityImagesManager({
             {images.map((img) => (
               <li key={img.id}>
                 <div className="group relative aspect-square overflow-hidden rounded-lg border border-border bg-muted">
-                  <img alt="" className="h-full w-full object-cover" loading="lazy" src={img.url} />
+                  <img alt="" className="h-full w-full object-cover" src={img.url} />
                   <div className="absolute inset-x-0 bottom-0 flex justify-end gap-1 bg-gradient-to-t from-black/60 to-transparent p-2 opacity-0 transition-opacity group-hover:opacity-100">
                     <Button
                       aria-label="Delete image"
