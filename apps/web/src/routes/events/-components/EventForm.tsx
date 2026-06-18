@@ -13,6 +13,7 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { AddressFields } from "@/routes/-components/AddressFields";
+import { addressSchemaShape, requiredString } from "@/routes/-components/address-schema";
 import { ImageUploadField } from "@/routes/-components/ImageUploadField";
 import { SubmitButton } from "@/routes/-components/SubmitButton";
 import { TextareaField } from "@/routes/-components/TextareaField";
@@ -20,21 +21,13 @@ import { TextField } from "@/routes/-components/TextField";
 
 const eventFormSchema = z
   .object({
+    ...addressSchemaShape,
     capacity: z.coerce.number().int().min(1, { message: "Capacity must be at least 1" }),
-    city: z.string().refine((v) => v.trim().length > 0, { message: "City is required" }),
-    country: z.string().refine((v) => v.trim().length > 0, { message: "Country is required" }),
     description: z.string().optional().default(""),
-    endTime: z.string().refine((v) => v.trim().length > 0, { message: "End time is required" }),
-    houseNumber: z
-      .string()
-      .refine((v) => v.trim().length > 0, { message: "House number is required" }),
+    endTime: requiredString("End time"),
     inviteType: z.enum(["open", "invite_only"]),
-    name: z.string().refine((v) => v.trim().length > 0, { message: "Name is required" }),
-    postalCode: z
-      .string()
-      .refine((v) => v.trim().length > 0, { message: "Postal code is required" }),
-    startTime: z.string().refine((v) => v.trim().length > 0, { message: "Start time is required" }),
-    street: z.string().refine((v) => v.trim().length > 0, { message: "Street is required" }),
+    name: requiredString("Name"),
+    startTime: requiredString("Start time"),
     visibility: z.enum(["public", "private"]),
   })
   .superRefine((data, ctx) => {

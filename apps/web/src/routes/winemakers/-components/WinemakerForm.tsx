@@ -5,23 +5,16 @@ import { z } from "zod";
 
 import { Form } from "@/components/ui/form";
 import { AddressFields } from "@/routes/-components/AddressFields";
+import { addressSchemaShape, requiredString } from "@/routes/-components/address-schema";
 import { ImageUploadField } from "@/routes/-components/ImageUploadField";
 import { SubmitButton } from "@/routes/-components/SubmitButton";
 import { TextareaField } from "@/routes/-components/TextareaField";
 import { TextField } from "@/routes/-components/TextField";
 
 const winemakerFormSchema = z.object({
-  city: z.string().refine((v) => v.trim().length > 0, { message: "City is required" }),
-  country: z.string().refine((v) => v.trim().length > 0, { message: "Country is required" }),
-  description: z.string().refine((v) => v.trim().length > 0, {
-    message: "Description is required",
-  }),
-  houseNumber: z
-    .string()
-    .refine((v) => v.trim().length > 0, { message: "House number is required" }),
-  name: z.string().refine((v) => v.trim().length > 0, { message: "Name is required" }),
-  postalCode: z.string().refine((v) => v.trim().length > 0, { message: "Postal code is required" }),
-  street: z.string().refine((v) => v.trim().length > 0, { message: "Street is required" }),
+  ...addressSchemaShape,
+  description: requiredString("Description"),
+  name: requiredString("Name"),
 });
 
 export type WinemakerFormValues = z.infer<typeof winemakerFormSchema>;

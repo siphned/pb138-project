@@ -19,20 +19,21 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import {
+  addressSchemaShape,
+  COUNTRY_MESSAGE,
+  COUNTRY_REGEX,
+  HOUSE_NUMBER_MESSAGE,
+  HOUSE_NUMBER_REGEX,
+  POSTAL_CODE_MESSAGE,
+  POSTAL_CODE_REGEX,
+} from "@/routes/-components/address-schema";
 import { DeliveryMethodToggle } from "@/routes/-components/DeliveryMethodToggle";
 
-const requiredString = (label: string) => z.string().min(1, `${label} is required`);
-
-const POSTAL_CODE_REGEX = /^[\d\s-]{3,10}$/;
-const COUNTRY_REGEX = /^[\p{L}\s'-]+$/u;
-const HOUSE_NUMBER_REGEX = /^\d+[a-zA-Z]?(\/\d+)?$/;
 const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
-const POSTAL_CODE_MESSAGE = "Postal code must be 3-10 digits (e.g., 60200 or 602 00)";
-const COUNTRY_MESSAGE = "Country must contain only letters";
-const HOUSE_NUMBER_MESSAGE = "House number must be digits, optionally with one letter (e.g., 68A)";
-
 const baseAddressFormSchema = z.object({
+  ...addressSchemaShape,
   billingAddressSameAsShipping: z.boolean(),
 
   billingCity: z.string().optional().default(""),
@@ -40,15 +41,10 @@ const baseAddressFormSchema = z.object({
   billingHouseNumber: z.string().optional().default(""),
   billingPostalCode: z.string().optional().default(""),
   billingStreet: z.string().optional().default(""),
-  city: requiredString("City"),
-  country: requiredString("Country").regex(COUNTRY_REGEX, COUNTRY_MESSAGE),
   deliveryType: z.enum(["pickup", "shipping"]),
   guestEmail: z.string().optional().or(z.literal("")),
   guestName: z.string().optional().or(z.literal("")),
-  houseNumber: requiredString("House number").regex(HOUSE_NUMBER_REGEX, HOUSE_NUMBER_MESSAGE),
   paymentMethod: z.enum(["card", "bank_transfer", "cash_on_delivery"]),
-  postalCode: requiredString("Postal code").regex(POSTAL_CODE_REGEX, POSTAL_CODE_MESSAGE),
-  street: requiredString("Street"),
 });
 
 export type AddressFormValues = z.infer<typeof baseAddressFormSchema>;
