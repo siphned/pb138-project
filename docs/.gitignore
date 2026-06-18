@@ -18,6 +18,10 @@ maestro/
 logging/
 plans/
 
+# Agent and AI tooling
+agents/
+wiki/
+
 # Temporary notes
 notes.md
 

@@ -37,8 +37,15 @@ test-results/
 apps/*/test-results.xml
 apps/*/playwright-report/
 
-# Superpowers docs (generated)
-docs/superpowers/
+# AI/Development tooling (kept locally, not committed)
+.claude/
+.opencode/
+.playwright-mcp/
+.superpowers/
+conductor/
+wiki/
+docs/agents/
+docs/wiki/
 
 # Scripts (temporary/local)
 test-all.sh
