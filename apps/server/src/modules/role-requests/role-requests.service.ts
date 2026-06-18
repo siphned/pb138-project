@@ -4,11 +4,13 @@ import type { RoleRequest } from "@repo/shared/schemas";
 import { db } from "../../db";
 import { logger } from "../../utils/logger";
 import { emailService } from "../email/email.service";
+import * as userRolesRepo from "../users/user-roles.repository";
 import { UserNotFoundError } from "../users/users.errors";
 import * as usersRepo from "../users/users.repository";
 import { usersService } from "../users/users.service";
 import {
   AlreadyHasPendingRequestError,
+  AlreadyHasRoleError,
   AlreadyRespondedError,
   RoleRequestNotFoundError,
 } from "./role-requests.errors";
@@ -102,6 +104,9 @@ export class RoleRequestsService {
     businessName: string,
     details?: string
   ): Promise<RoleRequest> {
+    const existingRoles = await userRolesRepo.findByUserId(db, userId);
+    if (existingRoles.includes(type)) throw new AlreadyHasRoleError();
+
     const existing = await roleRequestsRepo.findByUserId(db, userId);
     const pending = existing.find((r) => r.type === type && r.status === "pending");
 

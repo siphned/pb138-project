@@ -75,11 +75,45 @@ export type ShopData = {
 export const FEATURED_USERS = {
   test_user: {
     city: "Brno",
-    email: "willy@winery.demo",
+    email: "palahap384@gzeos.com",
     fname: "Willy",
     lname: "the Kid",
   },
 } as const;
+
+// ── Pending role-request applicants (get real Clerk accounts during seed) ────
+// These users always appear as pending role requests so the admin can approve
+// them in the demo. Real Clerk accounts are created (or looked up) at seed time
+// so the approve flow can call clerkClient.users.getUser successfully.
+export const PENDING_APPLICANTS = [
+  {
+    businessName: "Vinárstvo Šimko",
+    city: "Brno",
+    details: "Small family winery focusing on Moravian varieties",
+    email: "demo-applicant-winemaker@gzeos.com",
+    fname: "Pavel",
+    lname: "Šimko",
+    requestType: "winemaker" as const,
+  },
+  {
+    businessName: "Fajnové víno",
+    city: "Praha",
+    details: "Boutique wine shop in Prague centre",
+    email: "demo-applicant-shop@gzeos.com",
+    fname: "Kateřina",
+    lname: "Fejková",
+    requestType: "shop_owner" as const,
+  },
+  {
+    businessName: "Zemský vinný dvůr",
+    city: "Bratislava",
+    details: "Traditional Slovak winery with 20 years of experience",
+    email: "demo-applicant-winemaker2@gzeos.com",
+    fname: "Miroslav",
+    lname: "Zeman",
+    requestType: "winemaker" as const,
+  },
+] as const;
 
 // ── Supporting customers ─────────────────────────────────────────────────────
 export const SUPPORTING_CUSTOMERS: { fname: string; lname: string; email: string; city: string }[] =

@@ -1,6 +1,6 @@
 import type { Address, Order, Product } from "@repo/shared/schemas";
 import { orderItems, orders } from "@repo/shared/schemas";
-import { and, eq, isNull } from "drizzle-orm";
+import { and, eq, inArray, isNull } from "drizzle-orm";
 import type { Database } from "../../db";
 
 export type OrderItemWithProduct = typeof orderItems.$inferSelect & {
@@ -82,6 +82,18 @@ export async function listForUser(db: Database, userId: string): Promise<Order[]
   return db.query.orders.findMany({
     orderBy: (orders, { desc }) => [desc(orders.createdAt)],
     where: and(eq(orders.userId, userId), isNull(orders.deletedAt)),
+  });
+}
+
+export async function findInProgress(
+  db: Database
+): Promise<{ id: string; status: Order["status"] }[]> {
+  return db.query.orders.findMany({
+    columns: { id: true, status: true },
+    where: and(
+      inArray(orders.status, ["pending", "confirmed", "shipped"]),
+      isNull(orders.deletedAt)
+    ),
   });
 }
 
