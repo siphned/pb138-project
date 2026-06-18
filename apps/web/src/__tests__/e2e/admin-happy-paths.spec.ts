@@ -10,7 +10,9 @@ async function waitForMain(page: import("@playwright/test").Page) {
     .waitForResponse((resp) => resp.url().includes("/users/me") && resp.status() < 500, {
       timeout: 30000,
     })
-    .catch(() => {});
+    .catch(() => {
+      /* /users/me may not fire if already cached */
+    });
   await page.waitForFunction(() => document.querySelector("main") !== null, null, {
     timeout: 20000,
   });
