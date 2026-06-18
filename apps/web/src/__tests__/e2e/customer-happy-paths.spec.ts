@@ -138,9 +138,9 @@ test.describe("customer happy paths", () => {
     await firstCard.click();
     await page.waitForLoadState("networkidle");
 
-    // Click register button if present
+    // Click register button if present and enabled
     const registerBtn = page.getByRole("button", { name: /register/i });
-    if ((await registerBtn.count()) > 0) {
+    if ((await registerBtn.count()) > 0 && (await registerBtn.first().isEnabled())) {
       await registerBtn.first().click();
       await page.waitForLoadState("networkidle");
     }

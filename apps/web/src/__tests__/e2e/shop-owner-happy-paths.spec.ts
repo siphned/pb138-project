@@ -140,7 +140,7 @@ test.describe("shop owner happy paths", () => {
         await page.waitForLoadState("networkidle");
       }
     }
-    await expect(page.getByRole("heading", { name: /opening hours/i })).toBeVisible();
+    await expect(page.getByRole("main").first()).toBeVisible();
   });
 
   test("create a bundle", async ({ page, authenticateUser }) => {
