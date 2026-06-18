@@ -17,3 +17,9 @@ export class AlreadyHasPendingRequestError extends ConflictError {
     super("You already have a pending request for this role", "ALREADY_HAS_PENDING_REQUEST");
   }
 }
+
+export class AlreadyHasRoleError extends ConflictError {
+  constructor() {
+    super("You already have this role", "ALREADY_HAS_ROLE");
+  }
+}

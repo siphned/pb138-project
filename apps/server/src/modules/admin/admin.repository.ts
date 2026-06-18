@@ -1,6 +1,6 @@
 import type { Review, User } from "@repo/shared/schemas";
 import { reviews, userRoles, users } from "@repo/shared/schemas";
-import { and, count, eq, isNull } from "drizzle-orm";
+import { and, count, eq, isNotNull, isNull } from "drizzle-orm";
 import type { Database } from "../../db";
 
 export type AdminUserRow = User & {
@@ -36,7 +36,7 @@ export async function listAllReviews(
     offset: number;
   }
 ): Promise<{ data: AdminReviewRow[]; total: number }> {
-  const where = isNull(reviews.deletedAt);
+  const where = and(isNull(reviews.deletedAt), isNotNull(reviews.flaggedAt));
 
   const [data, countResult] = await Promise.all([
     db.query.reviews.findMany({
@@ -101,4 +101,8 @@ export async function setUserStatus(
 
 export async function softDeleteReview(db: Database, id: string): Promise<void> {
   await db.update(reviews).set({ deletedAt: new Date() }).where(eq(reviews.id, id));
+}
+
+export async function unflagReview(db: Database, id: string): Promise<void> {
+  await db.update(reviews).set({ flaggedAt: null }).where(eq(reviews.id, id));
 }

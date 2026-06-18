@@ -1,6 +1,7 @@
 import { useQueryClient } from "@tanstack/react-query";
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
 import { useState } from "react";
+import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -13,121 +14,157 @@ import {
 import { Skeleton } from "@/components/ui/skeleton";
 import { useDeleteAdminReviewsById } from "@/generated/hooks/useDeleteAdminReviewsById";
 import { getAdminReviewsQueryKey, useGetAdminReviews } from "@/generated/hooks/useGetAdminReviews";
+import { usePostAdminReviewsByIdUnflag } from "@/generated/hooks/usePostAdminReviewsByIdUnflag";
 
 export const Route = createFileRoute("/_authenticated/_admin/moderation")({
   component: ModerationPage,
 });
 
+function entityLink(entityType: string, entityId: string): string {
+  if (entityType === "product") return `/products/${entityId}`;
+  if (entityType === "winemaker") return `/winemakers/${entityId}`;
+  if (entityType === "wine") return `/wines/${entityId}`;
+  return "#";
+}
+
+function entityLabel(entityType: string): string {
+  if (entityType === "product") return "Product";
+  if (entityType === "winemaker") return "Winemaker";
+  if (entityType === "wine") return "Wine";
+  return entityType;
+}
+
 function ModerationPage() {
   const { data, isLoading, error } = useGetAdminReviews();
   const queryClient = useQueryClient();
-  const { mutate: deleteReview, isPending: isDeleting } = useDeleteAdminReviewsById();
   const [confirmDelete, setConfirmDelete] = useState<string | null>(null);
-  const [approvedReviews, setApprovedReviews] = useState<Set<string>>(new Set());
+
+  const invalidate = () => queryClient.invalidateQueries({ queryKey: getAdminReviewsQueryKey() });
+
+  const deleteMutation = useDeleteAdminReviewsById({
+    mutation: {
+      onError: () => toast.error("Failed to delete review"),
+      onSuccess: () => {
+        setConfirmDelete(null);
+        invalidate();
+        toast.success("Review deleted");
+      },
+    },
+  });
+
+  const unflagMutation = usePostAdminReviewsByIdUnflag({
+    mutation: {
+      onError: () => toast.error("Failed to approve review"),
+      onSuccess: () => {
+        invalidate();
+        toast.success("Review approved — flag removed");
+      },
+    },
+  });
 
   // biome-ignore lint/suspicious/noExplicitAny: API response is untyped
-  const reviews = (data as any)?.data || [];
+  const reviews = (data as any)?.data ?? [];
 
   if (error) {
     return (
-      <main className="mx-auto max-w-6xl space-y-4 p-6">
+      <main className="mx-auto max-w-4xl space-y-4 p-6">
         <h1 className="text-2xl font-semibold">Content Moderation</h1>
         <div className="rounded-md bg-destructive/10 p-4 text-destructive">
-          <p>
-            Failed to load moderation queue:{" "}
-            {error instanceof Error ? error.message : "Unknown error"}
-          </p>
+          Failed to load moderation queue:{" "}
+          {error instanceof Error ? error.message : "Unknown error"}
         </div>
       </main>
     );
   }
 
-  const renderContent = () => {
-    if (isLoading) {
-      return (
+  return (
+    <main className="mx-auto max-w-4xl space-y-4 p-6">
+      <div>
+        <h1 className="text-2xl font-semibold">Content Moderation</h1>
+        <p className="text-sm text-muted-foreground">
+          Flagged reviews awaiting review. Approve to dismiss the flag, or delete to remove the
+          review permanently.
+        </p>
+      </div>
+
+      {isLoading && (
         <div className="space-y-2">
-          {Array.from({ length: 5 }).map((_, i) => (
-            <Skeleton className="h-24 w-full" key={i} />
+          {Array.from({ length: 3 }).map((_, i) => (
+            <Skeleton className="h-28 w-full" key={i} />
           ))}
         </div>
-      );
-    }
+      )}
 
-    if (reviews.length === 0) {
-      return (
+      {!isLoading && reviews.length === 0 && (
         <div className="rounded-md border border-border bg-card p-8 text-center">
-          <p className="text-muted-foreground">No reviews to moderate</p>
+          <p className="text-muted-foreground">No flagged reviews — queue is clear</p>
         </div>
-      );
-    }
+      )}
 
-    return (
-      <div className="space-y-4">
-        {/* biome-ignore lint/suspicious/noExplicitAny: API response is untyped */}
-        {reviews.map((review: any) => (
-          <div className="rounded-md border border-border bg-card p-4" key={review.id}>
-            <div className="flex items-start justify-between gap-4">
-              <div className="flex-1">
-                <p className="font-medium">
-                  {review.user?.fname || review.user?.lname
-                    ? `${review.user.fname || ""} ${review.user.lname || ""}`.trim()
-                    : "Anonymous"}
-                </p>
-                <p className="mt-1 text-sm text-muted-foreground">
-                  {review.content || "No content"}
-                </p>
-                <p className="mt-2 flex items-center gap-4 text-xs text-muted-foreground">
-                  <span>Rating: {review.rating}/5</span>
-                  <span>{new Date(review.createdAt).toLocaleDateString()}</span>
-                </p>
-              </div>
-              <div className="flex shrink-0 gap-2">
-                <Button
-                  disabled={approvedReviews.has(review.id)}
-                  onClick={() => {
-                    setApprovedReviews((prev) => new Set(prev).add(review.id));
-                  }}
-                  size="sm"
-                  variant="outline"
+      {!isLoading && reviews.length > 0 && (
+        <div className="space-y-3">
+          {/* biome-ignore lint/suspicious/noExplicitAny: API response is untyped */}
+          {reviews.map((review: any) => {
+            const authorName =
+              review.user?.fname || review.user?.lname
+                ? `${review.user.fname ?? ""} ${review.user.lname ?? ""}`.trim()
+                : "Anonymous";
+            const link = entityLink(review.entityType, review.entityId);
+            const label = entityLabel(review.entityType);
+
+            return (
+              <div
+                className="rounded-lg border border-border bg-card p-4 space-y-3"
+                key={review.id}
+              >
+                <div className="flex items-start justify-between gap-4">
+                  <div className="flex-1 min-w-0">
+                    <div className="flex items-center gap-2 flex-wrap">
+                      <span className="font-medium">{authorName}</span>
+                      <span className="text-xs text-muted-foreground">·</span>
+                      <span className="text-xs text-muted-foreground">
+                        {new Date(review.createdAt).toLocaleDateString()}
+                      </span>
+                      <span className="text-xs text-muted-foreground">·</span>
+                      <span className="text-xs text-muted-foreground">
+                        Rating: {review.rating}/5
+                      </span>
+                    </div>
+                    <p className="mt-1 text-sm text-foreground/80 line-clamp-3">
+                      {review.body || <span className="italic text-muted-foreground">No text</span>}
+                    </p>
+                  </div>
+                  <div className="flex shrink-0 gap-2">
+                    <Button
+                      disabled={unflagMutation.isPending}
+                      onClick={() => unflagMutation.mutate({ id: review.id })}
+                      size="sm"
+                      variant="outline"
+                    >
+                      Approve
+                    </Button>
+                    <Button
+                      disabled={deleteMutation.isPending}
+                      onClick={() => setConfirmDelete(review.id)}
+                      size="sm"
+                      variant="destructive"
+                    >
+                      Delete
+                    </Button>
+                  </div>
+                </div>
+
+                <Link
+                  className="inline-flex items-center gap-1 text-xs text-primary hover:underline"
+                  to={link as never}
                 >
-                  {approvedReviews.has(review.id) ? "Approved" : "Approve"}
-                </Button>
-                <Button
-                  disabled={isDeleting}
-                  onClick={() => setConfirmDelete(review.id)}
-                  size="sm"
-                  variant="destructive"
-                >
-                  Delete
-                </Button>
+                  View on {label} page →
+                </Link>
               </div>
-            </div>
-          </div>
-        ))}
-      </div>
-    );
-  };
-
-  const handleConfirmDelete = (reviewId: string) => {
-    deleteReview(
-      { id: reviewId },
-      {
-        onSuccess: () => {
-          setConfirmDelete(null);
-          queryClient.invalidateQueries({ queryKey: getAdminReviewsQueryKey() });
-        },
-      }
-    );
-  };
-
-  return (
-    <main className="mx-auto max-w-6xl space-y-4 p-6">
-      <h1 className="text-2xl font-semibold">Content Moderation</h1>
-      <p className="text-muted-foreground">
-        Review flagged content and manage platform compliance.
-      </p>
-
-      {renderContent()}
+            );
+          })}
+        </div>
+      )}
 
       <Dialog
         onOpenChange={(open) => !open && setConfirmDelete(null)}
@@ -145,11 +182,11 @@ function ModerationPage() {
               Cancel
             </Button>
             <Button
-              disabled={isDeleting}
-              onClick={() => confirmDelete && handleConfirmDelete(confirmDelete)}
+              disabled={deleteMutation.isPending}
+              onClick={() => confirmDelete && deleteMutation.mutate({ id: confirmDelete })}
               variant="destructive"
             >
-              {isDeleting ? "Deleting..." : "Delete"}
+              {deleteMutation.isPending ? "Deleting..." : "Delete"}
             </Button>
           </DialogFooter>
         </DialogContent>

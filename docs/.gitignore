@@ -1,0 +1,35 @@
+# AI-generated analysis and planning docs (kept locally for reference)
+*-design.md
+*-plan.md
+2026-*.md
+
+# AI audit and analysis
+audit/
+AUDIT.md
+AUDIT_SUMMARY.md
+BUILD_RECOVERY_RUNBOOK.md
+JIRA_TASK_MAPPING*.md
+UI_AUDIT*
+WINE-121_CURRENT_STATUS.md
+
+# AI orchestration
+superpowers/
+maestro/
+logging/
+plans/
+
+# Agent and AI tooling
+agents/
+wiki/
+
+# Temporary notes
+notes.md
+
+# Code review artifacts
+code_reviews/
+
+# Postman collections
+postman/
+
+# Temporary analysis files
+stats-endpoint-design.md

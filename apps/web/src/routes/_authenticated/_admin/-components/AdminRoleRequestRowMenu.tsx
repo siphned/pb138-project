@@ -1,6 +1,7 @@
 import { MoreHorizontalCircle01Icon } from "@hugeicons/core-free-icons";
 import { HugeiconsIcon } from "@hugeicons/react";
 import { useQueryClient } from "@tanstack/react-query";
+import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
@@ -29,6 +30,38 @@ export function AdminRoleRequestRowMenu({ requestId, status }: AdminRoleRequestR
 
   const refresh = () => queryClient.invalidateQueries({ queryKey: getRoleRequestsQueryKey() });
 
+  const handleApprove = () =>
+    approve.mutate(
+      { id: requestId },
+      {
+        onError: (err) => {
+          const msg = (err as { response?: { data?: { error?: { message?: string } } } })?.response
+            ?.data?.error?.message;
+          toast.error(msg ?? "Failed to approve request");
+        },
+        onSuccess: () => {
+          toast.success("Role request approved");
+          refresh();
+        },
+      }
+    );
+
+  const handleReject = () =>
+    reject.mutate(
+      { id: requestId },
+      {
+        onError: (err) => {
+          const msg = (err as { response?: { data?: { error?: { message?: string } } } })?.response
+            ?.data?.error?.message;
+          toast.error(msg ?? "Failed to decline request");
+        },
+        onSuccess: () => {
+          toast.success("Role request declined");
+          refresh();
+        },
+      }
+    );
+
   return (
     <DropdownMenu>
       <DropdownMenuTrigger
@@ -44,13 +77,8 @@ export function AdminRoleRequestRowMenu({ requestId, status }: AdminRoleRequestR
         }
       />
       <DropdownMenuContent align="end">
-        <DropdownMenuItem onClick={() => approve.mutate({ id: requestId }, { onSuccess: refresh })}>
-          Accept
-        </DropdownMenuItem>
-        <DropdownMenuItem
-          onClick={() => reject.mutate({ id: requestId }, { onSuccess: refresh })}
-          variant="destructive"
-        >
+        <DropdownMenuItem onClick={handleApprove}>Accept</DropdownMenuItem>
+        <DropdownMenuItem onClick={handleReject} variant="destructive">
           Decline
         </DropdownMenuItem>
       </DropdownMenuContent>

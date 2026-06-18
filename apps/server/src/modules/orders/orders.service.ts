@@ -8,6 +8,7 @@ import { emailService } from "../email/email.service";
 import * as productsRepo from "../products/products.repository";
 import * as shopsRepo from "../shops/shops.repository";
 import * as usersRepo from "../users/users.repository";
+import * as ordersAutoAdvance from "./orders.auto-advance";
 import type { CreateOrderItem, OrderWithItems } from "./orders.repository";
 import * as ordersRepo from "./orders.repository";
 
@@ -164,6 +165,7 @@ export class OrdersService {
     await this.afterCheckout(order, items, userId, data).catch((err) => {
       logger.error({ err, orderId: order.id }, "afterCheckout failed");
     });
+    ordersAutoAdvance.scheduleAdvance(order.id);
 
     return order;
   }

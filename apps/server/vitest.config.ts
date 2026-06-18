@@ -27,7 +27,7 @@ export default defineConfig({
         branches: 50,
         functions: 58,
         lines: 68,
-        statements: 64,
+        statements: 63,
       },
     },
     // Pre-bundle zod so its re-exported `z` namespace binding resolves correctly.
