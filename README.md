@@ -4,8 +4,8 @@ A full-stack multi-vendor marketplace for wine producers and retailers with even
 
 **Course:** PB138 — Web Development (FI MUNI)  
 **Team:** Adam Mališ, Ján Pullman, Matěj Šinogl, Ondřej Málek  
-**GitHub (Primary):** https://github.com/siphned/pb138-project  
-**GitLab (Mirror):** Set to public for review at https://gitlab.fi.muni.cz/
+**📦 GitHub (Public):** https://github.com/siphned/pb138-project  
+**🚀 Live Demo:** https://pb138-project-server.vercel.app (See the app in action)
 
 ---
 
