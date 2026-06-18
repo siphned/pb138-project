@@ -1,6 +1,7 @@
 import { FilterIcon } from "@hugeicons/core-free-icons";
 import { HugeiconsIcon } from "@hugeicons/react";
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
+import { useEffect } from "react";
 import { PageHeader } from "@/components/primitives/page-header";
 import { Button } from "@/components/ui/button";
 import {
@@ -12,6 +13,7 @@ import {
 } from "@/components/ui/select";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { useGetProducts } from "@/generated/hooks/useGetProducts";
+import { useGetShopsMe } from "@/generated/hooks/useGetShopsMe";
 import {
   type GetProductsQueryParamsColorEnumKey,
   type GetProductsQueryParamsSortEnumKey,
@@ -20,6 +22,7 @@ import {
   getProductsQueryParamsSortEnum,
   getProductsQueryParamsTypeEnum,
 } from "@/generated/types/GetProducts";
+import { useRoles } from "@/hooks/useRoles";
 import { CatalogFilters } from "@/routes/-components/CatalogFilters";
 import { CatalogPagination } from "@/routes/-components/CatalogPagination";
 import { CatalogResults } from "@/routes/-components/CatalogResults";
@@ -82,9 +85,30 @@ function ProductsPage() {
     navigate({ replace: true, search: { ...search, page: newPage } });
   };
 
+  // "My Bundles" entry: scope bundles to one of the owner's shops, defaulting to
+  // the first. The picker is only shown to a shop owner viewing bundles.
+  const roles = useRoles();
+  const isShopOwner = roles.includes("shop_owner");
+  const myShopsQuery = useGetShopsMe({ query: { enabled: isShopOwner } });
+  const myShops = Array.isArray(myShopsQuery.data) ? myShopsQuery.data : [];
+  const showShopPicker = isShopOwner && search.isBundle === true && myShops.length > 0;
+
+  useEffect(() => {
+    if (showShopPicker && !search.shopId) {
+      navigate({ replace: true, search: { ...search, page: 1, shopId: myShops[0]?.id } });
+    }
+  }, [showShopPicker, search, navigate, myShops]);
+
   return (
     <div className="container mx-auto space-y-8 px-6 py-8 lg:px-12">
-      <PageHeader description="Browse wines available for purchase." title="Products" />
+      <PageHeader
+        description={
+          showShopPicker
+            ? "View and manage bundles for your shops."
+            : "Browse wines available for purchase."
+        }
+        title={showShopPicker ? "My Bundles" : "Products"}
+      />
 
       <div className="grid grid-cols-1 gap-12 lg:grid-cols-[280px_1fr]">
         <div className="lg:hidden">
@@ -110,6 +134,29 @@ function ProductsPage() {
         </aside>
 
         <main className="space-y-8">
+          {showShopPicker && (
+            <div className="flex items-center gap-2">
+              <span className="text-sm font-medium text-muted-foreground">Shop:</span>
+              <Select
+                onValueChange={(v) => v && handleSearchChange({ ...search, shopId: v })}
+                value={search.shopId ?? myShops[0]?.id}
+              >
+                <SelectTrigger className="w-[220px]" size="sm">
+                  <SelectValue placeholder="Select a shop">
+                    {(v: string | null) => myShops.find((s) => s.id === v)?.name ?? "Select a shop"}
+                  </SelectValue>
+                </SelectTrigger>
+                <SelectContent>
+                  {myShops.map((s) => (
+                    <SelectItem key={s.id} value={s.id}>
+                      {s.name}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+          )}
+
           <CatalogState
             emptyDescription="Try adjusting your filters to find what you're looking for."
             emptyTitle="No products found"
