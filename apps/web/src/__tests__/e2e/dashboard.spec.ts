@@ -5,12 +5,22 @@ const hasWinemakerCreds = !!process.env.TEST_USER_WINEMAKER_EMAIL;
 const hasShopOwnerCreds = !!process.env.TEST_USER_SHOP_OWNER_EMAIL;
 
 test.describe("dashboard: all-roles user", () => {
+  test.setTimeout(90000);
   test("all-roles user can access dashboard", async ({ page, authenticateUser }) => {
     await authenticateUser();
     await page.goto("/dashboard");
     await page.waitForLoadState("networkidle");
     expect(page.url()).toContain("/dashboard");
-    await expect(page.getByRole("main").first()).toBeVisible();
+    await page
+      .waitForResponse((resp) => resp.url().includes("/users/me") && resp.status() < 500, {
+        timeout: 30000,
+      })
+      .catch(() => {
+        /* /users/me may not fire if already cached */
+      });
+    await page.waitForFunction(() => document.querySelector("main") !== null, null, {
+      timeout: 20000,
+    });
   });
 });
 

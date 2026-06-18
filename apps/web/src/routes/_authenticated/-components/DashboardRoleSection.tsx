@@ -14,6 +14,7 @@ import {
 } from "@/components/ui/select";
 import { useUser } from "@/context/UserContext";
 import { usePostRoleRequests } from "@/generated/hooks/usePostRoleRequests";
+import { Role } from "@/types/roles";
 
 const roleRequestSchema = z.object({
   businessName: z
@@ -60,6 +61,12 @@ export function DashboardRoleSection() {
 
   const roles = user.roles ?? [];
 
+  const availableOptions = TYPE_OPTIONS.filter((opt) => {
+    if (opt.value === "winemaker") return !roles.includes(Role.winemaker);
+    if (opt.value === "shop_owner") return !roles.includes(Role.shopOwner);
+    return true;
+  });
+
   const onSubmit = (data: RoleRequestValues) => {
     mutation.mutate({
       data: {
@@ -80,23 +87,31 @@ export function DashboardRoleSection() {
         ))}
       </div>
 
-      {mutation.isSuccess ? (
+      {mutation.isSuccess && (
         <p className="rounded-md border border-border bg-muted p-4 text-sm text-foreground">
           Request submitted, awaiting admin approval.
         </p>
-      ) : (
+      )}
+      {!mutation.isSuccess && availableOptions.length === 0 && (
+        <p className="rounded-md border border-border bg-muted p-4 text-sm text-muted-foreground">
+          You already have all available roles.
+        </p>
+      )}
+      {!mutation.isSuccess && availableOptions.length > 0 && (
         <form className="space-y-4" noValidate onSubmit={handleSubmit(onSubmit)}>
           <div className="space-y-2">
             <Label htmlFor="request-type">Request a new role</Label>
             <Select
               onValueChange={(v) => setValue("type", v as RoleRequestValues["type"])}
-              value={type}
+              value={
+                availableOptions.some((o) => o.value === type) ? type : availableOptions[0]?.value
+              }
             >
               <SelectTrigger id="request-type">
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>
-                {TYPE_OPTIONS.map((opt) => (
+                {availableOptions.map((opt) => (
                   <SelectItem key={opt.value} value={opt.value}>
                     {opt.label}
                   </SelectItem>
