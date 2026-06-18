@@ -44,12 +44,21 @@ test.describe("winemaker happy paths", () => {
     await page.waitForLoadState("networkidle");
 
     await page.goto("/wines/new");
-    await page.waitForLoadState("networkidle");
-    expect(page.url()).toContain("/wines/new");
+    // Wait for the page to settle into either the form or the "no winemaker profile" message
+    await Promise.race([
+      page.getByLabel(/name/i).waitFor({ state: "visible" }),
+      page
+        .getByRole("heading", { name: /winemaker profile required/i })
+        .waitFor({ state: "visible" }),
+    ]).catch(() => {});
 
-    // If no winemaker profile is linked to this Clerk user, the form is replaced with a message
-    const profileRequired = page.getByRole("heading", { name: /winemaker profile required/i });
-    if (await profileRequired.isVisible({ timeout: 2000 }).catch(() => false)) return;
+    if (
+      await page
+        .getByRole("heading", { name: /winemaker profile required/i })
+        .isVisible()
+        .catch(() => false)
+    )
+      return;
 
     await page.getByLabel(/name/i).fill("E2E Reserve Wine");
     await page.getByLabel(/region/i).fill("Mikulovská");
