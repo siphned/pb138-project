@@ -25,7 +25,8 @@ export const guestSessionsRoutes = new Elysia({
         expires: session.expiresAt,
         httpOnly: true,
         path: "/",
-        sameSite: "lax",
+        sameSite: "none",
+        secure: true,
         value: session.id,
       });
       set.status = 201;

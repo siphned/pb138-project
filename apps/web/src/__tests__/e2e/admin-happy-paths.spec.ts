@@ -1,25 +1,6 @@
 import { expect, test } from "../../../playwright.fixtures";
 
-async function waitForMain(page: import("@playwright/test").Page) {
-  // page.goto() triggers a full React reinit. The Clerk getToken() call inside
-  // the axios interceptor delays the /users/me HTTP request start — networkidle
-  // fires while the token is still being resolved, so showAuthGate stays true
-  // and <main> is absent. Explicitly wait for the /users/me response first so
-  // we know the query has settled, then poll the DOM for <main>.
-  await page
-    .waitForResponse((resp) => resp.url().includes("/users/me") && resp.status() < 500, {
-      timeout: 30000,
-    })
-    .catch(() => {
-      /* /users/me may not fire if already cached */
-    });
-  await page.waitForFunction(() => document.querySelector("main") !== null, null, {
-    timeout: 20000,
-  });
-}
-
 test.describe("admin happy paths", () => {
-  test.setTimeout(90000);
   test("view user list and search", async ({ page, authenticateUser }) => {
     await authenticateUser();
     await page.waitForLoadState("networkidle");
@@ -31,9 +12,9 @@ test.describe("admin happy paths", () => {
     expect(url.includes("/users") || url.includes("/dashboard")).toBe(true);
     if (!url.includes("/users")) return;
 
-    const searchInput = page.getByRole("textbox", { name: /search/i });
+    const searchInput = page.getByRole("searchbox", { name: /search/i });
     if ((await searchInput.count()) > 0) {
-      await searchInput.first().fill("willy");
+      await searchInput.fill("willy");
       await page.waitForLoadState("networkidle");
     }
 
@@ -56,7 +37,7 @@ test.describe("admin happy paths", () => {
     await userLinks.first().click();
     await page.waitForLoadState("networkidle");
     expect(page.url()).toMatch(/\/users\/[\w-]+/);
-    await waitForMain(page);
+    await expect(page.getByRole("main").first()).toBeVisible();
   });
 
   test("ban and unban a user", async ({ page, authenticateUser }) => {
@@ -87,7 +68,7 @@ test.describe("admin happy paths", () => {
         }
       }
     }
-    await waitForMain(page);
+    await expect(page.getByRole("main").first()).toBeVisible();
   });
 
   test("approve or decline role request", async ({ page, authenticateUser }) => {
@@ -118,7 +99,7 @@ test.describe("admin happy paths", () => {
       }
     }
 
-    await waitForMain(page);
+    await expect(page.getByRole("main").first()).toBeVisible();
   });
 
   test("delete a review from moderation", async ({ page, authenticateUser }) => {
@@ -138,7 +119,7 @@ test.describe("admin happy paths", () => {
       await page.waitForLoadState("networkidle");
     }
 
-    await waitForMain(page);
+    await expect(page.getByRole("main").first()).toBeVisible();
   });
 
   test("view admin stats", async ({ page, authenticateUser }) => {
@@ -150,6 +131,6 @@ test.describe("admin happy paths", () => {
     await page.waitForLoadState("networkidle");
     expect(page.url()).toContain("/stats");
 
-    await waitForMain(page);
+    await expect(page.getByRole("main").first()).toBeVisible();
   });
 });
