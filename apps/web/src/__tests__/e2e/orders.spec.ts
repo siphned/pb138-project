@@ -6,7 +6,7 @@ test.describe("orders: authenticated user", () => {
     await page.goto("/orders");
     await page.waitForLoadState("networkidle");
     expect(page.url()).toContain("/orders");
-    await expect(page.locator("main")).toBeVisible();
+    await expect(page.getByRole("main").first()).toBeVisible();
   });
 
   test("order detail renders when clicking into an order", async ({ page, authenticateUser }) => {
@@ -23,6 +23,6 @@ test.describe("orders: authenticated user", () => {
     await orderLinks.first().click();
     await page.waitForLoadState("networkidle");
     expect(page.url()).toMatch(/\/orders\/\d+/);
-    await expect(page.locator("main")).toBeVisible();
+    await expect(page.getByRole("main").first()).toBeVisible();
   });
 });

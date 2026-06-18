@@ -8,15 +8,9 @@ test.describe("Auth redirects", () => {
     "/settings",
     "/orders",
     "/stats",
-    "/admin",
-    "/admin/users",
-    "/admin/role-requests",
-    "/admin/moderation",
-    "/manage/shops/1",
-    "/manage/shops/1/inventory",
-    "/manage/shops/1/bundles",
-    "/manage/shops/1/shop-orders",
-    "/manage/shops/1/supply-browse",
+    "/users",
+    "/role-requests",
+    "/moderation",
   ];
 
   for (const route of protectedRoutes) {
