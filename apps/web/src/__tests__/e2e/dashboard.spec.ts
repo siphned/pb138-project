@@ -10,7 +10,10 @@ test.describe("dashboard: all-roles user", () => {
     await page.goto("/dashboard");
     await page.waitForLoadState("networkidle");
     expect(page.url()).toContain("/dashboard");
-    await expect(page.getByRole("main").first()).toBeVisible();
+    await page
+      .waitForSelector('[aria-label="Loading"]', { state: "detached", timeout: 15000 })
+      .catch(() => {});
+    await expect(page.getByRole("main").first()).toBeVisible({ timeout: 10000 });
   });
 });
 

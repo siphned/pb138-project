@@ -1,5 +1,15 @@
 import { expect, test } from "../../../playwright.fixtures";
 
+async function waitForMain(page: import("@playwright/test").Page) {
+  // After navigation, the auth gate may briefly show a loading spinner while
+  // the /users/me profile query is in flight. Wait for it to detach before
+  // asserting the real page content.
+  await page
+    .waitForSelector('[aria-label="Loading"]', { state: "detached", timeout: 15000 })
+    .catch(() => {});
+  await expect(page.getByRole("main").first()).toBeVisible({ timeout: 10000 });
+}
+
 test.describe("admin happy paths", () => {
   test("view user list and search", async ({ page, authenticateUser }) => {
     await authenticateUser();
@@ -12,7 +22,7 @@ test.describe("admin happy paths", () => {
     expect(url.includes("/users") || url.includes("/dashboard")).toBe(true);
     if (!url.includes("/users")) return;
 
-    const searchInput = page.getByLabel(/search/i);
+    const searchInput = page.getByLabel(/search/i).first();
     if ((await searchInput.count()) > 0) {
       await searchInput.fill("willy");
       await page.waitForLoadState("networkidle");
@@ -37,7 +47,7 @@ test.describe("admin happy paths", () => {
     await userLinks.first().click();
     await page.waitForLoadState("networkidle");
     expect(page.url()).toMatch(/\/users\/[\w-]+/);
-    await expect(page.getByRole("main").first()).toBeVisible();
+    await waitForMain(page);
   });
 
   test("ban and unban a user", async ({ page, authenticateUser }) => {
@@ -68,7 +78,7 @@ test.describe("admin happy paths", () => {
         }
       }
     }
-    await expect(page.getByRole("main").first()).toBeVisible();
+    await waitForMain(page);
   });
 
   test("approve or decline role request", async ({ page, authenticateUser }) => {
@@ -99,7 +109,7 @@ test.describe("admin happy paths", () => {
       }
     }
 
-    await expect(page.getByRole("main").first()).toBeVisible();
+    await waitForMain(page);
   });
 
   test("delete a review from moderation", async ({ page, authenticateUser }) => {
@@ -119,7 +129,7 @@ test.describe("admin happy paths", () => {
       await page.waitForLoadState("networkidle");
     }
 
-    await expect(page.getByRole("main").first()).toBeVisible();
+    await waitForMain(page);
   });
 
   test("view admin stats", async ({ page, authenticateUser }) => {
@@ -131,6 +141,6 @@ test.describe("admin happy paths", () => {
     await page.waitForLoadState("networkidle");
     expect(page.url()).toContain("/stats");
 
-    await expect(page.getByRole("main").first()).toBeVisible();
+    await waitForMain(page);
   });
 });
