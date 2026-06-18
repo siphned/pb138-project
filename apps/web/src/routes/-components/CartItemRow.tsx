@@ -49,11 +49,15 @@ export function CartItemRow({
         <div className="mt-1">
           <QuantityControl
             disabled={isUpdatingQuantity}
+            max={item.product.quantity}
             onDecrement={() => onQuantityChange(item.product.id, quantity - 1)}
             onIncrement={() => onQuantityChange(item.product.id, quantity + 1)}
             value={quantity}
           />
         </div>
+        {quantity >= item.product.quantity && (
+          <p className="text-xs text-muted-foreground">Max available: {item.product.quantity}</p>
+        )}
       </div>
 
       <div className="ml-auto flex flex-col items-end gap-2 sm:ml-0">
