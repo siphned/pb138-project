@@ -1,15 +1,23 @@
 import { expect, test } from "../../../playwright.fixtures";
 
 async function waitForMain(page: import("@playwright/test").Page) {
-  // page.goto() triggers a full React reinit; the auth gate (showAuthGate) may
-  // hold the spinner up while /users/me resolves. Poll the DOM directly with a
-  // generous timeout rather than relying on the spinner element's presence.
+  // page.goto() triggers a full React reinit. The Clerk getToken() call inside
+  // the axios interceptor delays the /users/me HTTP request start — networkidle
+  // fires while the token is still being resolved, so showAuthGate stays true
+  // and <main> is absent. Explicitly wait for the /users/me response first so
+  // we know the query has settled, then poll the DOM for <main>.
+  await page
+    .waitForResponse((resp) => resp.url().includes("/users/me") && resp.status() < 500, {
+      timeout: 30000,
+    })
+    .catch(() => {});
   await page.waitForFunction(() => document.querySelector("main") !== null, null, {
-    timeout: 30000,
+    timeout: 20000,
   });
 }
 
 test.describe("admin happy paths", () => {
+  test.setTimeout(90000);
   test("view user list and search", async ({ page, authenticateUser }) => {
     await authenticateUser();
     await page.waitForLoadState("networkidle");
