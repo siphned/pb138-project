@@ -2,7 +2,7 @@
   "dependencies": {
     "@stablelib/base64": "^1.0.1",
     "react": "^19.2.4",
-    "zod": "^3.23.8"
+    "zod": "^4.4.3"
   },
   "devDependencies": {
     "@biomejs/biome": "^2.4.16",
